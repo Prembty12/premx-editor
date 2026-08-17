@@ -59,7 +59,10 @@ jobs:
         run: |
           URL="${{ github.event.inputs.video_url }}"
           echo "📥 Downloading video locally using yt-dlp..."
-          yt-dlp -f "bestvideo+bestaudio/best/best" "$URL" -o "input_video.mp4"
+          
+          # Added user-agent to bypass YouTube bot detection without compromising quality
+          yt-dlp --user-agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
+          --no-check-certificate -f "bestvideo+bestaudio/best/best" "$URL" -o "input_video.mp4"
           
           if [ ! -f "input_video.mp4" ]; then
             echo "Error: Video download failed!"
