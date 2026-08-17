@@ -51,7 +51,7 @@ jobs:
       - name: Install FFmpeg & yt-dlp
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg curl
+          sudo apt-get install -y ffmpeg curl python3
           sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
           sudo chmod a+rx /usr/local/bin/yt-dlp
 
@@ -59,13 +59,20 @@ jobs:
         id: stream
         run: |
           URL="${{ github.event.inputs.video_url }}"
-          echo "🌐 Extracting Direct High-Res Stream URL..."
+          echo "🌐 Extracting Direct High-Res Stream URL via yt-dlp..."
           
-          STREAM_URL=$(yt-dlp -g --extractor-args "youtube:player_client=android,web" -f "bestvideo+bestaudio/best" "$URL" 2>/dev/null | head -n 1)
+          # Get direct playable stream link
+          STREAM_URL=$(yt-dlp -g -f "bestvideo+bestaudio/best" "$URL" 2>/dev/null | head -n 1)
           
+          if [ -z "$STREAM_URL" ]; then
+            STREAM_URL=$(yt-dlp -g -f "best" "$URL" 2>/dev/null | head -n 1)
+          fi
+
           if [ -n "$STREAM_URL" ]; then
+            echo "Successfully extracted stream URL."
             echo "STREAM_INPUT=$STREAM_URL" >> $GITHUB_ENV
           else
+            echo "Falling back to raw URL."
             echo "STREAM_INPUT=$URL" >> $GITHUB_ENV
           fi
 
@@ -110,7 +117,7 @@ jobs:
           SOFTWARES=("Adobe Premiere Pro 2024" "DaVinci Resolve Studio 18" "Final Cut Pro 10.7" "Sony Vegas Pro 21")
           CAMERAS=("iPhone 15 Pro Max" "Sony A7IV" "Canon EOS R6" "Samsung Galaxy S24 Ultra")
 
-          # Create a GitHub Release first
+          # Create GitHub Release
           gh release create "$TAG_NAME" --title "Generated Clips #${{ github.run_number }}" --notes "Automated clips rendered via PremxGamer HD" || true
 
           for ((i=1; i<=CLIP_COUNT; i++)); do
@@ -146,7 +153,6 @@ jobs:
             echo "🚀 Instantly uploading clip $i to Release..."
             gh release upload "$TAG_NAME" "$CLIP_FILE" --clobber
             
-            # Delete local file immediately after upload to save space
             rm -f "$CLIP_FILE"
           done
         env:
