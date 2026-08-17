@@ -4,13 +4,17 @@ on:
   workflow_dispatch:
     inputs:
       video_url:
-        description: 'Video URL (YouTube / Direct MP4 Link)'
+        description: 'Video URL (YouTube Link or Direct MP4 Link)'
         required: true
         default: ''
       video_title:
-        description: 'File Name Prefix (e.g. COD, PUBG, GTA)'
+        description: 'File Name Prefix (e.g. cod -> cod1.mp4, cod2.mp4)'
         required: true
-        default: 'COD'
+        default: 'cod'
+      game_name:
+        description: 'Game Name for History List (e.g. newcod)'
+        required: true
+        default: 'newcod'
       ratio:
         description: 'Crop Ratio [0=None, 1=1:1, 2=4:5, 3=9:16, 4=3:4, 5=4:3]'
         required: true
@@ -27,10 +31,6 @@ on:
         description: 'Har clip kitne second ka ho?'
         required: true
         default: '15'
-      speed:
-        description: 'Speed [0=1.0x, 1=1.05x, 2=1.10x]'
-        required: true
-        default: '0'
       fps:
         description: 'FPS [1=30, 2=60]'
         required: true
@@ -51,21 +51,19 @@ jobs:
       - name: Install FFmpeg & yt-dlp
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg curl python3
+          sudo apt-get install -y ffmpeg curl
+          # yt-dlp ko latest version par install karna taaki YouTube links block na ho
           sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
           sudo chmod a+rx /usr/local/bin/yt-dlp
 
-      - name: Download Video Locally
+      - name: Download Video (YouTube or Direct Link)
         run: |
           URL="${{ github.event.inputs.video_url }}"
-          echo "📥 Downloading video locally using yt-dlp..."
+          echo "📥 Downloading video using yt-dlp..."
+          yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=mp4]/best[ext=mp4]/best" "$URL" -o "input_video.mp4" || yt-dlp "$URL" -o "input_video.mp4"
           
-          # Added user-agent to bypass YouTube bot detection without compromising quality
-          yt-dlp --user-agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
-          --no-check-certificate -f "bestvideo+bestaudio/best/best" "$URL" -o "input_video.mp4"
-          
-          if [ ! -f "input_video.mp4" ]; then
-            echo "Error: Video download failed!"
+          if [ ! -f "input_video.mp4" ] || [ ! -s "input_video.mp4" ]; then
+            echo "Error: Download failed!"
             exit 1
           fi
 
@@ -76,12 +74,11 @@ jobs:
           FILTER="${{ github.event.inputs.filter }}"
           CLIP_COUNT=${{ github.event.inputs.clip_count }}
           CLIP_LEN=${{ github.event.inputs.clip_len }}
-          SPEED_OPT="${{ github.event.inputs.speed }}"
           FPS_OPT="${{ github.event.inputs.fps }}"
 
-          NAME_TAG=$(echo "$TITLE_INPUT" | tr ' ' '_')
           TAG_NAME="v1.0.${{ github.run_number }}"
 
+          # Crop Ratios
           CROP=""
           if [ "$RATIO" = "1" ]; then CROP="scale=1080:1080:force_original_aspect_ratio=increase,crop=1080:1080,"; fi
           if [ "$RATIO" = "2" ]; then CROP="scale=1080:1350:force_original_aspect_ratio=increase,crop=1080:1350,"; fi
@@ -89,6 +86,7 @@ jobs:
           if [ "$RATIO" = "4" ]; then CROP="scale=1080:1440:force_original_aspect_ratio=increase,crop=1080:1440,"; fi
           if [ "$RATIO" = "5" ]; then CROP="scale=1440:1080:force_original_aspect_ratio=increase,crop=1440:1080,"; fi
 
+          # Color & Gaming Filters
           GAME=""
           if [ "$FILTER" = "1" ]; then GAME="eq=brightness=0.03:contrast=1.10:saturation=1.24,unsharp=5:5:1.0:5:5:0.0,"; fi
           if [ "$FILTER" = "2" ]; then GAME="eq=brightness=0.01:contrast=1.10:saturation=1.35:gamma=1.1,unsharp=5:5:1.0:5:5:0.0,"; fi
@@ -97,53 +95,27 @@ jobs:
           if [ "$FILTER" = "5" ]; then GAME="eq=contrast=1.15:saturation=1.1,colorbalance=rs=0.05:bs=-0.05,"; fi
           if [ "$FILTER" = "6" ]; then GAME="eq=contrast=1.2:saturation=1.4,unsharp=7:7:2.5:7:7:0.0,"; fi
 
-          SPD="1.0"
-          if [ "$SPEED_OPT" = "1" ]; then SPD="1.05"; fi
-          if [ "$SPEED_OPT" = "2" ]; then SPD="1.10"; fi
-
+          # FPS Setup
           FPS="60"
           if [ "$FPS_OPT" = "1" ]; then FPS="30"; fi
 
-          VF_CHAIN="${CROP}${GAME}setpts=PTS/${SPD}"
-          mkdir -p output_clips
+          VF_CHAIN="${CROP}${GAME}scale=trunc(iw/2)*2:trunc(ih/2)*2"
 
-          SOFTWARES=("Adobe Premiere Pro 2024" "DaVinci Resolve Studio 18" "Final Cut Pro 10.7" "Sony Vegas Pro 21")
-          CAMERAS=("iPhone 15 Pro Max" "Sony A7IV" "Canon EOS R6" "Samsung Galaxy S24 Ultra")
-
-          # Create GitHub Release
-          gh release create "$TAG_NAME" --title "Generated Clips #${{ github.run_number }}" --notes "Automated clips rendered via PremxGamer HD" || true
+          # GitHub Release create karna
+          gh release create "$TAG_NAME" --title "Clips Rendered: $TITLE_INPUT" --notes "Automated clips for $TITLE_INPUT" || true
 
           for ((i=1; i<=CLIP_COUNT; i++)); do
             SS=$(( (i-1) * CLIP_LEN ))
             
-            HEX_HASH=$(openssl rand -hex 4)
-            SW_INDEX=$(( RANDOM % 4 ))
-            CAM_INDEX=$(( RANDOM % 4 ))
-            SELECTED_SW="${SOFTWARES[$SW_INDEX]}"
-            SELECTED_CAM="${CAMERAS[$CAM_INDEX]}"
-            
-            RAND_MONTH=$(( 1 + RANDOM % 12 ))
-            RAND_DAY=$(( 1 + RANDOM % 28 ))
-            RAND_HOUR=$(( 10 + RANDOM % 12 ))
-            RAND_MIN=$(( 10 + RANDOM % 49 ))
-            FAKE_DATE="2025-${RAND_MONTH}-${RAND_DAY}T${RAND_HOUR}:${RAND_MIN}:00Z"
+            CLIP_FILE="${TITLE_INPUT}${i}.mp4"
 
-            CLIP_FILE="output_clips/${NAME_TAG}_${i}.mp4"
-
-            echo "🎥 Rendering clip $i of $CLIP_COUNT..."
-            ffmpeg -y -ss $SS -t $CLIP_LEN -i "input_video.mp4" -i logo.png \
-              -filter_complex "[0:v]${VF_CHAIN}[bg];[1:v]scale=160:-1[logo];[bg][logo]overlay=35:H-h-10" \
-              -r $FPS -c:v libx264 -preset fast -crf 18 -profile:v high -level 4.2 -pix_fmt yuv420p -af "atempo=${SPD}" \
-              -map_metadata -1 \
-              -metadata title="${NAME_TAG}_${i}" \
-              -metadata artist="PremxGamer_${HEX_HASH}" \
-              -metadata album="PremxGamer_Clips" \
-              -metadata encoder="${SELECTED_SW}" \
-              -metadata comment="Rendered by PremxGamer via ${SELECTED_CAM} - Hash:${HEX_HASH}" \
-              -metadata creation_time="${FAKE_DATE}" \
+            echo "🎥 Rendering $CLIP_FILE with filters & effects..."
+            ffmpeg -y -ss $SS -t $CLIP_LEN -i "input_video.mp4" \
+              -vf "${VF_CHAIN}" \
+              -r $FPS -c:v libx264 -crf 18 -preset fast -pix_fmt yuv420p \
               "$CLIP_FILE"
 
-            echo "🚀 Instantly uploading clip $i to Release..."
+            echo "🚀 Uploading $CLIP_FILE to Release..."
             gh release upload "$TAG_NAME" "$CLIP_FILE" --clobber
             
             rm -f "$CLIP_FILE"
@@ -151,18 +123,23 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Save Video Link to game_links
+      - name: Save Video Links to game_links
         run: |
-          URL="${{ github.event.inputs.video_url }}"
-          TITLE="${{ github.event.inputs.video_title }}"
+          GAME_NAME="${{ github.event.inputs.game_name }}"
+          TITLE_INPUT="${{ github.event.inputs.video_title }}"
+          CLIP_COUNT=${{ github.event.inputs.clip_count }}
+          TAG_NAME="v1.0.${{ github.run_number }}"
           
           mkdir -p game_links
-          FILE_PATH="game_links/${TITLE}.txt"
+          FILE_PATH="game_links/history.txt"
           
-          echo "$(date +'%Y-%m-%d %H:%M:%S') - ${URL}" >> "$FILE_PATH"
+          for ((i=1; i<=CLIP_COUNT; i++)); do
+            RELEASE_URL="https://github.com/${{ github.repository }}/releases/download/${TAG_NAME}/${TITLE_INPUT}${i}.mp4"
+            echo "${GAME_NAME}${i} | Link: ${RELEASE_URL}" >> "$FILE_PATH"
+          done
           
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add game_links/
-          git commit -m "Auto-sync updated link: ${TITLE}.txt" || echo "No changes to commit"
+          git commit -m "Update links for ${GAME_NAME}" || echo "No changes"
           git push
