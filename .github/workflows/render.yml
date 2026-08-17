@@ -23,6 +23,10 @@ on:
         description: 'Filter [0=OFF, 1=BALANCED, 2=GAMING, 3=FPS BOOST, 4=NIGHT MAP, 5=CINEMATIC, 6=ULTRA SHARP]'
         required: true
         default: '2'
+      speed:
+        description: 'Video Speed [1=Normal (1x), 2=Fast (1.25x), 3=Super Fast (1.5x), 4=Slow Motion (0.8x)]'
+        required: true
+        default: '1'
       clip_count:
         description: 'Kitne clips banane hain?'
         required: true
@@ -52,7 +56,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y ffmpeg curl
-          # yt-dlp ko latest version par install karna taaki YouTube links block na ho
           sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
           sudo chmod a+rx /usr/local/bin/yt-dlp
 
@@ -72,6 +75,7 @@ jobs:
           TITLE_INPUT="${{ github.event.inputs.video_title }}"
           RATIO="${{ github.event.inputs.ratio }}"
           FILTER="${{ github.event.inputs.filter }}"
+          SPEED_OPT="${{ github.event.inputs.speed }}"
           CLIP_COUNT=${{ github.event.inputs.clip_count }}
           CLIP_LEN=${{ github.event.inputs.clip_len }}
           FPS_OPT="${{ github.event.inputs.fps }}"
@@ -95,11 +99,21 @@ jobs:
           if [ "$FILTER" = "5" ]; then GAME="eq=contrast=1.15:saturation=1.1,colorbalance=rs=0.05:bs=-0.05,"; fi
           if [ "$FILTER" = "6" ]; then GAME="eq=contrast=1.2:saturation=1.4,unsharp=7:7:2.5:7:7:0.0,"; fi
 
+          # Speed Control Filter (Video + Audio sync)
+          V_SPEED=""
+          A_SPEED=""
+          if [ "$SPEED_OPT" = "1" ]; then V_SPEED=""; A_SPEED=""; fi
+          if [ "$SPEED_OPT" = "2" ]; then V_SPEED="setpts=0.8*PTS,"; A_SPEED="atempo=1.25,"; fi
+          if [ "$SPEED_OPT" = "3" ]; then V_SPEED="setpts=0.6666*PTS,"; A_SPEED="atempo=1.5,"; fi
+          if [ "$SPEED_OPT" = "4" ]; then V_SPEED="setpts=1.25*PTS,"; A_SPEED="atempo=0.8,"; fi
+
           # FPS Setup
           FPS="60"
           if [ "$FPS_OPT" = "1" ]; then FPS="30"; fi
 
-          VF_CHAIN="${CROP}${GAME}scale=trunc(iw/2)*2:trunc(ih/2)*2"
+          # Final Filter Chain with Speed & Crop & Color
+          VF_CHAIN="${V_SPEED}${CROP}${GAME}scale=trunc(iw/2)*2:trunc(ih/2)*2"
+          AF_CHAIN="${A_SPEED}aresample=44100"
 
           # GitHub Release create karna
           gh release create "$TAG_NAME" --title "Clips Rendered: $TITLE_INPUT" --notes "Automated clips for $TITLE_INPUT" || true
@@ -109,10 +123,15 @@ jobs:
             
             CLIP_FILE="${TITLE_INPUT}${i}.mp4"
 
-            echo "🎥 Rendering $CLIP_FILE with filters & effects..."
+            echo "🎥 Rendering $CLIP_FILE with Speed, Filters & Metadata..."
             ffmpeg -y -ss $SS -t $CLIP_LEN -i "input_video.mp4" \
               -vf "${VF_CHAIN}" \
+              -af "${AF_CHAIN}" \
+              -metadata title="${TITLE_INPUT}${i}" \
+              -metadata artist="PremxGamer HD" \
+              -metadata comment="PremxGamer Clip" \
               -r $FPS -c:v libx264 -crf 18 -preset fast -pix_fmt yuv420p \
+              -c:a aac -b:a 128k \
               "$CLIP_FILE"
 
             echo "🚀 Uploading $CLIP_FILE to Release..."
