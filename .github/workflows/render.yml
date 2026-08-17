@@ -4,15 +4,15 @@ on:
   workflow_dispatch:
     inputs:
       video_url:
-        description: 'Video URL (YouTube Link or Direct MP4 Link)'
+        description: 'YouTube Video URL (Direct Paste)'
         required: true
         default: ''
       video_title:
-        description: 'File Name Prefix (e.g. cod -> cod1.mp4, cod2.mp4)'
+        description: 'Exact File Name Prefix (e.g. cod -> cod1.mp4, cod2.mp4)'
         required: true
         default: 'cod'
       game_name:
-        description: 'Game Name for History List (e.g. newcod)'
+        description: 'Game Name for File Creation (e.g. newcod -> newcod.txt)'
         required: true
         default: 'newcod'
       ratio:
@@ -52,21 +52,29 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install FFmpeg & yt-dlp
+      - name: Install FFmpeg & Tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg curl
+          sudo apt-get install -y ffmpeg curl python3-pip
           sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
           sudo chmod a+rx /usr/local/bin/yt-dlp
 
-      - name: Download Video (YouTube or Direct Link)
+      - name: Fetch Video with Anti-Block Bypass
         run: |
           URL="${{ github.event.inputs.video_url }}"
-          echo "📥 Downloading video using yt-dlp..."
-          yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=mp4]/best[ext=mp4]/best" "$URL" -o "input_video.mp4" || yt-dlp "$URL" -o "input_video.mp4"
+          echo "📥 Fetching video with enhanced bypass..."
+          
+          yt-dlp --extractor-args "youtube:player_client=ios,web" \
+                 --user-agent "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1" \
+                 --geo-bypass \
+                 -f "b[ext=mp4]/best" "$URL" -o "input_video.mp4" || \
+          yt-dlp --extractor-args "youtube:player_client=android" \
+                 --geo-bypass \
+                 "$URL" -o "input_video.mp4" || \
+          yt-dlp --geo-bypass --rm-cache-dir "$URL" -o "input_video.mp4"
           
           if [ ! -f "input_video.mp4" ] || [ ! -s "input_video.mp4" ]; then
-            echo "Error: Download failed!"
+            echo "Error: YouTube blocked the fetch request!"
             exit 1
           fi
 
@@ -99,7 +107,7 @@ jobs:
           if [ "$FILTER" = "5" ]; then GAME="eq=contrast=1.15:saturation=1.1,colorbalance=rs=0.05:bs=-0.05,"; fi
           if [ "$FILTER" = "6" ]; then GAME="eq=contrast=1.2:saturation=1.4,unsharp=7:7:2.5:7:7:0.0,"; fi
 
-          # Speed Control Filter (Video + Audio sync)
+          # Speed Control
           V_SPEED=""
           A_SPEED=""
           if [ "$SPEED_OPT" = "1" ]; then V_SPEED=""; A_SPEED=""; fi
@@ -111,11 +119,9 @@ jobs:
           FPS="60"
           if [ "$FPS_OPT" = "1" ]; then FPS="30"; fi
 
-          # Final Filter Chain with Speed & Crop & Color
           VF_CHAIN="${V_SPEED}${CROP}${GAME}scale=trunc(iw/2)*2:trunc(ih/2)*2"
           AF_CHAIN="${A_SPEED}aresample=44100"
 
-          # GitHub Release create karna
           gh release create "$TAG_NAME" --title "Clips Rendered: $TITLE_INPUT" --notes "Automated clips for $TITLE_INPUT" || true
 
           for ((i=1; i<=CLIP_COUNT; i++)); do
@@ -123,13 +129,12 @@ jobs:
             
             CLIP_FILE="${TITLE_INPUT}${i}.mp4"
 
-            echo "🎥 Rendering $CLIP_FILE with Speed, Filters & Metadata..."
+            echo "🎥 Rendering $CLIP_FILE..."
             ffmpeg -y -ss $SS -t $CLIP_LEN -i "input_video.mp4" \
               -vf "${VF_CHAIN}" \
               -af "${AF_CHAIN}" \
               -metadata title="${TITLE_INPUT}${i}" \
               -metadata artist="PremxGamer HD" \
-              -metadata comment="PremxGamer Clip" \
               -r $FPS -c:v libx264 -crf 18 -preset fast -pix_fmt yuv420p \
               -c:a aac -b:a 128k \
               "$CLIP_FILE"
@@ -142,7 +147,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Save Video Links to game_links
+      - name: Save Video Links with Game Name File
         run: |
           GAME_NAME="${{ github.event.inputs.game_name }}"
           TITLE_INPUT="${{ github.event.inputs.video_title }}"
@@ -150,7 +155,8 @@ jobs:
           TAG_NAME="v1.0.${{ github.run_number }}"
           
           mkdir -p game_links
-          FILE_PATH="game_links/history.txt"
+          # Ab history.txt ki jagah exact game name wali file banegi (jaise newcod.txt)
+          FILE_PATH="game_links/${GAME_NAME}.txt"
           
           for ((i=1; i<=CLIP_COUNT; i++)); do
             RELEASE_URL="https://github.com/${{ github.repository }}/releases/download/${TAG_NAME}/${TITLE_INPUT}${i}.mp4"
@@ -160,5 +166,5 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add game_links/
-          git commit -m "Update links for ${GAME_NAME}" || echo "No changes"
+          git commit -m "Add links for ${GAME_NAME}" || echo "No changes"
           git push
