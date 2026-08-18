@@ -1,0 +1,59 @@
+name: Test Video Downloader
+
+on:
+  workflow_dispatch:
+    inputs:
+      video_url:
+        description: 'YouTube Video URL (Direct Paste)'
+        required: true
+        default: ''
+
+jobs:
+  test-download:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install FFmpeg & yt-dlp
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg curl python3-pip
+          sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
+          sudo chmod a+rx /usr/local/bin/yt-dlp
+
+      - name: Test Download Video
+        env:
+          INPUT_URL: ${{ github.event.inputs.video_url }}
+          YOUTUBE_COOKIES: ${{ secrets.YOUTUBE_COOKIES }}
+        run: |
+          URL="$INPUT_URL"
+          
+          if [[ -n "$YOUTUBE_COOKIES" ]]; then
+            echo "🍪 Using YouTube Cookies from Secrets..."
+            echo "$YOUTUBE_COOKIES" > cookies.txt
+            COOKIE_ARG="--cookies cookies.txt"
+          else
+            COOKIE_ARG=""
+          fi
+          
+          echo "📥 Downloading test video from: $URL"
+          yt-dlp $COOKIE_ARG \
+                 --extractor-args "youtube:player_client=ios,web" \
+                 --geo-bypass \
+                 -f "b[ext=mp4]/best" "$URL" -o "input_video.mp4" || \
+          yt-dlp $COOKIE_ARG \
+                 --extractor-args "youtube:player_client=android" \
+                 --geo-bypass \
+                 "$URL" -o "input_video.mp4" || \
+          yt-dlp $COOKIE_ARG --geo-bypass "$URL" -o "input_video.mp4"
+          
+          rm -f cookies.txt
+          
+          if [ -f "input_video.mp4" ] && [ -s "input_video.mp4" ]; then
+            echo "✅ SUCCESS: Video downloaded successfully!"
+            ls -lh input_video.mp4
+          else
+            echo "❌ ERROR: Video download failed!"
+            exit 1
+          fi
