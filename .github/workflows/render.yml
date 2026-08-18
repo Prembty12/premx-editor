@@ -59,22 +59,35 @@ jobs:
           sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
           sudo chmod a+rx /usr/local/bin/yt-dlp
 
-      - name: Fetch Video with Anti-Block Bypass
+      - name: Fetch Video with Cookies & Bypass
         run: |
           URL="${{ github.event.inputs.video_url }}"
-          echo "📥 Fetching video with enhanced bypass..."
           
-          yt-dlp --extractor-args "youtube:player_client=ios,web" \
-                 --user-agent "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1" \
+          # Agar aapne GitHub Secrets mein YOUTUBE_COOKIES add kiya hai toh ye use karega
+          if [ -n "${{ secrets.YOUTUBE_COOKIES }}" ]; then
+            echo "🍪 Using YouTube Cookies from Secrets..."
+            echo "${{ secrets.YOUTUBE_COOKIES }}" > cookies.txt
+            COOKIE_ARG="--cookies cookies.txt"
+          else
+            COOKIE_ARG=""
+          fi
+          
+          echo "📥 Fetching video securely..."
+          yt-dlp $COOKIE_ARG \
+                 --extractor-args "youtube:player_client=ios,web" \
                  --geo-bypass \
                  -f "b[ext=mp4]/best" "$URL" -o "input_video.mp4" || \
-          yt-dlp --extractor-args "youtube:player_client=android" \
+          yt-dlp $COOKIE_ARG \
+                 --extractor-args "youtube:player_client=android" \
                  --geo-bypass \
                  "$URL" -o "input_video.mp4" || \
-          yt-dlp --geo-bypass --rm-cache-dir "$URL" -o "input_video.mp4"
+          yt-dlp $COOKIE_ARG --geo-bypass "$URL" -o "input_video.mp4"
+          
+          # Cleanup cookies file for security
+          rm -f cookies.txt
           
           if [ ! -f "input_video.mp4" ] || [ ! -s "input_video.mp4" ]; then
-            echo "Error: YouTube blocked the fetch request!"
+            echo "Error: Video fetch failed!"
             exit 1
           fi
 
@@ -155,7 +168,6 @@ jobs:
           TAG_NAME="v1.0.${{ github.run_number }}"
           
           mkdir -p game_links
-          # Ab history.txt ki jagah exact game name wali file banegi (jaise newcod.txt)
           FILE_PATH="game_links/${GAME_NAME}.txt"
           
           for ((i=1; i<=CLIP_COUNT; i++)); do
