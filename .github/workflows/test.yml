@@ -38,6 +38,8 @@ jobs:
           fi
           
           echo "📥 Downloading test video from: $URL"
+          
+          # Try downloading with various client extractors as fallbacks
           yt-dlp $COOKIE_ARG \
                  --extractor-args "youtube:player_client=ios,web" \
                  --geo-bypass \
@@ -48,6 +50,7 @@ jobs:
                  "$URL" -o "input_video.mp4" || \
           yt-dlp $COOKIE_ARG --geo-bypass "$URL" -o "input_video.mp4"
           
+          # Ensure cookies file is always cleaned up securely
           rm -f cookies.txt
           
           if [ -f "input_video.mp4" ] && [ -s "input_video.mp4" ]; then
@@ -57,3 +60,11 @@ jobs:
             echo "❌ ERROR: Video download failed!"
             exit 1
           fi
+
+      - name: Upload Downloaded Video Artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: downloaded-video
+          path: input_video.mp4
+          retention-days: 1
