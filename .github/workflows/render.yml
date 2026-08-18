@@ -63,7 +63,6 @@ jobs:
         run: |
           URL="${{ github.event.inputs.video_url }}"
           
-          # Safely check for cookies using double brackets
           if [[ -n "${{ secrets.YOUTUBE_COOKIES }}" ]]; then
             echo "🍪 Using YouTube Cookies from Secrets..."
             echo "${{ secrets.YOUTUBE_COOKIES }}" > cookies.txt
@@ -83,7 +82,6 @@ jobs:
                  "$URL" -o "input_video.mp4" || \
           yt-dlp $COOKIE_ARG --geo-bypass "$URL" -o "input_video.mp4"
           
-          # Cleanup cookies file for security
           rm -f cookies.txt
           
           if [ ! -f "input_video.mp4" ] || [ ! -s "input_video.mp4" ]; then
