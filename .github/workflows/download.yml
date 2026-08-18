@@ -1,0 +1,48 @@
+name: YouTube Simple Downloader
+
+on:
+  workflow_dispatch:
+    inputs:
+      video_url:
+        description: 'Paste YouTube Video URL'
+        required: true
+        default: ''
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Install FFmpeg & yt-dlp
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg curl python3-pip
+          sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
+          sudo chmod a+rx /usr/local/bin/yt-dlp
+
+      - name: Download Video
+        env:
+          URL: ${{ github.event.inputs.video_url }}
+        run: |
+          # Clean URL just in case
+          CLEAN_URL=$(echo "$URL" | tr -d '[:space:]')
+          
+          echo "📥 Downloading video from: $CLEAN_URL"
+          yt-dlp -f "best[ext=mp4]/best" "$CLEAN_URL" -o "final_video.mp4"
+
+          if [ -f "final_video.mp4" ] && [ -s "final_video.mp4" ]; then
+            echo "✅ Success! Video downloaded."
+          else
+            echo "❌ Failed! Download nahi ho paya."
+            exit 1
+          fi
+
+      - name: Upload Video Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: youtube-video
+          path: final_video.mp4
+          retention-days: 1
+          
