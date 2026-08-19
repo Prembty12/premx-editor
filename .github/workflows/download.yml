@@ -1,13 +1,12 @@
-name: Manual YouTube Downloader
+name: YouTube Video Downloader
 
 on:
   workflow_dispatch:
     inputs:
       video_url:
-        description: 'YouTube Video URL enter karein'
+        description: 'YouTube Video URL'
         required: true
-        type: string
-        default: 'https://youtu.be/QVlHT7_l0e0?si=XpiQ3NpxgSsl_hGW'
+        default: 'https://youtu.be/QVlHT7_l0e0'
 
 jobs:
   download-video:
@@ -20,27 +19,32 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.10'
+        python-version: '3.12' # Python version updated
 
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
         pip install yt-dlp
 
-    - name: Setup FFmpeg (for video + audio merging)
+    - name: Setup FFmpeg
       uses: AnimMouse/setup-ffmpeg@v1
 
-    - name: Download Video via yt-dlp
+    # Yahan secret use karna zaroori hai
+    - name: Create Cookies File
       run: |
-        # GitHub input se URL automatic utha lega
-        VIDEO_URL="${{ github.event.inputs.video_url }}"
-        VIDEO_FORMAT="bestvideo+best/best"
+        echo "${{ secrets.YOUTUBE_COOKIES }}" > cookies.txt
 
-        echo "🚀 Downloading video from: $VIDEO_URL"
-        yt-dlp --format "$VIDEO_FORMAT" "$VIDEO_URL"
+    - name: Download Video
+      run: |
+        # --cookies flag ke saath --user-agent add karna bahut zaroori hai
+        # Varna YouTube pehchan leta hai ki ye yt-dlp hai
+        yt-dlp --cookies cookies.txt \
+               --user-agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
+               --format "bestvideo+bestaudio/best" \
+               "${{ github.event.inputs.video_url }}"
 
-    - name: Upload Downloaded Video Artifact
+    - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: downloaded-youtube-video
+        name: video-output
         path: "*.mp4"
