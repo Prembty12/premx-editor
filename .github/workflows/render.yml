@@ -4,23 +4,15 @@ on:
   workflow_dispatch:
     inputs:
       video_url:
-        description: '1. Main Video URL (2K/YouTube Link or Direct Link)'
+        description: 'YouTube Video URL (Direct Paste)'
         required: true
         default: ''
-      audio_url:
-        description: '2. Optional: Direct MP3/Audio URL'
-        required: false
-        default: ''
-      sound_video_url:
-        description: '3. Optional: Video Link to Extract Sound from and Merge'
-        required: false
-        default: ''
       video_title:
-        description: 'Exact File Name Prefix'
+        description: 'Exact File Name Prefix (e.g. cod -> cod1.mp4, cod2.mp4)'
         required: true
         default: 'cod'
       game_name:
-        description: 'Game Name for File Creation'
+        description: 'Game Name for File Creation (e.g. newcod -> newcod.txt)'
         required: true
         default: 'newcod'
       ratio:
@@ -32,7 +24,7 @@ on:
         required: true
         default: '2'
       speed:
-        description: 'Video Speed [1=Normal, 2=Fast, 3=Super Fast, 4=Slow]'
+        description: 'Video Speed [1=Normal (1x), 2=Fast (1.25x), 3=Super Fast (1.5x), 4=Slow Motion (0.8x)]'
         required: true
         default: '1'
       clip_count:
@@ -62,64 +54,95 @@ jobs:
 
       - name: Fast Install FFmpeg & Tools
         run: |
-          echo "⚡ Fast installing required packages..."
-          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg curl wget
+          echo "⚡ Fast installing packages..."
+          sudo apt-get update -qq -y
+          sudo apt-get install -y -qq ffmpeg curl python3-pip
           sudo curl -sL https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
           sudo chmod a+rx /usr/local/bin/yt-dlp
 
-      - name: Fetch Video, Audio and Extract/Merge Sound
+      - name: Fetch Video with Anti-Block Bypass
         run: |
-          VIDEO_URL="${{ github.event.inputs.video_url }}"
-          AUDIO_URL="${{ github.event.inputs.audio_url }}"
-          SOUND_VIDEO_URL="${{ github.event.inputs.sound_video_url }}"
+          URL="${{ github.event.inputs.video_url }}"
+          echo "📥 Fetching video with enhanced bypass..."
           
-          echo "📥 Downloading main video..."
-          if echo "$VIDEO_URL" | grep -qE "youtube\.com|youtu\.be"; then
-            yt-dlp -f "bestvideo+bestaudio/best" --merge-output-format mp4 "$VIDEO_URL" -o "input_video.mp4"
-          else
-            curl -L "$VIDEO_URL" -o "input_video.mp4"
+          yt-dlp --extractor-args "youtube:player_client=ios,web" \
+                 --user-agent "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1" \
+                 --geo-bypass \
+                 -f "b[ext=mp4]/best" "$URL" -o "input_video.mp4" || \
+          yt-dlp --extractor-args "youtube:player_client=android" \
+                 --geo-bypass \
+                 "$URL" -o "input_video.mp4" || \
+          yt-dlp --geo-bypass --rm-cache-dir "$URL" -o "input_video.mp4"
+          
+          if [ ! -f "input_video.mp4" ] || [ ! -s "input_video.mp4" ]; then
+            echo "Error: YouTube blocked the fetch request!"
+            exit 1
           fi
 
-          if [ -n "$AUDIO_URL" ]; then
-            curl -L "$AUDIO_URL" -o "input_audio.mp3"
-            ffmpeg -y -i "input_video.mp4" -i "input_audio.mp3" -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 -shortest "merged_video.mp4"
-            mv "merged_video.mp4" "input_video.mp4"
-          fi
-
-          if [ -n "$SOUND_VIDEO_URL" ]; then
-            echo "🔊 Extracting sound..."
-            if echo "$SOUND_VIDEO_URL" | grep -qE "youtube\.com|youtu\.be"; then
-              yt-dlp -f "bestaudio/best" "$SOUND_VIDEO_URL" -o "sound_source.mp4"
-            else
-              curl -L "$SOUND_VIDEO_URL" -o "sound_source.mp4"
-            fi
-            ffmpeg -y -i "input_video.mp4" -i "sound_source.mp4" -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 -shortest "merged_video.mp4"
-            mv "merged_video.mp4" "input_video.mp4"
-          fi
-
-      - name: Process Clips with PremxGamer Metadata
+      - name: Process and Instant Upload Clips
         run: |
           TITLE_INPUT="${{ github.event.inputs.video_title }}"
+          RATIO="${{ github.event.inputs.ratio }}"
+          FILTER="${{ github.event.inputs.filter }}"
+          SPEED_OPT="${{ github.event.inputs.speed }}"
           CLIP_COUNT=${{ github.event.inputs.clip_count }}
           CLIP_LEN=${{ github.event.inputs.clip_len }}
+          FPS_OPT="${{ github.event.inputs.fps }}"
+
           TAG_NAME="v1.0.${{ github.run_number }}"
-          
-          META="PremxGamer_HD_$(date +%Y%m%d)"
-          
-          gh release create "$TAG_NAME" --title "Clips Rendered: $TITLE_INPUT" --notes "Created by PremxGamer" || true
+
+          # Crop Ratios
+          CROP=""
+          if [ "$RATIO" = "1" ]; then CROP="scale=1080:1080:force_original_aspect_ratio=increase,crop=1080:1080,"; fi
+          if [ "$RATIO" = "2" ]; then CROP="scale=1080:1350:force_original_aspect_ratio=increase,crop=1080:1350,"; fi
+          if [ "$RATIO" = "3" ]; then CROP="scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,"; fi
+          if [ "$RATIO" = "4" ]; then CROP="scale=1080:1440:force_original_aspect_ratio=increase,crop=1080:1440,"; fi
+          if [ "$RATIO" = "5" ]; then CROP="scale=1440:1080:force_original_aspect_ratio=increase,crop=1440:1080,"; fi
+
+          # Color & Gaming Filters
+          GAME=""
+          if [ "$FILTER" = "1" ]; then GAME="eq=brightness=0.03:contrast=1.10:saturation=1.24,unsharp=5:5:1.0:5:5:0.0,"; fi
+          if [ "$FILTER" = "2" ]; then GAME="eq=brightness=0.01:contrast=1.10:saturation=1.35:gamma=1.1,unsharp=5:5:1.0:5:5:0.0,"; fi
+          if [ "$FILTER" = "3" ]; then GAME="eq=brightness=0.05:contrast=1.25,unsharp=5:5:1.5:5:5:0.0,"; fi
+          if [ "$FILTER" = "4" ]; then GAME="eq=brightness=0.12:gamma=1.2,"; fi
+          if [ "$FILTER" = "5" ]; then GAME="eq=contrast=1.15:saturation=1.1,colorbalance=rs=0.05:bs=-0.05,"; fi
+          if [ "$FILTER" = "6" ]; then GAME="eq=contrast=1.2:saturation=1.4,unsharp=7:7:2.5:7:7:0.0,"; fi
+
+          # Speed Control
+          V_SPEED=""
+          A_SPEED=""
+          if [ "$SPEED_OPT" = "1" ]; then V_SPEED=""; A_SPEED=""; fi
+          if [ "$SPEED_OPT" = "2" ]; then V_SPEED="setpts=0.8*PTS,"; A_SPEED="atempo=1.25,"; fi
+          if [ "$SPEED_OPT" = "3" ]; then V_SPEED="setpts=0.6666*PTS,"; A_SPEED="atempo=1.5,"; fi
+          if [ "$SPEED_OPT" = "4" ]; then V_SPEED="setpts=1.25*PTS,"; A_SPEED="atempo=0.8,"; fi
+
+          # FPS Setup
+          FPS="60"
+          if [ "$FPS_OPT" = "1" ]; then FPS="30"; fi
+
+          VF_CHAIN="${V_SPEED}${CROP}${GAME}scale=trunc(iw/2)*2:trunc(ih/2)*2"
+          AF_CHAIN="${A_SPEED}aresample=44100"
+
+          gh release create "$TAG_NAME" --title "Clips Rendered: $TITLE_INPUT" --notes "Automated clips for $TITLE_INPUT" || true
 
           for ((i=1; i<=CLIP_COUNT; i++)); do
             SS=$(( (i-1) * CLIP_LEN ))
-            CLIP_FILE="${TITLE_INPUT}${i}.mp4"
             
-            ffmpeg -y -ss $SS -t $CLIP_LEN -i "input_video.mp4" \
-              -metadata artist="PremxGamer" \
-              -metadata comment="$META" \
-              -metadata title="${TITLE_INPUT}_${i}" \
-              -c:v libx264 -crf 18 -preset fast -pix_fmt yuv420p \
-              -c:a aac -b:a 128k "$CLIP_FILE"
+            CLIP_FILE="${TITLE_INPUT}${i}.mp4"
 
+            echo "🎥 Rendering $CLIP_FILE..."
+            ffmpeg -y -ss $SS -t $CLIP_LEN -i "input_video.mp4" \
+              -vf "${VF_CHAIN}" \
+              -af "${AF_CHAIN}" \
+              -metadata title="${TITLE_INPUT}${i}" \
+              -metadata artist="PremxGamer HD" \
+              -r $FPS -c:v libx264 -crf 18 -preset fast -pix_fmt yuv420p \
+              -c:a aac -b:a 128k \
+              "$CLIP_FILE"
+
+            echo "🚀 Uploading $CLIP_FILE to Release..."
             gh release upload "$TAG_NAME" "$CLIP_FILE" --clobber
+            
             rm -f "$CLIP_FILE"
           done
         env:
