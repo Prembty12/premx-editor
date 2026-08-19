@@ -1,7 +1,13 @@
-name: YouTube Video Downloader
+name: Manual YouTube Downloader
 
 on:
-  workflow_dispatch: # GitHub dashboard se manual run karne ke liye
+  workflow_dispatch:
+    inputs:
+      video_url:
+        description: 'YouTube Video URL enter karein'
+        required: true
+        type: string
+        default: 'https://youtu.be/QVlHT7_l0e0?si=XpiQ3NpxgSsl_hGW'
 
 jobs:
   download-video:
@@ -24,21 +30,14 @@ jobs:
     - name: Setup FFmpeg (for video + audio merging)
       uses: AnimMouse/setup-ffmpeg@v1
 
-    - name: Create Cookies File from Secrets
-      run: |
-        echo "${{ secrets.YOUTUBE_COOKIES }}" > cookies.txt
-
     - name: Download Video via yt-dlp
       run: |
-        # Yahan apna YouTube video ka URL daal dein
-        VIDEO_URL="https://youtu.be/QVlHT7_l0e0?si=XpiQ3NpxgSsl_hGW"
-        
-        # QUALITY SETTING: 
-        # 'bestvideo+best/best' matlab sabse best quality (1080p/4K) audio ke sath merge ho jayegi
+        # GitHub input se URL automatic utha lega
+        VIDEO_URL="${{ github.event.inputs.video_url }}"
         VIDEO_FORMAT="bestvideo+best/best"
 
-        echo "🚀 Downloading video..."
-        yt-dlp --format "$VIDEO_FORMAT" --cookies cookies.txt "$VIDEO_URL"
+        echo "🚀 Downloading video from: $VIDEO_URL"
+        yt-dlp --format "$VIDEO_FORMAT" "$VIDEO_URL"
 
     - name: Upload Downloaded Video Artifact
       uses: actions/upload-artifact@v4
