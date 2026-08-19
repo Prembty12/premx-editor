@@ -19,32 +19,33 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.12' # Python version updated
+        python-version: '3.12'
 
-    - name: Install Dependencies
+    - name: Install Dependencies & Node.js
       run: |
         python -m pip install --upgrade pip
         pip install yt-dlp
+        # YouTube signature/challenge solve karne ke liye Node.js zaroori hai
+        sudo apt-get update
+        sudo apt-get install -y nodejs
 
     - name: Setup FFmpeg
       uses: AnimMouse/setup-ffmpeg@v1
 
-    # Yahan secret use karna zaroori hai
     - name: Create Cookies File
       run: |
         echo "${{ secrets.YOUTUBE_COOKIES }}" > cookies.txt
 
     - name: Download Video
       run: |
-        # --cookies flag ke saath --user-agent add karna bahut zaroori hai
-        # Varna YouTube pehchan leta hai ki ye yt-dlp hai
         yt-dlp --cookies cookies.txt \
                --user-agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
                --format "bestvideo+bestaudio/best" \
+               --extractor-args "youtube:player_client=android" \
                "${{ github.event.inputs.video_url }}"
 
-    - name: Upload Artifact
+    - name: Upload Video Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: video-output
+        name: downloaded-youtube-video
         path: "*.mp4"
