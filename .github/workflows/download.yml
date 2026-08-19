@@ -212,7 +212,7 @@ jobs:
                   [ -n "$proxy" ] && cmd+=" --proxy $proxy"
                   [ -n "$cookie" ] && cmd+=" --cookies $cookie"
                   [ -n "$user_agent" ] && cmd+=" --user-agent \"$user_agent\""
-                  cmd+=" --impersonate chrome-123"
+                  cmd+=" --impersonate chrome"
                   cmd+=" --extractor-args \"youtube:player_client=$client;player_skip=webpage,configs;visitor_data=$visitor_data\""
                   if [ "$client" = "android" ]; then
                       cmd+=" --extractor-args \"youtube:device_model=$model;os_version=$os\""
