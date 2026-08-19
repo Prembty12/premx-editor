@@ -60,11 +60,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install FFmpeg & Tools
+      - name: Fast Install FFmpeg & Tools
         run: |
-          sudo apt-get update
-          sudo apt-get install -y ffmpeg curl python3-pip wget
-          sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
+          echo "⚡ Fast installing required packages..."
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg curl wget
+          sudo curl -sL https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
           sudo chmod a+rx /usr/local/bin/yt-dlp
 
       - name: Fetch Video, Audio and Extract/Merge Sound
@@ -82,7 +82,7 @@ jobs:
 
           if [ -n "$AUDIO_URL" ]; then
             curl -L "$AUDIO_URL" -o "input_audio.mp3"
-            ffmpeg -i "input_video.mp4" -i "input_audio.mp3" -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 -shortest "merged_video.mp4"
+            ffmpeg -y -i "input_video.mp4" -i "input_audio.mp3" -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 -shortest "merged_video.mp4"
             mv "merged_video.mp4" "input_video.mp4"
           fi
 
@@ -93,7 +93,7 @@ jobs:
             else
               curl -L "$SOUND_VIDEO_URL" -o "sound_source.mp4"
             fi
-            ffmpeg -i "input_video.mp4" -i "sound_source.mp4" -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 -shortest "merged_video.mp4"
+            ffmpeg -y -i "input_video.mp4" -i "sound_source.mp4" -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 -shortest "merged_video.mp4"
             mv "merged_video.mp4" "input_video.mp4"
           fi
 
@@ -104,7 +104,6 @@ jobs:
           CLIP_LEN=${{ github.event.inputs.clip_len }}
           TAG_NAME="v1.0.${{ github.run_number }}"
           
-          # Metadata string
           META="PremxGamer_HD_$(date +%Y%m%d)"
           
           gh release create "$TAG_NAME" --title "Clips Rendered: $TITLE_INPUT" --notes "Created by PremxGamer" || true
@@ -113,7 +112,6 @@ jobs:
             SS=$(( (i-1) * CLIP_LEN ))
             CLIP_FILE="${TITLE_INPUT}${i}.mp4"
             
-            # Metadata embedded via ffmpeg -metadata
             ffmpeg -y -ss $SS -t $CLIP_LEN -i "input_video.mp4" \
               -metadata artist="PremxGamer" \
               -metadata comment="$META" \
@@ -126,3 +124,24 @@ jobs:
           done
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Save Video Links with Game Name File
+        run: |
+          GAME_NAME="${{ github.event.inputs.game_name }}"
+          TITLE_INPUT="${{ github.event.inputs.video_title }}"
+          CLIP_COUNT=${{ github.event.inputs.clip_count }}
+          TAG_NAME="v1.0.${{ github.run_number }}"
+          
+          mkdir -p game_links
+          FILE_PATH="game_links/${GAME_NAME}.txt"
+          
+          for ((i=1; i<=CLIP_COUNT; i++)); do
+            RELEASE_URL="https://github.com/${{ github.repository }}/releases/download/${TAG_NAME}/${TITLE_INPUT}${i}.mp4"
+            echo "${GAME_NAME}${i} | Link: ${RELEASE_URL}" >> "$FILE_PATH"
+          done
+          
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add game_links/
+          git commit -m "Add links for ${GAME_NAME}" || echo "No changes"
+          git push
