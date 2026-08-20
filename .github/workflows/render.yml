@@ -4,8 +4,12 @@ on:
   workflow_dispatch:
     inputs:
       video_url:
-        description: 'YouTube Video URL (Direct Paste)'
+        description: 'Direct API Link or Video URL'
         required: true
+        default: ''
+      audio_url:
+        description: 'Optional Audio/Video URL (Leave blank if not needed)'
+        required: false
         default: ''
       video_title:
         description: 'Exact File Name Prefix (e.g. cod -> cod1.mp4, cod2.mp4)'
@@ -52,30 +56,65 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install FFmpeg & Tools
+      - name: Cache FFmpeg and Tools
+        id: cache-tools
+        uses: actions/cache@v4
+        with:
+          path: |
+            /usr/local/bin/yt-dlp
+            /usr/bin/ffmpeg
+          key: ${{ runner.os }}-video-tools-v5
+
+      - name: Install & Update Tools
         run: |
           sudo apt-get update
           sudo apt-get install -y ffmpeg curl python3-pip
+          
           sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
           sudo chmod a+rx /usr/local/bin/yt-dlp
+          
+          yt-dlp --version
+          ffmpeg -version
 
-      - name: Fetch Video with Anti-Block Bypass
+      - name: Fully Auto Fetch Video from API Link or YouTube
         run: |
           URL="${{ github.event.inputs.video_url }}"
-          echo "📥 Fetching video with enhanced bypass..."
+          AUDIO_URL="${{ github.event.inputs.audio_url }}"
           
-          yt-dlp --extractor-args "youtube:player_client=ios,web" \
-                 --user-agent "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1" \
-                 --geo-bypass \
-                 -f "b[ext=mp4]/best" "$URL" -o "input_video.mp4" || \
-          yt-dlp --extractor-args "youtube:player_client=android" \
-                 --geo-bypass \
-                 "$URL" -o "input_video.mp4" || \
-          yt-dlp --geo-bypass --rm-cache-dir "$URL" -o "input_video.mp4"
+          echo "📥 Fetching video source..."
+          
+          # Agar link videodownapi ya kisi direct download source ka hai, toh curl/wget se try karein
+          if [[ "$URL" == *"videodownapi.com"* ]] || [[ "$URL" == *"download"* ]]; then
+            echo "🔗 Direct Downloader API link detected. Downloading via curl..."
+            curl -L -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" "$URL" -o "input_video.mp4" || \
+            wget --user-agent="Mozilla/5.0" "$URL" -O "input_video.mp4"
+          fi
+          
+          # Agar upar wale se file nahi aayi ya normal YouTube link hai, toh yt-dlp use karega
+          if [ ! -f "input_video.mp4" ] || [ ! -s "input_video.mp4" ]; then
+            echo "🔄 Fallback to yt-dlp extraction..."
+            yt-dlp --extractor-args "youtube:player_client=android,web" \
+                   --geo-bypass \
+                   --no-check-certificates \
+                   -f "b[ext=mp4]/best" "$URL" -o "input_video.mp4" || \
+            yt-dlp --geo-bypass --no-check-certificates "$URL" -o "input_video.mp4"
+          fi
           
           if [ ! -f "input_video.mp4" ] || [ ! -s "input_video.mp4" ]; then
-            echo "Error: YouTube blocked the fetch request!"
+            echo "Error: Failed to fetch video completely!"
             exit 1
+          fi
+
+          # Handle Optional Audio/Video Link if provided
+          if [ -n "$AUDIO_URL" ]; then
+            echo "🎵 Fetching optional audio/video source..."
+            yt-dlp --extract-audio --audio-format mp3 --geo-bypass "$AUDIO_URL" -o "optional_audio.mp3" || true
+
+            if [ -f "optional_audio.mp3" ]; then
+              echo "🔄 Merging custom MP3 audio into main video..."
+              ffmpeg -y -i "input_video.mp4" -i "optional_audio.mp3" -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 "input_video_merged.mp4"
+              mv "input_video_merged.mp4" "input_video.mp4"
+            fi
           fi
 
       - name: Process and Instant Upload Clips
@@ -87,8 +126,6 @@ jobs:
           CLIP_COUNT=${{ github.event.inputs.clip_count }}
           CLIP_LEN=${{ github.event.inputs.clip_len }}
           FPS_OPT="${{ github.event.inputs.fps }}"
-
-          TAG_NAME="v1.0.${{ github.run_number }}"
 
           # Crop Ratios
           CROP=""
@@ -119,17 +156,18 @@ jobs:
           FPS="60"
           if [ "$FPS_OPT" = "1" ]; then FPS="30"; fi
 
+          # Final Video Filter Chain
           VF_CHAIN="${V_SPEED}${CROP}${GAME}scale=trunc(iw/2)*2:trunc(ih/2)*2"
           AF_CHAIN="${A_SPEED}aresample=44100"
 
-          gh release create "$TAG_NAME" --title "Clips Rendered: $TITLE_INPUT" --notes "Automated clips for $TITLE_INPUT" || true
-
           for ((i=1; i<=CLIP_COUNT; i++)); do
             SS=$(( (i-1) * CLIP_LEN ))
-            
             CLIP_FILE="${TITLE_INPUT}${i}.mp4"
+            
+            TAG_NAME="v1.0.${{ github.run_number }}-$i"
 
             echo "🎥 Rendering $CLIP_FILE..."
+            
             ffmpeg -y -ss $SS -t $CLIP_LEN -i "input_video.mp4" \
               -vf "${VF_CHAIN}" \
               -af "${AF_CHAIN}" \
@@ -139,7 +177,8 @@ jobs:
               -c:a aac -b:a 128k \
               "$CLIP_FILE"
 
-            echo "🚀 Uploading $CLIP_FILE to Release..."
+            echo "🚀 Creating release and uploading $CLIP_FILE..."
+            gh release create "$TAG_NAME" --title "Clip $i: $TITLE_INPUT" --notes "Automated clip $i" || true
             gh release upload "$TAG_NAME" "$CLIP_FILE" --clobber
             
             rm -f "$CLIP_FILE"
@@ -152,13 +191,12 @@ jobs:
           GAME_NAME="${{ github.event.inputs.game_name }}"
           TITLE_INPUT="${{ github.event.inputs.video_title }}"
           CLIP_COUNT=${{ github.event.inputs.clip_count }}
-          TAG_NAME="v1.0.${{ github.run_number }}"
           
           mkdir -p game_links
-          # Ab history.txt ki jagah exact game name wali file banegi (jaise newcod.txt)
           FILE_PATH="game_links/${GAME_NAME}.txt"
           
           for ((i=1; i<=CLIP_COUNT; i++)); do
+            TAG_NAME="v1.0.${{ github.run_number }}-$i"
             RELEASE_URL="https://github.com/${{ github.repository }}/releases/download/${TAG_NAME}/${TITLE_INPUT}${i}.mp4"
             echo "${GAME_NAME}${i} | Link: ${RELEASE_URL}" >> "$FILE_PATH"
           done
