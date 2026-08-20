@@ -63,43 +63,39 @@ jobs:
           path: |
             /usr/local/bin/yt-dlp
             /usr/bin/ffmpeg
-          key: ${{ runner.os }}-video-tools-v2
+          key: ${{ runner.os }}-video-tools-v3
 
-      - name: Install Tools (Only if not cached)
-        if: steps.cache-tools.outputs.cache-hit != 'true'
+      - name: Install & Update Tools
         run: |
-          echo "🔍 Cache miss! Installing FFmpeg and tools..."
           sudo apt-get update
           sudo apt-get install -y ffmpeg curl python3-pip
+          
+          # Always fetch the absolute latest yt-dlp to prevent fetch errors
           sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
           sudo chmod a+rx /usr/local/bin/yt-dlp
-          echo "✅ Tools installed successfully!"
-
-      - name: Tools Status Check
-        run: |
-          if [ "${{ steps.cache-tools.outputs.cache-hit }}" == "true" ]; then
-            echo "🚀 Cache hit! Using pre-installed tools instantly."
-          fi
+          
           yt-dlp --version
           ffmpeg -version
 
-      - name: Fetch Video and Optional Audio
+      - name: Fetch Video and Optional Audio with Anti-Block Bypass
         run: |
           URL="${{ github.event.inputs.video_url }}"
           AUDIO_URL="${{ github.event.inputs.audio_url }}"
           
-          echo "📥 Fetching main video..."
-          yt-dlp --extractor-args "youtube:player_client=ios,web" \
-                 --user-agent "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1" \
+          echo "📥 Fetching main video with advanced bypass..."
+          
+          yt-dlp --extractor-args "youtube:player_client=android,web" \
                  --geo-bypass \
+                 --no-check-certificates \
                  -f "b[ext=mp4]/best" "$URL" -o "input_video.mp4" || \
-          yt-dlp --extractor-args "youtube:player_client=android" \
+          yt-dlp --extractor-args "youtube:player_client=ios,web" \
                  --geo-bypass \
+                 --no-check-certificates \
                  "$URL" -o "input_video.mp4" || \
-          yt-dlp --geo-bypass --rm-cache-dir "$URL" -o "input_video.mp4"
+          yt-dlp --geo-bypass --rm-cache-dir --no-check-certificates "$URL" -o "input_video.mp4"
           
           if [ ! -f "input_video.mp4" ] || [ ! -s "input_video.mp4" ]; then
-            echo "Error: YouTube blocked the fetch request!"
+            echo "Error: YouTube blocked the fetch request or invalid URL!"
             exit 1
           fi
 
