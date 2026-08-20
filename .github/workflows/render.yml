@@ -1,4 +1,4 @@
-name: Auto Stream Video Editor (PremxGamer HD)
+Name: Auto Stream Video Editor (PremxGamer HD)
 
 on:
   workflow_dispatch:
@@ -63,7 +63,7 @@ jobs:
           path: |
             /usr/local/bin/yt-dlp
             /usr/bin/ffmpeg
-          key: ${{ runner.os }}-video-tools-v5
+          key: ${{ runner.os }}-video-tools-v6
 
       - name: Install & Update Tools
         run: |
@@ -83,14 +83,12 @@ jobs:
           
           echo "📥 Fetching video source..."
           
-          # Agar link videodownapi ya kisi direct download source ka hai, toh curl/wget se try karein
           if [[ "$URL" == *"videodownapi.com"* ]] || [[ "$URL" == *"download"* ]]; then
             echo "🔗 Direct Downloader API link detected. Downloading via curl..."
             curl -L -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" "$URL" -o "input_video.mp4" || \
             wget --user-agent="Mozilla/5.0" "$URL" -O "input_video.mp4"
           fi
           
-          # Agar upar wale se file nahi aayi ya normal YouTube link hai, toh yt-dlp use karega
           if [ ! -f "input_video.mp4" ] || [ ! -s "input_video.mp4" ]; then
             echo "🔄 Fallback to yt-dlp extraction..."
             yt-dlp --extractor-args "youtube:player_client=android,web" \
@@ -105,7 +103,6 @@ jobs:
             exit 1
           fi
 
-          # Handle Optional Audio/Video Link if provided
           if [ -n "$AUDIO_URL" ]; then
             echo "🎵 Fetching optional audio/video source..."
             yt-dlp --extract-audio --audio-format mp3 --geo-bypass "$AUDIO_URL" -o "optional_audio.mp3" || true
@@ -117,7 +114,7 @@ jobs:
             fi
           fi
 
-      - name: Process and Instant Upload Clips
+      - name: Process Clips and Upload to Single Release
         run: |
           TITLE_INPUT="${{ github.event.inputs.video_title }}"
           RATIO="${{ github.event.inputs.ratio }}"
@@ -126,6 +123,11 @@ jobs:
           CLIP_COUNT=${{ github.event.inputs.clip_count }}
           CLIP_LEN=${{ github.event.inputs.clip_len }}
           FPS_OPT="${{ github.event.inputs.fps }}"
+
+          # Single Release Tag for all clips
+          SINGLE_TAG="v1.0.${{ github.run_number }}"
+          echo "📦 Creating single release: $SINGLE_TAG"
+          gh release create "$SINGLE_TAG" --title "Batch Clips: $TITLE_INPUT" --notes "All generated clips for run ${{ github.run_number }}" || true
 
           # Crop Ratios
           CROP=""
@@ -156,15 +158,12 @@ jobs:
           FPS="60"
           if [ "$FPS_OPT" = "1" ]; then FPS="30"; fi
 
-          # Final Video Filter Chain
           VF_CHAIN="${V_SPEED}${CROP}${GAME}scale=trunc(iw/2)*2:trunc(ih/2)*2"
           AF_CHAIN="${A_SPEED}aresample=44100"
 
           for ((i=1; i<=CLIP_COUNT; i++)); do
             SS=$(( (i-1) * CLIP_LEN ))
             CLIP_FILE="${TITLE_INPUT}${i}.mp4"
-            
-            TAG_NAME="v1.0.${{ github.run_number }}-$i"
 
             echo "🎥 Rendering $CLIP_FILE..."
             
@@ -177,32 +176,31 @@ jobs:
               -c:a aac -b:a 128k \
               "$CLIP_FILE"
 
-            echo "🚀 Creating release and uploading $CLIP_FILE..."
-            gh release create "$TAG_NAME" --title "Clip $i: $TITLE_INPUT" --notes "Automated clip $i" || true
-            gh release upload "$TAG_NAME" "$CLIP_FILE" --clobber
+            echo "🚀 Uploading $CLIP_FILE to single release ($SINGLE_TAG)..."
+            gh release upload "$SINGLE_TAG" "$CLIP_FILE" --clobber
             
             rm -f "$CLIP_FILE"
           done
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Save Video Links with Game Name File
+      - name: Save All Video Links to Text File
         run: |
           GAME_NAME="${{ github.event.inputs.game_name }}"
           TITLE_INPUT="${{ github.event.inputs.video_title }}"
           CLIP_COUNT=${{ github.event.inputs.clip_count }}
+          SINGLE_TAG="v1.0.${{ github.run_number }}"
           
           mkdir -p game_links
           FILE_PATH="game_links/${GAME_NAME}.txt"
           
           for ((i=1; i<=CLIP_COUNT; i++)); do
-            TAG_NAME="v1.0.${{ github.run_number }}-$i"
-            RELEASE_URL="https://github.com/${{ github.repository }}/releases/download/${TAG_NAME}/${TITLE_INPUT}${i}.mp4"
+            RELEASE_URL="https://github.com/${{ github.repository }}/releases/download/${SINGLE_TAG}/${TITLE_INPUT}${i}.mp4"
             echo "${GAME_NAME}${i} | Link: ${RELEASE_URL}" >> "$FILE_PATH"
           done
           
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add game_links/
-          git commit -m "Add links for ${GAME_NAME}" || echo "No changes"
+          git commit -m "Add batch links for ${GAME_NAME}" || echo "No changes"
           git push
