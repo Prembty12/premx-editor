@@ -2,3 +2,6 @@ newcod1 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0
 newcod1 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.29/cod1.mp4
 newcod2 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.29/cod2.mp4
 newcod3 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.29/cod3.mp4
+newcod1 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.55/cod1.mp4
+newcod2 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.55/cod2.mp4
+newcod3 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.55/cod3.mp4
