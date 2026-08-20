@@ -1,11 +1,15 @@
-name: Auto Stream Video Editor (PremxGamer HD)
+Name: Auto Stream Video Editor (PremxGamer HD)
 
 on:
   workflow_dispatch:
     inputs:
       video_url:
-        description: 'YouTube Video URL (Direct Paste)'
+        description: 'YouTube Video URL or Direct Stream Link'
         required: true
+        default: ''
+      audio_url:
+        description: 'Optional Audio/Video URL (Leave blank if not needed)'
+        required: false
         default: ''
       video_title:
         description: 'Exact File Name Prefix (e.g. cod -> cod1.mp4, cod2.mp4)'
@@ -59,43 +63,67 @@ jobs:
           path: |
             /usr/local/bin/yt-dlp
             /usr/bin/ffmpeg
-          key: ${{ runner.os }}-video-tools-v2
+          key: ${{ runner.os }}-video-tools-v3
 
-      - name: Install Tools (Only if not cached)
-        if: steps.cache-tools.outputs.cache-hit != 'true'
+      - name: Install & Update Tools
         run: |
-          echo "🔍 Cache miss! Installing FFmpeg and tools..."
           sudo apt-get update
           sudo apt-get install -y ffmpeg curl python3-pip
+          
+          # Always fetch the absolute latest yt-dlp to prevent fetch errors
           sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
           sudo chmod a+rx /usr/local/bin/yt-dlp
-          echo "✅ Tools installed successfully!"
-
-      - name: Tools Status Check
-        run: |
-          if [ "${{ steps.cache-tools.outputs.cache-hit }}" == "true" ]; then
-            echo "🚀 Cache hit! Using pre-installed tools instantly."
-          fi
+          
           yt-dlp --version
           ffmpeg -version
 
-      - name: Fetch Video with Anti-Block Bypass
+      - name: Fetch Video and Optional Audio with Anti-Block Bypass
         run: |
           URL="${{ github.event.inputs.video_url }}"
-          echo "📥 Fetching video with enhanced bypass..."
+          AUDIO_URL="${{ github.event.inputs.audio_url }}"
           
-          yt-dlp --extractor-args "youtube:player_client=ios,web" \
-                 --user-agent "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1" \
-                 --geo-bypass \
-                 -f "b[ext=mp4]/best" "$URL" -o "input_video.mp4" || \
-          yt-dlp --extractor-args "youtube:player_client=android" \
-                 --geo-bypass \
-                 "$URL" -o "input_video.mp4" || \
-          yt-dlp --geo-bypass --rm-cache-dir "$URL" -o "input_video.mp4"
+          echo "📥 Fetching source with ultimate stream bypass..."
+          
+          if [[ "$URL" == *"googlevideo.com"* ]]; then
+            echo "🔗 Direct Google Stream URL detected. Bypassing via FFmpeg stream capture..."
+            # FFmpeg acts like VLC to grab the stream directly using proper user-agent headers
+            ffmpeg -user_agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
+                   -headers "Range: bytes=0-\r\n" \
+                   -i "$URL" \
+                   -t 600 -c copy "input_video.mp4" || \
+            ffmpeg -i "$URL" -t 600 -c copy "input_video.mp4"
+          else
+            yt-dlp --extractor-args "youtube:player_client=android,web" \
+                   --geo-bypass \
+                   --no-check-certificates \
+                   -f "b[ext=mp4]/best" "$URL" -o "input_video.mp4" || \
+            yt-dlp --extractor-args "youtube:player_client=ios,web" \
+                   --geo-bypass \
+                   --no-check-certificates \
+                   "$URL" -o "input_video.mp4" || \
+            yt-dlp --geo-bypass --rm-cache-dir --no-check-certificates "$URL" -o "input_video.mp4"
+          fi
           
           if [ ! -f "input_video.mp4" ] || [ ! -s "input_video.mp4" ]; then
-            echo "Error: YouTube blocked the fetch request!"
+            echo "Error: Stream capture failed or token expired!"
             exit 1
+          fi
+
+          # Handle Optional Audio/Video Link if provided
+          if [ -n "$AUDIO_URL" ]; then
+            echo "🎵 Fetching optional audio/video source..."
+            yt-dlp --extract-audio --audio-format mp3 --geo-bypass "$AUDIO_URL" -o "optional_audio.mp3" || \
+            yt-dlp --geo-bypass -f "b[ext=mp4]/best" "$AUDIO_URL" -o "optional_video.mp4" || true
+
+            if [ -f "optional_audio.mp3" ]; then
+              echo "🔄 Merging custom MP3 audio into main video..."
+              ffmpeg -y -i "input_video.mp4" -i "optional_audio.mp3" -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 "input_video_merged.mp4"
+              mv "input_video_merged.mp4" "input_video.mp4"
+            elif [ -f "optional_video.mp4" ]; then
+              echo "🔄 Merging custom Video audio into main video..."
+              ffmpeg -y -i "input_video.mp4" -i "optional_video.mp4" -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 "input_video_merged.mp4"
+              mv "input_video_merged.mp4" "input_video.mp4"
+            fi
           fi
 
       - name: Process and Instant Upload Clips
@@ -107,8 +135,6 @@ jobs:
           CLIP_COUNT=${{ github.event.inputs.clip_count }}
           CLIP_LEN=${{ github.event.inputs.clip_len }}
           FPS_OPT="${{ github.event.inputs.fps }}"
-
-          TAG_NAME="v1.0.${{ github.run_number }}"
 
           # Crop Ratios
           CROP=""
@@ -143,16 +169,15 @@ jobs:
           VF_CHAIN="${V_SPEED}${CROP}${GAME}scale=trunc(iw/2)*2:trunc(ih/2)*2"
           AF_CHAIN="${A_SPEED}aresample=44100"
 
-          gh release create "$TAG_NAME" --title "Clips Rendered: $TITLE_INPUT" --notes "Automated clips for $TITLE_INPUT" || true
-
           for ((i=1; i<=CLIP_COUNT; i++)); do
             SS=$(( (i-1) * CLIP_LEN ))
-            
             CLIP_FILE="${TITLE_INPUT}${i}.mp4"
+            
+            # Unique tag per clip to prevent release deletion
+            TAG_NAME="v1.0.${{ github.run_number }}-$i"
 
             echo "🎥 Rendering $CLIP_FILE..."
             
-            # Yahan overlay=30:H-h-30 ka matlab hai Left side se 30px aur Bottom se 30px
             if [ -f "logo.png" ]; then
               ffmpeg -y -ss $SS -t $CLIP_LEN -i "input_video.mp4" -i "logo.png" \
                 -filter_complex "[0:v]${VF_CHAIN}[vid];[1:v]scale=150:-1[logo];[vid][logo]overlay=30:H-h-30" \
@@ -173,7 +198,8 @@ jobs:
                 "$CLIP_FILE"
             fi
 
-            echo "🚀 Uploading $CLIP_FILE to Release..."
+            echo "🚀 Creating release and uploading $CLIP_FILE..."
+            gh release create "$TAG_NAME" --title "Clip $i: $TITLE_INPUT" --notes "Automated clip $i for $TITLE_INPUT" || true
             gh release upload "$TAG_NAME" "$CLIP_FILE" --clobber
             
             rm -f "$CLIP_FILE"
@@ -186,12 +212,12 @@ jobs:
           GAME_NAME="${{ github.event.inputs.game_name }}"
           TITLE_INPUT="${{ github.event.inputs.video_title }}"
           CLIP_COUNT=${{ github.event.inputs.clip_count }}
-          TAG_NAME="v1.0.${{ github.run_number }}"
           
           mkdir -p game_links
           FILE_PATH="game_links/${GAME_NAME}.txt"
           
           for ((i=1; i<=CLIP_COUNT; i++)); do
+            TAG_NAME="v1.0.${{ github.run_number }}-$i"
             RELEASE_URL="https://github.com/${{ github.repository }}/releases/download/${TAG_NAME}/${TITLE_INPUT}${i}.mp4"
             echo "${GAME_NAME}${i} | Link: ${RELEASE_URL}" >> "$FILE_PATH"
           done
