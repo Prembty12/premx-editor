@@ -77,11 +77,11 @@ jobs:
           URL="${{ github.event.inputs.video_url }}"
           AUDIO_URL="${{ github.event.inputs.audio_url }}"
           
-          echo "📥 Downloading main video directly using curl..."
-          curl -L "$URL" -o "input_video.mp4"
+          echo "📥 Downloading main video with Mobile User-Agent..."
+          curl -L -A "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1" "$URL" -o "input_video.mp4"
           
           if [ ! -f "input_video.mp4" ] || [ ! -s "input_video.mp4" ]; then
-            echo "❌ Error: Direct download failed! The link might have expired."
+            echo "❌ Error: Direct download failed! The link might have been blocked or expired."
             exit 1
           fi
           
@@ -90,7 +90,7 @@ jobs:
           # Handle Optional Audio/Video Link if provided
           if [ -n "$AUDIO_URL" ]; then
             echo "🎵 Fetching optional audio/video source..."
-            curl -L "$AUDIO_URL" -o "optional_file.mp4" || true
+            curl -L -A "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1" "$AUDIO_URL" -o "optional_file.mp4" || true
 
             if [ -f "optional_file.mp4" ] && [ -s "optional_file.mp4" ]; then
               echo "🔄 Merging optional audio/video into main video..."
