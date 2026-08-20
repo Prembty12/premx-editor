@@ -1,4 +1,4 @@
-name: Auto Stream Video Editor (PremxGamer HD)
+Name: Auto Stream Video Editor (PremxGamer HD)
 
 on:
   workflow_dispatch:
@@ -82,11 +82,10 @@ jobs:
           URL="${{ github.event.inputs.video_url }}"
           AUDIO_URL="${{ github.event.inputs.audio_url }}"
           
-          echo "📥 Fetching source with ultimate stream bypass..."
+          echo "📥 Processing input stream URL safely..."
           
           if [[ "$URL" == *"googlevideo.com"* ]]; then
-            echo "🔗 Direct Google Stream URL detected. Bypassing via FFmpeg stream capture..."
-            # FFmpeg acts like VLC to grab the stream directly using proper user-agent headers
+            echo "🔗 Direct Google Stream URL detected. Capturing via FFmpeg..."
             ffmpeg -user_agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
                    -headers "Range: bytes=0-\r\n" \
                    -i "$URL" \
@@ -105,7 +104,7 @@ jobs:
           fi
           
           if [ ! -f "input_video.mp4" ] || [ ! -s "input_video.mp4" ]; then
-            echo "Error: Stream capture failed or token expired!"
+            echo "Error: Stream capture failed! The link might be broken or expired."
             exit 1
           fi
 
