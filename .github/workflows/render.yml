@@ -7,6 +7,10 @@ on:
         description: 'YouTube Video URL (Direct Paste)'
         required: true
         default: ''
+      audio_url:
+        description: 'Optional Audio/Video URL (Leave blank if not needed)'
+        required: false
+        default: ''
       video_title:
         description: 'Exact File Name Prefix (e.g. cod -> cod1.mp4, cod2.mp4)'
         required: true
@@ -79,11 +83,12 @@ jobs:
           yt-dlp --version
           ffmpeg -version
 
-      - name: Fetch Video with Anti-Block Bypass
+      - name: Fetch Video and Optional Audio
         run: |
           URL="${{ github.event.inputs.video_url }}"
-          echo "📥 Fetching video with enhanced bypass..."
+          AUDIO_URL="${{ github.event.inputs.audio_url }}"
           
+          echo "📥 Fetching main video..."
           yt-dlp --extractor-args "youtube:player_client=ios,web" \
                  --user-agent "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1" \
                  --geo-bypass \
@@ -96,6 +101,23 @@ jobs:
           if [ ! -f "input_video.mp4" ] || [ ! -s "input_video.mp4" ]; then
             echo "Error: YouTube blocked the fetch request!"
             exit 1
+          fi
+
+          # Handle Optional Audio/Video Link if provided
+          if [ -n "$AUDIO_URL" ]; then
+            echo "🎵 Fetching optional audio/video source..."
+            yt-dlp --extract-audio --audio-format mp3 --geo-bypass "$AUDIO_URL" -o "optional_audio.mp3" || \
+            yt-dlp --geo-bypass -f "b[ext=mp4]/best" "$AUDIO_URL" -o "optional_video.mp4" || true
+
+            if [ -f "optional_audio.mp3" ]; then
+              echo "🔄 Merging custom MP3 audio into main video..."
+              ffmpeg -y -i "input_video.mp4" -i "optional_audio.mp3" -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 "input_video_merged.mp4"
+              mv "input_video_merged.mp4" "input_video.mp4"
+            elif [ -f "optional_video.mp4" ]; then
+              echo "🔄 Merging custom Video audio into main video..."
+              ffmpeg -y -i "input_video.mp4" -i "optional_video.mp4" -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 "input_video_merged.mp4"
+              mv "input_video_merged.mp4" "input_video.mp4"
+            fi
           fi
 
       - name: Process and Instant Upload Clips
@@ -145,7 +167,7 @@ jobs:
             SS=$(( (i-1) * CLIP_LEN ))
             CLIP_FILE="${TITLE_INPUT}${i}.mp4"
             
-            # Har clip ke liye unique tag taaki release se delete na ho
+            # Unique tag per clip to prevent release deletion
             TAG_NAME="v1.0.${{ github.run_number }}-$i"
 
             echo "🎥 Rendering $CLIP_FILE..."
