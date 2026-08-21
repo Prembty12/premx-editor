@@ -1,4 +1,34 @@
-- name: Download Video via Playwright Browser
+name: Test Browser Link
+
+on:
+  workflow_dispatch:
+    inputs:
+      video_url:
+        description: 'Direct Link / API Link to Test'
+        required: true
+        default: ''
+
+jobs:
+  test-link:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Playwright & Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgbm-dev
+          npm init -y
+          npm install playwright
+          npx playwright install --with-deps chromium
+
+      - name: Download Video via Playwright Browser
         env:
           TARGET_URL: ${{ github.event.inputs.video_url }}
         run: |
@@ -21,7 +51,6 @@
 
               let finalVideoUrl = "";
 
-              // Network requests ko intercept karke real media stream URL pakdo
               page.on("response", async response => {
                 const url = response.url();
                 if (url.includes("videoplayback") && response.status() === 200) {
@@ -49,7 +78,6 @@
 
               console.log("📥 Downloading video file...");
               
-              // Node.js se file download karna with proper User-Agent
               const fileStream = fs.createWriteStream("downloaded_video.mp4");
               const client = finalVideoUrl.startsWith("https") ? https : http;
 
