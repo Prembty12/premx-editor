@@ -1,4 +1,4 @@
-name: Auto Stream Video Editor (PremxGamer HD2)
+name: Auto Stream Video Editor (PremxGamer HD)
 
 on:
   workflow_dispatch:
@@ -62,7 +62,7 @@ jobs:
           path: |
             /usr/local/bin/yt-dlp
             /usr/bin/ffmpeg
-          key: ${{ runner.os }}-video-tools-v9
+          key: ${{ runner.os }}-video-tools-v10
 
       - name: Install & Update Tools
         run: |
@@ -73,23 +73,19 @@ jobs:
           yt-dlp --version
           ffmpeg -version
 
-      - name: Smart Universal Fetch (Direct API / Stream / yt-dlp)
+      - name: Smart Universal Fetch (Direct Stream vs YouTube)
         run: |
           URL="${{ github.event.inputs.video_url }}"
           AUDIO_URL="${{ github.event.inputs.audio_url }}"
           
-          echo "📥 Analyzing and fetching video source..."
+          echo "📥 Analyzing link type..."
           
-          # Agar link direct videodownapi, googlevideo, ya .mp4/.webm direct stream ka hai toh curl use karega
-          if [[ "$URL" == *"videodownapi.com"* ]] || [[ "$URL" == *"googlevideo.com"* ]] || [[ "$URL" == *".mp4"* ]] || [[ "$URL" == *"download"* ]]; then
-            echo "🔗 Direct API / Stream / Media link detected. Downloading via curl..."
-            curl -L -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36" "$URL" -o "input_video.mp4" || \
-            wget --user-agent="Mozilla/5.0" "$URL" -O "input_video.mp4"
-          fi
-          
-          # Agar curl se file download nahi hui ya ye normal YouTube link hai, toh yt-dlp anti-block mode chalega
-          if [ ! -f "input_video.mp4" ] || [ ! -s "input_video.mp4" ]; then
-            echo "🔄 Fallback / Standard yt-dlp extraction with anti-block..."
+          # Agar link googlevideo ya direct media stream ka hai, toh sirf curl chalega aur yhin rok denge
+          if [[ "$URL" == "googlevideo.com" ]] || [[ "$URL" == "videodownapi.com" ]] || [[ "$URL" == ".mp4" ]]; then
+            echo "🔗 Direct Stream / Media link detected. Downloading via curl..."
+            curl -L -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36" "$URL" -o "input_video.mp4"
+          else
+            echo "🔄 Standard YouTube or Web link detected. Using yt-dlp anti-block mode..."
             yt-dlp --extractor-args "youtube:player_client=web_embedded,web" \
                    --geo-bypass \
                    --no-check-certificates \
