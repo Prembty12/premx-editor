@@ -1,4 +1,4 @@
-name: Auto Stream Video
+name: Auto Stream Video Editor (PremxGamer HD)
 
 on:
   workflow_dispatch:
@@ -55,47 +55,89 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Cache FFmpeg and Tools
-        id: cache-tools
-        uses: actions/cache@v4
+      - name: Setup Node.js & Python
+        uses: actions/setup-node@v4
         with:
-          path: |
-            /usr/local/bin/yt-dlp
-            /usr/bin/ffmpeg
-          key: ${{ runner.os }}-video-tools-v10
+          node-version: '20'
 
-      - name: Install & Update Tools
+      - name: Install Dependencies & Playwright Browsers
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg curl python3-pip jq
+          sudo apt-get install -y ffmpeg curl jq libgbm-dev
+          npm install -g playwright
+          npx playwright install --with-deps chromium
           sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
           sudo chmod a+rx /usr/local/bin/yt-dlp
-          yt-dlp --version
-          ffmpeg -version
 
-      - name: Smart Universal Fetch (Direct Stream vs YouTube)
+      - name: Smart Browser-Assisted Fetch (Playwright + yt-dlp)
         run: |
           URL="${{ github.event.inputs.video_url }}"
           AUDIO_URL="${{ github.event.inputs.audio_url }}"
           
-          echo "📥 Analyzing link type..."
+          echo "📥 Checking link type and initializing browser automation..."
           
-          # Agar link googlevideo ya direct media stream ka hai, toh sirf curl chalega aur yhin rok denge
           if [[ "$URL" == "googlevideo.com" ]] || [[ "$URL" == "videodownapi.com" ]] || [[ "$URL" == ".mp4" ]]; then
-            echo "🔗 Direct Stream / Media link detected. Downloading via curl..."
-            curl -L -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36" "$URL" -o "input_video.mp4"
+            echo "🌐 Using Headless Browser (Playwright) to open and capture direct stream..."
+            
+            # Create a temporary Node.js script to download the video using Playwright
+            cat << 'EOF' > fetch_stream.js
+            const { chromium } = require('playwright');
+            const fs = require('fs');
+            const https = require('https');
+            const http = require('http');
+
+            (async () => {
+              const targetUrl = process.env.TARGET_URL;
+              console.log("Launching browser...");
+              const browser = await chromium.launch({ headless: true });
+              const context = await browser.newContext({
+                userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
+              });
+              const page = await context.newPage();
+
+              console.log(Navigating to URL...);
+              try {
+                // Intercept response to download file directly if it's a media stream
+                page.on('response', async response => {
+                  const url = response.url();
+                  if (url.includes('videoplayback') || response.headers()['content-type']?.includes('video')) {
+                    console.log("Captured video stream response:", url);
+                  }
+                });
+
+                await page.goto(targetUrl, { waitUntil: 'networkidle', timeout: 60000 });
+                
+                // Try downloading using standard fetch inside the page context or direct URL download via curl with cookies
+                console.log("Extracting cookies and session data...");
+                const cookies = await context.cookies();
+                let cookieHeader = cookies.map(c => ${c.name}=${c.value}).join('; ');
+                
+                console.log("Downloading stream via curl with captured session...");
+                const { execSync } = require('child_process');
+                execSync(curl -L -b "${cookieHeader}" -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36" "${targetUrl}" -o input_video.mp4, { stdio: 'inherit' });
+
+              } catch (err) {
+                console.error("Browser navigation error:", err);
+                process.exit(1);
+              } finally {
+                await browser.close();
+              }
+            })();
+            EOF
+
+            export TARGET_URL="$URL"
+            node fetch_stream.js
+
           else
-            echo "🔄 Standard YouTube or Web link detected. Using yt-dlp anti-block mode..."
+            echo "🔄 Standard YouTube link detected. Using yt-dlp..."
             yt-dlp --extractor-args "youtube:player_client=web_embedded,web" \
                    --geo-bypass \
                    --no-check-certificates \
-                   --user-agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36" \
-                   -f "b[ext=mp4]/best" "$URL" -o "input_video.mp4" || \
-            yt-dlp --geo-bypass --no-check-certificates "$URL" -o "input_video.mp4"
+                   -f "b[ext=mp4]/best" "$URL" -o "input_video.mp4"
           fi
           
           if [ ! -f "input_video.mp4" ] || [ ! -s "input_video.mp4" ]; then
-            echo "Error: Failed to fetch video completely!"
+            echo "Error: Failed to fetch video completely via browser/yt-dlp!"
             exit 1
           fi
 
@@ -103,7 +145,6 @@ jobs:
             echo "🎵 Fetching optional audio source..."
             yt-dlp --extract-audio --audio-format mp3 --geo-bypass "$AUDIO_URL" -o "optional_audio.mp3" || true
             if [ -f "optional_audio.mp3" ]; then
-              echo "🔄 Merging custom MP3 audio into main video..."
               ffmpeg -y -i "input_video.mp4" -i "optional_audio.mp3" -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 "input_video_merged.mp4"
               mv "input_video_merged.mp4" "input_video.mp4"
             fi
