@@ -1,4 +1,34 @@
-name: Download Video via Browser Context
+name: Test Browser Link
+
+on:
+  workflow_dispatch:
+    inputs:
+      video_url:
+        description: 'Direct Link / API Link to Test'
+        required: true
+        default: ''
+
+jobs:
+  test-link:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Playwright & Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgbm-dev
+          npm init -y
+          npm install playwright
+          npx playwright install --with-deps chromium
+
+      - name: Download Video via Detailed Debug Script
         run: |
           echo "🚀 Starting detailed debug download..."
           node -e '
@@ -21,7 +51,6 @@ name: Download Video via Browser Context
               });
               const page = await context.newPage();
 
-              // Sabhi responses ko track karenge
               page.on("response", response => {
                 if (response.url().includes("googlevideo.com")) {
                   console.log(`📥 Network Log: [${response.status()}] ${response.url()}`);
