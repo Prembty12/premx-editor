@@ -1,4 +1,4 @@
-name: Download Video via Playwright Browser
+- name: Download Video via Playwright Browser
         env:
           TARGET_URL: ${{ github.event.inputs.video_url }}
         run: |
