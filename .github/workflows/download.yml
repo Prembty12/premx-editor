@@ -1,1 +1,53 @@
+name: Download Video via Browser Context
+        run: |
+          echo "🚀 Starting detailed debug download..."
+          node -e '
+            const { chromium } = require("playwright");
+            const fs = require("fs");
+            
+            const targetUrl = "${{ github.event.inputs.video_url }}";
+            
+            (async () => {
+              if (!targetUrl) {
+                  console.error("❌ Link input mein nahi mila!");
+                  process.exit(1);
+              }
+              
+              console.log("🔗 URL Received (Full):", targetUrl);
 
+              const browser = await chromium.launch({ headless: true });
+              const context = await browser.newContext({
+                userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+              });
+              const page = await context.newPage();
+
+              // Sabhi responses ko track karenge
+              page.on("response", response => {
+                if (response.url().includes("googlevideo.com")) {
+                  console.log(`📥 Network Log: [${response.status()}] ${response.url()}`);
+                }
+              });
+
+              console.log("🔗 Navigating...");
+              try {
+                const response = await page.goto(targetUrl, { waitUntil: "networkidle", timeout: 120000 });
+                console.log("✅ Response Status from Page:", response.status());
+                
+                const buffer = await page.evaluate(async () => {
+                   const response = await fetch(window.location.href);
+                   if (!response.ok) throw new Error("Fetch failed with status " + response.status);
+                   return await response.arrayBuffer();
+                });
+
+                fs.writeFileSync("downloaded_video.mp4", Buffer.from(buffer));
+                console.log("✅ Success! File size: " + buffer.byteLength + " bytes");
+                
+              } catch (err) {
+                console.error("❌ FAILED! Error details:", err.message);
+                process.exit(1);
+              } finally {
+                await browser.close();
+              }
+            })();
+          '
+          ls -lh downloaded_video.mp4
