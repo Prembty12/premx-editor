@@ -1,82 +1,43 @@
-name: Test Browser Link
+name: Termux Curl Downloader
 
 on:
   workflow_dispatch:
     inputs:
       video_url:
-        description: 'Direct Link / API Link to Test'
+        description: 'Paste Direct Google Video Link'
         required: true
         default: ''
 
 jobs:
-  test-link:
-    runs-on: ubuntu-latest
+  download:
+    runs-on: self-hosted   # Yeh zaroori hai taaki kaam aapke phone par ho
+    
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install Playwright & Dependencies
+      - name: Download Video via Curl on Phone
+        env:
+          TARGET_URL: ${{ github.event.inputs.video_url }}
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libgbm-dev
-          npm init -y
-          npm install playwright
-          npx playwright install --with-deps chromium
+          echo "=========================================="
+          echo "🚀 PremxGamer Direct Link Downloader (Phone)"
+          echo "=========================================="
 
-      - name: Download Video via Detailed Debug Script
-        run: |
-          echo "🚀 Starting detailed debug download..."
-          node -e '
-            const { chromium } = require("playwright");
-            const fs = require("fs");
-            
-            const targetUrl = "${{ github.event.inputs.video_url }}";
-            
-            (async () => {
-              if (!targetUrl) {
-                  console.error("❌ Link input mein nahi mila!");
-                  process.exit(1);
-              }
-              
-              console.log("🔗 URL Received (Full):", targetUrl);
+          if [ -z "$TARGET_URL" ]; then
+              echo "❌ Error: Link khali nahi ho sakta!"
+              exit 1
+          fi
 
-              const browser = await chromium.launch({ headless: true });
-              const context = await browser.newContext({
-                userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
-              });
-              const page = await context.newPage();
+          OUTPUT_FILE="downloaded_video.mp4"
 
-              page.on("response", response => {
-                if (response.url().includes("googlevideo.com")) {
-                  console.log(`📥 Network Log: [${response.status()}] ${response.url()}`);
-                }
-              });
+          echo "📥 Starting download via curl..."
+          
+          # Wahi same working curl command jo aapne Termux par chalai thi
+          curl -L -C - "$TARGET_URL" \
+            -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36" \
+            -H "Referer: https://www.youtube.com/" \
+            -o "$OUTPUT_FILE"
 
-              console.log("🔗 Navigating...");
-              try {
-                const response = await page.goto(targetUrl, { waitUntil: "networkidle", timeout: 120000 });
-                console.log("✅ Response Status from Page:", response.status());
-                
-                const buffer = await page.evaluate(async () => {
-                   const response = await fetch(window.location.href);
-                   if (!response.ok) throw new Error("Fetch failed with status " + response.status);
-                   return await response.arrayBuffer();
-                });
-
-                fs.writeFileSync("downloaded_video.mp4", Buffer.from(buffer));
-                console.log("✅ Success! File size: " + buffer.byteLength + " bytes");
-                
-              } catch (err) {
-                console.error("❌ FAILED! Error details:", err.message);
-                process.exit(1);
-              } finally {
-                await browser.close();
-              }
-            })();
-          '
-          ls -lh downloaded_video.mp4
+          echo "📊 Checking final file size..."
+          ls -lh "$OUTPUT_FILE"
