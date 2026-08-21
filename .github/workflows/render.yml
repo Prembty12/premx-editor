@@ -78,16 +78,16 @@ jobs:
           URL="${{ github.event.inputs.video_url }}"
           AUDIO_URL="${{ github.event.inputs.audio_url }}"
           
-          echo "📥 Fetching video source...[span_3](start_span)"[span_3](end_span)
+          echo "📥 Fetching video source...[span_0](start_span)"[span_0](end_span)
           
           if [[ "$URL" == *"videodownapi.com"* ]] || [[ "$URL" == *"download"* ]]; then
-            echo "🔗 Direct Downloader API link detected. Downloading via curl...[span_4](start_span)"[span_4](end_span)
+            echo "🔗 Direct Downloader API link detected. Downloading via curl...[span_1](start_span)"[span_1](end_span)
             curl -L -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" "$URL" -o "input_video.mp4" || \
             wget --user-agent="Mozilla/5.0" "$URL" -O "input_video.mp4"
           fi
           
           if [ ! -f "input_video.mp4" ] || [ ! -s "input_video.mp4" ]; then
-            echo "🔄 Fallback to yt-dlp extraction...[span_5](start_span)"[span_5](end_span)
+            echo "🔄 Fallback to yt-dlp extraction...[span_2](start_span)"[span_2](end_span)
             yt-dlp --extractor-args "youtube:player_client=android,web" \
                    --geo-bypass \
                    --no-check-certificates \
@@ -96,15 +96,15 @@ jobs:
           fi
           
           if [ ! -f "input_video.mp4" ] || [ ! -s "input_video.mp4" ]; then
-            echo "Error: Failed to fetch video completely[span_6](start_span)!"[span_6](end_span)
+            echo "Error: Failed to fetch video completely[span_3](start_span)!"[span_3](end_span)
             exit 1
           fi
 
           if [ -n "$AUDIO_URL" ]; then
-            echo "🎵 Fetching optional audio/video source...[span_7](start_span)"[span_7](end_span)
+            echo "🎵 Fetching optional audio/video source...[span_4](start_span)"[span_4](end_span)
             yt-dlp --extract-audio --audio-format mp3 --geo-bypass "$AUDIO_URL" -o "optional_audio.mp3" || true
             if [ -f "optional_audio.mp3" ]; then
-              echo "🔄 Merging custom MP3 audio into main video...[span_8](start_span)"[span_8](end_span)
+              echo "🔄 Merging custom MP3 audio into main video...[span_5](start_span)"[span_5](end_span)
               ffmpeg -y -i "input_video.mp4" -i "optional_audio.mp3" -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 "input_video_merged.mp4"
               mv "input_video_merged.mp4" "input_video.mp4"
             fi
@@ -124,7 +124,7 @@ jobs:
           FPS_OPT="${{ github.event.inputs.fps }}"
           
           SINGLE_TAG="v1.0.${{ github.run_number }}"
-          echo "📦 Creating single release: $SINGLE_TAG[span_9](start_span)"[span_9](end_span)
+          echo "📦 Creating single release: $SINGLE_TAG[span_6](start_span)"[span_6](end_span)
           gh release create "$SINGLE_TAG" --title "Batch Clips: $RAW_TITLE" --notes "All generated clips for run ${{ github.run_number }}" || true
 
           # Git Configuration for Live Updates
@@ -172,7 +172,7 @@ jobs:
           for ((i=1; i<=CLIP_COUNT; i++)); do
             SS=$(( (i-1) * CLIP_LEN ))
             CLIP_FILE="${TITLE_INPUT}${i}.mp4"
-            echo "🎥 Rendering $CLIP_FILE...[span_10](start_span)"[span_10](end_span)
+            echo "🎥 Rendering $CLIP_FILE...[span_7](start_span)"[span_7](end_span)
 
             if [ -f "logo.png" ]; then
               ffmpeg -y -ss $SS -t $CLIP_LEN -i "input_video.mp4" -i "logo.png" \
@@ -197,20 +197,20 @@ jobs:
                 "$CLIP_FILE"
             fi
 
-            echo "🚀 Uploading $CLIP_FILE to single release ($SINGLE_TAG)...[span_11](start_span)"[span_11](end_span)
+            echo "🚀 Uploading $CLIP_FILE to single release ($SINGLE_TAG)...[span_8](start_span)"[span_8](end_span)
             gh release upload "$SINGLE_TAG" "$CLIP_FILE" --clobber
             
             # 🔗 Ek-ek karke release se direct download link fetch karke file mein add aur push karna
-            echo "🔍 Fetching direct link for $CLIP_FILE...[span_12](start_span)"[span_12](end_span)
+            echo "🔍 Fetching direct link for $CLIP_FILE...[span_9](start_span)"[span_9](end_span)
             DIRECT_URL=$(gh release view "$SINGLE_TAG" --json assets --jq ".assets[] | select(.name==\"$CLIP_FILE\") | .url")
             
             if [ -n "$DIRECT_URL" ]; then
               CLEAN_NAME="${CLIP_FILE%.mp4}"
               echo "${CLEAN_NAME} | Link: ${DIRECT_URL}" >> "$FILE_PATH"
               
-              echo "🔄 Committing and pushing link for ${CLIP_FILE}...[span_13](start_span)"[span_13](end_span)
+              echo "🔄 Committing and pushing link for ${CLIP_FILE}...[span_10](start_span)"[span_10](end_span)
               git add "$FILE_PATH"
-              git commit -m "Add link for ${CLIP_FILE} dynamically" || echo "No changes[span_14](start_span)"[span_14](end_span)
+              git commit -m "Add link for ${CLIP_FILE} dynamically" || echo "No changes[span_11](start_span)"[span_11](end_span)
               git pull --rebase origin main || true
               git push || true
             fi
