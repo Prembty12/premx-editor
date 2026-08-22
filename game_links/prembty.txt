@@ -1,2 +1,3 @@
 prem1 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.75/prem1.mp4
 prem2 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.75/prem2.mp4
+prem3 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.75/prem3.mp4
