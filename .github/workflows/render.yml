@@ -131,8 +131,8 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          mkdir -p game_links
-          FILE_PATH="game_links/${GAME_NAME}.txt"
+          mkdir -p game_links_editor
+          FILE_PATH="game_links_editor/${GAME_NAME}.txt"
           > "$FILE_PATH"
 
           # Crop Ratios
