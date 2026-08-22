@@ -23,3 +23,4 @@ mm222 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.8
 mm223 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.81/mm223.mp4
 mm224 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.81/mm224.mp4
 mm225 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.81/mm225.mp4
+mm226 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.81/mm226.mp4
