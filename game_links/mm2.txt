@@ -5,3 +5,4 @@ mm24 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.81
 mm25 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.81/mm25.mp4
 mm26 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.81/mm26.mp4
 mm27 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.81/mm27.mp4
+mm28 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.81/mm28.mp4
