@@ -1,4 +1,0 @@
-cod1 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.71/cod1.mp4
-cod1 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.73-1/cod1.mp4
-cod2 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.73-2/cod2.mp4
-cod3 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.73-3/cod3.mp4
