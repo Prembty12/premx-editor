@@ -145,8 +145,8 @@ jobs:
 
           # Upgraded Color & Gaming Filters
           GAME=""
-          if [ "$FILTER" = "1" ]; then GAME="eq=brightness=0.04:contrast=1.15:saturation=1.30:gamma=1.05,unsharp=5:5:1.2:5:5:0.0,"; fi
-          if [ "$FILTER" = "2" ]; then GAME="eq=brightness=0.02:contrast=1.20:saturation=1.45:gamma=1.12,unsharp=5:5:1.5:5:5:0.0,"; fi
+          if [ "$FILTER" = "1" ]; then GAME="eq=brightness=0.02:contrast=1.15:saturation=1.26,hqdn3d=1.5:1.5:6:6,unsharp=5:5:1.2:5:5:0.0,"; fi
+          if [ "$FILTER" = "2" ]; then GAME="eq=brightness=0.02:contrast=1.20:saturation=1.25:gamma=1.12,vibrance=intensity=0.15,hqdn3d=1.5:1.5:6:6,cas=0.3,noise=alls=4:allf=t+u,unsharp=5:5:1.5:5:5:0.0,"; fi 
           if [ "$FILTER" = "3" ]; then GAME="eq=brightness=0.08:contrast=1.30:saturation=1.35,unsharp=7:7:1.8:7:7:0.0,"; fi
           if [ "$FILTER" = "4" ]; then GAME="eq=brightness=0.15:contrast=1.20:gamma=1.25,unsharp=5:5:1.0:5:5:0.0,"; fi
           if [ "$FILTER" = "5" ]; then GAME="eq=contrast=1.25:saturation=1.20,colorbalance=rs=0.08:gs=0.02:bs=-0.08,unsharp=5:5:1.2:5:5:0.0,"; fi
@@ -179,7 +179,7 @@ jobs:
                 -filter_complex "[0:v]${VF_CHAIN}[vid];[1:v]scale=160:-1[logo];[vid][logo]overlay=30:H-h-20" \
                 -af "${AF_CHAIN}" \
                 -metadata title="${TITLE_INPUT}${i}" \
-                -metadata artist="PremxGamer HD" \
+                -metadata artist="PremxGamer" \
                 -r $FPS \
                 -c:v libx264 \
                 -preset medium \
@@ -202,7 +202,7 @@ jobs:
                 -vf "${VF_CHAIN}" \
                 -af "${AF_CHAIN}" \
                 -metadata title="${TITLE_INPUT}${i}" \
-                -metadata artist="PremxGamer HD" \
+                -metadata artist="PremxGamer" \
                 -r $FPS \
                 -c:v libx264 \
                 -preset medium \
