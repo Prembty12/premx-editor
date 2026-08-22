@@ -1,4 +1,4 @@
-name: Auto Stream Video Editor (PremxGamer HD)
+Name: Auto Stream Video Editor (PremxGamer HD)
 
 on:
   workflow_dispatch:
@@ -78,7 +78,7 @@ jobs:
           URL="${{ github.event.inputs.video_url }}"
           AUDIO_URL="${{ github.event.inputs.audio_url }}"
           
-          echo "📥 Fetching video source..."
+          echo "📦 Fetching video source..."
           
           if [[ "$URL" == *"videodownapi.com"* ]] || [[ "$URL" == *"download"* ]]; then
             echo "🔗 Direct Downloader API link detected. Downloading via curl..."
@@ -110,7 +110,7 @@ jobs:
             fi
           fi
 
-      - name: Process Clips with Logo and Upload to Single Release
+      - name: Process Clips, Instant Release Upload, and Real-time Repo Push
         run: |
           RAW_TITLE="${{ github.event.inputs.video_title }}"
           TITLE_INPUT=$(echo "$RAW_TITLE" | tr ' ' '_')
@@ -121,10 +121,15 @@ jobs:
           CLIP_COUNT=${{ github.event.inputs.clip_count }}
           CLIP_LEN=${{ github.event.inputs.clip_len }}
           FPS_OPT="${{ github.event.inputs.fps }}"
-          
-          SINGLE_TAG="v1.0.${{ github.run_number }}"
-          echo "📦 Creating single release: $SINGLE_TAG"
-          gh release create "$SINGLE_TAG" --title "Batch Clips: $RAW_TITLE" --notes "All generated clips for run ${{ github.run_number }}" || true
+          GAME_NAME="${{ github.event.inputs.game_name }}"
+
+          # Setup Git configuration once
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          mkdir -p game_links
+          FILE_PATH="game_links/${GAME_NAME}.txt"
+          touch "$FILE_PATH"
 
           # Crop Ratios
           CROP=""
@@ -163,11 +168,13 @@ jobs:
           for ((i=1; i<=CLIP_COUNT; i++)); do
             SS=$(( (i-1) * CLIP_LEN ))
             CLIP_FILE="${TITLE_INPUT}${i}.mp4"
-            echo "🎥 Rendering $CLIP_FILE..."
+            CLIP_TAG="v1.0.${{ github.run_number }}-${i}"
+            
+            echo "🎬 Rendering $CLIP_FILE..."
 
             if [ -f "logo.png" ]; then
               ffmpeg -y -ss $SS -t $CLIP_LEN -i "input_video.mp4" -i "logo.png" \
-                -filter_complex "[0:v]${VF_CHAIN}[vid];[1:v]scale=150:-1[logo];[vid][logo]overlay=30:H-h-30" \
+                -filter_complex "[0:v]${VF_CHAIN}[vid];[1:v]scale=160:-1[logo];[vid][logo]overlay=30:H-h-20" \
                 -af "${AF_CHAIN}" \
                 -metadata title="${TITLE_INPUT}${i}" \
                 -metadata artist="PremxGamer HD" \
@@ -213,43 +220,29 @@ jobs:
                 "$CLIP_FILE"
             fi
 
-            echo "🚀 Uploading $CLIP_FILE to single release ($SINGLE_TAG)..."
-            gh release upload "$SINGLE_TAG" "$CLIP_FILE" --clobber
-            
+            echo "📦 Creating unique release for $CLIP_FILE ($CLIP_TAG)..."
+            gh release create "$CLIP_TAG" --title "Clip: $TITLE_INPUT${i}" --notes "Real-time generated clip for run ${{ github.run_number }}" || true
+
+            echo "🚀 Uploading $CLIP_FILE to release..."
+            gh release upload "$CLIP_TAG" "$CLIP_FILE" --clobber
+
+            # Extract the direct download asset URL instantly from the release
+            CLIP_URL=$(gh release view "$CLIP_TAG" --json assets --jq ".assets[] | select(.name == \"$CLIP_FILE\") | .url")
+
+            if [ -n "$CLIP_URL" ]; then
+              echo "📝 Appending link for ${TITLE_INPUT}${i} to $FILE_PATH..."
+              echo "${TITLE_INPUT}${i} | Link: ${CLIP_URL}" >> "$FILE_PATH"
+
+              # Instant git commit and push for this specific clip
+              git add "$FILE_PATH"
+              git commit -m "Real-time add link for clip ${TITLE_INPUT}${i}" || echo "No changes to commit"
+              
+              git pull --rebase origin main || git pull --rebase origin master || true
+              git push origin HEAD:main || git push origin HEAD:master || git push || true
+            fi
+
+            # Clean up local file to free up space
             rm -f "$CLIP_FILE"
           done
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Save All Video Links from Release to Text File
-        run: |
-          GAME_NAME="${{ github.event.inputs.game_name }}"
-          SINGLE_TAG="v1.0.${{ github.run_number }}"
-          
-          mkdir -p game_links
-          FILE_PATH="game_links/${GAME_NAME}.txt"
-          > "$FILE_PATH"
-          
-          echo "🔍 Fetching direct asset download links from release $SINGLE_TAG..."
-          
-          gh release view "$SINGLE_TAG" --json assets --jq '.assets[] | "\(.name) \(.url)"' | while read -r name url; do
-            if [[ "$name" == *.mp4 ]]; then
-              CLEAN_NAME="${name%.mp4}"
-              echo "${CLEAN_NAME} | Link: ${url}" >> "$FILE_PATH"
-            fi
-          done
-          
-          echo "📄 Generated links content:"
-          cat "$FILE_PATH"
-          
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          
-          git add "$FILE_PATH"
-          git commit -m "Add batch links directly from release for ${GAME_NAME}" || echo "No changes to commit"
-          
-          # Safe rebase and push logic
-          git pull --rebase origin main || git pull --rebase origin master || true
-          git push origin HEAD:main || git push origin HEAD:master || git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GitHub_TOKEN }}
