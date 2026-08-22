@@ -1,4 +1,4 @@
-name: Download Googlevideo with Curl
+name: Download Googlevideo with Curl (Termux Style)
 
 on:
   workflow_dispatch:
@@ -16,10 +16,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download using Curl
+      - name: Download using Curl with Headers
         run: |
-          echo "Starting download with curl..."
-          curl -L -o downloaded_video.mp4 "${{ inputs.video_url }}"
+          echo "Starting download with curl and browser headers..."
+          curl -L \
+            -H "User-Agent: Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36" \
+            -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8" \
+            -H "Referer: https://www.youtube.com/" \
+            -o downloaded_video.mp4 \
+            "${{ inputs.video_url }}"
+          
           ls -lh downloaded_video.mp4
 
       - name: Upload file as Artifact
