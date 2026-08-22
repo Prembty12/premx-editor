@@ -17,3 +17,4 @@ mm216 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.8
 mm217 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.81/mm217.mp4
 mm218 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.81/mm218.mp4
 mm219 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.81/mm219.mp4
+mm220 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.81/mm220.mp4
