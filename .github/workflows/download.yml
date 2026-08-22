@@ -1,43 +1,30 @@
-name: Termux Curl Downloader
+name: Download Googlevideo with Curl
 
 on:
   workflow_dispatch:
     inputs:
       video_url:
-        description: 'Paste Direct Google Video Link'
+        description: 'Paste your Googlevideo link here'
         required: true
-        default: ''
+        type: string
 
 jobs:
   download:
-    runs-on: self-hosted   # Yeh zaroori hai taaki kaam aapke phone par ho
-    
+    runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download Video via Curl on Phone
-        env:
-          TARGET_URL: ${{ github.event.inputs.video_url }}
+      - name: Download using Curl
         run: |
-          echo "=========================================="
-          echo "🚀 PremxGamer Direct Link Downloader (Phone)"
-          echo "=========================================="
+          echo "Starting download with curl..."
+          curl -L -o downloaded_video.mp4 "${{ inputs.video_url }}"
+          ls -lh downloaded_video.mp4
 
-          if [ -z "$TARGET_URL" ]; then
-              echo "❌ Error: Link khali nahi ho sakta!"
-              exit 1
-          fi
-
-          OUTPUT_FILE="downloaded_video.mp4"
-
-          echo "📥 Starting download via curl..."
-          
-          # Wahi same working curl command jo aapne Termux par chalai thi
-          curl -L -C - "$TARGET_URL" \
-            -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36" \
-            -H "Referer: https://www.youtube.com/" \
-            -o "$OUTPUT_FILE"
-
-          echo "📊 Checking final file size..."
-          ls -lh "$OUTPUT_FILE"
+      - name: Upload file as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: downloaded-video-file
+          path: downloaded_video.mp4
+          if-no-files-found: ignore
