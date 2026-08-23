@@ -13,3 +13,4 @@ Ghost_soap_escaps12 | Link: https://github.com/Prembty12/premx-editor/releases/d
 Ghost_soap_escaps13 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps13.mp4
 Ghost_soap_escaps14 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps14.mp4
 Ghost_soap_escaps15 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps15.mp4
+Ghost_soap_escaps16 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps16.mp4
