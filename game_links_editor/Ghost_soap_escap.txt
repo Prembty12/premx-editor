@@ -6,3 +6,4 @@ Ghost_soap_escaps5 | Link: https://github.com/Prembty12/premx-editor/releases/do
 Ghost_soap_escaps6 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps6.mp4
 Ghost_soap_escaps7 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps7.mp4
 Ghost_soap_escaps8 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps8.mp4
+Ghost_soap_escaps9 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps9.mp4
