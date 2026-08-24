@@ -6,7 +6,7 @@
 BASE="."
 API="https://graph.facebook.com/v24.0"
 LINKS_DIR="game_links_editor"
-POSTED_DIR="posted_links"
+POSTED_DIR="posted_links_editor"
 FRAMES_DIR="temp_frames"
 
 GAME_LINKS_DIR="$BASE/$LINKS_DIR"
