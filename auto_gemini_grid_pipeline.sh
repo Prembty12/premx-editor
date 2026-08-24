@@ -1,12 +1,12 @@
 #!/bin/bash
 # ==========================================
-# FULLY AUTOMATED PIPELINE (INSTANT TEST MODE)
+# FULLY AUTOMATED PIPELINE (RANDOM GAME & RANDOM LINK PICKER)
 # ==========================================
 
 BASE="."
 API="https://graph.facebook.com/v24.0"
 LINKS_DIR="game_links_editor"
-POSTED_DIR="posted_links_editor"
+POSTED_DIR="posted_links"
 FRAMES_DIR="temp_frames"
 
 GAME_LINKS_DIR="$BASE/$LINKS_DIR"
@@ -30,7 +30,7 @@ get_random_gemini_key() {
     fi
 }
 
-# 1. Unposted game file pick karega
+# 1. Randomly pick an unposted game file from the folder
 shopt -s nullglob
 GAME_FILES=("$GAME_LINKS_DIR"/*.txt)
 
@@ -39,17 +39,20 @@ if [ ${#GAME_FILES[@]} -eq 0 ]; then
     exit 0
 fi
 
-TARGET_FILE="${GAME_FILES[0]}"
+# Pick a random file from the array
+RANDOM_INDEX=$((RANDOM % ${#GAME_FILES[@]}))
+TARGET_FILE="${GAME_FILES[$RANDOM_INDEX]}"
+
 RAW_GNAME=$(basename "$TARGET_FILE")
 SELECTED_GAME_NAME="${RAW_GNAME%_uploaded_links.txt}"
 SELECTED_GAME_NAME="${SELECTED_GAME_NAME%.txt}"
 GAME_POSTED_LOG="$POSTED_LINKS_DIR/${SELECTED_GAME_NAME}_posted_links.txt"
 
-echo "🎮 Auto-Selected Game File: $RAW_GNAME"
+echo "🎮 Randomly Auto-Selected Game File: $RAW_GNAME"
 
-# 2. File se link parse karega
+# 2. Parse and Randomly pick a link from the selected file (Supports '| Link:' format)
 PARSED_DATA=$(TARGET_FILE="$TARGET_FILE" python3 -c "
-import sys, json, os
+import sys, json, os, random
 target = os.environ.get('TARGET_FILE', '')
 if not os.path.exists(target):
     print('{}')
@@ -63,21 +66,30 @@ if not lines:
     print('{}')
     sys.exit(0)
 
-url = ''
-title = ''
-raw_lines = []
-for idx, line in enumerate(lines):
-    if line.startswith('http://') or line.startswith('https://'):
-        url = line
-        if idx > 0 and not lines[idx-1].startswith('http'):
-            title = lines[idx-1]
-            raw_lines = [lines[idx-1], line]
-        else:
-            title = os.path.basename(url).split('?')[0]
-            raw_lines = [line]
-        break
+valid_pairs = []
+for line in lines:
+    # Extract URL if line contains 'http://' or 'https://'
+    if 'http://' in line or 'https://' in line:
+        parts = line.split()
+        url = ''
+        for p in parts:
+            if p.startswith('http://') or p.startswith('https://'):
+                url = p
+                break
+        if url:
+            # Title is the rest of the line or file name
+            title = line.replace(url, '').replace('| Link:', '').replace('|', '').strip()
+            if not title:
+                title = os.path.basename(url).split('?')[0]
+            valid_pairs.append({'title': title, 'url': url, 'raw': line})
 
-print(json.dumps({'title': title.replace('Original:', '').strip(), 'url': url, 'raw': '\n'.join(raw_lines)}))
+if not valid_pairs:
+    print('{}')
+    sys.exit(0)
+
+# Pick a random link from this file
+chosen = random.choice(valid_pairs)
+print(json.dumps({'title': chosen['title'], 'url': chosen['url'], 'raw': chosen['raw']}))
 ")
 
 SELECTED_URL=$(echo "$PARSED_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('url', ''))" 2>/dev/null)
@@ -88,6 +100,8 @@ if [ -z "$SELECTED_URL" ]; then
     echo "⚠️ Is file me koi valid link nahi hai."
     exit 0
 fi
+
+echo "🔗 Randomly Selected Link: $SELECTED_URL"
 
 # 3. 📸 8 Screenshots & Grid Generation
 CURRENT_GEMINI_KEY=$(get_random_gemini_key)
