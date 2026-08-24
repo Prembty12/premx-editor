@@ -209,7 +209,7 @@ if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$IG_ID" ]; then
 
     if [ -n "$CREATION_ID" ] && [ "$CREATION_ID" != "None" ]; then
         echo "⏳ Container created successfully (ID: $CREATION_ID). Waiting 15 seconds for video processing..."
-        sleep 15
+        sleep 40
         
         PUBLISH_RES=$(curl -s -X POST "$API/$IG_ID/media_publish" \
           -d "creation_id=$CREATION_ID" \
