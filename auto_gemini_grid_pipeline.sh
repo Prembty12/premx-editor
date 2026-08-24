@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==========================================
-# FULLY AUTOMATED PIPELINE WITH POST_MODE & 4H GAP CHECK
+# FULLY AUTOMATED PIPELINE (INSTANT TEST MODE)
 # ==========================================
 
 BASE="."
@@ -29,40 +29,6 @@ get_random_gemini_key() {
         echo "${valid_keys[$((RANDOM % ${#valid_keys[@]}))]}"
     fi
 }
-
-# ⏰ 0. SMART 4-HOUR GAP CHECK
-if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$PAGE_ID" ]; then
-    echo "🔍 Checking Facebook last post timing to maintain minimum 4-hour gap..."
-    LAST_POST_RES=$(curl -s "$API/$PAGE_ID/feed?limit=1&access_token=$PAGE_ACCESS_TOKEN")
-    
-    LAST_POST_TIME=$(echo "$LAST_POST_RES" | python3 -c "
-import sys, json
-from datetime import datetime, timezone
-try:
-    data = json.load(sys.stdin)
-    posts = data.get('data', [])
-    if not posts:
-        print('NO_PREVIOUS_POST')
-    else:
-        created_time_str = posts[0].get('created_time', '')
-        post_time = datetime.strptime(created_time_str, '%Y-%m-%dT%H:%M:%S%z')
-        now = datetime.now(timezone.utc)
-        diff_hours = (now - post_time).total_seconds() / 3600
-        print(f'{diff_hours:.2f}')
-except Exception as e:
-    print('ERROR')
-" 2>/dev/null)
-
-    echo "⏱️ Hours since last post: $LAST_POST_TIME"
-
-    if [ "$LAST_POST_TIME" != "NO_PREVIOUS_POST" ] && [ "$LAST_POST_TIME" != "ERROR" ]; then
-        IS_LESS_THAN_4H=$(python3 -c "print(1 if float('$LAST_POST_TIME') < 4.0 else 0)")
-        if [ "$IS_LESS_THAN_4H" -eq 1 ]; then
-            echo "⏳ Last post ko abhi 4 ghante poore nahi hue hain. Spam se bachne ke liye script rok di gayi hai!"
-            exit 0
-        fi
-    fi
-fi
 
 # 1. Unposted game file pick karega
 shopt -s nullglob
