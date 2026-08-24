@@ -1,12 +1,12 @@
 #!/bin/bash
 # ==========================================
-# FULLY AUTOMATED PIPELINE (DEBUGGED POSTING MODE)
+# FULLY AUTOMATED PIPELINE (STATUS CHECK & RETRY LOOP)
 # ==========================================
 
 BASE="."
 API="https://graph.facebook.com/v24.0"
 LINKS_DIR="game_links_editor"
-POSTED_DIR="posted_links_editor"
+POSTED_DIR="posted_links"
 FRAMES_DIR="temp_frames"
 
 GAME_LINKS_DIR="$BASE/$LINKS_DIR"
@@ -193,7 +193,7 @@ CAPTION="$AI_TITLE
 #videogames #gamingcommunity #gaming #${SELECTED_GAME_NAME,,} #gamingreels #reels"
 echo "📝 Selected Title: $AI_TITLE"
 
-# 5. 🚀 POSTING LOGIC (Instagram Only with Detailed Logging)
+# 5. 🚀 POSTING LOGIC (With Status Check & Retry Loop)
 PUBLISH_ID=""
 
 if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$IG_ID" ]; then
@@ -208,9 +208,25 @@ if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$IG_ID" ]; then
     CREATION_ID=$(echo "$CONTAINER_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
 
     if [ -n "$CREATION_ID" ] && [ "$CREATION_ID" != "None" ]; then
-        echo "⏳ Container created successfully (ID: $CREATION_ID). Waiting 15 seconds for video processing..."
-        sleep 40
+        echo "⏳ Container created (ID: $CREATION_ID). Checking video processing status from Instagram..."
         
+        for i in {1..5}; do
+            sleep 15
+            echo "🔍 Status check attempt $i/5..."
+            
+            STATUS_RES=$(curl -s "$API/$CREATION_ID?fields=status_code,status&access_token=$PAGE_ACCESS_TOKEN")
+            echo "📊 Status Response: $STATUS_RES"
+            
+            STATUS_CODE=$(echo "$STATUS_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status_code', ''))" 2>/dev/null)
+            
+            if [ "$STATUS_CODE" == "FINISHED" ]; then
+                echo "✅ Video processing finished by Instagram!"
+                break
+            else
+                echo "⏳ Video is still processing (Status: $STATUS_CODE). Waiting..."
+            fi
+        done
+
         PUBLISH_RES=$(curl -s -X POST "$API/$IG_ID/media_publish" \
           -d "creation_id=$CREATION_ID" \
           -d "access_token=$PAGE_ACCESS_TOKEN")
@@ -235,7 +251,7 @@ if [ -n "$PUBLISH_ID" ] && [ "$PUBLISH_ID" != "None" ]; then
     echo "$INSIGHTS_RES" > "logs/insight_$PUBLISH_ID.json"
 fi
 
-# 7. Local Files Cleanup & Sync (Only runs if Publish ID is successfully generated)
+# 7. Local Files Cleanup & Sync
 if [ -n "$PUBLISH_ID" ] && [ "$PUBLISH_ID" != "None" ]; then
     python3 -c "
 import os
