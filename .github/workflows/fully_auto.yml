@@ -1,13 +1,16 @@
-name: Fully Auto Gemini Grid & Insights Pipeline
+name: Automated Gaming Reels Pipeline
 
 on:
-  schedule:
-    - cron: '0 */6 * * *'
   workflow_dispatch:
+  schedule:
+    - cron: '0 */4 * * *' # Har 4 ghante me run hoga
 
 jobs:
   auto-run:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # 👈 Yeh zaroori hai taaki script posted links aur logs ko wapas repository me save kar sake
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -16,7 +19,12 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+          
+      - name: Install Dependencies & FFmpeg
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg
+          pip install --upgrade pip
+          pip install Pillow
 
       - name: Run Fully Automated Grid Script
         env:
@@ -35,3 +43,4 @@ jobs:
         with:
           commit_message: "🤖 Fully automated grid analysis, posting & insights update"
           branch: main
+          
