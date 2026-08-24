@@ -1,12 +1,12 @@
 #!/bin/bash
 # ==========================================
-# FULLY AUTOMATED PIPELINE (RANDOM GAME & RANDOM LINK PICKER)
+# FULLY AUTOMATED PIPELINE (DEBUGGED POSTING MODE)
 # ==========================================
 
 BASE="."
 API="https://graph.facebook.com/v24.0"
 LINKS_DIR="game_links_editor"
-POSTED_DIR="posted_links"
+POSTED_DIR="posted_links_editor"
 FRAMES_DIR="temp_frames"
 
 GAME_LINKS_DIR="$BASE/$LINKS_DIR"
@@ -39,7 +39,6 @@ if [ ${#GAME_FILES[@]} -eq 0 ]; then
     exit 0
 fi
 
-# Pick a random file from the array
 RANDOM_INDEX=$((RANDOM % ${#GAME_FILES[@]}))
 TARGET_FILE="${GAME_FILES[$RANDOM_INDEX]}"
 
@@ -50,7 +49,7 @@ GAME_POSTED_LOG="$POSTED_LINKS_DIR/${SELECTED_GAME_NAME}_posted_links.txt"
 
 echo "🎮 Randomly Auto-Selected Game File: $RAW_GNAME"
 
-# 2. Parse and Randomly pick a link from the selected file (Supports '| Link:' format)
+# 2. Parse and Randomly pick a link from the selected file
 PARSED_DATA=$(TARGET_FILE="$TARGET_FILE" python3 -c "
 import sys, json, os, random
 target = os.environ.get('TARGET_FILE', '')
@@ -68,7 +67,6 @@ if not lines:
 
 valid_pairs = []
 for line in lines:
-    # Extract URL if line contains 'http://' or 'https://'
     if 'http://' in line or 'https://' in line:
         parts = line.split()
         url = ''
@@ -77,7 +75,6 @@ for line in lines:
                 url = p
                 break
         if url:
-            # Title is the rest of the line or file name
             title = line.replace(url, '').replace('| Link:', '').replace('|', '').strip()
             if not title:
                 title = os.path.basename(url).split('?')[0]
@@ -87,7 +84,6 @@ if not valid_pairs:
     print('{}')
     sys.exit(0)
 
-# Pick a random link from this file
 chosen = random.choice(valid_pairs)
 print(json.dumps({'title': chosen['title'], 'url': chosen['url'], 'raw': chosen['raw']}))
 ")
@@ -197,7 +193,7 @@ CAPTION="$AI_TITLE
 #videogames #gamingcommunity #gaming #${SELECTED_GAME_NAME,,} #gamingreels #reels"
 echo "📝 Selected Title: $AI_TITLE"
 
-# 5. 🚀 POSTING LOGIC (Instagram Only vs Both)
+# 5. 🚀 POSTING LOGIC (Instagram Only with Detailed Logging)
 PUBLISH_ID=""
 
 if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$IG_ID" ]; then
@@ -208,26 +204,28 @@ if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$IG_ID" ]; then
       --data-urlencode "caption=$CAPTION" \
       --data-urlencode "access_token=$PAGE_ACCESS_TOKEN")
 
+    echo "📦 Container Response: $CONTAINER_RES"
     CREATION_ID=$(echo "$CONTAINER_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
 
     if [ -n "$CREATION_ID" ] && [ "$CREATION_ID" != "None" ]; then
-        sleep 12
+        echo "⏳ Container created successfully (ID: $CREATION_ID). Waiting 15 seconds for video processing..."
+        sleep 15
+        
         PUBLISH_RES=$(curl -s -X POST "$API/$IG_ID/media_publish" \
           -d "creation_id=$CREATION_ID" \
           -d "access_token=$PAGE_ACCESS_TOKEN")
+          
+        echo "📢 Publish Response: $PUBLISH_RES"
         PUBLISH_ID=$(echo "$PUBLISH_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
-        echo "🎉 Instagram Post Published! ID: $PUBLISH_ID"
+        
+        if [ -n "$PUBLISH_ID" ] && [ "$PUBLISH_ID" != "None" ]; then
+            echo "🎉 Instagram Post Published Successfully! ID: $PUBLISH_ID"
+        else
+            echo "❌ Error: Failed to publish container!"
+        fi
+    else
+        echo "❌ Error: Failed to create Instagram media container!"
     fi
-fi
-
-echo "🎛️ Current Posting Mode: $POST_MODE"
-if [ "$POST_MODE" == "both" ] && [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$PAGE_ID" ]; then
-    echo "🚀 'both' mode active hai, Facebook Page par bhi post ho rahi hai..."
-    FB_POST_RES=$(curl -s -X POST "$API/$PAGE_ID/videos" \
-      --data-urlencode "file_url=$SELECTED_URL" \
-      --data-urlencode "description=$CAPTION" \
-      --data-urlencode "access_token=$PAGE_ACCESS_TOKEN")
-    echo "🎉 Facebook Post Result: $FB_POST_RES"
 fi
 
 # 6. 📊 Insights Check
@@ -237,8 +235,8 @@ if [ -n "$PUBLISH_ID" ] && [ "$PUBLISH_ID" != "None" ]; then
     echo "$INSIGHTS_RES" > "logs/insight_$PUBLISH_ID.json"
 fi
 
-# 7. Local Files Cleanup & Sync
-if [ -n "$PUBLISH_ID" ]; then
+# 7. Local Files Cleanup & Sync (Only runs if Publish ID is successfully generated)
+if [ -n "$PUBLISH_ID" ] && [ "$PUBLISH_ID" != "None" ]; then
     python3 -c "
 import os
 target_file = '$TARGET_FILE'
@@ -258,4 +256,6 @@ with open(posted_log, 'a', encoding='utf-8') as f:
     f.write(selected_line + f'\nVideo id : {pub_id}\n\n')
 print('✅ Link shifted to posted folder!')
 "
+else
+    echo "⚠️ Skipped file sync because Publish ID was not generated."
 fi
