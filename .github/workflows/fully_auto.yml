@@ -1,1 +1,38 @@
+name: Fully Auto Gemini Grid & Insights Pipeline
 
+on:
+  schedule:
+    - cron: '0 */6 * * *' # Har 6 ghante me auto run hoga
+  workflow_dispatch: # GitHub se manually 'Run workflow' dabane ke liye
+
+jobs:
+  auto-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python & FFmpeg
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Run Fully Automated Grid Script
+        env:
+          GEMINI_API_KEY_1: ${{ secrets.GEMINI_API_KEY_1 }}
+          GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}
+          GEMINI_API_KEY_3: ${{ secrets.GEMINI_API_KEY_3 }}
+          PAGE_ACCESS_TOKEN: ${{ secrets.PAGE_ACCESS_TOKEN }}
+          PAGE_ID: ${{ secrets.PAGE_ID }}
+          IG_ID: ${{ secrets.IG_ID }}
+          POST_MODE: 'ig_only'   # Yahan 'ig_only' ya 'both' set karein
+        run: |
+          bash auto_gemini_grid_pipeline.sh
+
+      - name: Commit & Push Changes Back to Repository
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "🤖 Fully automated grid analysis, posting & insights update"
+          branch: main
+          
