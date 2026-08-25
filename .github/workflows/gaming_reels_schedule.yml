@@ -3,7 +3,7 @@ name: gaming_reels_schedule
 on:
   workflow_dispatch:
   schedule:
-    - cron: '*/3 * * * *' # Har 5 minutes mein background mein check karega
+    - cron: '*/5 * * * *' # Har 5 minutes mein background mein check karega
 
 jobs:
   auto-run:
@@ -19,11 +19,12 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
+          cache: 'pip' # Ab yeh requirements.txt ko dhoondh lega aur cache perfectly kaam karega!
           
       - name: Install Dependencies & FFmpeg
         run: |
           sudo apt-get update && sudo apt-get install -y ffmpeg
-          pip install Pillow requests
+          pip install -r requirements.txt
 
       - name: Run Fully Automated Grid Script
         env:
@@ -34,7 +35,7 @@ jobs:
           PAGE_ID: ${{ secrets.PAGE_ID }}
           IG_ID: ${{ secrets.IG_ID }}
           POST_MODE: 'ig_only'
-          COOLDOWN_MINUTES: '300' # 👈 Yahan se aap cooldown control kar sakte hain (jaise 300 minutes = 5 hours)
+          COOLDOWN_MINUTES: '300' # 300 minutes (5 hours) cooldown gap
         run: |
           bash auto_gemini_grid_pipeline_schedule.sh
 
