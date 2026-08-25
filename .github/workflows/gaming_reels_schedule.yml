@@ -3,7 +3,8 @@ name: Automated Gaming Reels Pipeline
 on:
   workflow_dispatch:
   schedule:
-    - cron: '*/20 * * * *' # Testing ke liye har 20 minutes
+    - cron: '*/5 * * * *' # Testing ke liye har 5 minutes
+
 
 
 jobs:
