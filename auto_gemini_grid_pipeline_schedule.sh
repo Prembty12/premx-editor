@@ -6,7 +6,7 @@
 BASE="."
 API="https://graph.facebook.com/v24.0"
 LINKS_DIR="game_links_editor"
-POSTED_DIR="posted_links"
+POSTED_DIR="posted_links_editor"
 FRAMES_DIR="temp_frames"
 
 GAME_LINKS_DIR="$BASE/$LINKS_DIR"
@@ -88,7 +88,7 @@ TARGET_FILE="${GAME_FILES[$RANDOM_INDEX]}"
 RAW_GNAME=$(basename "$TARGET_FILE")
 SELECTED_GAME_NAME="${RAW_GNAME%_uploaded_links.txt}"
 SELECTED_GAME_NAME="${SELECTED_GAME_NAME%.txt}"
-GAME_POSTED_LOG="$POSTED_LINKS_DIR/${SELECTED_GAME_NAME}_posted_links.txt"
+GAME_POSTED_LOG="$POSTED_LINKS_DIR/${SELECTED_GAME_NAME}_posted_links_editor.txt"
 
 echo "🎮 Randomly Auto-Selected Game File: $RAW_GNAME"
 
