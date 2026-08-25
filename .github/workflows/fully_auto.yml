@@ -1,7 +1,7 @@
 name: Automated Gaming Reels Pipeline
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # Sirf manual / instant run ke liye
 
 jobs:
   auto-run:
@@ -13,15 +13,15 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Python & FFmpeg
+      - name: Set up Python & Cache
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
+          cache: 'pip' # 👈 Yeh pip packages ko cache karega
           
       - name: Install Dependencies & FFmpeg
         run: |
           sudo apt-get update && sudo apt-get install -y ffmpeg
-          pip install --upgrade pip
           pip install Pillow
 
       - name: Run Fully Automated Grid Script
@@ -41,4 +41,3 @@ jobs:
         with:
           commit_message: "🤖 Fully automated grid analysis, posting & insights update"
           branch: main
-          
