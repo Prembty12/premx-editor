@@ -1,4 +1,4 @@
-name: Automated Gaming Reels Pipeline
+name: gaming_reels_schedule
 
 on:
   workflow_dispatch:
