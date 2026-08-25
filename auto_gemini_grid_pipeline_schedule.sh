@@ -237,7 +237,7 @@ if [ -f "$GRID_PATH" ]; then
 
             echo "🤖 Requesting title generation from Gemini model..."
             gemini_resp=$(curl -s -X POST -H "Content-Type: application/json" \
-              "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=$CURRENT_GEMINI_KEY" \
+              "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=$CURRENT_GEMINI_KEY" \
               -d "$payload")
 
             echo "📥 Raw Gemini Response:"
