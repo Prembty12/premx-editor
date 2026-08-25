@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==========================================
-# FULLY AUTOMATED PIPELINE (WITH 5-HOURS GAP CHECK)
+# FULLY AUTOMATED PIPELINE (WITH LIVE DEBUG INFO & 5-HOURS GAP CHECK)
 # ==========================================
 
 BASE="."
@@ -46,13 +46,12 @@ try:
     res = requests.get(url).json()
     if 'data' in res and len(res['data']) > 0:
         created_time_str = res['data'][0].get('created_time')
-        # Parse Facebook ISO format timestamp
         last_time = datetime.strptime(created_time_str, '%Y-%m-%dT%H:%M:%S%z')
         now = datetime.now(timezone.utc)
         diff_hours = (now - last_time).total_seconds() / 3600
         print(f'LAST_POST_HOURS:{diff_hours}')
     else:
-        print('LAST_POST_HOURS:999') # No posts found, safe to post
+        print('LAST_POST_HOURS:999')
 except Exception as e:
     print(f'ERROR:{e}')
     print('LAST_POST_HOURS:999')
@@ -61,13 +60,12 @@ except Exception as e:
     HOURS_AGO=$(echo "$LAST_POST_CHECK" | grep "LAST_POST_HOURS" | cut -d':' -f2)
     
     if [ -n "$HOURS_AGO" ]; then
-        # Compare if hours ago is less than 5 using python float check
         IS_LESS_THAN_5=$(python3 -c "print('yes' if float('$HOURS_AGO') < 5.0 else 'no')")
         
         if [ "$IS_LESS_THAN_5" == "yes" ]; then
             rem_time=$(python3 -c "print(round(5.0 - float('$HOURS_AGO'), 2))")
             echo "⏳ 5 ghante ka gap poora nahi hua hai! Aakhri post sirf $HOURS_AGO ghante pehle ki gayi thi."
-            echo "🛑 Script ko rok diya gaya hai. Kripya $rem_time ghante baad try karein (ya agar aapne manual post ki hai toh timer reset ho gaya hai)."
+            echo "🛑 Script ko rok diya gaya hai. Kripya $rem_time ghante baad try karein."
             exit 0
         else
             echo "✅ 5 ghante ka gap poora ho chuka hai ($HOURS_AGO ghante pehle post hui thi). Nayi post ki ja sakti hai!"
@@ -144,20 +142,24 @@ fi
 
 echo "🔗 Randomly Selected Link: $SELECTED_URL"
 
-# 3. 📸 8 Screenshots & Grid Generation
+# 3. 📸 8 Screenshots & Grid Generation (Live FFmpeg Info Enabled)
 CURRENT_GEMINI_KEY=$(get_random_gemini_key)
 rm -f "$FRAMES_DIR"/*.jpg
 
+echo "📸 Taking 8 screenshots from video..."
 timestamps=("00:00:02" "00:00:05" "00:00:08" "00:00:11" "00:00:14" "00:00:17" "00:00:20" "00:00:23")
 for i in "${!timestamps[@]}"; do
     idx=$((i+1))
-    ffmpeg -y -ss "${timestamps[$i]}" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$FRAMES_DIR/frame_$idx.jpg" &>/dev/null
+    echo "✂️ Cutting frame $idx at timestamp ${timestamps[$i]}..."
+    ffmpeg -y -ss "${timestamps[$i]}" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$FRAMES_DIR/frame_$idx.jpg"
     if [ ! -f "$FRAMES_DIR/frame_$idx.jpg" ]; then
-        ffmpeg -y -ss "00:00:02" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$FRAMES_DIR/frame_$idx.jpg" &>/dev/null
+        echo "⚠️ Fallback frame cut at 00:00:02..."
+        ffmpeg -y -ss "00:00:02" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$FRAMES_DIR/frame_$idx.jpg"
     fi
 done
 
 GRID_PATH="$FRAMES_DIR/merged_8_grid.jpg"
+echo "🧩 Merging frames into grid image..."
 
 python3 - <<EOF
 import os
@@ -177,12 +179,15 @@ for idx, im in enumerate(images):
     row = idx // 2
     grid_img.paste(im, (col * 540, row * 960))
 grid_img.save('$GRID_PATH', 'JPEG', quality=85)
+print("✅ Grid image created successfully!")
 EOF
 
-# 4. Gemini se Viral Title Generation
+# 4. Gemini se Viral Title Generation (Live Upload & Response Debugging)
 AI_TITLE=""
 if [ -f "$GRID_PATH" ]; then
     file_size=$(wc -c < "$GRID_PATH")
+    echo "📤 Initializing upload of grid image to Gemini API..."
+    
     upload_res=$(curl -s -D - -X POST "https://generativelanguage.googleapis.com/upload/v1beta/files?key=$CURRENT_GEMINI_KEY" \
       -H "X-Goog-Upload-Protocol: resumable" \
       -H "X-Goog-Upload-Command: start" \
@@ -191,9 +196,13 @@ if [ -f "$GRID_PATH" ]; then
       -H "Content-Type: application/json" \
       -d '{"file": {"display_name": "GridScreenshot"}}')
 
+    echo "📦 Upload Init Response Headers & Body:"
+    echo "$upload_res"
+
     gemini_upload_url=$(echo "$upload_res" | grep -i "x-goog-upload-url:" | tr -d '\r' | cut -d' ' -f2)
 
     if [ -n "$gemini_upload_url" ]; then
+        echo "🚀 Uploading binary data to Gemini session..."
         finalize_res=$(curl -s -X POST "$gemini_upload_url" \
           -H "X-Goog-Upload-Protocol: resumable" \
           -H "X-Goog-Upload-Command: upload, finalize" \
@@ -201,12 +210,18 @@ if [ -f "$GRID_PATH" ]; then
           -H "Content-Length: $file_size" \
           --data-binary "@$GRID_PATH")
 
+        echo "🏁 Finalize Response: $finalize_res"
         file_uri=$(echo "$finalize_res" | jq -r '.file.uri // empty')
         
         if [ -n "$file_uri" ]; then
             file_name_g_api=$(echo "$file_uri" | awk -F'/' '{print $NF}')
+            echo "⏳ Waiting for Gemini file to become ACTIVE..."
+            
             while true; do
-              state=$(curl -s "https://generativelanguage.googleapis.com/v1beta/files/$file_name_g_api?key=$CURRENT_GEMINI_KEY" | jq -r '.state // empty')
+              state_res=$(curl -s "https://generativelanguage.googleapis.com/v1beta/files/$file_name_g_api?key=$CURRENT_GEMINI_KEY")
+              state=$(echo "$state_res" | jq -r '.state // empty')
+              echo "🔄 Current Gemini File State: $state"
+              
               [ "$state" = "ACTIVE" ] && break
               [ "$state" = "FAILED" ] && break
               sleep 1
@@ -220,25 +235,36 @@ if [ -f "$GRID_PATH" ]; then
               --arg ptext "$prompt_text" \
               '{contents: [{parts: [{file_data: {file_uri: $uri, mime_type: $mime}}, {text: $ptext}]}]}')
 
+            echo "🤖 Requesting title generation from Gemini model..."
             gemini_resp=$(curl -s -X POST -H "Content-Type: application/json" \
               "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=$CURRENT_GEMINI_KEY" \
               -d "$payload")
 
+            echo "📥 Raw Gemini Response:"
+            echo "$gemini_resp"
+
             AI_TITLE=$(echo "$gemini_resp" | jq -r '.candidates[0].content.parts[0].text // empty' | tr -d '"')
+        else
+            echo "❌ Error: File URI could not be extracted from finalize response."
         fi
+    else
+        echo "❌ Error: Gemini upload URL could not be fetched."
     fi
+else
+    echo "❌ Error: Grid path image file not found."
 fi
 
 if [ -z "$AI_TITLE" ] || [ "$AI_TITLE" == "null" ]; then
     AI_TITLE="🔥 Insane Pro Gaming Moments! 🎮🔥"
+    echo "⚠️ Falling back to default title because Gemini title was empty."
 fi
 
 CAPTION="$AI_TITLE
 
 #videogames #gamingcommunity #gaming #${SELECTED_GAME_NAME,,} #gamingreels #reels"
-echo "📝 Selected Title: $AI_TITLE"
+echo "📝 Final Title Selected: $AI_TITLE"
 
-# 5. 🚀 POSTING LOGIC (With Status Check & Retry Loop)
+# 5. 🚀 POSTING LOGIC (Instagram Reels)
 PUBLISH_ID=""
 
 if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$IG_ID" ]; then
