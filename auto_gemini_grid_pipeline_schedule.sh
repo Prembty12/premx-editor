@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==========================================
-# FULLY AUTOMATED PIPELINE (LOCAL FILE COOLDOWN - ZERO API ABUSE)
+# FULLY AUTOMATED PIPELINE (SMART HYBRID COOLDOWN - ZERO API ABUSE)
 # ==========================================
 
 BASE="."
@@ -14,7 +14,7 @@ GAME_LINKS_DIR="$BASE/$LINKS_DIR"
 POSTED_LINKS_DIR="$BASE/$POSTED_DIR"
 mkdir -p "$GAME_LINKS_DIR" "$POSTED_LINKS_DIR" "$FRAMES_DIR" "logs"
 
-# ⏱️ Target Cooldown Minutes (Default 300 minutes / 5 hours, ya YAML environment se)
+# ⏱️ Target Cooldown Minutes (Default 300 minutes / 5 hours)
 TARGET_COOLDOWN_MINUTES="${COOLDOWN_MINUTES:-300}"
 
 # 🔑 Gemini Keys Rotation System
@@ -34,30 +34,71 @@ get_random_gemini_key() {
     fi
 }
 
-# 0. ⏳ Local File Cooldown Check (No unnecessary API calls every 5 mins!)
-if [ -f "$COOLDOWN_TRACKER" ]; then
-    LAST_POST_EPOCH=$(cat "$COOLDOWN_TRACKER" | tr -d '[:space:]')
+# 🧠 SMART HYBRID COOLDOWN CHECK (Pehle local file, phir zaroorat padne par Live FB API)
+check_fb_cooldown() {
     CURRENT_EPOCH=$(date +%s)
     
-    if [[ "$LAST_POST_EPOCH" =~ ^[0-9]+$ ]]; then
-        DIFF_SECONDS=$((CURRENT_EPOCH - LAST_POST_EPOCH))
-        DIFF_MINS=$(python3 -c "print(round($DIFF_SECONDS / 60, 2))")
+    # STEP 1: Pehle Local File check karo (Zero API abuse)
+    if [ -f "$COOLDOWN_TRACKER" ]; then
+        LAST_POST_EPOCH=$(cat "$COOLDOWN_TRACKER" | tr -d '[:space:]')
         
-        IS_LESS_THAN_COOLDOWN=$(python3 -c "print('yes' if float('$DIFF_MINS') < float('$TARGET_COOLDOWN_MINUTES') else 'no')")
-        
-        if [ "$IS_LESS_THAN_COOLDOWN" == "yes" ]; then
-            rem_time_mins=$(python3 -c "print(round(float('$TARGET_COOLDOWN_MINUTES') - float('$DIFF_MINS'), 2))")
-            rem_hours=$(python3 -c "print(round(float('$rem_time_mins') / 60, 2))")
-            echo "⏳ Cooldown active hai! Aakhri post ko sirf $DIFF_MINS minutes hue hain."
-            echo "🛑 Script chupchaap exit ho rahi hai. Lagbhag $rem_hours ghante ($rem_time_mins minutes) baad fir se check hoga."
-            exit 0
-        else
-            echo "✅ Cooldown period ($TARGET_COOLDOWN_MINUTES minutes) poora ho chuka hai. Nayi post process ho rahi hai!"
+        if [[ "$LAST_POST_EPOCH" =~ ^[0-9]+$ ]]; then
+            DIFF_SECONDS=$((CURRENT_EPOCH - LAST_POST_EPOCH))
+            DIFF_MINS=$(python3 -c "print(round($DIFF_SECONDS / 60, 2))")
+            
+            IS_LESS_THAN_COOLDOWN=$(python3 -c "print('yes' if float('$DIFF_MINS') < float('$TARGET_COOLDOWN_MINUTES') else 'no')")
+            
+            if [ "$IS_LESS_THAN_COOLDOWN" == "yes" ]; then
+                rem_time_mins=$(python3 -c "print(round(float('$TARGET_COOLDOWN_MINUTES') - float('$DIFF_MINS'), 2))")
+                rem_hours=$(python3 -c "print(round(float('$rem_time_mins') / 60, 2))")
+                echo "⏳ [Local Cache] Cooldown active hai! Aakhri post ko sirf $DIFF_MINS minutes hue hain."
+                echo "🛑 Script chupchaap exit ho rahi hai. Lagbhag $rem_hours ghante baaki hain."
+                exit 0
+            else
+                echo "✅ [Local Cache] Cooldown period poora ho chuka hai. Live API verification check kar rahe hain..."
+            fi
         fi
+    else
+        echo "⚠️ Local tracker file nahi mili. Live Facebook API se verify kar rahe hain..."
     fi
-else
-    echo "⚠️ Cooldown tracker file nahi mili, pehli baar run ho raha hai ya nayi file hai. Proceeding..."
-fi
+
+    # STEP 2: Agar local cache clear ho, toh Live Facebook Page API se cross-check karo
+    if [ -n "$FB_PAGE_ACCESS_TOKEN" ]; then
+        echo "🔍 Checking live Facebook page timeline for last post timestamp..."
+        FB_API_URL="https://graph.facebook.com/v21.0/me/feed?fields=created_time&limit=1&access_token=${FB_PAGE_ACCESS_TOKEN}"
+        
+        API_RESPONSE=$(curl -s "$FB_API_URL")
+        LAST_POST_TIME_STR=$(echo "$API_RESPONSE" | grep -o '"created_time":"[^"]*"' | head -n 1 | cut -d'"' -f4)
+        
+        if [ -n "$LAST_POST_TIME_STR" ]; then
+            LAST_POST_EPOCH=$(date -d "$LAST_POST_TIME_STR" +%s 2>/dev/null)
+            
+            if [ -n "$LAST_POST_EPOCH" ]; then
+                DIFF_SECONDS=$(( CURRENT_EPOCH - LAST_POST_EPOCH ))
+                DIFF_MINUTES=$(( DIFF_SECONDS / 60 ))
+                
+                echo "⏱️ Live API ke mutabiq, aakhri post ko $DIFF_MINUTES minutes ho chuke hain."
+                
+                if [ $DIFF_MINUTES -lt $TARGET_COOLDOWN_MINUTES ]; then
+                    REMAINING=$(( TARGET_COOLDOWN_MINUTES - DIFF_MINUTES ))
+                    echo "⏳ Cooldown active hai! Abhi bhi $REMAINING minutes baaki hain."
+                    echo "$LAST_POST_EPOCH" > "$COOLDOWN_TRACKER"
+                    echo "🛑 Script exit ho rahi hai."
+                    exit 0
+                else
+                    echo "✅ Live API Cooldown bhi poora ho chuka hai! Nayi post process ho rahi hai."
+                fi
+            fi
+        else
+            echo "⚠️ Facebook API se time nahi mila, local state ke bharose aage badh rahe hain."
+        fi
+    else
+        echo "⚠️ FB_PAGE_ACCESS_TOKEN missing hai, live API check skip kiya."
+    fi
+}
+
+# 🚀 Script ke shuru mein Cooldown Check run hoga
+check_fb_cooldown
 
 # 1. Randomly pick an unposted game file from the folder
 shopt -s nullglob
@@ -190,10 +231,10 @@ if [ -f "$GRID_PATH" ]; then
         if [ -n "$file_uri" ]; then
             file_name_g_api=$(echo "$file_uri" | awk -F'/' '{print $NF}')
             while true; do
-              state=$(curl -s "https://generativelanguage.googleapis.com/v1beta/files/$file_name_g_api?key=$CURRENT_GEMINI_KEY" | jq -r '.state // empty')
-              [ "$state" = "ACTIVE" ] && break
-              [ "$state" = "FAILED" ] && break
-              sleep 1
+             state=$(curl -s "https://generativelanguage.googleapis.com/v1beta/files/$file_name_g_api?key=$CURRENT_GEMINI_KEY" | jq -r '.state // empty')
+             [ "$state" = "ACTIVE" ] && break
+             [ "$state" = "FAILED" ] && break
+             sleep 1
             done
 
             prompt_text="Based on this 8-photos 9:16 grid screenshot, choose and output ONLY ONE single best, highly viral catchy Hook title with emojis. Do not mention game names or file numbers. Just output the plain text title string."
@@ -241,7 +282,7 @@ if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$IG_ID" ]; then
         
         for i in {1..10}; do
             sleep 15
-            echo "🔍 Status check attempt $i/5..."
+            echo "🔍 Status check attempt $i/10..."
             
             STATUS_RES=$(curl -s "$API/$CREATION_ID?fields=status_code,status&access_token=$PAGE_ACCESS_TOKEN")
             echo "📊 Status Response: $STATUS_RES"
