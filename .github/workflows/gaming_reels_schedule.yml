@@ -1,0 +1,46 @@
+name: Automated Gaming Reels Pipeline
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/20 * * * *' # Testing ke liye har 20 minutes
+
+
+jobs:
+  auto-run:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # 👈 Yeh zaroori hai taaki script posted links aur logs ko wapas repository me save kar sake
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python & FFmpeg
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          
+      - name: Install Dependencies & FFmpeg
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg
+          pip install --upgrade pip
+          pip install Pillow
+
+      - name: Run Fully Automated Grid Script
+        env:
+          GEMINI_API_KEY_1: ${{ secrets.GEMINI_API_KEY_1 }}
+          GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}
+          GEMINI_API_KEY_3: ${{ secrets.GEMINI_API_KEY_3 }}
+          PAGE_ACCESS_TOKEN: ${{ secrets.PAGE_ACCESS_TOKEN }}
+          PAGE_ID: ${{ secrets.PAGE_ID }}
+          IG_ID: ${{ secrets.IG_ID }}
+          POST_MODE: 'ig_only'
+        run: |
+          bash auto_gemini_grid_pipeline_schedule.sh
+
+      - name: Commit & Push Changes Back to Repository
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "🤖 Fully automated grid analysis, posting & insights update"
+          branch: main
