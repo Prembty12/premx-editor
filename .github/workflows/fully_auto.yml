@@ -2,8 +2,6 @@ name: Automated Gaming Reels Pipeline
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 */4 * * *' # Har 4 ghante me run hoga
 
 jobs:
   auto-run:
