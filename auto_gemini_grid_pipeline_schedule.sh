@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==========================================
-# FULLY AUTOMATED PIPELINE (WITH 5-HOURS GAP CHECK)
+# FULLY AUTOMATED PIPELINE (LOCAL FILE COOLDOWN - ZERO API ABUSE)
 # ==========================================
 
 BASE="."
@@ -8,10 +8,14 @@ API="https://graph.facebook.com/v24.0"
 LINKS_DIR="game_links_editor"
 POSTED_DIR="posted_links"
 FRAMES_DIR="temp_frames"
+COOLDOWN_TRACKER="logs/last_post_timestamp.txt"
 
 GAME_LINKS_DIR="$BASE/$LINKS_DIR"
 POSTED_LINKS_DIR="$BASE/$POSTED_DIR"
 mkdir -p "$GAME_LINKS_DIR" "$POSTED_LINKS_DIR" "$FRAMES_DIR" "logs"
+
+# ⏱️ Target Cooldown Minutes (Default 300 minutes / 5 hours, ya YAML environment se)
+TARGET_COOLDOWN_MINUTES="${COOLDOWN_MINUTES:-300}"
 
 # 🔑 Gemini Keys Rotation System
 GEMINI_KEYS=("$GEMINI_API_KEY_1" "$GEMINI_API_KEY_2" "$GEMINI_API_KEY_3")
@@ -30,49 +34,29 @@ get_random_gemini_key() {
     fi
 }
 
-# 0. ⏳ Check 5 Hours Gap from Facebook Page Last Post (Manual or Auto)
-if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$PAGE_ID" ]; then
-    echo "🔍 Checking last post time on Facebook Page to ensure 5-hour gap..."
+# 0. ⏳ Local File Cooldown Check (No unnecessary API calls every 5 mins!)
+if [ -f "$COOLDOWN_TRACKER" ]; then
+    LAST_POST_EPOCH=$(cat "$COOLDOWN_TRACKER" | tr -d '[:space:]')
+    CURRENT_EPOCH=$(date +%s)
     
-    LAST_POST_CHECK=$(python3 -c "
-import requests, sys
-from datetime import datetime, timezone
-
-page_id = '$PAGE_ID'
-token = '$PAGE_ACCESS_TOKEN'
-url = f'https://graph.facebook.com/v24.0/{page_id}/feed?access_token={token}&limit=1'
-
-try:
-    res = requests.get(url).json()
-    if 'data' in res and len(res['data']) > 0:
-        created_time_str = res['data'][0].get('created_time')
-        # Parse Facebook ISO format timestamp
-        last_time = datetime.strptime(created_time_str, '%Y-%m-%dT%H:%M:%S%z')
-        now = datetime.now(timezone.utc)
-        diff_hours = (now - last_time).total_seconds() / 3600
-        print(f'LAST_POST_HOURS:{diff_hours}')
-    else:
-        print('LAST_POST_HOURS:999') # No posts found, safe to post
-except Exception as e:
-    print(f'ERROR:{e}')
-    print('LAST_POST_HOURS:999')
-")
-
-    HOURS_AGO=$(echo "$LAST_POST_CHECK" | grep "LAST_POST_HOURS" | cut -d':' -f2)
-    
-    if [ -n "$HOURS_AGO" ]; then
-        # Compare if hours ago is less than 5 using python float check
-        IS_LESS_THAN_5=$(python3 -c "print('yes' if float('$HOURS_AGO') < 5.0 else 'no')")
+    if [[ "$LAST_POST_EPOCH" =~ ^[0-9]+$ ]]; then
+        DIFF_SECONDS=$((CURRENT_EPOCH - LAST_POST_EPOCH))
+        DIFF_MINS=$(python3 -c "print(round($DIFF_SECONDS / 60, 2))")
         
-        if [ "$IS_LESS_THAN_5" == "yes" ]; then
-            rem_time=$(python3 -c "print(round(5.0 - float('$HOURS_AGO'), 2))")
-            echo "⏳ 5 ghante ka gap poora nahi hua hai! Aakhri post sirf $HOURS_AGO ghante pehle ki gayi thi."
-            echo "🛑 Script ko rok diya gaya hai. Kripya $rem_time ghante baad try karein (ya agar aapne manual post ki hai toh timer reset ho gaya hai)."
+        IS_LESS_THAN_COOLDOWN=$(python3 -c "print('yes' if float('$DIFF_MINS') < float('$TARGET_COOLDOWN_MINUTES') else 'no')")
+        
+        if [ "$IS_LESS_THAN_COOLDOWN" == "yes" ]; then
+            rem_time_mins=$(python3 -c "print(round(float('$TARGET_COOLDOWN_MINUTES') - float('$DIFF_MINS'), 2))")
+            rem_hours=$(python3 -c "print(round(float('$rem_time_mins') / 60, 2))")
+            echo "⏳ Cooldown active hai! Aakhri post ko sirf $DIFF_MINS minutes hue hain."
+            echo "🛑 Script chupchaap exit ho rahi hai. Lagbhag $rem_hours ghante ($rem_time_mins minutes) baad fir se check hoga."
             exit 0
         else
-            echo "✅ 5 ghante ka gap poora ho chuka hai ($HOURS_AGO ghante pehle post hui thi). Nayi post ki ja sakti hai!"
+            echo "✅ Cooldown period ($TARGET_COOLDOWN_MINUTES minutes) poora ho chuka hai. Nayi post process ho rahi hai!"
         fi
     fi
+else
+    echo "⚠️ Cooldown tracker file nahi mili, pehli baar run ho raha hai ya nayi file hai. Proceeding..."
 fi
 
 # 1. Randomly pick an unposted game file from the folder
@@ -289,11 +273,15 @@ if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$IG_ID" ]; then
     fi
 fi
 
-# 6. 📊 Insights Check
+# 6. 📊 Insights Check & 🕒 Save Current Timestamp to Local File (Crucial for Cooldown)
 if [ -n "$PUBLISH_ID" ] && [ "$PUBLISH_ID" != "None" ]; then
     echo "📊 Fetching Instagram insights..."
     INSIGHTS_RES=$(curl -s "$API/$PUBLISH_ID/insights?metric=clips_reels_play_count,clips_reels_total_interactions,likes,comments&access_token=$PAGE_ACCESS_TOKEN")
     echo "$INSIGHTS_RES" > "logs/insight_$PUBLISH_ID.json"
+
+    # Save current epoch time so next runs know exact post time without calling API!
+    date +%s > "$COOLDOWN_TRACKER"
+    echo "🕒 New post timestamp saved locally for cooldown tracking."
 fi
 
 # 7. Local Files Cleanup & Sync
@@ -320,4 +308,3 @@ print('✅ Link shifted to posted folder!')
 else
     echo "⚠️ Skipped file sync because Publish ID was not generated."
 fi
-
