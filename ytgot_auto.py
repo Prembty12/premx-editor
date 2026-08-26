@@ -29,7 +29,7 @@ def get_ytgot_download_link(youtube_url):
         search_box.clear()
         search_box.send_keys(youtube_url)
         
-        print("Download button par click kar rahe hain...")
+        print("Download/Search button par click kar rahe hain...")
         try:
             download_btn = download_box.find_element(By.TAG_NAME, "button")
             download_btn.click()
@@ -37,10 +37,10 @@ def get_ytgot_download_link(youtube_url):
             download_btn = driver.find_element(By.XPATH, "//button[contains(text(), 'Download')]")
             download_btn.click()
             
-        print("Video info load hone ka wait ho raha hai...")
-        time.sleep(6)
+        print("Link paste karne ke baad 5 second wait kar rahe hain...")
+        time.sleep(5)  # Aapka bataya hua 5 second ka wait
         
-        print("Start button par click kar rahe hain...")
+        print("Ab Start button par click kar rahe hain...")
         start_btn = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@id='download-box']//button[last()]")))
         driver.execute_script("arguments[0].scrollIntoView(true);", start_btn)
         time.sleep(1)
@@ -49,33 +49,24 @@ def get_ytgot_download_link(youtube_url):
         print("File prepare ho rahi hai, 'Download File' button aane ka wait kar rahe hain...")
         
         final_link = None
-        download_clicked = False
-        
-        # 35 seconds tak loop chalayenge jab tak 'Download File' button na mil jaye
+        # 35 seconds tak wait karenge jab tak file ready hokar 'Download File' button na aa jaye
         for i in range(35):
             time.sleep(2)
             try:
-                # 'Download File' button ko dhoondna
                 dl_button = driver.find_element(By.XPATH, "//a[contains(text(), 'Download File')] | //button[contains(text(), 'Download File')]")
-                
                 if dl_button:
                     print("Download File button mil gaya! Us par click kar rahe hain...")
                     driver.execute_script("arguments[0].scrollIntoView(true);", dl_button)
                     time.sleep(1)
-                    
-                    # Button par click karte hain taaki link trigger ho jaye
                     driver.execute_script("arguments[0].click();", dl_button)
-                    download_clicked = True
-                    time.sleep(3) # Click ke baad link generate hone ka chhota sa wait
+                    time.sleep(3)
                     
-                    # Click karne ke baad agar yeh <a> tag hai toh uska href le lo
                     if dl_button.tag_name == 'a':
                         final_link = dl_button.get_attribute("href")
                     break
             except:
                 pass
                 
-        # Agar button click hone ke baad bhi direct href na mile, toh page ke naye links scan kar lo
         if not final_link:
             links = driver.find_elements(By.TAG_NAME, "a")
             for link in links:
@@ -90,7 +81,7 @@ def get_ytgot_download_link(youtube_url):
             print(final_link)
             print("==========================================")
         else:
-            print("Button click ho gaya tha, lekin link capture nahi ho paya.")
+            print("Link capture nahi ho paya.")
 
     except Exception as e:
         import traceback
