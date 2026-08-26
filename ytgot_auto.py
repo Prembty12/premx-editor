@@ -8,10 +8,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
-def download_video_via_browser(youtube_url):
-    print("Browser download ke liye shuru ho raha hai...")
+def download_1080p_exact_steps(youtube_url):
+    print("Browser shuru ho raha hai...")
     
-    # Download folder set karna
     download_dir = os.path.join(os.getcwd(), "downloads")
     os.makedirs(download_dir, exist_ok=True)
     
@@ -21,7 +20,6 @@ def download_video_via_browser(youtube_url):
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--window-size=1920,1080")
     
-    # Browser ko automatically file download karne ki permission dena
     prefs = {
         "download.default_directory": download_dir,
         "download.prompt_for_download": False,
@@ -35,43 +33,48 @@ def download_video_via_browser(youtube_url):
     try:
         print("Website khol rahe hain: https://www.seekin.ai/")
         driver.get("https://www.seekin.ai/")
+        time.sleep(5)
         
         wait = WebDriverWait(driver, 25)
         
-        print("Input box mein link paste kiya ja raha hai...")
-        search_box = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@type='text' or contains(@placeholder, 'http')]")))
+        print("Link paste kiya ja raha hai...")
+        search_box = wait.until(EC.presence_of_element_located((By.TAG_NAME, "input")))
         search_box.clear()
         search_box.send_keys(youtube_url)
+        print("Link successfully paste ho gaya!")
         
+        # Step 1: Link paste ke baad 5 seconds ka wait
         print("5 seconds wait kar rahe hain...")
         time.sleep(5)
         
-        print("Analyze / Download button par click kar rahe hain...")
+        print("Download button par click kar rahe hain...")
         try:
-            analyze_btn = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'Analyze Video')] | //button[contains(., 'Download')]")))
-            driver.execute_script("arguments[0].scrollIntoView(true);", analyze_btn)
+            init_btn = driver.find_element(By.XPATH, "//button[contains(., 'Download') or contains(., 'Analyze')]")
+            driver.execute_script("arguments[0].scrollIntoView(true);", init_btn)
             time.sleep(1)
-            driver.execute_script("arguments[0].click();", analyze_btn)
+            driver.execute_script("arguments[0].click();", init_btn)
         except Exception as e:
-            print("Button click mein error aaya:", e)
-            
-        print("Download buttons aane ka wait ho raha hai...")
-        time.sleep(8)
+            print("Initial click error:", e)
+
+        # Step 2: Format aane ka wait (10 seconds)
+        print("10 seconds wait kar rahe hain taaki 1080p format load ho jaye...")
+        time.sleep(10)
         
-        print("Browser ke zariye download button par click kar rahe hain...")
+        print("1080p download button dhoond kar click kar rahe hain...")
         download_clicked = False
         
         for i in range(15):
             try:
-                # Page par jitne bhi Download buttons hain, unme se pehle wale par click kar do
-                download_buttons = driver.find_elements(By.XPATH, "//button[contains(., 'Download')] | //a[contains(., 'Download')]")
-                for btn in download_buttons:
+                # 1080p ya final download button ko dhoondna
+                buttons = driver.find_elements(By.XPATH, "//button[contains(., '1080') or contains(., 'Download')] | //a[contains(., 'Download')]")
+                for btn in buttons:
                     if btn.is_displayed():
+                        text = btn.text.lower()
                         driver.execute_script("arguments[0].scrollIntoView(true);", btn)
                         time.sleep(1)
                         driver.execute_script("arguments[0].click();", btn)
                         download_clicked = True
-                        print("Download button par click ho gaya hai!")
+                        print(f"1080p download button par click ho gaya: {text}")
                         break
                 if download_clicked:
                     break
@@ -81,9 +84,9 @@ def download_video_via_browser(youtube_url):
         if download_clicked:
             print("File download ho rahi hai, 15 seconds wait karte hain...")
             time.sleep(15)
-            print(f"\nKaam ho gaya! File aapke folder mein save ho gayi hogi.")
+            print(f"\nKaam ho gaya! File downloads folder mein save ho gayi hogi.")
         else:
-            print("Error: Browser download button nahi daba paya.")
+            print("Error: 1080p download button nahi mila.")
 
     except Exception as e:
         import traceback
@@ -98,5 +101,4 @@ if __name__ == "__main__":
         link = sys.argv[1]
     else:
         link = input("YouTube ka link yahan paste karein: ")
-    download_video_via_browser(link)
-    
+    download_1080p_exact_steps(link)
