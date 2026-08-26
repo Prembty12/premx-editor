@@ -11,10 +11,11 @@ def get_ytgot_download_link(youtube_url):
     print("Browser shuru ho raha hai...")
     options = webdriver.ChromeOptions()
     
-    # GitHub Actions ke liye headless mode zaroori hai
-    options.add_argument("--headless")
+    # Headless mode ke sath window size bada karna zaroori hai taaki buttons na chupein
+    options.add_argument("--headless=new")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--window-size=1920,1080")
     
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     
@@ -39,11 +40,14 @@ def get_ytgot_download_link(youtube_url):
             download_btn.click()
             
         print("Video info load hone ka wait ho raha hai...")
-        time.sleep(4)
+        time.sleep(5) # Thoda extra wait taaki card poori tarah render ho jaye
         
         print("Start button par click kar rahe hain...")
-        start_btn = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Start')]")))
-        start_btn.click()
+        # Button ko screen par scroll karna aur JavaScript click use karna taaki click miss na ho
+        start_btn = wait.until(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Start')]")))
+        driver.execute_script("arguments[0].scrollIntoView(true);", start_btn)
+        time.sleep(1)
+        driver.execute_script("arguments[0].click();", start_btn)
         
         print("File prepare ho rahi hai, wait kiya ja raha hai...")
         final_link = None
@@ -82,7 +86,6 @@ def get_ytgot_download_link(youtube_url):
         driver.quit()
 
 if __name__ == "__main__":
-    # GitHub workflow se link lene ke liye argument check karega, warna input maangega
     if len(sys.argv) > 1:
         link = sys.argv[1]
     else:
