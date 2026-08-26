@@ -1,67 +1,108 @@
-name: Browser Test and Download
+name: YouTube Browser Automation
 
 on:
   workflow_dispatch:
     inputs:
-      video_url:
-        description: 'Vahan videoplayback ya YouTube link dalein:'
+      search_query:
+        description: 'YouTube par kya search ya play karna hai uska naam dalein:'
         required: true
         type: string
 
 jobs:
-    test-browser:
-      runs-on: ubuntu-latest
-  
-      steps:
-        - name: Checkout Repository
-          uses: actions/checkout@v4
-  
-        - name: Set up Python
-          uses: actions/setup-python@v5
-          with:
-            python-version: '3.10'
-  
-        - name: Install Dependencies
-          run: |
-            pip install playwright
-            # Direct command ki jagah python module ke zariye install karenge
-            python -m playwright install chromium
-            python -m playwright install-deps chromium
-  
-        - name: Run Browser Automation Test
-          env:
-            TARGET_URL: "${{ github.event.inputs.video_url }}"
-          run: |
-            python - << 'EOF'
-            import os
-            from playwright.sync_api import sync_playwright
-            
-            url = os.environ.get("TARGET_URL")
-            print(f"Testing URL in browser: {url}")
-            
-            with sync_playwright() as p:
-                browser = p.chromium.launch(headless=True)
-                context = browser.new_context(
-                    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-                )
-                page = context.new_page()
-                
-                try:
-                    response = page.goto(url, timeout=30000)
-                    print(f"HTTP Status: {response.status}")
-                    print(f"Page Title: {page.title()}")
-                    
-                    page.screenshot(path="browser_test.png")
-                    print("Screenshot saved as browser_test.png")
-                    
-                except Exception as e:
-                    print(f"Error loading URL in browser: {e}")
-                    
-                browser.close()
-            EOF
-  
-        - name: Upload Browser Screenshot Artifact
-          uses: actions/upload-artifact@v4
-          with:
-            name: browser-debug-screenshot
-            path: browser_test.png
+  browser-automation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies & yt-dlp
+        run: |
+          pip install playwright yt-dlp
+          python -m playwright install chromium
+          python -m playwright install-deps chromium
+          sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Run Browser to Find and Download Video
+        env:
+          QUERY: "${{ github.event.inputs.search_query }}"
+        run: |
+          python - << 'EOF'
+          import os
+          import time
+          from playwright.sync_api import sync_playwright
+          
+          query = os.environ.get("QUERY")
+          print(f"Searching on YouTube for: {query}")
+          
+          with sync_playwright() as p:
+              # Headless browser launch kar rahe hain ek real User-Agent ke sath
+              browser = p.chromium.launch(headless=True)
+              context = browser.new_context(
+                  user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+                  viewport={"width": 1280, "height": 720}
+              )
+              page = context.new_page()
+              
+              try:
+                  # 1. YouTube par jayenge
+                  page.goto("https://www.youtube.com", timeout=60000)
+                  print("YouTube opened successfully.")
+                  
+                  # 2. Search box mein query daalenge
+                  page.fill('input[name="search_query"]', query)
+                  page.press('input[name="search_query"]', 'Enter')
+                  
+                  # 3. Results load hone ka wait karenge
+                  page.wait_for_selector('ytd-video-renderer', timeout=15000)
+                  print("Search results loaded.")
+                  
+                  # 4. Pehli video par click karenge
+                  video_link_element = page.locator('ytd-video-renderer #video-title').first
+                  video_url = video_link_element.get_attribute('href')
+                  full_url = f"https://www.youtube.com{video_url}"
+                  print(f"Found target video URL: {full_url}")
+                  
+                  # 5. Us video page par jayenge
+                  page.goto(full_url, timeout=60000)
+                  time.sleep(5)
+                  
+                  # Screenshot le lenge proof ke liye
+                  page.screenshot(path="youtube_playing.png")
+                  print("Screenshot saved.")
+                  
+                  # URL ko file mein save kar lenge taaki yt-dlp ise download kar sake
+                  with open("video_link.txt", "w") as f:
+                      f.write(full_url)
+                      
+              except Exception as e:
+                  print(f"Browser automation error: {e}")
+                  page.screenshot(path="error_screenshot.png")
+                  
+              browser.close()
+          EOF
+
+      - name: Download Video using Extracted URL
+        run: |
+          if [ -f "video_link.txt" ]; then
+            TARGET_URL=$(cat video_link.txt)
+            echo "Downloading video from: $TARGET_URL"
+            # yt-dlp ab fresh URL ko use karke seedha download kar lega
+            yt-dlp "$TARGET_URL" -o "downloaded_video.mp4"
+          else
+            echo "Video link could not be extracted."
+            exit 1
+          fi
+
+      - name: Upload Final Video & Logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: youtube-browser-result
+          path: |
+            downloaded_video.mp4
+            *.png
