@@ -10,8 +10,6 @@ from webdriver_manager.chrome import ChromeDriverManager
 def get_ytgot_download_link(youtube_url):
     print("Browser shuru ho raha hai...")
     options = webdriver.ChromeOptions()
-    
-    # Headless mode ke sath window size bada karna zaroori hai taaki buttons na chupein
     options.add_argument("--headless=new")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
@@ -40,28 +38,30 @@ def get_ytgot_download_link(youtube_url):
             download_btn.click()
             
         print("Video info load hone ka wait ho raha hai...")
-        time.sleep(5) # Thoda extra wait taaki card poori tarah render ho jaye
+        time.sleep(5)
         
         print("Start button par click kar rahe hain...")
-        # Button ko screen par scroll karna aur JavaScript click use karna taaki click miss na ho
         start_btn = wait.until(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Start')]")))
         driver.execute_script("arguments[0].scrollIntoView(true);", start_btn)
         time.sleep(1)
         driver.execute_script("arguments[0].click();", start_btn)
         
-        print("File prepare ho rahi hai, wait kiya ja raha hai...")
-        final_link = None
+        print("File prepare ho rahi hai ('Preparing your file...'), 30 seconds tak wait kar rahe hain...")
         
-        for i in range(15):
+        final_link = None
+        # Yahan script tab tak loop chalayegi jab tak 'Download File' button na aa jaye
+        for i in range(30):
             time.sleep(2)
             try:
-                download_file_btn = driver.find_element(By.XPATH, "//a[contains(text(), 'Download File')]")
+                # Check karenge ki button par 'Download File' aa gaya hai ya nahi
+                download_file_btn = driver.find_element(By.XPATH, "//a[contains(text(), 'Download File') or contains(@class, 'download')]")
                 final_link = download_file_btn.get_attribute("href")
-                if final_link:
+                if final_link and "http" in final_link:
                     break
             except:
                 pass
             
+            # Agar button nahi mila toh page ke saare links mein googlevideo ya download dhoondege
             links = driver.find_elements(By.TAG_NAME, "a")
             for link in links:
                 href = link.get_attribute("href")
@@ -77,7 +77,7 @@ def get_ytgot_download_link(youtube_url):
             print(final_link)
             print("==========================================")
         else:
-            print("Link nikalne mein thoda time lag gaya.")
+            print("Link nikalne mein time lag gaya, website ne process hone mein zyada samay liya.")
 
     except Exception as e:
         print(f"Kuch error aa gaya: {str(e)}")
