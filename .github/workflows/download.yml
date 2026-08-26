@@ -19,8 +19,8 @@ jobs:
       - name: Install VLC and Virtual Display Tools
         run: |
           sudo apt-get update
-          # VLC aur virtual frame buffer (Xvfb) install kar rahe hain
-          sudo apt-get install -y vlc xvfb cvlc
+          # Yahan 'cvlc' hata kar sirf 'vlc' aur 'xvfb' kar diya hai
+          sudo apt-get install -y vlc xvfb
 
       - name: Stream and Record using VLC via Virtual Screen
         run: |
@@ -28,17 +28,15 @@ jobs:
           
           echo "Starting VLC stream capture..."
           
-          # Xvfb ke zariye virtual display chalu karke VLC ko stream record karne ke liye command denge
-          # Yeh stream ko 'vlc_output.mp4' me save karega
+          # cvlc ab seedha kaam karega kyunki vlc install ho chuka hai
           xvfb-run -a cvlc -I dummy "$STREAM_URL" \
             --sout="#standard{access=file,mux=mp4,dst=vlc_output.mp4}" \
             vlc://quit &
             
-          # Kuch der stream chalne ka wait karenge (jaise 3 minute, ya jab tak man kare)
-          # Agar video choti hai toh time adjust kar sakte ho
+          # Video record hone ke liye 60 seconds ka wait karenge (video lambi ho toh ise badha sakte ho)
           sleep 60
           
-          # VLC process ko band karenge taaki file properly save ho jaye
+          # VLC process ko band karenge taaki file save ho jaye
           pkill vlc || true
 
       - name: Check Output File
