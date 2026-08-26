@@ -1,15 +1,15 @@
-name: VLC Stream Capture
+name: FFmpeg Stream Recorder
 
 on:
   workflow_dispatch:
     inputs:
       video_url:
-        description: 'VLC wala videoplayback link yahan dalein:'
+        description: 'Apna videoplayback link yahan dalein:'
         required: true
         type: string
 
 jobs:
-  vlc-capture:
+  ffmpeg-record:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,31 +21,27 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ffmpeg
 
-      - name: Download Stream via FFmpeg with VLC Headers
+      - name: Record Stream using FFmpeg
         run: |
           STREAM_URL="${{ github.event.inputs.video_url }}"
           
-          echo "Starting stream download..."
+          echo "Starting FFmpeg recording..."
           
-          # VLC jaisa User-Agent aur Referer dekar ffmpeg se stream pull karenge
-          ffmpeg -user_agent "VLC/3.0.18 LibVLC/3.0.18" \
-                 -headers "Referer: https://www.youtube.com/\r\n" \
+          # Yahan hum browser/VLC jaisa User-Agent aur headers de rahe hain
+          # Taaki YouTube server block na kare
+          ffmpeg -y \
+                 -user_agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
+                 -headers "Referer: https://www.youtube.com/" \
                  -i "$STREAM_URL" \
                  -c copy \
-                 vlc_output.mp4 || true
-
-      - name: Check Output File Size
+                 recorded_video.mp4
+                 
+      - name: Check Recorded File
         run: |
-          ls -lh vlc_output.mp4
-          # Agar file 1MB se choti hai toh error throw karega taaki pata chale ki download nahi hua
-          FILESIZE=$(stat -c%s "vlc_output.mp4" 2>/dev/null || echo 0)
-          if [ "$FILESIZE" -lt 1000000 ]; then
-            echo "Error: Video file is too small ($FILESIZE bytes). Stream was blocked or failed."
-            exit 1
-          fi
+          ls -lh recorded_video.mp4
 
-      - name: Upload Downloaded Video
+      - name: Upload Recorded Video
         uses: actions/upload-artifact@v4
         with:
-          name: vlc-captured-video
-          path: vlc_output.mp4
+          name: ffmpeg-recorded-video
+          path: recorded_video.mp4
