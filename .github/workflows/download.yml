@@ -16,32 +16,33 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install VLC and Virtual Display Tools
+      - name: Install FFmpeg
         run: |
           sudo apt-get update
-          # Yahan 'cvlc' hata kar sirf 'vlc' aur 'xvfb' kar diya hai
-          sudo apt-get install -y vlc xvfb
+          sudo apt-get install -y ffmpeg
 
-      - name: Stream and Record using VLC via Virtual Screen
+      - name: Download Stream via FFmpeg with VLC Headers
         run: |
           STREAM_URL="${{ github.event.inputs.video_url }}"
           
-          echo "Starting VLC stream capture..."
+          echo "Starting stream download..."
           
-          # cvlc ab seedha kaam karega kyunki vlc install ho chuka hai
-          xvfb-run -a cvlc -I dummy "$STREAM_URL" \
-            --sout="#standard{access=file,mux=mp4,dst=vlc_output.mp4}" \
-            vlc://quit &
-            
-          # Video record hone ke liye 60 seconds ka wait karenge (video lambi ho toh ise badha sakte ho)
-          sleep 60
-          
-          # VLC process ko band karenge taaki file save ho jaye
-          pkill vlc || true
+          # VLC jaisa User-Agent aur Referer dekar ffmpeg se stream pull karenge
+          ffmpeg -user_agent "VLC/3.0.18 LibVLC/3.0.18" \
+                 -headers "Referer: https://www.youtube.com/\r\n" \
+                 -i "$STREAM_URL" \
+                 -c copy \
+                 vlc_output.mp4 || true
 
-      - name: Check Output File
+      - name: Check Output File Size
         run: |
-          ls -lh vlc_output.mp4 || echo "File not found yet"
+          ls -lh vlc_output.mp4
+          # Agar file 1MB se choti hai toh error throw karega taaki pata chale ki download nahi hua
+          FILESIZE=$(stat -c%s "vlc_output.mp4" 2>/dev/null || echo 0)
+          if [ "$FILESIZE" -lt 1000000 ]; then
+            echo "Error: Video file is too small ($FILESIZE bytes). Stream was blocked or failed."
+            exit 1
+          fi
 
       - name: Upload Downloaded Video
         uses: actions/upload-artifact@v4
