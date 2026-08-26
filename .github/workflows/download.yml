@@ -1,47 +1,71 @@
-name: FFmpeg Stream Recorder
+name: Browser Test and Download
 
 on:
   workflow_dispatch:
     inputs:
       video_url:
-        description: 'Apna videoplayback link yahan dalein:'
+        description: 'Vahan videoplayback ya YouTube link dalein:'
         required: true
         type: string
 
 jobs:
-  ffmpeg-record:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Install FFmpeg
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ffmpeg
-
-      - name: Record Stream using FFmpeg
-        run: |
-          STREAM_URL="${{ github.event.inputs.video_url }}"
-          
-          echo "Starting FFmpeg recording..."
-          
-          # Yahan hum browser/VLC jaisa User-Agent aur headers de rahe hain
-          # Taaki YouTube server block na kare
-          ffmpeg -y \
-                 -user_agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
-                 -headers "Referer: https://www.youtube.com/" \
-                 -i "$STREAM_URL" \
-                 -c copy \
-                 recorded_video.mp4
-                 
-      - name: Check Recorded File
-        run: |
-          ls -lh recorded_video.mp4
-
-      - name: Upload Recorded Video
-        uses: actions/upload-artifact@v4
-        with:
-          name: ffmpeg-recorded-video
-          path: recorded_video.mp4
+    test-browser:
+      runs-on: ubuntu-latest
+  
+      steps:
+        - name: Checkout Repository
+          uses: actions/checkout@v4
+  
+        - name: Set up Python
+          uses: actions/setup-python@v5
+          with:
+            python-version: '3.10'
+  
+        - name: Install Dependencies
+          run: |
+            pip install -r requirements.txt
+            playwright install chromium
+            playwright install-deps chromium
+  
+        - name: Run Browser Automation Test
+          env:
+            TARGET_URL: "${{ github.event.inputs.video_url }}"
+          run: |
+            python - << 'EOF'
+            import os
+            from playwright.sync_api import sync_playwright
+            
+            url = os.environ.get("TARGET_URL")
+            print(f"Testing URL in browser: {url}")
+            
+            with sync_playwright() as p:
+                # Headless browser launch kar rahe hain (agar screen dekhni ho toh headless=False karte hain par yaha server hai toh True rahega)
+                browser = p.chromium.launch(headless=True)
+                context = browser.new_context(
+                    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+                )
+                page = context.new_page()
+                
+                try:
+                    # Link par navigate karo
+                    response = page.goto(url, timeout=30000)
+                    print(f"HTTP Status: {response.status}")
+                    
+                    # Page ka title ya content check karo ki load hua ya nahi
+                    print(f"Page Title: {page.title()}")
+                    
+                    # Screenshot le lo taaki pata chale browser mein kya khula
+                    page.screenshot(path="browser_test.png")
+                    print("Screenshot saved as browser_test.png")
+                    
+                except Exception as e:
+                    print(f"Error loading URL in browser: {e}")
+                    
+                browser.close()
+            EOF
+  
+        - name: Upload Browser Screenshot Artifact
+          uses: actions/upload-artifact@v4
+          with:
+            name: browser-debug-screenshot
+            path: browser_test.png
