@@ -1,69 +1,101 @@
-name: Simple Browser Workflow
+import time
+import sys
+import os
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.chrome import ChromeDriverManager
 
-on:
-  workflow_dispatch:
-    inputs:
-      website_url:
-        description: 'Jis website ko browser mein kholna hai uska link dalein:'
-        required: true
-        default: 'https://www.seekin.ai/'
-        type: string
+def download_video_via_browser(youtube_url):
+    print("Browser download ke liye shuru ho raha hai...")
+    
+    # Download folder set karna
+    download_dir = os.path.join(os.getcwd(), "downloads")
+    os.makedirs(download_dir, exist_ok=True)
+    
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless=new")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--window-size=1920,1080")
+    
+    # Browser ko automatically file download karne ki permission dena
+    prefs = {
+        "download.default_directory": download_dir,
+        "download.prompt_for_download": False,
+        "download.directory_upgrade": True,
+        "safebrowsing.enabled": True
+    }
+    options.add_experimental_option("prefs", prefs)
+    
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    
+    try:
+        print("Website khol rahe hain: https://www.seekin.ai/")
+        driver.get("https://www.seekin.ai/")
+        
+        wait = WebDriverWait(driver, 25)
+        
+        print("Input box mein link paste kiya ja raha hai...")
+        search_box = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@type='text' or contains(@placeholder, 'http')]")))
+        search_box.clear()
+        search_box.send_keys(youtube_url)
+        
+        print("5 seconds wait kar rahe hain...")
+        time.sleep(5)
+        
+        print("Analyze / Download button par click kar rahe hain...")
+        try:
+            analyze_btn = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'Analyze Video')] | //button[contains(., 'Download')]")))
+            driver.execute_script("arguments[0].scrollIntoView(true);", analyze_btn)
+            time.sleep(1)
+            driver.execute_script("arguments[0].click();", analyze_btn)
+        except Exception as e:
+            print("Button click mein error aaya:", e)
+            
+        print("Download buttons aane ka wait ho raha hai...")
+        time.sleep(8)
+        
+        print("Browser ke zariye download button par click kar rahe hain...")
+        download_clicked = False
+        
+        for i in range(15):
+            try:
+                # Page par jitne bhi Download buttons hain, unme se pehle wale par click kar do
+                download_buttons = driver.find_elements(By.XPATH, "//button[contains(., 'Download')] | //a[contains(., 'Download')]")
+                for btn in download_buttons:
+                    if btn.is_displayed():
+                        driver.execute_script("arguments[0].scrollIntoView(true);", btn)
+                        time.sleep(1)
+                        driver.execute_script("arguments[0].click();", btn)
+                        download_clicked = True
+                        print("Download button par click ho gaya hai!")
+                        break
+                if download_clicked:
+                    break
+            except:
+                time.sleep(2)
+                
+        if download_clicked:
+            print("File download ho rahi hai, 15 seconds wait karte hain...")
+            time.sleep(15)
+            print(f"\nKaam ho gaya! File aapke folder mein save ho gayi hogi.")
+        else:
+            print("Error: Browser download button nahi daba paya.")
 
-jobs:
-  run-browser:
-    runs-on: ubuntu-latest
+    except Exception as e:
+        import traceback
+        print(f"\nCRITICAL ERROR DETAILS:")
+        traceback.print_exc()
+    
+    finally:
+        driver.quit()
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-
-      - name: Install Playwright & Dependencies
-        run: |
-          pip install playwright
-          python -m playwright install chromium
-          python -m playwright install-deps chromium
-
-      - name: Run Simple Browser Script
-        env:
-          TARGET_URL: "${{ github.event.inputs.website_url }}"
-        run: |
-          python - << 'EOF'
-          import os
-          from playwright.sync_api import sync_playwright
-
-          url = os.environ.get("TARGET_URL")
-          print(f"Browser khol raha hai link par: {url}")
-
-          with sync_playwright() as p:
-              # Chromium browser launch kar rahe hain
-              browser = p.chromium.launch(headless=True)
-              page = browser.new_page(
-                  user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
-              )
-              
-              try:
-                  # Link par jaakar page load hone ka wait karenge
-                  page.goto(url, timeout=60000)
-                  print(f"Page Title: {page.title()}")
-                  
-                  # Browser ka screenshot lenge
-                  page.screenshot(path="browser_screenshot.png", full_page=True)
-                  print("Screenshot successfully save ho gaya hai!")
-                  
-              except Exception as e:
-                  print(f"Error aaya: {e}")
-                  page.screenshot(path="browser_screenshot.png")
-                  
-              browser.close()
-          EOF
-
-      - name: Upload Screenshot Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: browser-screenshot-result
-          path: browser_screenshot.png
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        link = sys.argv[1]
+    else:
+        link = input("YouTube ka link yahan paste karein: ")
+    download_video_via_browser(link)
