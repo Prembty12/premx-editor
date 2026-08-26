@@ -6,7 +6,7 @@ on:
       website_url:
         description: 'Jis website ko browser mein kholna hai uska link dalein:'
         required: true
-        default: 'https://www.youtube.com'
+        default: 'https://www.seekin.ai/'
         type: string
 
 jobs:
