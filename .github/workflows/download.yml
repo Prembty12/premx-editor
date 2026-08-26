@@ -23,9 +23,10 @@ jobs:
   
         - name: Install Dependencies
           run: |
-            pip install -r requirements.txt
-            playwright install chromium
-            playwright install-deps chromium
+            pip install playwright
+            # Direct command ki jagah python module ke zariye install karenge
+            python -m playwright install chromium
+            python -m playwright install-deps chromium
   
         - name: Run Browser Automation Test
           env:
@@ -39,7 +40,6 @@ jobs:
             print(f"Testing URL in browser: {url}")
             
             with sync_playwright() as p:
-                # Headless browser launch kar rahe hain (agar screen dekhni ho toh headless=False karte hain par yaha server hai toh True rahega)
                 browser = p.chromium.launch(headless=True)
                 context = browser.new_context(
                     user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
@@ -47,14 +47,10 @@ jobs:
                 page = context.new_page()
                 
                 try:
-                    # Link par navigate karo
                     response = page.goto(url, timeout=30000)
                     print(f"HTTP Status: {response.status}")
-                    
-                    # Page ka title ya content check karo ki load hua ya nahi
                     print(f"Page Title: {page.title()}")
                     
-                    # Screenshot le lo taaki pata chale browser mein kya khula
                     page.screenshot(path="browser_test.png")
                     print("Screenshot saved as browser_test.png")
                     
