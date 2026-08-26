@@ -37,7 +37,7 @@ def get_ytgot_download_link(youtube_url):
             download_btn = driver.find_element(By.XPATH, "//button[contains(text(), 'Download')]")
             download_btn.click()
             
-        print("Link paste karne ke baad 5 second wait kar rahe hain...")
+        print("Link paste karne ke baad 5 seconds wait kar rahe hain...")
         time.sleep(5)  # Aapka bataya hua 5 second ka wait
         
         print("Ab Start button par click kar rahe hain...")
@@ -49,31 +49,42 @@ def get_ytgot_download_link(youtube_url):
         print("File prepare ho rahi hai, 'Download File' button aane ka wait kar rahe hain...")
         
         final_link = None
-        # 35 seconds tak wait karenge jab tak file ready hokar 'Download File' button na aa jaye
-        for i in range(35):
+        
+        # 40 seconds tak wait karenge jab tak file ready hokar 'Download File' button active na ho jaye
+        for i in range(20):
             time.sleep(2)
             try:
+                # 'Download File' button ko dhoondna
                 dl_button = driver.find_element(By.XPATH, "//a[contains(text(), 'Download File')] | //button[contains(text(), 'Download File')]")
                 if dl_button:
                     print("Download File button mil gaya! Us par click kar rahe hain...")
                     driver.execute_script("arguments[0].scrollIntoView(true);", dl_button)
                     time.sleep(1)
-                    driver.execute_script("arguments[0].click();", dl_button)
-                    time.sleep(3)
                     
-                    if dl_button.tag_name == 'a':
-                        final_link = dl_button.get_attribute("href")
-                    break
+                    # Button par click karte hi file-d.ytgot.com wala direct link generate hota hai
+                    driver.execute_script("arguments[0].click();", dl_button)
+                    time.sleep(4) # Click ke baad link render hone ka wait
+                    
+                    # Ab page ke saare links check karenge ki file-d.ytgot.com wala link kahan hai
+                    all_links = driver.find_elements(By.TAG_NAME, "a")
+                    for link in all_links:
+                        href = link.get_attribute("href")
+                        if href and "file-d.ytgot.com" in href:
+                            final_link = href
+                            break
+                    
+                    if not final_link:
+                        # Agar direct <a> mein na mile toh window/page attributes ya naye elements check karo
+                        for link in all_links:
+                            href = link.get_attribute("href")
+                            if href and any(ext in href for ext in ["googlevideo.com", "download", ".mp4", "stream"]):
+                                final_link = href
+                                break
+                    
+                    if final_link:
+                        break
             except:
                 pass
-                
-        if not final_link:
-            links = driver.find_elements(By.TAG_NAME, "a")
-            for link in links:
-                href = link.get_attribute("href")
-                if href and any(ext in href for ext in ["googlevideo.com", "download", ".mp4", "stream"]):
-                    final_link = href
-                    break
 
         if final_link:
             print("\n==========================================")
@@ -81,7 +92,7 @@ def get_ytgot_download_link(youtube_url):
             print(final_link)
             print("==========================================")
         else:
-            print("Link capture nahi ho paya.")
+            print("Error: File-d link capture nahi ho paya.")
 
     except Exception as e:
         import traceback
