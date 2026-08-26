@@ -281,7 +281,7 @@ if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$IG_ID" ]; then
     if [ -n "$CREATION_ID" ] && [ "$CREATION_ID" != "None" ]; then
         echo "⏳ Container created (ID: $CREATION_ID). Checking video processing status from Instagram..."
         
-        for i in {1..5}; do
+        for i in {1..15}; do
             sleep 15
             echo "🔍 Status check attempt $i/5..."
             
