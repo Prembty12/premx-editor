@@ -1,41 +1,52 @@
-name: Stream and Download Video
+name: VLC Stream Capture
 
 on:
   workflow_dispatch:
     inputs:
       video_url:
-        description: 'Yahan apna direct videoplayback link paste karo:'
+        description: 'VLC wala videoplayback link yahan dalein:'
         required: true
         type: string
 
 jobs:
-  capture-stream:
+  vlc-capture:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install FFmpeg
+      - name: Install VLC and Virtual Display Tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg
+          # VLC aur virtual frame buffer (Xvfb) install kar rahe hain
+          sudo apt-get install -y vlc xvfb cvlc
 
-      - name: Capture and Download Stream via FFmpeg
+      - name: Stream and Record using VLC via Virtual Screen
         run: |
-          # User dwara diya gaya link input variable se liya jayega
           STREAM_URL="${{ github.event.inputs.video_url }}"
           
-          echo "Connecting to stream and saving..."
+          echo "Starting VLC stream capture..."
           
-          # FFmpeg stream ko capture karega aur webm/mp4 format me save karega
-          ffmpeg -user_agent "Mozilla/5.0 (SMART-TV; Linux; Tizen 4.0) AppleWebkit/537.36 (KHTML, like Gecko) TV Safari/537.36" \
-                 -i "$STREAM_URL" \
-                 -c copy \
-                 captured_output.webm
+          # Xvfb ke zariye virtual display chalu karke VLC ko stream record karne ke liye command denge
+          # Yeh stream ko 'vlc_output.mp4' me save karega
+          xvfb-run -a cvlc -I dummy "$STREAM_URL" \
+            --sout="#standard{access=file,mux=mp4,dst=vlc_output.mp4}" \
+            vlc://quit &
+            
+          # Kuch der stream chalne ka wait karenge (jaise 3 minute, ya jab tak man kare)
+          # Agar video choti hai toh time adjust kar sakte ho
+          sleep 60
+          
+          # VLC process ko band karenge taaki file properly save ho jaye
+          pkill vlc || true
+
+      - name: Check Output File
+        run: |
+          ls -lh vlc_output.mp4 || echo "File not found yet"
 
       - name: Upload Downloaded Video
         uses: actions/upload-artifact@v4
         with:
-          name: downloaded-stream-video
-          path: captured_output.webm
+          name: vlc-captured-video
+          path: vlc_output.mp4
