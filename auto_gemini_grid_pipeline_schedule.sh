@@ -182,87 +182,83 @@ grid_img.save('$GRID_PATH', 'JPEG', quality=85)
 print("✅ Grid image created successfully!")
 EOF
 
-# 4. Gemini se Viral Title Generation (Live Upload & Response Debugging)
+# 4. Gemini se Viral Title Generation (With Retry Loop)
 AI_TITLE=""
-if [ -f "$GRID_PATH" ]; then
-    file_size=$(wc -c < "$GRID_PATH")
-    echo "📤 Initializing upload of grid image to Gemini API..."
+MAX_RETRIES=2
+
+for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
+    echo "🤖 Gemini Title Generation Attempt $attempt/$MAX_RETRIES..."
     
-    upload_res=$(curl -s -D - -X POST "https://generativelanguage.googleapis.com/upload/v1beta/files?key=$CURRENT_GEMINI_KEY" \
-      -H "X-Goog-Upload-Protocol: resumable" \
-      -H "X-Goog-Upload-Command: start" \
-      -H "X-Goog-Upload-Header-Content-Length: $file_size" \
-      -H "X-Goog-Upload-Header-Content-Type: image/jpeg" \
-      -H "Content-Type: application/json" \
-      -d '{"file": {"display_name": "GridScreenshot"}}')
-
-    echo "📦 Upload Init Response Headers & Body:"
-    echo "$upload_res"
-
-    gemini_upload_url=$(echo "$upload_res" | grep -i "x-goog-upload-url:" | tr -d '\r' | cut -d' ' -f2)
-
-    if [ -n "$gemini_upload_url" ]; then
-        echo "🚀 Uploading binary data to Gemini session..."
-        finalize_res=$(curl -s -X POST "$gemini_upload_url" \
+    if [ -f "$GRID_PATH" ]; then
+        file_size=$(wc -c < "$GRID_PATH")
+        upload_res=$(curl -s -D - -X POST "https://generativelanguage.googleapis.com/upload/v1beta/files?key=$CURRENT_GEMINI_KEY" \
           -H "X-Goog-Upload-Protocol: resumable" \
-          -H "X-Goog-Upload-Command: upload, finalize" \
-          -H "X-Goog-Upload-Offset: 0" \
-          -H "Content-Length: $file_size" \
-          --data-binary "@$GRID_PATH")
+          -H "X-Goog-Upload-Command: start" \
+          -H "X-Goog-Upload-Header-Content-Length: $file_size" \
+          -H "X-Goog-Upload-Header-Content-Type: image/jpeg" \
+          -H "Content-Type: application/json" \
+          -d '{"file": {"display_name": "GridScreenshot"}}')
 
-        echo "🏁 Finalize Response: $finalize_res"
-        file_uri=$(echo "$finalize_res" | jq -r '.file.uri // empty')
-        
-        if [ -n "$file_uri" ]; then
-            file_name_g_api=$(echo "$file_uri" | awk -F'/' '{print $NF}')
-            echo "⏳ Waiting for Gemini file to become ACTIVE..."
+        gemini_upload_url=$(echo "$upload_res" | grep -i "x-goog-upload-url:" | tr -d '\r' | cut -d' ' -f2)
+
+        if [ -n "$gemini_upload_url" ]; then
+            finalize_res=$(curl -s -X POST "$gemini_upload_url" \
+              -H "X-Goog-Upload-Protocol: resumable" \
+              -H "X-Goog-Upload-Command: upload, finalize" \
+              -H "X-Goog-Upload-Offset: 0" \
+              -H "Content-Length: $file_size" \
+              --data-binary "@$GRID_PATH")
+
+            file_uri=$(echo "$finalize_res" | jq -r '.file.uri // empty')
             
-            while true; do
-              state_res=$(curl -s "https://generativelanguage.googleapis.com/v1beta/files/$file_name_g_api?key=$CURRENT_GEMINI_KEY")
-              state=$(echo "$state_res" | jq -r '.state // empty')
-              echo "🔄 Current Gemini File State: $state"
-              
-              [ "$state" = "ACTIVE" ] && break
-              [ "$state" = "FAILED" ] && break
-              sleep 1
-            done
+            if [ -n "$file_uri" ]; then
+                file_name_g_api=$(echo "$file_uri" | awk -F'/' '{print $NF}')
+                while true; do
+                  state=$(curl -s "https://generativelanguage.googleapis.com/v1beta/files/$file_name_g_api?key=$CURRENT_GEMINI_KEY" | jq -r '.state // empty')
+                  [ "$state" = "ACTIVE" ] && break
+                  [ "$state" = "FAILED" ] && break
+                  sleep 1
+                done
 
-            prompt_text="Based on this 8-photos 9:16 grid screenshot, choose and output ONLY ONE single best, highly viral catchy Hook title with emojis. Do not mention game names or file numbers. Just output the plain text title string."
+                prompt_text="Based on this 8-photos 9:16 grid screenshot, choose and output ONLY ONE single best, highly viral catchy Hook title with emojis. Do not mention game names or file numbers. Just output the plain text title string."
 
-            payload=$(jq -n \
-              --arg uri "$file_uri" \
-              --arg mime "image/jpeg" \
-              --arg ptext "$prompt_text" \
-              '{contents: [{parts: [{file_data: {file_uri: $uri, mime_type: $mime}}, {text: $ptext}]}]}')
+                payload=$(jq -n \
+                  --arg uri "$file_uri" \
+                  --arg mime "image/jpeg" \
+                  --arg ptext "$prompt_text" \
+                  '{contents: [{parts: [{file_data: {file_uri: $uri, mime_type: $mime}}, {text: $ptext}]}]}')
 
-            echo "🤖 Requesting title generation from Gemini model..."
-            gemini_resp=$(curl -s -X POST -H "Content-Type: application/json" \
-              "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=$CURRENT_GEMINI_KEY" \
-              -d "$payload")
+                gemini_resp=$(curl -s -X POST -H "Content-Type: application/json" \
+                  "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=$CURRENT_GEMINI_KEY" \
+                  -d "$payload")
 
-            echo "📥 Raw Gemini Response:"
-            echo "$gemini_resp"
-
-            AI_TITLE=$(echo "$gemini_resp" | jq -r '.candidates[0].content.parts[0].text // empty' | tr -d '"')
-        else
-            echo "❌ Error: File URI could not be extracted from finalize response."
+                AI_TITLE=$(echo "$gemini_resp" | jq -r '.candidates[0].content.parts[0].text // empty' | tr -d '"')
+            fi
         fi
-    else
-        echo "❌ Error: Gemini upload URL could not be fetched."
     fi
-else
-    echo "❌ Error: Grid path image file not found."
-fi
+
+    # Check if title was successfully generated
+    if [ -n "$AI_TITLE" ] && [ "$AI_TITLE" != "null" ]; then
+        echo "✅ Title generated successfully!"
+        break
+    else
+        if [ $attempt -lt $MAX_RETRIES ]; then
+            echo "⚠️ Title generate nahi hua. 10 seconds baad dobara grid image upload karke try kar rahe hain..."
+            sleep 10
+        fi
+    fi
+done
 
 if [ -z "$AI_TITLE" ] || [ "$AI_TITLE" == "null" ]; then
     AI_TITLE="🔥 Insane Pro Gaming Moments! 🎮🔥"
-    echo "⚠️ Falling back to default title because Gemini title was empty."
 fi
 
 CAPTION="$AI_TITLE
 
 #videogames #gamingcommunity #gaming #${SELECTED_GAME_NAME,,} #gamingreels #reels"
-echo "📝 Final Title Selected: $AI_TITLE"
+echo "📝 Selected Title: $AI_TITLE"
+
+
 
 # 5. 🚀 POSTING LOGIC (Instagram Reels)
 PUBLISH_ID=""
