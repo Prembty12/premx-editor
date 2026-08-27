@@ -1,23 +1,19 @@
 import time
 import sys
 import os
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
+import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
 
 def snapscooper_click_flow(youtube_url):
-    print("Browser shuru ho raha hai...")
+    print("Undetected browser shuru ho raha hai...")
     
     download_dir = os.path.join(os.getcwd(), "downloads")
     os.makedirs(download_dir, exist_ok=True)
     
-    options = webdriver.ChromeOptions()
-    options.add_argument("--headless=new")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
+    # Undetected ChromeDriver use kar rahe hain taaki Cloudflare detect na kare
+    options = uc.ChromeOptions()
     options.add_argument("--window-size=1920,1080")
     
     prefs = {
@@ -28,7 +24,7 @@ def snapscooper_click_flow(youtube_url):
     }
     options.add_experimental_option("prefs", prefs)
     
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    driver = uc.Chrome(options=options, use_subprocess=True)
     
     def take_screenshot(name):
         path = os.path.join(download_dir, f"screenshot_{name}.png")
@@ -38,7 +34,7 @@ def snapscooper_click_flow(youtube_url):
     try:
         print("Website khol rahe hain: https://snapscooper.com/")
         driver.get("https://snapscooper.com/")
-        time.sleep(4)
+        time.sleep(5)
         take_screenshot("1_home")
         
         wait = WebDriverWait(driver, 20)
@@ -62,20 +58,19 @@ def snapscooper_click_flow(youtube_url):
         driver.execute_script("arguments[0].click();", arrow_btn)
         
         print("Arrow button click ho gaya! Formats load hone ka wait kar rahe hain...")
-        time.sleep(4)
+        time.sleep(5)
         take_screenshot("3_arrow_clicked")
         
-        print("Ab red 'Download' (4K) button par click kar rahe hain...")
-        # Red download button ko target kar rahe hain jisme text 'Download' ho
-        download_4k_btn = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'Download')] | //a[contains(., 'Download')]")))
-        driver.execute_script("arguments[0].scrollIntoView(true);", download_4k_btn)
+        print("Red 'Download' (4K) button par click kar rahe hain...")
+        download_btn = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".submit-btn-group .submit-btn, button.submit-btn")))
+        driver.execute_script("arguments[0].scrollIntoView(true);", download_btn)
         time.sleep(1)
-        driver.execute_script("arguments[0].click();", download_4k_btn)
+        driver.execute_script("arguments[0].click();", download_btn)
         
         print("Download button par click ho gaya! Screenshot le rahe hain...")
         take_screenshot("4_download_clicked")
         
-        print("15 seconds wait kar rahe hain...")
+        print("15 seconds wait kar rahe hain final process ke liye...")
         time.sleep(15)
         take_screenshot("5_final_wait_done")
         
