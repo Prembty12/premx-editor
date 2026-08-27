@@ -55,22 +55,31 @@ def snapscooper_click_flow(youtube_url):
         time.sleep(2)
         take_screenshot("2_link_pasted_check")
         
-        print("Exact .submit-btn par click kar rahe hain...")
+        print("Primary arrow/submit button par click kar rahe hain...")
         arrow_btn = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".submit-btn, button.submit-btn")))
-        
         driver.execute_script("arguments[0].scrollIntoView(true);", arrow_btn)
         time.sleep(1)
         driver.execute_script("arguments[0].click();", arrow_btn)
         
-        print("Button click ho gaya! Screenshot le rahe hain...")
-        time.sleep(3)
+        print("Arrow button click ho gaya! Formats load hone ka wait kar rahe hain...")
+        time.sleep(4)
         take_screenshot("3_arrow_clicked")
         
-        print("10 seconds wait kar rahe hain formats load hone ke liye...")
-        time.sleep(10)
-        take_screenshot("4_formats_ready")
+        print("Ab red 'Download' (4K) button par click kar rahe hain...")
+        # Red download button ko target kar rahe hain jisme text 'Download' ho
+        download_4k_btn = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'Download')] | //a[contains(., 'Download')]")))
+        driver.execute_script("arguments[0].scrollIntoView(true);", download_4k_btn)
+        time.sleep(1)
+        driver.execute_script("arguments[0].click();", download_4k_btn)
         
-        print("Process complete!")
+        print("Download button par click ho gaya! Screenshot le rahe hain...")
+        take_screenshot("4_download_clicked")
+        
+        print("15 seconds wait kar rahe hain...")
+        time.sleep(15)
+        take_screenshot("5_final_wait_done")
+        
+        print("Poora process successfully complete ho gaya!")
         
     except Exception as e:
         import traceback
