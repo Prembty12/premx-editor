@@ -43,28 +43,29 @@ def snapscooper_click_flow(youtube_url):
         
         wait = WebDriverWait(driver, 20)
         
-        print("Input box mein link JavaScript ke zariye daal rahe hain...")
-        search_box = wait.until(EC.presence_of_element_located((By.XPATH, "//input[contains(@placeholder, 'Paste') or @type='text']")))
+        print("Input box mein exact Svelte class ke zariye link daal rahe hain...")
+        search_box = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "input.search-input.svelte-7ccykd")))
         
-        # JavaScript se value set kar rahe hain taaki link gayab na ho
-        driver.execute_script("arguments[0].value = arguments[1];", search_box, youtube_url)
-        # React/Vue frameworks ke liye input event dispatch karna zaroori hai
-        driver.execute_script("arguments[0].dispatchEvent(new Event('input', { bubbles: true }));", search_box)
-        driver.execute_script("arguments[0].dispatchEvent(new Event('change', { bubbles: true }));", search_box)
+        # JavaScript se value set karke Svelte events trigger karna
+        driver.execute_script("""
+            arguments[0].value = arguments[1];
+            arguments[0].dispatchEvent(new Event('input', { bubbles: true }));
+            arguments[0].dispatchEvent(new Event('change', { bubbles: true }));
+            arguments[0].dispatchEvent(new Event('blur', { bubbles: true }));
+        """, search_box, youtube_url)
         
         time.sleep(2)
         take_screenshot("2_link_pasted_check")
         
-        print("Red 'Download' / Arrow button par click kar rahe hain...")
-        # Jo button screen par dikh raha hai (Download button with 4k icon)
-        download_btn = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'Download') or descendant::*[local-name()='svg']]")))
-        driver.execute_script("arguments[0].scrollIntoView(true);", download_btn)
+        print("Arrow button (`button.search-input-action`) par click kar rahe hain...")
+        arrow_btn = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button.search-input-action.svelte-7ccykd")))
+        driver.execute_script("arguments[0].scrollIntoView(true);", arrow_btn)
         time.sleep(1)
-        driver.execute_script("arguments[0].click();", download_btn)
+        driver.execute_script("arguments[0].click();", arrow_btn)
         
-        print("Button click ho gaya! Screenshot le rahe hain...")
+        print("Arrow button click ho gaya! Screenshot le rahe hain...")
         time.sleep(3)
-        take_screenshot("3_download_clicked")
+        take_screenshot("3_arrow_clicked")
         
         print("10 seconds wait kar rahe hain formats load hone ke liye...")
         time.sleep(10)
