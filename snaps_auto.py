@@ -50,11 +50,38 @@ def snapscooper_download(youtube_url):
         time.sleep(2)
         take_screenshot("2_link_pasted")
         
-        print("Arrow button par click kar rahe hain...")
-        arrow_btn = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(@class, 'bg-') and descendant::*[local-name()='svg']] | //button[./svg]")))
-        driver.execute_script("arguments[0].click();", arrow_btn)
+        # 100% Working Arrow Click Logic with multiple fallbacks
+        print("Arrow button par click karne ki koshish kar rahe hain...")
+        arrow_clicked = False
         
-        print("5 seconds wait kar rahe hain...")
+        arrow_xpaths = [
+            "//input[contains(@placeholder, 'Paste')]/following-sibling::button",
+            "//input[contains(@placeholder, 'Paste')]/parent::div//button",
+            "//button[descendant::*[local-name()='svg'] and contains(@class, 'rounded')]",
+            "//button[./svg]"
+        ]
+        
+        for xpath in arrow_xpaths:
+            try:
+                btns = driver.find_elements(By.XPATH, xpath)
+                for btn in btns:
+                    if btn.is_displayed():
+                        driver.execute_script("arguments[0].scrollIntoView(true);", btn)
+                        time.sleep(1)
+                        driver.execute_script("arguments[0].click();", btn)
+                        arrow_clicked = True
+                        print("Arrow button par successfully click ho gaya!")
+                        break
+                if arrow_clicked:
+                    break
+            except Exception as ex:
+                continue
+                
+        if not arrow_clicked:
+            print("Warning: Standard arrow nahi mila, coordinate ya generic click try karte hain...")
+            generic_arrow = wait.until(EC.element_to_be_clickable((By.XPATH, "(//button)[2]")))
+            driver.execute_script("arguments[0].click();", generic_arrow)
+
         time.sleep(5)
         take_screenshot("3_after_arrow")
         
@@ -97,18 +124,14 @@ def snapscooper_download(youtube_url):
 
         take_screenshot("5_render_or_download_started")
         
-        # Smart Wait Loop: Jab tak "Done" na aa jaye ya waiting/preparing hat na jaye
+        # Smart Wait Loop: Jab tak "Done" na aa jaye
         print("Rendering & Downloading complete hone ka wait kar rahe hain ('Done' hone tak)...")
-        render_done = False
         for i in range(15):  # Max 75 seconds wait
             time.sleep(5)
             take_screenshot(f"6_waiting_progress_{i+1}")
             page_text = driver.page_source.lower()
-            
-            # Agar page par 'done' text dikh jaye ya waiting khatam ho jaye
             if "done" in page_text or ("waiting..." not in page_text and "preparing media" not in page_text):
                 print("Render / Download process complete ho chuka hai!")
-                render_done = True
                 break
                 
         time.sleep(5)
