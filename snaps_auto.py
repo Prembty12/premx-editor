@@ -46,7 +46,6 @@ def snapscooper_click_flow(youtube_url):
         print("Input box mein link daal rahe hain...")
         search_box = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "input.search-input.svelte-7ccykd")))
         
-        # Svelte ke liye value set karke events dispatch karna
         driver.execute_script("""
             arguments[0].value = arguments[1];
             arguments[0].dispatchEvent(new Event('input', { bubbles: true }));
@@ -56,24 +55,22 @@ def snapscooper_click_flow(youtube_url):
         time.sleep(2)
         take_screenshot("2_link_pasted_check")
         
-        print("Pink button jisme `lucide-arrow-right` hai, us par click kar rahe hain...")
-        # Inspect screenshot ke mutabiq exact arrow icon wale button ko target kiya hai
-        arrow_btn = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button:has(svg.lucide-arrow-right), button.search-input-action")))
+        print("Exact .submit-btn par click kar rahe hain...")
+        arrow_btn = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".submit-btn, button.submit-btn")))
         
         driver.execute_script("arguments[0].scrollIntoView(true);", arrow_btn)
         time.sleep(1)
-        # JavaScript click taaki koi overlay ya blocking issue na ho
         driver.execute_script("arguments[0].click();", arrow_btn)
         
-        print("Arrow button par click ho gaya! Screenshot le rahe hain...")
-        time.sleep(4)
+        print("Button click ho gaya! Screenshot le rahe hain...")
+        time.sleep(3)
         take_screenshot("3_arrow_clicked")
         
         print("10 seconds wait kar rahe hain formats load hone ke liye...")
         time.sleep(10)
         take_screenshot("4_formats_ready")
         
-        print("Process complete! Sabhi screenshots save ho chuke hain.")
+        print("Process complete!")
         
     except Exception as e:
         import traceback
