@@ -1,4 +1,4 @@
-name: YTGot Automation
+name: YTGot Automation & Release
 
 on:
   workflow_dispatch:
@@ -11,6 +11,8 @@ on:
 jobs:
   run-script:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Releases mein file upload karne ke liye permission zaroori hai
 
     steps:
       - name: Checkout Code
@@ -30,8 +32,10 @@ jobs:
         run: |
           python ytgot_auto.py "${{ github.event.inputs.video_url }}"
 
-      - name: Upload Screenshot Artifact
-        uses: actions/upload-artifact@v4
+      - name: Upload Video to GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          name: ytgot-screenshot
-          path: ytgot_screenshot.png
+          files: downloads/*
+          tag_name: video-download-${{ github.run_number }}
+          name: "Downloaded Video #${{ github.run_number }}"
+          body: "Automated download from YTGot for URL: ${{ github.event.inputs.video_url }}"
