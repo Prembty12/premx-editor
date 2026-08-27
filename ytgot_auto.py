@@ -1,6 +1,5 @@
 import time
 import sys
-import os
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
@@ -8,7 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
-def take_debug_screenshot(youtube_url):
+def print_page_buttons(youtube_url):
     print("Browser shuru ho raha hai...")
     
     options = webdriver.ChromeOptions()
@@ -32,14 +31,19 @@ def take_debug_screenshot(youtube_url):
         search_box.send_keys(youtube_url)
         print("Link successfully paste ho gaya!")
         
-        # Aapka bataya hua 10 seconds ka wait
         print("10 seconds wait kar rahe hain...")
         time.sleep(10)
         
-        # Screenshot lena aur save karna
-        screenshot_path = "debug_screenshot.png"
-        driver.save_screenshot(screenshot_path)
-        print(f"\nScreenshot successfully save ho gaya hai: {screenshot_path}")
+        print("\n--- PAGE PAR JO BUTTONS / LINKS MILE HAIN ---")
+        elements = driver.find_elements(By.XPATH, "//button | //a")
+        for el in elements:
+            try:
+                text = el.text.strip()
+                if text:
+                    print(f"Found -> Tag: {el.tag_name} | Text: {text}")
+            except:
+                pass
+        print("---------------------------------------------\n")
         
     except Exception as e:
         import traceback
@@ -54,4 +58,4 @@ if __name__ == "__main__":
         link = sys.argv[1]
     else:
         link = input("YouTube ka link yahan paste karein: ")
-    take_debug_screenshot(link)
+    print_page_buttons(link)
