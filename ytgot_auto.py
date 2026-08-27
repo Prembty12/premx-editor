@@ -1,5 +1,6 @@
 import time
 import sys
+import os
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
@@ -7,7 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
-def print_page_buttons(youtube_url):
+def take_ytgot_screenshot(youtube_url):
     print("Browser shuru ho raha hai...")
     
     options = webdriver.ChromeOptions()
@@ -19,14 +20,14 @@ def print_page_buttons(youtube_url):
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     
     try:
-        print("Website khol rahe hain: https://www.seekin.ai/")
-        driver.get("https://www.seekin.ai/")
+        print("Website khol rahe hain: https://ytgot.com/")
+        driver.get("https://ytgot.com/")
         time.sleep(5)
         
         wait = WebDriverWait(driver, 25)
         
-        print("Link paste kiya ja raha hai...")
-        search_box = wait.until(EC.presence_of_element_located((By.TAG_NAME, "input")))
+        print("Input box mein link paste kiya ja raha hai...")
+        search_box = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@type='text' or contains(@placeholder, 'Paste')]")))
         search_box.clear()
         search_box.send_keys(youtube_url)
         print("Link successfully paste ho gaya!")
@@ -34,16 +35,9 @@ def print_page_buttons(youtube_url):
         print("10 seconds wait kar rahe hain...")
         time.sleep(10)
         
-        print("\n--- PAGE PAR JO BUTTONS / LINKS MILE HAIN ---")
-        elements = driver.find_elements(By.XPATH, "//button | //a")
-        for el in elements:
-            try:
-                text = el.text.strip()
-                if text:
-                    print(f"Found -> Tag: {el.tag_name} | Text: {text}")
-            except:
-                pass
-        print("---------------------------------------------\n")
+        screenshot_path = "ytgot_screenshot.png"
+        driver.save_screenshot(screenshot_path)
+        print(f"\nScreenshot successfully save ho gaya: {screenshot_path}")
         
     except Exception as e:
         import traceback
@@ -58,4 +52,4 @@ if __name__ == "__main__":
         link = sys.argv[1]
     else:
         link = input("YouTube ka link yahan paste karein: ")
-    print_page_buttons(link)
+    take_ytgot_screenshot(link)
