@@ -43,28 +43,30 @@ def snapscooper_click_flow(youtube_url):
         
         wait = WebDriverWait(driver, 20)
         
-        print("Input box mein exact Svelte class ke zariye link daal rahe hain...")
+        print("Input box mein link daal rahe hain...")
         search_box = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "input.search-input.svelte-7ccykd")))
         
-        # JavaScript se value set karke Svelte events trigger karna
+        # Svelte ke liye value set karke events dispatch karna
         driver.execute_script("""
             arguments[0].value = arguments[1];
             arguments[0].dispatchEvent(new Event('input', { bubbles: true }));
             arguments[0].dispatchEvent(new Event('change', { bubbles: true }));
-            arguments[0].dispatchEvent(new Event('blur', { bubbles: true }));
         """, search_box, youtube_url)
         
         time.sleep(2)
         take_screenshot("2_link_pasted_check")
         
-        print("Arrow button (`button.search-input-action`) par click kar rahe hain...")
-        arrow_btn = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button.search-input-action.svelte-7ccykd")))
+        print("Pink button jisme `lucide-arrow-right` hai, us par click kar rahe hain...")
+        # Inspect screenshot ke mutabiq exact arrow icon wale button ko target kiya hai
+        arrow_btn = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button:has(svg.lucide-arrow-right), button.search-input-action")))
+        
         driver.execute_script("arguments[0].scrollIntoView(true);", arrow_btn)
         time.sleep(1)
+        # JavaScript click taaki koi overlay ya blocking issue na ho
         driver.execute_script("arguments[0].click();", arrow_btn)
         
-        print("Arrow button click ho gaya! Screenshot le rahe hain...")
-        time.sleep(3)
+        print("Arrow button par click ho gaya! Screenshot le rahe hain...")
+        time.sleep(4)
         take_screenshot("3_arrow_clicked")
         
         print("10 seconds wait kar rahe hain formats load hone ke liye...")
