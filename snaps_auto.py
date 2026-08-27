@@ -43,44 +43,34 @@ def snapscooper_click_flow(youtube_url):
         
         wait = WebDriverWait(driver, 20)
         
-        print("Input box mein link paste kiya ja raha hai...")
+        print("Input box mein link JavaScript ke zariye daal rahe hain...")
         search_box = wait.until(EC.presence_of_element_located((By.XPATH, "//input[contains(@placeholder, 'Paste') or @type='text']")))
-        search_box.clear()
-        search_box.send_keys(youtube_url)
-        time.sleep(2)
         
-        print("Red arrow (→) button par click kar rahe hain...")
-        arrow_btn = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(@class, 'bg-') and descendant::*[local-name()='svg']] | //input[contains(@placeholder, 'Paste')]/following-sibling::button | //button[./svg]")))
-        driver.execute_script("arguments[0].scrollIntoView(true);", arrow_btn)
+        # JavaScript se value set kar rahe hain taaki link gayab na ho
+        driver.execute_script("arguments[0].value = arguments[1];", search_box, youtube_url)
+        # React/Vue frameworks ke liye input event dispatch karna zaroori hai
+        driver.execute_script("arguments[0].dispatchEvent(new Event('input', { bubbles: true }));", search_box)
+        driver.execute_script("arguments[0].dispatchEvent(new Event('change', { bubbles: true }));", search_box)
+        
+        time.sleep(2)
+        take_screenshot("2_link_pasted_check")
+        
+        print("Red 'Download' / Arrow button par click kar rahe hain...")
+        # Jo button screen par dikh raha hai (Download button with 4k icon)
+        download_btn = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'Download') or descendant::*[local-name()='svg']]")))
+        driver.execute_script("arguments[0].scrollIntoView(true);", download_btn)
         time.sleep(1)
-        driver.execute_script("arguments[0].click();", arrow_btn)
+        driver.execute_script("arguments[0].click();", download_btn)
         
-        print("Arrow button click ho gaya! Screenshot le rahe hain...")
+        print("Button click ho gaya! Screenshot le rahe hain...")
         time.sleep(3)
-        take_screenshot("2_arrow_clicked")
+        take_screenshot("3_download_clicked")
         
-        print("Formats load hone ka wait aur 'Download 4K' button par click kar rahe hain...")
-        time.sleep(5)
-        
-        # Exact 'Download 4K' button click logic
-        try:
-            btn_4k = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[contains(., '4K') or contains(., '2160p') or contains(., 'Download 4K')]")))
-            driver.execute_script("arguments[0].scrollIntoView(true);", btn_4k)
-            time.sleep(1)
-            driver.execute_script("arguments[0].click();", btn_4k)
-            print("'Download 4K' button par successfully click ho gaya!")
-        except Exception as e:
-            print("Direct 4K nahi mila, fallback button try kar rahe hain:", e)
-            fallback_btn = driver.find_element(By.XPATH, "(//a[contains(., 'Download')])[1]")
-            driver.execute_script("arguments[0].click();", fallback_btn)
-            
-        time.sleep(2)
-        take_screenshot("3_download_4k_clicked")
-        
-        print("10 seconds wait kar rahe hain...")
+        print("10 seconds wait kar rahe hain formats load hone ke liye...")
         time.sleep(10)
+        take_screenshot("4_formats_ready")
         
-        print("Process complete! Dono screenshots save ho chuke hain.")
+        print("Process complete! Sabhi screenshots save ho chuke hain.")
         
     except Exception as e:
         import traceback
