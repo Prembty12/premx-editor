@@ -187,6 +187,8 @@ AI_TITLE=""
 MAX_RETRIES=2
 
 for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
+    CURRENT_GEMINI_KEY=$(get_random_gemini_key)
+    
     echo "🤖 Gemini Title Generation Attempt $attempt/$MAX_RETRIES..."
     
     if [ -f "$GRID_PATH" ]; then
