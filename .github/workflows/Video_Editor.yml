@@ -1,4 +1,4 @@
-name: Video Editor2 (PremxGamer HD)
+name: Auto Stream Video Editor (PremxGamer HD)
 
 on:
   workflow_dispatch:
@@ -11,6 +11,10 @@ on:
         description: 'Download Method [1=ytgot.com Selenium, 2=Direct API / yt-dlp]'
         required: true
         default: '1'
+      target_resolution:
+        description: 'Required Resolution Check [e.g. 1080, 720, 480 - Leave blank to skip check]'
+        required: false
+        default: '1080'
       audio_url:
         description: 'Optional Audio/Video URL (Leave blank if not needed)'
         required: false
@@ -73,7 +77,7 @@ jobs:
           sudo apt-get install -y ./google-chrome-stable_current_amd64.deb
           rm google-chrome-stable_current_amd64.deb
           
-          pip install selenium webdriver-manager
+          pip install selenium webdriver-manager opencv-python
           
           sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
           sudo chmod a+rx /usr/local/bin/yt-dlp
@@ -180,10 +184,11 @@ jobs:
               download_video_fully(link)
           EOF
 
-      - name: Fully Auto Fetch Video based on Selected Method
+      - name: Fully Auto Fetch Video and Verify Resolution
         run: |
           URL="${{ github.event.inputs.video_url }}"
           METHOD="${{ github.event.inputs.download_method }}"
+          TARGET_RES="${{ github.event.inputs.target_resolution }}"
           AUDIO_URL="${{ github.event.inputs.audio_url }}"
           
           if [ "$METHOD" = "1" ]; then
@@ -215,6 +220,24 @@ jobs:
             exit 1
           fi
 
+          # 🔍 Resolution Verification Step
+          echo "📐 Checking downloaded video resolution..."
+          VIDEO_WIDTH=$(ffprobe -v error -select_streams v:0 -show_entries stream=width -of default=noprint_wrappers=1:nokey=1 input_video.mp4)
+          VIDEO_HEIGHT=$(ffprobe -v error -select_streams v:0 -show_entries stream=height -of default=noprint_wrappers=1:nokey=1 input_video.mp4)
+          
+          echo "📊 Downloaded Video Resolution: ${VIDEO_WIDTH}x${VIDEO_HEIGHT}"
+
+          if [ -n "$TARGET_RES" ]; then
+            echo "🎯 Target Required Resolution Height: ${TARGET_RES}p"
+            if [ "$VIDEO_HEIGHT" != "$TARGET_RES" ]; then
+              echo "❌ ERROR: Downloaded video resolution height (${VIDEO_HEIGHT}p) does not match target resolution (${TARGET_RES}p)!"
+              echo "🛑 Script stopped due to resolution mismatch."
+              exit 1
+            else
+              echo "✅ Resolution matched successfully (${VIDEO_HEIGHT}p)!"
+            fi
+          fi
+
           if [ -n "$AUDIO_URL" ]; then
             echo "🎵 Fetching optional audio/video source..."
             yt-dlp --extract-audio --audio-format mp3 --geo-bypass "$AUDIO_URL" -o "optional_audio.mp3" || true
@@ -239,7 +262,7 @@ jobs:
           GAME_NAME="${{ github.event.inputs.game_name }}"
           
           SINGLE_TAG="v1.0.${{ github.run_number }}"
-          echo "📦 Creating single release: $SINGLE_TAG"
+          echo "📦 Creating single release: `$SINGLE_TAG`"
           gh release create "$SINGLE_TAG" --title "Batch Clips: $RAW_TITLE" --notes "All generated clips for run ${{ github.run_number }}" || true
 
           git config --global user.name "github-actions[bot]"
