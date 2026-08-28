@@ -176,7 +176,7 @@ jobs:
 
             if [ -f "logo.png" ]; then
               ffmpeg -y -ss $SS -t $CLIP_LEN -i "input_video.mp4" -i "logo.png" \
-                -filter_complex "[0:v]${VF_CHAIN}[vid];[1:v]scale=160:-1[logo];[vid][logo]overlay=30:H-h-20" \
+                -filter_complex "[0:v]${VF_CHAIN}[vid];[1:v]scale=165:-1[logo];[vid][logo]overlay=30:H-h-20" \
                 -af "${AF_CHAIN}" \
                 -metadata title="${TITLE_INPUT}${i}" \
                 -metadata artist="PremxGamer" \
@@ -186,8 +186,8 @@ jobs:
                 -profile:v high \
                 -level:v 4.2 \
                 -pix_fmt yuv420p \
-                -b:v 12M \
-                -bufsize 24M \
+                -b:v 18M \
+                -bufsize 36M \
                 -g 60 \
                 -keyint_min 60 \
                 -sc_threshold 0 \
@@ -209,8 +209,8 @@ jobs:
                 -profile:v high \
                 -level:v 4.2 \
                 -pix_fmt yuv420p \
-                -b:v 12M \
-                -bufsize 24M \
+                -b:v 18M \
+                -bufsize 36M \
                 -g 60 \
                 -keyint_min 60 \
                 -sc_threshold 0 \
