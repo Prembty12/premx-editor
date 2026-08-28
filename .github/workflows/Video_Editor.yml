@@ -1,4 +1,4 @@
-name: Video Editor2 (PremxGamer HD)
+name: Video Editor2
 
 on:
   workflow_dispatch:
