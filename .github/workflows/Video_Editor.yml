@@ -1,4 +1,4 @@
-name: Auto Stream Video Editor (PremxGamer HD)
+name: Video Editor2 (PremxGamer HD)
 
 on:
   workflow_dispatch:
@@ -78,7 +78,7 @@ jobs:
           sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
           sudo chmod a+rx /usr/local/bin/yt-dlp
 
-      - name: Create YTGot Browser Downloader Script with Extended Wait
+      - name: Create YTGot Browser Downloader Script with Live Speed Tracker
         run: |
           cat << 'EOF' > download_via_browser.py
           import time
@@ -157,29 +157,44 @@ jobs:
                           time.sleep(2)
                           
                   if start_clicked:
-                      print("📥 Video download shuru ho gayi hai, complete hone ka wait kar rahe hain...", flush=True)
+                      print("📥 Video download shuru ho gayi hai, live speed track ki ja rahi hai...", flush=True)
                       
-                      # Extended wait loop (up to 90 seconds) for large videos
-                      completed = False
-                      for _ in range(45):
-                          time.sleep(2)
+                      prev_size = 0
+                      stable_count = 0
+                      
+                      # Real-time tracking loop (up to 90 seconds)
+                      for _ in range(180):
+                          time.sleep(0.5)
                           if not os.path.exists(download_dir):
                               continue
                               
                           files = os.listdir(download_dir)
-                          # Check if any complete video format exists without .crdownload
-                          complete_files = [f for f in files if f.endswith(('.mp4', '.mkv', '.webm')) and not f.endswith('.crdownload')]
+                          target_file = None
+                          for f in files:
+                              if f.endswith('.crdownload') or f.endswith('.mp4') or f.endswith('.mkv') or f.endswith('.webm'):
+                                  target_file = os.path.join(download_dir, f)
+                                  break
                           
-                          if complete_files:
-                              print(f"✅ Download successfully finished: {complete_files[0]}", flush=True)
-                              completed = True
-                              break
-                          else:
-                              print(f"📂 Current folder files (downloading...): {files}", flush=True)
+                          if target_file and os.path.exists(target_file):
+                              curr_size = os.path.getsize(target_file)
+                              diff = curr_size - prev_size
                               
-                      if not completed:
-                          print("⚠️ Warning: Download time limit reached or file still in crdownload state.", flush=True)
-                      
+                              if diff > 0:
+                                  speed_kb = (diff * 2) / 1024 # KB per second
+                                  print(f"⚡ Live Speed: {speed_kb:.2f} KB/s | Downloaded: {curr_size / (1024*1024):.2f} MB", flush=True)
+                                  stable_count = 0
+                              elif curr_size > 0:
+                                  stable_count += 1
+                              
+                              prev_size = curr_size
+                              
+                              # If file is finished (.crdownload is gone and size is stable)
+                              if not target_file.endswith('.crdownload') and stable_count >= 6 and curr_size > 1024*1024:
+                                  print(f"✅ Download complete successfully! Total size: {curr_size / (1024*1024):.2f} MB", flush=True)
+                                  break
+                          else:
+                              print("⏳ Waiting for browser stream...", flush=True)
+                              
                       files = os.listdir(download_dir)
                       print(f"📂 Final Downloads folder contents: {files}", flush=True)
                   else:
@@ -221,7 +236,6 @@ jobs:
               python3 download_via_browser.py "$URL" || true
               
               if [ -d "downloads" ]; then
-                # Move any completed video file, ignoring .crdownload files
                 find downloads/ -type f \( -name "*.mp4" -o -name "*.mkv" -o -name "*.webm" \) ! -name "*.crdownload" -exec mv {} input_video.mp4 \; || true
               fi
             fi
