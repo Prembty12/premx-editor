@@ -46,5 +46,3 @@ jobs:
         with:
           commit_message: "🤖 Fully automated grid analysis, posting & local cooldown sync"
           branch: main
-          file_pattern: game_links_editor/ posted_links_editor/ temp_frames/* logs/
-          remove_file_changes: true
