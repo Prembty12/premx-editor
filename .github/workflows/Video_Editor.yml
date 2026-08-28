@@ -1,4 +1,4 @@
-name: Video Editor2 (PremxGamer HD)
+name: Auto Stream Video Editor (PremxGamer HD)
 
 on:
   workflow_dispatch:
@@ -78,7 +78,7 @@ jobs:
           sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
           sudo chmod a+rx /usr/local/bin/yt-dlp
 
-      - name: Create YTGot Browser Downloader Script with Speed Tracker
+      - name: Create YTGot Browser Downloader Script with Real-Time Flush Tracker
         run: |
           cat << 'EOF' > download_via_browser.py
           import time
@@ -92,7 +92,7 @@ jobs:
           from webdriver_manager.chrome import ChromeDriverManager
 
           def download_video_fully(youtube_url):
-              print("🌐 Browser (Chrome Headless) shuru ho raha hai...")
+              print("🌐 Browser (Chrome Headless) shuru ho raha hai...", flush=True)
               
               download_dir = os.path.join(os.getcwd(), "downloads")
               os.makedirs(download_dir, exist_ok=True)
@@ -114,30 +114,30 @@ jobs:
               driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
               
               try:
-                  print("🔗 Website khol rahe hain: https://ytgot.com/")
+                  print("🔗 Website khol rahe hain: https://ytgot.com/", flush=True)
                   driver.get("https://ytgot.com/")
                   time.sleep(3)
                   
                   wait = WebDriverWait(driver, 25)
                   
-                  print("⌨️ Input box mein link paste kiya ja raha hai...")
+                  print("⌨️ Input box mein link paste kiya ja raha hai...", flush=True)
                   search_box = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@type='text' or contains(@placeholder, 'Paste')]")))
                   search_box.clear()
                   search_box.send_keys(youtube_url)
-                  print("✅ Link successfully paste ho gaya!")
+                  print("✅ Link successfully paste ho gaya!", flush=True)
                   
                   time.sleep(2)
                   
-                  print("🖱️ Initial Download button par click kar rahe hain...")
+                  print("🖱️ Initial Download button par click kar rahe hain...", flush=True)
                   download_btn = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'Download')]")))
                   driver.execute_script("arguments[0].scrollIntoView(true);", download_btn)
                   time.sleep(1)
                   driver.execute_script("arguments[0].click();", download_btn)
                   
-                  print("⏳ 10 seconds wait kar rahe hain taaki 'Start' button load ho jaye...")
+                  print("⏳ 10 seconds wait kar rahe hain taaki 'Start' button load ho jaye...", flush=True)
                   time.sleep(10)
                   
-                  print("🖱️ 'Start' button ko dhundh kar click kar rahe hain...")
+                  print("🖱️ 'Start' button ko dhundh kar click kar rahe hain...", flush=True)
                   start_clicked = False
                   
                   for i in range(15):
@@ -149,7 +149,7 @@ jobs:
                                   time.sleep(1)
                                   driver.execute_script("arguments[0].click();", btn)
                                   start_clicked = True
-                                  print("✅ Start button par successfully click ho gaya!")
+                                  print("✅ Start button par successfully click ho gaya!", flush=True)
                                   break
                           if start_clicked:
                               break
@@ -157,17 +157,19 @@ jobs:
                           time.sleep(2)
                           
                   if start_clicked:
-                      print("📥 Video download shuru ho gayi hai, live speed track ki ja rahi hai...")
+                      print("📥 Video download shuru ho gayi hai, live tracking active...", flush=True)
                       
                       prev_size = 0
-                      completed = False
+                      stable_count = 0
                       
-                      # Max 60 seconds tracking loop
-                      for _ in range(60):
-                          time.sleep(1)
-                          files = os.listdir(download_dir)
+                      # Check every 0.5 seconds for real-time responsiveness
+                      for _ in range(120): # up to 60 seconds
+                          time.sleep(0.5)
                           
-                          # Check if any .crdownload or final video file is growing
+                          if not os.path.exists(download_dir):
+                              continue
+                              
+                          files = os.listdir(download_dir)
                           target_file = None
                           for f in files:
                               if f.endswith('.crdownload') or f.endswith('.mp4') or f.endswith('.mkv') or f.endswith('.webm'):
@@ -179,34 +181,33 @@ jobs:
                               diff = curr_size - prev_size
                               
                               if diff > 0:
-                                  speed_kb = diff / 1024
-                                  print(f"⚡ Download Speed: {speed_kb:.2f} KB/s (Total downloaded: {curr_size / (1024*1024):.2f} MB)")
+                                  speed_kb = (diff * 2) / 1024 # per second estimate
+                                  print(f"⚡ Live Speed: {speed_kb:.2f} KB/s | Downloaded: {curr_size / (1024*1024):.2f} MB", flush=True)
+                                  stable_count = 0 # reset stability counter if size is changing
+                              elif curr_size > 0:
+                                  stable_count += 1
                               
                               prev_size = curr_size
                               
-                              # If file extension changed from .crdownload to final format or size stable for long, break
-                              if not target_file.endswith('.crdownload') and diff == 0 and curr_size > 1024*1024:
-                                  print("✅ Download complete successfully!")
-                                  completed = True
+                              # If file is finished (.crdownload gone and size hasn't changed for 3 seconds)
+                              if not target_file.endswith('.crdownload') and stable_count >= 6 and curr_size > 1024*1024:
+                                  print(f"✅ Download successfully finished! Total size: {curr_size / (1024*1024):.2f} MB", flush=True)
                                   break
                           else:
-                              print("⏳ Waiting for download stream to appear...")
+                              print("⏳ Waiting for browser stream...", flush=True)
                               
-                      if not completed:
-                          print("⚠️ Download loop finished or timed out. Checking folder...")
-                          
                       files = os.listdir(download_dir)
-                      print(f"📂 Downloads folder ki files: {files}")
+                      print(f"📂 Final Downloads folder contents: {files}", flush=True)
                   else:
-                      print("❌ Error: 'Start' button nahi mila.")
+                      print("❌ Error: 'Start' button nahi mila.", flush=True)
 
               except Exception as e:
                   import traceback
-                  print(f"\n❌ CRITICAL ERROR DETAILS IN BROWSER SCRIPT:")
+                  print(f"\n❌ CRITICAL ERROR DETAILS IN BROWSER SCRIPT:", flush=True)
                   traceback.print_exc()
               finally:
                   driver.quit()
-                  print("🔒 Browser closed successfully.")
+                  print("🔒 Browser closed successfully.", flush=True)
 
           if __name__ == "__main__":
               if len(sys.argv) > 1:
