@@ -1,4 +1,4 @@
-name: Auto Stream Video Editor (PremxGamer HD)
+name: Video Editor
 
 on:
   workflow_dispatch:
