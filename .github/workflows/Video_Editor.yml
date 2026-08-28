@@ -1,68 +1,7 @@
-name: Video Editor2 (PremxGamer HD)
-
-on:
-  workflow_dispatch:
-    inputs:
-      video_url:
-        description: 'Direct API Link or Video URL'
-        required: true
-        default: ''
-      download_method:
-        description: 'Download Method [1=ytgot.com Selenium, 2=Direct API / yt-dlp]'
-        required: true
-        default: '1'
-      audio_url:
-        description: 'Optional Audio/Video URL (Leave blank if not needed)'
-        required: false
-        default: ''
-      video_title:
-        description: 'Exact File Name Prefix (e.g. cod -> cod1.mp4, cod2.mp4)'
-        required: true
-        default: 'cod'
-      game_name:
-        description: 'Game Name for File Creation (e.g. newcod -> newcod.txt)'
-        required: true
-        default: 'newcod'
-      ratio:
-        description: 'Crop Ratio [0=None, 1=1:1, 2=4:5, 3=9:16, 4=3:4, 5=4:3]'
-        required: true
-        default: '3'
-      filter:
-        description: 'Filter [0=OFF, 1=BALANCED POP, 2=PRO GAMING VIVID, 3=CYBER FPS BOOST, 4=NIGHT MAP ENHANCER, 5=CINEMATIC TEAL-ORANGE, 6=ULTRA SHARP HDR]'
-        required: true
-        default: '2'
-      speed:
-        description: 'Video Speed [1=Normal (1x), 2=1.05x, 3=1.10x, 4=1.25x, 5=1.5x, 6=Slow (0.8x)]'
-        required: true
-        default: '1'
-      clip_count:
-        description: 'Kitne clips banane hain?'
-        required: true
-        default: '3'
-      clip_len:
-        description: 'Har clip kitne second ka ho?'
-        required: true
-        default: '15'
-      fps:
-        description: 'FPS [1=30, 2=60]'
-        required: true
-        default: '2'
-
-jobs:
-  process-video:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Set up Python
+- name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11'
 
       - name: Install System Dependencies & Google Chrome
         run: |
@@ -73,7 +12,7 @@ jobs:
           sudo apt-get install -y ./google-chrome-stable_current_amd64.deb
           rm google-chrome-stable_current_amd64.deb
           
-          pip install selenium webdriver-manager
+          pip install selenium webdriver-manager opencv-python
           
           sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
           sudo chmod a+rx /usr/local/bin/yt-dlp
@@ -157,8 +96,8 @@ jobs:
                           time.sleep(2)
                           
                   if start_clicked:
-                      print("Video download ho rahi hai, 30 seconds wait karte hain...")
-                      time.sleep(30)
+                      print("Video download ho rahi hai, 35 seconds wait karte hain...")
+                      time.sleep(35)
                       
                       files = os.listdir(download_dir)
                       print(f"Downloads folder ki files: {files}")
@@ -180,10 +119,11 @@ jobs:
               download_video_fully(link)
           EOF
 
-      - name: Fully Auto Fetch Video based on Selected Method
+      - name: Fully Auto Fetch Video and Verify Resolution
         run: |
           URL="${{ github.event.inputs.video_url }}"
           METHOD="${{ github.event.inputs.download_method }}"
+          TARGET_RES="${{ github.event.inputs.target_resolution }}"
           AUDIO_URL="${{ github.event.inputs.audio_url }}"
           
           if [ "$METHOD" = "1" ]; then
@@ -201,13 +141,16 @@ jobs:
             wget --user-agent="Mozilla/5.0" "$URL" -O "input_video.mp4"
           fi
           
+          # Sirf tabhi yt-dlp chalega jab browser/api se download na ho aur URL koi direct media file ho (YouTube link na ho)
           if [ ! -f "input_video.mp4" ] || [ ! -s "input_video.mp4" ]; then
-            echo "🔄 Fallback to yt-dlp extraction..."
-            yt-dlp --extractor-args "youtube:player_client=android,web" \
-                    --geo-bypass \
-                    --no-check-certificates \
-                    -f "b[ext=mp4]/best" "$URL" -o "input_video.mp4" || \
-            yt-dlp --geo-bypass --no-check-certificates "$URL" -o "input_video.mp4"
+            if [[ "$URL" == *"youtube.com"* ]] || [[ "$URL" == *"youtu.be"* ]]; then
+              echo "❌ Error: ytgot.com se video download nahi ho payi. YouTube direct link par yt-dlp block kar raha hai."
+              echo "🛑 Kripya ytgot.com par ensure karein ki video properly load ho rahi hai, ya direct download link use karein."
+              exit 1
+            else
+              echo "🔄 Fallback extraction..."
+              yt-dlp --geo-bypass --no-check-certificates "$URL" -o "input_video.mp4" || true
+            fi
           fi
           
           if [ ! -f "input_video.mp4" ] || [ ! -s "input_video.mp4" ]; then
@@ -215,140 +158,20 @@ jobs:
             exit 1
           fi
 
-          if [ -n "$AUDIO_URL" ]; then
-            echo "🎵 Fetching optional audio/video source..."
-            yt-dlp --extract-audio --audio-format mp3 --geo-bypass "$AUDIO_URL" -o "optional_audio.mp3" || true
-            if [ -f "optional_audio.mp3" ]; then
-              echo "🔄 Merging custom MP3 audio into main video..."
-              ffmpeg -y -i "input_video.mp4" -i "optional_audio.mp3" -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 "input_video_merged.mp4"
-              mv "input_video_merged.mp4" "input_video.mp4"
+          # 📐 Resolution Verification & 1080p Check Step
+          echo "📐 Checking downloaded video resolution..."
+          VIDEO_WIDTH=$(ffprobe -v error -select_streams v:0 -show_entries stream=width -of default=noprint_wrappers=1:nokey=1 input_video.mp4)
+          VIDEO_HEIGHT=$(ffprobe -v error -select_streams v:0 -show_entries stream=height -of default=noprint_wrappers=1:nokey=1 input_video.mp4)
+          
+          echo "📊 Downloaded Video Resolution: ${VIDEO_WIDTH}x${VIDEO_HEIGHT}"
+
+          if [ -n "$TARGET_RES" ]; then
+            echo "🎯 Target Required Resolution Height: ${TARGET_RES}p"
+            if [ "$VIDEO_HEIGHT" -lt "$TARGET_RES" ]; then
+              echo "❌ ERROR: Downloaded video resolution height (${VIDEO_HEIGHT}p) is below target resolution (${TARGET_RES}p)!"
+              echo "🛑 Script stopped and download cancelled due to low resolution."
+              exit 1
+            else
+              echo "✅ Resolution is ${VIDEO_HEIGHT}p (meets or exceeds target ${TARGET_RES}p)!"
             fi
           fi
-
-      - name: Process Clips, Single Release, and Real-time Links Push
-        run: |
-          RAW_TITLE="${{ github.event.inputs.video_title }}"
-          TITLE_INPUT=$(echo "$RAW_TITLE" | tr ' ' '_')
-          
-          RATIO="${{ github.event.inputs.ratio }}"
-          FILTER="${{ github.event.inputs.filter }}"
-          SPEED_OPT="${{ github.event.inputs.speed }}"
-          CLIP_COUNT=${{ github.event.inputs.clip_count }}
-          CLIP_LEN=${{ github.event.inputs.clip_len }}
-          FPS_OPT="${{ github.event.inputs.fps }}"
-          GAME_NAME="${{ github.event.inputs.game_name }}"
-          
-          SINGLE_TAG="v1.0.${{ github.run_number }}"
-          echo "📦 Creating single release: $SINGLE_TAG"
-          gh release create "$SINGLE_TAG" --title "Batch Clips: $RAW_TITLE" --notes "All generated clips for run ${{ github.run_number }}" || true
-
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-          mkdir -p game_links_editor
-          FILE_PATH="game_links_editor/${GAME_NAME}.txt"
-          > "$FILE_PATH"
-
-          CROP=""
-          if [ "$RATIO" = "1" ]; then CROP="scale=1080:1080:force_original_aspect_ratio=increase,crop=1080:1080,"; fi
-          if [ "$RATIO" = "2" ]; then CROP="scale=1080:1350:force_original_aspect_ratio=increase,crop=1080:1350,"; fi
-          if [ "$RATIO" = "3" ]; then CROP="scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,"; fi
-          if [ "$RATIO" = "4" ]; then CROP="scale=1080:1440:force_original_aspect_ratio=increase,crop=1080:1440,"; fi
-          if [ "$RATIO" = "5" ]; then CROP="scale=1440:1080:force_original_aspect_ratio=increase,crop=1440:1080,"; fi
-
-          GAME=""
-          if [ "$FILTER" = "1" ]; then GAME="eq=brightness=0.02:contrast=1.18:saturation=1.25,hqdn3d=1.5:1.5:6:6,unsharp=3:3:0.75:3:3:0.0,"; fi
-          if [ "$FILTER" = "2" ]; then GAME="eq=brightness=0.01:contrast=1.20:saturation=1.25:gamma=1.12,vibrance=intensity=0.20,hqdn3d=1.5:1.5:6:6,cas=0.3,noise=alls=3:allf=t+u,unsharp=3:3:0.75:3:3:0.0,"; fi 
-          if [ "$FILTER" = "3" ]; then GAME="eq=brightness=0.08:contrast=1.30:saturation=1.35,unsharp=7:7:1.8:7:7:0.0,"; fi
-          if [ "$FILTER" = "4" ]; then GAME="eq=brightness=0.15:contrast=1.20:gamma=1.25,unsharp=5:5:1.0:5:5:0.0,"; fi
-          if [ "$FILTER" = "5" ]; then GAME="eq=contrast=1.25:saturation=1.20,colorbalance=rs=0.08:gs=0.02:bs=-0.08,unsharp=5:5:1.2:5:5:0.0,"; fi
-          if [ "$FILTER" = "6" ]; then GAME="eq=contrast=1.35:saturation=1.55:gamma=1.05,unsharp=7:7:2.5:7:7:0.0,"; fi
-
-          V_SPEED=""
-          A_SPEED=""
-          if [ "$SPEED_OPT" = "1" ]; then V_SPEED=""; A_SPEED=""; fi
-          if [ "$SPEED_OPT" = "2" ]; then V_SPEED="setpts=0.9523*PTS,"; A_SPEED="atempo=1.05,"; fi
-          if [ "$SPEED_OPT" = "3" ]; then V_SPEED="setpts=0.9090*PTS,"; A_SPEED="atempo=1.10,"; fi
-          if [ "$SPEED_OPT" = "4" ]; then V_SPEED="setpts=0.8*PTS,"; A_SPEED="atempo=1.25,"; fi
-          if [ "$SPEED_OPT" = "5" ]; then V_SPEED="setpts=0.6666*PTS,"; A_SPEED="atempo=1.5,"; fi
-          if [ "$SPEED_OPT" = "6" ]; then V_SPEED="setpts=1.25*PTS,"; A_SPEED="atempo=0.8,"; fi
-
-          FPS="60"
-          if [ "$FPS_OPT" = "1" ]; then FPS="30"; fi
-
-          VF_CHAIN="${V_SPEED}${CROP}${GAME}scale=trunc(iw/2)*2:trunc(ih/2)*2"
-          AF_CHAIN="${A_SPEED}aresample=48000"
-
-          for ((i=1; i<=CLIP_COUNT; i++)); do
-            SS=$(( (i-1) * CLIP_LEN ))
-            CLIP_FILE="${TITLE_INPUT}${i}.mp4"
-            echo "🎬 Rendering $CLIP_FILE..."
-
-            if [ -f "logo.png" ]; then
-              ffmpeg -y -ss $SS -t $CLIP_LEN -i "input_video.mp4" -i "logo.png" \
-                -filter_complex "[0:v]${VF_CHAIN}[vid];[1:v]scale=165:-1[logo];[vid][logo]overlay=30:H-h-20" \
-                -af "${AF_CHAIN}" \
-                -metadata title="${TITLE_INPUT}${i}" \
-                -metadata artist="PremxGamer" \
-                -r $FPS \
-                -c:v libx264 \
-                -preset slow \
-                -profile:v high \
-                -level:v 4.2 \
-                -pix_fmt yuv420p \
-                -b:v 18M \
-                -bufsize 36M \
-                -g 60 \
-                -keyint_min 60 \
-                -sc_threshold 0 \
-                -c:a aac \
-                -b:a 192k \
-                -ar 48000 \
-                -ac 2 \
-                -movflags +faststart \
-                "$CLIP_FILE"
-            else
-              ffmpeg -y -ss $SS -t $CLIP_LEN -i "input_video.mp4" \
-                -vf "${VF_CHAIN}" \
-                -af "${AF_CHAIN}" \
-                -metadata title="${TITLE_INPUT}${i}" \
-                -metadata artist="PremxGamer" \
-                -r $FPS \
-                -c:v libx264 \
-                -preset slow \
-                -profile:v high \
-                -level:v 4.2 \
-                -pix_fmt yuv420p \
-                -b:v 18M \
-                -bufsize 36M \
-                -g 60 \
-                -keyint_min 60 \
-                -sc_threshold 0 \
-                -c:a aac \
-                -b:a 192k \
-                -ar 48000 \
-                -ac 2 \
-                -movflags +faststart \
-                "$CLIP_FILE"
-            fi
-
-            echo "🚀 Uploading $CLIP_FILE to single release ($SINGLE_TAG)..."
-            gh release upload "$SINGLE_TAG" "$CLIP_FILE" --clobber
-
-            CLIP_URL=$(gh release view "$SINGLE_TAG" --json assets --jq ".assets[] | select(.name == \"$CLIP_FILE\") | .url")
-
-            if [ -n "$CLIP_URL" ]; then
-              echo "📝 Appending link for ${TITLE_INPUT}${i} to $FILE_PATH..."
-              echo "${TITLE_INPUT}${i} | Link: ${CLIP_URL}" >> "$FILE_PATH"
-
-              git add "$FILE_PATH"
-              git commit -m "Real-time add link for clip ${TITLE_INPUT}${i}" || echo "No changes to commit"
-              
-              git pull --rebase origin main || git pull --rebase origin master || true
-              git push origin HEAD:main || git push origin HEAD:master || git push || true
-            fi
-
-            rm -f "$CLIP_FILE"
-          done
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
