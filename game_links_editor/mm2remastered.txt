@@ -2,3 +2,4 @@ mm2remastered_1 | Link: https://github.com/Prembty12/premx-editor/releases/downl
 mm2remastered_2 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_2.mp4
 mm2remastered_3 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_3.mp4
 mm2remastered_4 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_4.mp4
+mm2remastered_5 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_5.mp4
