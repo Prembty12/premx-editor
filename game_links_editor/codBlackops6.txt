@@ -6,4 +6,10 @@ codBlackops64 | Link: https://github.com/Prembty12/premx-editor/releases/downloa
 codBlackops66 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops66.mp4
 codBlackops67 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops67.mp4
 codBlackops68 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops68.mp4
+<<<<<<< HEAD
 
+=======
+codBlackops69 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops69.mp4
+codBlackops610 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops610.mp4
+>>>>>>> 1e92e01 (Real-time add link for clip codBlackops610)
+codBlackops611 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops611.mp4
