@@ -4,15 +4,11 @@ on:
   workflow_dispatch:
     inputs:
       video_url:
-        description: 'Direct API Link or Video URL'
+        description: 'Direct API Link or YouTube Video URL'
         required: true
         default: ''
-      download_method:
-        description: 'Download Method [1=ytgot.com Selenium, 2=Direct API / yt-dlp]'
-        required: true
-        default: '1'
       target_resolution:
-        description: 'Required Resolution Check [e.g. 1080, 720, 480 - Leave blank to skip check]'
+        description: 'Required Resolution Check [e.g. 1080, 720, 1440 - Leave blank to skip check]'
         required: false
         default: '1080'
       audio_url:
@@ -82,7 +78,7 @@ jobs:
           sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
           sudo chmod a+rx /usr/local/bin/yt-dlp
 
-      - name: Create Browser Downloader Script
+      - name: Create YTGot Browser Downloader Script with Speed Tracker
         run: |
           cat << 'EOF' > download_via_browser.py
           import time
@@ -96,7 +92,7 @@ jobs:
           from webdriver_manager.chrome import ChromeDriverManager
 
           def download_video_fully(youtube_url):
-              print("Browser shuru ho raha hai...")
+              print("🌐 Browser (Chrome Headless) shuru ho raha hai...")
               
               download_dir = os.path.join(os.getcwd(), "downloads")
               os.makedirs(download_dir, exist_ok=True)
@@ -118,30 +114,30 @@ jobs:
               driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
               
               try:
-                  print("Website khol rahe hain: https://ytgot.com/")
+                  print("🔗 Website khol rahe hain: https://ytgot.com/")
                   driver.get("https://ytgot.com/")
-                  time.sleep(5)
+                  time.sleep(3)
                   
                   wait = WebDriverWait(driver, 25)
                   
-                  print("Input box mein link paste kiya ja raha hai...")
+                  print("⌨️ Input box mein link paste kiya ja raha hai...")
                   search_box = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@type='text' or contains(@placeholder, 'Paste')]")))
                   search_box.clear()
                   search_box.send_keys(youtube_url)
-                  print("Link successfully paste ho gaya!")
+                  print("✅ Link successfully paste ho gaya!")
                   
                   time.sleep(2)
                   
-                  print("Initial Download button par click kar rahe hain...")
+                  print("🖱️ Initial Download button par click kar rahe hain...")
                   download_btn = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'Download')]")))
                   driver.execute_script("arguments[0].scrollIntoView(true);", download_btn)
                   time.sleep(1)
                   driver.execute_script("arguments[0].click();", download_btn)
                   
-                  print("10 seconds wait kar rahe hain taaki 'Start' button load ho jaye...")
+                  print("⏳ 10 seconds wait kar rahe hain taaki 'Start' button load ho jaye...")
                   time.sleep(10)
                   
-                  print("'Start' button par click kar rahe hain...")
+                  print("🖱️ 'Start' button ko dhundh kar click kar rahe hain...")
                   start_clicked = False
                   
                   for i in range(15):
@@ -153,7 +149,7 @@ jobs:
                                   time.sleep(1)
                                   driver.execute_script("arguments[0].click();", btn)
                                   start_clicked = True
-                                  print("Start button par successfully click ho gaya!")
+                                  print("✅ Start button par successfully click ho gaya!")
                                   break
                           if start_clicked:
                               break
@@ -161,20 +157,56 @@ jobs:
                           time.sleep(2)
                           
                   if start_clicked:
-                      print("Video download ho rahi hai, 35 seconds wait karte hain...")
-                      time.sleep(35)
+                      print("📥 Video download shuru ho gayi hai, live speed track ki ja rahi hai...")
                       
+                      prev_size = 0
+                      completed = False
+                      
+                      # Max 60 seconds tracking loop
+                      for _ in range(60):
+                          time.sleep(1)
+                          files = os.listdir(download_dir)
+                          
+                          # Check if any .crdownload or final video file is growing
+                          target_file = None
+                          for f in files:
+                              if f.endswith('.crdownload') or f.endswith('.mp4') or f.endswith('.mkv') or f.endswith('.webm'):
+                                  target_file = os.path.join(download_dir, f)
+                                  break
+                          
+                          if target_file and os.path.exists(target_file):
+                              curr_size = os.path.getsize(target_file)
+                              diff = curr_size - prev_size
+                              
+                              if diff > 0:
+                                  speed_kb = diff / 1024
+                                  print(f"⚡ Download Speed: {speed_kb:.2f} KB/s (Total downloaded: {curr_size / (1024*1024):.2f} MB)")
+                              
+                              prev_size = curr_size
+                              
+                              # If file extension changed from .crdownload to final format or size stable for long, break
+                              if not target_file.endswith('.crdownload') and diff == 0 and curr_size > 1024*1024:
+                                  print("✅ Download complete successfully!")
+                                  completed = True
+                                  break
+                          else:
+                              print("⏳ Waiting for download stream to appear...")
+                              
+                      if not completed:
+                          print("⚠️ Download loop finished or timed out. Checking folder...")
+                          
                       files = os.listdir(download_dir)
-                      print(f"Downloads folder ki files: {files}")
+                      print(f"📂 Downloads folder ki files: {files}")
                   else:
-                      print("Error: 'Start' button nahi mila.")
+                      print("❌ Error: 'Start' button nahi mila.")
 
               except Exception as e:
                   import traceback
-                  print(f"\nCRITICAL ERROR DETAILS:")
+                  print(f"\n❌ CRITICAL ERROR DETAILS IN BROWSER SCRIPT:")
                   traceback.print_exc()
               finally:
                   driver.quit()
+                  print("🔒 Browser closed successfully.")
 
           if __name__ == "__main__":
               if len(sys.argv) > 1:
@@ -184,23 +216,15 @@ jobs:
               download_video_fully(link)
           EOF
 
-      - name: Fully Auto Fetch Video and Verify Resolution
+      - name: Fully Auto Fetch Video and Strict Resolution Check
         run: |
           URL="${{ github.event.inputs.video_url }}"
-          METHOD="${{ github.event.inputs.download_method }}"
           TARGET_RES="${{ github.event.inputs.target_resolution }}"
           AUDIO_URL="${{ github.event.inputs.audio_url }}"
           
-          if [ "$METHOD" = "1" ]; then
-            echo "🚀 Downloading via ytgot.com browser automation..."
-            python3 download_via_browser.py "$URL" || true
-            
-            if [ -d "downloads" ]; then
-              find downloads/ -type f \( -name "*.mp4" -o -name "*.mkv" -o -name "*.webm" \) -exec mv {} input_video.mp4 \; || true
-            fi
-          fi
+          echo "📦 Fetching video source..."
           
-          if [[ "$URL" == *"videodownapi.com"* ]] || [[ "$URL" == *"download"* ]] && [ ! -f "input_video.mp4" ]; then
+          if [[ "$URL" == *"videodownapi.com"* ]] || [[ "$URL" == *"download"* ]]; then
             echo "🔗 Direct Downloader API link detected. Downloading via curl..."
             curl -L -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" "$URL" -o "input_video.mp4" || \
             wget --user-agent="Mozilla/5.0" "$URL" -O "input_video.mp4"
@@ -208,17 +232,26 @@ jobs:
           
           if [ ! -f "input_video.mp4" ] || [ ! -s "input_video.mp4" ]; then
             if [[ "$URL" == *"youtube.com"* ]] || [[ "$URL" == *"youtu.be"* ]]; then
-              echo "❌ Error: ytgot.com se video download nahi ho payi. YouTube direct link par yt-dlp block kar raha hai."
-              echo "🛑 Script stopped and download cancelled."
-              exit 1
-            else
-              echo "🔄 Fallback extraction..."
-              yt-dlp --geo-bypass --no-check-certificates "$URL" -o "input_video.mp4" || true
+              echo "🚀 Running YTGot browser automation downloader..."
+              python3 download_via_browser.py "$URL" || true
+              
+              if [ -d "downloads" ]; then
+                find downloads/ -type f \( -name "*.mp4" -o -name "*.mkv" -o -name "*.webm" \) -exec mv {} input_video.mp4 \; || true
+              fi
             fi
           fi
           
           if [ ! -f "input_video.mp4" ] || [ ! -s "input_video.mp4" ]; then
-            echo "Error: Failed to fetch video completely!"
+            echo "🔄 Fallback to standard yt-dlp extraction..."
+            yt-dlp --extractor-args "youtube:player_client=android,web" \
+                   --geo-bypass \
+                   --no-check-certificates \
+                   -f "b[ext=mp4]/best" "$URL" -o "input_video.mp4" || \
+            yt-dlp --geo-bypass --no-check-certificates "$URL" -o "input_video.mp4" || true
+          fi
+          
+          if [ ! -f "input_video.mp4" ] || [ ! -s "input_video.mp4" ]; then
+            echo "❌ Error: Failed to fetch video completely!"
             exit 1
           fi
 
@@ -232,7 +265,7 @@ jobs:
             echo "🎯 Target Required Resolution Height: ${TARGET_RES}p"
             if [ "$VIDEO_HEIGHT" -lt "$TARGET_RES" ]; then
               echo "❌ ERROR: Downloaded video resolution height (${VIDEO_HEIGHT}p) is below target resolution (${TARGET_RES}p)!"
-              echo "🛑 Script stopped and download cancelled due to low resolution."
+              echo "🛑 Script stopped and workflow cancelled because resolution is low."
               exit 1
             else
               echo "✅ Resolution is ${VIDEO_HEIGHT}p (meets or exceeds target ${TARGET_RES}p)!"
