@@ -67,7 +67,7 @@ jobs:
       - name: Install System Dependencies & Google Chrome
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg curl python3-pip jq wget unzip libxi6 libgconf-2-4 libnss3
+          sudo apt-get install -y ffmpeg curl python3-pip jq wget unzip libxi6 libnss3
           
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo apt-get install -y ./google-chrome-stable_current_amd64.deb
