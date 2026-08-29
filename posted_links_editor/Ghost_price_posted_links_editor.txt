@@ -7,3 +7,6 @@ Video id : 18084066965395420
 Ghost7 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.84/Ghost7.mp4
 Video id : 18609940525065173
 
+Ghost3 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.84/Ghost3.mp4
+Video id : 18181091227424574
+
