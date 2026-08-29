@@ -1,2 +1,2 @@
 ghost1 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.86/ghost1.mp4
-ghost2 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.86/ghost2.mp4
+
