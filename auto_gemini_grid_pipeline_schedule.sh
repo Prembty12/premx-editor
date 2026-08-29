@@ -33,9 +33,9 @@ get_random_gemini_key() {
 # Default post mode (Cron ke liye agar variable na ho toh 1 maan lega)
 DEFAULT_POST_MODE="${POST_MODE:-1}"
 
-# 0. ⏳ Check 5 Hours Gap from Facebook Page Last Post
-if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$PAGE_ID" ]; then
-    echo "🔍 Checking last post time on Facebook Page to ensure 5-hour gap..."
+# 0. ⏳ Check 3 Hours Gap (Sirf tabhi chalega jab Facebook par post hona ho - Mode 1 ya 3)
+if [ "$DEFAULT_POST_MODE" != "2" ] && [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$PAGE_ID" ]; then
+    echo "🔍 Checking last post time on Facebook Page to ensure 3-hour gap..."
     
     LAST_POST_CHECK=$(python3 -c "
 import requests, sys
