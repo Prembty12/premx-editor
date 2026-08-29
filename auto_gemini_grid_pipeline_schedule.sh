@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==========================================
-# FULLY AUTOMATED PIPELINE (WITH LIVE DEBUG INFO & 5-HOURS GAP CHECK)
+# FULLY AUTOMATED PIPELINE (CRON-SAFE & AUTO-RETRY)
 # ==========================================
 
 BASE="."
@@ -30,7 +30,10 @@ get_random_gemini_key() {
     fi
 }
 
-# 0. ⏳ Check 5 Hours Gap from Facebook Page Last Post (Manual or Auto)
+# Default post mode (Cron ke liye agar variable na ho toh 1 maan lega)
+DEFAULT_POST_MODE="${POST_MODE:-1}"
+
+# 0. ⏳ Check 5 Hours Gap from Facebook Page Last Post
 if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$PAGE_ID" ]; then
     echo "🔍 Checking last post time on Facebook Page to ensure 5-hour gap..."
     
@@ -142,7 +145,7 @@ fi
 
 echo "🔗 Randomly Selected Link: $SELECTED_URL"
 
-# 3. 📸 8 Screenshots & Grid Generation (Live FFmpeg Info Enabled)
+# 3. 📸 8 Screenshots & Grid Generation
 CURRENT_GEMINI_KEY=$(get_random_gemini_key)
 rm -f "$FRAMES_DIR"/*.jpg
 
@@ -182,14 +185,14 @@ grid_img.save('$GRID_PATH', 'JPEG', quality=85)
 print("✅ Grid image created successfully!")
 EOF
 
-# 4. Gemini se Viral Title Generation (With Retry Loop)
+# 4. Gemini se Viral Title Generation (With Smart Auto-Retry & Key Rotation)
 AI_TITLE=""
-MAX_RETRIES=2
+MAX_TOTAL_RETRIES=4
 
-for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
+for ((attempt=1; attempt<=MAX_TOTAL_RETRIES; attempt++)); do
     CURRENT_GEMINI_KEY=$(get_random_gemini_key)
     
-    echo "🤖 Gemini Title Generation Attempt $attempt/$MAX_RETRIES..."
+    echo "🤖 Gemini Title Generation Attempt $attempt/$MAX_TOTAL_RETRIES..."
     
     if [ -f "$GRID_PATH" ]; then
         file_size=$(wc -c < "$GRID_PATH")
@@ -215,43 +218,46 @@ for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
             
             if [ -n "$file_uri" ]; then
                 file_name_g_api=$(echo "$file_uri" | awk -F'/' '{print $NF}')
-                while true; do
+                
+                state_check_counter=0
+                while [ $state_check_counter -lt 10 ]; do
                   state=$(curl -s "https://generativelanguage.googleapis.com/v1beta/files/$file_name_g_api?key=$CURRENT_GEMINI_KEY" | jq -r '.state // empty')
                   [ "$state" = "ACTIVE" ] && break
                   [ "$state" = "FAILED" ] && break
                   sleep 1
+                  state_check_counter=$((state_check_counter + 1))
                 done
 
-                prompt_text="Based on this 8-photos 9:16 grid screenshot, choose and output ONLY ONE single best, highly viral catchy Hook title with emojis. Do not mention game names or file numbers. Just output the plain text title string."
+                if [ "$state" = "ACTIVE" ]; then
+                    prompt_text="Based on this 8-photos 9:16 grid screenshot, choose and output ONLY ONE single best, highly viral catchy Hook title with emojis. Do not mention game names or file numbers. Just output the plain text title string."
 
-                payload=$(jq -n \
-                  --arg uri "$file_uri" \
-                  --arg mime "image/jpeg" \
-                  --arg ptext "$prompt_text" \
-                  '{contents: [{parts: [{file_data: {file_uri: $uri, mime_type: $mime}}, {text: $ptext}]}]}')
+                    payload=$(jq -n \
+                      --arg uri "$file_uri" \
+                      --arg mime "image/jpeg" \
+                      --arg ptext "$prompt_text" \
+                      '{contents: [{parts: [{file_data: {file_uri: $uri, mime_type: $mime}}, {text: $ptext}]}]}')
 
-                gemini_resp=$(curl -s -X POST -H "Content-Type: application/json" \
-                  "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=$CURRENT_GEMINI_KEY" \
-                  -d "$payload")
+                    gemini_resp=$(curl -s -X POST -H "Content-Type: application/json" \
+                      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=$CURRENT_GEMINI_KEY" \
+                      -d "$payload")
 
-                AI_TITLE=$(echo "$gemini_resp" | jq -r '.candidates[0].content.parts[0].text // empty' | tr -d '"')
+                    AI_TITLE=$(echo "$gemini_resp" | jq -r '.candidates[0].content.parts[0].text // empty' | tr -d '"')
+                fi
             fi
         fi
     fi
 
-    # Check if title was successfully generated
-    if [ -n "$AI_TITLE" ] && [ "$AI_TITLE" != "null" ]; then
+    if [ -n "$AI_TITLE" ] && [ "$AI_TITLE" != "null" ] && [ "$AI_TITLE" != "None" ]; then
         echo "✅ Title generated successfully!"
         break
     else
-        if [ $attempt -lt $MAX_RETRIES ]; then
-            echo "⚠️ Title generate nahi hua. 10 seconds baad dobara grid image upload karke try kar rahe hain..."
-            sleep 10
-        fi
+        echo "⚠️ Attempt $attempt fail ho gaya. Doosri key ke sath try kar rahe hain..."
+        AI_TITLE=""
+        sleep 5
     fi
 done
 
-if [ -z "$AI_TITLE" ] || [ "$AI_TITLE" == "null" ]; then
+if [ -z "$AI_TITLE" ] || [ "$AI_TITLE" == "null" ] || [ "$AI_TITLE" == "None" ]; then
     AI_TITLE="🔥 Insane Pro Gaming Moments! 🎮🔥"
 fi
 
@@ -260,20 +266,9 @@ CAPTION="$AI_TITLE
 #videogames #gamingcommunity #gaming #${SELECTED_GAME_NAME,,} #gamingreels #reels"
 echo "📝 Selected Title: $AI_TITLE"
 
-# ================= 5. 🚀 PLATFORM CONTROLLER & UPLOAD LOGIC =================
-echo ""
-echo "========================================"
-echo "🎯 SELECT POSTING PLATFORM:"
-echo "========================================"
-echo " 1) 🚀 Instagram & Facebook Both"
-echo " 2) 📸 Only Instagram Reel"
-echo " 3) 📘 Only Facebook Video"
-echo "----------------------------------------"
-read -p "Enter choice [1 to 3] (Default: 1): " POST_MODE
-
-if [ -z "$POST_MODE" ]; then
-    POST_MODE="1"
-fi
+# ================= 5. 🚀 CRON-SAFE PLATFORM CONTROLLER =================
+POST_MODE="$DEFAULT_POST_MODE"
+echo "🚀 Using Posting Mode: $POST_MODE (1: Both, 2: Insta Only, 3: FB Only)"
 
 PUBLISH_ID=""
 FB_POST_ID=""
@@ -339,7 +334,6 @@ if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "3" ]; then
         fi
     fi
 fi
-
 
 # 6. 📊 Insights Check
 if [ -n "$PUBLISH_ID" ] && [ "$PUBLISH_ID" != "None" ]; then
