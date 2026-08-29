@@ -288,8 +288,8 @@ if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "2" ]; then
         if [ -n "$CREATION_ID" ] && [ "$CREATION_ID" != "None" ]; then
             echo "⏳ Container created (ID: $CREATION_ID). Checking processing status..."
             
-            for i in {1..15}; do
-                sleep 15
+            for i in {1..45}; do
+                sleep 5
                 STATUS_RES=$(curl -s "$API/$CREATION_ID?fields=status_code,status&access_token=$PAGE_ACCESS_TOKEN")
                 STATUS_CODE=$(echo "$STATUS_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status_code', ''))" 2>/dev/null)
                 
