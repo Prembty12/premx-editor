@@ -60,15 +60,15 @@ except Exception as e:
     HOURS_AGO=$(echo "$LAST_POST_CHECK" | grep "LAST_POST_HOURS" | cut -d':' -f2)
     
     if [ -n "$HOURS_AGO" ]; then
-        IS_LESS_THAN_5=$(python3 -c "print('yes' if float('$HOURS_AGO') < 5.0 else 'no')")
+        IS_LESS_THAN_3=$(python3 -c "print('yes' if float('$HOURS_AGO') < 3.0 else 'no')")
         
         if [ "$IS_LESS_THAN_5" == "yes" ]; then
-            rem_time=$(python3 -c "print(round(5.0 - float('$HOURS_AGO'), 2))")
-            echo "⏳ 5 ghante ka gap poora nahi hua hai! Aakhri post sirf $HOURS_AGO ghante pehle ki gayi thi."
+            rem_time=$(python3 -c "print(round(3.0 - float('$HOURS_AGO'), 2))")
+            echo "⏳ 3 ghante ka gap poora nahi hua hai! Aakhri post sirf $HOURS_AGO ghante pehle ki gayi thi."
             echo "🛑 Script ko rok diya gaya hai. Kripya $rem_time ghante baad try karein."
             exit 0
         else
-            echo "✅ 5 ghante ka gap poora ho chuka hai ($HOURS_AGO ghante pehle post hui thi). Nayi post ki ja sakti hai!"
+            echo "✅ 3 ghante ka gap poora ho chuka hai ($HOURS_AGO ghante pehle post hui thi). Nayi post ki ja sakti hai!"
         fi
     fi
 fi
