@@ -60,15 +60,15 @@ except Exception as e:
     HOURS_AGO=$(echo "$LAST_POST_CHECK" | grep "LAST_POST_HOURS" | cut -d':' -f2)
     
     if [ -n "$HOURS_AGO" ]; then
-        IS_LESS_THAN_3=$(python3 -c "print('yes' if float('$HOURS_AGO') < 3.0 else 'no')")
+        IS_LESS_THAN_5=$(python3 -c "print('yes' if float('$HOURS_AGO') < 5.0 else 'no')")
         
-        if [ "$IS_LESS_THAN_3" == "yes" ]; then
-            rem_time=$(python3 -c "print(round(3.0 - float('$HOURS_AGO'), 2))")
-            echo "⏳ 3 ghante ka gap poora nahi hua hai! Aakhri post sirf $HOURS_AGO ghante pehle ki gayi thi."
+        if [ "$IS_LESS_THAN_5" == "yes" ]; then
+            rem_time=$(python3 -c "print(round(5.0 - float('$HOURS_AGO'), 2))")
+            echo "⏳ 5 ghante ka gap poora nahi hua hai! Aakhri post sirf $HOURS_AGO ghante pehle ki gayi thi."
             echo "🛑 Script ko rok diya gaya hai. Kripya $rem_time ghante baad try karein."
             exit 0
         else
-            echo "✅ 3 ghante ka gap poora ho chuka hai ($HOURS_AGO ghante pehle post hui thi). Nayi post ki ja sakti hai!"
+            echo "✅ 5 ghante ka gap poora ho chuka hai ($HOURS_AGO ghante pehle post hui thi). Nayi post ki ja sakti hai!"
         fi
     fi
 fi
@@ -260,315 +260,86 @@ CAPTION="$AI_TITLE
 #videogames #gamingcommunity #gaming #${SELECTED_GAME_NAME,,} #gamingreels #reels"
 echo "📝 Selected Title: $AI_TITLE"
 
+# ================= 5. 🚀 PLATFORM CONTROLLER & UPLOAD LOGIC =================
+echo ""
+echo "========================================"
+echo "🎯 SELECT POSTING PLATFORM:"
+echo "========================================"
+echo " 1) 🚀 Instagram & Facebook Both"
+echo " 2) 📸 Only Instagram Reel"
+echo " 3) 📘 Only Facebook Video"
+echo "----------------------------------------"
+read -p "Enter choice [1 to 3] (Default: 1): " POST_MODE
 
+if [ -z "$POST_MODE" ]; then
+    POST_MODE="1"
+fi
 
-# 5. 🚀 POSTING LOGIC (Instagram Reels & Facebook Page Video Simultaneous Upload)
 PUBLISH_ID=""
 FB_POST_ID=""
 
 # --- A. Instagram Reels Upload ---
-if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$IG_ID" ]; then
-    echo "🚀 Uploading to Instagram Reels..."
-    CONTAINER_RES=$(curl -s -X POST "$API/$IG_ID/media" \
-      --data-urlencode "media_type=REELS" \
-      --data-urlencode "video_url=$SELECTED_URL" \
-      --data-urlencode "caption=$CAPTION" \
-      --data-urlencode "access_token=$PAGE_ACCESS_TOKEN")
+if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "2" ]; then
+    if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$IG_ID" ]; then
+        echo "🚀 Uploading to Instagram Reels..."
+        CONTAINER_RES=$(curl -s -X POST "$API/$IG_ID/media" \
+          --data-urlencode "media_type=REELS" \
+          --data-urlencode "video_url=$SELECTED_URL" \
+          --data-urlencode "caption=$CAPTION" \
+          --data-urlencode "access_token=$PAGE_ACCESS_TOKEN")
 
-    echo "📦 Container Response: $CONTAINER_RES"
-    CREATION_ID=$(echo "$CONTAINER_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
+        CREATION_ID=$(echo "$CONTAINER_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
 
-    if [ -n "$CREATION_ID" ] && [ "$CREATION_ID" != "None" ]; then
-        echo "⏳ Container created (ID: $CREATION_ID). Checking video processing status from Instagram..."
-        
-        for i in {1..15}; do
-            sleep 10
-            echo "🔍 Status check attempt $i/15..."
+        if [ -n "$CREATION_ID" ] && [ "$CREATION_ID" != "None" ]; then
+            echo "⏳ Container created (ID: $CREATION_ID). Checking processing status..."
             
-            STATUS_RES=$(curl -s "$API/$CREATION_ID?fields=status_code,status&access_token=$PAGE_ACCESS_TOKEN")
-            STATUS_CODE=$(echo "$STATUS_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status_code', ''))" 2>/dev/null)
+            for i in {1..15}; do
+                sleep 15
+                STATUS_RES=$(curl -s "$API/$CREATION_ID?fields=status_code,status&access_token=$PAGE_ACCESS_TOKEN")
+                STATUS_CODE=$(echo "$STATUS_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status_code', ''))" 2>/dev/null)
+                
+                if [ "$STATUS_CODE" == "FINISHED" ]; then
+                    echo "✅ Video processing finished by Instagram!"
+                    break
+                else
+                    echo "⏳ Video still processing (Status: $STATUS_CODE)..."
+                fi
+            done
+
+            PUBLISH_RES=$(curl -s -X POST "$API/$IG_ID/media_publish" \
+              -d "creation_id=$CREATION_ID" \
+              -d "access_token=$PAGE_ACCESS_TOKEN")
+              
+            PUBLISH_ID=$(echo "$PUBLISH_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
             
-            if [ "$STATUS_CODE" == "FINISHED" ]; then
-                echo "✅ Video processing finished by Instagram!"
-                break
+            if [ -n "$PUBLISH_ID" ] && [ "$PUBLISH_ID" != "None" ]; then
+                echo "🎉 Instagram Post Published Successfully! ID: $PUBLISH_ID"
             else
-                echo "⏳ Video is still processing (Status: $STATUS_CODE). Waiting..."
+                echo "❌ Error: Failed to publish container to Instagram!"
             fi
-        done
-
-        PUBLISH_RES=$(curl -s -X POST "$API/$IG_ID/media_publish" \
-          -d "creation_id=$CREATION_ID" \
-          -d "access_token=$PAGE_ACCESS_TOKEN")
-          
-        echo "📢 Publish Response: $PUBLISH_RES"
-        PUBLISH_ID=$(echo "$PUBLISH_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
-        
-        if [ -n "$PUBLISH_ID" ] && [ "$PUBLISH_ID" != "None" ]; then
-            echo "🎉 Instagram Post Published Successfully! ID: $PUBLISH_ID"
-        else
-            echo "❌ Error: Failed to publish container to Instagram!"
         fi
-    else
-        echo "❌ Error: Failed to create Instagram media container!"
     fi
 fi
 
 # --- B. Facebook Page Video Upload ---
-if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$PAGE_ID" ]; then
-    echo "🚀 Uploading to Facebook Page..."
-    FB_RES=$(curl -s -X POST "$API/$PAGE_ID/videos" \
-      --data-urlencode "file_url=$SELECTED_URL" \
-      --data-urlencode "description=$CAPTION" \
-      --data-urlencode "access_token=$PAGE_ACCESS_TOKEN")
+if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "3" ]; then
+    if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$PAGE_ID" ]; then
+        echo "🚀 Uploading to Facebook Page..."
+        FB_RES=$(curl -s -X POST "$API/$PAGE_ID/videos" \
+          --data-urlencode "file_url=$SELECTED_URL" \
+          --data-urlencode "description=$CAPTION" \
+          --data-urlencode "access_token=$PAGE_ACCESS_TOKEN")
 
-    echo "📦 Facebook Response: $FB_RES"
-    FB_POST_ID=$(echo "$FB_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
+        FB_POST_ID=$(echo "$FB_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
 
-    if [ -n "$FB_POST_ID" ] && [ "$FB_POST_ID" != "None" ]; then
-        echo "🎉 Successfully Published to Facebook Page! Video ID: $FB_POST_ID"
-    else
-        echo "❌ Error: Failed to publish video to Facebook Page!"
-    fi
-fi
-
-
-# 6. 📊 Insights Check
-if [ -n "$PUBLISH_ID" ] && [ "$PUBLISH_ID" != "None" ]; then
-    echo "📊 Fetching Instagram insights..."
-    INSIGHTS_RES=$(curl -s "$API/$PUBLISH_ID/insights?metric=clips_reels_play_count,clips_reels_total_interactions,likes,comments&access_token=$PAGE_ACCESS_TOKEN")
-    echo "$INSIGHTS_RES" > "logs/insight_$PUBLISH_ID.json"
-fi
-
-# 7. Local Files Cleanup & Sync
-if [ -n "$PUBLISH_ID" ] && [ "$PUBLISH_ID" != "None" ]; then
-    python3 -c "
-import os
-target_file = '$TARGET_FILE'
-posted_log = '$GAME_POSTED_LOG'
-selected_line = '''$SELECTED_LINE'''
-pub_id = '$PUBLISH_ID'
-
-if os.path.exists(target_file):
-    with open(target_file, 'r', encoding='utf-8', errors='ignore') as f:
-        content = f.read()
-    cleaned = content.replace(selected_line, '').strip()
-    with open(target_file, 'w', encoding='utf-8') as f:
-        f.write(cleaned + '\n\n')
-
-os.makedirs(os.path.dirname(posted_log), exist_ok=True)
-with open(posted_log, 'a', encoding='utf-8') as f:
-    f.write(selected_line + f'\nVideo id : {pub_id}\n\n')
-print('✅ Link shifted to posted folder!')
-"
-else
-    echo "⚠️ Skipped file sync because Publish ID was not generated."
-fi
-    sys.exit(0)
-
-valid_pairs = []
-for line in lines:
-    if 'http://' in line or 'https://' in line:
-        parts = line.split()
-        url = ''
-        for p in parts:
-            if p.startswith('http://') or p.startswith('https://'):
-                url = p
-                break
-        if url:
-            title = line.replace(url, '').replace('| Link:', '').replace('|', '').strip()
-            if not title:
-                title = os.path.basename(url).split('?')[0]
-            valid_pairs.append({'title': title, 'url': url, 'raw': line})
-
-if not valid_pairs:
-    print('{}')
-    sys.exit(0)
-
-chosen = random.choice(valid_pairs)
-print(json.dumps({'title': chosen['title'], 'url': chosen['url'], 'raw': chosen['raw']}))
-")
-
-SELECTED_URL=$(echo "$PARSED_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('url', ''))" 2>/dev/null)
-FILE_NAME=$(echo "$PARSED_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('title', ''))" 2>/dev/null)
-SELECTED_LINE=$(echo "$PARSED_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('raw', ''))" 2>/dev/null)
-
-if [ -z "$SELECTED_URL" ]; then
-    echo "⚠️ Is file me koi valid link nahi hai."
-    exit 0
-fi
-
-echo "🔗 Randomly Selected Link: $SELECTED_URL"
-
-# 3. 📸 8 Screenshots & Grid Generation (Live FFmpeg Info Enabled)
-CURRENT_GEMINI_KEY=$(get_random_gemini_key)
-rm -f "$FRAMES_DIR"/*.jpg
-
-echo "📸 Taking 8 screenshots from video..."
-timestamps=("00:00:02" "00:00:05" "00:00:08" "00:00:11" "00:00:14" "00:00:17" "00:00:20" "00:00:23")
-for i in "${!timestamps[@]}"; do
-    idx=$((i+1))
-    echo "✂️ Cutting frame $idx at timestamp ${timestamps[$i]}..."
-    ffmpeg -y -ss "${timestamps[$i]}" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$FRAMES_DIR/frame_$idx.jpg"
-    if [ ! -f "$FRAMES_DIR/frame_$idx.jpg" ]; then
-        echo "⚠️ Fallback frame cut at 00:00:02..."
-        ffmpeg -y -ss "00:00:02" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$FRAMES_DIR/frame_$idx.jpg"
-    fi
-done
-
-GRID_PATH="$FRAMES_DIR/merged_8_grid.jpg"
-echo "🧩 Merging frames into grid image..."
-
-python3 - <<EOF
-import os
-from PIL import Image
-images = []
-for i in range(1, 9):
-    img_path = os.path.join('$FRAMES_DIR', f'frame_{i}.jpg')
-    if os.path.exists(img_path) and os.path.getsize(img_path) > 0:
-        im = Image.open(img_path).resize((540, 960))
-    else:
-        im = Image.new('RGB', (540, 960), (0, 0, 0))
-    images.append(im)
-
-grid_img = Image.new('RGB', (1080, 3840))
-for idx, im in enumerate(images):
-    col = idx % 2
-    row = idx // 2
-    grid_img.paste(im, (col * 540, row * 960))
-grid_img.save('$GRID_PATH', 'JPEG', quality=85)
-print("✅ Grid image created successfully!")
-EOF
-
-# 4. Gemini se Viral Title Generation (With Retry Loop)
-AI_TITLE=""
-MAX_RETRIES=2
-
-for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
-    CURRENT_GEMINI_KEY=$(get_random_gemini_key)
-    
-    echo "🤖 Gemini Title Generation Attempt $attempt/$MAX_RETRIES..."
-    
-    if [ -f "$GRID_PATH" ]; then
-        file_size=$(wc -c < "$GRID_PATH")
-        upload_res=$(curl -s -D - -X POST "https://generativelanguage.googleapis.com/upload/v1beta/files?key=$CURRENT_GEMINI_KEY" \
-          -H "X-Goog-Upload-Protocol: resumable" \
-          -H "X-Goog-Upload-Command: start" \
-          -H "X-Goog-Upload-Header-Content-Length: $file_size" \
-          -H "X-Goog-Upload-Header-Content-Type: image/jpeg" \
-          -H "Content-Type: application/json" \
-          -d '{"file": {"display_name": "GridScreenshot"}}')
-
-        gemini_upload_url=$(echo "$upload_res" | grep -i "x-goog-upload-url:" | tr -d '\r' | cut -d' ' -f2)
-
-        if [ -n "$gemini_upload_url" ]; then
-            finalize_res=$(curl -s -X POST "$gemini_upload_url" \
-              -H "X-Goog-Upload-Protocol: resumable" \
-              -H "X-Goog-Upload-Command: upload, finalize" \
-              -H "X-Goog-Upload-Offset: 0" \
-              -H "Content-Length: $file_size" \
-              --data-binary "@$GRID_PATH")
-
-            file_uri=$(echo "$finalize_res" | jq -r '.file.uri // empty')
-            
-            if [ -n "$file_uri" ]; then
-                file_name_g_api=$(echo "$file_uri" | awk -F'/' '{print $NF}')
-                while true; do
-                  state=$(curl -s "https://generativelanguage.googleapis.com/v1beta/files/$file_name_g_api?key=$CURRENT_GEMINI_KEY" | jq -r '.state // empty')
-                  [ "$state" = "ACTIVE" ] && break
-                  [ "$state" = "FAILED" ] && break
-                  sleep 1
-                done
-
-                prompt_text="Based on this 8-photos 9:16 grid screenshot, choose and output ONLY ONE single best, highly viral catchy Hook title with emojis. Do not mention game names or file numbers. Just output the plain text title string."
-
-                payload=$(jq -n \
-                  --arg uri "$file_uri" \
-                  --arg mime "image/jpeg" \
-                  --arg ptext "$prompt_text" \
-                  '{contents: [{parts: [{file_data: {file_uri: $uri, mime_type: $mime}}, {text: $ptext}]}]}')
-
-                gemini_resp=$(curl -s -X POST -H "Content-Type: application/json" \
-                  "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=$CURRENT_GEMINI_KEY" \
-                  -d "$payload")
-
-                AI_TITLE=$(echo "$gemini_resp" | jq -r '.candidates[0].content.parts[0].text // empty' | tr -d '"')
-            fi
-        fi
-    fi
-
-    # Check if title was successfully generated
-    if [ -n "$AI_TITLE" ] && [ "$AI_TITLE" != "null" ]; then
-        echo "✅ Title generated successfully!"
-        break
-    else
-        if [ $attempt -lt $MAX_RETRIES ]; then
-            echo "⚠️ Title generate nahi hua. 10 seconds baad dobara grid image upload karke try kar rahe hain..."
-            sleep 10
-        fi
-    fi
-done
-
-if [ -z "$AI_TITLE" ] || [ "$AI_TITLE" == "null" ]; then
-    AI_TITLE="🔥 Insane Pro Gaming Moments! 🎮🔥"
-fi
-
-CAPTION="$AI_TITLE
-
-#videogames #gamingcommunity #gaming #${SELECTED_GAME_NAME,,} #gamingreels #reels"
-echo "📝 Selected Title: $AI_TITLE"
-
-
-
-# 5. 🚀 POSTING LOGIC (Instagram Reels)
-PUBLISH_ID=""
-
-if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$IG_ID" ]; then
-    echo "🚀 Uploading to Instagram Reels..."
-    CONTAINER_RES=$(curl -s -X POST "$API/$IG_ID/media" \
-      --data-urlencode "media_type=REELS" \
-      --data-urlencode "video_url=$SELECTED_URL" \
-      --data-urlencode "caption=$CAPTION" \
-      --data-urlencode "access_token=$PAGE_ACCESS_TOKEN")
-
-    echo "📦 Container Response: $CONTAINER_RES"
-    CREATION_ID=$(echo "$CONTAINER_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
-
-    if [ -n "$CREATION_ID" ] && [ "$CREATION_ID" != "None" ]; then
-        echo "⏳ Container created (ID: $CREATION_ID). Checking video processing status from Instagram..."
-        
-        for i in {1..15}; do
-            sleep 15
-            echo "🔍 Status check attempt $i/5..."
-            
-            STATUS_RES=$(curl -s "$API/$CREATION_ID?fields=status_code,status&access_token=$PAGE_ACCESS_TOKEN")
-            echo "📊 Status Response: $STATUS_RES"
-            
-            STATUS_CODE=$(echo "$STATUS_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status_code', ''))" 2>/dev/null)
-            
-            if [ "$STATUS_CODE" == "FINISHED" ]; then
-                echo "✅ Video processing finished by Instagram!"
-                break
-            else
-                echo "⏳ Video is still processing (Status: $STATUS_CODE). Waiting..."
-            fi
-        done
-
-        PUBLISH_RES=$(curl -s -X POST "$API/$IG_ID/media_publish" \
-          -d "creation_id=$CREATION_ID" \
-          -d "access_token=$PAGE_ACCESS_TOKEN")
-          
-        echo "📢 Publish Response: $PUBLISH_RES"
-        PUBLISH_ID=$(echo "$PUBLISH_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
-        
-        if [ -n "$PUBLISH_ID" ] && [ "$PUBLISH_ID" != "None" ]; then
-            echo "🎉 Instagram Post Published Successfully! ID: $PUBLISH_ID"
+        if [ -n "$FB_POST_ID" ] && [ "$FB_POST_ID" != "None" ]; then
+            echo "🎉 Successfully Published to Facebook Page! Video ID: $FB_POST_ID"
         else
-            echo "❌ Error: Failed to publish container!"
+            echo "❌ Error: Failed to publish video to Facebook Page!"
         fi
-    else
-        echo "❌ Error: Failed to create Instagram media container!"
     fi
 fi
+
 
 # 6. 📊 Insights Check
 if [ -n "$PUBLISH_ID" ] && [ "$PUBLISH_ID" != "None" ]; then
@@ -578,13 +349,15 @@ if [ -n "$PUBLISH_ID" ] && [ "$PUBLISH_ID" != "None" ]; then
 fi
 
 # 7. Local Files Cleanup & Sync
-if [ -n "$PUBLISH_ID" ] && [ "$PUBLISH_ID" != "None" ]; then
+ACTIVE_ID="${PUBLISH_ID:-$FB_POST_ID}"
+
+if [ -n "$ACTIVE_ID" ] && [ "$ACTIVE_ID" != "None" ]; then
     python3 -c "
 import os
 target_file = '$TARGET_FILE'
 posted_log = '$GAME_POSTED_LOG'
 selected_line = '''$SELECTED_LINE'''
-pub_id = '$PUBLISH_ID'
+act_id = '$ACTIVE_ID'
 
 if os.path.exists(target_file):
     with open(target_file, 'r', encoding='utf-8', errors='ignore') as f:
@@ -595,9 +368,9 @@ if os.path.exists(target_file):
 
 os.makedirs(os.path.dirname(posted_log), exist_ok=True)
 with open(posted_log, 'a', encoding='utf-8') as f:
-    f.write(selected_line + f'\nVideo id : {pub_id}\n\n')
-print('✅ Link shifted to posted folder!')
+    f.write(selected_line + f'\nVideo id : {act_id}\n\n')
+print('✅ Link shifted to posted folder successfully!')
 "
 else
-    echo "⚠️ Skipped file sync because Publish ID was not generated."
+    echo "⚠️ Skipped file sync because no post ID was generated from platforms."
 fi
