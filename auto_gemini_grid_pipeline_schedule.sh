@@ -229,7 +229,100 @@ for ((attempt=1; attempt<=MAX_TOTAL_RETRIES; attempt++)); do
                 done
 
                 if [ "$state" = "ACTIVE" ]; then
-                    prompt_text="Based on this 8-photos 9:16 grid screenshot, choose and output ONLY ONE single best, highly viral catchy Hook title with emojis. Do not mention game names or file numbers. Just output the plain text title string."
+                    prompt_text="Analyze the provided 9:16 gaming screenshot/grid as a visual preview of the actual video.
+
+Your task is to identify the MOST VIRAL, VIDEO-RELEVANT moment or story visible across the screenshot.
+
+Do not simply describe what is happening. Understand the scene and turn the most interesting visual situation into a short, curiosity-driven Facebook/Instagram Reels hook.
+
+VISUAL ANALYSIS:
+Carefully examine:
+- Main character and their action
+- Enemy positions and movement
+- Weapons and combat situation
+- Character reactions and body language
+- Location and environment
+- Tactical positioning
+- What appears to be happening BEFORE and AFTER the key moment
+- Sudden changes between frames
+- Suspense or confrontation
+- Unexpected or unusual situations
+- Potential payoff suggested by the sequence
+- The single strongest moment that would make someone stop scrolling
+
+VIDEO-RELATED HOOK:
+The title must feel connected to what the viewer is about to see in the VIDEO, not just what one screenshot shows.
+
+Create curiosity about the actual moment:
+- What is about to happen?
+- What did the character notice?
+- What mistake did the enemy make?
+- What unexpected move is coming?
+- What makes this moment satisfying, surprising, tense, or interesting?
+
+Use the strongest angle supported by the visuals:
+curiosity, suspense, unexpected action, tactical play, perfect timing, enemy mistake, close call, sudden change, reaction, cinematic moment, or POV.
+
+TITLE STYLE:
+- Short and punchy
+- 10–15 words preferred
+- 30 words maximum
+- Natural English
+- Strong Facebook/Instagram Reels style
+- Make the viewer curious enough to watch
+- Do NOT explain the whole scene
+- Do NOT make it sound like a video description
+- Do NOT invent an event that is not visually supported
+
+AVOID GENERIC HOOKS:
+\"They Never Saw This Coming\"
+\"Nobody Expected This\"
+\"You Won't Believe What Happens Next\"
+\"This Changed Everything\"
+\"Wait For It\"
+\"Insane Moment\"
+\"Epic Moment\"
+
+AVOID BORING DESCRIPTIONS:
+\"Holding the sniper...\"
+\"Walking toward...\"
+\"Running through...\"
+\"Looking at...\"
+\"Moving into position...\"
+
+Instead, convert the situation into a compelling hook.
+
+IMPORTANT:
+If multiple frames show a sequence, understand the sequence as ONE video moment rather than treating each frame separately.
+
+Generate several possible hooks internally, compare them for:
+1. Viral potential
+2. Curiosity
+3. Video relevance
+4. Visual accuracy
+5. Emotional impact
+6. Specificity
+7. Shortness
+
+Then select ONLY the strongest one.
+
+STRICT OUTPUT:
+- Output ONLY ONE title.
+- No hashtags.
+- No # symbol.
+- No quotation marks.
+- No numbering.
+- No bullet points.
+- No explanation.
+- No extra text.
+- Do not mention the game name.
+- Do not mention file numbers.
+- Do not mention screenshot, image, grid, or frames.
+- Use 1–3 relevant emojis at the end.
+- Never use danger emojis such as ☠️💀🔪🔫🩸.
+
+FINAL RESPONSE:
+ONLY THE SINGLE VIRAL TITLE STRING."
 
                     payload=$(jq -n \
                       --arg uri "$file_uri" \
