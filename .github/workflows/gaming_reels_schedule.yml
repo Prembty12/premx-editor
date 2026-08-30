@@ -36,7 +36,7 @@ jobs:
           PAGE_ACCESS_TOKEN: ${{ secrets.PAGE_ACCESS_TOKEN }}
           PAGE_ID: ${{ secrets.PAGE_ID }}
           IG_ID: ${{ secrets.IG_ID }}
-          POST_MODE: '1'   # POST_MODE: ${{ vars.POST_MODE }}        
+          POST_MODE: '2'   # POST_MODE: ${{ vars.POST_MODE }}        
           COOLDOWN_MINUTES: '180' # 300 minutes (5 hours) cooldown gap
         run: |
           bash auto_gemini_grid_pipeline_schedule.sh
