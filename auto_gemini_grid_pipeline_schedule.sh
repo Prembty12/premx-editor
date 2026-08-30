@@ -265,8 +265,8 @@ curiosity, suspense, unexpected action, tactical play, perfect timing, enemy mis
 
 TITLE STYLE:
 - Short and punchy
-- 10–15 words preferred
-- 30 words maximum
+- 6–10 words preferred
+- 15 words maximum
 - Natural English
 - Strong Facebook/Instagram Reels style
 - Make the viewer curious enough to watch
