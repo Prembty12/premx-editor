@@ -33,9 +33,9 @@ get_random_gemini_key() {
 # Default post mode (Cron ke liye agar variable na ho toh 1 maan lega)
 DEFAULT_POST_MODE="${POST_MODE:-1}"
 
-# 0. ⏳ Check 3 Hours Gap (Sirf tabhi chalega jab Facebook par post hona ho - Mode 1 ya 3)
-if [ "$DEFAULT_POST_MODE" != "2" ] && [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$PAGE_ID" ]; then
-    echo "🔍 Checking last post time on Facebook Page to ensure 3-hour gap..."
+# 0. ⏳ Check 5 Hours Gap from Facebook Page Last Post
+if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$PAGE_ID" ]; then
+    echo "🔍 Checking last post time on Facebook Page to ensure 5-hour gap..."
     
     LAST_POST_CHECK=$(python3 -c "
 import requests, sys
@@ -63,7 +63,7 @@ except Exception as e:
     HOURS_AGO=$(echo "$LAST_POST_CHECK" | grep "LAST_POST_HOURS" | cut -d':' -f2)
     
     if [ -n "$HOURS_AGO" ]; then
-        IS_LESS_THAN_3=$(python3 -c "print('yes' if float('$HOURS_AGO') < 3.0 else 'no')")
+        IS_LESS_THAN_5=$(python3 -c "print('yes' if float('$HOURS_AGO') < 5.0 else 'no')")
         
         if [ "$IS_LESS_THAN_3" == "yes" ]; then
             rem_time=$(python3 -c "print(round(3.0 - float('$HOURS_AGO'), 2))")
@@ -229,103 +229,7 @@ for ((attempt=1; attempt<=MAX_TOTAL_RETRIES; attempt++)); do
                 done
 
                 if [ "$state" = "ACTIVE" ]; then
-                    prompt_text="Analyze the provided 9:16 gaming screenshot/grid as a visual preview of the actual video.
-
-Your task is to identify the MOST VIRAL, VIDEO-RELEVANT moment or story visible across the screenshot.
-
-Do not simply describe what is happening. Understand the scene and turn the most interesting visual situation into a short, curiosity-driven Facebook/Instagram Reels hook.
-
-VISUAL ANALYSIS:
-Carefully examine:
-- Main character and their action
-- Enemy positions and movement
-- Weapons and combat situation
-- Character reactions and body language
-- Location and environment
-- Tactical positioning
-- What appears to be happening BEFORE and AFTER the key moment
-- Sudden changes between frames
-- Suspense or confrontation
-- Unexpected or unusual situations
-- Potential payoff suggested by the sequence
-- The single strongest moment that would make someone stop scrolling
-
-VIDEO-RELATED HOOK:
-The title must feel connected to what the viewer is about to see in the VIDEO, not just what one screenshot shows.
-
-Create curiosity about the actual moment:
-- What is about to happen?
-- What did the character notice?
-- What mistake did the enemy make?
-- What unexpected move is coming?
-- What makes this moment satisfying, surprising, tense, or interesting?
-
-Use the strongest angle supported by the visuals:
-curiosity, suspense, unexpected action, tactical play, perfect timing, enemy mistake, close call, sudden change, reaction, cinematic moment, or POV.
-
-TITLE STYLE:
-- Make it feel like a real gamer casually wrote the caption
-- Keep it SHORT natural, and conversational
-- Slightly imperfect wording is okay if it feels more human
-- Short and punchy
-- 6–10 words preferred
-- 30 words maximum
-- Natural English
-- Strong Facebook/Instagram Reels style
-- Make the viewer curious enough to watch
-- Do NOT explain the whole scene
-- Do NOT make it sound like a video description
-- Do NOT invent an event that is not visually supported
-
-AVOID GENERIC HOOKS:
-"They Never Saw This Coming"
-"Nobody Expected This"
-"You Won't Believe What Happens Next"
-"This Changed Everything"
-"Wait For It"
-"Insane Moment"
-"Epic Moment"
-
-AVOID BORING DESCRIPTIONS:
-"Holding the sniper..."
-"Walking toward..."
-"Running through..."
-"Looking at..."
-"Moving into position..."
-
-Instead, convert the situation into a compelling hook.
-
-IMPORTANT:
-If multiple frames show a sequence, understand the sequence as ONE video moment rather than treating each frame separately.
-
-Generate several possible hooks internally, compare them for:
-1. Viral potential
-2. Curiosity
-3. Video relevance
-4. Visual accuracy
-5. Emotional impact
-6. Specificity
-7. Shortness
-
-Then select ONLY the strongest one.
-
-STRICT OUTPUT:
-- Output ONLY ONE title.
-- No hashtags.
-- No # symbol.
-- No quotation marks.
-- No numbering.
-- No bullet points.
-- No explanation.
-- No extra text.
-- Do not mention the game name.
-- Do not mention file numbers.
-- Do not mention screenshot, image, grid, or frames.
-- Use 1–3 relevant emojis at the end.
-- Never use danger emojis such as ☠️💀🔪🔫🩸.
-
-FINAL RESPONSE:
-ONLY THE SINGLE VIRAL TITLE STRING."
+                    prompt_text="Based on this 8-photos 9:16 grid screenshot, choose and output ONLY ONE single best, highly viral catchy Hook title with emojis. Do not mention game names or file numbers. Just output the plain text title string."
 
                     payload=$(jq -n \
                       --arg uri "$file_uri" \
@@ -384,8 +288,8 @@ if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "2" ]; then
         if [ -n "$CREATION_ID" ] && [ "$CREATION_ID" != "None" ]; then
             echo "⏳ Container created (ID: $CREATION_ID). Checking processing status..."
             
-            for i in {1..45}; do
-                sleep 5
+            for i in {1..15}; do
+                sleep 15
                 STATUS_RES=$(curl -s "$API/$CREATION_ID?fields=status_code,status&access_token=$PAGE_ACCESS_TOKEN")
                 STATUS_CODE=$(echo "$STATUS_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status_code', ''))" 2>/dev/null)
                 
