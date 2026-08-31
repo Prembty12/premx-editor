@@ -252,14 +252,6 @@ Carefully examine:
 
 VIDEO-RELATED HOOK:
 The title must feel connected to what the viewer is about to see in the VIDEO, not just what one screenshot shows.
-Make it feel like a real gamer casually wrote the caption.
-- Keep it SHORT, natural, and conversational.
-- Slightly imperfect wording is okay if it feels more human.
-- Avoid overly polished, professional, or marketing-style language.
-- Avoid sounding like an AI-generated viral title.
-- Use simple everyday English that gamers actually use.
-- Prefer natural reactions, observations, or thoughts over dramatic narration.
-- It can feel like someone reacting to the clip, not advertising it.
 
 Create curiosity about the actual moment:
 - What is about to happen?
@@ -272,8 +264,11 @@ Use the strongest angle supported by the visuals:
 curiosity, suspense, unexpected action, tactical play, perfect timing, enemy mistake, close call, sudden change, reaction, cinematic moment, or POV.
 
 TITLE STYLE:
+- Make it feel like a real gamer casually wrote the caption
+- Keep it SHORT natural, and conversational
+- Slightly imperfect wording is okay if it feels more human
 - Short and punchy
-- 10–15 words preferred
+- 6–10 words preferred
 - 30 words maximum
 - Natural English
 - Strong Facebook/Instagram Reels style
