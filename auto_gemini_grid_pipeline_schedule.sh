@@ -264,6 +264,7 @@ Use the strongest angle supported by the visuals:
 curiosity, suspense, unexpected action, tactical play, perfect timing, enemy mistake, close call, sudden change, reaction, cinematic moment, or POV.
 
 TITLE STYLE:
+ - Short and punchy
 - Short and punchy
 - 6–10 words preferred
 - 30 words maximum
