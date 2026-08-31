@@ -236,10 +236,7 @@ Your task is to identify the MOST VIRAL, VIDEO-RELEVANT moment or story visible 
 Do not simply describe what is happening. Understand the scene and turn the most interesting, funny, or roast-worthy visual situation into a short, engaging Facebook/Instagram Reels hook.
 
 VISUAL ANALYSIS:
-
 Carefully examine:
-
-
 
 Main character and their action
 
@@ -266,12 +263,9 @@ Potential payoff suggested by the sequence
 The single strongest moment that would make someone stop scrolling and comment
 
 VIDEO-RELATED HOOK:
-
 The title must feel connected to what the viewer is about to see in the VIDEO, not just what one screenshot shows.
 
 Create curiosity, humor, or a human reaction about the actual moment:
-
-
 
 What stupid mistake did the enemy make?
 
@@ -282,12 +276,9 @@ Why is this situation hilarious, embarrassing, or clever?
 What makes this moment satisfying, surprising, tense, or funny enough to spark comments?
 
 Use the strongest angle supported by the visuals:
-
 humor, roast, curiosity, suspense, unexpected action, tactical fail, perfect timing, enemy mistake, close call, sudden change, or reaction.
 
 TITLE STYLE:
-
-
 
 Short, punchy, and sounds like a real human gamer talking
 
@@ -308,42 +299,27 @@ Do NOT make it sound like a video description
 Do NOT invent an event that is not visually supported
 
 AVOID GENERIC HOOKS:
-
 "They Never Saw This Coming"
-
 "Nobody Expected This"
-
 "You Won't Believe What Happens Next"
-
 "This Changed Everything"
-
 "Wait For It"
-
 "Insane Moment"
-
 "Epic Moment"
 
 AVOID BORING DESCRIPTIONS:
-
 "Holding the sniper..."
-
 "Walking toward..."
-
 "Running through..."
-
 "Looking at..."
-
 "Moving into position..."
 
 Instead, convert the situation into a compelling, human, and engaging hook.
 
 IMPORTANT:
-
 If multiple frames show a sequence, understand the sequence as ONE video moment rather than treating each frame separately.
 
 Generate several possible hooks internally, compare them for:
-
-
 
 Viral potential
 
@@ -362,8 +338,6 @@ Shortness
 Then select ONLY the strongest one.
 
 STRICT OUTPUT:
-
-
 
 Output ONLY ONE title.
 
@@ -392,7 +366,6 @@ Use 1–3 relevant emojis at the end.
 Never use danger emojis such as ☠️💀🔪🔫🩸.
 
 FINAL RESPONSE:
-
 ONLY THE SINGLE VIRAL TITLE STRING."
 
                     payload=$(jq -n \
