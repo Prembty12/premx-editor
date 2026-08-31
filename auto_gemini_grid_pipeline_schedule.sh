@@ -261,9 +261,16 @@ Create curiosity about the actual moment:
 - What makes this moment satisfying, surprising, tense, or interesting?
 
 Use the strongest angle supported by the visuals:
-curiosity, suspense, unexpected action, tactical play, perfect timing, enemy mistake, close call, sudden change, reaction, cinematic moment, or POV.
+curiosity, suspense, unexpected action, action funny tactical play, perfect timing, enemy mistake, funny moments close call, sudden change, reaction, cinematic moment, 200 IQ play, overpowered, revenge arc, betrayal, glitch in the matrix, barely survived, flex moment, untold story, hidden secret, mind games, noob to pro, desperate measures, bait and switch, god tier aim, zero-kill win, maximum damage, ultimate troll, pure luck, skill issue, unstoppable force, last second save, sneak attack, karma strikes, double agent, mass destruction, underdog story, heart attack moment, god mode activated, rage quit, toxic laughter, impossible odds, speedrun moment, one-shot wonder, ultimate disrespect, anime moment, hero entry, panic mode, silent killer, trash talk backfire, glory kill, epic comeback, tension peak, masterclass, flawless victory, instant regret, unreal physics, final boss vibe or POV.
 
 TITLE STYLE:
+- Make it feel like a real gamer casually wrote the caption.
+- Keep it SHORT, natural, and conversational.
+- Slightly imperfect wording is okay if it feels more human.
+- Avoid overly polished, professional, or marketing-style language.
+- Avoid sounding like an AI-generated viral title.
+- Use simple everyday English that gamers actually use.
+
 - Short and punchy
 - 10–15 words preferred
 - 30 words maximum
