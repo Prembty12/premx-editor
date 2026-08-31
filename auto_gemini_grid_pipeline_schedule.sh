@@ -233,11 +233,10 @@ for ((attempt=1; attempt<=MAX_TOTAL_RETRIES; attempt++)); do
 
 Your task is to identify the MOST VIRAL, VIDEO-RELEVANT moment or story visible across the screenshot.
 
-Do not simply describe what is happening. Understand the scene and turn the most interesting visual situation into a SHORT, casual, human-sounding Facebook/Instagram Reels gaming hook.
+Do not simply describe what is happening. Understand the scene and turn the most interesting visual situation into a short, curiosity-driven Facebook/Instagram Reels hook.
 
 VISUAL ANALYSIS:
 Carefully examine:
-
 - Main character and their action
 - Enemy positions and movement
 - Weapons and combat situation
@@ -253,21 +252,7 @@ Carefully examine:
 
 VIDEO-RELATED HOOK:
 The title must feel connected to what the viewer is about to see in the VIDEO, not just what one screenshot shows.
-
-Create curiosity about the actual moment:
-
-- What is about to happen?
-- What did the character notice?
-- What mistake did the enemy make?
-- What unexpected move is coming?
-- What makes this moment satisfying, surprising, tense, interesting, or funny?
-
-Use the strongest angle supported by the visuals:
-curiosity, suspense, unexpected action, tactical play, perfect timing, enemy mistake, close call, sudden change, reaction, cinematic moment, or POV.
-
-HUMAN / CASUAL GAMING STYLE:
-
-- Make it feel like a real gamer casually wrote the caption.
+Make it feel like a real gamer casually wrote the caption.
 - Keep it SHORT, natural, and conversational.
 - Slightly imperfect wording is okay if it feels more human.
 - Avoid overly polished, professional, or marketing-style language.
@@ -275,25 +260,29 @@ HUMAN / CASUAL GAMING STYLE:
 - Use simple everyday English that gamers actually use.
 - Prefer natural reactions, observations, or thoughts over dramatic narration.
 - It can feel like someone reacting to the clip, not advertising it.
-- Don't force slang, Gen-Z phrases, or memes unless they naturally fit the visual.
-- Don't add unnecessary words just to reach a word count.
-- Avoid repetitive structures like "This is when...", "The moment when...", or "You won't believe..."
-- The caption should feel effortless, like a creator typed it quickly after watching the clip.
-- Curiosity should come naturally from the situation, not from exaggerated clickbait.
-- A little attitude or personality is good when supported by the moment.
+
+Create curiosity about the actual moment:
+- What is about to happen?
+- What did the character notice?
+- What mistake did the enemy make?
+- What unexpected move is coming?
+- What makes this moment satisfying, surprising, tense, or interesting?
+
+Use the strongest angle supported by the visuals:
+curiosity, suspense, unexpected action, tactical play, perfect timing, enemy mistake, close call, sudden change, reaction, cinematic moment, or POV.
 
 TITLE STYLE:
+- Short and punchy
+- 10–15 words preferred
+- 30 words maximum
+- Natural English
+- Strong Facebook/Instagram Reels style
+- Make the viewer curious enough to watch
+- Do NOT explain the whole scene
+- Do NOT make it sound like a video description
+- Do NOT invent an event that is not visually supported
 
-- Prefer 6–12 words when possible.
-- Maximum 20 words.
-- Short, punchy, casual English.
-- Natural Facebook/Instagram Reels gaming caption style.
-- Make the viewer curious enough to watch.
-- Do NOT explain the whole scene.
-- Do NOT make it sound like a video description.
-- Do NOT invent an event that is not visually supported.
-
-AVOID GENERIC AI HOOKS:
+AVOID GENERIC HOOKS:
 "They Never Saw This Coming"
 "Nobody Expected This"
 "You Won't Believe What Happens Next"
@@ -301,9 +290,6 @@ AVOID GENERIC AI HOOKS:
 "Wait For It"
 "Insane Moment"
 "Epic Moment"
-"This Was Crazy"
-"Things Got Crazy"
-"Bro Didn't See That Coming"
 
 AVOID BORING DESCRIPTIONS:
 "Holding the sniper..."
@@ -312,37 +298,23 @@ AVOID BORING DESCRIPTIONS:
 "Looking at..."
 "Moving into position..."
 
-Instead, turn the situation into a natural gamer-style thought, reaction, or curiosity hook.
+Instead, convert the situation into a compelling hook.
 
 IMPORTANT:
 If multiple frames show a sequence, understand the sequence as ONE video moment rather than treating each frame separately.
 
 Generate several possible hooks internally, compare them for:
-
 1. Viral potential
 2. Curiosity
 3. Video relevance
 4. Visual accuracy
 5. Emotional impact
-6. Natural human feel
+6. Specificity
 7. Shortness
 
 Then select ONLY the strongest one.
 
-FINAL QUALITY CHECK:
-Before answering, ask internally:
-
-- Would a real gaming creator actually write this?
-- Does it sound natural when read out loud?
-- Is it short enough?
-- Does it create curiosity without fake clickbait?
-- Is every important part supported by the visual?
-- Does it feel like a caption for the actual clip?
-
-If it sounds too polished, corporate, dramatic, or AI-generated, rewrite it to sound more casual and human.
-
 STRICT OUTPUT:
-
 - Output ONLY ONE title.
 - No hashtags.
 - No # symbol.
