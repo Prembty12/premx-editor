@@ -249,6 +249,7 @@ Carefully examine:
 - Unexpected or unusual situations
 - Potential payoff suggested by the sequence
 - The single strongest moment that would make someone stop scrolling
+- Only use the visual details provided in the prompt Do not assume any background music sound effects audio or hidden context that isn't explicitly mentioned
 
 VIDEO-RELATED HOOK:
 The title must feel connected to what the viewer is about to see in the VIDEO, not just what one screenshot shows.
