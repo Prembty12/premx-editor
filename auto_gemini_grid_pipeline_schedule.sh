@@ -264,9 +264,8 @@ Use the strongest angle supported by the visuals:
 curiosity, suspense, unexpected action, tactical play, perfect timing, enemy mistake, close call, sudden change, reaction, cinematic moment, or POV.
 
 TITLE STYLE:
- - Short and punchy
 - Short and punchy
-- 6–10 words preferred
+- 10–15 words preferred
 - 30 words maximum
 - Natural English
 - Strong Facebook/Instagram Reels style
@@ -276,20 +275,20 @@ TITLE STYLE:
 - Do NOT invent an event that is not visually supported
 
 AVOID GENERIC HOOKS:
-"They Never Saw This Coming"
-"Nobody Expected This"
-"You Won't Believe What Happens Next"
-"This Changed Everything"
-"Wait For It"
-"Insane Moment"
-"Epic Moment"
+\"They Never Saw This Coming\"
+\"Nobody Expected This\"
+\"You Won't Believe What Happens Next\"
+\"This Changed Everything\"
+\"Wait For It\"
+\"Insane Moment\"
+\"Epic Moment\"
 
 AVOID BORING DESCRIPTIONS:
-"Holding the sniper..."
-"Walking toward..."
-"Running through..."
-"Looking at..."
-"Moving into position..."
+\"Holding the sniper...\"
+\"Walking toward...\"
+\"Running through...\"
+\"Looking at...\"
+\"Moving into position...\"
 
 Instead, convert the situation into a compelling hook.
 
