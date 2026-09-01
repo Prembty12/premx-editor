@@ -274,6 +274,7 @@ TITLE STYLE:
 - Use natural curiosity based on the actual gameplay.
 - Avoid overly polished, professional, or marketing-style language.
 - Avoid sounding like an AI-generated viral title.
+- When possible use a natural question or reaction that encourages comments Do not force it when it does not fit the gameplay
 - Use simple everyday English that gamers actually use.
 - Sometimes use a light funny or playful roast when the gameplay supports it
 - Make it feel natural and relatable
@@ -283,8 +284,7 @@ TITLE STYLE:
 - Viral should come from the actual gameplay moment not forced clickbait
 
 - Short and punchy
-- 6–10 words preferred
-- 25 words maximum
+- 6–10 words preferred 30 words maximum
 - Natural English
 - Strong Facebook/Instagram Reels style
 - Make the viewer curious enough to watch
