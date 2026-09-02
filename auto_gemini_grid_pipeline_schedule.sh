@@ -150,27 +150,28 @@ generate_gemini_titles() {
     local current_gemini_key=$(get_random_gemini_key)
 
     if ! command -v ffmpeg &> /dev/null; then
-        pkg install ffmpeg -y &>/dev/null
+        sudo apt-get update && sudo apt-get install -y ffmpeg
     fi
 
     echo "📸 Calculating video duration and extracting 30 dynamic frames..." >&2
+    mkdir -p "$FRAMES_DIR"
     rm -f "$FRAMES_DIR"/*.jpg
 
     # 1. Video ki total duration nikalna
-    local DURATION=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$SELECTED_URL")
+    local DURATION=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$UPLOAD_URL")
     DURATION=${DURATION%.*}
     if [ -z "$DURATION" ] || [ "$DURATION" -le 0 ]; then
         DURATION=1
     fi
 
-    # 2. Smart Interval Logic: Agar video 30s se choti hai toh interval 1, warna 2 ya 3
+    # 2. Smart Interval Logic
     local NUM_FRAMES=30
     local interval=1
 
     if [ "$DURATION" -ge 30 ]; then
-        interval=2   # Badi video ke liye gap (2 ya 3 set kar sakte hain)
+        interval=2
     else
-        interval=1   # Choti video ke liye 1 second ka gap
+        interval=1
     fi
 
     timestamps=()
@@ -185,15 +186,15 @@ generate_gemini_titles() {
         timestamps+=($(printf "00:%02d:%02d" $min $sec))
     done
 
-    # 3. Frames cut karna (with -loglevel info)
+    # 3. Frames cut karna
     for i in "${!timestamps[@]}"; do
         local idx=$((i+1))
         local ts="${timestamps[$i]}"
         local frame_path="$FRAMES_DIR/frame_$idx.jpg"
         
-        ffmpeg -y -ss "$ts" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel info
+        ffmpeg -y -ss "$ts" -i "$UPLOAD_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel info
         if [ ! -f "$frame_path" ] || [ ! -s "$frame_path" ]; then
-            ffmpeg -y -ss "00:00:01" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel info
+            ffmpeg -y -ss "00:00:01" -i "$UPLOAD_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel info
         fi
     done
 
@@ -214,7 +215,6 @@ grid_path = '$grid_path'
 timestamps = "${timestamps[*]}".split()
 num_frames = $NUM_FRAMES
 
-# Frame par timestamp text overlay karna
 for i, ts in enumerate(timestamps):
     idx = i + 1
     frame_path = os.path.join(frames_dir, f'frame_{idx}.jpg')
@@ -240,7 +240,6 @@ for i in range(1, 31):
         im = Image.new('RGB', (432, 640), (0, 0, 0))
     images.append(im)
 
-# 5x6 layout canvas: Width = 5 * 432 = 2160, Height = 6 * 640 = 3840
 grid_img = Image.new('RGB', (2160, 3840))
 for idx, im in enumerate(images):
     col = idx % 5
@@ -250,7 +249,6 @@ for idx, im in enumerate(images):
 grid_img.save(grid_path, 'JPEG', quality=85)
 sys.stderr.write(f'✅ Grid successfully created with {num_frames} frames in 5x6 9:16 layout!\n')
 EOF
-}
 
 # 4. Gemini se Viral Title Generation (With Smart Auto-Retry & Key Rotation)
 AI_TITLE=""
