@@ -145,88 +145,44 @@ fi
 
 echo "🔗 Randomly Selected Link: $SELECTED_URL"
 
-# ================= FUNCTION FOR GEMINI 3.5 FLASH 9:16 VERTICAL GRID (30 FRAMES - 5x6) =================
-generate_gemini_titles() {
-    local current_gemini_key=$(get_random_gemini_key)
+# 3. 📸 8 Screenshots & Grid Generation
+CURRENT_GEMINI_KEY=$(get_random_gemini_key)
+rm -f "$FRAMES_DIR"/*.jpg
 
-    echo "📸 Calculating video duration and extracting 30 dynamic frames..." >&2
-    rm -f "$FRAMES_DIR"/*.jpg
-
-    # 1. Video ki total duration nikalna
-    local DURATION=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$UPLOAD_URL")
-    DURATION=${DURATION%.*}
-    if [ -z "$DURATION" ] || [ "$DURATION" -le 0 ]; then
-        DURATION=1
+echo "📸 Taking 8 screenshots from video..."
+timestamps=("00:00:02" "00:00:05" "00:00:08" "00:00:11" "00:00:14" "00:00:17" "00:00:20" "00:00:23")
+for i in "${!timestamps[@]}"; do
+    idx=$((i+1))
+    echo "✂️ Cutting frame $idx at timestamp ${timestamps[$i]}..."
+    ffmpeg -y -ss "${timestamps[$i]}" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$FRAMES_DIR/frame_$idx.jpg"
+    if [ ! -f "$FRAMES_DIR/frame_$idx.jpg" ]; then
+        echo "⚠️ Fallback frame cut at 00:00:02..."
+        ffmpeg -y -ss "00:00:02" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$FRAMES_DIR/frame_$idx.jpg"
     fi
+done
 
-    # 2. Smart Interval Logic
-    local NUM_FRAMES=30
-    local interval=1
+GRID_PATH="$FRAMES_DIR/merged_8_grid.jpg"
+echo "🧩 Merging frames into grid image..."
 
-    if [ "$DURATION" -ge 30 ]; then
-        interval=2
-    else
-        interval=1
-    fi
-
-    timestamps=()
-    for ((i=1; i<=NUM_FRAMES; i++)); do
-        local t=$(( (i - 1) * interval ))
-        if [ "$t" -ge "$DURATION" ]; then
-            t=$((DURATION - 1))
-            [ "$t" -lt 0 ] && t=0
-        fi
-        local min=$((t / 60))
-        local sec=$((t % 60))
-        timestamps+=($(printf "00:%02d:%02d" $min $sec))
-    done
-
-    # 3. Frames cut karna (with loglevel info)
-    for i in "${!timestamps[@]}"; do
-        local idx=$((i+1))
-        local ts="${timestamps[$i]}"
-        local frame_path="$FRAMES_DIR/frame_$idx.jpg"
-        
-        echo "✂️ Cutting frame $idx at $ts..." >&2
-        ffmpeg -y -i "$UPLOAD_URL" -ss "$ts" -vframes 1 -q:v 2 "$frame_path" -loglevel info
-        
-        if [ ! -f "$frame_path" ] || [ ! -s "$frame_path" ]; then
-            echo "⚠️ Fallback at 00:00:01 for frame $idx..." >&2
-            ffmpeg -y -i "$UPLOAD_URL" -ss "00:00:01" -vframes 1 -q:v 2 "$frame_path" -loglevel info
-        fi
-    done
-
-    local grid_path="$FRAMES_DIR/merged_30_grid_screenshot.jpg"
-
-    echo "🧩 Merging frames into 5x6 9:16 vertical grid using Python..." >&2
-    python3 - << 'EOF'
-import os, sys
-from PIL import Image, ImageDraw
-
-frames_dir = os.environ.get('FRAMES_DIR', 'frames_output')
-grid_path = os.path.join(frames_dir, 'merged_30_grid_screenshot.jpg')
-num_frames = 30
-
+python3 - <<EOF
+import os
+from PIL import Image
 images = []
-for i in range(1, 31):
-    img_path = os.path.join(frames_dir, f'frame_{i}.jpg')
-    if i <= num_frames and os.path.exists(img_path) and os.path.getsize(img_path) > 0:
-        try:
-            im = Image.open(img_path)
-        except Exception:
-            im = Image.new('RGB', (432, 640), (0, 0, 0))
+for i in range(1, 9):
+    img_path = os.path.join('$FRAMES_DIR', f'frame_{i}.jpg')
+    if os.path.exists(img_path) and os.path.getsize(img_path) > 0:
+        im = Image.open(img_path).resize((540, 960))
     else:
-        im = Image.new('RGB', (432, 640), (0, 0, 0))
+        im = Image.new('RGB', (540, 960), (0, 0, 0))
     images.append(im)
 
-grid_img = Image.new('RGB', (2160, 3840))
+grid_img = Image.new('RGB', (1080, 3840))
 for idx, im in enumerate(images):
-    col = idx % 5
-    row = idx // 5
-    grid_img.paste(im, (col * 432, row * 640))
-
-grid_img.save(grid_path, 'JPEG', quality=85)
-sys.stderr.write(f'✅ Grid successfully created with {num_frames} frames in 5x6 9:16 layout!\n')
+    col = idx % 2
+    row = idx // 2
+    grid_img.paste(im, (col * 540, row * 960))
+grid_img.save('$GRID_PATH', 'JPEG', quality=85)
+print("✅ Grid image created successfully!")
 EOF
 
 # 4. Gemini se Viral Title Generation (With Smart Auto-Retry & Key Rotation)
