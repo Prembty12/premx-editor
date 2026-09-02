@@ -147,11 +147,13 @@ echo "🔗 Randomly Selected Link: $SELECTED_URL"
 
 # ================= FUNCTION FOR GEMINI 3.5 FLASH 9:16 VERTICAL GRID (30 FRAMES - 5x6) =================
 generate_gemini_titles() {
+    local current_gemini_key=$(get_random_gemini_key)
+
     echo "📸 Calculating video duration and extracting 30 dynamic frames..." >&2
     rm -f "$FRAMES_DIR"/*.jpg
 
     # 1. Video ki total duration nikalna
-    local DURATION=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$SELECTED_URL")
+    local DURATION=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$UPLOAD_URL")
     DURATION=${DURATION%.*}
     if [ -z "$DURATION" ] || [ "$DURATION" -le 0 ]; then
         DURATION=1
@@ -185,37 +187,22 @@ generate_gemini_titles() {
         local ts="${timestamps[$i]}"
         local frame_path="$FRAMES_DIR/frame_$idx.jpg"
         
-        ffmpeg -y -ss "$ts" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel info || true
+        ffmpeg -y -ss "$ts" -i "$UPLOAD_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel info || true
         if [ ! -f "$frame_path" ] || [ ! -s "$frame_path" ]; then
-            ffmpeg -y -ss "00:00:01" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel info || true
+            ffmpeg -y -ss "00:00:01" -i "$UPLOAD_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel info || true
         fi
     done
 
     local grid_path="$FRAMES_DIR/merged_30_grid_screenshot.jpg"
 
     echo "🧩 Merging frames into 5x6 9:16 vertical grid using Python..." >&2
-    python3 - <<EOF
+    python3 - << 'EOF'
 import os, sys
 from PIL import Image, ImageDraw
 
-frames_dir = '$FRAMES_DIR'
-grid_path = '$grid_path'
-timestamps = "${timestamps[*]}".split()
-num_frames = $NUM_FRAMES
-
-# Frame par timestamp text overlay karna
-for i, ts in enumerate(timestamps):
-    idx = i + 1
-    frame_path = os.path.join(frames_dir, f'frame_{idx}.jpg')
-    if os.path.exists(frame_path) and os.path.getsize(frame_path) > 0:
-        try:
-            im = Image.open(frame_path).resize((432, 640))
-            draw = ImageDraw.Draw(im)
-            draw.rectangle([10, 10, 130, 50], fill=(0, 0, 0))
-            draw.text((15, 18), ts, fill=(255, 255, 255))
-            im.save(frame_path, 'JPEG', quality=85)
-        except Exception:
-            pass
+frames_dir = os.environ.get('FRAMES_DIR', 'frames_output')
+grid_path = os.environ.get('GRID_PATH', os.path.join(frames_dir, 'merged_30_grid_screenshot.jpg'))
+num_frames = 30
 
 images = []
 for i in range(1, 31):
@@ -229,7 +216,6 @@ for i in range(1, 31):
         im = Image.new('RGB', (432, 640), (0, 0, 0))
     images.append(im)
 
-# 5x6 layout canvas: Width = 5 * 432 = 2160, Height = 6 * 640 = 3840
 grid_img = Image.new('RGB', (2160, 3840))
 for idx, im in enumerate(images):
     col = idx % 5
@@ -239,6 +225,7 @@ for idx, im in enumerate(images):
 grid_img.save(grid_path, 'JPEG', quality=85)
 sys.stderr.write(f'✅ Grid successfully created with {num_frames} frames in 5x6 9:16 layout!\n')
 EOF
+}
 
 # 4. Gemini se Viral Title Generation (With Smart Auto-Retry & Key Rotation)
 AI_TITLE=""
