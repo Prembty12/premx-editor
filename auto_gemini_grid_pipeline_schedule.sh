@@ -276,18 +276,13 @@ TITLE STYLE:
 - Avoid sounding like an AI-generated viral title.
 - When possible use a natural question or reaction that encourages comments Do not force it when it does not fit the gameplay
 - Use simple everyday English that gamers actually use.
-- Sometimes use a light funny or playful roast when the gameplay supports it
-- Make it feel natural and relatable
-- Do not force jokes or roast every title
-- Use humor only when it can encourage people to react or comment
-- Make it viral but sound like a real gamer wrote it
-- Viral should come from the actual gameplay moment not forced clickbait
-
+- Sometimes use a light funny or playful roast when the gameplay supports it Make it feel natural and relatable
+- Do not force jokes or roast every title Use humor only when it can encourage people to react or comment
+- Make it viral but sound like a real gamer wrote it Viral should come from the actual gameplay moment not forced clickbait
+- Also read and use any clearly visible subtitles or on-screen text as part of the visual context
 - Short and punchy
-- 6–10 words preferred 30 words maximum
-- Natural English
-- Strong Facebook/Instagram Reels style
-- Make the viewer curious enough to watch
+- 6–10 words preferred 25 words maximum Natural English
+- Strong Facebook/Instagram Reels style Make the viewer curious enough to watch
 - Do NOT explain the whole scene
 - Do NOT make it sound like a video description
 - Do NOT invent an event that is not visually supported
