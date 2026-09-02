@@ -157,7 +157,7 @@ generate_gemini_titles() {
     rm -f "$FRAMES_DIR"/*.jpg
 
     # 1. Video ki total duration nikalna
-    local DURATION=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$UPLOAD_URL")
+    local DURATION=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$SELECTED_URL")
     DURATION=${DURATION%.*}
     if [ -z "$DURATION" ] || [ "$DURATION" -le 0 ]; then
         DURATION=1
@@ -191,9 +191,9 @@ generate_gemini_titles() {
         local ts="${timestamps[$i]}"
         local frame_path="$FRAMES_DIR/frame_$idx.jpg"
         
-        ffmpeg -y -ss "$ts" -i "$UPLOAD_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel info
+        ffmpeg -y -ss "$ts" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel info
         if [ ! -f "$frame_path" ] || [ ! -s "$frame_path" ]; then
-            ffmpeg -y -ss "00:00:01" -i "$UPLOAD_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel info
+            ffmpeg -y -ss "00:00:01" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel info
         fi
     done
 
@@ -250,6 +250,7 @@ for idx, im in enumerate(images):
 grid_img.save(grid_path, 'JPEG', quality=85)
 sys.stderr.write(f'✅ Grid successfully created with {num_frames} frames in 5x6 9:16 layout!\n')
 EOF
+}
 
 # 4. Gemini se Viral Title Generation (With Smart Auto-Retry & Key Rotation)
 AI_TITLE=""
