@@ -181,15 +181,18 @@ generate_gemini_titles() {
         timestamps+=($(printf "00:%02d:%02d" $min $sec))
     done
 
-    # 3. Frames cut karna
+    # 3. Frames cut karna (with loglevel info)
     for i in "${!timestamps[@]}"; do
         local idx=$((i+1))
         local ts="${timestamps[$i]}"
         local frame_path="$FRAMES_DIR/frame_$idx.jpg"
         
-        ffmpeg -y -ss "$ts" -i "$UPLOAD_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel info || true
+        echo "✂️ Cutting frame $idx at $ts..." >&2
+        ffmpeg -y -i "$UPLOAD_URL" -ss "$ts" -vframes 1 -q:v 2 "$frame_path" -loglevel info
+        
         if [ ! -f "$frame_path" ] || [ ! -s "$frame_path" ]; then
-            ffmpeg -y -ss "00:00:01" -i "$UPLOAD_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel info || true
+            echo "⚠️ Fallback at 00:00:01 for frame $idx..." >&2
+            ffmpeg -y -i "$UPLOAD_URL" -ss "00:00:01" -vframes 1 -q:v 2 "$frame_path" -loglevel info
         fi
     done
 
@@ -201,7 +204,7 @@ import os, sys
 from PIL import Image, ImageDraw
 
 frames_dir = os.environ.get('FRAMES_DIR', 'frames_output')
-grid_path = os.environ.get('GRID_PATH', os.path.join(frames_dir, 'merged_30_grid_screenshot.jpg'))
+grid_path = os.path.join(frames_dir, 'merged_30_grid_screenshot.jpg')
 num_frames = 30
 
 images = []
