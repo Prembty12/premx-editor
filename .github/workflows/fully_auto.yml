@@ -1,4 +1,4 @@
-name: Automated Gaming Reels Pipeline
+name: instant Gaming Reels Pipeline
 
 on:
   workflow_dispatch: # Sirf manual / instant run ke liye
