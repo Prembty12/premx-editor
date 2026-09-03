@@ -145,44 +145,96 @@ fi
 
 echo "🔗 Randomly Selected Link: $SELECTED_URL"
 
-# 3. 📸 8 Screenshots & Grid Generation
+# 3. 📸 30 Dynamic Frames & 5x6 Vertical Grid Generation
 CURRENT_GEMINI_KEY=$(get_random_gemini_key)
 rm -f "$FRAMES_DIR"/*.jpg
 
-echo "📸 Taking 8 screenshots from video..."
-timestamps=("00:00:02" "00:00:05" "00:00:08" "00:00:11" "00:00:14" "00:00:17" "00:00:20" "00:00:23")
+echo "📸 Calculating video duration and extracting 30 dynamic frames..."
+DURATION=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$SELECTED_URL")
+DURATION=${DURATION%.*}
+if [ -z "$DURATION" ] || [ "$DURATION" -le 0 ]; then
+    DURATION=1
+fi
+
+NUM_FRAMES=30
+interval=$((DURATION / NUM_FRAMES))
+if [ "$interval" -lt 1 ]; then
+    interval=1
+fi
+
+timestamps=()
+for ((i=1; i<=NUM_FRAMES; i++)); do
+    t=$(( (i - 1) * interval ))
+    if [ "$t" -ge "$DURATION" ]; then
+        t=$((DURATION - 1))
+        [ "$t" -lt 0 ] && t=0
+    fi
+    min=$((t / 60))
+    sec=$((t % 60))
+    timestamps+=($(printf "00:%02d:%02d" $min $sec))
+done
+
 for i in "${!timestamps[@]}"; do
     idx=$((i+1))
-    echo "✂️ Cutting frame $idx at timestamp ${timestamps[$i]}..."
-    ffmpeg -y -ss "${timestamps[$i]}" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$FRAMES_DIR/frame_$idx.jpg"
-    if [ ! -f "$FRAMES_DIR/frame_$idx.jpg" ]; then
-        echo "⚠️ Fallback frame cut at 00:00:02..."
-        ffmpeg -y -ss "00:00:02" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$FRAMES_DIR/frame_$idx.jpg"
+    ts="${timestamps[$i]}"
+    frame_path="$FRAMES_DIR/frame_$idx.jpg"
+    
+    ffmpeg -y -ss "$ts" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel info
+    if [ ! -f "$frame_path" ] || [ ! -s "$frame_path" ]; then
+        ffmpeg -y -ss "00:00:01" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel info
     fi
 done
 
-GRID_PATH="$FRAMES_DIR/merged_8_grid.jpg"
-echo "🧩 Merging frames into grid image..."
+GRID_PATH="$FRAMES_DIR/merged_30_grid_screenshot.jpg"
+echo "🧩 Merging frames into 5x6 9:16 vertical grid using Python..."
 
 python3 - <<EOF
-import os
-from PIL import Image
+import os, sys
+try:
+    from PIL import Image, ImageDraw
+except ImportError:
+    import subprocess
+    subprocess.run(["pip", "install", "Pillow"], check=True)
+    from PIL import Image, ImageDraw
+
+frames_dir = '$FRAMES_DIR'
+grid_path = '$GRID_PATH'
+timestamps = "${timestamps[*]}".split()
+num_frames = $NUM_FRAMES
+
+for i, ts in enumerate(timestamps):
+    idx = i + 1
+    frame_path = os.path.join(frames_dir, f'frame_{idx}.jpg')
+    if os.path.exists(frame_path) and os.path.getsize(frame_path) > 0:
+        try:
+            im = Image.open(frame_path).resize((432, 640))
+            draw = ImageDraw.Draw(im)
+            draw.rectangle([10, 10, 130, 50], fill=(0, 0, 0))
+            draw.text((15, 18), ts, fill=(255, 255, 255))
+            im.save(frame_path, 'JPEG', quality=85)
+        except Exception:
+            pass
+
 images = []
-for i in range(1, 9):
-    img_path = os.path.join('$FRAMES_DIR', f'frame_{i}.jpg')
-    if os.path.exists(img_path) and os.path.getsize(img_path) > 0:
-        im = Image.open(img_path).resize((540, 960))
+for i in range(1, 31):
+    img_path = os.path.join(frames_dir, f'frame_{i}.jpg')
+    if i <= num_frames and os.path.exists(img_path) and os.path.getsize(img_path) > 0:
+        try:
+            im = Image.open(img_path)
+        except Exception:
+            im = Image.new('RGB', (432, 640), (0, 0, 0))
     else:
-        im = Image.new('RGB', (540, 960), (0, 0, 0))
+        im = Image.new('RGB', (432, 640), (0, 0, 0))
     images.append(im)
 
-grid_img = Image.new('RGB', (1080, 3840))
+grid_img = Image.new('RGB', (2160, 3840))
 for idx, im in enumerate(images):
-    col = idx % 2
-    row = idx // 2
-    grid_img.paste(im, (col * 540, row * 960))
-grid_img.save('$GRID_PATH', 'JPEG', quality=85)
-print("✅ Grid image created successfully!")
+    col = idx % 5
+    row = idx // 5
+    grid_img.paste(im, (col * 432, row * 640))
+
+grid_img.save(grid_path, 'JPEG', quality=85)
+print('✅ Grid successfully created with 30 frames in 5x6 9:16 layout!')
 EOF
 
 # 4. Gemini se Viral Title Generation (With Smart Auto-Retry & Key Rotation)
