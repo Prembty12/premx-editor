@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==========================================
-# 🤖 TRUE AI AGENT FULLY AUTOMATED PIPELINE (STRICT GEMINI-ONLY SMART CUTTING)
+# 🤖 TRUE AI AGENT FULLY AUTOMATED PIPELINE (ROBUST PARSER FIX)
 # ==========================================
 
 BASE="."
@@ -32,7 +32,7 @@ get_random_gemini_key() {
     if [ ${#valid_keys[@]} -eq 0 ]; then
         echo "$GEMINI_API_KEY_1"
     else
-        echo "${valid_keys[$((RANDOM % ${#valid_keys[@]}))]}"
+        echo "${valid_keys[$((RANDOM \%${#valid_keys[@]}))]}"
     fi
 }
 
@@ -100,13 +100,13 @@ TARGET_FILE=$(echo "$AGENT_OUTPUT" | python3 -c "import sys, json; print(json.lo
 SELECTED_GAME_NAME=$(echo "$AGENT_OUTPUT" | python3 -c "import sys, json; print(json.load(sys.stdin).get('game_name', ''))" 2>/dev/null)
 SELECTED_STYLE=$(echo "$AGENT_OUTPUT" | python3 -c "import sys, json; print(json.load(sys.stdin).get('chosen_style', 'curiosity'))" 2>/dev/null)
 
-if [ -z "$TARGET_FILE" ] || [ "$TARGET_FILE" == "None" ] || [ ! -f "$TARGET_FILE" ]; then
+if [ -z "$TARGET_FILE" ] || [ "$TARGET_FILE" == "None" ] \vert{}\vert{} [ ! -f "$TARGET_FILE" ]; then
     echo "⚠️ [WARNING] AI Agent ko koi valid game file nahi mili! Target File: $TARGET_FILE"
     exit 0
 fi
 
 GAME_POSTED_LOG="$POSTED_LINKS_DIR/${SELECTED_GAME_NAME}_posted_links_editor.txt"
-echo "🎮 Selected Game: $SELECTED_GAME_NAME | Target File: $TARGET_FILE | Style: $SELECTED_STYLE"
+echo "🎮 Selected Game: $SELECTED_GAME_NAME | Target File: $TARGET_FILE \vert{} Style:$SELECTED_STYLE"
 
 # 4. Parse and Validate Link
 echo "🔗 [STEP 4] Parsing and validating link from target file..."
@@ -160,7 +160,7 @@ SOURCE_DURATION=$(ffprobe -v error -show_entries format=duration -of default=nop
 echo "⏱️ Raw ffprobe duration output: '$SOURCE_DURATION'"
 SOURCE_DURATION=${SOURCE_DURATION%.*}
 
-if [ -z "$SOURCE_DURATION" ] || [ "$SOURCE_DURATION" -le 0 ]; then
+if [ -z "$SOURCE_DURATION" ] || [ -z "$SOURCE_DURATION" ] \vert{}\vert{} [ "$SOURCE_DURATION" -le 0 ]; then
     echo "⚠️ [WARNING] ffprobe duration failed or returned 0. Defaulting source duration to 60s."
     SOURCE_DURATION=60
 fi
@@ -180,7 +180,7 @@ for ((i=1; i<=NUM_FRAMES; i++)); do
     [ "$t" -lt 0 ] && t=0
     min=$((t / 60))
     sec=$((t % 60))
-    timestamps+=($(printf "00:%02d:%02d" $min $sec))
+    timestamps+=($(printf "00:%02d:%02d" $min$sec))
 done
 
 for i in "${!timestamps[@]}"; do
@@ -188,7 +188,7 @@ for i in "${!timestamps[@]}"; do
     ts="${timestamps[$i]}"
     frame_path="$FRAMES_DIR/frame_$idx.jpg"
     ffmpeg -y -ss "$ts" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel error >/dev/null 2>&1
-    if [ ! -f "$frame_path" ] || [ ! -s "$frame_path" ]; then
+    if [ ! -f "$frame_path" ] \vert{}\vert{} [ ! -s "$frame_path" ]; then
         ffmpeg -y -ss "00:00:01" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel error >/dev/null 2>&1
     fi
 done
@@ -196,23 +196,7 @@ done
 GRID_PATH="$FRAMES_DIR/merged_30_grid_screenshot.jpg"
 echo "🧩 Merging frames into 5x6 vertical grid..."
 
-python3 - <<EOF
-import os
-try:
-    from PIL import Image, ImageDraw
-except ImportError:
-    import subprocess
-    subprocess.run(["pip", "install", "Pillow"], check=True)
-    from PIL import Image, ImageDraw
-
-frames_dir = '$FRAMES_DIR'
-grid_path = '$GRID_PATH'
-timestamps = "${timestamps[*]}".split()
-
-for i, ts in enumerate(timestamps):
-    idx = i + 1
-    frame_path = os.path.join(frames_dir, f'frame_{idx}.jpg')
-    if os.path.exists(frame_path) and os.path.getsize(frame_path) > 0:
+python3 - <<EOF "Pillow"], "install", + .split() 1 Image, ImageDraw ImportError: PIL and check="True)" enumerate(timestamps): except f'frame_{idx}.jpg') for frame_path="os.path.join(frames_dir," frames_dir="$FRAMES_DIR" from grid_path="$GRID_PATH" i, idx="i" if import in os os.path.exists(frame_path) os.path.getsize(frame_path) subprocess subprocess.run(["pip", timestamps="${timestamps[*]}" try: ts> 0:
         try:
             im = Image.open(frame_path).resize((432, 640))
             draw = ImageDraw.Draw(im)
@@ -276,7 +260,7 @@ MAX_TOTAL_RETRIES=4
 
 for ((attempt=1; attempt<=MAX_TOTAL_RETRIES; attempt++)); do
     CURRENT_GEMINI_KEY=$(get_random_gemini_key)
-    echo "🤖 Gemini Attempt $attempt/$MAX_TOTAL_RETRIES (Key used: ${CURRENT_GEMINI_KEY:0,6}...)"
+    echo "🤖 Gemini Attempt $attempt/$MAX_TOTAL_RETRIES (Key used:${CURRENT_GEMINI_KEY:0,6}...)"
     
     if [ -f "$GRID_PATH" ]; then
         file_size=$(wc -c < "$GRID_PATH")
@@ -301,7 +285,7 @@ for ((attempt=1; attempt<=MAX_TOTAL_RETRIES; attempt++)); do
             file_uri=$(echo "$finalize_res" | jq -r '.file.uri // empty')
             
             if [ -n "$file_uri" ]; then
-                file_name_g_api=$(echo "$file_uri" | awk -F'/' '{print $NF}')
+                file_name_g_api=$(echo "$file_uri" \vert{} awk -F'/' '{print $NF}')
                 
                 state_check_counter=0
                 while [ $state_check_counter -lt 10 ]; do
@@ -327,10 +311,10 @@ Return ONLY valid JSON format, no markdown wrapping."
                       --arg uri "$file_uri" \
                       --arg mime "image/jpeg" \
                       --arg ptext "$prompt_text" \
-                      '{contents: [{parts: [{file_data: {file_uri: $uri, mime_type: $mime}}, {text: $ptext}]}]}')
+                      '{contents: [{parts: [{file_data: {file_uri: $uri, mime_type: $mime}}, {text:$ptext}]}]}')
 
                     gemini_resp=$(curl -s -X POST -H "Content-Type: application/json" \
-                      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=$CURRENT_GEMINI_KEY" \
+                      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$CURRENT_GEMINI_KEY" \
                       -d "$payload")
 
                     GEMINI_JSON_RESULT=$(echo "$gemini_resp" | jq -r '.candidates[0].content.parts[0].text // empty')
@@ -349,11 +333,13 @@ Return ONLY valid JSON format, no markdown wrapping."
     fi
 done
 
-# Strict Parse: If Gemini fails, DO NOT CUT OR UPLOAD! Exit immediately.
+# Ultra-Robust Parse: Safely handles markdown ```json blocks and extracts JSON
 PARSED_JSON_DATA=$(python3 -c "
 import json, re, sys
 raw = '''$GEMINI_JSON_RESULT'''
-cleaned = re.sub(r'[\`\`\`json|\`\`\`]', '', raw).strip()
+cleaned = re.sub(r'```json', '', raw, flags=re.IGNORECASE)
+cleaned = re.sub(r'```', '', cleaned).strip()
+
 data = {}
 try:
     match = re.search(r'\{.*?\}', cleaned, re.DOTALL)
@@ -362,7 +348,7 @@ try:
     else:
         data = json.loads(cleaned)
 except Exception as e:
-    print(json.dumps({'status': 'failed', 'error': str(e)}))
+    print(json.dumps({'status': 'failed', 'error': str(e), 'raw': raw}))
     sys.exit(0)
 
 title = data.get('title')
@@ -383,7 +369,7 @@ else:
 PARSED_STATUS=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status', 'failed'))" 2>/dev/null)
 
 if [ "$PARSED_STATUS" != "success" ]; then
-    echo "❌ [ERROR] Gemini failed to return valid JSON decision! Halting pipeline completely to prevent bad/random cutting."
+    echo "❌ [ERROR] Gemini failed to return valid JSON decision! Full parsed output: $PARSED_JSON_DATA"
     exit 1
 fi
 
@@ -428,7 +414,7 @@ if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "2" ]; then
         echo "🚀 Uploading to Instagram Reels..."
         CONTAINER_RES=$(curl -s -X POST "$API/$IG_ID/media" \
           --data-urlencode "media_type=REELS" \
-          --data-urlencode "video_url=$SELECTED_URL" \
+          --data-urlencode "video_url=$FINAL_CLIP_PATH" \
           --data-urlencode "caption=$CAPTION" \
           --data-urlencode "access_token=$PAGE_ACCESS_TOKEN")
         
@@ -455,7 +441,7 @@ if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "3" ]; then
     if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$PAGE_ID" ]; then
         echo "🚀 Uploading to Facebook Page..."
         FB_RES=$(curl -s -X POST "$API/$PAGE_ID/videos" \
-          --data-urlencode "file_url=$SELECTED_URL" \
+          --data-urlencode "source=@$FINAL_CLIP_PATH" \
           --data-urlencode "description=$CAPTION" \
           --data-urlencode "access_token=$PAGE_ACCESS_TOKEN")
 
