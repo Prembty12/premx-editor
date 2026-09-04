@@ -70,3 +70,88 @@
 ====================================================
 🏁 Pipeline Finished at: Fri Sep  4 18:35:44 UTC 2026
 ====================================================
+====================================================
+🚀 Pipeline Started at: Fri Sep  4 18:45:08 UTC 2026
+====================================================
+🔍 [STEP 0] Checking Facebook Cookie Session Health...
+⚠️ Checking Facebook Cookie Session Health...
+✅ Status: Cookies present and verified for pipeline execution.
+📈 [STEP 1] Pulling real analytics and insights from past posts...
+📊 Real Facebook Insights fetched & AI memory updated successfully!
+🤖 [STEP 3] Consulting AI Agent Brain (ai_agent.py)...
+🧠 AI Agent Raw Output: {"target_file": "game_links_editor/SpiderMan2.txt", "game_name": "SpiderMan2", "chosen_style": "aggressive"}
+🎮 Selected Game: SpiderMan2 | Target File: game_links_editor/SpiderMan2.txt | Style: aggressive
+🔗 [STEP 4] Parsing and validating link from target file...
+🔗 Validated Link Found: https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan21.mp4
+✂️ [STEP 5] Checking source video total duration via ffprobe...
+⏱️ Raw ffprobe duration output: '31.866667'
+📸 [STEP 6] Extracting 30 dynamic frames across source video...
+🧩 Merging frames into 5x6 vertical grid...
+✅ Grid screenshot created successfully.
+🤖 [STEP 7] Sending grid & past insights to Gemini for Smart Action Cutting Decision...
+🤖 Gemini Attempt 1/4 (Key used: RN6LW91lWr-f6WNx0g629kEPUccQvtLTgCte6YYZfctYl1w...)
+🤖 Gemini JSON Response: '{
+  "title": "UNLEASHING ABSOLUTE MAYHEM IN NYC! 🕸️🔥",
+  "start_time": "00:00:13",
+  "clip_duration": 17
+}'
+🎯 Strict Gemini Decisions Loaded Successfully:
+   - Title: UNLEASHING ABSOLUTE MAYHEM IN NYC! 🕸️🔥
+   - Start Time: 00:00:13
+   - Clip Duration: 17 seconds
+✂️ [STEP 8] Cutting thrilling clip via FFmpeg from 00:00:13 for 17 seconds...
+✅ Optimized action clip successfully saved at: temp_frames/final_cut_clip.mp4
+🚀 [STEP 9] Uploading content to platforms...
+🚀 Uploading to Instagram Reels...
+📦 IG Container Response: {"id":"17981329509119519"}
+⏳ IG Status Check (1): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"AGq-Md595Yi5f1M1p_xvK5f"}}
+⏳ IG Status Check (2): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"ArIq1YhVzfJ3hxYhp9nt-Fw"}}
+⏳ IG Status Check (3): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"AYQfMFi7uj5zZ3esmrxNp07"}}
+⏳ IG Status Check (4): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"A0q8-qmC0CGydXKcn47ElJa"}}
+⏳ IG Status Check (5): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"ADvqH2mYpTqUTkSwATCArcC"}}
+⏳ IG Status Check (6): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"AIorKV_3ehAv8s9z2xsLYAV"}}
+⏳ IG Status Check (7): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"AVAmSro0UdC6FaBgdb5vPRl"}}
+⏳ IG Status Check (8): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"Ac1ssbDwtaMFKHDSOcAom_9"}}
+⏳ IG Status Check (9): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"Aw7GwaR3IyenloGQ9wfAiX1"}}
+⏳ IG Status Check (10): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"AhE-lnV1TW2b8YUveu7YVBA"}}
+⏳ IG Status Check (11): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"A9UFVEGgZf5KjhkJ3uv8gH9"}}
+⏳ IG Status Check (12): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"AM7Xf4GO3mRvNA5P07-0Y-P"}}
+⏳ IG Status Check (13): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"Ar35e7jFXOZH4asynRwfrXf"}}
+⏳ IG Status Check (14): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"ASAHa6SLzhEZH4BzhYvU_8-"}}
+⏳ IG Status Check (15): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"AcIOycUDDX1hzN8Dh3fynsd"}}
+⏳ IG Status Check (16): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"ACPhoGZhEQ_74dhEplQeA38"}}
+⏳ IG Status Check (17): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"ALYwuYvPBAqlOSTAzHH0Yf-"}}
+⏳ IG Status Check (18): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"Al1JyJennHgD3YgK9CsFwcN"}}
+⏳ IG Status Check (19): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"Ap6i4qjFuLq-odM2QNWeY0R"}}
+⏳ IG Status Check (20): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"Axfin08d9EPT4ZYZEgiAuv5"}}
+⏳ IG Status Check (21): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"A85d5zCieV7z1QOxzXI5aXU"}}
+⏳ IG Status Check (22): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"APiQ0JCIMorlQ8eZWtxWS6h"}}
+⏳ IG Status Check (23): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"AqWD_b5FPi2byWizxFdMh-w"}}
+⏳ IG Status Check (24): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"ArjkzQQVBYyYKUQMkQwf_hT"}}
+⏳ IG Status Check (25): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"AX_wQUton2e53dQi4hZRvvt"}}
+⏳ IG Status Check (26): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"AtUKwO3ZSvn55OtHgvCw1ed"}}
+⏳ IG Status Check (27): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"AVAIG040pPDkOPyp3DPPo3-"}}
+⏳ IG Status Check (28): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"AQpyVisQGvIPKya8_9AampS"}}
+⏳ IG Status Check (29): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"AjHYdvexAqCAg6NRUm3EK_a"}}
+⏳ IG Status Check (30): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"AsBZm14ubdqatsKFferFZA8"}}
+⏳ IG Status Check (31): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"AnS5zBAs_c5Nd6uigZL1CSf"}}
+⏳ IG Status Check (32): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"ADqgdbOa8NMuURrjetx4_sY"}}
+⏳ IG Status Check (33): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"AiP6hzXtC-rx05a7Urp2wI-"}}
+⏳ IG Status Check (34): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"AT8iA7z1fB2v_NQGl7sVgPO"}}
+⏳ IG Status Check (35): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"A_J9g6Iy8JbRWw2E89FENtQ"}}
+⏳ IG Status Check (36): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"Ahh9pfP6bHHsHvwGOQjUxTR"}}
+⏳ IG Status Check (37): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"AiXsnOTS7ZuHLsZDYKjkc_g"}}
+⏳ IG Status Check (38): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"A8PE0BM6jlaC4DJH2pXcB3M"}}
+⏳ IG Status Check (39): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"AFvYTMyeP1mc3QIiYvdqeVQ"}}
+⏳ IG Status Check (40): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"A8FpJkKr9vjRMIhBqPxmpne"}}
+⏳ IG Status Check (41): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"AK-B9YwAxU7jiKVnPhVaojn"}}
+⏳ IG Status Check (42): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"A5y3gGLj9C5kMvlPy2XtgU5"}}
+⏳ IG Status Check (43): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"AVjjPZRJQgdTtkPkfuQDnlF"}}
+⏳ IG Status Check (44): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"AIlRr6B6-Ynh7dgI1RzfmSv"}}
+⏳ IG Status Check (45): {"error":{"message":"(#100) Tried accessing nonexisting field (status_t)","type":"OAuthException","code":100,"fbtrace_id":"A2HXmxCkSEC7gQEeqUa5wQ2"}}
+📢 IG Publish Response: {"error":{"message":"Fatal","type":"OAuthException","code":-1,"error_subcode":2207077,"is_transient":false,"error_user_title":"Internal server error","error_user_msg":"Internal server error: An internal server error has occurred. Video download failed with: HTTP error code 502. Bad Gateway","fbtrace_id":"AeVXM-7rJAWnPxGf47V4DW1"}}
+📝 [STEP 10] Updating memory and file sync. Active ID: 
+⚠️ [WARNING] Skipped file sync because no active post ID was generated.
+====================================================
+🏁 Pipeline Finished at: Fri Sep  4 18:50:32 UTC 2026
+====================================================
