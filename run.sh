@@ -425,46 +425,73 @@ else
     exit 1
 fi
 
-# 9. 🚀 Upload to Platforms (With Full Error Debugging)
-echo "🚀 [STEP 9] Uploading content to platforms..."
+# ================= 5. 🚀 CRON-SAFE PLATFORM CONTROLLER =================
 POST_MODE="$DEFAULT_POST_MODE"
+echo "🚀 Using Posting Mode: $POST_MODE (1: Both, 2: Insta Only, 3: FB Only)"
+
 PUBLISH_ID=""
 FB_POST_ID=""
 
+# --- A. Instagram Reels Upload ---
 if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "2" ]; then
     if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$IG_ID" ]; then
         echo "🚀 Uploading to Instagram Reels..."
-        CONTAINER_RES=$(curl -s -X POST "$API/$IG_ID/media" \
-          --data-urlencode "media_type=REELS" \
-          --data-urlencode "video_url=$FINAL_CLIP_PATH" \
-          --data-urlencode "caption=$CAPTION" \
-          --data-urlencode "access_token=$PAGE_ACCESS_TOKEN")
         
-        echo "📦 IG Container Response: $CONTAINER_RES"
-        CREATION_ID=$(echo "$CONTAINER_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
+        # AUTOMATIC PUBLIC URL GENERATION FOR INSTAGRAM
+        echo "🌐 Generating public URL for the local clip..."
+        PUBLIC_VIDEO_URL=$(curl -s -F "reqtype=fileupload" -F "fileToUpload=@$FINAL_CLIP_PATH" https://catbox.moe/user/api.php)
+        echo "🔗 Generated Public URL: $PUBLIC_VIDEO_URL"
 
-        if [ -n "$CREATION_ID" ] && [ "$CREATION_ID" != "None" ]; then
-            for i in {1..45}; do
-                sleep 5
-                STATUS_RES=$(curl -s "$API/$CREATION_ID?fields=status_code,status_t,status&access_token=$PAGE_ACCESS_TOKEN")
-                echo "⏳ IG Status Check ($i): $STATUS_RES"
-                STATUS_CODE=$(echo "$STATUS_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status_code', ''))" 2>/dev/null)
-                [ "$STATUS_CODE" == "FINISHED" ] && break
-            done
+        if [ -z "$PUBLIC_VIDEO_URL" ] || [[ ! "$PUBLIC_VIDEO_URL" =~ ^http ]]; then
+            echo "❌ Error: Failed to generate public URL for Instagram!"
+        else
+            CONTAINER_RES=$(curl -s -X POST "$API/$IG_ID/media" \
+              --data-urlencode "media_type=REELS" \
+              --data-urlencode "video_url=$PUBLIC_VIDEO_URL" \
+              --data-urlencode "caption=$CAPTION" \
+              --data-urlencode "access_token=$PAGE_ACCESS_TOKEN")
 
-            PUBLISH_RES=$(curl -s -X POST "$API/$IG_ID/media_publish" \
-              -d "creation_id=$CREATION_ID" \
-              -d "access_token=$PAGE_ACCESS_TOKEN")
-            
-            echo "📢 IG Publish Response: $PUBLISH_RES"
-            PUBLISH_ID=$(echo "$PUBLISH_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
+            echo "📦 IG Container Response: $CONTAINER_RES"
+            CREATION_ID=$(echo "$CONTAINER_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
+
+            if [ -n "$CREATION_ID" ] && [ "$CREATION_ID" != "None" ]; then
+                echo "⏳ Container created (ID: $CREATION_ID). Checking processing status..."
+                
+                for i in {1..45}; do
+                    sleep 5
+                    STATUS_RES=$(curl -s "$API/$CREATION_ID?fields=status_code,status&access_token=$PAGE_ACCESS_TOKEN")
+                    STATUS_CODE=$(echo "$STATUS_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status_code', ''))" 2>/dev/null)
+                    
+                    if [ "$STATUS_CODE" == "FINISHED" ]; then
+                        echo "✅ Video processing finished by Instagram!"
+                        break
+                    else
+                        echo "⏳ Video still processing (Status: $STATUS_CODE)..."
+                    fi
+                done
+
+                PUBLISH_RES=$(curl -s -X POST "$API/$IG_ID/media_publish" \
+                  -d "creation_id=$CREATION_ID" \
+                  -d "access_token=$PAGE_ACCESS_TOKEN")
+                
+                echo "📢 IG Publish Response: $PUBLISH_RES"
+                PUBLISH_ID=$(echo "$PUBLISH_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
+                
+                if [ -n "$PUBLISH_ID" ] && [ "$PUBLISH_ID" != "None" ]; then
+                    echo "🎉 Instagram Post Published Successfully! ID: $PUBLISH_ID"
+                else
+                    echo "❌ Error: Failed to publish container to Instagram!"
+                fi
+            fi
         fi
     fi
 fi
 
+# --- B. Facebook Page Video Upload ---
 if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "3" ]; then
     if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$PAGE_ID" ]; then
         echo "🚀 Uploading to Facebook Page..."
+        # Using local cut video file source for Facebook upload
         FB_RES=$(curl -s -X POST "$API/$PAGE_ID/videos" \
           --data-urlencode "source=@$FINAL_CLIP_PATH" \
           --data-urlencode "description=$CAPTION" \
@@ -472,6 +499,12 @@ if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "3" ]; then
 
         echo "📦 FB Upload Response: $FB_RES"
         FB_POST_ID=$(echo "$FB_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
+
+        if [ -n "$FB_POST_ID" ] && [ "$FB_POST_ID" != "None" ]; then
+            echo "🎉 Successfully Published to Facebook Page! Video ID: $FB_POST_ID"
+        else
+            echo "❌ Error: Failed to publish video to Facebook Page!"
+        fi
     fi
 fi
 
