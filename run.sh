@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==========================================
-# 🤖 TRUE AI AGENT FULLY AUTOMATED PIPELINE (FIXED & GEMINI-2.5-FLASH)
+# 🤖 TRUE AI AGENT FULLY AUTOMATED PIPELINE (FIXED PARSING & MODEL)
 # ==========================================
 
 BASE="."
@@ -248,8 +248,8 @@ grid_img.save(grid_path, 'JPEG', quality=85)
 print("✅ Grid screenshot created successfully.")
 EOF
 
-# 7. 🤖 Strict Gemini-2.5-Flash Smart JSON Analysis
-echo "🤖 [STEP 7] Sending grid & past insights to Gemini-2.5-Flash for Smart Action Cutting Decision..."
+# 7. 🤖 Gemini Smart JSON Analysis
+echo "🤖 [STEP 7] Sending grid & past insights to Gemini for Smart Action Cutting Decision..."
 
 INSIGHTS_SUMMARY=$(python3 -c "
 import os, json
@@ -333,9 +333,8 @@ Return ONLY valid JSON format, no markdown wrapping."
                       --arg ptext "$prompt_text" \
                       '{contents: [{parts: [{file_data: {file_uri: $uri, mime_type: $mime}}, {text: $ptext}]}]}')
 
-                    # Using gemini-3.5-flash as requested
                     gemini_resp=$(curl -s -X POST -H "Content-Type: application/json" \
-                      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=$CURRENT_GEMINI_KEY" \
+                      "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$CURRENT_GEMINI_KEY" \
                       -d "$payload")
 
                     GEMINI_JSON_RESULT=$(echo "$gemini_resp" | jq -r '.candidates[0].content.parts[0].text // empty')
@@ -354,9 +353,10 @@ Return ONLY valid JSON format, no markdown wrapping."
     fi
 done
 
-# Ultra-Robust Safe Python JSON Parser (avoiding syntax issues)
-PARSED_JSON_DATA=$(GEMINI_RAW="$GEMINI_JSON_RESULT" python3 -c "
+# Safe Python JSON Parser using Heredoc (Fixed Syntax Error)
+PARSED_JSON_DATA=$(GEMINI_RAW="$GEMINI_JSON_RESULT" python3 - << 'EOF'
 import json, re, sys, os
+
 raw = os.environ.get('GEMINI_RAW', '')
 cleaned = re.sub(r'```json', '', raw, flags=re.IGNORECASE)
 cleaned = re.sub(r'```', '', cleaned).strip()
@@ -385,7 +385,8 @@ else:
         print(json.dumps({'status': 'success', 'title': title, 'start_time': start_time, 'duration': dur_int}))
     except:
         print(json.dumps({'status': 'failed', 'error': 'Invalid duration format'}))
-")
+EOF
+)
 
 PARSED_STATUS=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status', 'failed'))" 2>/dev/null)
 
