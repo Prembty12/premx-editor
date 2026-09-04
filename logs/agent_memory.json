@@ -1,6 +1,17 @@
 {
     "game_scores": {
-        "MexicanBorderwar": 15
+        "MexicanBorderwar": 5,
+        "Ghost_soap_escap": 5,
+        "ghostwork": 8,
+        "Ghost Destroys Mexican": 5,
+        "combatopration": 5,
+        "Callofdutyaw": 5,
+        "codBlackops6": 5,
+        "Ghost_price": 5,
+        "Russian_secret_missions": 5,
+        "mm2remastered": 8,
+        "SpiderMan2": 5,
+        "RescueOperation": 5
     },
     "title_styles": {
         "curiosity": 13,
@@ -8,6 +19,6 @@
         "question": 10,
         "emoji_heavy": 10
     },
-    "last_used_style": "curiosity",
-    "last_played_game": "MexicanBorderwar"
+    "last_used_style": "aggressive",
+    "last_played_game": "mm2remastered"
 }
