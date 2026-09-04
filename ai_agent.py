@@ -79,7 +79,7 @@ def run_agent_brain():
     chosen_style = sorted_styles[0][0] if random.random() > 0.3 else random.choice(list(styles.keys()))
 
     api_key = get_active_key()
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={api_key}"
     
     prompt = f"""You are an advanced AI Social Media Manager and Gaming Content Agent.
 Available games: {available_games}
