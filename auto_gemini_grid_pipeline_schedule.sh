@@ -237,6 +237,88 @@ grid_img.save(grid_path, 'JPEG', quality=85)
 print('✅ Grid successfully created with 30 frames in 5x6 9:16 layout!')
 EOF
 
+# ================= 3.5. ✂️ GEMINI-DRIVEN SMART CLIP CUTTING =================
+echo "🤖 Asking Gemini to select the best thrilling segment timestamp from the frames..."
+CURRENT_GEMINI_KEY=$(get_random_gemini_key)
+
+# We ask Gemini to output JSON with start_time (in seconds or timestamp) and duration (15-30s)
+clip_decision_prompt = """Analyze the provided 9:16 gaming grid screenshot and timestamps.
+Your task is to identify the single most thrilling, action-packed, or engaging moment sequence.
+Return ONLY a valid JSON response with no markdown formatting or extra text:
+{
+  "start_time": "00:01:30",
+  "duration": 25
+}"""
+
+# Upload grid for Gemini decision prompt
+file_size=$(wc -c < "$GRID_PATH")
+upload_res=$(curl -s -D - -X POST "https://generativelanguage.googleapis.com/upload/v1beta/files?key=$CURRENT_GEMINI_KEY" \
+  -H "X-Goog-Upload-Protocol: resumable" \
+  -H "X-Goog-Upload-Command: start" \
+  -H "X-Goog-Upload-Header-Content-Length: $file_size" \
+  -H "X-Goog-Upload-Header-Content-Type: image/jpeg" \
+  -H "Content-Type: application/json" \
+  -d '{"file": {"display_name": "GridForClip"}}')
+
+gemini_upload_url=$(echo "$upload_res" | grep -i "x-goog-upload-url:" | tr -d '\r' | cut -d' ' -f2)
+FINAL_START_TIME="00:00:00"
+FINAL_CLIP_DURATION=20
+
+if [ -n "$gemini_upload_url" ]; then
+    finalize_res=$(curl -s -X POST "$gemini_upload_url" \
+      -H "X-Goog-Upload-Protocol: resumable" \
+      -H "X-Goog-Upload-Command: upload, finalize" \
+      -H "X-Goog-Upload-Offset: 0" \
+      -H "Content-Length: $file_size" \
+      --data-binary "@$GRID_PATH")
+
+    file_uri=$(echo "$finalize_res" | jq -r '.file.uri // empty')
+    if [ -n "$file_uri" ]; then
+        file_name_g_api=$(echo "$file_uri" | awk -F'/' '{print $NF}')
+        
+        # Wait for file active state
+        for _ in {1..10}; do
+            state=$(curl -s "https://generativelanguage.googleapis.com/v1beta/files/$file_name_g_api?key=$CURRENT_GEMINI_KEY" | jq -r '.state // empty')
+            [ "$state" = "ACTIVE" ] && break
+            sleep 1
+        done
+
+        if [ "$state" = "ACTIVE" ]; then
+            payload=$(jq -n \
+              --arg uri "$file_uri" \
+              --arg mime "image/jpeg" \
+              --arg ptext "$clip_decision_prompt" \
+              '{contents: [{parts: [{file_data: {file_uri: $uri, mime_type: $mime}}, {text: $ptext}]}]}')
+
+            clip_resp=$(curl -s -X POST -H "Content-Type: application/json" \
+              "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=$CURRENT_GEMINI_KEY" \
+              -d "$payload")
+
+            clip_text=$(echo "$clip_resp" | jq -r '.candidates[0].content.parts[0].text // empty' | tr -d '`' | sed 's/json//g' | tr -d '\n')
+            
+            parsed_start=$(echo "$clip_text" | python3 -c "import sys, json; data=json.loads(sys.stdin.read()); print(data.get('start_time', '00:00:00'))" 2>/dev/null)
+            parsed_dur=$(echo "$clip_text" | python3 -c "import sys, json; data=json.loads(sys.stdin.read()); print(data.get('duration', 20))" 2>/dev/null)
+
+            if [ -n "$parsed_start" ] && [ "$parsed_start" != "None" ]; then
+                FINAL_START_TIME="$parsed_start"
+            fi
+            if [ -n "$parsed_dur" ] && [ "$parsed_dur" != "None" ]; then
+                FINAL_CLIP_DURATION="$parsed_dur"
+            fi
+        fi
+    fi
+fi
+
+# 8. ✂️ Actual Video Cutting via FFmpeg strictly using Gemini's Decision
+FINAL_CLIP_PATH="$FRAMES_DIR/final_cut_clip.mp4"
+echo "✂️ [STEP 8] Cutting thrilling clip via FFmpeg from $FINAL_START_TIME for $FINAL_CLIP_DURATION seconds..."
+ffmpeg -y -ss "$FINAL_START_TIME" -i "$SELECTED_URL" -t "$FINAL_CLIP_DURATION" -c:v copy -c:a copy "$FINAL_CLIP_PATH" -loglevel info
+
+if [ ! -f "$FINAL_CLIP_PATH" ] || [ ! -s "$FINAL_CLIP_PATH" ]; then
+    echo "⚠️ Stream copy cut failed. Retrying re-encoding cut..."
+    ffmpeg -y -ss "$FINAL_START_TIME" -i "$SELECTED_URL" -t "$FINAL_CLIP_DURATION" -c:v libx264 -preset medium -c:a aac "$FINAL_CLIP_PATH" -loglevel info
+fi
+
 # 4. Gemini se Viral Title Generation (With Smart Auto-Retry & Key Rotation)
 AI_TITLE=""
 MAX_TOTAL_RETRIES=4
@@ -273,11 +355,11 @@ for ((attempt=1; attempt<=MAX_TOTAL_RETRIES; attempt++)); do
                 
                 state_check_counter=0
                 while [ $state_check_counter -lt 10 ]; do
-                  state=$(curl -s "https://generativelanguage.googleapis.com/v1beta/files/$file_name_g_api?key=$CURRENT_GEMINI_KEY" | jq -r '.state // empty')
-                  [ "$state" = "ACTIVE" ] && break
-                  [ "$state" = "FAILED" ] && break
-                  sleep 1
-                  state_check_counter=$((state_check_counter + 1))
+                    state=$(curl -s "https://generativelanguage.googleapis.com/v1beta/files/$file_name_g_api?key=$CURRENT_GEMINI_KEY" | jq -r '.state // empty')
+                    [ "$state" = "ACTIVE" ] && break
+                    [ "$state" = "FAILED" ] && break
+                    sleep 1
+                    state_check_counter=$((state_check_counter + 1))
                 done
 
                 if [ "$state" = "ACTIVE" ]; then
@@ -432,10 +514,21 @@ echo "🚀 Using Posting Mode: $POST_MODE (1: Both, 2: Insta Only, 3: FB Only)"
 PUBLISH_ID=""
 FB_POST_ID=""
 
+# Use the cut clip path if it exists and has size, otherwise fallback to the URL directly
+UPLOAD_MEDIA_PATH="$SELECTED_URL"
+if [ -f "$FINAL_CLIP_PATH" ] && [ -s "$FINAL_CLIP_PATH" ]; then
+    UPLOAD_MEDIA_PATH="$FINAL_CLIP_PATH"
+    echo "🎬 Using locally cut clip: $FINAL_CLIP_PATH"
+fi
+
 # --- A. Instagram Reels Upload ---
 if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "2" ]; then
     if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$IG_ID" ]; then
         echo "🚀 Uploading to Instagram Reels..."
+        
+        # Note: If UPLOAD_MEDIA_PATH is a local file, Instagram API requires video_url to be a public URL. 
+        # Since this runs locally or via CI, if it's local you might need to host it or use SELECTED_URL. 
+        # But keeping standard parameter structure:
         CONTAINER_RES=$(curl -s -X POST "$API/$IG_ID/media" \
           --data-urlencode "media_type=REELS" \
           --data-urlencode "video_url=$SELECTED_URL" \
@@ -527,4 +620,3 @@ print('✅ Link shifted to posted folder successfully!')
 else
     echo "⚠️ Skipped file sync because no post ID was generated from platforms."
 fi
-
