@@ -192,3 +192,48 @@
 ====================================================
 🏁 Pipeline Finished at: Fri Sep  4 19:04:40 UTC 2026
 ====================================================
+====================================================
+🚀 Pipeline Started at: Fri Sep  4 19:16:19 UTC 2026
+====================================================
+🔍 [STEP 0] Checking Facebook Cookie Session Health...
+⚠️ Checking Facebook Cookie Session Health...
+✅ Status: Cookies present and verified for pipeline execution.
+📈 [STEP 1] Pulling real analytics and insights from past posts...
+📊 Real Facebook Insights fetched & AI memory updated successfully!
+🤖 [STEP 3] Consulting AI Agent Brain (ai_agent.py)...
+🧠 AI Agent Raw Output: {"target_file": "game_links_editor/combatopration.txt", "game_name": "combatopration", "chosen_style": "aggressive"}
+🎮 Selected Game: combatopration | Target File: game_links_editor/combatopration.txt | Style: aggressive
+🔗 [STEP 4] Parsing and validating link from target file...
+🔗 Validated Link Found: https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_6.mp4
+✂️ [STEP 5] Checking source video total duration via ffprobe...
+⏱️ Raw ffprobe duration output: '55.500000'
+📸 [STEP 6] Extracting 30 dynamic frames across source video...
+🧩 Merging frames into 5x6 vertical grid...
+✅ Grid screenshot created successfully.
+🤖 [STEP 7] Sending grid & past insights to Gemini for Smart Action Cutting Decision...
+🤖 Gemini Attempt 1/4 (Key used: RN6LW91lWr-f6WNx0g629kEPUccQvtLTgCte6YYZfctYl1w...)
+🤖 Gemini JSON Response: '{
+  "title": "NO SURVIVORS IN THESE CATACOMBS! 💀🔥",
+  "start_time": "00:00:08",
+  "clip_duration": 20
+}'
+🎯 Strict Gemini Decisions Loaded Successfully:
+   - Title: NO SURVIVORS IN THESE CATACOMBS! 💀🔥
+   - Start Time: 00:00:08
+   - Clip Duration: 20 seconds
+✂️ [STEP 8] Cutting thrilling clip via FFmpeg from 00:00:08 for 20 seconds...
+✅ Optimized action clip successfully saved at: temp_frames/final_cut_clip.mp4
+🚀 Using Posting Mode: 2 (1: Both, 2: Insta Only, 3: FB Only)
+🚀 Uploading to Instagram Reels via GitHub Release Asset...
+🏷️ Creating temporary GitHub Release (clip-release-1788549430)...
+❌ Error: Failed to create temporary GitHub Release!
+Response: {
+  "message": "Bad credentials",
+  "documentation_url": "https://docs.github.com/rest",
+  "status": "401"
+}
+📝 [STEP 10] Updating memory and file sync. Active ID: 
+⚠️ [WARNING] Skipped file sync because no active post ID was generated.
+====================================================
+🏁 Pipeline Finished at: Fri Sep  4 19:17:11 UTC 2026
+====================================================
