@@ -1,0 +1,61 @@
+name: Autonomous Gaming Agent Workflow
+
+on:
+  schedule:
+    # Har 3 ghante mein automatic run hoga (Cron expression)
+    - cron: '0 */3 * * *'
+  workflow_dispatch:
+    # Tu ise GitHub dashboard se manually bhi run kar sakta hai
+
+jobs:
+  run-gaming-agent:
+  
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Install System Dependencies (FFmpeg & Build Tools)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg jq curl
+
+      - name: Install Python Packages
+        run: |
+          pip install --upgrade pip
+          pip install requests Pillow
+
+      - name: Make Shell Scripts Executable
+        run: |
+          chmod +x run.sh loop.sh
+
+      - name: Run Master Pipeline
+        env:
+          GEMINI_API_KEY_1: ${{ secrets.GEMINI_API_KEY_1 }}
+          GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}
+          GEMINI_API_KEY_3: ${{ secrets.GEMINI_API_KEY_3 }}
+          PAGE_ACCESS_TOKEN: ${{ secrets.PAGE_ACCESS_TOKEN }}
+          PAGE_ID: ${{ secrets.PAGE_ID }}
+          IG_ID: ${{ secrets.IG_ID }}
+          FB_C_USER: ${{ secrets.FB_C_USER }}
+          FB_XS: ${{ secrets.FB_XS }}
+          POST_MODE: ${{ secrets.POST_MODE }}
+        run: |
+          bash run.sh
+
+      - name: Commit and Push Updated Memory & Posted Logs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add logs/ posted_links_editor/ game_links_editor/ archived_links/ || true
+          git commit -m "🤖 Auto-Agent: Update memory, insights, and shift posted links [skip ci]" || echo "No changes to commit"
+          git push || echo "Nothing to push"
