@@ -46,7 +46,7 @@ jobs:
           IG_ID: ${{ secrets.IG_ID }}
           FB_C_USER: ${{ secrets.FB_C_USER }}
           FB_XS: ${{ secrets.FB_XS }}
-          POST_MODE: ${{ secrets.POST_MODE }}
+          POST_MODE: '2'   # POST_MODE: ${{ vars.POST_MODE }}
         run: |
           bash run.sh
 
