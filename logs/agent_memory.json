@@ -6,19 +6,19 @@
         "Ghost Destroys Mexican": 5,
         "combatopration": 5,
         "Callofdutyaw": 5,
-        "codBlackops6": 10,
+        "codBlackops6": 5,
         "Ghost_price": 5,
         "Russian_secret_missions": 5,
         "mm2remastered": 5,
-        "SpiderMan2": 5,
+        "SpiderMan2": 10,
         "RescueOperation": 5
     },
     "title_styles": {
-        "curiosity": 16,
+        "curiosity": 19,
         "aggressive": 13,
         "question": 13,
         "emoji_heavy": 10
     },
     "last_used_style": "curiosity",
-    "last_played_game": "codBlackops6"
+    "last_played_game": "SpiderMan2"
 }
