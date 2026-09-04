@@ -6,7 +6,7 @@
         "Ghost Destroys Mexican": 5,
         "combatopration": 5,
         "Callofdutyaw": 5,
-        "codBlackops6": 5,
+        "codBlackops6": 10,
         "Ghost_price": 5,
         "Russian_secret_missions": 5,
         "mm2remastered": 5,
@@ -15,10 +15,10 @@
     },
     "title_styles": {
         "curiosity": 13,
-        "aggressive": 10,
+        "aggressive": 13,
         "question": 10,
         "emoji_heavy": 10
     },
     "last_used_style": "aggressive",
-    "last_played_game": "combatopration"
+    "last_played_game": "codBlackops6"
 }
