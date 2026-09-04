@@ -155,3 +155,40 @@
 ====================================================
 🏁 Pipeline Finished at: Fri Sep  4 18:50:32 UTC 2026
 ====================================================
+====================================================
+🚀 Pipeline Started at: Fri Sep  4 19:04:02 UTC 2026
+====================================================
+🔍 [STEP 0] Checking Facebook Cookie Session Health...
+⚠️ Checking Facebook Cookie Session Health...
+✅ Status: Cookies present and verified for pipeline execution.
+📈 [STEP 1] Pulling real analytics and insights from past posts...
+📊 Real Facebook Insights fetched & AI memory updated successfully!
+🤖 [STEP 3] Consulting AI Agent Brain (ai_agent.py)...
+🧠 AI Agent Raw Output: {"target_file": "game_links_editor/codBlackops6.txt", "game_name": "codBlackops6", "chosen_style": "aggressive"}
+🎮 Selected Game: codBlackops6 | Target File: game_links_editor/codBlackops6.txt | Style: aggressive
+🔗 [STEP 4] Parsing and validating link from target file...
+🔗 Validated Link Found: https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops64.mp4
+✂️ [STEP 5] Checking source video total duration via ffprobe...
+⏱️ Raw ffprobe duration output: '45.483333'
+📸 [STEP 6] Extracting 30 dynamic frames across source video...
+🧩 Merging frames into 5x6 vertical grid...
+✅ Grid screenshot created successfully.
+🤖 [STEP 7] Sending grid & past insights to Gemini for Smart Action Cutting Decision...
+🤖 Gemini Attempt 1/4 (Key used: RN6LW91lWr-f6WNx0g629kEPUccQvtLTgCte6YYZfctYl1w...)
+🤖 Gemini JSON Response: '{"title": "THEY'RE NOT READY FOR THIS MISSION! 🚁💀", "start_time": "00:00:10", "clip_duration": 19}'
+🎯 Strict Gemini Decisions Loaded Successfully:
+   - Title: THEY'RE NOT READY FOR THIS MISSION! 🚁💀
+   - Start Time: 00:00:10
+   - Clip Duration: 19 seconds
+✂️ [STEP 8] Cutting thrilling clip via FFmpeg from 00:00:10 for 19 seconds...
+✅ Optimized action clip successfully saved at: temp_frames/final_cut_clip.mp4
+🚀 Using Posting Mode: 2 (1: Both, 2: Insta Only, 3: FB Only)
+🚀 Uploading to Instagram Reels...
+🌐 Generating public URL for the local clip...
+🔗 Generated Public URL: Invalid uploader
+❌ Error: Failed to generate public URL for Instagram!
+📝 [STEP 10] Updating memory and file sync. Active ID: 
+⚠️ [WARNING] Skipped file sync because no active post ID was generated.
+====================================================
+🏁 Pipeline Finished at: Fri Sep  4 19:04:40 UTC 2026
+====================================================
