@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==========================================
-# 🤖 TRUE AI AGENT FULLY AUTOMATED PIPELINE (CLEANED OCTAL & PARSER FIX)
+# 🤖 TRUE AI AGENT FULLY AUTOMATED PIPELINE (FIXED & GEMINI-2.5-FLASH)
 # ==========================================
 
 BASE="."
@@ -32,7 +32,8 @@ get_random_gemini_key() {
     if [ ${#valid_keys[@]} -eq 0 ]; then
         echo "$GEMINI_API_KEY_1"
     else
-        echo "${valid_keys[$((RANDOM \%${#valid_keys[@]}))]}"
+        local idx=$((RANDOM % ${#valid_keys[@]}))
+        echo "${valid_keys[$idx]}"
     fi
 }
 
@@ -81,7 +82,7 @@ except Exception as e:
     echo "📊 Hours since last post: $HOURS_AGO"
     
     if [ -n "$HOURS_AGO" ]; then
-        IS_LESS_THAN_3=$(python3 -c "print('yes' if float('$HOURS_AGO') < 3.0 else 'no')")
+        IS_LESS_THAN_3=$(python3 -c "print('yes' if float('$HOURS_AGO' or '0') < 3.0 else 'no')")
         if [ "$IS_LESS_THAN_3" == "yes" ]; then
             echo "⏳ 3 ghante ka gap poora nahi hua hai! Sirf $HOURS_AGO ghante hue hain."
             exit 0
@@ -100,13 +101,13 @@ TARGET_FILE=$(echo "$AGENT_OUTPUT" | python3 -c "import sys, json; print(json.lo
 SELECTED_GAME_NAME=$(echo "$AGENT_OUTPUT" | python3 -c "import sys, json; print(json.load(sys.stdin).get('game_name', ''))" 2>/dev/null)
 SELECTED_STYLE=$(echo "$AGENT_OUTPUT" | python3 -c "import sys, json; print(json.load(sys.stdin).get('chosen_style', 'curiosity'))" 2>/dev/null)
 
-if [ -z "$TARGET_FILE" ] || [ "$TARGET_FILE" == "None" ] \vert{}\vert{} [ ! -f "$TARGET_FILE" ]; then
+if [ -z "$TARGET_FILE" ] || [ "$TARGET_FILE" == "None" ] || [ ! -f "$TARGET_FILE" ]; then
     echo "⚠️ [WARNING] AI Agent ko koi valid game file nahi mili! Target File: $TARGET_FILE"
     exit 0
 fi
 
 GAME_POSTED_LOG="$POSTED_LINKS_DIR/${SELECTED_GAME_NAME}_posted_links_editor.txt"
-echo "🎮 Selected Game: $SELECTED_GAME_NAME | Target File: $TARGET_FILE \vert{} Style:$SELECTED_STYLE"
+echo "🎮 Selected Game: $SELECTED_GAME_NAME | Target File: $TARGET_FILE | Style: $SELECTED_STYLE"
 
 # 4. Parse and Validate Link
 echo "🔗 [STEP 4] Parsing and validating link from target file..."
@@ -160,7 +161,7 @@ SOURCE_DURATION=$(ffprobe -v error -show_entries format=duration -of default=nop
 echo "⏱️ Raw ffprobe duration output: '$SOURCE_DURATION'"
 SOURCE_DURATION=${SOURCE_DURATION%.*}
 
-if [ -z "$SOURCE_DURATION" ] \vert{}\vert{} [ "$SOURCE_DURATION" -le 0 ]; then
+if [ -z "$SOURCE_DURATION" ] || [ "$SOURCE_DURATION" -le 0 ] 2>/dev/null; then
     echo "⚠️ [WARNING] ffprobe duration failed or returned 0. Defaulting source duration to 60s."
     SOURCE_DURATION=60
 fi
@@ -180,7 +181,6 @@ for ((i=1; i<=NUM_FRAMES; i++)); do
     [ "$t" -lt 0 ] && t=0
     min=$((t / 60))
     sec=$((t % 60))
-    # Fixed octal bug by using 10-base explicit conversion 10#
     timestamps+=($(printf "00:%02d:%02d" $((10#$min)) $((10#$sec)) ))
 done
 
@@ -189,7 +189,7 @@ for i in "${!timestamps[@]}"; do
     ts="${timestamps[$i]}"
     frame_path="$FRAMES_DIR/frame_$idx.jpg"
     ffmpeg -y -ss "$ts" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel error >/dev/null 2>&1
-    if [ ! -f "$frame_path" ] \vert{}\vert{} [ ! -s "$frame_path" ]; then
+    if [ ! -f "$frame_path" ] || [ ! -s "$frame_path" ]; then
         ffmpeg -y -ss "00:00:01" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel error >/dev/null 2>&1
     fi
 done
@@ -197,7 +197,7 @@ done
 GRID_PATH="$FRAMES_DIR/merged_30_grid_screenshot.jpg"
 echo "🧩 Merging frames into 5x6 vertical grid..."
 
-python3 - << 'EOF'
+TIMESTAMPS_STR="${timestamps[*]}" python3 - << 'EOF'
 import os
 import subprocess
 
@@ -247,11 +247,9 @@ for idx, im in enumerate(images):
 grid_img.save(grid_path, 'JPEG', quality=85)
 print("✅ Grid screenshot created successfully.")
 EOF
-# Pass timestamps securely via environment variable
-TIMESTAMPS_STR="${timestamps[*]}" python3 -c "import os" 2>/dev/null
 
-# 7. 🤖 Strict Gemini Smart JSON Analysis
-echo "🤖 [STEP 7] Sending grid & past insights to Gemini for Smart Action Cutting Decision..."
+# 7. 🤖 Strict Gemini-2.5-Flash Smart JSON Analysis
+echo "🤖 [STEP 7] Sending grid & past insights to Gemini-2.5-Flash for Smart Action Cutting Decision..."
 
 INSIGHTS_SUMMARY=$(python3 -c "
 import os, json
@@ -282,7 +280,7 @@ MAX_TOTAL_RETRIES=4
 
 for ((attempt=1; attempt<=MAX_TOTAL_RETRIES; attempt++)); do
     CURRENT_GEMINI_KEY=$(get_random_gemini_key)
-    echo "🤖 Gemini Attempt $attempt/$MAX_TOTAL_RETRIES (Key used:${CURRENT_GEMINI_KEY:0,6}...)"
+    echo "🤖 Gemini Attempt $attempt/$MAX_TOTAL_RETRIES (Key used: ${CURRENT_GEMINI_KEY:0,6}...)"
     
     if [ -f "$GRID_PATH" ]; then
         file_size=$(wc -c < "$GRID_PATH")
@@ -307,7 +305,7 @@ for ((attempt=1; attempt<=MAX_TOTAL_RETRIES; attempt++)); do
             file_uri=$(echo "$finalize_res" | jq -r '.file.uri // empty')
             
             if [ -n "$file_uri" ]; then
-                file_name_g_api=$(echo "$file_uri" \vert{} awk -F'/' '{print $NF}')
+                file_name_g_api=$(echo "$file_uri" | awk -F'/' '{print $NF}')
                 
                 state_check_counter=0
                 while [ $state_check_counter -lt 10 ]; do
@@ -333,10 +331,11 @@ Return ONLY valid JSON format, no markdown wrapping."
                       --arg uri "$file_uri" \
                       --arg mime "image/jpeg" \
                       --arg ptext "$prompt_text" \
-                      '{contents: [{parts: [{file_data: {file_uri: $uri, mime_type: $mime}}, {text:$ptext}]}]}')
+                      '{contents: [{parts: [{file_data: {file_uri: $uri, mime_type: $mime}}, {text: $ptext}]}]}')
 
+                    # Using gemini-2.5-flash as requested
                     gemini_resp=$(curl -s -X POST -H "Content-Type: application/json" \
-                      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=$CURRENT_GEMINI_KEY" \
+                      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=$CURRENT_GEMINI_KEY" \
                       -d "$payload")
 
                     GEMINI_JSON_RESULT=$(echo "$gemini_resp" | jq -r '.candidates[0].content.parts[0].text // empty')
@@ -355,10 +354,10 @@ Return ONLY valid JSON format, no markdown wrapping."
     fi
 done
 
-# Ultra-Robust Parse: Safely handles markdown ```json blocks and extracts JSON
-PARSED_JSON_DATA=$(python3 -c "
-import json, re, sys
-raw = '''$GEMINI_JSON_RESULT'''
+# Ultra-Robust Safe Python JSON Parser (avoiding syntax issues)
+PARSED_JSON_DATA=$(GEMINI_RAW="$GEMINI_JSON_RESULT" python3 -c "
+import json, re, sys, os
+raw = os.environ.get('GEMINI_RAW', '')
 cleaned = re.sub(r'```json', '', raw, flags=re.IGNORECASE)
 cleaned = re.sub(r'```', '', cleaned).strip()
 
