@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==========================================
-# 🤖 TRUE AI AGENT FULLY AUTOMATED PIPELINE (12S MONETIZATION GUARDED)
+# 🤖 TRUE AI AGENT FULLY AUTOMATED PIPELINE (STRICT GEMINI-ONLY SMART CUTTING)
 # ==========================================
 
 BASE="."
@@ -12,6 +12,13 @@ FRAMES_DIR="temp_frames"
 GAME_LINKS_DIR="$BASE/$LINKS_DIR"
 POSTED_LINKS_DIR="$BASE/$POSTED_DIR"
 mkdir -p "$GAME_LINKS_DIR" "$POSTED_LINKS_DIR" "$FRAMES_DIR" "logs"
+
+LOG_FILE="logs/pipeline_debug.log"
+exec > >(tee -a "$LOG_FILE") 2>&1
+
+echo "===================================================="
+echo "🚀 Pipeline Started at: $(date)"
+echo "===================================================="
 
 GEMINI_KEYS=("$GEMINI_API_KEY_1" "$GEMINI_API_KEY_2" "$GEMINI_API_KEY_3")
 
@@ -30,26 +37,26 @@ get_random_gemini_key() {
 }
 
 DEFAULT_POST_MODE="${POST_MODE:-1}"
-MIN_CLIP_DURATION=12  # 🔒 Strict Facebook Monetization Rule: Minimum 12 seconds required
+MIN_CLIP_DURATION=12
 
 # 0. 🍪 Pre-Flight Cookie Health Check
-echo "🔍 Checking Facebook Cookie Session Health..."
+echo "🔍 [STEP 0] Checking Facebook Cookie Session Health..."
 python3 cookie_checker.py
 if [ $? -ne 0 ]; then
-    echo "❌ Pipeline halted due to invalid or expired Facebook cookies."
+    echo "❌ [ERROR] Pipeline halted due to invalid or expired Facebook cookies."
     exit 1
 fi
 
-# 1. 📊 Update Past Performance via Real Facebook Insights
-echo "📈 Pulling real analytics and insights from past posts..."
+# 1. 📊 Update Past Performance & Insights
+echo "📈 [STEP 1] Pulling real analytics and insights from past posts..."
 python3 insights_tracker.py
 
 # 2. ⏳ Check 3 Hours Gap
 if [ "$DEFAULT_POST_MODE" != "2" ] && [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$PAGE_ID" ]; then
-    echo "🔍 Checking last post time on Facebook Page to ensure 3-hour gap..."
+    echo "🔍 [STEP 2] Checking last post time on Facebook Page..."
     
     LAST_POST_CHECK=$(python3 -c "
-import requests, sys
+import requests
 from datetime import datetime, timezone
 
 page_id = '$PAGE_ID'
@@ -67,14 +74,14 @@ try:
     else:
         print('LAST_POST_HOURS:999')
 except Exception as e:
-    print('LAST_POST_HOURS:999')
+    print(f'LAST_POST_HOURS:999 (Error: {e})')
 ")
 
     HOURS_AGO=$(echo "$LAST_POST_CHECK" | grep "LAST_POST_HOURS" | cut -d':' -f2)
+    echo "📊 Hours since last post: $HOURS_AGO"
     
     if [ -n "$HOURS_AGO" ]; then
         IS_LESS_THAN_3=$(python3 -c "print('yes' if float('$HOURS_AGO') < 3.0 else 'no')")
-        
         if [ "$IS_LESS_THAN_3" == "yes" ]; then
             echo "⏳ 3 ghante ka gap poora nahi hua hai! Sirf $HOURS_AGO ghante hue hain."
             exit 0
@@ -84,25 +91,25 @@ except Exception as e:
     fi
 fi
 
-# 3. 🧠 AI AGENT BRAIN: Smart Game & Title Style Selection
-echo "🤖 Consulting AI Agent Brain (ai_agent.py)..."
+# 3. 🧠 AI AGENT BRAIN
+echo "🤖 [STEP 3] Consulting AI Agent Brain (ai_agent.py)..."
 AGENT_OUTPUT=$(python3 ai_agent.py)
+echo "🧠 AI Agent Raw Output: $AGENT_OUTPUT"
 
 TARGET_FILE=$(echo "$AGENT_OUTPUT" | python3 -c "import sys, json; print(json.load(sys.stdin).get('target_file', ''))" 2>/dev/null)
 SELECTED_GAME_NAME=$(echo "$AGENT_OUTPUT" | python3 -c "import sys, json; print(json.load(sys.stdin).get('game_name', ''))" 2>/dev/null)
 SELECTED_STYLE=$(echo "$AGENT_OUTPUT" | python3 -c "import sys, json; print(json.load(sys.stdin).get('chosen_style', 'curiosity'))" 2>/dev/null)
 
 if [ -z "$TARGET_FILE" ] || [ "$TARGET_FILE" == "None" ] || [ ! -f "$TARGET_FILE" ]; then
-    echo "⚠️ AI Agent ko koi valid game file nahi mili!"
+    echo "⚠️ [WARNING] AI Agent ko koi valid game file nahi mili! Target File: $TARGET_FILE"
     exit 0
 fi
 
 GAME_POSTED_LOG="$POSTED_LINKS_DIR/${SELECTED_GAME_NAME}_posted_links_editor.txt"
+echo "🎮 Selected Game: $SELECTED_GAME_NAME | Target File: $TARGET_FILE | Style: $SELECTED_STYLE"
 
-echo "🎮 AI Agent Selected Game: $SELECTED_GAME_NAME"
-echo "🎨 AI Agent Selected Title Style: $SELECTED_STYLE"
-
-# 4. Parse and Validate Link from selected file
+# 4. Parse and Validate Link
+echo "🔗 [STEP 4] Parsing and validating link from target file..."
 PARSED_DATA=$(TARGET_FILE="$TARGET_FILE" python3 -c "
 import sys, json, os, random
 target = os.environ.get('TARGET_FILE', '')
@@ -114,10 +121,6 @@ with open(target, 'r', encoding='utf-8', errors='ignore') as f:
     content = f.read()
 
 lines = [l.strip() for l in content.split('\n') if l.strip()]
-if not lines:
-    print('{}')
-    sys.exit(0)
-
 valid_pairs = []
 for line in lines:
     if 'http://' in line or 'https://' in line:
@@ -145,50 +148,35 @@ SELECTED_URL=$(echo "$PARSED_DATA" | python3 -c "import sys, json; print(json.lo
 SELECTED_LINE=$(echo "$PARSED_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('raw', ''))" 2>/dev/null)
 
 if [ -z "$SELECTED_URL" ]; then
-    echo "⚠️ Is file me koi valid link nahi hai."
+    echo "⚠️ [WARNING] Is file me koi valid link nahi mila."
     exit 0
 fi
 
 echo "🔗 Validated Link Found: $SELECTED_URL"
 
-# 5. ✂️ Dynamic Trimming & Monetization Safety Guard Check (Min 12 Seconds)
-echo "✂️ Calculating optimal clip duration with 12s Monetization Guard..."
+# 5. ⏱️ Get Source Video Duration
+echo "✂️ [STEP 5] Checking source video total duration via ffprobe..."
 SOURCE_DURATION=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$SELECTED_URL" 2>/dev/null)
+echo "⏱️ Raw ffprobe duration output: '$SOURCE_DURATION'"
 SOURCE_DURATION=${SOURCE_DURATION%.*}
+
 if [ -z "$SOURCE_DURATION" ] || [ "$SOURCE_DURATION" -le 0 ]; then
-    SOURCE_DURATION=30
+    echo "⚠️ [WARNING] ffprobe duration failed or returned 0. Defaulting source duration to 60s."
+    SOURCE_DURATION=60
 fi
 
-# AI/Insights or dynamic range determination (e.g. between 15 to 45 seconds based on content)
-DYNAMIC_TARGET_DURATION=$(( (RANDOM % 31) + 15 )) 
-
-# Enforce strict minimum 12-second monetization safeguard rule
-if [ "$DYNAMIC_TARGET_DURATION" -lt "$MIN_CLIP_DURATION" ]; then
-    FINAL_CLIP_DURATION="$MIN_CLIP_DURATION"
-else
-    FINAL_CLIP_DURATION="$DYNAMIC_TARGET_DURATION"
-fi
-
-# Ensure clip duration doesn't exceed source video length
-if [ "$FINAL_CLIP_DURATION" -gt "$SOURCE_DURATION" ]; then
-    FINAL_CLIP_DURATION="$SOURCE_DURATION"
-fi
-
-echo "🔒 Locked Clip Duration: $FINAL_CLIP_DURATION seconds (Meets Facebook 12s Monetization Standard)."
-
-# 6. 📸 30 Dynamic Frames & 5x6 Vertical Grid Generation
+# 6. 📸 Frame Extraction & 5x6 Grid Generation Across Full Video
 rm -f "$FRAMES_DIR"/*.jpg
+echo "📸 [STEP 6] Extracting 30 dynamic frames across source video..."
 
-echo "📸 Extracting 30 dynamic frames..."
-DURATION="$FINAL_CLIP_DURATION"
 NUM_FRAMES=30
-interval=$((DURATION / NUM_FRAMES))
+interval=$((SOURCE_DURATION / NUM_FRAMES))
 [ "$interval" -lt 1 ] && interval=1
 
 timestamps=()
 for ((i=1; i<=NUM_FRAMES; i++)); do
     t=$(( (i - 1) * interval ))
-    [ "$t" -ge "$DURATION" ] && t=$((DURATION - 1))
+    [ "$t" -ge "$SOURCE_DURATION" ] && t=$((SOURCE_DURATION - 1))
     [ "$t" -lt 0 ] && t=0
     min=$((t / 60))
     sec=$((t % 60))
@@ -199,9 +187,9 @@ for i in "${!timestamps[@]}"; do
     idx=$((i+1))
     ts="${timestamps[$i]}"
     frame_path="$FRAMES_DIR/frame_$idx.jpg"
-    ffmpeg -y -ss "$ts" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel info >/dev/null 2>&1
+    ffmpeg -y -ss "$ts" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel error >/dev/null 2>&1
     if [ ! -f "$frame_path" ] || [ ! -s "$frame_path" ]; then
-        ffmpeg -y -ss "00:00:01" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel info >/dev/null 2>&1
+        ffmpeg -y -ss "00:00:01" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel error >/dev/null 2>&1
     fi
 done
 
@@ -231,8 +219,8 @@ for i, ts in enumerate(timestamps):
             draw.rectangle([10, 10, 130, 50], fill=(0, 0, 0))
             draw.text((15, 18), ts, fill=(255, 255, 255))
             im.save(frame_path, 'JPEG', quality=85)
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"⚠️ Frame processing error at {idx}: {e}")
 
 images = []
 for i in range(1, 31):
@@ -253,25 +241,42 @@ for idx, im in enumerate(images):
     grid_img.paste(im, (col * 432, row * 640))
 
 grid_img.save(grid_path, 'JPEG', quality=85)
+print("✅ Grid screenshot created successfully.")
 EOF
 
-# 7. Gemini Title Generation with Adaptive Style Prompt
+# 7. 🤖 Strict Gemini Smart JSON Analysis
+echo "🤖 [STEP 7] Sending grid & past insights to Gemini for Smart Action Cutting Decision..."
+
+INSIGHTS_SUMMARY=$(python3 -c "
+import os, json
+memory_file = 'logs/agent_memory.json'
+if os.path.exists(memory_file):
+    try:
+        with open(memory_file, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            print(f'Top Game Scores: {data.get(\"game_scores\", {})}, Styles: {data.get(\"title_styles\", {})}')
+    except:
+        print('No prior memory stats.')
+else:
+    print('Fresh run.')
+")
+
 if [ "$SELECTED_STYLE" == "aggressive" ]; then
-    STYLE_PROMPT="Create a bold, intense, high-energy aggressive gaming hook title. Make it sound shocking or extreme."
+    STYLE_PROMPT="Create a bold, intense, high-energy aggressive gaming hook title."
 elif [ "$SELECTED_STYLE" == "question" ]; then
-    STYLE_PROMPT="Create a curiosity-driven question hook title that forces the viewer to watch till the end."
+    STYLE_PROMPT="Create a curiosity-driven question hook title."
 elif [ "$SELECTED_STYLE" == "emoji_heavy" ]; then
-    STYLE_PROMPT="Create a fast-paced viral gaming title packed with strong expressions and matching dynamic emojis."
+    STYLE_PROMPT="Create a fast-paced viral gaming title with strong emojis."
 else
-    STYLE_PROMPT="Create a high-curiosity viral Facebook/Instagram Reels hook title. 6-10 words preferred."
+    STYLE_PROMPT="Create a high-curiosity viral Facebook/Instagram Reels hook title (6-10 words preferred)."
 fi
 
-AI_TITLE=""
+GEMINI_JSON_RESULT=""
 MAX_TOTAL_RETRIES=4
 
 for ((attempt=1; attempt<=MAX_TOTAL_RETRIES; attempt++)); do
     CURRENT_GEMINI_KEY=$(get_random_gemini_key)
-    echo "🤖 Gemini Title Generation Attempt $attempt/$MAX_TOTAL_RETRIES (Style: $SELECTED_STYLE)..."
+    echo "🤖 Gemini Attempt $attempt/$MAX_TOTAL_RETRIES (Key used: ${CURRENT_GEMINI_KEY:0,6}...)"
     
     if [ -f "$GRID_PATH" ]; then
         file_size=$(wc -c < "$GRID_PATH")
@@ -300,14 +305,23 @@ for ((attempt=1; attempt<=MAX_TOTAL_RETRIES; attempt++)); do
                 
                 state_check_counter=0
                 while [ $state_check_counter -lt 10 ]; do
-                  state=$(curl -s "https://generativelanguage.googleapis.com/v1beta/files/$file_name_g_api?key=$CURRENT_GEMINI_KEY" | jq -r '.state // empty')
-                  [ "$state" = "ACTIVE" ] && break
-                  sleep 1
-                  state_check_counter=$((state_check_counter + 1))
+                    state=$(curl -s "https://generativelanguage.googleapis.com/v1beta/files/$file_name_g_api?key=$CURRENT_GEMINI_KEY" | jq -r '.state // empty')
+                    [ "$state" = "ACTIVE" ] && break
+                    sleep 1
+                    state_check_counter=$((state_check_counter + 1))
                 done
 
                 if [ "$state" = "ACTIVE" ]; then
-                    prompt_text="Analyze the provided 9:16 gaming screenshot grid. $STYLE_PROMPT No punctuation quotes, max 25 words, 1-3 emojis at the end. ONLY THE TITLE STRING."
+                    prompt_text="Analyze the provided 9:16 gaming screenshot grid. Total video source duration is $SOURCE_DURATION seconds.
+Insights Context: $INSIGHTS_SUMMARY
+Style Directive: $STYLE_PROMPT
+
+Your primary job as an expert video editor is to find the most thrilling, high-action segment, skipping dull introductions.
+Return a JSON object with EXACTLY three keys:
+1. 'title' (string: viral title with 1-3 emojis)
+2. 'start_time' (string format HH:MM:SS indicating exact peak action start time based on grid timestamps)
+3. 'clip_duration' (integer: length between 12 and 45 seconds meeting monetization rules)
+Return ONLY valid JSON format, no markdown wrapping."
 
                     payload=$(jq -n \
                       --arg uri "$file_uri" \
@@ -316,66 +330,95 @@ for ((attempt=1; attempt<=MAX_TOTAL_RETRIES; attempt++)); do
                       '{contents: [{parts: [{file_data: {file_uri: $uri, mime_type: $mime}}, {text: $ptext}]}]}')
 
                     gemini_resp=$(curl -s -X POST -H "Content-Type: application/json" \
-                      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=$CURRENT_GEMINI_KEY" \
+                      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$CURRENT_GEMINI_KEY" \
                       -d "$payload")
 
-                    AI_TITLE=$(echo "$gemini_resp" | jq -r '.candidates[0].content.parts[0].text // empty' | tr -d '"')
+                    GEMINI_JSON_RESULT=$(echo "$gemini_resp" | jq -r '.candidates[0].content.parts[0].text // empty')
+                    echo "🤖 Gemini JSON Response: '$GEMINI_JSON_RESULT'"
                 fi
             fi
         fi
     fi
 
-    if [ -n "$AI_TITLE" ] && [ "$AI_TITLE" != "null" ] && [ "$AI_TITLE" != "None" ]; then
+    if [ -n "$GEMINI_JSON_RESULT" ] && [ "$GEMINI_JSON_RESULT" != "null" ]; then
         break
     else
-        AI_TITLE=""
+        echo "⚠️ Gemini attempt $attempt failed. Retrying..."
+        GEMINI_JSON_RESULT=""
         sleep 3
     fi
 done
 
-# Smart Local AI Fallback Engine
-if [ -z "$AI_TITLE" ] || [ "$AI_TITLE" == "null" ] || [ "$AI_TITLE" == "None" ]; then
-    echo "⚠️ Gemini API busy/fail! Activating Smart Local AI Fallback Engine..."
-    
-    AI_TITLE=$(python3 -c "
-import random
-game = '$SELECTED_GAME_NAME'.replace('_', ' ').title()
-style = '$SELECTED_STYLE'
+# Strict Parse: If Gemini fails, DO NOT CUT OR UPLOAD! Exit immediately.
+PARSED_JSON_DATA=$(python3 -c "
+import json, re, sys
+raw = '''$GEMINI_JSON_RESULT'''
+cleaned = re.sub(r'[\`\`\`json|\`\`\`]', '', raw).strip()
+data = {}
+try:
+    match = re.search(r'\{.*?\}', cleaned, re.DOTALL)
+    if match:
+        data = json.loads(match.group(0))
+    else:
+        data = json.loads(cleaned)
+except Exception as e:
+    print(json.dumps({'status': 'failed', 'error': str(e)}))
+    sys.exit(0)
 
-templates = {
-    'curiosity': [
-        f'The Secret {game} Play Nobody Expected 🤯',
-        f'This {game} Trick Will Change Everything For You 🤫',
-        f'You Wont Believe How This {game} Match Ended 😳'
-    ],
-    'aggressive': [
-        f'Destroying Everyone In {game} Without Mercy 🔥',
-        f'Absolute Chaos In This Insane {game} Lobby 💀',
-        f'Total Destruction: Pure {game} Gameplay ⚡'
-    ],
-    'question': [
-        f'How Did This {game} Player Pull Off This Move? 🤔',
-        f'Can Anyone Beat This Insane {game} Record? 🎯',
-        f'Is This The Best {game} Play Ever? 🧐'
-    ],
-    'emoji_heavy': [
-        f'INSANE {game} MOMENT 💀🔥🎮',
-        f'PRO {game} GAMEPLAY 🚀🔥💯',
-        f'GOD LEVEL {game} SKILLS ⚡👑🔥'
-    ]
-}
+title = data.get('title')
+start_time = data.get('start_time')
+duration = data.get('clip_duration')
 
-pool = templates.get(style, templates['curiosity'])
-print(random.choice(pool))
+if not title or not start_time or not duration:
+    print(json.dumps({'status': 'failed', 'error': 'Missing keys in JSON'}))
+else:
+    try:
+        dur_int = int(duration)
+        if dur_int < 12: dur_int = 12
+        print(json.dumps({'status': 'success', 'title': title, 'start_time': start_time, 'duration': dur_int}))
+    except:
+        print(json.dumps({'status': 'failed', 'error': 'Invalid duration format'}))
 ")
+
+PARSED_STATUS=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status', 'failed'))" 2>/dev/null)
+
+if [ "$PARSED_STATUS" != "success" ]; then
+    echo "❌ [ERROR] Gemini failed to return valid JSON decision! Halting pipeline completely to prevent bad/random cutting."
+    exit 1
 fi
+
+AI_TITLE=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('title', ''))" 2>/dev/null)
+FINAL_START_TIME=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('start_time', ''))" 2>/dev/null)
+FINAL_CLIP_DURATION=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('duration', 15))" 2>/dev/null)
+
+echo "🎯 Strict Gemini Decisions Loaded Successfully:"
+echo "   - Title: $AI_TITLE"
+echo "   - Start Time: $FINAL_START_TIME"
+echo "   - Clip Duration: $FINAL_CLIP_DURATION seconds"
 
 CAPTION="$AI_TITLE
 
 #videogames #gamingcommunity #gaming #${SELECTED_GAME_NAME,,} #gamingreels #reels"
-echo "📝 Generated Title: $AI_TITLE"
 
-# 8. 🚀 Upload to Platforms
+# 8. ✂️ Actual Video Cutting via FFmpeg strictly using Gemini's Decision
+FINAL_CLIP_PATH="$FRAMES_DIR/final_cut_clip.mp4"
+echo "✂️ [STEP 8] Cutting thrilling clip via FFmpeg from $FINAL_START_TIME for $FINAL_CLIP_DURATION seconds..."
+ffmpeg -y -ss "$FINAL_START_TIME" -i "$SELECTED_URL" -t "$FINAL_CLIP_DURATION" -c:v copy -c:a copy "$FINAL_CLIP_PATH" -loglevel error >/dev/null 2>&1
+
+if [ ! -f "$FINAL_CLIP_PATH" ] || [ ! -s "$FINAL_CLIP_PATH" ]; then
+    echo "⚠️ Stream copy cut failed. Retrying re-encoding cut..."
+    ffmpeg -y -ss "$FINAL_START_TIME" -i "$SELECTED_URL" -t "$FINAL_CLIP_DURATION" -c:v libx264 -preset ultrafast -c:a aac "$FINAL_CLIP_PATH" -loglevel error >/dev/null 2>&1
+fi
+
+if [ -f "$FINAL_CLIP_PATH" ] && [ -s "$FINAL_CLIP_PATH" ]; then
+    echo "✅ Optimized action clip successfully saved at: $FINAL_CLIP_PATH"
+else
+    echo "❌ [ERROR] FFmpeg failed to cut the video clip based on Gemini's timing!"
+    exit 1
+fi
+
+# 9. 🚀 Upload to Platforms
+echo "🚀 [STEP 9] Uploading content to platforms..."
 POST_MODE="$DEFAULT_POST_MODE"
 PUBLISH_ID=""
 FB_POST_ID=""
@@ -388,7 +431,7 @@ if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "2" ]; then
           --data-urlencode "video_url=$SELECTED_URL" \
           --data-urlencode "caption=$CAPTION" \
           --data-urlencode "access_token=$PAGE_ACCESS_TOKEN")
-
+        
         CREATION_ID=$(echo "$CONTAINER_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
 
         if [ -n "$CREATION_ID" ] && [ "$CREATION_ID" != "None" ]; then
@@ -402,7 +445,7 @@ if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "2" ]; then
             PUBLISH_RES=$(curl -s -X POST "$API/$IG_ID/media_publish" \
               -d "creation_id=$CREATION_ID" \
               -d "access_token=$PAGE_ACCESS_TOKEN")
-              
+            
             PUBLISH_ID=$(echo "$PUBLISH_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
         fi
     fi
@@ -420,13 +463,13 @@ if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "3" ]; then
     fi
 fi
 
-# 9. 🧠 Memory & Adaptive Feedback Update
+# 10. 🧠 Memory & Adaptive Feedback Update & File Cleanup
 ACTIVE_ID="${PUBLISH_ID:-$FB_POST_ID}"
+echo "📝 [STEP 10] Updating memory and file sync. Active ID: $ACTIVE_ID"
 
 if [ -n "$ACTIVE_ID" ] && [ "$ACTIVE_ID" != "None" ]; then
     python3 -c "
 import os, json
-
 memory_file = 'logs/agent_memory.json'
 memory = {'game_scores': {}, 'title_styles': {'curiosity': 10, 'aggressive': 10, 'question': 10, 'emoji_heavy': 10}}
 if os.path.exists(memory_file):
@@ -438,7 +481,6 @@ if os.path.exists(memory_file):
 
 g_name = '$SELECTED_GAME_NAME'
 memory['game_scores'][g_name] = memory['game_scores'].get(g_name, 10) + 5
-
 used_style = '$SELECTED_STYLE'
 if used_style in memory['title_styles']:
     memory['title_styles'][used_style] += 3
@@ -446,8 +488,7 @@ if used_style in memory['title_styles']:
 os.makedirs('logs', exist_ok=True)
 with open(memory_file, 'w', encoding='utf-8') as f:
     json.dump(memory, f, indent=4)
-
-print('🧠 Agent Memory & Adaptive Style Feedback Updated Successfully!')
+print('🧠 Agent Memory Updated Successfully!')
 "
 
     python3 -c "
@@ -467,9 +508,12 @@ if os.path.exists(target_file):
 os.makedirs(os.path.dirname(posted_log), exist_ok=True)
 with open(posted_log, 'a', encoding='utf-8') as f:
     f.write(selected_line + f'\nVideo id : {act_id}\n\n')
-print('✅ Link shifted to posted folder successfully!')
+print('✅ Link successfully removed from temp file and shifted to posted folder!')
 "
 else
-    echo "⚠️ Skipped file sync because no post ID was generated."
+    echo "⚠️ [WARNING] Skipped file sync because no active post ID was generated."
 fi
 
+echo "===================================================="
+echo "🏁 Pipeline Finished at: $(date)"
+echo "===================================================="
