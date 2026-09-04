@@ -32,3 +32,41 @@
 ====================================================
 🏁 Pipeline Finished at: Fri Sep  4 18:24:24 UTC 2026
 ====================================================
+====================================================
+🚀 Pipeline Started at: Fri Sep  4 18:30:50 UTC 2026
+====================================================
+🔍 [STEP 0] Checking Facebook Cookie Session Health...
+⚠️ Checking Facebook Cookie Session Health...
+✅ Status: Cookies present and verified for pipeline execution.
+📈 [STEP 1] Pulling real analytics and insights from past posts...
+📊 Real Facebook Insights fetched & AI memory updated successfully!
+🤖 [STEP 3] Consulting AI Agent Brain (ai_agent.py)...
+🧠 AI Agent Raw Output: {"target_file": "game_links_editor/codBlackops6.txt", "game_name": "codBlackops6", "chosen_style": "aggressive"}
+🎮 Selected Game: codBlackops6 | Target File: game_links_editor/codBlackops6.txt | Style: aggressive
+🔗 [STEP 4] Parsing and validating link from target file...
+🔗 Validated Link Found: https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops612.mp4
+✂️ [STEP 5] Checking source video total duration via ffprobe...
+⏱️ Raw ffprobe duration output: '45.483333'
+📸 [STEP 6] Extracting 30 dynamic frames across source video...
+🧩 Merging frames into 5x6 vertical grid...
+✅ Grid screenshot created successfully.
+🤖 [STEP 7] Sending grid & past insights to Gemini for Smart Action Cutting Decision...
+🤖 Gemini Attempt 1/4 (Key used: RN6J5_QVQBUvFTVI_NgeSbuK39Bch1Zf2akLrKLLi7XO1AA...)
+🤖 Gemini JSON Response: '{
+  "title": "WHO ALLOWED ME TO SNIPE LIKE THIS?! 😤🎯",
+  "start_time": "00:00:02",
+  "clip_duration": 27
+}'
+🎯 Strict Gemini Decisions Loaded Successfully:
+   - Title: WHO ALLOWED ME TO SNIPE LIKE THIS?! 😤🎯
+   - Start Time: 00:00:02
+   - Clip Duration: 27 seconds
+✂️ [STEP 8] Cutting thrilling clip via FFmpeg from 00:00:02 for 27 seconds...
+✅ Optimized action clip successfully saved at: temp_frames/final_cut_clip.mp4
+🚀 [STEP 9] Uploading content to platforms...
+🚀 Uploading to Instagram Reels...
+📝 [STEP 10] Updating memory and file sync. Active ID: 
+⚠️ [WARNING] Skipped file sync because no active post ID was generated.
+====================================================
+🏁 Pipeline Finished at: Fri Sep  4 18:35:44 UTC 2026
+====================================================
