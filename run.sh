@@ -425,7 +425,7 @@ else
     exit 1
 fi
 
-# 9. 🚀 Upload to Platforms
+# 9. 🚀 Upload to Platforms (With Full Error Debugging)
 echo "🚀 [STEP 9] Uploading content to platforms..."
 POST_MODE="$DEFAULT_POST_MODE"
 PUBLISH_ID=""
@@ -440,12 +440,14 @@ if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "2" ]; then
           --data-urlencode "caption=$CAPTION" \
           --data-urlencode "access_token=$PAGE_ACCESS_TOKEN")
         
+        echo "📦 IG Container Response: $CONTAINER_RES"
         CREATION_ID=$(echo "$CONTAINER_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
 
         if [ -n "$CREATION_ID" ] && [ "$CREATION_ID" != "None" ]; then
             for i in {1..45}; do
                 sleep 5
-                STATUS_RES=$(curl -s "$API/$CREATION_ID?fields=status_code,status&access_token=$PAGE_ACCESS_TOKEN")
+                STATUS_RES=$(curl -s "$API/$CREATION_ID?fields=status_code,status_t,status&access_token=$PAGE_ACCESS_TOKEN")
+                echo "⏳ IG Status Check ($i): $STATUS_RES"
                 STATUS_CODE=$(echo "$STATUS_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status_code', ''))" 2>/dev/null)
                 [ "$STATUS_CODE" == "FINISHED" ] && break
             done
@@ -454,6 +456,7 @@ if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "2" ]; then
               -d "creation_id=$CREATION_ID" \
               -d "access_token=$PAGE_ACCESS_TOKEN")
             
+            echo "📢 IG Publish Response: $PUBLISH_RES"
             PUBLISH_ID=$(echo "$PUBLISH_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
         fi
     fi
@@ -467,6 +470,7 @@ if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "3" ]; then
           --data-urlencode "description=$CAPTION" \
           --data-urlencode "access_token=$PAGE_ACCESS_TOKEN")
 
+        echo "📦 FB Upload Response: $FB_RES"
         FB_POST_ID=$(echo "$FB_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
     fi
 fi
