@@ -60,6 +60,6 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add logs/ posted_links_editor/ game_links_editor/ archived_links/ || true
+          git add logs/ posted_links_editor/ game_links_editor/ temp_frames/ || true
           git commit -m "🤖 Auto-Agent: Update memory, insights, and shift posted links [skip ci]" || echo "No changes to commit"
           git push || echo "Nothing to push"
