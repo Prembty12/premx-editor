@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==========================================
-# 🤖 TRUE AI AGENT FULLY AUTOMATED PIPELINE (ROBUST PARSER FIX)
+# 🤖 TRUE AI AGENT FULLY AUTOMATED PIPELINE (CLEANED OCTAL & PARSER FIX)
 # ==========================================
 
 BASE="."
@@ -160,7 +160,7 @@ SOURCE_DURATION=$(ffprobe -v error -show_entries format=duration -of default=nop
 echo "⏱️ Raw ffprobe duration output: '$SOURCE_DURATION'"
 SOURCE_DURATION=${SOURCE_DURATION%.*}
 
-if [ -z "$SOURCE_DURATION" ] || [ -z "$SOURCE_DURATION" ] \vert{}\vert{} [ "$SOURCE_DURATION" -le 0 ]; then
+if [ -z "$SOURCE_DURATION" ] \vert{}\vert{} [ "$SOURCE_DURATION" -le 0 ]; then
     echo "⚠️ [WARNING] ffprobe duration failed or returned 0. Defaulting source duration to 60s."
     SOURCE_DURATION=60
 fi
@@ -180,7 +180,8 @@ for ((i=1; i<=NUM_FRAMES; i++)); do
     [ "$t" -lt 0 ] && t=0
     min=$((t / 60))
     sec=$((t % 60))
-    timestamps+=($(printf "00:%02d:%02d" $min$sec))
+    # Fixed octal bug by using 10-base explicit conversion 10#
+    timestamps+=($(printf "00:%02d:%02d" $((10#$min)) $((10#$sec)) ))
 done
 
 for i in "${!timestamps[@]}"; do
@@ -196,7 +197,26 @@ done
 GRID_PATH="$FRAMES_DIR/merged_30_grid_screenshot.jpg"
 echo "🧩 Merging frames into 5x6 vertical grid..."
 
-python3 - <<EOF "Pillow"], "install", + .split() 1 Image, ImageDraw ImportError: PIL and check="True)" enumerate(timestamps): except f'frame_{idx}.jpg') for frame_path="os.path.join(frames_dir," frames_dir="$FRAMES_DIR" from grid_path="$GRID_PATH" i, idx="i" if import in os os.path.exists(frame_path) os.path.getsize(frame_path) subprocess subprocess.run(["pip", timestamps="${timestamps[*]}" try: ts> 0:
+python3 - << 'EOF'
+import os
+import subprocess
+
+frames_dir = 'temp_frames'
+grid_path = os.path.join(frames_dir, 'merged_30_grid_screenshot.jpg')
+
+try:
+    from PIL import Image, ImageDraw
+except ImportError:
+    subprocess.run(["pip", "install", "Pillow"], check=True)
+    from PIL import Image, ImageDraw
+
+timestamps_env = os.environ.get('TIMESTAMPS_STR', '')
+timestamps = timestamps_env.split()
+
+for i in range(1, 31):
+    frame_path = os.path.join(frames_dir, f'frame_{i}.jpg')
+    ts = timestamps[i-1] if (i-1) < len(timestamps) else "00:00:00"
+    if os.path.exists(frame_path) and os.path.getsize(frame_path) > 0:
         try:
             im = Image.open(frame_path).resize((432, 640))
             draw = ImageDraw.Draw(im)
@@ -204,7 +224,7 @@ python3 - <<EOF "Pillow"], "install", + .split() 1 Image, ImageDraw ImportError:
             draw.text((15, 18), ts, fill=(255, 255, 255))
             im.save(frame_path, 'JPEG', quality=85)
         except Exception as e:
-            print(f"⚠️ Frame processing error at {idx}: {e}")
+            print(f"⚠️ Frame processing error at {i}: {e}")
 
 images = []
 for i in range(1, 31):
@@ -227,6 +247,8 @@ for idx, im in enumerate(images):
 grid_img.save(grid_path, 'JPEG', quality=85)
 print("✅ Grid screenshot created successfully.")
 EOF
+# Pass timestamps securely via environment variable
+TIMESTAMPS_STR="${timestamps[*]}" python3 -c "import os" 2>/dev/null
 
 # 7. 🤖 Strict Gemini Smart JSON Analysis
 echo "🤖 [STEP 7] Sending grid & past insights to Gemini for Smart Action Cutting Decision..."
@@ -314,7 +336,7 @@ Return ONLY valid JSON format, no markdown wrapping."
                       '{contents: [{parts: [{file_data: {file_uri: $uri, mime_type: $mime}}, {text:$ptext}]}]}')
 
                     gemini_resp=$(curl -s -X POST -H "Content-Type: application/json" \
-                      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$CURRENT_GEMINI_KEY" \
+                      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=$CURRENT_GEMINI_KEY" \
                       -d "$payload")
 
                     GEMINI_JSON_RESULT=$(echo "$gemini_resp" | jq -r '.candidates[0].content.parts[0].text // empty')
