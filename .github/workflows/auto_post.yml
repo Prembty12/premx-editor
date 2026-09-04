@@ -7,6 +7,9 @@ on:
   workflow_dispatch:
     # Tu ise GitHub dashboard se manually bhi run kar sakta hai
 
+permissions:
+  contents: write
+
 jobs:
   run-gaming-agent:
   
@@ -47,6 +50,7 @@ jobs:
           FB_C_USER: ${{ secrets.FB_C_USER }}
           FB_XS: ${{ secrets.FB_XS }}
           POST_MODE: '2'   # POST_MODE: ${{ vars.POST_MODE }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           bash run.sh
 
