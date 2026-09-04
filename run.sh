@@ -411,11 +411,11 @@ CAPTION="$AI_TITLE
 # 8. ✂️ Actual Video Cutting via FFmpeg strictly using Gemini's Decision
 FINAL_CLIP_PATH="$FRAMES_DIR/final_cut_clip.mp4"
 echo "✂️ [STEP 8] Cutting thrilling clip via FFmpeg from $FINAL_START_TIME for $FINAL_CLIP_DURATION seconds..."
-ffmpeg -y -ss "$FINAL_START_TIME" -i "$SELECTED_URL" -t "$FINAL_CLIP_DURATION" -c:v copy -c:a copy "$FINAL_CLIP_PATH" -loglevel error >/dev/null 2>&1
+ffmpeg -y -ss "$FINAL_START_TIME" -i "$SELECTED_URL" -t "$FINAL_CLIP_DURATION" -c:v copy -c:a copy "$FINAL_CLIP_PATH" -loglevel info
 
 if [ ! -f "$FINAL_CLIP_PATH" ] || [ ! -s "$FINAL_CLIP_PATH" ]; then
     echo "⚠️ Stream copy cut failed. Retrying re-encoding cut..."
-    ffmpeg -y -ss "$FINAL_START_TIME" -i "$SELECTED_URL" -t "$FINAL_CLIP_DURATION" -c:v libx264 -preset ultrafast -c:a aac "$FINAL_CLIP_PATH" -loglevel error >/dev/null 2>&1
+    ffmpeg -y -ss "$FINAL_START_TIME" -i "$SELECTED_URL" -t "$FINAL_CLIP_DURATION" -c:v libx264 -preset veryfast -c:a aac "$FINAL_CLIP_PATH" -loglevel info
 fi
 
 if [ -f "$FINAL_CLIP_PATH" ] && [ -s "$FINAL_CLIP_PATH" ]; then
