@@ -330,7 +330,7 @@ Return ONLY valid JSON format, no markdown wrapping."
                       '{contents: [{parts: [{file_data: {file_uri: $uri, mime_type: $mime}}, {text: $ptext}]}]}')
 
                     gemini_resp=$(curl -s -X POST -H "Content-Type: application/json" \
-                      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$CURRENT_GEMINI_KEY" \
+                      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=$CURRENT_GEMINI_KEY" \
                       -d "$payload")
 
                     GEMINI_JSON_RESULT=$(echo "$gemini_resp" | jq -r '.candidates[0].content.parts[0].text // empty')
