@@ -1,0 +1,13 @@
+{
+    "game_scores": {
+        "MexicanBorderwar": 15
+    },
+    "title_styles": {
+        "curiosity": 13,
+        "aggressive": 10,
+        "question": 10,
+        "emoji_heavy": 10
+    },
+    "last_used_style": "curiosity",
+    "last_played_game": "MexicanBorderwar"
+}
