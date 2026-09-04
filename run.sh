@@ -188,9 +188,9 @@ for i in "${!timestamps[@]}"; do
     idx=$((i+1))
     ts="${timestamps[$i]}"
     frame_path="$FRAMES_DIR/frame_$idx.jpg"
-    ffmpeg -y -ss "$ts" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel error >/dev/null 2>&1
+    ffmpeg -y -ss "$ts" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel info
     if [ ! -f "$frame_path" ] || [ ! -s "$frame_path" ]; then
-        ffmpeg -y -ss "00:00:01" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel error >/dev/null 2>&1
+        ffmpeg -y -ss "00:00:01" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel info
     fi
 done
 
