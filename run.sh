@@ -166,11 +166,11 @@ if [ -z "$SOURCE_DURATION" ] || [ "$SOURCE_DURATION" -le 0 ] 2>/dev/null; then
     SOURCE_DURATION=60
 fi
 
-# 6. 📸 Frame Extraction & 5x6 Grid Generation Across Full Video
+# 6. 📸 Frame Extraction & 6x10 Grid Generation Across Full Video
 rm -f "$FRAMES_DIR"/*.jpg
-echo "📸 [STEP 6] Extracting 30 dynamic frames across source video..."
+echo "📸 [STEP 6] Extracting 60 dynamic frames across source video..."
 
-NUM_FRAMES=30
+NUM_FRAMES=60
 interval=$((SOURCE_DURATION / NUM_FRAMES))
 [ "$interval" -lt 1 ] && interval=1
 
@@ -194,15 +194,15 @@ for i in "${!timestamps[@]}"; do
     fi
 done
 
-GRID_PATH="$FRAMES_DIR/merged_30_grid_screenshot.jpg"
-echo "🧩 Merging frames into 5x6 vertical grid..."
+GRID_PATH="$FRAMES_DIR/merged_60_grid_screenshot.jpg"
+echo "🧩 Merging frames into 6x10 vertical grid (2592x3840)..."
 
 TIMESTAMPS_STR="${timestamps[*]}" python3 - << 'EOF'
 import os
 import subprocess
 
 frames_dir = 'temp_frames'
-grid_path = os.path.join(frames_dir, 'merged_30_grid_screenshot.jpg')
+grid_path = os.path.join(frames_dir, 'merged_60_grid_screenshot.jpg')
 
 try:
     from PIL import Image, ImageDraw
@@ -213,39 +213,41 @@ except ImportError:
 timestamps_env = os.environ.get('TIMESTAMPS_STR', '')
 timestamps = timestamps_env.split()
 
-for i in range(1, 31):
+for i in range(1, 61):
     frame_path = os.path.join(frames_dir, f'frame_{i}.jpg')
     ts = timestamps[i-1] if (i-1) < len(timestamps) else "00:00:00"
     if os.path.exists(frame_path) and os.path.getsize(frame_path) > 0:
         try:
-            im = Image.open(frame_path).resize((432, 640))
+            # Resize each frame to 432x384
+            im = Image.open(frame_path).resize((432, 384))
             draw = ImageDraw.Draw(im)
-            draw.rectangle([10, 10, 130, 50], fill=(0, 0, 0))
-            draw.text((15, 18), ts, fill=(255, 255, 255))
-            im.save(frame_path, 'JPEG', quality=85)
+            draw.rectangle([10, 10, 120, 40], fill=(0, 0, 0))
+            draw.text((13, 15), ts, fill=(255, 255, 255))
+            im.save(frame_path, 'JPEG', quality=80)
         except Exception as e:
             print(f"⚠️ Frame processing error at {i}: {e}")
 
 images = []
-for i in range(1, 31):
+for i in range(1, 61):
     img_path = os.path.join(frames_dir, f'frame_{i}.jpg')
     if os.path.exists(img_path) and os.path.getsize(img_path) > 0:
         try:
             im = Image.open(img_path)
         except Exception:
-            im = Image.new('RGB', (432, 640), (0, 0, 0))
+            im = Image.new('RGB', (432, 384), (0, 0, 0))
     else:
-        im = Image.new('RGB', (432, 640), (0, 0, 0))
+        im = Image.new('RGB', (432, 384), (0, 0, 0))
     images.append(im)
 
-grid_img = Image.new('RGB', (2160, 3840))
+# Canvas size: 2592 x 3840 (6 columns, 10 rows)
+grid_img = Image.new('RGB', (2592, 3840))
 for idx, im in enumerate(images):
-    col = idx % 5
-    row = idx // 5
-    grid_img.paste(im, (col * 432, row * 640))
+    col = idx % 6
+    row = idx // 6
+    grid_img.paste(im, (col * 432, row * 384))
 
 grid_img.save(grid_path, 'JPEG', quality=85)
-print("✅ Grid screenshot created successfully.")
+print("✅ 60-frame grid screenshot created successfully.")
 EOF
 
 # 7. 🤖 Gemini Smart JSON Analysis
