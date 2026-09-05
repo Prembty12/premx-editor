@@ -17,5 +17,5 @@ while true; do
     bash run.sh
 
     echo "⏳ Waiting for 3 hours before the next check..."
-    sleep 10800
+    sleep 24800
 done
