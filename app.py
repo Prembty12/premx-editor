@@ -1,11 +1,11 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import yt_dlp
 
 app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return jsonify({"status": "Running", "usage": "Use /download?url=YOUR_YOUTUBE_LINK"})
+    return render_template('index.html')
 
 @app.route('/download', methods=['GET'])
 def download():
@@ -17,8 +17,14 @@ def download():
         ydl_opts = {
             'format': 'best',
             'noplaylist': True,
-            'extractor_args': {'youtube': {'player_client': ['web']}}
+            'extractor_args': {
+                'youtube': {
+                    'player_client': ['android', 'web']
+                }
+            }
+            # 'cookiefile': 'cookies.txt', # Agar bot error aaye toh yahan cookies enable karein
         }
+        
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(yt_url, download=False)
             
