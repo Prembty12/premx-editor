@@ -14,15 +14,10 @@ def download():
         return jsonify({"error": "Missing URL parameter"}), 400
 
     try:
-        # Bypassing bot detection using ios/tv client arguments
         ydl_opts = {
             'format': 'best',
             'noplaylist': True,
-            'extractor_args': {
-                'youtube': {
-                    'player_client': ['ios', 'tv', 'web']
-                }
-            }
+            'extractor_args': {'youtube': {'player_client': ['web']}}
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(yt_url, download=False)
