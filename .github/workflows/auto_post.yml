@@ -3,7 +3,7 @@ name: Autonomous Gaming Agent Workflow
 on:
   schedule:
     # Har 3 ghante mein automatic run hoga (Cron expression)
-    - cron: '0 */3 * * *'
+    - cron: '0 */16 * * *'
   workflow_dispatch:
     # Tu ise GitHub dashboard se manually bhi run kar sakta hai
 
