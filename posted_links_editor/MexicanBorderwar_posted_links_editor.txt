@@ -22,3 +22,6 @@ Video id : 18132563233658216
 MexicanBorderwar8 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.1/MexicanBorderwar8.mp4
 Video id : 18078883568700991
 
+MexicanBorderwar1 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.1/MexicanBorderwar1.mp4
+Video id : 18005022521987248
+
