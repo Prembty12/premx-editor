@@ -14,15 +14,15 @@ def download():
         return jsonify({"error": "Missing URL parameter"}), 400
 
     try:
-        # Using yt-dlp python library directly instead of subprocess for stability
+        # Added extra options to bypass bot detection / sign-in checks
         ydl_opts = {
             'format': 'best',
-            'noplaylist': True
+            'noplaylist': True,
+            'extractor_args': {'youtube': {'player_client': ['android', 'web']}}
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(yt_url, download=False)
             
-            # Extracting formats if available
             formats = []
             for f in info.get('formats', []):
                 if f.get('url'):
