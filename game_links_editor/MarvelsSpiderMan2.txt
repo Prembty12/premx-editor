@@ -31,3 +31,4 @@ MarvelsSpiderMan230 | Link: https://github.com/Prembty12/premx-editor/releases/d
 MarvelsSpiderMan231 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan231.mp4
 MarvelsSpiderMan232 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan232.mp4
 MarvelsSpiderMan233 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan233.mp4
+MarvelsSpiderMan234 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan234.mp4
