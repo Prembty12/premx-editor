@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify
-import subprocess
-import json
+import yt_dlp
 
 app = Flask(__name__)
 
@@ -15,27 +14,30 @@ def download():
         return jsonify({"error": "Missing URL parameter"}), 400
 
     try:
-        # yt-dlp command to extract direct stream URLs in JSON format
-        command = ['yt-dlp', '-j', yt_url]
-        result = subprocess.run(command, capture_output=True, text=True, check=True)
-        data = json.loads(result.stdout)
+        # Using yt-dlp python library directly instead of subprocess for stability
+        ydl_opts = {
+            'format': 'best',
+            'noplaylist': True
+        }
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(yt_url, download=False)
+            
+            # Extracting formats if available
+            formats = []
+            for f in info.get('formats', []):
+                if f.get('url'):
+                    formats.append({
+                        'format_id': f.get('format_id'),
+                        'resolution': f.get('format_note') or f.get('resolution'),
+                        'url': f.get('url')
+                    })
 
-        # Extracting useful info
-        formats = []
-        for f in data.get('formats', []):
-            if f.get('url') and f.get('ext') == 'mp4':
-                formats.append({
-                    'format_id': f.get('format_id'),
-                    'resolution': f.get('format_note') or f.get('resolution'),
-                    'url': f.get('url')
-                })
-
-        return jsonify({
-            "title": data.get('title'),
-            "thumbnail": data.get('thumbnail'),
-            "duration": data.get('duration'),
-            "formats": formats
-        })
+            return jsonify({
+                "title": info.get('title'),
+                "thumbnail": info.get('thumbnail'),
+                "duration": info.get('duration'),
+                "formats": formats
+            })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
