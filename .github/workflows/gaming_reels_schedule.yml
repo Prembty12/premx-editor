@@ -2,7 +2,7 @@ name: gaming_reels_schedule
 
 on:
   workflow_dispatch:
-  schedule:
+ # schedule:
     # - cron: '0 */5000 * * *' # Har 5 ghante mein automatic run hoga
      
     #- cron: '*/59 * * * *' # Har 5 minutes mein background mein check karega
