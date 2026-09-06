@@ -12,11 +12,11 @@ on:
         required: false
         default: ''
       video_title:
-        description: 'Exact File Name Prefix (e.g. cod -> cod1.mp4, cod2.mp4)'
+        description: 'Game Title Name Prefix (e.g. cod -> cod1.mp4, cod2.mp4)'
         required: true
         default: 'cod'
       game_name:
-        description: 'Game Name for File Creation (e.g. newcod -> newcod.txt)'
+        description: 'Game Name for File Creation (e.g. newcod -> FileNamegame.txt)'
         required: true
         default: 'newcod'
       ratio:
