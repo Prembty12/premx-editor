@@ -1,12 +1,12 @@
 {
     "game_scores": {
         "MexicanBorderwar": 5,
-        "Ghost_soap_escap": 5,
+        "Ghost_soap_escap": 10,
         "ghostwork": 5,
         "Ghost Destroys Mexican": 5,
         "combatopration": 5,
         "Callofdutyaw": 5,
-        "codBlackops6": 10,
+        "codBlackops6": 5,
         "Ghost_price": 5,
         "Russian_secret_missions": 5,
         "mm2remastered": 5,
@@ -15,10 +15,10 @@
     },
     "title_styles": {
         "curiosity": 22,
-        "aggressive": 19,
+        "aggressive": 22,
         "question": 19,
         "emoji_heavy": 19
     },
-    "last_used_style": "curiosity",
-    "last_played_game": "codBlackops6"
+    "last_used_style": "aggressive",
+    "last_played_game": "Ghost_soap_escap"
 }
