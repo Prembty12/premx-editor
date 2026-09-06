@@ -9,3 +9,4 @@ sifu8 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.9
 sifu9 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu9.mp4
 sifu10 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu10.mp4
 sifu11 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu11.mp4
+sifu12 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu12.mp4
