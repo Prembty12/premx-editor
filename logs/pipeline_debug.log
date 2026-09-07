@@ -43720,3 +43720,18 @@ size=   43927kB time=00:00:19.98 bitrate=18002.2kbits/s speed=88.1x
 🧠 AI Agent Raw Output: ⚠️ WARNING: Facebook Page ID ya Access Token missing hai!
 {"target_file": "game_links_editor/ UkraineCovertMission.txt", "game_name": " UkraineCovertMission", "chosen_style": "curiosity", "streak_count": 0, "inspired_by_title": ""}
 ⚠️ [WARNING] AI Agent ko koi valid game file nahi mili! Target File: 
+====================================================
+🚀 Pipeline Started at: Mon Sep  7 18:32:46 UTC 2026
+====================================================
+🔍 [STEP 0] Checking Facebook Cookie Session Health...
+⚠️ Checking Facebook Cookie Session Health...
+✅ Status: Cookies present and verified for pipeline execution.
+📈 [STEP 1] Pulling real analytics and insights from past posts...
+📊 Real Facebook Insights fetched & AI memory updated successfully!
+🤖 [STEP 3] Consulting AI Agent Brain (ai_agent.py)...
+🧠 AI Agent Raw Output: 🔄 Facebook Graph API se pichle 14 dino ka data fetch ho raha hai...
+✅ SUCCESS: Facebook se 50 videos ka data successfully fetch hua!
+📊 CHECK: Highest views pichle 14 dino mein 6267 mile.
+⏳ NO VIRAL MATCH: Kisi video ne 7k ka target cross nahi kiya ya game list se match nahi hua.
+{"target_file": "game_links_editor/AfghanistanRedZone.txt", "game_name": "AfghanistanRedZone", "chosen_style": "aggressive", "streak_count": 0, "inspired_by_title": ""}
+⚠️ [WARNING] AI Agent ko koi valid game file nahi mili! Target File: 

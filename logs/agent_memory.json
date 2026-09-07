@@ -1,13 +1,27 @@
 {
-    "game_scores": {},
+    "game_scores": {
+        "Ghost_soap_escap": 5,
+        "ghostwork": 8,
+        "Ghost Destroys Mexican": 5,
+        "combatopration": 5,
+        "Callofdutyaw": 5,
+        "codBlackops6": 5,
+        "Ghost_price": 5,
+        "VietnamCavePrison": 8,
+        "MexicanBorderwar": 5,
+        "Russian_secret_missions": 5,
+        "mm2remastered": 8,
+        "SpiderMan2": 5,
+        "RescueOperation": 5
+    },
     "title_styles": {
         "curiosity": 10,
         "aggressive": 10,
         "question": 10,
         "emoji_heavy": 10
     },
-    "last_used_style": "curiosity",
-    "last_played_game": " UkraineCovertMission",
+    "last_used_style": "aggressive",
+    "last_played_game": "AfghanistanRedZone",
     "streak_game": "",
     "streak_count": 0,
     "winning_title_context": ""
