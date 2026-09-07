@@ -11,8 +11,8 @@ GEMINI_KEYS = [
     os.environ.get("GEMINI_API_KEY_3"),
 ]
 
-FB_PAGE_ID = os.environ.get("FB_PAGE_ID")
-FB_ACCESS_TOKEN = os.environ.get("FB_ACCESS_TOKEN")
+FB_PAGE_ID = os.environ.get("PAGE_ID")
+FB_ACCESS_TOKEN = os.environ.get("PAGE_ACCESS_TOKEN")
 
 def get_active_key():
     valid = [k for k in GEMINI_KEYS if k]
