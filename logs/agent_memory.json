@@ -10,15 +10,19 @@
         "Ghost_price": 5,
         "Russian_secret_missions": 5,
         "mm2remastered": 5,
-        "SpiderMan2": 10,
-        "RescueOperation": 5
+        "SpiderMan2": 5,
+        "RescueOperation": 5,
+        "VietnamCavePrison": 15
     },
     "title_styles": {
-        "curiosity": 22,
+        "curiosity": 25,
         "aggressive": 22,
         "question": 22,
         "emoji_heavy": 22
     },
-    "last_used_style": "question",
-    "last_played_game": "SpiderMan2"
+    "last_used_style": "curiosity",
+    "last_played_game": "VietnamCavePrison",
+    "streak_game": "",
+    "streak_count": 0,
+    "winning_title_context": ""
 }
