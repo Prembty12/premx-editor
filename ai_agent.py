@@ -21,15 +21,17 @@ def get_active_key():
     return random.choice(valid)
 
 def check_facebook_high_performance(game_list):
-    """Facebook se pichle 14 dino ke videos check karke best performing game aur uska winning title dhoondta hai"""
+    """Facebook se pichle 14 dino ke videos check karke best performing game aur winning title dhoondta hai"""
     if not FB_PAGE_ID or not FB_ACCESS_TOKEN:
+        print("⚠️ WARNING: Facebook Page ID ya Access Token missing hai!")
         return None, ""
     
     try:
+        print("🔄 Facebook Graph API se pichle 14 dino ka data fetch ho raha hai...")
         fourteen_days_ago = datetime.now() - timedelta(days=14)
         since_timestamp = int(fourteen_days_ago.timestamp())
 
-        url = f"https://graph.facebook.com/v24.0/{FB_PAGE_ID}/videos"
+        url = f"https://graph.facebook.com/v19.0/{FB_PAGE_ID}/videos"
         params = {
             "fields": "title,description,views,created_time",
             "since": since_timestamp,
@@ -37,13 +39,18 @@ def check_facebook_high_performance(game_list):
             "limit": 50
         }
         response = requests.get(url, params=params, timeout=15)
+        
         if response.status_code != 200:
+            print(f"❌ ERROR: Facebook API fail ho gayi. Status: {response.status_code}")
             return None, ""
             
         data = response.json().get("data", [])
+        print(f"✅ SUCCESS: Facebook se {len(data)} videos ka data successfully fetch hua!")
+        
         best_views = 7000
         winning_game = None
         winning_title = ""
+        highest_found = 0
 
         for video in data:
             title = video.get("title", "")
@@ -51,7 +58,9 @@ def check_facebook_high_performance(game_list):
             text = (title + " " + description).lower()
             views = video.get("views", 0)
             
-            # Agar views 7k se zyada hain aur sabse high hain
+            if views > highest_found:
+                highest_found = views
+            
             if views > best_views:
                 for game in game_list:
                     if game.lower() in text:
@@ -59,9 +68,17 @@ def check_facebook_high_performance(game_list):
                         winning_game = game
                         winning_title = title if title else description
 
+        print(f"📊 CHECK: Highest views pichle 14 dino mein {highest_found} mile.")
+        
+        if winning_game:
+            print(f"🔥 VIRAL MATCH: 7k+ cross ho gaya! Game: {winning_game} ({best_views} views)")
+        else:
+            print("⏳ NO VIRAL MATCH: Kisi video ne 7k ka target cross nahi kiya ya game list se match nahi hua.")
+
         return winning_game, winning_title
-    except Exception:
-        pass
+        
+    except Exception as e:
+        print(f"❌ ERROR: Facebook data fetch karne me dikkat aayi: {e}")
         
     return None, ""
 
