@@ -3,6 +3,7 @@ import glob
 import json
 import random
 import requests
+from datetime import datetime, timedelta
 
 GEMINI_KEYS = [
     os.environ.get("GEMINI_API_KEY_1"),
@@ -10,9 +11,59 @@ GEMINI_KEYS = [
     os.environ.get("GEMINI_API_KEY_3"),
 ]
 
+FB_PAGE_ID = os.environ.get("FB_PAGE_ID")
+FB_ACCESS_TOKEN = os.environ.get("FB_ACCESS_TOKEN")
+
 def get_active_key():
     valid = [k for k in GEMINI_KEYS if k]
-    return random.choice(valid) if valid else os.environ.get("GEMINI_API_KEY_1")
+    if not valid:
+        raise ValueError("No valid Gemini API keys found.")
+    return random.choice(valid)
+
+def check_facebook_high_performance(game_list):
+    """Facebook se pichle 14 dino ke videos check karke best performing game aur uska winning title dhoondta hai"""
+    if not FB_PAGE_ID or not FB_ACCESS_TOKEN:
+        return None, ""
+    
+    try:
+        fourteen_days_ago = datetime.now() - timedelta(days=14)
+        since_timestamp = int(fourteen_days_ago.timestamp())
+
+        url = f"https://graph.facebook.com/v19.0/{FB_PAGE_ID}/videos"
+        params = {
+            "fields": "title,description,views,created_time",
+            "since": since_timestamp,
+            "access_token": FB_ACCESS_TOKEN,
+            "limit": 50
+        }
+        response = requests.get(url, params=params, timeout=15)
+        if response.status_code != 200:
+            return None, ""
+            
+        data = response.json().get("data", [])
+        best_views = 7000
+        winning_game = None
+        winning_title = ""
+
+        for video in data:
+            title = video.get("title", "")
+            description = video.get("description", "")
+            text = (title + " " + description).lower()
+            views = video.get("views", 0)
+            
+            # Agar views 7k se zyada hain aur sabse high hain
+            if views > best_views:
+                for game in game_list:
+                    if game.lower() in text:
+                        best_views = views
+                        winning_game = game
+                        winning_title = title if title else description
+
+        return winning_game, winning_title
+    except Exception:
+        pass
+        
+    return None, ""
 
 def run_agent_brain():
     links_dir = "game_links_editor"
@@ -31,7 +82,10 @@ def run_agent_brain():
             "emoji_heavy": 10
         },
         "last_used_style": "curiosity",
-        "last_played_game": ""
+        "last_played_game": "",
+        "streak_game": "",
+        "streak_count": 0,
+        "winning_title_context": ""
     }
     
     if os.path.exists(memory_file):
@@ -40,26 +94,29 @@ def run_agent_brain():
                 loaded = json.load(f)
                 if isinstance(loaded, dict):
                     memory.update(loaded)
-        except:
+        except (json.JSONDecodeError, IOError):
             pass
 
     all_files = glob.glob(os.path.join(links_dir, "*.txt"))
     if not all_files:
-        print(json.dumps({"error": "No files"}))
+        print(json.dumps({"error": "No files found"}))
         return
 
     valid_game_files = []
     for f in all_files:
-        with open(f, 'r', encoding='utf-8', errors='ignore') as file_obj:
-            content = file_obj.read().strip()
-        if not content:
-            archive_path = os.path.join(archive_dir, os.path.basename(f))
-            os.rename(f, archive_path)
-        else:
-            valid_game_files.append(f)
+        try:
+            with open(f, 'r', encoding='utf-8', errors='ignore') as file_obj:
+                content = file_obj.read().strip()
+            if not content:
+                archive_path = os.path.join(archive_dir, os.path.basename(f))
+                os.rename(f, archive_path)
+            else:
+                valid_game_files.append(f)
+        except IOError:
+            continue
 
     if not valid_game_files:
-        print(json.dumps({"error": "No valid links left in any file"}))
+        print(json.dumps({"error": "No valid links left in main folder"}))
         return
 
     game_list = []
@@ -69,64 +126,99 @@ def run_agent_brain():
         game_list.append(g_name)
         file_mapping[g_name] = f
 
-    last_game = memory.get("last_played_game", "")
-    available_games = [g for g in game_list if g != last_game]
-    if not available_games:
-        available_games = game_list
+    game_list.sort()
+
+    # High performance check (Returns game name and winning title)
+    high_perf_game, winning_title = check_facebook_high_performance(game_list)
+    
+    current_streak_game = memory.get("streak_game", "")
+    current_streak_count = memory.get("streak_count", 0)
+
+    chosen_game = ""
+
+    if high_perf_game and current_streak_count < 3:
+        if current_streak_game == high_perf_game:
+            current_streak_count += 1
+        else:
+            current_streak_game = high_perf_game
+            current_streak_count = 1
+        chosen_game = high_perf_game
+        memory["winning_title_context"] = winning_title
+    else:
+        memory["streak_game"] = ""
+        memory["streak_count"] = 0
+        memory["winning_title_context"] = ""
+        
+        # Round-Robin Rotation Fallback
+        last_game = memory.get("last_played_game", "")
+        if last_game in game_list:
+            last_index = game_list.index(last_game)
+            next_index = (last_index + 1) % len(game_list)
+            chosen_game = game_list[next_index]
+        else:
+            chosen_game = game_list[0]
+
+    memory["streak_game"] = chosen_game if high_perf_game and chosen_game == high_perf_game else ""
+    memory["streak_count"] = current_streak_count if memory["streak_game"] else 0
 
     styles = memory.get("title_styles", {"curiosity": 10, "aggressive": 10, "question": 10, "emoji_heavy": 10})
-    sorted_styles = sorted(styles.items(), key=lambda x: x[1])
-    chosen_style = sorted_styles[0][0] if random.random() > 0.3 else random.choice(list(styles.keys()))
+    chosen_style = random.choice(list(styles.keys()))
+    winning_context = memory.get("winning_title_context", "None")
 
-    api_key = get_active_key()
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={api_key}"
-    
-    prompt = f"""You are an advanced AI Social Media Manager and Gaming Content Agent.
-Available games: {available_games}
-Game Performance Scores: {memory.get('game_scores', {})}
+    try:
+        api_key = get_active_key()
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+        
+        prompt = f"""You are an advanced AI Social Media Manager and Gaming Content Agent.
+Target Game for today: {chosen_game}
 Title Styles Performance: {styles}
+Reference Winning Title (from recent high-performing video with 7k+ views): "{winning_context}"
 
 Task: 
-1. Pick ONE best game file from the available list to post today.
-2. Use the target title style: '{chosen_style}'.
+1. Use the selected game: '{chosen_game}'.
+2. Pick or generate a catchy title style inspired by the reference winning title context if available.
+3. Choose the best title style from: {list(styles.keys())}.
 
 Respond ONLY in a strict JSON format with no extra text or markdown wrappers:
-{{"chosen_game": "game_name_here", "chosen_style": "{chosen_style}", "reasoning": "short reason"}}"""
+{{"chosen_game": "{chosen_game}", "chosen_style": "style_here", "reasoning": "short reason"}}"""
 
-    payload = {
-        "contents": [{
-            "parts": [{"text": prompt}]
-        }]
-    }
+        payload = {
+            "contents": [{
+                "parts": [{"text": prompt}]
+            }]
+        }
 
-    chosen_game = random.choice(available_games)
-    try:
         response = requests.post(url, json=payload, timeout=15)
+        response.raise_for_status()
         res_data = response.json()
-        text_res = res_data.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "")
-        text_res = text_res.replace("```json", "").replace("```", "").strip()
-        parsed = json.loads(text_res)
-        if parsed.get("chosen_game") in file_mapping:
-            chosen_game = parsed.get("chosen_game")
-            chosen_style = parsed.get("chosen_style", chosen_style)
+        
+        candidates = res_data.get("candidates", [])
+        if candidates and "content" in candidates[0]:
+            parts = candidates[0]["content"].get("parts", [])
+            if parts:
+                text_res = parts[0].get("text", "").replace("```json", "").replace("```", "").strip()
+                parsed = json.loads(text_res)
+                if parsed.get("chosen_style") in styles:
+                    chosen_style = parsed.get("chosen_style")
     except Exception:
-        scores = memory.get("game_scores", {})
-        if scores:
-            filtered_scores = {k: v for k, v in scores.items() if k in available_games}
-            if filtered_scores:
-                chosen_game = max(filtered_scores, key=filtered_scores.get)
+        pass
 
     target_file = file_mapping[chosen_game]
     
     memory["last_used_style"] = chosen_style
     memory["last_played_game"] = chosen_game
-    with open(memory_file, 'w', encoding='utf-8') as f:
-        json.dump(memory, f, indent=4)
+    try:
+        with open(memory_file, 'w', encoding='utf-8') as f:
+            json.dump(memory, f, indent=4)
+    except IOError:
+        pass
 
     print(json.dumps({
         "target_file": target_file,
         "game_name": chosen_game,
-        "chosen_style": chosen_style
+        "chosen_style": chosen_style,
+        "streak_count": memory.get("streak_count", 0),
+        "inspired_by_title": winning_context
     }))
 
 if __name__ == "__main__":
