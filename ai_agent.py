@@ -29,7 +29,7 @@ def check_facebook_high_performance(game_list):
         fourteen_days_ago = datetime.now() - timedelta(days=14)
         since_timestamp = int(fourteen_days_ago.timestamp())
 
-        url = f"https://graph.facebook.com/v19.0/{FB_PAGE_ID}/videos"
+        url = f"https://graph.facebook.com/v24.0/{FB_PAGE_ID}/videos"
         params = {
             "fields": "title,description,views,created_time",
             "since": since_timestamp,
