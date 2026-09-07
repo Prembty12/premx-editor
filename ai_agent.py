@@ -3,6 +3,7 @@ import glob
 import json
 import random
 import requests
+import sys
 from datetime import datetime, timedelta
 
 GEMINI_KEYS = [
@@ -14,6 +15,10 @@ GEMINI_KEYS = [
 FB_PAGE_ID = os.environ.get("PAGE_ID")
 FB_ACCESS_TOKEN = os.environ.get("PAGE_ACCESS_TOKEN")
 
+def log(msg):
+    """Logs ko stderr me bhejne ke liye taaki stdout JSON ko disturb na kare"""
+    sys.stderr.write(f"{msg}\n")
+
 def get_active_key():
     valid = [k for k in GEMINI_KEYS if k]
     if not valid:
@@ -21,13 +26,12 @@ def get_active_key():
     return random.choice(valid)
 
 def check_facebook_high_performance(game_list):
-    """Facebook se pichle 14 dino ke videos check karke best performing game aur winning title dhoondta hai"""
     if not FB_PAGE_ID or not FB_ACCESS_TOKEN:
-        print("⚠️ WARNING: Facebook Page ID ya Access Token missing hai!")
+        log("⚠️ WARNING: Facebook Page ID ya Access Token missing hai!")
         return None, ""
     
     try:
-        print("🔄 Facebook Graph API se pichle 14 dino ka data fetch ho raha hai...")
+        log("🔄 Facebook Graph API se pichle 14 dino ka data fetch ho raha hai...")
         fourteen_days_ago = datetime.now() - timedelta(days=14)
         since_timestamp = int(fourteen_days_ago.timestamp())
 
@@ -41,11 +45,11 @@ def check_facebook_high_performance(game_list):
         response = requests.get(url, params=params, timeout=15)
         
         if response.status_code != 200:
-            print(f"❌ ERROR: Facebook API fail ho gayi. Status: {response.status_code}")
+            log(f"❌ ERROR: Facebook API fail ho gayi. Status: {response.status_code}")
             return None, ""
             
         data = response.json().get("data", [])
-        print(f"✅ SUCCESS: Facebook se {len(data)} videos ka data successfully fetch hua!")
+        log(f"✅ SUCCESS: Facebook se {len(data)} videos ka data successfully fetch hua!")
         
         best_views = 7000
         winning_game = None
@@ -68,17 +72,17 @@ def check_facebook_high_performance(game_list):
                         winning_game = game
                         winning_title = title if title else description
 
-        print(f"📊 CHECK: Highest views pichle 14 dino mein {highest_found} mile.")
+        log(f"📊 CHECK: Highest views pichle 14 dino mein {highest_found} mile.")
         
         if winning_game:
-            print(f"🔥 VIRAL MATCH: 7k+ cross ho gaya! Game: {winning_game} ({best_views} views)")
+            log(f"🔥 VIRAL MATCH: 7k+ cross ho gaya! Game: {winning_game} ({best_views} views)")
         else:
-            print("⏳ NO VIRAL MATCH: Kisi video ne 7k ka target cross nahi kiya ya game list se match nahi hua.")
+            log("⏳ NO VIRAL MATCH: Kisi video ne 7k ka target cross nahi kiya ya game list se match nahi hua.")
 
         return winning_game, winning_title
         
     except Exception as e:
-        print(f"❌ ERROR: Facebook data fetch karne me dikkat aayi: {e}")
+        log(f"❌ ERROR: Facebook data fetch karne me dikkat aayi: {e}")
         
     return None, ""
 
@@ -145,7 +149,6 @@ def run_agent_brain():
 
     game_list.sort()
 
-    # High performance check (Returns game name and winning title)
     high_perf_game, winning_title = check_facebook_high_performance(game_list)
     
     current_streak_game = memory.get("streak_game", "")
@@ -166,7 +169,6 @@ def run_agent_brain():
         memory["streak_count"] = 0
         memory["winning_title_context"] = ""
         
-        # Round-Robin Rotation Fallback
         last_game = memory.get("last_played_game", "")
         if last_game in game_list:
             last_index = game_list.index(last_game)
@@ -230,6 +232,7 @@ Respond ONLY in a strict JSON format with no extra text or markdown wrappers:
     except IOError:
         pass
 
+    # Standard output me sirf JSON aayega
     print(json.dumps({
         "target_file": target_file,
         "game_name": chosen_game,
