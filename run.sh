@@ -392,8 +392,24 @@ EOF
 
 PARSED_STATUS=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status', 'failed'))" 2>/dev/null)
 
+# Agar Gemini fail ho gaya, toh exit karne ke bajaye Fallback Brain ko bulao
 if [ "$PARSED_STATUS" != "success" ]; then
-    echo "❌ [ERROR] Gemini failed to return valid JSON decision! Full parsed output: $PARSED_JSON_DATA"
+    echo "⚠️ Gemini failed. Triggering Fallback Brain (Pollinations.ai)..."
+    
+    export GRID_PATH
+    export SOURCE_DURATION
+    export INSIGHTS_SUMMARY
+    export STYLE_PROMPT
+    
+    PARSED_JSON_DATA=$(python3 fallback_brain.py)
+    echo "🧠 Fallback AI Final Response: $PARSED_JSON_DATA"
+    
+    PARSED_STATUS=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status', 'failed'))" 2>/dev/null)
+fi
+
+# Agar Gemini aur Fallback dono fail ho gaye, tabhi pipeline rukegi
+if [ "$PARSED_STATUS" != "success" ]; then
+    echo "❌ [ERROR] Gemini aur Fallback dono fail ho gaye! Pipeline halted."
     exit 1
 fi
 
