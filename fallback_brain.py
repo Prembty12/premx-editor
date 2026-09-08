@@ -6,50 +6,58 @@ import sys
 import requests
 
 
-# --- BLOCK 1: POLLINATIONS.AI (Current Fallback Brain) ---
-def try_pollinations(grid_path, prompt_text):
+# --- BLOCK 1: HUGGING FACE VISION API (New Fallback Brain) ---
+def try_huggingface(grid_path, prompt_text):
   try:
-    print('🔄 Attempting analysis via Pollinations.ai...')
+    print('🔄 Attempting analysis via Hugging Face Vision API...')
+    
+    # Hugging Face token environment variable se uthayenge
+    hf_token = os.environ.get('HF_TOKEN', '')
+    headers = {}
+    if hf_token:
+      headers['Authorization'] = f'Bearer {hf_token}'
+
     with open(grid_path, 'rb') as f:
       b64_image = base64.b64encode(f.read()).decode('utf-8')
 
-    payload = {
-        'messages': [{
-            'role': 'user',
-            'content': [
-                {'type': 'text', 'text': prompt_text},
-                {
-                    'type': 'image_url',
-                    'image_url': f'data:image/jpeg;base64,{b64_image}'
-                },
-            ],
-        }],
-        'model': 'openai',
-        'json_mode': True,
-    }
+    # Llama 3.2 Vision model endpoint
+    api_url = 'https://api-inference.huggingface.co/models/meta-llama/Llama-3.2-11B-Vision-Instruct'
 
+    payload = {
+        'inputs': f'<|image|><|begin_of_text|>{prompt_text}',
+        'parameters': {
+            'max_new_tokens': 300,
+            'return_full_text': False
+        }
+    }
+    
+    # Note: Hugging Face image payload formats can vary by model, 
+    # alternative standard OpenAI-compatible chat endpoint can also be used if preferred:
+    # Alternative HF Chat Endpoint: https://router.huggingface.co/v1/chat/completions
+    
     resp = requests.post(
-        'https://text.pollinations.ai/',
+        api_url,
         json=payload,
-        headers={'Content-Type': 'application/json'},
-        timeout=30,
+        headers=headers,
+        timeout=40,
     )
     
-    print(f'🔍 Pollinations Response Status: {resp.status_code}')
-    print(f'🔍 Pollinations Response Text: {resp.text[:200]}')
+    print(f'🔍 Hugging Face Response Status: {resp.status_code}')
+    print(f'🔍 Hugging Face Response Text: {resp.text[:200]}')
 
     if resp.status_code == 200 and resp.text:
-      print('✅ Pollinations.ai Success!')
+      print('✅ Hugging Face Success!')
+      # HF inference returns list or dict depending on the endpoint format
+      res_data = resp.json()
+      if isinstance(res_data, list) and len(res_data) > 0:
+        return res_data[0].get('generated_text', '')
+      elif isinstance(res_data, dict):
+        return res_data.get('generated_text', str(res_data))
       return resp.text
+      
   except Exception as e:
-    print(f'⚠️ Pollinations Error: {e}')
+    print(f'⚠️ Hugging Face Error: {e}')
   return None
-
-
-# --- BLOCK 2: FUTURE AI (Aap jab chahein yahan naya AI block jod sakte hain) ---
-# def try_future_ai_2(grid_path, prompt_text):
-#     # Future AI code here
-#     return None
 
 
 if __name__ == '__main__':
@@ -73,12 +81,8 @@ Return ONLY valid JSON format, no markdown wrapping."""
 
   raw_result = None
 
-  # 1st: Try Pollinations.ai
-  raw_result = try_pollinations(grid_path, prompt_text)
-
-  # 2nd (Future): If Pollinations fails, try next block
-  # if not raw_result:
-  #     raw_result = try_future_ai_2(grid_path, prompt_text)
+  # 1st: Try Hugging Face
+  raw_result = try_huggingface(grid_path, prompt_text)
 
   # Final Output Parser
   if raw_result:
