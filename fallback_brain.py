@@ -6,12 +6,11 @@ import sys
 import requests
 
 
-# --- BLOCK 1: HUGGING FACE VISION API (New Fallback Brain) ---
+# --- BLOCK 1: HUGGING FACE VISION API (Updated Router Endpoint) ---
 def try_huggingface(grid_path, prompt_text):
   try:
-    print('🔄 Attempting analysis via Hugging Face Vision API...')
+    print('🔄 Attempting analysis via Hugging Face Router API...')
     
-    # Hugging Face token environment variable se uthayenge
     hf_token = os.environ.get('HF_TOKEN', '')
     headers = {}
     if hf_token:
@@ -20,8 +19,8 @@ def try_huggingface(grid_path, prompt_text):
     with open(grid_path, 'rb') as f:
       b64_image = base64.b64encode(f.read()).decode('utf-8')
 
-    # Llama 3.2 Vision model endpoint
-    api_url = 'https://api-inference.huggingface.co/models/meta-llama/Llama-3.2-11B-Vision-Instruct'
+    # Updated stable Hugging Face router endpoint
+    api_url = 'https://router.huggingface.co/hf-inference/models/meta-llama/Llama-3.2-11B-Vision-Instruct'
 
     payload = {
         'inputs': f'<|image|><|begin_of_text|>{prompt_text}',
@@ -30,10 +29,6 @@ def try_huggingface(grid_path, prompt_text):
             'return_full_text': False
         }
     }
-    
-    # Note: Hugging Face image payload formats can vary by model, 
-    # alternative standard OpenAI-compatible chat endpoint can also be used if preferred:
-    # Alternative HF Chat Endpoint: https://router.huggingface.co/v1/chat/completions
     
     resp = requests.post(
         api_url,
@@ -47,7 +42,6 @@ def try_huggingface(grid_path, prompt_text):
 
     if resp.status_code == 200 and resp.text:
       print('✅ Hugging Face Success!')
-      # HF inference returns list or dict depending on the endpoint format
       res_data = resp.json()
       if isinstance(res_data, list) and len(res_data) > 0:
         return res_data[0].get('generated_text', '')
