@@ -20,9 +20,7 @@ def try_pollinations(grid_path, prompt_text):
                 {'type': 'text', 'text': prompt_text},
                 {
                     'type': 'image_url',
-                    'image_url': {
-                        'url': f'data:image/jpeg;base64,{b64_image}'
-                    },
+                    'image_url': f'data:image/jpeg;base64,{b64_image}'
                 },
             ],
         }],
@@ -36,6 +34,10 @@ def try_pollinations(grid_path, prompt_text):
         headers={'Content-Type': 'application/json'},
         timeout=30,
     )
+    
+    print(f'🔍 Pollinations Response Status: {resp.status_code}')
+    print(f'🔍 Pollinations Response Text: {resp.text[:200]}')
+
     if resp.status_code == 200 and resp.text:
       print('✅ Pollinations.ai Success!')
       return resp.text
@@ -83,7 +85,7 @@ Return ONLY valid JSON format, no markdown wrapping."""
     cleaned = re.sub(r'```json', '', raw_result, flags=re.IGNORECASE)
     cleaned = re.sub(r'```', '', cleaned).strip()
     try:
-      match = re.search(r'\{.*?\}', cleaned, raw_result, flags=re.DOTALL) if False else re.search(r'\{.*?\}', cleaned, re.DOTALL)
+      match = re.search(r'\{.*?\}', cleaned, re.DOTALL)
       if match:
         data = json.loads(match.group(0))
       else:
