@@ -6,22 +6,23 @@
         "combatopration": 5,
         "Callofdutyaw": 5,
         "codBlackops6": 5,
-        "Ghost_price": 10,
+        "Ghost_price": 5,
         "VietnamCavePrison": 5,
         "MexicanBorderwar": 5,
         "Russian_secret_missions": 5,
         "mm2remastered": 5,
         "SpiderMan2": 5,
-        "RescueOperation": 5
+        "RescueOperation": 5,
+        " UkraineCovertMission": 15
     },
     "title_styles": {
         "curiosity": 10,
-        "aggressive": 10,
+        "aggressive": 13,
         "question": 16,
         "emoji_heavy": 10
     },
-    "last_used_style": "question",
-    "last_played_game": "Ghost_price",
+    "last_used_style": "aggressive",
+    "last_played_game": " UkraineCovertMission",
     "streak_game": "",
     "streak_count": 0,
     "winning_title_context": ""
