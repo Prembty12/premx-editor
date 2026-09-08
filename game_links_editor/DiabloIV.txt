@@ -1,2 +1,3 @@
 DiabloIV1 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.102/DiabloIV1.mp4
 DiabloIV2 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.102/DiabloIV2.mp4
+DiabloIV3 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.102/DiabloIV3.mp4
