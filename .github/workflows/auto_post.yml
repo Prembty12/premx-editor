@@ -51,6 +51,7 @@ jobs:
           FB_XS: ${{ secrets.FB_XS }}
           POST_MODE: '2'   # POST_MODE: ${{ vars.POST_MODE }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           bash run.sh
 
