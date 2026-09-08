@@ -8,3 +8,4 @@ DiabloIV7 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1
 DiabloIV8 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.102/DiabloIV8.mp4
 DiabloIV9 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.102/DiabloIV9.mp4
 DiabloIV10 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.102/DiabloIV10.mp4
+DiabloIV11 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.102/DiabloIV11.mp4
