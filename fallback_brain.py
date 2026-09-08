@@ -6,47 +6,58 @@ import sys
 import requests
 
 
-# --- BLOCK 1: HUGGING FACE VISION API (Updated Router Endpoint) ---
+# --- BLOCK 1: HUGGING FACE OPENAI-COMPATIBLE VISION API ---
 def try_huggingface(grid_path, prompt_text):
   try:
-    print('🔄 Attempting analysis via Hugging Face Router API...')
+    print('🔄 Attempting analysis via Hugging Face Chat Router...')
     
     hf_token = os.environ.get('HF_TOKEN', '')
-    headers = {}
-    if hf_token:
-      headers['Authorization'] = f'Bearer {hf_token}'
+    headers = {
+        'Authorization': f'Bearer {hf_token}',
+        'Content-Type': 'application/json'
+    }
 
     with open(grid_path, 'rb') as f:
       b64_image = base64.b64encode(f.read()).decode('utf-8')
 
-    # Updated stable Hugging Face router endpoint
-    api_url = 'https://router.huggingface.co/hf-inference/models/meta-llama/Llama-3.2-11B-Vision-Instruct'
+    # Hugging Face standard OpenAI-compatible endpoint
+    api_url = 'https://router.huggingface.co/v1/chat/completions'
 
     payload = {
-        'inputs': f'<|image|><|begin_of_text|>{prompt_text}',
-        'parameters': {
-            'max_new_tokens': 300,
-            'return_full_text': False
-        }
+        'model': 'Qwen/Qwen2-VL-7B-Instruct',
+        'messages': [
+            {
+                'role': 'user',
+                'content': [
+                    {'type': 'text', 'text': prompt_text},
+                    {
+                        'type': 'image_url',
+                        'image_url': {
+                            'url': f'data:image/jpeg;base64,{b64_image}'
+                        }
+                    }
+                ]
+            }
+        ],
+        'max_tokens': 300
     }
     
     resp = requests.post(
         api_url,
         json=payload,
         headers=headers,
-        timeout=40,
+        timeout=45,
     )
     
     print(f'🔍 Hugging Face Response Status: {resp.status_code}')
-    print(f'🔍 Hugging Face Response Text: {resp.text[:200]}')
+    print(f'🔍 Hugging Face Response Text: {resp.text[:300]}')
 
     if resp.status_code == 200 and resp.text:
       print('✅ Hugging Face Success!')
       res_data = resp.json()
-      if isinstance(res_data, list) and len(res_data) > 0:
-        return res_data[0].get('generated_text', '')
-      elif isinstance(res_data, dict):
-        return res_data.get('generated_text', str(res_data))
+      choices = res_data.get('choices', [])
+      if choices and len(choices) > 0:
+        return choices[0].get('message', {}).get('content', '')
       return resp.text
       
   except Exception as e:
@@ -75,7 +86,7 @@ Return ONLY valid JSON format, no markdown wrapping."""
 
   raw_result = None
 
-  # 1st: Try Hugging Face
+  # Try Hugging Face Chat Router
   raw_result = try_huggingface(grid_path, prompt_text)
 
   # Final Output Parser
