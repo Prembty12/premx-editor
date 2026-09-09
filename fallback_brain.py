@@ -6,25 +6,25 @@ import sys
 import requests
 
 
-# --- BLOCK 1: HUGGING FACE OPENAI-COMPATIBLE VISION API ---
-def try_huggingface(grid_path, prompt_text):
+def try_openrouter(grid_path, prompt_text):
   try:
-    print('🔄 Attempting analysis via Hugging Face Chat Router...')
+    print('🔄 Attempting analysis via OpenRouter API...')
     
-    hf_token = os.environ.get('HF_TOKEN', '')
+    api_key = os.environ.get('OPENROUTER_API_KEY', '')
     headers = {
-        'Authorization': f'Bearer {hf_token}',
-        'Content-Type': 'application/json'
+        'Authorization': f'Bearer {api_key}',
+        'Content-Type': 'application/json',
+        'HTTP-Referer': 'https://github.com',
+        'X-Title': 'Gaming Video Editor'
     }
 
     with open(grid_path, 'rb') as f:
       b64_image = base64.b64encode(f.read()).decode('utf-8')
 
-    # Hugging Face standard OpenAI-compatible endpoint
-    api_url = 'https://router.huggingface.co/v1/chat/completions'
+    api_url = 'https://openrouter.ai/api/v1/chat/completions'
 
     payload = {
-        'model': 'Qwen/Qwen2-VL-7B-Instruct',
+        'model': 'openrouter/free',
         'messages': [
             {
                 'role': 'user',
@@ -49,11 +49,11 @@ def try_huggingface(grid_path, prompt_text):
         timeout=45,
     )
     
-    print(f'🔍 Hugging Face Response Status: {resp.status_code}')
-    print(f'🔍 Hugging Face Response Text: {resp.text[:300]}')
+    print(f'🔍 OpenRouter Response Status: {resp.status_code}')
+    print(f'🔍 OpenRouter Response Text: {resp.text[:300]}')
 
     if resp.status_code == 200 and resp.text:
-      print('✅ Hugging Face Success!')
+      print('✅ OpenRouter Success!')
       res_data = resp.json()
       choices = res_data.get('choices', [])
       if choices and len(choices) > 0:
@@ -61,7 +61,7 @@ def try_huggingface(grid_path, prompt_text):
       return resp.text
       
   except Exception as e:
-    print(f'⚠️ Hugging Face Error: {e}')
+    print(f'⚠️ OpenRouter Error: {e}')
   return None
 
 
@@ -84,12 +84,8 @@ Return a JSON object with EXACTLY three keys:
 3. 'clip_duration' (integer: length between 12 and 45 seconds meeting monetization rules)
 Return ONLY valid JSON format, no markdown wrapping."""
 
-  raw_result = None
+  raw_result = try_openrouter(grid_path, prompt_text)
 
-  # Try Hugging Face Chat Router
-  raw_result = try_huggingface(grid_path, prompt_text)
-
-  # Final Output Parser
   if raw_result:
     cleaned = re.sub(r'```json', '', raw_result, flags=re.IGNORECASE)
     cleaned = re.sub(r'```', '', cleaned).strip()
