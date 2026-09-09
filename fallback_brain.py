@@ -24,7 +24,7 @@ def try_openrouter(grid_path, prompt_text):
     api_url = 'https://openrouter.ai/api/v1/chat/completions'
 
     payload = {
-        'model': 'openrouter/free',
+        'model': 'liquid/lfm-2.5-2.6b:free',
         'messages': [
             {
                 'role': 'user',
