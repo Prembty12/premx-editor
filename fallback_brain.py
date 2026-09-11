@@ -4,6 +4,7 @@ import json
 import os
 import re
 import sys
+import time
 import requests
 
 
@@ -60,24 +61,52 @@ Return ONLY valid JSON format, no markdown wrapping."""
         "temperature": 0.6,
     }
 
-    try:
-        response = requests.post(
-            invoke_url, headers=headers, json=payload, timeout=45
-        )
-        if response.status_code == 200:
-            res_json = response.json()
-            choices = res_json.get("choices", [])
-            if choices:
-                msg = choices[0].get("message", {})
-                raw_result = msg.get("content", "") or msg.get("reasoning", "")
-                if raw_result:
-                    return {"status": "success", "raw": str(raw_result)}
-        return {
-            "status": "failed",
-            "error": f"NVIDIA Error {response.status_code}: {response.text[:150]}",
-        }
-    except Exception as e:
-        return {"status": "failed", "error": f"NVIDIA Exception: {str(e)}"}
+    # Retry loop for handling 503 / 429 / timeouts smoothly
+    max_retries = 2
+    for attempt in range(max_retries):
+        try:
+            response = requests.post(
+                invoke_url, headers=headers, json=payload, timeout=60
+            )
+            if response.status_code == 200:
+                res_json = response.json()
+                choices = res_json.get("choices", [])
+                if choices:
+                    msg = choices[0].get("message", {})
+                    raw_result = msg.get("content", "") or msg.get(
+                        "reasoning", ""
+                    )
+                    if raw_result:
+                        return {"status": "success", "raw": str(raw_result)}
+
+            # Agar server busy ya rate limit ho toh wait karke retry karega
+            if response.status_code in [503, 429, 502, 504]:
+                wait_time = (attempt + 1) * 3
+                print(
+                    f"⚠️ NVIDIA Server Busy ({response.status_code}). Retrying in {wait_time}s... (Attempt {attempt + 1}/{max_retries})",
+                    file=sys.stderr,
+                )
+                time.sleep(wait_time)
+                continue
+
+            return {
+                "status": "failed",
+                "error": f"NVIDIA Error {response.status_code}: {response.text[:150]}",
+            }
+        except Exception as e:
+            if attempt == max_retries - 1:
+                return {
+                    "status": "failed",
+                    "error": f"NVIDIA Exception: {str(e)}",
+                }
+            wait_time = (attempt + 1) * 3
+            print(
+                f"⚠️ NVIDIA Exception: {str(e)}. Retrying in {wait_time}s...",
+                file=sys.stderr,
+            )
+            time.sleep(wait_time)
+
+    return {"status": "failed", "error": "NVIDIA max retries reached"}
 
 
 def call_openrouter(grid_path, source_duration, insights, style_prompt):
@@ -207,7 +236,6 @@ def run_fallback_pipeline():
         try:
             data = json.loads(target_str)
         except json.JSONDecodeError:
-            # Fallback for single-quoted strings or python-style dict outputs from LLMs
             data = ast.literal_eval(target_str)
 
         title = data.get("title")
