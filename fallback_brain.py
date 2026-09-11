@@ -14,9 +14,19 @@ def run_nvidia_fallback():
   insights = os.environ.get('INSIGHTS_SUMMARY', '')
   style_prompt = os.environ.get('STYLE_PROMPT', '')
 
-  # NVIDIA API Key (Aap yahan direkt bhi daal sakte hain ya env variable use kar sakte hain)
-  api_key = os.environ.get('NVIDIA_API_KEY', '')
-  )
+  # NVIDIA API Key (Only loaded securely from environment variables)
+  api_key = os.environ.get('NVIDIA_API_KEY')
+
+  if not api_key:
+    print(
+        json.dumps(
+            {
+                'status': 'failed',
+                'error': 'NVIDIA_API_KEY environment variable is missing',
+            }
+        )
+    )
+    return
 
   if not os.path.exists(grid_path):
     print(
