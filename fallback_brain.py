@@ -10,13 +10,14 @@ def try_nvidia(grid_path, prompt_text):
     print('🔄 Attempting analysis via NVIDIA API...')
     api_key = os.environ.get('NVIDIA_API_KEY', '')
     if not api_key:
-      print('⚠️ NVIDIA_API_KEY not found')
+      print('⚠️ NVIDIA_API_KEY not found in environment variables.')
       return None
 
+    invoke_url = 'https://integrate.api.nvidia.com/v1/chat/completions'
     headers = {
         'Authorization': f'Bearer {api_key}',
         'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
     }
 
     with open(grid_path, 'rb') as f:
@@ -36,25 +37,30 @@ def try_nvidia(grid_path, prompt_text):
                 }
             ]
         }],
-        'max_tokens': 1024
+        'max_tokens': 1024,
+        'temperature': 0.6,
+        'top_p': 0.95,
+        'chat_template_kwargs': {'enable_thinking': True},
     }
 
-    resp = requests.post(
-        'https://integrate.api.nvidia.com/v1/chat/completions',
-        json=payload,
-        headers=headers,
-        timeout=45,
-    )
+    resp = requests.post(invoke_url, json=payload, headers=headers, timeout=60)
     print(f'🔍 NVIDIA Response Status: {resp.status_code}')
+    print(f'🔍 NVIDIA Response Text: {resp.text[:400]}')
 
     if resp.status_code == 200 and resp.text:
       print('✅ NVIDIA Success!')
       res_data = resp.json()
       choices = res_data.get('choices', [])
       if choices:
-        return choices[0].get('message', {}).get('content', '')
+        msg = choices[0].get('message', {})
+        content = msg.get('content', '')
+        if not content:
+          content = msg.get('reasoning', '')
+        return content
+    else:
+      print(f'❌ NVIDIA Failed with status {resp.status_code}: {resp.text}')
   except Exception as e:
-    print(f'⚠️ NVIDIA Error: {e}')
+    print(f'⚠️ NVIDIA Error Exception: {e}')
   return None
 
 
@@ -70,7 +76,7 @@ def try_openrouter_fixed(grid_path, prompt_text):
         'Authorization': f'Bearer {api_key}',
         'Content-Type': 'application/json',
         'HTTP-Referer': 'https://github.com',
-        'X-Title': 'Gaming Video Editor'
+        'X-Title': 'Gaming Video Editor',
     }
 
     with open(grid_path, 'rb') as f:
@@ -90,7 +96,7 @@ def try_openrouter_fixed(grid_path, prompt_text):
                 }
             ]
         }],
-        'max_tokens': 300
+        'max_tokens': 300,
     }
 
     resp = requests.post(
@@ -100,6 +106,7 @@ def try_openrouter_fixed(grid_path, prompt_text):
         timeout=45,
     )
     print(f'🔍 OpenRouter Fixed Status: {resp.status_code}')
+    print(f'🔍 OpenRouter Fixed Text: {resp.text[:400]}')
 
     if resp.status_code == 200 and resp.text:
       print('✅ OpenRouter Fixed Model Success!')
@@ -107,8 +114,13 @@ def try_openrouter_fixed(grid_path, prompt_text):
       choices = res_data.get('choices', [])
       if choices:
         return choices[0].get('message', {}).get('content', '')
+    else:
+      print(
+          f'❌ OpenRouter Fixed Failed with status {resp.status_code}:'
+          f' {resp.text}'
+      )
   except Exception as e:
-    print(f'⚠️ OpenRouter Fixed Error: {e}')
+    print(f'⚠️ OpenRouter Fixed Error Exception: {e}')
   return None
 
 
@@ -124,7 +136,7 @@ def try_openrouter_free(grid_path, prompt_text):
         'Authorization': f'Bearer {api_key}',
         'Content-Type': 'application/json',
         'HTTP-Referer': 'https://github.com',
-        'X-Title': 'Gaming Video Editor'
+        'X-Title': 'Gaming Video Editor',
     }
 
     with open(grid_path, 'rb') as f:
@@ -144,7 +156,7 @@ def try_openrouter_free(grid_path, prompt_text):
                 }
             ]
         }],
-        'max_tokens': 300
+        'max_tokens': 300,
     }
 
     resp = requests.post(
@@ -154,6 +166,7 @@ def try_openrouter_free(grid_path, prompt_text):
         timeout=45,
     )
     print(f'🔍 OpenRouter Free Status: {resp.status_code}')
+    print(f'🔍 OpenRouter Free Text: {resp.text[:400]}')
 
     if resp.status_code == 200 and resp.text:
       print('✅ OpenRouter Free Success!')
@@ -161,8 +174,13 @@ def try_openrouter_free(grid_path, prompt_text):
       choices = res_data.get('choices', [])
       if choices:
         return choices[0].get('message', {}).get('content', '')
+    else:
+      print(
+          f'❌ OpenRouter Free Failed with status {resp.status_code}:'
+          f' {resp.text}'
+      )
   except Exception as e:
-    print(f'⚠️ OpenRouter Free Error: {e}')
+    print(f'⚠️ OpenRouter Free Error Exception: {e}')
   return None
 
 
@@ -187,7 +205,7 @@ Return ONLY valid JSON format, no markdown wrapping."""
 
   raw_result = None
 
-  # Tier 1: NVIDIA API
+  # Tier 1: NVIDIA API (with exact payload params matching your script)
   raw_result = try_nvidia(grid_path, prompt_text)
 
   # Tier 2: OpenRouter Fixed Model
