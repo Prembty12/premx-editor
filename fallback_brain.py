@@ -221,7 +221,7 @@ def run_pipeline():
     nvidia_model = os.environ.get("NVIDIA_MODEL", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning")
 
     primary_model = os.environ.get("OPENROUTER_MODEL", "vidia/nemotron-3-nano-omni-30b-a3b-reasoning:free")
-    fallback_model = "openrouter/free"
+    fallback_model = "openrouter/fre"
 
     if not os.path.exists(grid_path):
         print(json.dumps({"status": "failed", "error": f"Grid image path not found: {grid_path}"}))
