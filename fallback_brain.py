@@ -7,6 +7,42 @@ import sys
 import requests
 
 
+def parse_json_safely(raw_result):
+    """ Cleans up response string, fixes leading zeros, and safely extracts JSON """
+    try:
+        cleaned = re.sub(r"```json", "", str(raw_result), flags=re.IGNORECASE)
+        cleaned = re.sub(r"```", "", cleaned).strip()
+
+        match = re.search(r"\{.*?\}", cleaned, re.DOTALL)
+        target_str = match.group(0) if match else cleaned
+
+        # Fix leading zeros in numbers (e.g. "duration": 020 -> "duration": 20)
+        target_str = re.sub(r'(?<=\s|:)\b0+(?=[1-9]\d*)\b', '', target_str)
+
+        try:
+            data = json.loads(target_str)
+        except Exception:
+            data = ast.literal_eval(target_str)
+
+        if isinstance(data, dict):
+            title = data.get("title")
+            start_time = data.get("start_time")
+            duration = data.get("clip_duration", data.get("duration", 15))
+
+            if title and start_time:
+                dur_int = int(duration)
+                dur_int = max(12, min(45, dur_int))
+                return {
+                    "title": str(title),
+                    "start_time": str(start_time),
+                    "duration": dur_int
+                }, None
+
+        return None, "Missing required keys 'title' or 'start_time'"
+    except Exception as e:
+        return None, f"Parsing error: {str(e)}"
+
+
 def call_openrouter(grid_path, source_duration, insights, style_prompt, model_name, api_keys):
     if not api_keys:
         return {
@@ -80,7 +116,6 @@ Return ONLY valid JSON format, no markdown wrapping."""
                         msg = choices[0].get("message", {})
                         raw_result = msg.get("content", "") or msg.get("reasoning", "")
                         
-                        # --- STRICT JSON VALIDATION BEFORE ACCEPTING AS SUCCESS ---
                         if raw_result:
                             parsed_data, parse_err = parse_json_safely(raw_result)
                             if parsed_data:
@@ -90,7 +125,7 @@ Return ONLY valid JSON format, no markdown wrapping."""
                                     "actual_model": actual_model
                                 }
                             else:
-                                last_error = f"API Key #{idx} output valid API response but invalid JSON content: {parse_err}"
+                                last_error = f"API Key #{idx} valid response but invalid JSON content: {parse_err}"
                                 print(f"⚠️ {last_error}. Trying next key...", file=sys.stderr)
                                 continue
                     
@@ -107,40 +142,7 @@ Return ONLY valid JSON format, no markdown wrapping."""
             last_error = f"API Key #{idx} Exception: {str(e)}"
             print(f"⚠️ {last_error} Trying next key...", file=sys.stderr)
 
-    return {"status": "failed", "error": f"All API keys failed for model {model_name}. Last error: {last_error}"}
-
-
-def parse_json_safely(raw_result):
-    """ Helper function to extract and validate title, start_time, duration """
-    try:
-        cleaned = re.sub(r"```json", "", str(raw_result), flags=re.IGNORECASE)
-        cleaned = re.sub(r"```", "", cleaned).strip()
-
-        match = re.search(r"\{.*?\}", cleaned, re.DOTALL)
-        target_str = match.group(0) if match else cleaned
-
-        try:
-            data = json.loads(target_str)
-        except Exception:
-            data = ast.literal_eval(target_str)
-
-        if isinstance(data, dict):
-            title = data.get("title")
-            start_time = data.get("start_time")
-            duration = data.get("clip_duration", data.get("duration", 15))
-
-            if title and start_time:
-                dur_int = int(duration)
-                dur_int = max(12, min(45, dur_int))
-                return {
-                    "title": str(title),
-                    "start_time": str(start_time),
-                    "duration": dur_int
-                }, None
-
-        return None, "Missing required keys 'title' or 'start_time'"
-    except Exception as e:
-        return None, f"Parsing error: {str(e)}"
+    return {"status": "failed", "error": f"Failed for model {model_name}. Last error: {last_error}"}
 
 
 def run_pipeline():
@@ -167,10 +169,6 @@ def run_pipeline():
 
     primary_model = os.environ.get("OPENROUTER_MODEL", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free")
     fallback_model = "openrouter/free"
-    
-    models_to_try = [primary_model]
-    if fallback_model not in models_to_try:
-        models_to_try.append(fallback_model)
 
     if not os.path.exists(grid_path):
         print(
@@ -178,37 +176,52 @@ def run_pipeline():
         )
         return
 
-    # Loop through Models -> If primary model fails or produces bad JSON, it seamlessly moves to fallback
-    for model in models_to_try:
-        print(f"🔄 Trying Model: {model} with available API keys...", file=sys.stderr)
-        result = call_openrouter(grid_path, source_duration, insights, style_prompt, model, api_keys)
-        
-        if result.get("status") == "success":
-            data = result.get("data", {})
-            used_model = result.get("actual_model", model)
-            
-            # Print final successful response and exit script
-            print(
-                json.dumps(
-                    {
-                        "status": "success",
-                        "model": used_model,
-                        "title": data["title"],
-                        "start_time": data["start_time"],
-                        "duration": data["duration"],
-                    }
-                )
-            )
-            return
-        else:
-            print(f"⚠️ Model {model} completely failed across all keys: {result.get('error')}", file=sys.stderr)
+    # STEP 1: Primary Model ko SIRF 1st API Key ke sath TRY karo (Single Attempt)
+    print(f"🔄 Trying Primary Model: {primary_model} (Single attempt with Key #1)...", file=sys.stderr)
+    result = call_openrouter(grid_path, source_duration, insights, style_prompt, primary_model, api_keys[:1])
 
-    # If all models failed
+    if result.get("status") == "success":
+        data = result.get("data", {})
+        print(
+            json.dumps(
+                {
+                    "status": "success",
+                    "model": result.get("actual_model", primary_model),
+                    "title": data["title"],
+                    "start_time": data["start_time"],
+                    "duration": data["duration"],
+                }
+            )
+        )
+        return
+
+    # STEP 2: Primary Model Fail hua, toh Fallback 'openrouter/free' ko ALL API Keys ke sath TRY karo
+    print(f"⚠️ Primary Model failed on 1st attempt: {result.get('error')}", file=sys.stderr)
+    print(f"🔄 Switching to Fallback Model: {fallback_model} with ALL API Keys...", file=sys.stderr)
+    
+    fallback_result = call_openrouter(grid_path, source_duration, insights, style_prompt, fallback_model, api_keys)
+
+    if fallback_result.get("status") == "success":
+        data = fallback_result.get("data", {})
+        print(
+            json.dumps(
+                {
+                    "status": "success",
+                    "model": fallback_result.get("actual_model", fallback_model),
+                    "title": data["title"],
+                    "start_time": data["start_time"],
+                    "duration": data["duration"],
+                }
+            )
+        )
+        return
+
+    # STEP 3: Agar Fallback Model bhi saari Keys par fail ho gaya
     print(
         json.dumps(
             {
                 "status": "failed",
-                "error": "All models and API keys failed to generate valid JSON output.",
+                "error": f"Primary model failed (1st attempt) and Fallback model failed across all keys. Last error: {fallback_result.get('error')}",
             }
         )
     )
