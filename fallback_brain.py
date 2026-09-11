@@ -99,7 +99,7 @@ Return ONLY valid JSON format, no markdown wrapping."""
         try:
             print(f"🔑 Trying API Key #{idx} with model {model_name}...", file=sys.stderr)
             response = requests.post(
-                invoke_url, headers=headers, json=payload, timeout=45
+                invoke_url, headers=headers, json=payload, timeout=11
             )
             
             if response.status_code == 200:
