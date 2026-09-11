@@ -193,7 +193,7 @@ def run_pipeline():
     # EXACT MODEL ID FIX WITH .strip()
     primary_model = os.environ.get(
         "OPENROUTER_MODEL",
-        "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+        "openrouter/free",
     ).strip()
     fallback_model = "openrouter/free"
 
