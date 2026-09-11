@@ -4,112 +4,10 @@ import json
 import os
 import re
 import sys
-import time
 import requests
 
 
-def call_nvidia(grid_path, source_duration, insights, style_prompt):
-    api_key = os.environ.get("NVIDIA_API_KEY", "").strip()
-    if not api_key:
-        return {
-            "status": "failed",
-            "error": "NVIDIA_API_KEY environment variable missing",
-        }
-
-    invoke_url = "https://integrate.api.nvidia.com/v1/chat/completions"
-
-    try:
-        with open(grid_path, "rb") as f:
-            base64_image = base64.b64encode(f.read()).decode("utf-8")
-    except Exception as e:
-        return {"status": "failed", "error": f"NVIDIA base64 error: {str(e)}"}
-
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Accept": "application/json",
-        "Content-Type": "application/json",
-    }
-
-    prompt_text = f"""Analyze the provided 9:16 gaming screenshot grid. Total video source duration is {source_duration} seconds.
-Insights Context: {insights}
-Style Directive: {style_prompt}
-
-Your primary job as an expert video editor is to find the most thrilling, high-action segment, skipping dull introductions.
-Return a JSON object with EXACTLY three keys:
-1. 'title' (string: viral title with 1-3 emojis)
-2. 'start_time' (string format HH:MM:SS indicating exact peak action start time based on grid timestamps)
-3. 'clip_duration' (integer: length between 12 and 45 seconds meeting monetization rules)
-Return ONLY valid JSON format, no markdown wrapping."""
-
-    payload = {
-        "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
-        "messages": [
-            {
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": prompt_text},
-                    {
-                        "type": "image_url",
-                        "image_url": {
-                            "url": f"data:image/jpeg;base64,{base64_image}"
-                        },
-                    },
-                ],
-            }
-        ],
-        "max_tokens": 1024,
-        "temperature": 0.6,
-    }
-
-    # Retry loop for handling 503 / 429 / timeouts smoothly
-    max_retries = 2
-    for attempt in range(max_retries):
-        try:
-            response = requests.post(
-                invoke_url, headers=headers, json=payload, timeout=60
-            )
-            if response.status_code == 200:
-                res_json = response.json()
-                choices = res_json.get("choices", [])
-                if choices:
-                    msg = choices[0].get("message", {})
-                    raw_result = msg.get("content", "") or msg.get(
-                        "reasoning", ""
-                    )
-                    if raw_result:
-                        return {"status": "success", "raw": str(raw_result)}
-
-            # Agar server busy ya rate limit ho toh wait karke retry karega
-            if response.status_code in [503, 429, 502, 504]:
-                wait_time = (attempt + 1) * 3
-                print(
-                    f"⚠️ NVIDIA Server Busy ({response.status_code}). Retrying in {wait_time}s... (Attempt {attempt + 1}/{max_retries})",
-                    file=sys.stderr,
-                )
-                time.sleep(wait_time)
-                continue
-
-            return {
-                "status": "failed",
-                "error": f"NVIDIA Error {response.status_code}: {response.text[:150]}",
-            }
-        except Exception as e:
-            if attempt == max_retries - 1:
-                return {
-                    "status": "failed",
-                    "error": f"NVIDIA Exception: {str(e)}",
-                }
-            wait_time = (attempt + 1) * 3
-            print(
-                f"⚠️ NVIDIA Exception: {str(e)}. Retrying in {wait_time}s...",
-                file=sys.stderr,
-            )
-            time.sleep(wait_time)
-
-    return {"status": "failed", "error": "NVIDIA max retries reached"}
-
-
-def call_openrouter(grid_path, source_duration, insights, style_prompt):
+def call_openrouter(grid_path, source_duration, insights, style_prompt, model_name="openrouter/free"):
     api_key = os.environ.get("OPENROUTER_API_KEY", "").strip()
     if not api_key:
         return {
@@ -142,7 +40,7 @@ Return a JSON object with EXACTLY three keys:
 Return ONLY valid JSON format, no markdown wrapping."""
 
     payload = {
-        "model": "openrouter/free",
+        "model": model_name,
         "messages": [
             {
                 "role": "user",
@@ -181,13 +79,16 @@ Return ONLY valid JSON format, no markdown wrapping."""
         return {"status": "failed", "error": f"OpenRouter Exception: {str(e)}"}
 
 
-def run_fallback_pipeline():
+def run_pipeline():
     grid_path = os.environ.get(
         "GRID_PATH", "temp_frames/merged_60_grid_screenshot.jpg"
     )
     source_duration = os.environ.get("SOURCE_DURATION", "60")
     insights = os.environ.get("INSIGHTS_SUMMARY", "")
     style_prompt = os.environ.get("STYLE_PROMPT", "")
+    
+    # Get model name from environment variable or fallback to default
+    openrouter_model = os.environ.get("OPENROUTER_MODEL", "openrouter/free")
 
     if not os.path.exists(grid_path):
         print(
@@ -195,27 +96,17 @@ def run_fallback_pipeline():
         )
         return
 
-    # 1. Try NVIDIA first
-    print("🔄 Trying NVIDIA API first...", file=sys.stderr)
-    result = call_nvidia(grid_path, source_duration, insights, style_prompt)
+    # Call OpenRouter directly, showing the model name being used
+    print(f"🔄 Calling OpenRouter API (Model: {openrouter_model})...", file=sys.stderr)
+    result = call_openrouter(grid_path, source_duration, insights, style_prompt, openrouter_model)
 
-    # 2. If NVIDIA fails, switch to OpenRouter
-    if result.get("status") != "success":
-        print(
-            f"⚠️ NVIDIA failed: {result.get('error')}. Switching to OpenRouter free model...",
-            file=sys.stderr,
-        )
-        result = call_openrouter(
-            grid_path, source_duration, insights, style_prompt
-        )
-
-    # If both fail
+    # If it fails
     if result.get("status") != "success":
         print(
             json.dumps(
                 {
                     "status": "failed",
-                    "error": f"Both APIs failed. Final error: {result.get('error')}",
+                    "error": f"OpenRouter failed: {result.get('error')}",
                 }
             )
         )
@@ -236,6 +127,7 @@ def run_fallback_pipeline():
         try:
             data = json.loads(target_str)
         except json.JSONDecodeError:
+            # Fallback for single-quoted strings or python-style dict outputs from LLMs
             data = ast.literal_eval(target_str)
 
         title = data.get("title")
@@ -252,6 +144,7 @@ def run_fallback_pipeline():
                 json.dumps(
                     {
                         "status": "success",
+                        "model": openrouter_model,
                         "title": title,
                         "start_time": start_time,
                         "duration": dur_int,
@@ -277,4 +170,4 @@ def run_fallback_pipeline():
 
 
 if __name__ == "__main__":
-    run_fallback_pipeline()
+    run_pipeline()
