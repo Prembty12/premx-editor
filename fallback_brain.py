@@ -125,7 +125,7 @@ def run_pipeline():
         )
         return
 
-    primary_model = os.environ.get("OPENROUTER_MODEL", "vidia/nemotron-3-nano-omni-30b-a3b-reasoning:free")
+    primary_model = os.environ.get("OPENROUTER_MODEL", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free")
     fallback_model = "openrouter/free"
     
     models_to_try = [primary_model]
