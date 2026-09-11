@@ -9,25 +9,25 @@
         "Ghost_price": 5,
         "VietnamCavePrison": 5,
         "MexicanBorderwar": 5,
-        "Russian_secret_missions": 5,
+        "Russian_secret_missions": 10,
         "mm2remastered": 5,
         "SpiderMan2": 5,
-        "RescueOperation": 10,
+        "RescueOperation": 5,
         " UkraineCovertMission": 5,
         "AfghanistanRedZone": 5,
         "DiabloIV": 5,
         "GODOFWAR3": 5,
-        "GodofWarLaufey ": 11,
-        "MarvelsSpiderMan2": 13
+        "GodofWarLaufey ": 9,
+        "MarvelsSpiderMan2": 11
     },
     "title_styles": {
         "curiosity": 19,
         "aggressive": 22,
-        "question": 16,
+        "question": 19,
         "emoji_heavy": 19
     },
-    "last_used_style": "emoji_heavy",
-    "last_played_game": "RescueOperation",
+    "last_used_style": "question",
+    "last_played_game": "Russian_secret_missions",
     "streak_game": "",
     "streak_count": 0,
     "winning_title_context": ""
