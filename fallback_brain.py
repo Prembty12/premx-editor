@@ -73,12 +73,19 @@ Return ONLY valid JSON format, no markdown wrapping."""
                         "error": f"OpenRouter API internal error: {res_json['error']}",
                     }
                 
+                # Extract the actual model used by OpenRouter from the response root
+                actual_model = res_json.get("model", model_name)
+                
                 choices = res_json.get("choices", [])
                 if choices:
                     msg = choices[0].get("message", {})
-                    raw_result = msg.get("content", "")
+                    raw_result = msg.get("content", "") or msg.get("reasoning", "")
                     if raw_result:
-                        return {"status": "success", "raw": str(raw_result)}
+                        return {
+                            "status": "success", 
+                            "raw": str(raw_result), 
+                            "actual_model": actual_model
+                        }
                 
                 return {
                     "status": "failed",
@@ -106,11 +113,9 @@ def run_pipeline():
     insights = os.environ.get("INSIGHTS_SUMMARY", "")
     style_prompt = os.environ.get("STYLE_PROMPT", "")
     
-    # Primary model (default: google/gemini-flash-1.5:free)
     primary_model = os.environ.get("OPENROUTER_MODEL", "vidia/nemotron-3-nano-omni-30b-a3b-reasoning:free")
     fallback_model = "openrouter/free"
     
-    # Models list for fallback mechanism
     models_to_try = [primary_model]
     if fallback_model not in models_to_try:
         models_to_try.append(fallback_model)
@@ -124,17 +129,16 @@ def run_pipeline():
     result = None
     used_model = primary_model
 
-    # Try models one by one
     for model in models_to_try:
         print(f"🔄 Calling OpenRouter API (Model: {model})...", file=sys.stderr)
         result = call_openrouter(grid_path, source_duration, insights, style_prompt, model)
         if result.get("status") == "success":
-            used_model = model
+            # Yeh line OpenRouter ke actual selected model ko capture kar legi
+            used_model = result.get("actual_model", model)
             break
         else:
             print(f"⚠️ Model {model} failed: {result.get('error')}. Trying fallback model...", file=sys.stderr)
 
-    # If all models fail
     if result.get("status") != "success":
         print(
             json.dumps(
@@ -146,7 +150,6 @@ def run_pipeline():
         )
         return
 
-    # Parse raw response safely with JSON + AST fallback
     try:
         raw_result = result.get("raw", "")
         if not isinstance(raw_result, str):
