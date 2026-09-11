@@ -53,7 +53,6 @@ Return ONLY valid JSON format, no markdown wrapping."""
         "temperature": 0.6,
     }
 
-    # Try each API key one by one
     last_error = ""
     for idx, api_key in enumerate(api_keys, 1):
         headers = {
@@ -80,17 +79,25 @@ Return ONLY valid JSON format, no markdown wrapping."""
                     if choices:
                         msg = choices[0].get("message", {})
                         raw_result = msg.get("content", "") or msg.get("reasoning", "")
+                        
+                        # --- STRICT JSON VALIDATION BEFORE ACCEPTING AS SUCCESS ---
                         if raw_result:
-                            return {
-                                "status": "success", 
-                                "raw": str(raw_result), 
-                                "actual_model": actual_model
-                            }
+                            parsed_data, parse_err = parse_json_safely(raw_result)
+                            if parsed_data:
+                                return {
+                                    "status": "success", 
+                                    "data": parsed_data, 
+                                    "actual_model": actual_model
+                                }
+                            else:
+                                last_error = f"API Key #{idx} output valid API response but invalid JSON content: {parse_err}"
+                                print(f"⚠️ {last_error}. Trying next key...", file=sys.stderr)
+                                continue
                     
                     last_error = f"API Key #{idx} 200 OK but missing 'choices'."
                     print(f"⚠️ {last_error} Trying next key...", file=sys.stderr)
                 except json.JSONDecodeError:
-                    last_error = f"API Key #{idx} invalid JSON response: {response.text[:100]}"
+                    last_error = f"API Key #{idx} invalid JSON HTTP response."
                     print(f"⚠️ {last_error} Trying next key...", file=sys.stderr)
             else:
                 last_error = f"API Key #{idx} Error {response.status_code}: {response.text[:100]}"
@@ -100,7 +107,40 @@ Return ONLY valid JSON format, no markdown wrapping."""
             last_error = f"API Key #{idx} Exception: {str(e)}"
             print(f"⚠️ {last_error} Trying next key...", file=sys.stderr)
 
-    return {"status": "failed", "error": f"All API keys failed. Last error: {last_error}"}
+    return {"status": "failed", "error": f"All API keys failed for model {model_name}. Last error: {last_error}"}
+
+
+def parse_json_safely(raw_result):
+    """ Helper function to extract and validate title, start_time, duration """
+    try:
+        cleaned = re.sub(r"```json", "", str(raw_result), flags=re.IGNORECASE)
+        cleaned = re.sub(r"```", "", cleaned).strip()
+
+        match = re.search(r"\{.*?\}", cleaned, re.DOTALL)
+        target_str = match.group(0) if match else cleaned
+
+        try:
+            data = json.loads(target_str)
+        except Exception:
+            data = ast.literal_eval(target_str)
+
+        if isinstance(data, dict):
+            title = data.get("title")
+            start_time = data.get("start_time")
+            duration = data.get("clip_duration", data.get("duration", 15))
+
+            if title and start_time:
+                dur_int = int(duration)
+                dur_int = max(12, min(45, dur_int))
+                return {
+                    "title": str(title),
+                    "start_time": str(start_time),
+                    "duration": dur_int
+                }, None
+
+        return None, "Missing required keys 'title' or 'start_time'"
+    except Exception as e:
+        return None, f"Parsing error: {str(e)}"
 
 
 def run_pipeline():
@@ -121,7 +161,7 @@ def run_pipeline():
 
     if not api_keys:
         print(
-            json.dumps({"status": "failed", "error": "No OpenRouter API keys found in environment variables (OPENROUTER_API_KEY to OPENROUTER_API_KEY_5)"})
+            json.dumps({"status": "failed", "error": "No OpenRouter API keys found in environment variables"})
         )
         return
 
@@ -138,84 +178,41 @@ def run_pipeline():
         )
         return
 
-    result = None
-    used_model = primary_net = primary_model
-
+    # Loop through Models -> If primary model fails or produces bad JSON, it seamlessly moves to fallback
     for model in models_to_try:
         print(f"🔄 Trying Model: {model} with available API keys...", file=sys.stderr)
         result = call_openrouter(grid_path, source_duration, insights, style_prompt, model, api_keys)
+        
         if result.get("status") == "success":
+            data = result.get("data", {})
             used_model = result.get("actual_model", model)
-            break
-        else:
-            print(f"⚠️ Model {model} completely failed across all keys: {result.get('error')}", file=sys.stderr)
-
-    if result.get("status") != "success":
-        print(
-            json.dumps(
-                {
-                    "status": "failed",
-                    "error": f"All models and API keys failed. Last error: {result.get('error')}",
-                }
-            )
-        )
-        return
-
-    try:
-        raw_result = result.get("raw", "")
-        if not isinstance(raw_result, str):
-            raw_result = str(raw_result)
-
-        cleaned = re.sub(r"```json", "", raw_result, flags=re.IGNORECASE)
-        cleaned = re.sub(r"```", "", cleaned).strip()
-
-        match = re.search(r"\{.*?\}", cleaned, re.DOTALL)
-        target_str = match.group(0) if match else cleaned
-
-        try:
-            data = json.loads(target_str)
-        except json.JSONDecodeError:
-            data = ast.literal_eval(target_str)
-
-        title = data.get("title")
-        start_time = data.get("start_time")
-        duration = data.get("clip_duration", data.get("duration", 15))
-
-        if title and start_time:
-            dur_int = int(duration)
-            if dur_int < 12:
-                dur_int = 12
-            elif dur_int > 45:
-                dur_int = 45
+            
+            # Print final successful response and exit script
             print(
                 json.dumps(
                     {
                         "status": "success",
                         "model": used_model,
-                        "title": title,
-                        "start_time": start_time,
-                        "duration": dur_int,
+                        "title": data["title"],
+                        "start_time": data["start_time"],
+                        "duration": data["duration"],
                     }
                 )
             )
+            return
         else:
-            print(
-                json.dumps(
-                    {
-                        "status": "failed",
-                        "error": "Missing title or start_time in JSON",
-                    }
-                )
-            )
+            print(f"⚠️ Model {model} completely failed across all keys: {result.get('error')}", file=sys.stderr)
 
-    except Exception as e:
-        print(
-            json.dumps(
-                {"status": "failed", "error": f"Parsing error: {str(e)}"}
-            )
+    # If all models failed
+    print(
+        json.dumps(
+            {
+                "status": "failed",
+                "error": "All models and API keys failed to generate valid JSON output.",
+            }
         )
+    )
 
 
 if __name__ == "__main__":
     run_pipeline()
-
