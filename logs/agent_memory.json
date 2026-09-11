@@ -1,6 +1,6 @@
 {
     "game_scores": {
-        "Ghost_soap_escap": 10,
+        "Ghost_soap_escap": 5,
         "ghostwork": 5,
         "Ghost Destroys Mexican": 5,
         "combatopration": 5,
@@ -15,17 +15,18 @@
         "RescueOperation": 5,
         " UkraineCovertMission": 5,
         "AfghanistanRedZone": 5,
-        "DiabloIV": 9,
-        "GODOFWAR3": 11
+        "DiabloIV": 7,
+        "GODOFWAR3": 9,
+        "GodofWarLaufey ": 15
     },
     "title_styles": {
-        "curiosity": 16,
+        "curiosity": 19,
         "aggressive": 19,
         "question": 16,
         "emoji_heavy": 16
     },
-    "last_used_style": "aggressive",
-    "last_played_game": "Ghost_soap_escap",
+    "last_used_style": "curiosity",
+    "last_played_game": "GodofWarLaufey ",
     "streak_game": "",
     "streak_count": 0,
     "winning_title_context": ""
