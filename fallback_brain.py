@@ -7,7 +7,7 @@ import sys
 import requests
 
 
-def call_openrouter(grid_path, source_duration, insights, style_prompt, model_name="google/gemini-flash-1.5:free"):
+def call_openrouter(grid_path, source_duration, insights, style_prompt, model_name="vidia/nemotron-3-nano-omni-30b-a3b-reasoning:free"):
     api_key = os.environ.get("OPENROUTER_API_KEY", "").strip()
     if not api_key:
         return {
@@ -107,7 +107,7 @@ def run_pipeline():
     style_prompt = os.environ.get("STYLE_PROMPT", "")
     
     # Primary model (default: google/gemini-flash-1.5:free)
-    primary_model = os.environ.get("OPENROUTER_MODEL", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free")
+    primary_model = os.environ.get("OPENROUTER_MODEL", "vidia/nemotron-3-nano-omni-30b-a3b-reasoning:free")
     fallback_model = "openrouter/free"
     
     # Models list for fallback mechanism
