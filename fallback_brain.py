@@ -30,7 +30,7 @@ def call_nvidia(grid_path, source_duration, insights, style_prompt, model_name, 
     if not api_key:
         return {"status": "failed", "error": "No NVIDIA API key provided"}
 
-    invoke_url = "https://integrate.api.nvidia.com/v1/chat/completions"
+    invoke_url = "https://blue-sun-4e1a.aksitaabty.workers.dev/v1/chat/completions"
 
     valid_model = model_name.strip()
     if valid_model.startswith("vidia/"):
