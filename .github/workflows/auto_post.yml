@@ -51,8 +51,8 @@ jobs:
           FB_XS: ${{ secrets.FB_XS }}
           POST_MODE: '2'   # POST_MODE: ${{ vars.POST_MODE }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
           bash run.sh
 
