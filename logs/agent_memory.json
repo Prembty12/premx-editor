@@ -12,22 +12,22 @@
         "Russian_secret_missions": 5,
         "mm2remastered": 5,
         "SpiderMan2": 5,
-        "RescueOperation": 5,
+        "RescueOperation": 10,
         " UkraineCovertMission": 5,
         "AfghanistanRedZone": 5,
         "DiabloIV": 5,
-        "GODOFWAR3": 7,
-        "GodofWarLaufey ": 13,
-        "MarvelsSpiderMan2": 15
+        "GODOFWAR3": 5,
+        "GodofWarLaufey ": 11,
+        "MarvelsSpiderMan2": 13
     },
     "title_styles": {
         "curiosity": 19,
         "aggressive": 22,
         "question": 16,
-        "emoji_heavy": 16
+        "emoji_heavy": 19
     },
-    "last_used_style": "aggressive",
-    "last_played_game": "MarvelsSpiderMan2",
+    "last_used_style": "emoji_heavy",
+    "last_played_game": "RescueOperation",
     "streak_game": "",
     "streak_count": 0,
     "winning_title_context": ""
