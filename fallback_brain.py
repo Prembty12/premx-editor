@@ -62,7 +62,8 @@ Return ONLY valid JSON format, no markdown wrapping."""
       if choices:
         msg = choices[0].get("message", {})
         raw_result = msg.get("content", "") or msg.get("reasoning", "")
-        return {"status": "success", "raw": raw_result}
+        if raw_result:
+          return {"status": "success", "raw": str(raw_result)}
     return {"status": "failed", "error": f"NVIDIA Error {response.status_code}: {response.text[:150]}"}
   except Exception as e:
     return {"status": "failed", "error": f"NVIDIA Exception: {str(e)}"}
@@ -123,7 +124,8 @@ Return ONLY valid JSON format, no markdown wrapping."""
       if choices:
         msg = choices[0].get("message", {})
         raw_result = msg.get("content", "")
-        return {"status": "success", "raw": raw_result}
+        if raw_result:
+          return {"status": "success", "raw": str(raw_result)}
     return {"status": "failed", "error": f"OpenRouter Error {response.status_code}: {response.text[:150]}"}
   except Exception as e:
     return {"status": "failed", "error": f"OpenRouter Exception: {str(e)}"}
@@ -139,23 +141,26 @@ def run_fallback_pipeline():
     print(json.dumps({"status": "failed", "error": "Grid image path not found"}))
     return
 
-  # 1. Pehle NVIDIA Try Karega
+  # 1. Try NVIDIA first
   print("🔄 Trying NVIDIA API first...", file=sys.stderr)
   result = call_nvidia(grid_path, source_duration, insights, style_prompt)
 
-  # 2. Agar NVIDIA fail hua, toh OpenRouter par switch ho jao
+  # 2. If NVIDIA fails, switch to OpenRouter
   if result.get("status") != "success":
     print(f"⚠️ NVIDIA failed: {result.get('error')}. Switching to OpenRouter free model...", file=sys.stderr)
     result = call_openrouter(grid_path, source_duration, insights, style_prompt)
 
-  # Agar dono fail ho gaye
+  # If both fail
   if result.get("status") != "success":
     print(json.dumps({"status": "failed", "error": f"Both APIs failed. Final error: {result.get('error')}"}))
     return
 
-  # Raw response ko parse karke final JSON banana
+  # Parse raw response safely
   try:
     raw_result = result.get("raw", "")
+    if not isinstance(raw_result, str):
+      raw_result = str(raw_result)
+
     cleaned = re.sub(r"```json", "", raw_result, flags=re.IGNORECASE)
     cleaned = re.sub(r"```", "", cleaned).strip()
 
