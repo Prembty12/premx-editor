@@ -7,12 +7,11 @@ import sys
 import requests
 
 
-def call_openrouter(grid_path, source_duration, insights, style_prompt, model_name="vidia/nemotron-3-nano-omni-30b-a3b-reasoning:free"):
-    api_key = os.environ.get("OPENROUTER_API_KEY", "").strip()
-    if not api_key:
+def call_openrouter(grid_path, source_duration, insights, style_prompt, model_name, api_keys):
+    if not api_keys:
         return {
             "status": "failed",
-            "error": "OPENROUTER_API_KEY environment variable missing",
+            "error": "No OpenRouter API keys provided",
         }
 
     invoke_url = "https://openrouter.ai/api/v1/chat/completions"
@@ -22,11 +21,6 @@ def call_openrouter(grid_path, source_duration, insights, style_prompt, model_na
             base64_image = base64.b64encode(f.read()).decode("utf-8")
     except Exception as e:
         return {"status": "failed", "error": f"OpenRouter base64 error: {str(e)}"}
-
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json",
-    }
 
     prompt_text = f"""Analyze the provided 9:16 gaming screenshot grid. Total video source duration is {source_duration} seconds.
 Insights Context: {insights}
@@ -59,50 +53,54 @@ Return ONLY valid JSON format, no markdown wrapping."""
         "temperature": 0.6,
     }
 
-    try:
-        response = requests.post(
-            invoke_url, headers=headers, json=payload, timeout=45
-        )
-        
-        if response.status_code == 200:
-            try:
-                res_json = response.json()
-                if "error" in res_json:
-                    return {
-                        "status": "failed",
-                        "error": f"OpenRouter API internal error: {res_json['error']}",
-                    }
-                
-                # Extract the actual model used by OpenRouter from the response root
-                actual_model = res_json.get("model", model_name)
-                
-                choices = res_json.get("choices", [])
-                if choices:
-                    msg = choices[0].get("message", {})
-                    raw_result = msg.get("content", "") or msg.get("reasoning", "")
-                    if raw_result:
-                        return {
-                            "status": "success", 
-                            "raw": str(raw_result), 
-                            "actual_model": actual_model
-                        }
-                
-                return {
-                    "status": "failed",
-                    "error": f"OpenRouter 200 OK but missing 'choices'. Full response: {response.text}",
-                }
-            except json.JSONDecodeError:
-                return {
-                    "status": "failed",
-                    "error": f"OpenRouter invalid JSON response: {response.text}",
-                }
-                
-        return {
-            "status": "failed",
-            "error": f"OpenRouter Error {response.status_code}: {response.text}",
+    # Try each API key one by one
+    last_error = ""
+    for idx, api_key in enumerate(api_keys, 1):
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
         }
-    except Exception as e:
-        return {"status": "failed", "error": f"OpenRouter Exception: {str(e)}"}
+        
+        try:
+            print(f"🔑 Trying API Key #{idx} with model {model_name}...", file=sys.stderr)
+            response = requests.post(
+                invoke_url, headers=headers, json=payload, timeout=45
+            )
+            
+            if response.status_code == 200:
+                try:
+                    res_json = response.json()
+                    if "error" in res_json:
+                        last_error = f"API Key #{idx} internal error: {res_json['error']}"
+                        print(f"⚠️ {last_error}. Trying next key...", file=sys.stderr)
+                        continue
+                    
+                    actual_model = res_json.get("model", model_name)
+                    choices = res_json.get("choices", [])
+                    if choices:
+                        msg = choices[0].get("message", {})
+                        raw_result = msg.get("content", "") or msg.get("reasoning", "")
+                        if raw_result:
+                            return {
+                                "status": "success", 
+                                "raw": str(raw_result), 
+                                "actual_model": actual_model
+                            }
+                    
+                    last_error = f"API Key #{idx} 200 OK but missing 'choices'."
+                    print(f"⚠️ {last_error} Trying next key...", file=sys.stderr)
+                except json.JSONDecodeError:
+                    last_error = f"API Key #{idx} invalid JSON response: {response.text[:100]}"
+                    print(f"⚠️ {last_error} Trying next key...", file=sys.stderr)
+            else:
+                last_error = f"API Key #{idx} Error {response.status_code}: {response.text[:100]}"
+                print(f"⚠️ {last_error} Trying next key...", file=sys.stderr)
+                
+        except Exception as e:
+            last_error = f"API Key #{idx} Exception: {str(e)}"
+            print(f"⚠️ {last_error} Trying next key...", file=sys.stderr)
+
+    return {"status": "failed", "error": f"All API keys failed. Last error: {last_error}"}
 
 
 def run_pipeline():
@@ -113,7 +111,21 @@ def run_pipeline():
     insights = os.environ.get("INSIGHTS_SUMMARY", "")
     style_prompt = os.environ.get("STYLE_PROMPT", "")
     
-    primary_model = os.environ.get("OPENROUTER_MODEL", "vidia/nemotron-3-nano-omni-30b-a3b-reasoning:free")
+    # Collect up to 5 API keys from environment variables
+    api_keys = []
+    for i in range(1, 6):
+        key_env_name = "OPENROUTER_API_KEY" if i == 1 else f"OPENROUTER_API_KEY_{i}"
+        key_val = os.environ.get(key_env_name, "").strip()
+        if key_val and key_val not in api_keys:
+            api_keys.append(key_val)
+
+    if not api_keys:
+        print(
+            json.dumps({"status": "failed", "error": "No OpenRouter API keys found in environment variables (OPENROUTER_API_KEY to OPENROUTER_API_KEY_5)"})
+        )
+        return
+
+    primary_model = os.environ.get("OPENROUTER_MODEL", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free")
     fallback_model = "openrouter/free"
     
     models_to_try = [primary_model]
@@ -127,24 +139,23 @@ def run_pipeline():
         return
 
     result = None
-    used_model = primary_model
+    used_model = primary_net = primary_model
 
     for model in models_to_try:
-        print(f"🔄 Calling OpenRouter API (Model: {model})...", file=sys.stderr)
-        result = call_openrouter(grid_path, source_duration, insights, style_prompt, model)
+        print(f"🔄 Trying Model: {model} with available API keys...", file=sys.stderr)
+        result = call_openrouter(grid_path, source_duration, insights, style_prompt, model, api_keys)
         if result.get("status") == "success":
-            # Yeh line OpenRouter ke actual selected model ko capture kar legi
             used_model = result.get("actual_model", model)
             break
         else:
-            print(f"⚠️ Model {model} failed: {result.get('error')}. Trying fallback model...", file=sys.stderr)
+            print(f"⚠️ Model {model} completely failed across all keys: {result.get('error')}", file=sys.stderr)
 
     if result.get("status") != "success":
         print(
             json.dumps(
                 {
                     "status": "failed",
-                    "error": f"All OpenRouter models failed. Last error: {result.get('error')}",
+                    "error": f"All models and API keys failed. Last error: {result.get('error')}",
                 }
             )
         )
