@@ -1,4 +1,3 @@
-AfghanistanRedZone1 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.101/AfghanistanRedZone1.mp4
 AfghanistanRedZone2 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.101/AfghanistanRedZone2.mp4
 AfghanistanRedZone3 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.101/AfghanistanRedZone3.mp4
 AfghanistanRedZone4 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.101/AfghanistanRedZone4.mp4
@@ -7,3 +6,4 @@ AfghanistanRedZone6 | Link: https://github.com/Prembty12/premx-editor/releases/d
 AfghanistanRedZone7 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.101/AfghanistanRedZone7.mp4
 AfghanistanRedZone8 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.101/AfghanistanRedZone8.mp4
 AfghanistanRedZone9 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.101/AfghanistanRedZone9.mp4
+

@@ -13,16 +13,17 @@
         "mm2remastered": 5,
         "SpiderMan2": 5,
         "RescueOperation": 5,
-        " UkraineCovertMission": 15
+        " UkraineCovertMission": 13,
+        "AfghanistanRedZone": 15
     },
     "title_styles": {
         "curiosity": 10,
         "aggressive": 13,
         "question": 16,
-        "emoji_heavy": 10
+        "emoji_heavy": 13
     },
-    "last_used_style": "aggressive",
-    "last_played_game": " UkraineCovertMission",
+    "last_used_style": "emoji_heavy",
+    "last_played_game": "AfghanistanRedZone",
     "streak_game": "",
     "streak_count": 0,
     "winning_title_context": ""
