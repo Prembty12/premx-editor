@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# 🚀 OPENROUTER BASH AGENT (PRODUCTION READY - FULLY FIXED)
+# 🚀 OPENROUTER BASH AGENT (BULLETPROOF PARSER & FAILSAFE REGEX)
 # ==============================================================================
 
 GRID_PATH="${GRID_PATH:-temp_frames/merged_60_grid_screenshot.jpg}"
@@ -118,7 +118,7 @@ if [ -z "$RAW_RESPONSE" ]; then
     exit 1
 fi
 
-# 3. 🧹 Robust Regex JSON Parser (Filters Out Reasoning Text)
+# 3. 🧹 Robust JSON Parser (Fixes Unterminated String Literals & Broken JSON)
 RAW_RESPONSE="$RAW_RESPONSE" REQUESTED_MODEL="$SUCCESS_REQUESTED_MODEL" ROUTED_MODEL="$SUCCESS_ROUTED_MODEL" python3 - << 'EOF'
 import os, json, re, ast
 
@@ -126,26 +126,48 @@ raw = os.environ.get('RAW_RESPONSE', '')
 req_m = os.environ.get('REQUESTED_MODEL', '')
 rout_m = os.environ.get('ROUTED_MODEL', '')
 
+# Remove markdown syntax
 cleaned = re.sub(r'```json', '', raw, flags=re.IGNORECASE)
 cleaned = re.sub(r'```', '', cleaned).strip()
 
 # Extract JSON object ignoring any preamble/reasoning text
 match = re.search(r'\{.*\}', cleaned, re.DOTALL)
 target = match.group(0) if match else cleaned
+
+# Fix unescaped newlines inside strings and trailing commas
+target = re.sub(r'(?<!\\)\n', ' ', target)
 target = re.sub(r',\s*([\}\]])', r'\1', target)
 
+data = None
 try:
+    data = json.loads(target)
+except Exception:
     try:
-        data = json.loads(target)
-    except:
         data = ast.literal_eval(target)
+    except Exception:
+        # Emergency Regex Extraction if string syntax is broken
+        title_m = re.search(r'"title"\s*:\s*"(.*?)"', target)
+        start_m = re.search(r'"start_time"\s*:\s*"(.*?)"', target)
+        dur_m = re.search(r'"clip_duration"\s*:\s*(\d+)', target) or re.search(r'"duration"\s*:\s*(\d+)', target)
+        
+        if title_m and start_m:
+            data = {
+                "title": title_m.group(1),
+                "start_time": start_m.group(1),
+                "clip_duration": int(dur_m.group(1)) if dur_m else 15
+            }
 
+if data and isinstance(data, dict):
     title = data.get('title')
     start_time = data.get('start_time')
     duration = data.get('clip_duration', data.get('duration', 15))
 
     if title and start_time:
-        dur_int = max(12, min(45, int(duration)))
+        try:
+            dur_int = max(12, min(45, int(duration)))
+        except:
+            dur_int = 15
+
         print(json.dumps({
             "status": "success",
             "requested_model": req_m,
@@ -156,6 +178,6 @@ try:
         }))
     else:
         print(json.dumps({"status": "failed", "error": "Missing JSON keys"}))
-except Exception as e:
-    print(json.dumps({"status": "failed", "error": f"Parse error: {str(e)}"}))
+else:
+    print(json.dumps({"status": "failed", "error": "Unrepairable JSON response"}))
 EOF
