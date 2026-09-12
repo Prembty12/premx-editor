@@ -4,11 +4,12 @@ import json
 import os
 import re
 import sys
+import time
 import requests
 
+session = requests.Session()
 
 def parse_json_safely(raw_result):
-    """Cleans raw AI response and parses valid JSON"""
     try:
         cleaned = re.sub(r"```json", "", str(raw_result), flags=re.IGNORECASE)
         cleaned = re.sub(r"```", "", cleaned).strip()
@@ -16,7 +17,6 @@ def parse_json_safely(raw_result):
         match = re.search(r"\{.*?\}", cleaned, re.DOTALL)
         target_str = match.group(0) if match else cleaned
 
-        # Fix leading zeros in numbers (e.g., 020 -> 20)
         target_str = re.sub(r"(?<=\s|:)\b0+(?=[1-9]\d*)\b", "", target_str)
 
         try:
@@ -50,16 +50,18 @@ def call_openrouter(
     style_prompt,
     model_name,
     api_keys,
-    timeout_sec=10,
+    timeout_sec=6,
 ):
     if not api_keys:
         return {"status": "failed", "error": "No OpenRouter API keys provided"}
 
     invoke_url = "https://openrouter.ai/api/v1/chat/completions"
 
+    t_base64_start = time.time()
     try:
         with open(grid_path, "rb") as f:
             base64_image = base64.b64encode(f.read()).decode("utf-8")
+        print(f"⏱️ [Timer] Base64 Encoding: {round(time.time() - t_base64_start, 2)}s", file=sys.stderr)
     except Exception as e:
         return {"status": "failed", "error": f"Base64 encoding error: {str(e)}"}
 
@@ -90,11 +92,13 @@ Return ONLY valid JSON format, no markdown wrapping."""
                 ],
             }
         ],
-        "max_tokens": 512,
-        "temperature": 0.5,
+        "max_tokens": 256,
+        "temperature": 0.3,
     }
 
     last_error = ""
+
+    # Yahan AAPKI SAARI 5 KEYS ITERATE HONGI
     for idx, api_key in enumerate(api_keys, 1):
         headers = {
             "Authorization": f"Bearer {api_key}",
@@ -103,30 +107,30 @@ Return ONLY valid JSON format, no markdown wrapping."""
 
         try:
             print(
-                f"🔑 Trying API Key #{idx} with model {model_name} (Max {timeout_sec}s)...",
+                f"🔑 Trying API Key #{idx} of {len(api_keys)} with model {model_name} (Max {timeout_sec}s)...",
                 file=sys.stderr,
             )
-            # STRICT HARD TIMEOUT AT 10 SECONDS
-            response = requests.post(
-                invoke_url, headers=headers, json=payload, timeout=timeout_sec
+            req_start_time = time.time()
+            
+            response = session.post(
+                invoke_url, headers=headers, json=payload, timeout=(3, timeout_sec)
             )
+
+            req_elapsed = round(time.time() - req_start_time, 2)
+            print(f"⏱️ [Timer] Key #{idx} Request took: {req_elapsed}s", file=sys.stderr)
 
             if response.status_code == 200:
                 res_json = response.json()
                 if "error" in res_json:
                     last_error = f"API Key #{idx} internal error: {res_json['error']}"
-                    print(
-                        f"⚠️ {last_error}. Trying next key...", file=sys.stderr
-                    )
+                    print(f"⚠️ {last_error}. Trying next key...", file=sys.stderr)
                     continue
 
                 actual_model = res_json.get("model", model_name)
                 choices = res_json.get("choices", [])
                 if choices:
                     msg = choices[0].get("message", {})
-                    raw_result = msg.get("content", "") or msg.get(
-                        "reasoning", ""
-                    )
+                    raw_result = msg.get("content", "") or msg.get("reasoning", "")
 
                     if raw_result:
                         parsed_data, parse_err = parse_json_safely(raw_result)
@@ -137,24 +141,17 @@ Return ONLY valid JSON format, no markdown wrapping."""
                                 "actual_model": actual_model,
                             }
                         else:
-                            last_error = f"API Key #{idx} valid response but invalid JSON content: {parse_err}"
-                            print(
-                                f"⚠️ {last_error}. Trying next key...",
-                                file=sys.stderr,
-                            )
+                            last_error = f"API Key #{idx} invalid JSON: {parse_err}"
+                            print(f"⚠️ {last_error}. Trying next key...", file=sys.stderr)
                             continue
-                else:
-                    last_error = f"API Key #{idx} 200 OK but missing 'choices'."
-                    print(
-                        f"⚠️ {last_error}. Trying next key...", file=sys.stderr
-                    )
             else:
-                last_error = f"API Key #{idx} Error {response.status_code}: {response.text[:100]}"
+                last_error = f"API Key #{idx} Error {response.status_code}"
                 print(f"⚠️ {last_error}. Trying next key...", file=sys.stderr)
 
         except requests.exceptions.Timeout:
-            last_error = f"API Key #{idx} timed out after {timeout_sec} seconds"
-            print(f"⏱️ {last_error}. Trying next key...", file=sys.stderr)
+            req_elapsed = round(time.time() - req_start_time, 2)
+            last_error = f"API Key #{idx} timed out after {req_elapsed}s"
+            print(f"⏱️ {last_error}. Skipping to next key...", file=sys.stderr)
         except Exception as e:
             last_error = f"API Key #{idx} Exception: {str(e)}"
             print(f"⚠️ {last_error}. Trying next key...", file=sys.stderr)
@@ -166,6 +163,8 @@ Return ONLY valid JSON format, no markdown wrapping."""
 
 
 def run_pipeline():
+    total_start_time = time.time()
+
     grid_path = os.environ.get(
         "GRID_PATH", "temp_frames/merged_60_grid_screenshot.jpg"
     )
@@ -175,53 +174,41 @@ def run_pipeline():
 
     api_keys = []
     for i in range(1, 6):
-        key_env_name = (
-            "OPENROUTER_API_KEY" if i == 1 else f"OPENROUTER_API_KEY_{i}"
-        )
+        key_env_name = "OPENROUTER_API_KEY" if i == 1 else f"OPENROUTER_API_KEY_{i}"
         key_val = os.environ.get(key_env_name, "").strip()
         if key_val and key_val not in api_keys:
             api_keys.append(key_val)
 
     if not api_keys:
-        print(
-            json.dumps(
-                {"status": "failed", "error": "No OpenRouter API keys found"}
-            )
-        )
+        print(json.dumps({"status": "failed", "error": "No OpenRouter API keys found"}))
         return
 
-    # EXACT MODEL ID FIX WITH .strip()
     primary_model = os.environ.get(
         "OPENROUTER_MODEL",
-        "vidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+        "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
     ).strip()
     fallback_model = "openrouter/free"
 
     if not os.path.exists(grid_path):
-        print(
-            json.dumps(
-                {"status": "failed", "error": "Grid image path not found"}
-            )
-        )
+        print(json.dumps({"status": "failed", "error": "Grid image path not found"}))
         return
 
-    # STEP 1: Primary Model (1 Try | Strict 10s Limit)
-    print(
-        f"🔄 Primary Model Check: {primary_model} (1 Try | 10s Limit)...",
-        file=sys.stderr,
-    )
+    # STEP 1: Primary Model (Saari Keys Try Karega Agar Fail Hua)
+    print(f"🔄 Primary Check: {primary_model} (6s Limit per key)...", file=sys.stderr)
     result = call_openrouter(
         grid_path,
         source_duration,
         insights,
         style_prompt,
         primary_model,
-        api_keys[:1],
-        timeout_sec=10,
+        api_keys,
+        timeout_sec=6,
     )
 
     if result.get("status") == "success":
         data = result.get("data", {})
+        total_elapsed = round(time.time() - total_start_time, 2)
+        print(f"⏱️ [Timer] TOTAL PIPELINE EXECUTION TIME: {total_elapsed}s", file=sys.stderr)
         print(
             json.dumps({
                 "status": "success",
@@ -229,13 +216,13 @@ def run_pipeline():
                 "title": data["title"],
                 "start_time": data["start_time"],
                 "duration": data["duration"],
+                "execution_time_seconds": total_elapsed
             })
         )
         return
 
-    # STEP 2: Instant Fallback to openrouter/free (10s Limit per Key)
-    print(f"⚠️ Primary failed: {result.get('error')}", file=sys.stderr)
-    print(f"🔄 Instant Switch -> Fallback: {fallback_model}", file=sys.stderr)
+    # STEP 2: Fallback Model (Saari Keys Try Karega Agar Fail Hua)
+    print(f"⚠️ Primary failed. 🔄 Switch -> Fallback: {fallback_model}", file=sys.stderr)
 
     fallback_result = call_openrouter(
         grid_path,
@@ -244,8 +231,11 @@ def run_pipeline():
         style_prompt,
         fallback_model,
         api_keys,
-        timeout_sec=10,
+        timeout_sec=6,
     )
+
+    total_elapsed = round(time.time() - total_start_time, 2)
+    print(f"⏱️ [Timer] TOTAL PIPELINE EXECUTION TIME: {total_elapsed}s", file=sys.stderr)
 
     if fallback_result.get("status") == "success":
         data = fallback_result.get("data", {})
@@ -256,6 +246,7 @@ def run_pipeline():
                 "title": data["title"],
                 "start_time": data["start_time"],
                 "duration": data["duration"],
+                "execution_time_seconds": total_elapsed
             })
         )
         return
@@ -263,10 +254,8 @@ def run_pipeline():
     print(
         json.dumps({
             "status": "failed",
-            "error": (
-                "Both primary and fallback failed. Last error:"
-                f" {fallback_result.get('error')}"
-            ),
+            "error": f"Both primary and fallback failed. Last error: {fallback_result.get('error')}",
+            "execution_time_seconds": total_elapsed
         })
     )
 
