@@ -3,16 +3,25 @@ import base64
 import json
 import os
 import re
+import socket
 import sys
 import time
 from datetime import datetime
 import requests
 
+# FORCE UNBUFFERED LOGGING FOR GITHUB ACTIONS (INSTANT TERMINAL PRINTS)
+sys.stdout.reconfigure(line_buffering=True)
+sys.stderr.reconfigure(line_buffering=True)
+
+# FORCE GLOBAL SOCKET TIMEOUT TO PREVENT TCP HANGS
+socket.setdefaulttimeout(6)
+
 session = requests.Session()
 
+
 def get_current_time():
-    """Returns formatted current time string for terminal logs"""
     return datetime.now().strftime("%H:%M:%S")
+
 
 def parse_json_safely(raw_result):
     try:
@@ -66,7 +75,12 @@ def call_openrouter(
     try:
         with open(grid_path, "rb") as f:
             base64_image = base64.b64encode(f.read()).decode("utf-8")
-        print(f"⏱️ [{get_current_time()}] Base64 Encoding: {round(time.time() - t_base64_start, 2)}s", file=sys.stderr)
+        print(
+            f"⏱️ [{get_current_time()}] Base64 Encoding:"
+            f" {round(time.time() - t_base64_start, 2)}s",
+            file=sys.stderr,
+            flush=True,
+        )
     except Exception as e:
         return {"status": "failed", "error": f"Base64 encoding error: {str(e)}"}
 
@@ -111,30 +125,50 @@ Return ONLY valid JSON format, no markdown wrapping."""
 
         try:
             print(
-                f"🔑 [{get_current_time()}] Trying API Key #{idx} of {len(api_keys)} with model {model_name} (Max {timeout_sec}s)...",
+                f"🔑 [{get_current_time()}] Trying API Key #{idx} of"
+                f" {len(api_keys)} with model {model_name} (Max"
+                f" {timeout_sec}s)...",
                 file=sys.stderr,
+                flush=True,
             )
             req_start_time = time.time()
-            
+
             response = session.post(
-                invoke_url, headers=headers, json=payload, timeout=(3, timeout_sec)
+                invoke_url,
+                headers=headers,
+                json=payload,
+                timeout=(3, timeout_sec),
             )
 
             req_elapsed = round(time.time() - req_start_time, 2)
-            print(f"⏱️ [{get_current_time()}] Key #{idx} Request took: {req_elapsed}s", file=sys.stderr)
+            print(
+                f"⏱️ [{get_current_time()}] Key #{idx} Request took:"
+                f" {req_elapsed}s",
+                file=sys.stderr,
+                flush=True,
+            )
 
             if response.status_code == 200:
                 res_json = response.json()
                 if "error" in res_json:
-                    last_error = f"API Key #{idx} internal error: {res_json['error']}"
-                    print(f"⚠️ [{get_current_time()}] {last_error}. Trying next key...", file=sys.stderr)
+                    last_error = (
+                        f"API Key #{idx} internal error: {res_json['error']}"
+                    )
+                    print(
+                        f"⚠️ [{get_current_time()}] {last_error}. Trying next"
+                        " key...",
+                        file=sys.stderr,
+                        flush=True,
+                    )
                     continue
 
                 actual_model = res_json.get("model", model_name)
                 choices = res_json.get("choices", [])
                 if choices:
                     msg = choices[0].get("message", {})
-                    raw_result = msg.get("content", "") or msg.get("reasoning", "")
+                    raw_result = msg.get("content", "") or msg.get(
+                        "reasoning", ""
+                    )
 
                     if raw_result:
                         parsed_data, parse_err = parse_json_safely(raw_result)
@@ -145,20 +179,41 @@ Return ONLY valid JSON format, no markdown wrapping."""
                                 "actual_model": actual_model,
                             }
                         else:
-                            last_error = f"API Key #{idx} invalid JSON: {parse_err}"
-                            print(f"⚠️ [{get_current_time()}] {last_error}. Trying next key...", file=sys.stderr)
+                            last_error = (
+                                f"API Key #{idx} invalid JSON: {parse_err}"
+                            )
+                            print(
+                                f"⚠️ [{get_current_time()}] {last_error}."
+                                " Trying next key...",
+                                file=sys.stderr,
+                                flush=True,
+                            )
                             continue
             else:
                 last_error = f"API Key #{idx} Error {response.status_code}"
-                print(f"⚠️ [{get_current_time()}] {last_error}. Trying next key...", file=sys.stderr)
+                print(
+                    f"⚠️ [{get_current_time()}] {last_error}. Trying next"
+                    " key...",
+                    file=sys.stderr,
+                    flush=True,
+                )
 
         except requests.exceptions.Timeout:
             req_elapsed = round(time.time() - req_start_time, 2)
             last_error = f"API Key #{idx} timed out after {req_elapsed}s"
-            print(f"⏱️ [{get_current_time()}] {last_error}. Skipping to next key...", file=sys.stderr)
+            print(
+                f"⏱️ [{get_current_time()}] {last_error}. Skipping to next"
+                " key...",
+                file=sys.stderr,
+                flush=True,
+            )
         except Exception as e:
             last_error = f"API Key #{idx} Exception: {str(e)}"
-            print(f"⚠️ [{get_current_time()}] {last_error}. Trying next key...", file=sys.stderr)
+            print(
+                f"⚠️ [{get_current_time()}] {last_error}. Trying next key...",
+                file=sys.stderr,
+                flush=True,
+            )
 
     return {
         "status": "failed",
@@ -178,13 +233,19 @@ def run_pipeline():
 
     api_keys = []
     for i in range(1, 6):
-        key_env_name = "OPENROUTER_API_KEY" if i == 1 else f"OPENROUTER_API_KEY_{i}"
+        key_env_name = (
+            "OPENROUTER_API_KEY" if i == 1 else f"OPENROUTER_API_KEY_{i}"
+        )
         key_val = os.environ.get(key_env_name, "").strip()
         if key_val and key_val not in api_keys:
             api_keys.append(key_val)
 
     if not api_keys:
-        print(json.dumps({"status": "failed", "error": "No OpenRouter API keys found"}))
+        print(
+            json.dumps(
+                {"status": "failed", "error": "No OpenRouter API keys found"}
+            )
+        )
         return
 
     primary_model = os.environ.get(
@@ -194,11 +255,19 @@ def run_pipeline():
     fallback_model = "openrouter/free"
 
     if not os.path.exists(grid_path):
-        print(json.dumps({"status": "failed", "error": "Grid image path not found"}))
+        print(
+            json.dumps(
+                {"status": "failed", "error": "Grid image path not found"}
+            )
+        )
         return
 
-    # STEP 1: Primary Model
-    print(f"🔄 [{get_current_time()}] Primary Check: {primary_model} (6s Limit per key)...", file=sys.stderr)
+    print(
+        f"🔄 [{get_current_time()}] Primary Check: {primary_model} (6s Limit per"
+        " key)...",
+        file=sys.stderr,
+        flush=True,
+    )
     result = call_openrouter(
         grid_path,
         source_duration,
@@ -212,7 +281,12 @@ def run_pipeline():
     if result.get("status") == "success":
         data = result.get("data", {})
         total_elapsed = round(time.time() - total_start_time, 2)
-        print(f"⏱️ [{get_current_time()}] TOTAL PIPELINE EXECUTION TIME: {total_elapsed}s", file=sys.stderr)
+        print(
+            f"⏱️ [{get_current_time()}] TOTAL PIPELINE EXECUTION TIME:"
+            f" {total_elapsed}s",
+            file=sys.stderr,
+            flush=True,
+        )
         print(
             json.dumps({
                 "status": "success",
@@ -220,13 +294,17 @@ def run_pipeline():
                 "title": data["title"],
                 "start_time": data["start_time"],
                 "duration": data["duration"],
-                "execution_time_seconds": total_elapsed
+                "execution_time_seconds": total_elapsed,
             })
         )
         return
 
-    # STEP 2: Fallback Model
-    print(f"⚠️ [{get_current_time()}] Primary failed. 🔄 Switch -> Fallback: {fallback_model}", file=sys.stderr)
+    print(
+        f"⚠️ [{get_current_time()}] Primary failed. 🔄 Switch -> Fallback:"
+        f" {fallback_model}",
+        file=sys.stderr,
+        flush=True,
+    )
 
     fallback_result = call_openrouter(
         grid_path,
@@ -239,7 +317,12 @@ def run_pipeline():
     )
 
     total_elapsed = round(time.time() - total_start_time, 2)
-    print(f"⏱️ [{get_current_time()}] TOTAL PIPELINE EXECUTION TIME: {total_elapsed}s", file=sys.stderr)
+    print(
+        f"⏱️ [{get_current_time()}] TOTAL PIPELINE EXECUTION TIME:"
+        f" {total_elapsed}s",
+        file=sys.stderr,
+        flush=True,
+    )
 
     if fallback_result.get("status") == "success":
         data = fallback_result.get("data", {})
@@ -250,7 +333,7 @@ def run_pipeline():
                 "title": data["title"],
                 "start_time": data["start_time"],
                 "duration": data["duration"],
-                "execution_time_seconds": total_elapsed
+                "execution_time_seconds": total_elapsed,
             })
         )
         return
@@ -258,8 +341,11 @@ def run_pipeline():
     print(
         json.dumps({
             "status": "failed",
-            "error": f"Both primary and fallback failed. Last error: {fallback_result.get('error')}",
-            "execution_time_seconds": total_elapsed
+            "error": (
+                "Both primary and fallback failed. Last error:"
+                f" {fallback_result.get('error')}"
+            ),
+            "execution_time_seconds": total_elapsed,
         })
     )
 
