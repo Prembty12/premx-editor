@@ -1,186 +1,70 @@
-#!/bin/bash
-# ==============================================================================
-# 🚀 OPENROUTER BASH AGENT (FIXED ARRAY INITIALIZATION & BULLETPROOF PARSER)
-# ==============================================================================
+name: Autonomous Gaming Agent Workflow
 
-GRID_PATH="${GRID_PATH:-temp_frames/merged_60_grid_screenshot.jpg}"
-SOURCE_DURATION="${SOURCE_DURATION:-60}"
-INSIGHTS_SUMMARY="${INSIGHTS_SUMMARY:-}"
-STYLE_PROMPT="${STYLE_PROMPT:-}"
-PRIMARY_MODEL="${OPENROUTER_MODEL:-google/gemini-flash-1.5:free}"
-FALLBACK_MODEL="openrouter/free"
+on:
+  schedule:
+    # Har 3 ghante mein automatic run hoga (Cron expression)
+    - cron: '0 */12 * * *'
+  workflow_dispatch:
+    # Tu ise GitHub dashboard se manually bhi run kar sakta hai
 
-# 1. 🔑 Collect OpenRouter Keys Safely
-declare -a KEYS=()
-[ -n "$OPENROUTER_API_KEY" ] && KEYS+=("$OPENROUTER_API_KEY")
-[ -n "$OPENROUTER_API_KEY_2" ] && KEYS+=("$OPENROUTER_API_KEY_2")
-[ -n "$OPENROUTER_API_KEY_3" ] && KEYS+=("$OPENROUTER_API_KEY_3")
-[ -n "$OPENROUTER_API_KEY_4" ] && KEYS+=("$OPENROUTER_API_KEY_4")
-[ -n "$OPENROUTER_API_KEY_5" ] && KEYS+=("$OPENROUTER_API_KEY_5")
+permissions:
+  contents: write
 
-if [ ${#KEYS[@]} -eq 0 ]; then
-    echo '{"status": "failed", "error": "No OpenRouter API keys found"}'
-    exit 1
-fi
+jobs:
+  run-gaming-agent:
+  
+    runs-on: ubuntu-latest
 
-if [ ! -f "$GRID_PATH" ]; then
-    echo "{\"status\": \"failed\", \"error\": \"Grid image not found at $GRID_PATH\"}"
-    exit 1
-fi
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-get_random_openrouter_key() {
-    local idx=$((RANDOM % ${#KEYS[@]}))
-    echo "${KEYS[$idx]}"
-}
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
 
-PROMPT_TEXT="Analyze the provided 9:16 gaming screenshot grid. Total video source duration is ${SOURCE_DURATION} seconds.
-Insights Context: ${INSIGHTS_SUMMARY}
-Style Directive: ${STYLE_PROMPT}
+      - name: Install System Dependencies (FFmpeg & Build Tools)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg jq curl
 
-Your primary job as an expert video editor is to find the most thrilling, high-action segment, skipping dull introductions.
-Return a JSON object with EXACTLY three keys:
-1. 'title' (string: viral title with 1-3 emojis)
-2. 'start_time' (string format HH:MM:SS indicating exact peak action start time based on grid timestamps)
-3. 'clip_duration' (integer: length between 12 and 45 seconds meeting monetization rules)
-Return ONLY valid JSON format, no markdown wrapping."
+      - name: Install Python Packages
+        run: |
+          pip install --upgrade pip
+          pip install requests Pillow
 
-RAW_RESPONSE=""
-SUCCESS_REQUESTED_MODEL=""
-SUCCESS_ROUTED_MODEL=""
-MAX_RETRIES=4
+      - name: Make Shell Scripts Executable
+        run: |
+          chmod +x run.sh loop.sh
 
-# 2. 🔄 Attempt Loop with 45s Timeout
-for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
-    CURRENT_KEY=$(get_random_openrouter_key)
-    KEY_DISPLAY="${CURRENT_KEY:0:8}..."
-    
-    CURRENT_MODEL="$PRIMARY_MODEL"
-    [ $attempt -gt 2 ] && CURRENT_MODEL="$FALLBACK_MODEL"
-    
-    echo "🤖 [$(date +%H:%M:%S)] OpenRouter Bash Attempt $attempt/$MAX_RETRIES | Model: $CURRENT_MODEL | Key: $KEY_DISPLAY" >&2
-    
-    PAYLOAD_FILE="temp_frames/or_payload.json"
-    mkdir -p temp_frames
-    
-    export GRID_PATH CURRENT_MODEL PROMPT_TEXT PAYLOAD_FILE
-    python3 - << 'EOF'
-import os, json, base64
+      - name: Run Master Pipeline
+        env:
+          GEMINI_API_KEY_1: ${{ secrets.GEMINI_API_KEY_1 }}
+          GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}
+          GEMINI_API_KEY_3: ${{ secrets.GEMINI_API_KEY_3 }}
+          PAGE_ACCESS_TOKEN: ${{ secrets.PAGE_ACCESS_TOKEN }}
+          PAGE_ID: ${{ secrets.PAGE_ID }}
+          IG_ID: ${{ secrets.IG_ID }}
+          FB_C_USER: ${{ secrets.FB_C_USER }}
+          FB_XS: ${{ secrets.FB_XS }}
+          POST_MODE: '2'   # POST_MODE: ${{ vars.POST_MODE }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          OPENROUTER_API_KEY_2: ${{ secrets.OPENROUTER_API_KEY_2 }}
+          OPENROUTER_API_KEY_3: ${{ secrets.OPENROUTER_API_KEY_3 }}
+          OPENROUTER_API_KEY_4: ${{ secrets.OPENROUTER_API_KEY_4 }}
+        run: |
+          bash run.sh
 
-grid_path = os.environ.get('GRID_PATH')
-model = os.environ.get('CURRENT_MODEL')
-prompt = os.environ.get('PROMPT_TEXT')
-payload_file = os.environ.get('PAYLOAD_FILE')
-
-with open(grid_path, 'rb') as f:
-    b64_img = base64.b64encode(f.read()).decode('utf-8')
-
-payload = {
-    'model': model,
-    'messages': [{
-        'role': 'user',
-        'content': [
-            {'type': 'text', 'text': prompt},
-            {'type': 'image_url', 'image_url': {'url': f'data:image/jpeg;base64,{b64_img}'}}
-        ]
-    }],
-    'max_tokens': 1024,
-    'temperature': 0.4
-}
-
-with open(payload_file, 'w') as f:
-    json.dump(payload, f)
-EOF
-
-    RESP=$(curl -s --connect-timeout 5 -m 45 -X POST "https://openrouter.ai/api/v1/chat/completions" \
-        -H "Authorization: Bearer $CURRENT_KEY" \
-        -H "Content-Type: application/json" \
-        -d @"$PAYLOAD_FILE")
-
-    rm -f "$PAYLOAD_FILE"
-
-    CONTENT=$(echo "$RESP" | python3 -c "import sys, json; res=json.load(sys.stdin); print(res.get('choices', [{}])[0].get('message', {}).get('content', '') or res.get('choices', [{}])[0].get('message', {}).get('reasoning', ''))" 2>/dev/null)
-    ROUTED=$(echo "$RESP" | python3 -c "import sys, json; print(json.load(sys.stdin).get('model', ''))" 2>/dev/null)
-
-    if [ -n "$CONTENT" ] && [ "$CONTENT" != "None" ]; then
-        RAW_RESPONSE="$CONTENT"
-        SUCCESS_REQUESTED_MODEL="$CURRENT_MODEL"
-        SUCCESS_ROUTED_MODEL="${ROUTED:-$CURRENT_MODEL}"
-        echo "✅ [$(date +%H:%M:%S)] Success on Attempt $attempt! Routed Model: $SUCCESS_ROUTED_MODEL" >&2
-        break
-    else
-        echo "⚠️ [$(date +%H:%M:%S)] Attempt $attempt failed or timed out. Rotating key instantly..." >&2
-        sleep 1
-    fi
-done
-
-if [ -z "$RAW_RESPONSE" ]; then
-    echo '{"status": "failed", "error": "All OpenRouter attempts failed"}'
-    exit 1
-fi
-
-# 3. 🧹 Safe File-Based Passing & Bulletproof Parsing
-RESPONSE_FILE="temp_frames/or_response.txt"
-printf "%s" "$RAW_RESPONSE" > "$RESPONSE_FILE"
-
-export REQUESTED_MODEL="$SUCCESS_REQUESTED_MODEL" ROUTED_MODEL="$SUCCESS_ROUTED_MODEL" RESPONSE_FILE
-python3 - << 'EOF'
-import os, json, re
-
-response_file = os.environ.get('RESPONSE_FILE')
-req_m = os.environ.get('REQUESTED_MODEL', '')
-rout_m = os.environ.get('ROUTED_MODEL', '')
-
-try:
-    with open(response_file, 'r', encoding='utf-8') as f:
-        raw = f.read()
-except:
-    raw = ""
-
-if os.path.exists(response_file):
-    os.remove(response_file)
-
-title = None
-start_time = None
-duration = 15
-
-cleaned = re.sub(r'```json|```', '', raw).strip()
-
-match = re.search(r'\{.*?\}', cleaned, re.DOTALL)
-if match:
-    try:
-        data = json.loads(match.group(0))
-        title = data.get('title')
-        start_time = data.get('start_time')
-        duration = data.get('clip_duration', data.get('duration', 15))
-    except:
-        pass
-
-if not title:
-    title_match = re.search(r'["\']title["\']\s*:\s*["\']([^"\']+)["\']', cleaned)
-    if title_match:
-        title = title_match.group(1)
-    else:
-        lines = [l.strip() for l in cleaned.split('\n') if l.strip()]
-        title = lines[0][:60] if lines else "Epic Gaming Highlight! 🎮🔥"
-
-if not start_time:
-    time_match = re.search(r'\b\d{2}:\d{2}:\d{2}\b', cleaned)
-    if time_match:
-        start_time = time_match.group(0)
-    else:
-        start_time = "00:00:10"
-
-try:
-    dur_int = max(12, min(45, int(duration)))
-except:
-    dur_int = 15
-
-print(json.dumps({
-    "status": "success",
-    "requested_model": req_m,
-    "routed_model": rout_m,
-    "title": str(title),
-    "start_time": str(start_time),
-    "duration": dur_int
-}))
-EOF
+      - name: Commit and Push Updated Memory & Posted Logs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add logs/ posted_links_editor/ game_links_editor/ temp_frames/ || true
+          git commit -m "🤖 Auto-Agent: Update memory, insights, and shift posted links [skip ci]" || echo "No changes to commit"
+          git push || echo "Nothing to push"
