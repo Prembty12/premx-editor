@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# 🚀 OPENROUTER BASH AGENT (FILE-BASED SAFE PASSING & BULLETPROOF PARSER)
+# 🚀 OPENROUTER BASH AGENT (FIXED ARRAY INITIALIZATION & BULLETPROOF PARSER)
 # ==============================================================================
 
 GRID_PATH="${GRID_PATH:-temp_frames/merged_60_grid_screenshot.jpg}"
@@ -10,8 +10,8 @@ STYLE_PROMPT="${STYLE_PROMPT:-}"
 PRIMARY_MODEL="${OPENROUTER_MODEL:-google/gemini-flash-1.5:free}"
 FALLBACK_MODEL="openrouter/free"
 
-# 1. 🔑 Collect OpenRouter Keys
-KEYS=()
+# 1. 🔑 Collect OpenRouter Keys Safely
+declare -a KEYS=()
 [ -n "$OPENROUTER_API_KEY" ] && KEYS+=("$OPENROUTER_API_KEY")
 [ -n "$OPENROUTER_API_KEY_2" ] && KEYS+=("$OPENROUTER_API_KEY_2")
 [ -n "$OPENROUTER_API_KEY_3" ] && KEYS+=("$OPENROUTER_API_KEY_3")
@@ -118,7 +118,7 @@ if [ -z "$RAW_RESPONSE" ]; then
     exit 1
 fi
 
-# 3. 🧹 Safe File-Based Passing & Bulletproof Parsing (No Bash Quote Injection Issues)
+# 3. 🧹 Safe File-Based Passing & Bulletproof Parsing
 RESPONSE_FILE="temp_frames/or_response.txt"
 printf "%s" "$RAW_RESPONSE" > "$RESPONSE_FILE"
 
@@ -136,7 +136,6 @@ try:
 except:
     raw = ""
 
-# Cleanup response file
 if os.path.exists(response_file):
     os.remove(response_file)
 
@@ -146,7 +145,6 @@ duration = 15
 
 cleaned = re.sub(r'```json|```', '', raw).strip()
 
-# 1. Try JSON extraction
 match = re.search(r'\{.*?\}', cleaned, re.DOTALL)
 if match:
     try:
@@ -157,7 +155,6 @@ if match:
     except:
         pass
 
-# 2. Try Regex for Title if missing
 if not title:
     title_match = re.search(r'["\']title["\']\s*:\s*["\']([^"\']+)["\']', cleaned)
     if title_match:
@@ -166,7 +163,6 @@ if not title:
         lines = [l.strip() for l in cleaned.split('\n') if l.strip()]
         title = lines[0][:60] if lines else "Epic Gaming Highlight! 🎮🔥"
 
-# 3. Try Regex for Timestamp if missing
 if not start_time:
     time_match = re.search(r'\b\d{2}:\d{2}:\d{2}\b', cleaned)
     if time_match:
