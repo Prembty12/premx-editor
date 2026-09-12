@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# 🚀 OPENROUTER BASH AGENT (FIXED ARGUMENT LIMIT & STRICT PARSING)
+# 🚀 OPENROUTER BASH AGENT (FIXED ARGUMENT LIMIT & CURL OPTIONS)
 # ==============================================================================
 
 GRID_PATH="${GRID_PATH:-temp_frames/merged_60_grid_screenshot.jpg}"
@@ -62,6 +62,7 @@ for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
     PAYLOAD_FILE="temp_frames/or_payload.json"
     mkdir -p temp_frames
     
+    # Python script securely writes payload to file to avoid bash arg limits
     export GRID_PATH CURRENT_MODEL PROMPT_TEXT PAYLOAD_FILE
     python3 - << 'EOF'
 import os, json, base64
@@ -83,7 +84,7 @@ payload = {
             {'type': 'image_url', 'image_url': {'url': f'data:image/jpeg;base64,{b64_img}'}}
         ]
     }],
-    'max_tokens': 2000,
+    'max_tokens': 1500,
     'temperature': 0.4
 }
 
@@ -91,25 +92,24 @@ with open(payload_file, 'w') as f:
     json.dump(payload, f)
 EOF
 
-    RESP=$(curl -s --connect-timeout 4 -m 10 -X POST "https://openrouter.ai/api/v1/chat/completions" \
+    RESP=$(curl -s --connect-timeout 10 -m 30 -X POST "https://openrouter.ai/api/v1/chat/completions" \
         -H "Authorization: Bearer $CURRENT_KEY" \
         -H "Content-Type: application/json" \
         -d @"$PAYLOAD_FILE")
 
     rm -f "$PAYLOAD_FILE"
 
-    # FIXED: Only look at 'content', completely ignore 'reasoning' traces
-    CONTENT=$(echo "$RESP" | python3 -c "import sys, json; res=json.load(sys.stdin); print(res.get('choices', [{}])[0].get('message', {}).get('content', ''))" 2>/dev/null)
+    CONTENT=$(echo "$RESP" | python3 -c "import sys, json; res=json.load(sys.stdin); print(res.get('choices', [{}])[0].get('message', {}).get('content', '') or res.get('choices', [{}])[0].get('message', {}).get('reasoning', ''))" 2>/dev/null)
     ROUTED=$(echo "$RESP" | python3 -c "import sys, json; print(json.load(sys.stdin).get('model', ''))" 2>/dev/null)
 
-    if [ -n "$CONTENT" ] && [ "$CONTENT" != "None" ] && [[ "$CONTENT" != *"User Safety"* ]]; then
+    if [ -n "$CONTENT" ] && [ "$CONTENT" != "None" ]; then
         RAW_RESPONSE="$CONTENT"
         SUCCESS_REQUESTED_MODEL="$CURRENT_MODEL"
         SUCCESS_ROUTED_MODEL="${ROUTED:-$CURRENT_MODEL}"
         echo "✅ [$(date +%H:%M:%S)] Success on Attempt $attempt! Routed Model: $SUCCESS_ROUTED_MODEL" >&2
         break
     else
-        echo "⚠️ [$(date +%H:%M:%S)] Attempt $attempt failed, safety tripped, or timed out. Rotating key/model instantly..." >&2
+        echo "⚠️ [$(date +%H:%M:%S)] Attempt $attempt failed or timed out. Rotating key instantly..." >&2
         sleep 1
     fi
 done
@@ -119,60 +119,41 @@ if [ -z "$RAW_RESPONSE" ]; then
     exit 1
 fi
 
-# 3. 🧹 Safe Output JSON Parsing (Robust Markdown & Key Fallbacks)
+# 3. 🧹 Safe Output JSON Parsing
 export RAW_RESPONSE REQUESTED_MODEL="$SUCCESS_REQUESTED_MODEL" ROUTED_MODEL="$SUCCESS_ROUTED_MODEL"
 python3 - << 'EOF'
-import os, json, re
+import os, json, re, ast
 
 raw = os.environ.get('RAW_RESPONSE', '')
 req_m = os.environ.get('REQUESTED_MODEL', '')
 rout_m = os.environ.get('ROUTED_MODEL', '')
 
-title = None
-start_time = None
-duration = 15
+cleaned = re.sub(r'json', '', raw, flags=re.IGNORECASE).strip()
+match = re.search(r'\{.*?\}', cleaned, re.DOTALL)
+target = match.group(0) if match else cleaned
 
-# 1. Strip markdown code blocks if the model wrapped the JSON in them
-cleaned_raw = re.sub(r'```(?:json)?\s*([\s\S]*?)\s*```', r'\1', raw)
-
-# 2. Try parsing the whole string or the first JSON-like block found
-match = re.search(r'\{.*?\}', cleaned_raw, re.DOTALL)
-if match:
+try:
     try:
-        data = json.loads(match.group(0))
-        title = data.get('title') or data.get('name') or data.get('headline')
-        start_time = data.get('start_time') or data.get('startTime') or data.get('timestamp')
-        duration = data.get('clip_duration') or data.get('duration') or 15
+        data = json.loads(target)
     except:
-        pass
+        data = ast.literal_eval(target)
 
-# 3. Fallback regex extraction if JSON loading failed entirely
-if not title:
-    title_match = re.search(r'["\'](?:title|headline|name)["\']\s*:\s*["\']([^"\']+)["\']', cleaned_raw, re.IGNORECASE)
-    if title_match: title = title_match.group(1)
+    title = data.get('title')
+    start_time = data.get('start_time')
+    duration = data.get('clip_duration', data.get('duration', 15))
 
-if not start_time:
-    time_match = re.search(r'\b\d{2}:\d{2}:\d{2}\b', cleaned_raw)
-    if time_match: start_time = time_match.group(0)
-
-if title and start_time:
-    try:
+    if title and start_time:
         dur_int = max(12, min(45, int(duration)))
-    except:
-        dur_int = 15
-    
-    print(json.dumps({
-        "status": "success",
-        "requested_model": req_m,
-        "routed_model": rout_m,
-        "title": str(title),
-        "start_time": str(start_time),
-        "duration": dur_int
-    }))
-else:
-    print(json.dumps({
-        "status": "failed", 
-        "error": "Model response did not contain valid title or start_time", 
-        "raw_output": raw
-    }))
+        print(json.dumps({
+            "status": "success",
+            "requested_model": req_m,
+            "routed_model": rout_m,
+            "title": str(title),
+            "start_time": str(start_time),
+            "duration": dur_int
+        }))
+    else:
+        print(json.dumps({"status": "failed", "error": "Missing JSON keys"}))
+except Exception as e:
+    print(json.dumps({"status": "failed", "error": f"Parse error: {str(e)}"}))
 EOF
