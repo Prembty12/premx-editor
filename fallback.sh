@@ -98,7 +98,8 @@ EOF
 
     rm -f "$PAYLOAD_FILE"
 
-    CONTENT=$(echo "$RESP" | python3 -c "import sys, json; res=json.load(sys.stdin); print(res.get('choices', [{}])[0].get('message', {}).get('content', '') or res.get('choices', [{}])[0].get('message', {}).get('reasoning', ''))" 2>/dev/null)
+    # FIXED: Only look at 'content', completely ignore 'reasoning' traces
+    CONTENT=$(echo "$RESP" | python3 -c "import sys, json; res=json.load(sys.stdin); print(res.get('choices', [{}])[0].get('message', {}).get('content', ''))" 2>/dev/null)
     ROUTED=$(echo "$RESP" | python3 -c "import sys, json; print(json.load(sys.stdin).get('model', ''))" 2>/dev/null)
 
     if [ -n "$CONTENT" ] && [ "$CONTENT" != "None" ] && [[ "$CONTENT" != *"User Safety"* ]]; then
