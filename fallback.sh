@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# 🚀 OPENROUTER BASH AGENT (FIXED ARGUMENT LIMIT & CURL OPTIONS)
+# 🚀 OPENROUTER BASH AGENT (PRODUCTION READY - FULLY FIXED)
 # ==============================================================================
 
 GRID_PATH="${GRID_PATH:-temp_frames/merged_60_grid_screenshot.jpg}"
@@ -49,7 +49,7 @@ SUCCESS_REQUESTED_MODEL=""
 SUCCESS_ROUTED_MODEL=""
 MAX_RETRIES=4
 
-# 2. 🔄 Gemini-Style Attempt Loop
+# 2. 🔄 Execution Loop with Temp File Payload
 for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
     CURRENT_KEY=$(get_random_openrouter_key)
     KEY_DISPLAY="${CURRENT_KEY:0:8}..."
@@ -59,9 +59,9 @@ for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
     
     echo "🤖 [$(date +%H:%M:%S)] OpenRouter Bash Attempt $attempt/$MAX_RETRIES | Model: $CURRENT_MODEL | Key: $KEY_DISPLAY" >&2
     
-    # Payload temp file me likhega taaki "Argument list too long" error na aaye
     PAYLOAD_FILE="temp_frames/or_payload.json"
     
+    # Safe Base64 Encoding via File Buffer
     GRID_PATH="$GRID_PATH" CURRENT_MODEL="$CURRENT_MODEL" PROMPT_TEXT="$PROMPT_TEXT" PAYLOAD_FILE="$PAYLOAD_FILE" python3 - << 'EOF'
 import os, json, base64
 
@@ -90,7 +90,7 @@ with open(payload_file, 'w') as f:
     json.dump(payload, f)
 EOF
 
-    # Fix: Incorrect `--line-buffered` flag remove kiya, direct file upload (-d @)
+    # Strict non-blocking cURL command
     RESP=$(curl -s -N --connect-timeout 4 -m 10 -X POST "https://openrouter.ai/api/v1/chat/completions" \
         -H "Authorization: Bearer $CURRENT_KEY" \
         -H "Content-Type: application/json" \
@@ -118,7 +118,7 @@ if [ -z "$RAW_RESPONSE" ]; then
     exit 1
 fi
 
-# 3. 🧹 Safe Output JSON Parsing
+# 3. 🧹 Robust Regex JSON Parser (Filters Out Reasoning Text)
 RAW_RESPONSE="$RAW_RESPONSE" REQUESTED_MODEL="$SUCCESS_REQUESTED_MODEL" ROUTED_MODEL="$SUCCESS_ROUTED_MODEL" python3 - << 'EOF'
 import os, json, re, ast
 
@@ -129,8 +129,10 @@ rout_m = os.environ.get('ROUTED_MODEL', '')
 cleaned = re.sub(r'```json', '', raw, flags=re.IGNORECASE)
 cleaned = re.sub(r'```', '', cleaned).strip()
 
-match = re.search(r'\{.*?\}', cleaned, re.DOTALL)
+# Extract JSON object ignoring any preamble/reasoning text
+match = re.search(r'\{.*\}', cleaned, re.DOTALL)
 target = match.group(0) if match else cleaned
+target = re.sub(r',\s*([\}\]])', r'\1', target)
 
 try:
     try:
