@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# 🚀 OPENROUTER BASH AGENT (BULLETPROOF PARSER & FAILSAFE REGEX)
+# 🚀 OPENROUTER BASH AGENT (FIXED ARGUMENT LIMIT & CURL OPTIONS)
 # ==============================================================================
 
 GRID_PATH="${GRID_PATH:-temp_frames/merged_60_grid_screenshot.jpg}"
@@ -19,7 +19,7 @@ KEYS=()
 [ -n "$OPENROUTER_API_KEY_5" ] && KEYS+=("$OPENROUTER_API_KEY_5")
 
 if [ ${#KEYS[@]} -eq 0 ]; then
-    echo "{\"status\": \"failed\", \"error\": \"No OpenRouter API keys found\"}"
+    echo '{"status": "failed", "error": "No OpenRouter API keys found"}'
     exit 1
 fi
 
@@ -49,7 +49,7 @@ SUCCESS_REQUESTED_MODEL=""
 SUCCESS_ROUTED_MODEL=""
 MAX_RETRIES=4
 
-# 2. 🔄 Execution Loop with Temp File Payload
+# 2. 🔄 Gemini-Style Attempt Loop
 for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
     CURRENT_KEY=$(get_random_openrouter_key)
     KEY_DISPLAY="${CURRENT_KEY:0:8}..."
@@ -60,9 +60,11 @@ for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
     echo "🤖 [$(date +%H:%M:%S)] OpenRouter Bash Attempt $attempt/$MAX_RETRIES | Model: $CURRENT_MODEL | Key: $KEY_DISPLAY" >&2
     
     PAYLOAD_FILE="temp_frames/or_payload.json"
+    mkdir -p temp_frames
     
-    # Safe Base64 Encoding via File Buffer
-    GRID_PATH="$GRID_PATH" CURRENT_MODEL="$CURRENT_MODEL" PROMPT_TEXT="$PROMPT_TEXT" PAYLOAD_FILE="$PAYLOAD_FILE" python3 - << 'EOF'
+    # Python script securely writes payload to file to avoid bash arg limits
+    export GRID_PATH CURRENT_MODEL PROMPT_TEXT PAYLOAD_FILE
+    python3 - << 'EOF'
 import os, json, base64
 
 grid_path = os.environ.get('GRID_PATH')
@@ -90,8 +92,7 @@ with open(payload_file, 'w') as f:
     json.dump(payload, f)
 EOF
 
-    # Strict non-blocking cURL command
-    RESP=$(curl -s -N --connect-timeout 4 -m 10 -X POST "https://openrouter.ai/api/v1/chat/completions" \
+    RESP=$(curl -s --connect-timeout 4 -m 10 -X POST "https://openrouter.ai/api/v1/chat/completions" \
         -H "Authorization: Bearer $CURRENT_KEY" \
         -H "Content-Type: application/json" \
         -d @"$PAYLOAD_FILE")
@@ -114,60 +115,35 @@ EOF
 done
 
 if [ -z "$RAW_RESPONSE" ]; then
-    echo "{\"status\": \"failed\", \"error\": \"All OpenRouter attempts failed\"}"
+    echo '{"status": "failed", "error": "All OpenRouter attempts failed"}'
     exit 1
 fi
 
-# 3. 🧹 Robust JSON Parser (Fixes Unterminated String Literals & Broken JSON)
-RAW_RESPONSE="$RAW_RESPONSE" REQUESTED_MODEL="$SUCCESS_REQUESTED_MODEL" ROUTED_MODEL="$SUCCESS_ROUTED_MODEL" python3 - << 'EOF'
+# 3. 🧹 Safe Output JSON Parsing
+export RAW_RESPONSE REQUESTED_MODEL="$SUCCESS_REQUESTED_MODEL" ROUTED_MODEL="$SUCCESS_ROUTED_MODEL"
+python3 - << 'EOF'
 import os, json, re, ast
 
 raw = os.environ.get('RAW_RESPONSE', '')
 req_m = os.environ.get('REQUESTED_MODEL', '')
 rout_m = os.environ.get('ROUTED_MODEL', '')
 
-# Remove markdown syntax
-cleaned = re.sub(r'```json', '', raw, flags=re.IGNORECASE)
-cleaned = re.sub(r'```', '', cleaned).strip()
-
-# Extract JSON object ignoring any preamble/reasoning text
-match = re.search(r'\{.*\}', cleaned, re.DOTALL)
+cleaned = re.sub(r'json', '', raw, flags=re.IGNORECASE).strip()
+match = re.search(r'\{.*?\}', cleaned, re.DOTALL)
 target = match.group(0) if match else cleaned
 
-# Fix unescaped newlines inside strings and trailing commas
-target = re.sub(r'(?<!\\)\n', ' ', target)
-target = re.sub(r',\s*([\}\]])', r'\1', target)
-
-data = None
 try:
-    data = json.loads(target)
-except Exception:
     try:
+        data = json.loads(target)
+    except:
         data = ast.literal_eval(target)
-    except Exception:
-        # Emergency Regex Extraction if string syntax is broken
-        title_m = re.search(r'"title"\s*:\s*"(.*?)"', target)
-        start_m = re.search(r'"start_time"\s*:\s*"(.*?)"', target)
-        dur_m = re.search(r'"clip_duration"\s*:\s*(\d+)', target) or re.search(r'"duration"\s*:\s*(\d+)', target)
-        
-        if title_m and start_m:
-            data = {
-                "title": title_m.group(1),
-                "start_time": start_m.group(1),
-                "clip_duration": int(dur_m.group(1)) if dur_m else 15
-            }
 
-if data and isinstance(data, dict):
     title = data.get('title')
     start_time = data.get('start_time')
     duration = data.get('clip_duration', data.get('duration', 15))
 
     if title and start_time:
-        try:
-            dur_int = max(12, min(45, int(duration)))
-        except:
-            dur_int = 15
-
+        dur_int = max(12, min(45, int(duration)))
         print(json.dumps({
             "status": "success",
             "requested_model": req_m,
@@ -178,6 +154,6 @@ if data and isinstance(data, dict):
         }))
     else:
         print(json.dumps({"status": "failed", "error": "Missing JSON keys"}))
-else:
-    print(json.dumps({"status": "failed", "error": "Unrepairable JSON response"}))
+except Exception as e:
+    print(json.dumps({"status": "failed", "error": f"Parse error: {str(e)}"}))
 EOF
