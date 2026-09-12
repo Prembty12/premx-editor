@@ -13,24 +13,24 @@
         "mm2remastered": 5,
         "SpiderMan2": 5,
         "RescueOperation": 5,
-        " UkraineCovertMission": 5,
+        " UkraineCovertMission": 10,
         "AfghanistanRedZone": 5,
         "DiabloIV": 5,
         "GODOFWAR3": 5,
         "GodofWarLaufey ": 5,
         "MarvelsSpiderMan2": 5,
-        "ghostandela": 9,
-        "monkeyKing": 13,
-        "sifu": 15
+        "ghostandela": 7,
+        "monkeyKing": 11,
+        "sifu": 13
     },
     "title_styles": {
         "curiosity": 31,
         "aggressive": 28,
         "question": 22,
-        "emoji_heavy": 22
+        "emoji_heavy": 25
     },
-    "last_used_style": "question",
-    "last_played_game": "sifu",
+    "last_used_style": "emoji_heavy",
+    "last_played_game": " UkraineCovertMission",
     "streak_game": "",
     "streak_count": 0,
     "winning_title_context": ""
