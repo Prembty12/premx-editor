@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# 🚀 OPENROUTER BASH AGENT (MAX TOKENS INCREASED & BULLETPROOF PARSER)
+# 🚀 OPENROUTER BASH AGENT (FILE-BASED SAFE PASSING & BULLETPROOF PARSER)
 # ==============================================================================
 
 GRID_PATH="${GRID_PATH:-temp_frames/merged_60_grid_screenshot.jpg}"
@@ -83,7 +83,7 @@ payload = {
             {'type': 'image_url', 'image_url': {'url': f'data:image/jpeg;base64,{b64_img}'}}
         ]
     }],
-    'max_tokens': 1024,  # <--- Increased from 256 to 1024
+    'max_tokens': 1024,
     'temperature': 0.4
 }
 
@@ -118,14 +118,27 @@ if [ -z "$RAW_RESPONSE" ]; then
     exit 1
 fi
 
-# 3. 🧹 Ultimate Bulletproof Parsing (Handles any garbage text without crashing)
-export RAW_RESPONSE REQUESTED_MODEL="$SUCCESS_REQUESTED_MODEL" ROUTED_MODEL="$SUCCESS_ROUTED_MODEL"
+# 3. 🧹 Safe File-Based Passing & Bulletproof Parsing (No Bash Quote Injection Issues)
+RESPONSE_FILE="temp_frames/or_response.txt"
+printf "%s" "$RAW_RESPONSE" > "$RESPONSE_FILE"
+
+export REQUESTED_MODEL="$SUCCESS_REQUESTED_MODEL" ROUTED_MODEL="$SUCCESS_ROUTED_MODEL" RESPONSE_FILE
 python3 - << 'EOF'
 import os, json, re
 
-raw = os.environ.get('RAW_RESPONSE', '')
+response_file = os.environ.get('RESPONSE_FILE')
 req_m = os.environ.get('REQUESTED_MODEL', '')
 rout_m = os.environ.get('ROUTED_MODEL', '')
+
+try:
+    with open(response_file, 'r', encoding='utf-8') as f:
+        raw = f.read()
+except:
+    raw = ""
+
+# Cleanup response file
+if os.path.exists(response_file):
+    os.remove(response_file)
 
 title = None
 start_time = None
