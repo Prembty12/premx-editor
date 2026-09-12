@@ -10,7 +10,7 @@
         "VietnamCavePrison": 5,
         "MexicanBorderwar": 5,
         "Russian_secret_missions": 5,
-        "mm2remastered": 6,
+        "mm2remastered": 5,
         "SpiderMan2": 5,
         "RescueOperation": 5,
         " UkraineCovertMission": 5,
@@ -19,17 +19,18 @@
         "GODOFWAR3": 5,
         "GodofWarLaufey ": 5,
         "MarvelsSpiderMan2": 5,
-        "ghostandela": 11,
-        "monkeyKing": 15
+        "ghostandela": 9,
+        "monkeyKing": 13,
+        "sifu": 15
     },
     "title_styles": {
         "curiosity": 31,
         "aggressive": 28,
-        "question": 19,
+        "question": 22,
         "emoji_heavy": 22
     },
-    "last_used_style": "curiosity",
-    "last_played_game": "monkeyKing",
+    "last_used_style": "question",
+    "last_played_game": "sifu",
     "streak_game": "",
     "streak_count": 0,
     "winning_title_context": ""
