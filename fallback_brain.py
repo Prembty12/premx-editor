@@ -5,9 +5,14 @@ import os
 import re
 import sys
 import time
+from datetime import datetime
 import requests
 
 session = requests.Session()
+
+def get_current_time():
+    """Returns formatted current time string for terminal logs"""
+    return datetime.now().strftime("%H:%M:%S")
 
 def parse_json_safely(raw_result):
     try:
@@ -61,7 +66,7 @@ def call_openrouter(
     try:
         with open(grid_path, "rb") as f:
             base64_image = base64.b64encode(f.read()).decode("utf-8")
-        print(f"⏱️ [Timer] Base64 Encoding: {round(time.time() - t_base64_start, 2)}s", file=sys.stderr)
+        print(f"⏱️ [{get_current_time()}] Base64 Encoding: {round(time.time() - t_base64_start, 2)}s", file=sys.stderr)
     except Exception as e:
         return {"status": "failed", "error": f"Base64 encoding error: {str(e)}"}
 
@@ -98,7 +103,6 @@ Return ONLY valid JSON format, no markdown wrapping."""
 
     last_error = ""
 
-    # Yahan AAPKI SAARI 5 KEYS ITERATE HONGI
     for idx, api_key in enumerate(api_keys, 1):
         headers = {
             "Authorization": f"Bearer {api_key}",
@@ -107,7 +111,7 @@ Return ONLY valid JSON format, no markdown wrapping."""
 
         try:
             print(
-                f"🔑 Trying API Key #{idx} of {len(api_keys)} with model {model_name} (Max {timeout_sec}s)...",
+                f"🔑 [{get_current_time()}] Trying API Key #{idx} of {len(api_keys)} with model {model_name} (Max {timeout_sec}s)...",
                 file=sys.stderr,
             )
             req_start_time = time.time()
@@ -117,13 +121,13 @@ Return ONLY valid JSON format, no markdown wrapping."""
             )
 
             req_elapsed = round(time.time() - req_start_time, 2)
-            print(f"⏱️ [Timer] Key #{idx} Request took: {req_elapsed}s", file=sys.stderr)
+            print(f"⏱️ [{get_current_time()}] Key #{idx} Request took: {req_elapsed}s", file=sys.stderr)
 
             if response.status_code == 200:
                 res_json = response.json()
                 if "error" in res_json:
                     last_error = f"API Key #{idx} internal error: {res_json['error']}"
-                    print(f"⚠️ {last_error}. Trying next key...", file=sys.stderr)
+                    print(f"⚠️ [{get_current_time()}] {last_error}. Trying next key...", file=sys.stderr)
                     continue
 
                 actual_model = res_json.get("model", model_name)
@@ -142,19 +146,19 @@ Return ONLY valid JSON format, no markdown wrapping."""
                             }
                         else:
                             last_error = f"API Key #{idx} invalid JSON: {parse_err}"
-                            print(f"⚠️ {last_error}. Trying next key...", file=sys.stderr)
+                            print(f"⚠️ [{get_current_time()}] {last_error}. Trying next key...", file=sys.stderr)
                             continue
             else:
                 last_error = f"API Key #{idx} Error {response.status_code}"
-                print(f"⚠️ {last_error}. Trying next key...", file=sys.stderr)
+                print(f"⚠️ [{get_current_time()}] {last_error}. Trying next key...", file=sys.stderr)
 
         except requests.exceptions.Timeout:
             req_elapsed = round(time.time() - req_start_time, 2)
             last_error = f"API Key #{idx} timed out after {req_elapsed}s"
-            print(f"⏱️ {last_error}. Skipping to next key...", file=sys.stderr)
+            print(f"⏱️ [{get_current_time()}] {last_error}. Skipping to next key...", file=sys.stderr)
         except Exception as e:
             last_error = f"API Key #{idx} Exception: {str(e)}"
-            print(f"⚠️ {last_error}. Trying next key...", file=sys.stderr)
+            print(f"⚠️ [{get_current_time()}] {last_error}. Trying next key...", file=sys.stderr)
 
     return {
         "status": "failed",
@@ -193,8 +197,8 @@ def run_pipeline():
         print(json.dumps({"status": "failed", "error": "Grid image path not found"}))
         return
 
-    # STEP 1: Primary Model (Saari Keys Try Karega Agar Fail Hua)
-    print(f"🔄 Primary Check: {primary_model} (6s Limit per key)...", file=sys.stderr)
+    # STEP 1: Primary Model
+    print(f"🔄 [{get_current_time()}] Primary Check: {primary_model} (6s Limit per key)...", file=sys.stderr)
     result = call_openrouter(
         grid_path,
         source_duration,
@@ -208,7 +212,7 @@ def run_pipeline():
     if result.get("status") == "success":
         data = result.get("data", {})
         total_elapsed = round(time.time() - total_start_time, 2)
-        print(f"⏱️ [Timer] TOTAL PIPELINE EXECUTION TIME: {total_elapsed}s", file=sys.stderr)
+        print(f"⏱️ [{get_current_time()}] TOTAL PIPELINE EXECUTION TIME: {total_elapsed}s", file=sys.stderr)
         print(
             json.dumps({
                 "status": "success",
@@ -221,8 +225,8 @@ def run_pipeline():
         )
         return
 
-    # STEP 2: Fallback Model (Saari Keys Try Karega Agar Fail Hua)
-    print(f"⚠️ Primary failed. 🔄 Switch -> Fallback: {fallback_model}", file=sys.stderr)
+    # STEP 2: Fallback Model
+    print(f"⚠️ [{get_current_time()}] Primary failed. 🔄 Switch -> Fallback: {fallback_model}", file=sys.stderr)
 
     fallback_result = call_openrouter(
         grid_path,
@@ -235,7 +239,7 @@ def run_pipeline():
     )
 
     total_elapsed = round(time.time() - total_start_time, 2)
-    print(f"⏱️ [Timer] TOTAL PIPELINE EXECUTION TIME: {total_elapsed}s", file=sys.stderr)
+    print(f"⏱️ [{get_current_time()}] TOTAL PIPELINE EXECUTION TIME: {total_elapsed}s", file=sys.stderr)
 
     if fallback_result.get("status") == "success":
         data = fallback_result.get("data", {})
