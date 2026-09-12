@@ -401,7 +401,7 @@ if [ "$PARSED_STATUS" != "success" ]; then
     export INSIGHTS_SUMMARY
     export STYLE_PROMPT
     
-    PARSED_JSON_DATA=$(python3 fallback_brain.py)
+    PARSED_JSON_DATA=$(bash fallback.sh)
     echo "🧠 Fallback AI Final Response: $PARSED_JSON_DATA"
     
     PARSED_STATUS=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status', 'failed'))" 2>/dev/null)
