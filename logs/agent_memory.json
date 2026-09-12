@@ -5,9 +5,9 @@
         "Ghost Destroys Mexican": 5,
         "combatopration": 5,
         "Callofdutyaw": 5,
-        "codBlackops6": 5,
+        "codBlackops6": 10,
         "Ghost_price": 5,
-        "VietnamCavePrison": 10,
+        "VietnamCavePrison": 6,
         "MexicanBorderwar": 5,
         "Russian_secret_missions": 5,
         "mm2remastered": 5,
@@ -18,16 +18,16 @@
         "DiabloIV": 5,
         "GODOFWAR3": 5,
         "GodofWarLaufey ": 5,
-        "MarvelsSpiderMan2": 7
+        "MarvelsSpiderMan2": 5
     },
     "title_styles": {
-        "curiosity": 19,
+        "curiosity": 22,
         "aggressive": 25,
         "question": 19,
         "emoji_heavy": 22
     },
-    "last_used_style": "emoji_heavy",
-    "last_played_game": "VietnamCavePrison",
+    "last_used_style": "curiosity",
+    "last_played_game": "codBlackops6",
     "streak_game": "",
     "streak_count": 0,
     "winning_title_context": ""
