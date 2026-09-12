@@ -101,7 +101,7 @@ with open(payload_file, 'w') as f:
     json.dump(payload, f)
 EOF
 
-    RESP=$(curl -s --connect-timeout 4 -m 10 -X POST "[https://openrouter.ai/api/v1/chat/completions](https://openrouter.ai/api/v1/chat/completions)" \
+    RESP=$(curl -s --connect-timeout 6 -m 20 -X POST "[https://openrouter.ai/api/v1/chat/completions](https://openrouter.ai/api/v1/chat/completions)" \
         -H "Authorization: Bearer $CURRENT_KEY" \
         -H "Content-Type: application/json" \
         -d @"$PAYLOAD_FILE")
