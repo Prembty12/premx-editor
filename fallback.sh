@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# 🚀 OPENROUTER BASH AGENT (100% MODEL-AGNOSTIC & UNBREAKABLE PARSER)
+# 🚀 OPENROUTER BASH AGENT (FIXED ARGUMENT LIMIT & STRICT PARSING)
 # ==============================================================================
 
 GRID_PATH="${GRID_PATH:-temp_frames/merged_60_grid_screenshot.jpg}"
@@ -38,28 +38,18 @@ Insights Context: ${INSIGHTS_SUMMARY}
 Style Directive: ${STYLE_PROMPT}
 
 Your primary job as an expert video editor is to find the most thrilling, high-action segment, skipping dull introductions.
-
-CRITICAL TITLE RULES FOR HIGH ENGAGEMENT & COMMENTS:
-- Title must be a viral comment-bait (under 7 words, 1-2 emojis).
-- Trigger curiosity, arguments, or debate (e.g., 'Is this aim assist or pure luck? 🤨', 'They reported me for this loadout 💀', 'Stop using this gun, it's trash 😭').
-- DO NOT use generic words like 'Epic Kills' or 'CoD Gameplay'.
-
-CRITICAL STRING & JSON FORMATTING RULES:
-1. Return ONLY valid JSON format, no markdown wrapping.
-2. DO NOT use double quotes (\") inside the title string value. Use single quotes if needed.
-3. Do not include any newlines inside string values.
-
 Return a JSON object with EXACTLY three keys:
-1. 'title' (string: viral comment-bait title with 1-2 emojis)
+1. 'title' (string: viral title with 1-3 emojis)
 2. 'start_time' (string format HH:MM:SS indicating exact peak action start time based on grid timestamps)
-3. 'clip_duration' (integer: length between 12 and 45 seconds meeting monetization rules)"
+3. 'clip_duration' (integer: length between 12 and 45 seconds meeting monetization rules)
+Return ONLY valid JSON format, no markdown wrapping."
 
 RAW_RESPONSE=""
 SUCCESS_REQUESTED_MODEL=""
 SUCCESS_ROUTED_MODEL=""
 MAX_RETRIES=4
 
-# 2. 🔄 Execution Loop
+# 2. 🔄 Gemini-Style Attempt Loop
 for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
     CURRENT_KEY=$(get_random_openrouter_key)
     KEY_DISPLAY="${CURRENT_KEY:0:8}..."
@@ -101,7 +91,7 @@ with open(payload_file, 'w') as f:
     json.dump(payload, f)
 EOF
 
-    RESP=$(curl -s --connect-timeout 6 -m 20 -X POST "[https://openrouter.ai/api/v1/chat/completions](https://openrouter.ai/api/v1/chat/completions)" \
+    RESP=$(curl -s --connect-timeout 4 -m 10 -X POST "https://openrouter.ai/api/v1/chat/completions" \
         -H "Authorization: Bearer $CURRENT_KEY" \
         -H "Content-Type: application/json" \
         -d @"$PAYLOAD_FILE")
@@ -128,76 +118,53 @@ if [ -z "$RAW_RESPONSE" ]; then
     exit 1
 fi
 
-# 3. 🧹 Unbreakable Multi-Tier JSON Parser
+# 3. 🧹 Safe Output JSON Parsing (Strict Failure on Missing Data, No Dummy Defaults)
 export RAW_RESPONSE REQUESTED_MODEL="$SUCCESS_REQUESTED_MODEL" ROUTED_MODEL="$SUCCESS_ROUTED_MODEL"
 python3 - << 'EOF'
-import os, json, re, ast
+import os, json, re
 
 raw = os.environ.get('RAW_RESPONSE', '')
 req_m = os.environ.get('REQUESTED_MODEL', '')
 rout_m = os.environ.get('ROUTED_MODEL', '')
 
-# Remove markdown code block artifacts
-cleaned = re.sub(r'```json', '', raw, flags=re.IGNORECASE)
-cleaned = re.sub(r'```', '', cleaned).strip()
+title = None
+start_time = None
+duration = 15
 
-# Extract full outer JSON object
-match = re.search(r'\{.*\}', cleaned, re.DOTALL)
-target = match.group(0) if match else cleaned
-
-# Sanitize unescaped newlines and trailing commas
-target = re.sub(r'(?<!\\)\n', ' ', target)
-target = re.sub(r',\s*([\}\]])', r'\1', target)
-
-data = None
-
-# Tier 1: Standard JSON Parse
-try:
-    data = json.loads(target)
-except Exception:
-    pass
-
-# Tier 2: Python Literal Evaluation (Fixes single quote JSONs)
-if not data:
+# Try extracting json block if present
+match = re.search(r'\{.*?\}', raw, re.DOTALL)
+if match:
     try:
-        data = ast.literal_eval(target)
-    except Exception:
+        data = json.loads(match.group(0))
+        title = data.get('title')
+        start_time = data.get('start_time')
+        duration = data.get('clip_duration', data.get('duration', 15))
+    except:
         pass
 
-# Tier 3: Emergency Regex Rescue (Extracts values even if JSON syntax is completely broken)
-if not data or not isinstance(data, dict):
-    title_m = re.search(r'["\']title["\']\s*:\s*["\']([^"\']+)["\']', raw, re.IGNORECASE)
-    start_m = re.search(r'["\']start_time["\']\s*:\s*["\']([^"\']+)["\']', raw, re.IGNORECASE)
-    dur_m = re.search(r'["\'](?:clip_duration|duration)["\']\s*:\s*(\d+)', raw, re.IGNORECASE)
+# Fallback regex extraction if JSON block parsing failed
+if not title:
+    title_match = re.search(r'["\']title["\']\s*:\s*["\']([^"\']+)["\']', raw)
+    if title_match: title = title_match.group(1)
 
-    if title_m and start_m:
-        data = {
-            "title": title_m.group(1),
-            "start_time": start_m.group(1),
-            "clip_duration": int(dur_m.group(1)) if dur_m else 15
-        }
+if not start_time:
+    time_match = re.search(r'\b\d{2}:\d{2}:\d{2}\b', raw)
+    if time_match: start_time = time_match.group(0)
 
-if isinstance(data, dict):
-    title = data.get('title')
-    start_time = data.get('start_time')
-    duration = data.get('clip_duration', data.get('duration', 15))
-
-    if title and start_time:
-        try:
-            dur_int = max(12, min(45, int(duration)))
-        except:
-            dur_int = 15
-
-        print(json.dumps({
-            "status": "success",
-            "requested_model": req_m,
-            "routed_model": rout_m,
-            "title": str(title),
-            "start_time": str(start_time),
-            "duration": dur_int
-        }))
-    else:
-        print(json.dumps({"status": "failed", "error": "Missing JSON keys"}))
+if title and start_time:
+    try:
+        dur_int = max(12, min(45, int(duration)))
+    except:
+        dur_int = 15
+    
+    print(json.dumps({
+        "status": "success",
+        "requested_model": req_m,
+        "routed_model": rout_m,
+        "title": str(title),
+        "start_time": str(start_time),
+        "duration": dur_int
+    }))
 else:
-    print(json.dumps({"status": "failed", "error": "Unrepairable AI response"}))
+    print(json.dumps({"status": "failed", "error": "Model response did not contain valid title or start_time"}))
 EOF
