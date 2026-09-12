@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# 🚀 OPENROUTER PURE BASH AGENT (GEMINI ARCHITECTURE & NON-BLOCKING PIPELINE)
+# 🚀 OPENROUTER BASH AGENT (FIXED ARGUMENT LIMIT & CURL OPTIONS)
 # ==============================================================================
 
 GRID_PATH="${GRID_PATH:-temp_frames/merged_60_grid_screenshot.jpg}"
@@ -10,7 +10,7 @@ STYLE_PROMPT="${STYLE_PROMPT:-}"
 PRIMARY_MODEL="${OPENROUTER_MODEL:-nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free}"
 FALLBACK_MODEL="openrouter/free"
 
-# 1. 🔑 Collect All Available OpenRouter Keys Natively
+# 1. 🔑 Collect OpenRouter Keys
 KEYS=()
 [ -n "$OPENROUTER_API_KEY" ] && KEYS+=("$OPENROUTER_API_KEY")
 [ -n "$OPENROUTER_API_KEY_2" ] && KEYS+=("$OPENROUTER_API_KEY_2")
@@ -28,14 +28,10 @@ if [ ! -f "$GRID_PATH" ]; then
     exit 1
 fi
 
-# 2. 🎯 Gemini-Style Key Rotation Function
 get_random_openrouter_key() {
     local idx=$((RANDOM % ${#KEYS[@]}))
     echo "${KEYS[$idx]}"
 }
-
-# 3. ⚡ Fast Pure-Memory Base64 Conversion (No Overhead)
-BASE64_IMAGE=$(python3 -c "import base64; print(base64.b64encode(open('$GRID_PATH', 'rb').read()).decode('utf-8'))")
 
 PROMPT_TEXT="Analyze the provided 9:16 gaming screenshot grid. Total video source duration is ${SOURCE_DURATION} seconds.
 Insights Context: ${INSIGHTS_SUMMARY}
@@ -53,38 +49,54 @@ SUCCESS_REQUESTED_MODEL=""
 SUCCESS_ROUTED_MODEL=""
 MAX_RETRIES=4
 
-# 4. 🔄 Gemini-Style Instant Execution Loop with Strict Hard Limits
+# 2. 🔄 Gemini-Style Attempt Loop
 for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
     CURRENT_KEY=$(get_random_openrouter_key)
     KEY_DISPLAY="${CURRENT_KEY:0:8}..."
     
-    # Attempt 1-2: Primary Model | Attempt 3-4: Fallback Model
     CURRENT_MODEL="$PRIMARY_MODEL"
     [ $attempt -gt 2 ] && CURRENT_MODEL="$FALLBACK_MODEL"
     
     echo "🤖 [$(date +%H:%M:%S)] OpenRouter Bash Attempt $attempt/$MAX_RETRIES | Model: $CURRENT_MODEL | Key: $KEY_DISPLAY" >&2
     
-    PAYLOAD=$(python3 -c "
-import json
-print(json.dumps({
-    'model': '$CURRENT_MODEL',
+    # Payload temp file me likhega taaki "Argument list too long" error na aaye
+    PAYLOAD_FILE="temp_frames/or_payload.json"
+    
+    GRID_PATH="$GRID_PATH" CURRENT_MODEL="$CURRENT_MODEL" PROMPT_TEXT="$PROMPT_TEXT" PAYLOAD_FILE="$PAYLOAD_FILE" python3 - << 'EOF'
+import os, json, base64
+
+grid_path = os.environ.get('GRID_PATH')
+model = os.environ.get('CURRENT_MODEL')
+prompt = os.environ.get('PROMPT_TEXT')
+payload_file = os.environ.get('PAYLOAD_FILE')
+
+with open(grid_path, 'rb') as f:
+    b64_img = base64.b64encode(f.read()).decode('utf-8')
+
+payload = {
+    'model': model,
     'messages': [{
         'role': 'user',
         'content': [
-            {'type': 'text', 'text': '''$PROMPT_TEXT'''},
-            {'type': 'image_url', 'image_url': {'url': 'data:image/jpeg;base64,$BASE64_IMAGE'}}
+            {'type': 'text', 'text': prompt},
+            {'type': 'image_url', 'image_url': {'url': f'data:image/jpeg;base64,{b64_img}'}}
         ]
     }],
     'max_tokens': 256,
     'temperature': 0.4
-}))
-")
+}
 
-    # --connect-timeout 4 (Fast Handshake) | -m 8 (Hard Stop) | --line-buffered (Zero Lock)
-    RESP=$(curl -s --line-buffered --connect-timeout 4 -m 8 -X POST "https://openrouter.ai/api/v1/chat/completions" \
+with open(payload_file, 'w') as f:
+    json.dump(payload, f)
+EOF
+
+    # Fix: Incorrect `--line-buffered` flag remove kiya, direct file upload (-d @)
+    RESP=$(curl -s -N --connect-timeout 4 -m 10 -X POST "https://openrouter.ai/api/v1/chat/completions" \
         -H "Authorization: Bearer $CURRENT_KEY" \
         -H "Content-Type: application/json" \
-        -d "$PAYLOAD")
+        -d @"$PAYLOAD_FILE")
+
+    rm -f "$PAYLOAD_FILE"
 
     CONTENT=$(echo "$RESP" | python3 -c "import sys, json; res=json.load(sys.stdin); print(res.get('choices', [{}])[0].get('message', {}).get('content', '') or res.get('choices', [{}])[0].get('message', {}).get('reasoning', ''))" 2>/dev/null)
     ROUTED=$(echo "$RESP" | python3 -c "import sys, json; print(json.load(sys.stdin).get('model', ''))" 2>/dev/null)
@@ -106,7 +118,7 @@ if [ -z "$RAW_RESPONSE" ]; then
     exit 1
 fi
 
-# 5. 🧹 Ultra-Safe JSON Parser
+# 3. 🧹 Safe Output JSON Parsing
 RAW_RESPONSE="$RAW_RESPONSE" REQUESTED_MODEL="$SUCCESS_REQUESTED_MODEL" ROUTED_MODEL="$SUCCESS_ROUTED_MODEL" python3 - << 'EOF'
 import os, json, re, ast
 
