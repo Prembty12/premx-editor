@@ -101,14 +101,14 @@ EOF
     CONTENT=$(echo "$RESP" | python3 -c "import sys, json; res=json.load(sys.stdin); print(res.get('choices', [{}])[0].get('message', {}).get('content', '') or res.get('choices', [{}])[0].get('message', {}).get('reasoning', ''))" 2>/dev/null)
     ROUTED=$(echo "$RESP" | python3 -c "import sys, json; print(json.load(sys.stdin).get('model', ''))" 2>/dev/null)
 
-    if [ -n "$CONTENT" ] && [ "$CONTENT" != "None" ]; then
+    if [ -n "$CONTENT" ] && [ "$CONTENT" != "None" ] && [[ "$CONTENT" != *"User Safety"* ]]; then
         RAW_RESPONSE="$CONTENT"
         SUCCESS_REQUESTED_MODEL="$CURRENT_MODEL"
         SUCCESS_ROUTED_MODEL="${ROUTED:-$CURRENT_MODEL}"
         echo "✅ [$(date +%H:%M:%S)] Success on Attempt $attempt! Routed Model: $SUCCESS_ROUTED_MODEL" >&2
         break
     else
-        echo "⚠️ [$(date +%H:%M:%S)] Attempt $attempt failed or timed out. Rotating key instantly..." >&2
+        echo "⚠️ [$(date +%H:%M:%S)] Attempt $attempt failed, safety tripped, or timed out. Rotating key/model instantly..." >&2
         sleep 1
     fi
 done
