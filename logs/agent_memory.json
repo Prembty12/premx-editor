@@ -3,7 +3,7 @@
         "Ghost_soap_escap": 5,
         "ghostwork": 5,
         "Ghost Destroys Mexican": 5,
-        "combatopration": 10,
+        "combatopration": 5,
         "Callofdutyaw": 5,
         "codBlackops6": 5,
         "Ghost_price": 5,
@@ -18,16 +18,17 @@
         "DiabloIV": 5,
         "GODOFWAR3": 5,
         "GodofWarLaufey ": 5,
-        "MarvelsSpiderMan2": 5
+        "MarvelsSpiderMan2": 5,
+        "ghostandela": 15
     },
     "title_styles": {
-        "curiosity": 22,
+        "curiosity": 25,
         "aggressive": 28,
         "question": 19,
         "emoji_heavy": 22
     },
-    "last_used_style": "aggressive",
-    "last_played_game": "combatopration",
+    "last_used_style": "curiosity",
+    "last_played_game": "ghostandela",
     "streak_game": "",
     "streak_count": 0,
     "winning_title_context": ""
