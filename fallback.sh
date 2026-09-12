@@ -55,7 +55,7 @@ for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
     KEY_DISPLAY="${CURRENT_KEY:0:8}..."
     
     CURRENT_MODEL="$PRIMARY_MODEL"
-    [ $attempt -gt 2 ] && CURRENT_MODEL="$FALLBACK_MODEL"
+    [ $attempt -gt 1 ] && CURRENT_MODEL="$FALLBACK_MODEL"
     
     echo "🤖 [$(date +%H:%M:%S)] OpenRouter Bash Attempt $attempt/$MAX_RETRIES | Model: $CURRENT_MODEL | Key: $KEY_DISPLAY" >&2
     
@@ -91,7 +91,7 @@ with open(payload_file, 'w') as f:
     json.dump(payload, f)
 EOF
 
-    RESP=$(curl -s --connect-timeout 5 -m 45 -X POST "https://openrouter.ai/api/v1/chat/completions" \
+    RESP=$(curl -s --connect-timeout 10 -m 45 -X POST "https://openrouter.ai/api/v1/chat/completions" \
         -H "Authorization: Bearer $CURRENT_KEY" \
         -H "Content-Type: application/json" \
         -d @"$PAYLOAD_FILE")
