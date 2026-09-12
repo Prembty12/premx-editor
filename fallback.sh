@@ -91,7 +91,7 @@ with open(payload_file, 'w') as f:
     json.dump(payload, f)
 EOF
 
-    RESP=$(curl -s --connect-timeout 6 -m 20 -X POST "https://openrouter.ai/api/v1/chat/completions" \
+    RESP=$(curl -s --connect-timeout 4 -m 10 -X POST "https://openrouter.ai/api/v1/chat/completions" \
         -H "Authorization: Bearer $CURRENT_KEY" \
         -H "Content-Type: application/json" \
         -d @"$PAYLOAD_FILE")
@@ -118,7 +118,7 @@ if [ -z "$RAW_RESPONSE" ]; then
     exit 1
 fi
 
-# 3. 🧹 Safe Output JSON Parsing (Strict Failure on Missing Data, No Dummy Defaults)
+# 3. 🧹 Safe Output JSON Parsing (Robust Markdown & Key Fallbacks)
 export RAW_RESPONSE REQUESTED_MODEL="$SUCCESS_REQUESTED_MODEL" ROUTED_MODEL="$SUCCESS_ROUTED_MODEL"
 python3 - << 'EOF'
 import os, json, re
@@ -131,24 +131,27 @@ title = None
 start_time = None
 duration = 15
 
-# Try extracting json block if present
-match = re.search(r'\{.*?\}', raw, re.DOTALL)
+# 1. Strip markdown code blocks if the model wrapped the JSON in them
+cleaned_raw = re.sub(r'```(?:json)?\s*([\s\S]*?)\s*```', r'\1', raw)
+
+# 2. Try parsing the whole string or the first JSON-like block found
+match = re.search(r'\{.*?\}', cleaned_raw, re.DOTALL)
 if match:
     try:
         data = json.loads(match.group(0))
-        title = data.get('title')
-        start_time = data.get('start_time')
-        duration = data.get('clip_duration', data.get('duration', 15))
+        title = data.get('title') or data.get('name') or data.get('headline')
+        start_time = data.get('start_time') or data.get('startTime') or data.get('timestamp')
+        duration = data.get('clip_duration') or data.get('duration') or 15
     except:
         pass
 
-# Fallback regex extraction if JSON block parsing failed
+# 3. Fallback regex extraction if JSON loading failed entirely
 if not title:
-    title_match = re.search(r'["\']title["\']\s*:\s*["\']([^"\']+)["\']', raw)
+    title_match = re.search(r'["\'](?:title|headline|name)["\']\s*:\s*["\']([^"\']+)["\']', cleaned_raw, re.IGNORECASE)
     if title_match: title = title_match.group(1)
 
 if not start_time:
-    time_match = re.search(r'\b\d{2}:\d{2}:\d{2}\b', raw)
+    time_match = re.search(r'\b\d{2}:\d{2}:\d{2}\b', cleaned_raw)
     if time_match: start_time = time_match.group(0)
 
 if title and start_time:
@@ -166,5 +169,9 @@ if title and start_time:
         "duration": dur_int
     }))
 else:
-    print(json.dumps({"status": "failed", "error": "Model response did not contain valid title or start_time"}))
+    print(json.dumps({
+        "status": "failed", 
+        "error": "Model response did not contain valid title or start_time", 
+        "raw_output": raw
+    }))
 EOF
