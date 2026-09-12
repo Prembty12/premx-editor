@@ -3,96 +3,45 @@ import base64
 import json
 import os
 import re
-import socket
 import sys
 import time
 from datetime import datetime
 import requests
 
-# FORCE UNBUFFERED LOGGING FOR GITHUB ACTIONS (INSTANT TERMINAL PRINTS)
+# Instant Terminal logs output ke liye
 sys.stdout.reconfigure(line_buffering=True)
 sys.stderr.reconfigure(line_buffering=True)
-
-# FORCE GLOBAL SOCKET TIMEOUT TO PREVENT TCP HANGS
-socket.setdefaulttimeout(6)
-
-session = requests.Session()
 
 
 def get_current_time():
     return datetime.now().strftime("%H:%M:%S")
 
 
-def parse_json_safely(raw_result):
-    try:
-        cleaned = re.sub(r"```json", "", str(raw_result), flags=re.IGNORECASE)
-        cleaned = re.sub(r"```", "", cleaned).strip()
-
-        match = re.search(r"\{.*?\}", cleaned, re.DOTALL)
-        target_str = match.group(0) if match else cleaned
-
-        target_str = re.sub(r"(?<=\s|:)\b0+(?=[1-9]\d*)\b", "", target_str)
-
-        try:
-            data = json.loads(target_str)
-        except Exception:
-            data = ast.literal_eval(target_str)
-
-        if isinstance(data, dict):
-            title = data.get("title")
-            start_time = data.get("start_time")
-            duration = data.get("clip_duration", data.get("duration", 15))
-
-            if title and start_time:
-                dur_int = int(duration)
-                dur_int = max(12, min(45, dur_int))
-                return {
-                    "title": str(title),
-                    "start_time": str(start_time),
-                    "duration": dur_int,
-                }, None
-
-        return None, "Missing required keys 'title' or 'start_time'"
-    except Exception as e:
-        return None, f"Parsing error: {str(e)}"
-
-
 def call_openrouter(
-    grid_path,
-    source_duration,
-    insights,
-    style_prompt,
-    model_name,
-    api_keys,
-    timeout_sec=6,
+    grid_path, source_duration, insights, style_prompt, model_name, api_key
 ):
-    if not api_keys:
-        return {"status": "failed", "error": "No OpenRouter API keys provided"}
-
     invoke_url = "https://openrouter.ai/api/v1/chat/completions"
 
-    t_base64_start = time.time()
     try:
         with open(grid_path, "rb") as f:
             base64_image = base64.b64encode(f.read()).decode("utf-8")
-        print(
-            f"⏱️ [{get_current_time()}] Base64 Encoding:"
-            f" {round(time.time() - t_base64_start, 2)}s",
-            file=sys.stderr,
-            flush=True,
-        )
     except Exception as e:
-        return {"status": "failed", "error": f"Base64 encoding error: {str(e)}"}
+        return {"status": "failed", "error": f"Base64 error: {str(e)}"}
+
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+    }
 
     prompt_text = f"""Analyze the provided 9:16 gaming screenshot grid. Total video source duration is {source_duration} seconds.
 Insights Context: {insights}
 Style Directive: {style_prompt}
 
-Find the most thrilling, high-action segment.
+Your primary job as an expert video editor is to find the most thrilling, high-action segment, skipping dull introductions.
 Return a JSON object with EXACTLY three keys:
 1. 'title' (string: viral title with 1-3 emojis)
-2. 'start_time' (string format HH:MM:SS)
-3. 'clip_duration' (integer: length between 12 and 45 seconds)
+2. 'start_time' (string format HH:MM:SS indicating exact peak action start time based on grid timestamps)
+3. 'clip_duration' (integer: length between 12 and 45 seconds meeting monetization rules)
 Return ONLY valid JSON format, no markdown wrapping."""
 
     payload = {
@@ -112,117 +61,55 @@ Return ONLY valid JSON format, no markdown wrapping."""
             }
         ],
         "max_tokens": 256,
-        "temperature": 0.3,
+        "temperature": 0.4,
     }
 
-    last_error = ""
+    try:
+        req_start = time.time()
+        response = requests.post(
+            invoke_url, headers=headers, json=payload, timeout=8
+        )
+        req_elapsed = round(time.time() - req_start, 2)
 
-    for idx, api_key in enumerate(api_keys, 1):
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
+        if response.status_code == 200:
+            res_json = response.json()
+            if "error" in res_json:
+                return {
+                    "status": "failed",
+                    "error": f"API internal error: {res_json['error']}",
+                }
+
+            # Capture routed actual model name from OpenRouter response
+            actual_model = res_json.get("model", model_name)
+
+            choices = res_json.get("choices", [])
+            if choices:
+                msg = choices[0].get("message", {})
+                raw_result = msg.get("content", "") or msg.get("reasoning", "")
+                if raw_result:
+                    return {
+                        "status": "success",
+                        "raw": str(raw_result),
+                        "actual_model": actual_model,
+                    }
+
+            return {
+                "status": "failed",
+                "error": "200 OK but missing 'choices'",
+            }
+
+        return {
+            "status": "failed",
+            "error": f"Error {response.status_code}: {response.text[:100]}",
         }
-
-        try:
-            print(
-                f"🔑 [{get_current_time()}] Trying API Key #{idx} of"
-                f" {len(api_keys)} with model {model_name} (Max"
-                f" {timeout_sec}s)...",
-                file=sys.stderr,
-                flush=True,
-            )
-            req_start_time = time.time()
-
-            response = session.post(
-                invoke_url,
-                headers=headers,
-                json=payload,
-                timeout=(3, timeout_sec),
-            )
-
-            req_elapsed = round(time.time() - req_start_time, 2)
-            print(
-                f"⏱️ [{get_current_time()}] Key #{idx} Request took:"
-                f" {req_elapsed}s",
-                file=sys.stderr,
-                flush=True,
-            )
-
-            if response.status_code == 200:
-                res_json = response.json()
-                if "error" in res_json:
-                    last_error = (
-                        f"API Key #{idx} internal error: {res_json['error']}"
-                    )
-                    print(
-                        f"⚠️ [{get_current_time()}] {last_error}. Trying next"
-                        " key...",
-                        file=sys.stderr,
-                        flush=True,
-                    )
-                    continue
-
-                actual_model = res_json.get("model", model_name)
-                choices = res_json.get("choices", [])
-                if choices:
-                    msg = choices[0].get("message", {})
-                    raw_result = msg.get("content", "") or msg.get(
-                        "reasoning", ""
-                    )
-
-                    if raw_result:
-                        parsed_data, parse_err = parse_json_safely(raw_result)
-                        if parsed_data:
-                            return {
-                                "status": "success",
-                                "data": parsed_data,
-                                "actual_model": actual_model,
-                            }
-                        else:
-                            last_error = (
-                                f"API Key #{idx} invalid JSON: {parse_err}"
-                            )
-                            print(
-                                f"⚠️ [{get_current_time()}] {last_error}."
-                                " Trying next key...",
-                                file=sys.stderr,
-                                flush=True,
-                            )
-                            continue
-            else:
-                last_error = f"API Key #{idx} Error {response.status_code}"
-                print(
-                    f"⚠️ [{get_current_time()}] {last_error}. Trying next"
-                    " key...",
-                    file=sys.stderr,
-                    flush=True,
-                )
-
-        except requests.exceptions.Timeout:
-            req_elapsed = round(time.time() - req_start_time, 2)
-            last_error = f"API Key #{idx} timed out after {req_elapsed}s"
-            print(
-                f"⏱️ [{get_current_time()}] {last_error}. Skipping to next"
-                " key...",
-                file=sys.stderr,
-                flush=True,
-            )
-        except Exception as e:
-            last_error = f"API Key #{idx} Exception: {str(e)}"
-            print(
-                f"⚠️ [{get_current_time()}] {last_error}. Trying next key...",
-                file=sys.stderr,
-                flush=True,
-            )
-
-    return {
-        "status": "failed",
-        "error": f"Failed for model {model_name}. Last error: {last_error}",
-    }
+    except requests.exceptions.Timeout:
+        return {"status": "failed", "error": "Timed out after 8s"}
+    except Exception as e:
+        return {"status": "failed", "error": f"Exception: {str(e)}"}
 
 
 def run_pipeline():
-    total_start_time = time.time()
+    pipeline_start = time.time()
 
     grid_path = os.environ.get(
         "GRID_PATH", "temp_frames/merged_60_grid_screenshot.jpg"
@@ -233,17 +120,15 @@ def run_pipeline():
 
     api_keys = []
     for i in range(1, 6):
-        key_env_name = (
-            "OPENROUTER_API_KEY" if i == 1 else f"OPENROUTER_API_KEY_{i}"
-        )
-        key_val = os.environ.get(key_env_name, "").strip()
-        if key_val and key_val not in api_keys:
-            api_keys.append(key_val)
+        key_env = "OPENROUTER_API_KEY" if i == 1 else f"OPENROUTER_API_KEY_{i}"
+        val = os.environ.get(key_env, "").strip()
+        if val and val not in api_keys:
+            api_keys.append(val)
 
     if not api_keys:
         print(
             json.dumps(
-                {"status": "failed", "error": "No OpenRouter API keys found"}
+                {"status": "failed", "error": "No OPENROUTER_API_KEY found"}
             )
         )
         return
@@ -256,98 +141,115 @@ def run_pipeline():
 
     if not os.path.exists(grid_path):
         print(
-            json.dumps(
-                {"status": "failed", "error": "Grid image path not found"}
-            )
+            json.dumps({"status": "failed", "error": "Grid image path not found"})
         )
         return
 
-    print(
-        f"🔄 [{get_current_time()}] Primary Check: {primary_model} (6s Limit per"
-        " key)...",
-        file=sys.stderr,
-        flush=True,
-    )
-    result = call_openrouter(
-        grid_path,
-        source_duration,
-        insights,
-        style_prompt,
-        primary_model,
-        api_keys,
-        timeout_sec=6,
-    )
+    attempts = []
+    for k_idx, key in enumerate(api_keys, 1):
+        attempts.append((primary_model, key, k_idx))
+    for k_idx, key in enumerate(api_keys, 1):
+        attempts.append((fallback_model, key, k_idx))
 
-    if result.get("status") == "success":
-        data = result.get("data", {})
-        total_elapsed = round(time.time() - total_start_time, 2)
+    result = None
+    requested_model = primary_model
+    routed_model = primary_model
+
+    for model, key, k_num in attempts:
         print(
-            f"⏱️ [{get_current_time()}] TOTAL PIPELINE EXECUTION TIME:"
-            f" {total_elapsed}s",
+            f"🔄 [{get_current_time()}] Trying Model: {model} | Key #{k_num}...",
             file=sys.stderr,
             flush=True,
         )
+        result = call_openrouter(
+            grid_path,
+            source_duration,
+            insights,
+            style_prompt,
+            model,
+            key,
+        )
+
+        if result.get("status") == "success":
+            requested_model = model
+            routed_model = result.get("actual_model", model)
+            print(
+                f"✅ [{get_current_time()}] Success with Key #{k_num}! (Routed Model: {routed_model})",
+                file=sys.stderr,
+                flush=True,
+            )
+            break
+        else:
+            print(
+                f"⚠️ [{get_current_time()}] Key #{k_num} failed:"
+                f" {result.get('error')}. Trying next...",
+                file=sys.stderr,
+                flush=True,
+            )
+
+    if result.get("status") != "success":
+        total_time = round(time.time() - pipeline_start, 2)
         print(
             json.dumps({
-                "status": "success",
-                "model": result.get("actual_model", primary_model),
-                "title": data["title"],
-                "start_time": data["start_time"],
-                "duration": data["duration"],
-                "execution_time_seconds": total_elapsed,
+                "status": "failed",
+                "error": f"All attempts failed. Last error: {result.get('error')}",
+                "execution_time_seconds": total_time,
             })
         )
         return
 
-    print(
-        f"⚠️ [{get_current_time()}] Primary failed. 🔄 Switch -> Fallback:"
-        f" {fallback_model}",
-        file=sys.stderr,
-        flush=True,
-    )
+    try:
+        raw_result = result.get("raw", "")
+        cleaned = re.sub(r"```json", "", raw_result, flags=re.IGNORECASE)
+        cleaned = re.sub(r"```", "", cleaned).strip()
 
-    fallback_result = call_openrouter(
-        grid_path,
-        source_duration,
-        insights,
-        style_prompt,
-        fallback_model,
-        api_keys,
-        timeout_sec=6,
-    )
+        match = re.search(r"\{.*?\}", cleaned, re.DOTALL)
+        target_str = match.group(0) if match else cleaned
+        target_str = re.sub(r"(?<=\s|:)\b0+(?=[1-9]\d*)\b", "", target_str)
 
-    total_elapsed = round(time.time() - total_start_time, 2)
-    print(
-        f"⏱️ [{get_current_time()}] TOTAL PIPELINE EXECUTION TIME:"
-        f" {total_elapsed}s",
-        file=sys.stderr,
-        flush=True,
-    )
+        try:
+            data = json.loads(target_str)
+        except Exception:
+            data = ast.literal_eval(target_str)
 
-    if fallback_result.get("status") == "success":
-        data = fallback_result.get("data", {})
+        title = data.get("title")
+        start_time = data.get("start_time")
+        duration = data.get("clip_duration", data.get("duration", 15))
+
+        total_time = round(time.time() - pipeline_start, 2)
+
+        if title and start_time:
+            dur_int = max(12, min(45, int(duration)))
+            # Both requested model and actual routed model are returned in output
+            print(
+                json.dumps({
+                    "status": "success",
+                    "requested_model": requested_model,
+                    "routed_model": routed_model,
+                    "title": str(title),
+                    "start_time": str(start_time),
+                    "duration": dur_int,
+                    "execution_time_seconds": total_time,
+                })
+            )
+        else:
+            print(
+                json.dumps({
+                    "status": "failed",
+                    "error": "Missing title or start_time in JSON",
+                    "execution_time_seconds": total_time,
+                })
+            )
+
+    except Exception as e:
+        total_time = round(time.time() - pipeline_start, 2)
         print(
             json.dumps({
-                "status": "success",
-                "model": fallback_result.get("actual_model", fallback_model),
-                "title": data["title"],
-                "start_time": data["start_time"],
-                "duration": data["duration"],
-                "execution_time_seconds": total_elapsed,
+                "status": "failed",
+                "error": f"Parsing error: {str(e)}",
+                "execution_time_seconds": total_time,
             })
         )
-        return
-
-    print(
-        json.dumps({
-            "status": "failed",
-            "error": (
-                "Both primary and fallback failed. Last error:"
-                f" {fallback_result.get('error')}"
-            ),
-            "execution_time_seconds": total_elapsed,
-        })
-    )
 
 
 if __name__ == "__main__":
