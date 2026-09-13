@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# 🚀 OPENROUTER BASH AGENT (FULL TERMINAL DEBUG MODE)
+# 🚀 OPENROUTER BASH AGENT (FULL TERMINAL DEBUG MODE) - FIXED
 # ==============================================================================
 
 GRID_PATH="${GRID_PATH:-temp_frames/merged_60_grid_screenshot.jpg}"
@@ -9,7 +9,7 @@ INSIGHTS_SUMMARY="${INSIGHTS_SUMMARY:-}"
 STYLE_PROMPT="${STYLE_PROMPT:-}"
 
 PRIMARY_MODEL="${OPENROUTER_MODEL:-nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free}"
-FALLBACK_MODEL="openrouter/free"
+FALLBACK_MODEL="meta-llama/llama-3.2-11b-vision-instruct:free"
 
 # Debug flag (0 = silent, 1 = full debug)
 DEBUG="${DEBUG:-1}"
@@ -47,7 +47,18 @@ Insights Context: ${INSIGHTS_SUMMARY}
 Style Directive: ${STYLE_PROMPT}
 
 Find the most thrilling, high-action segment, skipping dull introductions.
-Return JSON with exactly three keys as specified in the schema."
+
+IMPORTANT: Do all your analysis internally. Do NOT write out your thinking, reasoning, or thought process. Just give me the final answer directly.
+
+STRICT OUTPUT RULES:
+1. Return ONLY ONE JSON object.
+2. Do NOT write thinking process, reasoning, or analysis in the output.
+3. Do NOT list multiple titles.
+4. Do NOT use markdown code blocks.
+5. Output must start with { and end with }.
+
+JSON format:
+{\"title\": \"Single Best Title\", \"start_time\": \"HH:MM:SS\", \"clip_duration\": 30}"
 
 RAW_RESPONSE=""
 SUCCESS_REQUESTED_MODEL=""
@@ -132,7 +143,7 @@ payload = {
             {'type': 'image_url', 'image_url': {'url': f'data:image/jpeg;base64,{b64_img}'}}
         ]
     }],
-    'max_tokens': 2048,
+    'max_tokens': 150,
     'temperature': 0.2,
     'response_format': {
         'type': 'json_schema',
@@ -144,7 +155,8 @@ payload = {
     },
     'provider': {
         'require_parameters': False if is_reasoning else True,
-        'ignore': ['nvidia/nemotron-3.5-content-safety:free']
+        'ignore': ['nvidia/nemotron-3.5-content-safety:free'],
+        'allow_fallbacks': True
     }
 }
 
@@ -159,7 +171,6 @@ PYEOF
     dbg ""
     dbg "   📡 Sending request to OpenRouter..."
     
-    # Curl with verbose status capture
     HTTP_CODE=$(curl -s -o /tmp/or_response_$$.json -w "%{http_code}" \
         --connect-timeout 15 -m 90 \
         -X POST "https://openrouter.ai/api/v1/chat/completions" \
@@ -280,31 +291,48 @@ if os.path.exists(response_file):
 
 dbg(f"📄 Raw length: {len(raw)} chars")
 
+# --- SMART PARSER: Last JSON block nikaalo ---
 cleaned = re.sub(r'```json\s*|\s*```', '', raw, flags=re.IGNORECASE).strip()
 dbg(f"🧽 After cleanup: {len(cleaned)} chars")
-dbg(f"🧽 First 200 chars: {cleaned[:200]}")
 
 data = None
+
+# Pehle direct parse try karo
 try:
     data = json.loads(cleaned)
     dbg("✅ Direct JSON parse SUCCESS")
-except json.JSONDecodeError as e:
-    dbg(f"⚠️  Direct parse failed: {e}")
-    match = re.search(r'\{.*\}', cleaned, re.DOTALL)
-    if match:
-        dbg(f"🔎 Found JSON-like block: {match.group(0)[:200]}")
+except json.JSONDecodeError:
+    dbg("⚠️  Direct parse failed, trying last JSON block...")
+    
+    # Last '{' se last '}' tak nikaalo
+    first_brace = cleaned.find('{')
+    last_brace = cleaned.rfind('}')
+    
+    if first_brace != -1 and last_brace != -1 and last_brace > first_brace:
+        json_candidate = cleaned[first_brace:last_brace+1]
+        dbg(f"🔎 JSON candidate (first 300): {json_candidate[:300]}")
         try:
-            data = json.loads(match.group(0))
-            dbg("✅ Regex JSON extract SUCCESS")
-        except Exception as e2:
-            dbg(f"❌ Regex parse failed: {e2}")
-            print(json.dumps({"status": "failed", "error": f"JSON parse error: {str(e2)}"}))
-            sys.exit(1)
-    else:
-        dbg("❌ No JSON block found in response")
-        print(json.dumps({"status": "failed", "error": "No JSON found"}))
+            data = json.loads(json_candidate)
+            dbg("✅ Parsed JSON from last block SUCCESS")
+        except Exception as e:
+            dbg(f"❌ Last block parse failed: {e}")
+    
+    # Agar phir bhi fail, toh title-specific pattern try karo
+    if data is None:
+        match = re.search(r'\{[^{}]*"title"[^{}]*\}', raw, re.DOTALL)
+        if match:
+            try:
+                data = json.loads(match.group(0))
+                dbg("✅ Parsed via title-specific regex")
+            except Exception as e:
+                dbg(f"❌ Title regex parse failed: {e}")
+    
+    if data is None:
+        dbg("❌ All parse attempts failed")
+        print(json.dumps({"status": "failed", "error": "No valid JSON found in response"}))
         sys.exit(1)
 
+# --- Extract fields ---
 dbg(f"📋 Parsed keys: {list(data.keys())}")
 dbg(f"📋 Parsed data: {json.dumps(data, ensure_ascii=False)[:500]}")
 
