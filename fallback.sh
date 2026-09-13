@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# 🚀 OPENROUTER BASH AGENT (REASONING RESCUE & BULLETPROOF PARSING)
+# 🚀 OPENROUTER BASH AGENT (STRUCTURED OUTPUTS + STRICT JSON)
 # ==============================================================================
 
 GRID_PATH="${GRID_PATH:-temp_frames/merged_60_grid_screenshot.jpg}"
@@ -8,6 +8,8 @@ SOURCE_DURATION="${SOURCE_DURATION:-60}"
 INSIGHTS_SUMMARY="${INSIGHTS_SUMMARY:-}"
 STYLE_PROMPT="${STYLE_PROMPT:-}"
 
+# Primary: Nemotron (vision + reasoning, free)
+# Fallback: Gemma 4 31B (vision + structured outputs, free)
 PRIMARY_MODEL="${OPENROUTER_MODEL:-nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free}"
 FALLBACK_MODEL="openrouter/free"
 
@@ -39,18 +41,14 @@ Insights Context: ${INSIGHTS_SUMMARY}
 Style Directive: ${STYLE_PROMPT}
 
 Your primary job as an expert video editor is to find the most thrilling, high-action segment, skipping dull introductions.
-Return a JSON object with EXACTLY three keys:
-1. 'title' (string: ONLY THE SINGLE VIRAL TITLE under 6 words based on visuals with 1-3 emojis creating curiosity and engagement strictly NO generic words like Epic Insane Crazy Best or Gameplay)
-2. 'start_time' (string format HH:MM:SS indicating exact peak action start time based on grid timestamps)
-3. 'clip_duration' (integer: length between 12 and 45 seconds meeting monetization rules)
-Return ONLY valid JSON format, no markdown wrapping."
+Return JSON with EXACTLY three keys as specified in the schema."
 
 RAW_RESPONSE=""
 SUCCESS_REQUESTED_MODEL=""
 SUCCESS_ROUTED_MODEL=""
 MAX_RETRIES=4
 
-# 2. 🔄 Attempt Loop with 45s Timeout & Key Rotation
+# 2. 🔄 Attempt Loop with 90s Timeout & Key Rotation
 for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
     CURRENT_KEY=$(get_random_openrouter_key)
     KEY_DISPLAY="${CURRENT_KEY:0:8}..."
@@ -75,6 +73,29 @@ payload_file = os.environ.get('PAYLOAD_FILE')
 with open(grid_path, 'rb') as f:
     b64_img = base64.b64encode(f.read()).decode('utf-8')
 
+# STRUCTURED OUTPUTS SCHEMA — model strictly isi format me JSON dega
+schema = {
+    "type": "object",
+    "properties": {
+        "title": {
+            "type": "string",
+            "description": "Viral title under 6 words with 1-3 emojis. NO generic words like Epic, Insane, Crazy, Best, Gameplay."
+        },
+        "start_time": {
+            "type": "string",
+            "description": "HH:MM:SS format indicating peak action start time"
+        },
+        "clip_duration": {
+            "type": "integer",
+            "minimum": 12,
+            "maximum": 45,
+            "description": "Clip length between 12 and 45 seconds"
+        }
+    },
+    "required": ["title", "start_time", "clip_duration"],
+    "additionalProperties": False
+}
+
 payload = {
     'model': model,
     'messages': [{
@@ -84,28 +105,41 @@ payload = {
             {'type': 'image_url', 'image_url': {'url': f'data:image/jpeg;base64,{b64_img}'}}
         ]
     }],
-    'max_tokens': 1024,
+    'max_tokens': 2048,
     'temperature': 0.2,
-    'response_format': {'type': 'json_object'}
+    # 🎯 STRUCTURED OUTPUT — yeh 100% JSON enforce karega
+    'response_format': {
+        'type': 'json_schema',
+        'json_schema': {
+            'name': 'video_edit_params',
+            'strict': True,
+            'schema': schema
+        }
+    },
+    'provider': {
+        # ✅ Sirf wahi provider use karo jo response_format support kare
+        'require_parameters': True,
+        'ignore': ['nvidia/nemotron-3.5-content-safety:free']
+    }
 }
 
 with open(payload_file, 'w') as f:
     json.dump(payload, f)
 EOF
 
-    RESP=$(curl -s --connect-timeout 10 -m 45 -X POST "https://openrouter.ai/api/v1/chat/completions" \
+    RESP=$(curl -s --connect-timeout 15 -m 90 -X POST "https://openrouter.ai/api/v1/chat/completions" \
         -H "Authorization: Bearer $CURRENT_KEY" \
         -H "Content-Type: application/json" \
         -d @"$PAYLOAD_FILE")
 
     rm -f "$PAYLOAD_FILE"
 
-    CONTENT=$(echo "$RESP" | python3 -c "import sys, json; res=json.load(sys.stdin); print(res.get('choices', [{}])[0].get('message', {}).get('content', '') or res.get('choices', [{}])[0].get('message', {}).get('reasoning', ''))" 2>/dev/null)
+    CONTENT=$(echo "$RESP" | python3 -c "import sys, json; res=json.load(sys.stdin); print(res.get('choices', [{}])[0].get('message', {}).get('content', '') or '')" 2>/dev/null)
     ROUTED=$(echo "$RESP" | python3 -c "import sys, json; print(json.load(sys.stdin).get('model', ''))" 2>/dev/null)
 
     if [ -n "$CONTENT" ] && [ "$CONTENT" != "None" ]; then
         echo "--------------------------------------------------" >&2
-        echo "🔍 [AI RAW RESPONSE / CHATBOARD OUTPUT]:" >&2
+        echo "🔍 [AI RAW RESPONSE]:" >&2
         echo "$CONTENT" >&2
         echo "--------------------------------------------------" >&2
         
@@ -115,8 +149,8 @@ EOF
         echo "✅ [$(date +%H:%M:%S)] Success on Attempt $attempt! Routed Model: $SUCCESS_ROUTED_MODEL" >&2
         break
     else
-        echo "⚠️ [$(date +%H:%M:%S)] Attempt $attempt failed or returned empty text." >&2
-        sleep 1
+        echo "⚠️ [$(date +%H:%M:%S)] Attempt $attempt failed. Raw: $RESP" >&2
+        sleep 2
     fi
 done
 
@@ -125,7 +159,7 @@ if [ -z "$RAW_RESPONSE" ]; then
     exit 1
 fi
 
-# 3. 🧹 Safe File Passing & Smart Reasoning Title Parser
+# 3. 🧹 SIMPLE PARSER — Ab sirf json.loads() chahiye (model strict JSON dega)
 RESPONSE_FILE="temp_frames/or_response.txt"
 printf "%s" "$RAW_RESPONSE" > "$RESPONSE_FILE"
 
@@ -146,96 +180,43 @@ except:
 if os.path.exists(response_file):
     os.remove(response_file)
 
-title = None
-start_time = None
-duration = 15
-
+# Structured outputs ke baad, model ne strict JSON diya hoga
+# Sirf markdown wrapper strip karna hai agar koi provider ne add kiya ho
 cleaned = re.sub(r'```json\s*|\s*```', '', raw, flags=re.IGNORECASE).strip()
 
-def is_invalid_title(t):
-    if not t: return True
-    t_lower = t.lower().strip()
-    bad_phrases = [
-        "analyze", "thinking", "thought", "reasoning", "step", "here is", 
-        "json", "output", "note", "need answer", "exact keys", "screenshot", 
-        "video editor", "viral title", "format", "grid frames", "the grid", 
-        "inspect grid", "timestamps", "prompt"
-    ]
-    if any(bp in t_lower for bp in bad_phrases):
-        return True
-    if len(t.split()) < 2:
-        return True
-    return False
-
-# Layer 1: Direct JSON Parse
 try:
     data = json.loads(cleaned)
-    t_candidate = data.get('title')
-    if not is_invalid_title(t_candidate):
-        title = t_candidate
-    start_time = data.get('start_time')
-    duration = data.get('clip_duration', data.get('duration', 15))
-except Exception:
-    pass
-
-# Layer 2: Extract nested JSON from text
-if not title:
-    matches = re.findall(r'\{[^{}]*"title"[^{}]*\}', cleaned, re.DOTALL)
-    for m in reversed(matches):
+except json.JSONDecodeError as e:
+    # Ek aur try: JSON object dhundho agar model ne text mix kar diya
+    match = re.search(r'\{.*\}', cleaned, re.DOTALL)
+    if match:
         try:
-            data = json.loads(m)
-            t_candidate = data.get('title')
-            if not is_invalid_title(t_candidate):
-                title = t_candidate
-                start_time = data.get('start_time')
-                duration = data.get('clip_duration', data.get('duration', 15))
-                break
-        except Exception:
-            pass
+            data = json.loads(match.group(0))
+        except:
+            print(json.dumps({"status": "failed", "error": f"JSON parse error: {str(e)}"}))
+            sys.exit(1)
+    else:
+        print(json.dumps({"status": "failed", "error": "No JSON found in response"}))
+        sys.exit(1)
 
-# Layer 3: Rescue Title from AI Thinking/Reasoning Text
-if not title:
-    quoted_candidates = re.findall(r'["\']([A-Z][^"\'\n]{3,50}?[⚔️🔥💥🎯⚡🏹💥🐾🐆💣⚔️].*?)["\']', raw)
-    for cand in quoted_candidates:
-        if not is_invalid_title(cand):
-            title = cand
-            break
+# Schema ke fields extract karo
+title = data.get('title', '').strip()
+start_time = data.get('start_time', '00:00:10')
+duration = data.get('clip_duration', 15)
 
-# Layer 4: Fallback Line Search
-if not title:
-    lines = [line.strip() for line in cleaned.split('\n') if line.strip()]
-    for line in reversed(lines):
-        clean_line = re.sub(r'^[\*\-\d\.\s#]+', '', line).strip()
-        if not is_invalid_title(clean_line) and len(clean_line) > 5 and len(clean_line.split()) >= 2:
-            title = clean_line[:60]
-            break
-
-# Strict Check: If no title found anywhere, exit cleanly
-if not title or is_invalid_title(title):
-    print(json.dumps({
-        "status": "failed",
-        "error": "Strict Parse Failed: Could not extract valid viral title from AI response."
-    }))
+# Minimal safety: title empty na ho
+if not title or len(title.split()) < 2:
+    print(json.dumps({"status": "failed", "error": "Title too short or empty"}))
     sys.exit(1)
 
-# Clean title for shell/FFmpeg safety
-title = str(title).split('\n')[0].strip()
+# Shell/FFmpeg safety — commas, quotes strip karo
 title = re.sub(r'[,\'"\-:\n\r]+', ' ', title).strip()
 title = re.sub(r'\s+', ' ', title)
 
-# Timestamp Extraction
-if not start_time:
-    time_match = re.search(r'\b\d{2}:\d{2}:\d{2}\b', raw)
-    if time_match:
-        start_time = time_match.group(0)
-    else:
-        # Check standard timestamp formats inside text (e.g. 00:29 or 00:23)
-        time_short = re.search(r'\b(\d{2}:\d{2})\b', raw)
-        start_time = f"00:{time_short.group(1)}" if time_short else "00:00:10"
-
+# Duration enforce (schema ne already constrain kiya, but double-check)
 try:
     dur_int = max(12, min(45, int(duration)))
-except Exception:
+except:
     dur_int = 15
 
 # Final Valid Output
