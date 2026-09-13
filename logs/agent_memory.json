@@ -15,22 +15,22 @@
         "RescueOperation": 5,
         " UkraineCovertMission": 5,
         "AfghanistanRedZone": 5,
-        "DiabloIV": 10,
-        "GODOFWAR3": 5,
+        "DiabloIV": 6,
+        "GODOFWAR3": 10,
         "GodofWarLaufey ": 5,
         "MarvelsSpiderMan2": 5,
         "ghostandela": 5,
         "monkeyKing": 5,
-        "sifu": 7
+        "sifu": 5
     },
     "title_styles": {
         "curiosity": 31,
         "aggressive": 31,
-        "question": 25,
+        "question": 28,
         "emoji_heavy": 28
     },
     "last_used_style": "question",
-    "last_played_game": "DiabloIV",
+    "last_played_game": "GODOFWAR3",
     "streak_game": "",
     "streak_count": 0,
     "winning_title_context": ""
