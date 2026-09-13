@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# 🚀 OPENROUTER BASH AGENT (WITH RAW AI RESPONSE LOGGING)
+# 🚀 OPENROUTER BASH AGENT (WITH openrouter/free SAVED & RIGID FILTERING)
 # ==============================================================================
 
 GRID_PATH="${GRID_PATH:-temp_frames/merged_60_grid_screenshot.jpg}"
@@ -85,7 +85,8 @@ payload = {
         ]
     }],
     'max_tokens': 1024,
-    'temperature': 0.4
+    'temperature': 0.4,
+    'response_format': {'type': 'json_object'}
 }
 
 with open(payload_file, 'w') as f:
@@ -102,7 +103,6 @@ EOF
     CONTENT=$(echo "$RESP" | python3 -c "import sys, json; res=json.load(sys.stdin); print(res.get('choices', [{}])[0].get('message', {}).get('content', '') or res.get('choices', [{}])[0].get('message', {}).get('reasoning', ''))" 2>/dev/null)
     ROUTED=$(echo "$RESP" | python3 -c "import sys, json; print(json.load(sys.stdin).get('model', ''))" 2>/dev/null)
 
-    # 🔍 PRINT CHATBOARD RESPONSE TO TERMINAL FOR DEBUGGING
     if [ -n "$CONTENT" ] && [ "$CONTENT" != "None" ]; then
         echo "--------------------------------------------------" >&2
         echo "🔍 [AI RAW RESPONSE / CHATBOARD OUTPUT]:" >&2
@@ -115,8 +115,7 @@ EOF
         echo "✅ [$(date +%H:%M:%S)] Success on Attempt $attempt! Routed Model: $SUCCESS_ROUTED_MODEL" >&2
         break
     else
-        echo "⚠️ [$(date +%H:%M:%S)] Attempt $attempt failed or returned empty text. Output was:" >&2
-        echo "$RESP" >&2
+        echo "⚠️ [$(date +%H:%M:%S)] Attempt $attempt failed or returned empty text." >&2
         sleep 1
     fi
 done
@@ -126,7 +125,7 @@ if [ -z "$RAW_RESPONSE" ]; then
     exit 1
 fi
 
-# 3. 🧹 File Passing & Parsing
+# 3. 🧹 Strict Multi-Layer JSON & Fallback Parsing
 RESPONSE_FILE="temp_frames/or_response.txt"
 printf "%s" "$RAW_RESPONSE" > "$RESPONSE_FILE"
 
@@ -155,15 +154,16 @@ cleaned = re.sub(r'```json\s*|\s*```', '', raw, flags=re.IGNORECASE).strip()
 
 def is_invalid_title(t):
     if not t: return True
-    t_lower = t.lower()
+    t_lower = t.lower().strip()
     bad_phrases = [
         "analyze", "thinking", "thought", "reasoning", "step", "here is", 
         "json", "output", "note", "need answer", "exact keys", "screenshot", 
-        "video editor", "viral title", "format"
+        "video editor", "viral title", "format", "grid frames", "the grid", 
+        "inspect grid", "timestamps"
     ]
     if any(bp in t_lower for bp in bad_phrases):
         return True
-    if re.match(r'^\d+\s*[\.\-:]+\s*\*\*', t):
+    if len(t.split()) < 2:
         return True
     return False
 
@@ -178,56 +178,43 @@ try:
 except Exception:
     pass
 
-# Layer 2: Extract nested JSON
+# Layer 2: Extract last structural JSON match in case of preceding reasoning
 if not title:
-    match = re.search(r'\{.*\}', cleaned, re.DOTALL)
-    if match:
+    matches = re.findall(r'\{[^{}]*"title"[^{}]*\}', cleaned, re.DOTALL)
+    for m in reversed(matches):
         try:
-            data = json.loads(match.group(0))
+            data = json.loads(m)
             t_candidate = data.get('title')
             if not is_invalid_title(t_candidate):
                 title = t_candidate
-            start_time = data.get('start_time')
-            duration = data.get('clip_duration', data.get('duration', 15))
+                start_time = data.get('start_time')
+                duration = data.get('clip_duration', data.get('duration', 15))
+                break
         except Exception:
             pass
 
-# Layer 3: Regex Line Fallback
-if not title:
-    lines = [line.strip() for line in cleaned.split('\n') if line.strip()]
-    for line in lines:
-        clean_line = re.sub(r'^[\*\-\d\.\s#]+', '', line).strip()
-        if not is_invalid_title(clean_line) and len(clean_line) > 5:
-            title = clean_line[:60]
-            break
-
-# Strict Failure on Bad Title
+# Strict Exit on Bad Title
 if not title or is_invalid_title(title):
     print(json.dumps({
         "status": "failed",
-        "error": "Strict Parse Failed: AI response contained reasoning text or invalid title format."
+        "error": "Strict Parse Failed: AI output contained no valid JSON title structure."
     }))
     sys.exit(1)
 
-# Clean title for FFmpeg safety
+# Clean title formatting
 title = str(title).split('\n')[0].strip()
 title = re.sub(r'[,\'"\-:\n\r]+', ' ', title).strip()
 title = re.sub(r'\s+', ' ', title)
 
-# Extract Timestamp
 if not start_time:
     time_match = re.search(r'\b\d{2}:\d{2}:\d{2}\b', cleaned)
-    if time_match:
-        start_time = time_match.group(0)
-    else:
-        start_time = "00:00:10"
+    start_time = time_match.group(0) if time_match else "00:00:10"
 
 try:
     dur_int = max(12, min(45, int(duration)))
 except Exception:
     dur_int = 15
 
-# Successful Output
 print(json.dumps({
     "status": "success",
     "requested_model": req_m,
