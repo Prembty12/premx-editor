@@ -118,7 +118,7 @@ if [ -z "$RAW_RESPONSE" ]; then
     exit 1
 fi
 
-# 3. 🧹 Safe File-Based Passing & Bulletproof Parsing (Zero Crash Guarantee)
+# 3. 🧹 Safe File-Based Passing & Strict Parsing (No Fallbacks)
 RESPONSE_FILE="temp_frames/or_response.txt"
 printf "%s" "$RAW_RESPONSE" > "$RESPONSE_FILE"
 
@@ -146,10 +146,22 @@ duration = 15
 # Strip markdown block wrappers
 cleaned = re.sub(r'```json\s*|\s*```', '', raw, flags=re.IGNORECASE).strip()
 
+def is_invalid_title(t):
+    if not t: return True
+    t_lower = t.lower()
+    bad_phrases = ["analyze", "thinking", "thought", "reasoning", "step", "here is", "json", "output", "note"]
+    if any(bp in t_lower for bp in bad_phrases) and len(t) < 25:
+        return True
+    if re.match(r'^\d+\s*[\.\-:]+\s*\*\*', t):
+        return True
+    return False
+
 # Layer 1: Try Direct JSON Parse
 try:
     data = json.loads(cleaned)
-    title = data.get('title')
+    t_candidate = data.get('title')
+    if not is_invalid_title(t_candidate):
+        title = t_candidate
     start_time = data.get('start_time')
     duration = data.get('clip_duration', data.get('duration', 15))
 except Exception:
@@ -161,45 +173,28 @@ if not title:
     if match:
         try:
             data = json.loads(match.group(0))
-            title = data.get('title')
+            t_candidate = data.get('title')
+            if not is_invalid_title(t_candidate):
+                title = t_candidate
             start_time = data.get('start_time')
             duration = data.get('clip_duration', data.get('duration', 15))
         except Exception:
             pass
 
-# Layer 3: Dynamic Regex Extraction directly from AI Text
+# Layer 3: Scan lines strictly rejecting reasoning/thinking lines
 if not title:
-    # 1. Look for JSON-like key value inside reasoning blocks
-    title_match = re.search(r'["\']?title["\']?\s*[:=]\s*["\']([^"\']+)["\']', cleaned, re.IGNORECASE)
-    if title_match:
-        extracted = title_match.group(1).strip()
-        # Ensure extracted title isn't just a label header
-        if extracted.lower() not in ["thinking process:", "thinking process", "reasoning", "thought"]:
-            title = extracted
-
-if not title:
-    # 2. Filter out internal AI monologue/thinking lines to find real title
-    ignore_patterns = [r'^thinking process', r'^thought', r'^reasoning', r'^analysis', r'^step \d']
     lines = [line.strip() for line in cleaned.split('\n') if line.strip()]
-    
     for line in lines:
-        # Skip brackets and internal thinking headings
-        if line.startswith('{') or line.startswith('}') or line.startswith('```'):
-            continue
-        
-        is_thinking_line = any(re.match(pat, line, re.IGNORECASE) for pat in ignore_patterns)
-        if not is_thinking_line:
-            # Clean up leading colon if present
-            clean_title = re.sub(r'^[^\w\s]+', '', line).strip()
-            if len(clean_title) > 3:
-                title = clean_title[:60]
-                break
+        clean_line = re.sub(r'^[\*\-\d\.\s#]+', '', line).strip()
+        if not is_invalid_title(clean_line) and len(clean_line) > 5:
+            title = clean_line[:60]
+            break
 
-# Strict Failure - Halts only if AI output is completely empty/unreadable
-if not title:
+# STRICT FAILURE: No dummy fallback, fail directly if title is missing or garbage
+if not title or is_invalid_title(title):
     print(json.dumps({
         "status": "failed",
-        "error": "AI response was empty or contained no valid title."
+        "error": "Strict Parse Failed: AI response contained reasoning text or invalid title format."
     }))
     sys.exit(1)
 
@@ -216,7 +211,7 @@ try:
 except Exception:
     dur_int = 15
 
-# Successful Output with AI Generated Title
+# Successful Output
 print(json.dumps({
     "status": "success",
     "requested_model": req_m,
