@@ -17,20 +17,20 @@
         "AfghanistanRedZone": 5,
         "DiabloIV": 5,
         "GODOFWAR3": 5,
-        "GodofWarLaufey ": 10,
-        "MarvelsSpiderMan2": 5,
+        "GodofWarLaufey ": 6,
+        "MarvelsSpiderMan2": 10,
         "ghostandela": 5,
         "monkeyKing": 5,
         "sifu": 5
     },
     "title_styles": {
         "curiosity": 31,
-        "aggressive": 37,
+        "aggressive": 40,
         "question": 31,
         "emoji_heavy": 28
     },
-    "last_used_style": "question",
-    "last_played_game": "GodofWarLaufey ",
+    "last_used_style": "aggressive",
+    "last_played_game": "MarvelsSpiderMan2",
     "streak_game": "",
     "streak_count": 0,
     "winning_title_context": ""
