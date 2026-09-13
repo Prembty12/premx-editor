@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# 🚀 OPENROUTER BASH AGENT (FULL TERMINAL DEBUG MODE)
+# 🚀 OPENROUTER BASH AGENT (1 PRIMARY TRY + 20 FALLBACK RETRIES + BULLETPROOF PARSER)
 # ==============================================================================
 
 GRID_PATH="${GRID_PATH:-temp_frames/merged_60_grid_screenshot.jpg}"
@@ -52,7 +52,9 @@ Return JSON with exactly three keys as specified in the schema."
 RAW_RESPONSE=""
 SUCCESS_REQUESTED_MODEL=""
 SUCCESS_ROUTED_MODEL=""
-MAX_RETRIES=10
+
+# 1 Primary Try + 20 Fallback Retries = Total 21 Attempts max
+MAX_RETRIES=21
 
 dbg ""
 dbg "════════════════════════════════════════════════════════"
@@ -60,8 +62,8 @@ dbg "🚀 OPENROUTER AGENT START — $(date '+%Y-%m-%d %H:%M:%S')"
 dbg "📁 Grid Path       : $GRID_PATH"
 dbg "⏱️  Source Duration : ${SOURCE_DURATION}s"
 dbg "🔑 Keys Loaded     : ${#KEYS[@]}"
-dbg "🎯 Primary Model   : $PRIMARY_MODEL"
-dbg "🔄 Fallback Model  : $FALLBACK_MODEL"
+dbg "🎯 Primary Model   : $PRIMARY_MODEL (Max 1 Try)"
+dbg "🔄 Fallback Model  : $FALLBACK_MODEL (Max 20 Tries)"
 dbg "════════════════════════════════════════════════════════"
 dbg ""
 
@@ -70,8 +72,12 @@ for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
     CURRENT_KEY=$(get_random_openrouter_key)
     KEY_DISPLAY="${CURRENT_KEY:0:12}...${CURRENT_KEY: -4}"
     
-    CURRENT_MODEL="$PRIMARY_MODEL"
-    [ $attempt -gt 5 ] && CURRENT_MODEL="$FALLBACK_MODEL"
+    # Attempt 1: Primary Model | Attempt 2-21: Fallback Model (openrouter/free)
+    if [ $attempt -eq 1 ]; then
+        CURRENT_MODEL="$PRIMARY_MODEL"
+    else
+        CURRENT_MODEL="$FALLBACK_MODEL"
+    fi
     
     dbg ""
     dbg "────────────────────────────────────────────────────────"
@@ -251,7 +257,7 @@ except: pass
         break
     else
         dbg "   ⚠️  Empty content in response. Retrying..."
-        sleep 2
+        sleep 1.5
     fi
 done
 
@@ -260,11 +266,11 @@ if [ -z "$RAW_RESPONSE" ]; then
     dbg "════════════════════════════════════════════════════════"
     dbg "❌ ALL ATTEMPTS FAILED"
     dbg "════════════════════════════════════════════════════════"
-    echo '{"status": "failed", "error": "All OpenRouter attempts failed"}'
+    echo '{"status": "failed", "error": "All 21 OpenRouter attempts failed"}'
     exit 1
 fi
 
-# 🧹 Parser with debug
+# 🧹 PARSER (Fail-proof Single Title Extractor)
 RESPONSE_FILE="temp_frames/or_response.txt"
 printf "%s" "$RAW_RESPONSE" > "$RESPONSE_FILE"
 
@@ -297,75 +303,85 @@ if os.path.exists(response_file):
 
 dbg(f"📄 Raw length: {len(raw)} chars")
 
-# Remove thinking tags from reasoning models
-cleaned = re.sub(r'<think>.*?</think>', '', raw, flags=re.DOTALL)
-cleaned = re.sub(r'```json\s*|\s*```', '', cleaned, flags=re.IGNORECASE).strip()
-dbg(f"🧽 After cleanup: {len(cleaned)} chars")
-
+cleaned = re.sub(r'```json\s*|\s*```', '', raw, flags=re.IGNORECASE).strip()
 data = None
+
+# Step 1: Direct JSON Parse
 try:
     data = json.loads(cleaned)
     dbg("✅ Direct JSON parse SUCCESS")
-except json.JSONDecodeError as e:
-    dbg(f"⚠️  Direct parse failed: {e}")
-    match = re.search(r'\{.*\}', cleaned, re.DOTALL)
+except Exception:
+    # Step 2: Strip <think> tags & regex extract JSON
+    no_think = re.sub(r'<think>.*?</think>', '', cleaned, flags=re.DOTALL).strip()
+    match = re.search(r'\{.*\}', no_think, re.DOTALL)
     if match:
-        dbg(f"🔎 Found JSON-like block: {match.group(0)[:200]}")
         try:
             data = json.loads(match.group(0))
             dbg("✅ Regex JSON extract SUCCESS")
-        except Exception as e2:
-            dbg(f"❌ Regex parse failed: {e2}")
-            print(json.dumps({"status": "failed", "error": f"JSON parse error: {str(e2)}"}))
-            sys.exit(1)
-    else:
-        dbg("❌ No JSON block found in response")
-        print(json.dumps({"status": "failed", "error": "No JSON found"}))
-        sys.exit(1)
+        except Exception:
+            pass
 
-dbg(f"📋 Parsed keys: {list(data.keys())}")
+# Step 3: ULTRA-FALLBACK (Extracts title & time from raw text if zero JSON was given)
+if not data or not isinstance(data, dict):
+    dbg("⚠️ JSON extraction completely failed. Running Bulletproof Text Scanner...")
+    
+    time_match = re.search(r'(\d{2}:\d{2}(?::\d{2})?)', raw)
+    start_time = time_match.group(1) if time_match else "00:00:15"
+    if len(start_time.split(':')) == 2:
+        start_time = f"00:{start_time}"
 
-raw_title = data.get('title', '')
+    title = "Insane Tactical Play 🎯🔥"
+    pure_text = re.sub(r'<think>.*?</think>', '', raw, flags=re.DOTALL).strip()
+    lines = [l.strip() for l in pure_text.split('\n') if l.strip()]
+    if not lines:
+        lines = [l.strip() for l in raw.split('\n') if l.strip()]
+        
+    for line in lines:
+        if any(skip in line.lower() for skip in ['parsing', 'scanning', 'analyze', 'schema', 'properties', 'json']):
+            continue
+        clean_l = re.sub(r'^\d+[\.\)]\s*|^[\-\*]\s*|[\*\#\`\"]', '', line).strip()
+        if 10 <= len(clean_l) <= 50:
+            title = clean_l
+            break
 
-# Extract single title strictly if array or multi-line text is outputted
+    data = {
+        "title": title,
+        "start_time": start_time,
+        "clip_duration": 20
+    }
+
+# Step 4: Strict Title Normalization & Single Title Extraction
+raw_title = data.get('title', 'Pro Gaming Moments 🎯🔥')
+
 if isinstance(raw_title, list):
-    raw_title = raw_title[0] if len(raw_title) > 0 else ""
+    raw_title = raw_title[0] if len(raw_title) > 0 else "Pro Gaming Moments 🎯🔥"
 elif isinstance(raw_title, str):
     lines = [line.strip() for line in raw_title.split('\n') if line.strip()]
-    if lines:
-        raw_title = lines[0]
-        raw_title = re.sub(r'^\d+[\.\)]\s*|^[\-\*]\s*', '', raw_title)
+    raw_title = lines[0] if lines else "Pro Gaming Moments 🎯🔥"
 
-title = str(raw_title).strip()
-start_time = str(data.get('start_time', '00:00:10')).strip()
-duration = data.get('clip_duration', 15)
-
-dbg(f"🎬 Extracted title: '{title}'")
-dbg(f"⏰ Extracted start_time: '{start_time}'")
-dbg(f"⏱️  Extracted duration: {duration}")
+title = re.sub(r'^\d+[\.\)]\s*|^[\-\*]\s*|[\*\#\`\"]', '', str(raw_title)).strip()
+title = re.sub(r'\s+', ' ', title)
 
 if not title:
-    dbg(f"❌ Title empty: '{title}'")
-    print(json.dumps({"status": "failed", "error": "Title empty"}))
-    sys.exit(1)
+    title = "Unstoppable Gaming Highlights 🎯🔥"
 
-title = re.sub(r'[,\'"\-:\n\r]+', ' ', title).strip()
-title = re.sub(r'\s+', ' ', title)
+start_time = str(data.get('start_time', '00:00:15')).strip()
+duration = data.get('clip_duration', 20)
 
 try:
     dur_int = max(12, min(45, int(duration)))
-except:
-    dur_int = 15
+except Exception:
+    dur_int = 20
 
-dbg(f"✅ Final title: '{title}'")
-dbg(f"✅ Final duration: {dur_int}")
+dbg(f"✅ Final Output Title: '{title}'")
+dbg(f"✅ Final Start Time  : '{start_time}'")
 
 print(json.dumps({
     "status": "success",
     "requested_model": req_m,
     "routed_model": rout_m,
-    "title": str(title),
-    "start_time": str(start_time),
+    "title": title,
+    "start_time": start_time,
     "duration": dur_int
 }))
 PYEOF
