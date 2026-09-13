@@ -1,8 +1,8 @@
 #!/bin/bash
 # ==============================================================================
-# 🚀 OPENROUTER BASH AGENT - FIXED V5
-# Fallback: openrouter/free (UNCHANGED - tension-free)
-# Fixes: max_tokens 4096, reasoning.exclude, regex fallback, smart reject
+# 🚀 OPENROUTER BASH AGENT - FIXED V6 (FINAL)
+# Fallback: openrouter/free (UNCHANGED - tensenmat)
+# Fixes: max_tokens 4096, reasoning.exclude, regex fallback, smart reject, exit 0
 # ==============================================================================
 
 GRID_PATH="${GRID_PATH:-temp_frames/merged_60_grid_screenshot.jpg}"
@@ -130,9 +130,9 @@ payload = {
             {'type': 'image_url', 'image_url': {'url': f'data:image/jpeg;base64,{b64_img}'}}
         ]
     }],
-    'max_tokens': 4096,                # ✅ FIX #1: 150 → 4096 (reasoning buffer)
+    'max_tokens': 4096,                # ✅ FIX #1: reasoning buffer
     'temperature': 0.2,
-    'reasoning': {                     # ✅ FIX #2: reasoning response se hatao
+    'reasoning': {                     # ✅ FIX #2: reasoning hide
         'exclude': True
     },
     'response_format': {
@@ -379,7 +379,7 @@ if data is None:
 if data is None:
     dbg("❌ All parse attempts failed")
     print(json.dumps({"status": "failed", "error": "No valid JSON found"}))
-    sys.exit(1)
+    sys.exit(0)   # ⚠️ exit 0 — wrapper/main script handle karega
 
 dbg(f"📋 Parsed keys: {list(data.keys())}")
 
@@ -394,7 +394,7 @@ dbg(f"⏱️  Duration: {duration}")
 if not title or len(title.split()) < 2:
     dbg(f"❌ Title invalid: '{title}'")
     print(json.dumps({"status": "failed", "error": "Title too short"}))
-    sys.exit(1)
+    sys.exit(0)
 
 title = re.sub(r'[,\'"\-:\n\r]+', ' ', title).strip()
 title = re.sub(r'\s+', ' ', title)
@@ -416,3 +416,8 @@ print(json.dumps({
     "duration": dur_int
 }))
 PYEOF
+
+# ============================================================
+# ✅ EXPLICIT EXIT 0 — pipeline continue guarantee
+# ============================================================
+exit 0
