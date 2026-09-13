@@ -1,6 +1,8 @@
 #!/bin/bash
 # ==============================================================================
-# 🚀 OPENROUTER BASH AGENT (FULL TERMINAL DEBUG MODE) - FIXED
+# 🚀 OPENROUTER BASH AGENT - FIXED V4
+# Fallback: openrouter/free (NO CHANGE)
+# Text models BLOCKED via require_parameters: True
 # ==============================================================================
 
 GRID_PATH="${GRID_PATH:-temp_frames/merged_60_grid_screenshot.jpg}"
@@ -9,12 +11,10 @@ INSIGHTS_SUMMARY="${INSIGHTS_SUMMARY:-}"
 STYLE_PROMPT="${STYLE_PROMPT:-}"
 
 PRIMARY_MODEL="${OPENROUTER_MODEL:-nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free}"
-FALLBACK_MODEL="meta-llama/llama-3.2-11b-vision-instruct:free"
+FALLBACK_MODEL="openrouter/free"   # ✅ NO CHANGE as requested
 
-# Debug flag (0 = silent, 1 = full debug)
 DEBUG="${DEBUG:-1}"
 
-# 🔑 API keys collect
 declare -a KEYS=()
 [ -n "$OPENROUTER_API_KEY" ] && KEYS+=("$OPENROUTER_API_KEY")
 [ -n "$OPENROUTER_API_KEY_2" ] && KEYS+=("$OPENROUTER_API_KEY_2")
@@ -37,7 +37,6 @@ get_random_openrouter_key() {
     echo "${KEYS[$idx]}"
 }
 
-# Debug helper
 dbg() {
     [ "$DEBUG" = "1" ] && echo "$@" >&2
 }
@@ -77,7 +76,6 @@ dbg "🔄 Fallback Model  : $FALLBACK_MODEL"
 dbg "════════════════════════════════════════════════════════"
 dbg ""
 
-# 🔄 Retry loop
 for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
     CURRENT_KEY=$(get_random_openrouter_key)
     KEY_DISPLAY="${CURRENT_KEY:0:12}...${CURRENT_KEY: -4}"
@@ -114,25 +112,13 @@ print(f"   📸 Image Size : {len(img_bytes)} bytes (b64: {len(b64_img)} chars)"
 schema = {
     "type": "object",
     "properties": {
-        "title": {
-            "type": "string",
-            "description": "Viral title under 6 words with 1-3 emojis. NO generic words like Epic, Insane, Crazy, Best, Gameplay."
-        },
-        "start_time": {
-            "type": "string",
-            "description": "HH:MM:SS format indicating peak action start time"
-        },
-        "clip_duration": {
-            "type": "integer",
-            "minimum": 12,
-            "maximum": 45
-        }
+        "title": {"type": "string"},
+        "start_time": {"type": "string"},
+        "clip_duration": {"type": "integer", "minimum": 12, "maximum": 45}
     },
     "required": ["title", "start_time", "clip_duration"],
     "additionalProperties": False
 }
-
-is_reasoning = any(k in model.lower() for k in ['reasoning', 'nemotron', 'nano-omni'])
 
 payload = {
     'model': model,
@@ -154,7 +140,7 @@ payload = {
         }
     },
     'provider': {
-        'require_parameters': False if is_reasoning else True,
+        'require_parameters': True,   # ✅ TEXT MODELS BLOCKED
         'ignore': ['nvidia/nemotron-3.5-content-safety:free'],
         'allow_fallbacks': True
     }
@@ -163,8 +149,8 @@ payload = {
 with open(payload_file, 'w') as f:
     json.dump(payload, f)
 
-print(f"   🧠 Is Reasoning: {is_reasoning}", flush=True)
 print(f"   🔧 require_parameters: {payload['provider']['require_parameters']}", flush=True)
+print(f"   🚫 Text-only models will be BLOCKED by OpenRouter", flush=True)
 print(f"   📤 Payload ready: {os.path.getsize(payload_file)} bytes", flush=True)
 PYEOF
 
@@ -190,7 +176,6 @@ PYEOF
         echo "" >&2
     fi
 
-    # Extract fields
     CONTENT=$(echo "$RESP" | python3 -c "
 import sys, json
 try:
@@ -202,14 +187,12 @@ try:
         print(content)
     else:
         print('')
-except Exception as e:
-    print('')
+except: print('')
 " 2>/dev/null)
     
     ROUTED=$(echo "$RESP" | python3 -c "
 import sys, json
-try:
-    print(json.load(sys.stdin).get('model', ''))
+try: print(json.load(sys.stdin).get('model', ''))
 except: print('')
 " 2>/dev/null)
     
@@ -218,8 +201,7 @@ import sys, json
 try:
     res = json.load(sys.stdin)
     err = res.get('error', {})
-    if err:
-        print(f\"{err.get('code','')} - {err.get('message','')}\")
+    if err: print(f\"{err.get('code','')} - {err.get('message','')}\")
 except: pass
 " 2>/dev/null)
 
@@ -258,7 +240,6 @@ if [ -z "$RAW_RESPONSE" ]; then
     exit 1
 fi
 
-# 🧹 Parser with debug
 RESPONSE_FILE="temp_frames/or_response.txt"
 printf "%s" "$RAW_RESPONSE" > "$RESPONSE_FILE"
 
@@ -277,8 +258,7 @@ rout_m = os.environ.get('ROUTED_MODEL', '')
 debug = os.environ.get('DEBUG', '0') == '1'
 
 def dbg(msg):
-    if debug:
-        print(msg, file=sys.stderr)
+    if debug: print(msg, file=sys.stderr)
 
 try:
     with open(response_file, 'r', encoding='utf-8') as f:
@@ -290,24 +270,17 @@ if os.path.exists(response_file):
     os.remove(response_file)
 
 dbg(f"📄 Raw length: {len(raw)} chars")
-
-# --- SMART PARSER: Last JSON block nikaalo ---
 cleaned = re.sub(r'```json\s*|\s*```', '', raw, flags=re.IGNORECASE).strip()
 dbg(f"🧽 After cleanup: {len(cleaned)} chars")
 
 data = None
-
-# Pehle direct parse try karo
 try:
     data = json.loads(cleaned)
     dbg("✅ Direct JSON parse SUCCESS")
 except json.JSONDecodeError:
     dbg("⚠️  Direct parse failed, trying last JSON block...")
-    
-    # Last '{' se last '}' tak nikaalo
     first_brace = cleaned.find('{')
     last_brace = cleaned.rfind('}')
-    
     if first_brace != -1 and last_brace != -1 and last_brace > first_brace:
         json_candidate = cleaned[first_brace:last_brace+1]
         dbg(f"🔎 JSON candidate (first 300): {json_candidate[:300]}")
@@ -316,8 +289,6 @@ except json.JSONDecodeError:
             dbg("✅ Parsed JSON from last block SUCCESS")
         except Exception as e:
             dbg(f"❌ Last block parse failed: {e}")
-    
-    # Agar phir bhi fail, toh title-specific pattern try karo
     if data is None:
         match = re.search(r'\{[^{}]*"title"[^{}]*\}', raw, re.DOTALL)
         if match:
@@ -326,13 +297,11 @@ except json.JSONDecodeError:
                 dbg("✅ Parsed via title-specific regex")
             except Exception as e:
                 dbg(f"❌ Title regex parse failed: {e}")
-    
     if data is None:
         dbg("❌ All parse attempts failed")
-        print(json.dumps({"status": "failed", "error": "No valid JSON found in response"}))
+        print(json.dumps({"status": "failed", "error": "No valid JSON found"}))
         sys.exit(1)
 
-# --- Extract fields ---
 dbg(f"📋 Parsed keys: {list(data.keys())}")
 dbg(f"📋 Parsed data: {json.dumps(data, ensure_ascii=False)[:500]}")
 
