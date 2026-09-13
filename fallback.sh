@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# 🚀 OPENROUTER BASH AGENT (STRUCTURED OUTPUTS + STRICT JSON)
+# 🚀 OPENROUTER BASH AGENT (FULL TERMINAL DEBUG MODE)
 # ==============================================================================
 
 GRID_PATH="${GRID_PATH:-temp_frames/merged_60_grid_screenshot.jpg}"
@@ -8,12 +8,13 @@ SOURCE_DURATION="${SOURCE_DURATION:-60}"
 INSIGHTS_SUMMARY="${INSIGHTS_SUMMARY:-}"
 STYLE_PROMPT="${STYLE_PROMPT:-}"
 
-# Primary: Nemotron (vision + reasoning, free)
-# Fallback: Gemma 4 31B (vision + structured outputs, free)
 PRIMARY_MODEL="${OPENROUTER_MODEL:-nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free}"
 FALLBACK_MODEL="openrouter/free"
 
-# 1. 🔑 Collect OpenRouter Keys Safely
+# Debug flag (0 = silent, 1 = full debug)
+DEBUG="${DEBUG:-1}"
+
+# 🔑 API keys collect
 declare -a KEYS=()
 [ -n "$OPENROUTER_API_KEY" ] && KEYS+=("$OPENROUTER_API_KEY")
 [ -n "$OPENROUTER_API_KEY_2" ] && KEYS+=("$OPENROUTER_API_KEY_2")
@@ -36,33 +37,56 @@ get_random_openrouter_key() {
     echo "${KEYS[$idx]}"
 }
 
+# Debug helper
+dbg() {
+    [ "$DEBUG" = "1" ] && echo "$@" >&2
+}
+
 PROMPT_TEXT="Analyze the provided 9:16 gaming screenshot grid. Total video source duration is ${SOURCE_DURATION} seconds.
 Insights Context: ${INSIGHTS_SUMMARY}
 Style Directive: ${STYLE_PROMPT}
 
-Your primary job as an expert video editor is to find the most thrilling, high-action segment, skipping dull introductions.
-Return JSON with EXACTLY three keys as specified in the schema."
+Find the most thrilling, high-action segment, skipping dull introductions.
+Return JSON with exactly three keys as specified in the schema."
 
 RAW_RESPONSE=""
 SUCCESS_REQUESTED_MODEL=""
 SUCCESS_ROUTED_MODEL=""
 MAX_RETRIES=4
 
-# 2. 🔄 Attempt Loop with 90s Timeout & Key Rotation
+dbg ""
+dbg "════════════════════════════════════════════════════════"
+dbg "🚀 OPENROUTER AGENT START — $(date '+%Y-%m-%d %H:%M:%S')"
+dbg "════════════════════════════════════════════════════════"
+dbg "📁 Grid Path       : $GRID_PATH"
+dbg "⏱️  Source Duration : ${SOURCE_DURATION}s"
+dbg "🔑 Keys Loaded     : ${#KEYS[@]}"
+dbg "🎯 Primary Model   : $PRIMARY_MODEL"
+dbg "🔄 Fallback Model  : $FALLBACK_MODEL"
+dbg "════════════════════════════════════════════════════════"
+dbg ""
+
+# 🔄 Retry loop
 for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
     CURRENT_KEY=$(get_random_openrouter_key)
-    KEY_DISPLAY="${CURRENT_KEY:0:8}..."
+    KEY_DISPLAY="${CURRENT_KEY:0:12}...${CURRENT_KEY: -4}"
     
     CURRENT_MODEL="$PRIMARY_MODEL"
     [ $attempt -gt 1 ] && CURRENT_MODEL="$FALLBACK_MODEL"
     
-    echo "🤖 [$(date +%H:%M:%S)] OpenRouter Bash Attempt $attempt/$MAX_RETRIES | Model: $CURRENT_MODEL | Key: $KEY_DISPLAY" >&2
+    dbg ""
+    dbg "────────────────────────────────────────────────────────"
+    dbg "🤖 ATTEMPT $attempt / $MAX_RETRIES"
+    dbg "────────────────────────────────────────────────────────"
+    dbg "   Model     : $CURRENT_MODEL"
+    dbg "   API Key   : $KEY_DISPLAY"
+    dbg "   Time      : $(date +%H:%M:%S)"
     
     PAYLOAD_FILE="temp_frames/or_payload.json"
     mkdir -p temp_frames
     
     export GRID_PATH CURRENT_MODEL PROMPT_TEXT PAYLOAD_FILE
-    python3 - << 'EOF'
+    python3 - << 'PYEOF'
 import os, json, base64
 
 grid_path = os.environ.get('GRID_PATH')
@@ -71,9 +95,11 @@ prompt = os.environ.get('PROMPT_TEXT')
 payload_file = os.environ.get('PAYLOAD_FILE')
 
 with open(grid_path, 'rb') as f:
-    b64_img = base64.b64encode(f.read()).decode('utf-8')
+    img_bytes = f.read()
+    b64_img = base64.b64encode(img_bytes).decode('utf-8')
 
-# STRUCTURED OUTPUTS SCHEMA — model strictly isi format me JSON dega
+print(f"   📸 Image Size : {len(img_bytes)} bytes (b64: {len(b64_img)} chars)", flush=True)
+
 schema = {
     "type": "object",
     "properties": {
@@ -88,13 +114,14 @@ schema = {
         "clip_duration": {
             "type": "integer",
             "minimum": 12,
-            "maximum": 45,
-            "description": "Clip length between 12 and 45 seconds"
+            "maximum": 45
         }
     },
     "required": ["title", "start_time", "clip_duration"],
     "additionalProperties": False
 }
+
+is_reasoning = any(k in model.lower() for k in ['reasoning', 'nemotron', 'nano-omni'])
 
 payload = {
     'model': model,
@@ -107,7 +134,6 @@ payload = {
     }],
     'max_tokens': 2048,
     'temperature': 0.2,
-    # 🎯 STRUCTURED OUTPUT — yeh 100% JSON enforce karega
     'response_format': {
         'type': 'json_schema',
         'json_schema': {
@@ -117,59 +143,131 @@ payload = {
         }
     },
     'provider': {
-        # ✅ Sirf wahi provider use karo jo response_format support kare
-        'require_parameters': True,
+        'require_parameters': False if is_reasoning else True,
         'ignore': ['nvidia/nemotron-3.5-content-safety:free']
     }
 }
 
 with open(payload_file, 'w') as f:
     json.dump(payload, f)
-EOF
 
-    RESP=$(curl -s --connect-timeout 15 -m 90 -X POST "https://openrouter.ai/api/v1/chat/completions" \
+print(f"   🧠 Is Reasoning: {is_reasoning}", flush=True)
+print(f"   🔧 require_parameters: {payload['provider']['require_parameters']}", flush=True)
+print(f"   📤 Payload ready: {os.path.getsize(payload_file)} bytes", flush=True)
+PYEOF
+
+    dbg ""
+    dbg "   📡 Sending request to OpenRouter..."
+    
+    # Curl with verbose status capture
+    HTTP_CODE=$(curl -s -o /tmp/or_response_$$.json -w "%{http_code}" \
+        --connect-timeout 15 -m 90 \
+        -X POST "https://openrouter.ai/api/v1/chat/completions" \
         -H "Authorization: Bearer $CURRENT_KEY" \
         -H "Content-Type: application/json" \
         -d @"$PAYLOAD_FILE")
-
+    
+    RESP=$(cat /tmp/or_response_$$.json 2>/dev/null)
+    rm -f /tmp/or_response_$$.json
     rm -f "$PAYLOAD_FILE"
 
-    CONTENT=$(echo "$RESP" | python3 -c "import sys, json; res=json.load(sys.stdin); print(res.get('choices', [{}])[0].get('message', {}).get('content', '') or '')" 2>/dev/null)
-    ROUTED=$(echo "$RESP" | python3 -c "import sys, json; print(json.load(sys.stdin).get('model', ''))" 2>/dev/null)
+    dbg "   📥 HTTP Status  : $HTTP_CODE"
+    
+    if [ "$DEBUG" = "1" ]; then
+        dbg "   📥 Raw Response :"
+        echo "$RESP" | head -c 2000 | sed 's/^/      /' >&2
+        echo "" >&2
+    fi
+
+    # Extract fields
+    CONTENT=$(echo "$RESP" | python3 -c "
+import sys, json
+try:
+    res = json.load(sys.stdin)
+    choices = res.get('choices', [])
+    if choices:
+        msg = choices[0].get('message', {})
+        content = msg.get('content', '') or msg.get('reasoning', '')
+        print(content)
+    else:
+        print('')
+except Exception as e:
+    print('')
+" 2>/dev/null)
+    
+    ROUTED=$(echo "$RESP" | python3 -c "
+import sys, json
+try:
+    print(json.load(sys.stdin).get('model', ''))
+except: print('')
+" 2>/dev/null)
+    
+    ERROR_MSG=$(echo "$RESP" | python3 -c "
+import sys, json
+try:
+    res = json.load(sys.stdin)
+    err = res.get('error', {})
+    if err:
+        print(f\"{err.get('code','')} - {err.get('message','')}\")
+except: pass
+" 2>/dev/null)
+
+    if [ -n "$ERROR_MSG" ]; then
+        dbg "   ❌ API Error    : $ERROR_MSG"
+    fi
 
     if [ -n "$CONTENT" ] && [ "$CONTENT" != "None" ]; then
-        echo "--------------------------------------------------" >&2
-        echo "🔍 [AI RAW RESPONSE]:" >&2
-        echo "$CONTENT" >&2
-        echo "--------------------------------------------------" >&2
+        dbg ""
+        dbg "   ✅ SUCCESS — Model responded!"
+        dbg "   🎯 Routed Model : ${ROUTED:-unknown}"
+        dbg "   📝 Content Len  : ${#CONTENT} chars"
+        dbg ""
+        dbg "   ┌─────────────────────────────────────────────"
+        dbg "   │ 🔍 AI RAW OUTPUT:"
+        dbg "   └─────────────────────────────────────────────"
+        echo "$CONTENT" | sed 's/^/   │ /' >&2
+        dbg "   ─────────────────────────────────────────────"
         
         RAW_RESPONSE="$CONTENT"
         SUCCESS_REQUESTED_MODEL="$CURRENT_MODEL"
         SUCCESS_ROUTED_MODEL="${ROUTED:-$CURRENT_MODEL}"
-        echo "✅ [$(date +%H:%M:%S)] Success on Attempt $attempt! Routed Model: $SUCCESS_ROUTED_MODEL" >&2
         break
     else
-        echo "⚠️ [$(date +%H:%M:%S)] Attempt $attempt failed. Raw: $RESP" >&2
+        dbg "   ⚠️  Empty content in response. Retrying..."
         sleep 2
     fi
 done
 
 if [ -z "$RAW_RESPONSE" ]; then
+    dbg ""
+    dbg "════════════════════════════════════════════════════════"
+    dbg "❌ ALL ATTEMPTS FAILED"
+    dbg "════════════════════════════════════════════════════════"
     echo '{"status": "failed", "error": "All OpenRouter attempts failed"}'
     exit 1
 fi
 
-# 3. 🧹 SIMPLE PARSER — Ab sirf json.loads() chahiye (model strict JSON dega)
+# 🧹 Parser with debug
 RESPONSE_FILE="temp_frames/or_response.txt"
 printf "%s" "$RAW_RESPONSE" > "$RESPONSE_FILE"
 
-export REQUESTED_MODEL="$SUCCESS_REQUESTED_MODEL" ROUTED_MODEL="$SUCCESS_ROUTED_MODEL" RESPONSE_FILE
-python3 - << 'EOF'
+dbg ""
+dbg "════════════════════════════════════════════════════════"
+dbg "🧹 PARSING PHASE"
+dbg "════════════════════════════════════════════════════════"
+
+export REQUESTED_MODEL="$SUCCESS_REQUESTED_MODEL" ROUTED_MODEL="$SUCCESS_ROUTED_MODEL" RESPONSE_FILE DEBUG
+python3 - << 'PYEOF'
 import os, json, re, sys
 
 response_file = os.environ.get('RESPONSE_FILE')
 req_m = os.environ.get('REQUESTED_MODEL', '')
 rout_m = os.environ.get('ROUTED_MODEL', '')
+debug = os.environ.get('DEBUG', '0') == '1'
+
+def dbg(msg):
+    if debug:
+        print(msg, file=sys.stderr)
 
 try:
     with open(response_file, 'r', encoding='utf-8') as f:
@@ -180,46 +278,60 @@ except:
 if os.path.exists(response_file):
     os.remove(response_file)
 
-# Structured outputs ke baad, model ne strict JSON diya hoga
-# Sirf markdown wrapper strip karna hai agar koi provider ne add kiya ho
-cleaned = re.sub(r'```json\s*|\s*```', '', raw, flags=re.IGNORECASE).strip()
+dbg(f"📄 Raw length: {len(raw)} chars")
 
+cleaned = re.sub(r'```json\s*|\s*```', '', raw, flags=re.IGNORECASE).strip()
+dbg(f"🧽 After cleanup: {len(cleaned)} chars")
+dbg(f"🧽 First 200 chars: {cleaned[:200]}")
+
+data = None
 try:
     data = json.loads(cleaned)
+    dbg("✅ Direct JSON parse SUCCESS")
 except json.JSONDecodeError as e:
-    # Ek aur try: JSON object dhundho agar model ne text mix kar diya
+    dbg(f"⚠️  Direct parse failed: {e}")
     match = re.search(r'\{.*\}', cleaned, re.DOTALL)
     if match:
+        dbg(f"🔎 Found JSON-like block: {match.group(0)[:200]}")
         try:
             data = json.loads(match.group(0))
-        except:
-            print(json.dumps({"status": "failed", "error": f"JSON parse error: {str(e)}"}))
+            dbg("✅ Regex JSON extract SUCCESS")
+        except Exception as e2:
+            dbg(f"❌ Regex parse failed: {e2}")
+            print(json.dumps({"status": "failed", "error": f"JSON parse error: {str(e2)}"}))
             sys.exit(1)
     else:
-        print(json.dumps({"status": "failed", "error": "No JSON found in response"}))
+        dbg("❌ No JSON block found in response")
+        print(json.dumps({"status": "failed", "error": "No JSON found"}))
         sys.exit(1)
 
-# Schema ke fields extract karo
+dbg(f"📋 Parsed keys: {list(data.keys())}")
+dbg(f"📋 Parsed data: {json.dumps(data, ensure_ascii=False)[:500]}")
+
 title = data.get('title', '').strip()
 start_time = data.get('start_time', '00:00:10')
 duration = data.get('clip_duration', 15)
 
-# Minimal safety: title empty na ho
+dbg(f"🎬 Extracted title: '{title}'")
+dbg(f"⏰ Extracted start_time: '{start_time}'")
+dbg(f"⏱️  Extracted duration: {duration}")
+
 if not title or len(title.split()) < 2:
-    print(json.dumps({"status": "failed", "error": "Title too short or empty"}))
+    dbg(f"❌ Title invalid: '{title}'")
+    print(json.dumps({"status": "failed", "error": "Title too short"}))
     sys.exit(1)
 
-# Shell/FFmpeg safety — commas, quotes strip karo
 title = re.sub(r'[,\'"\-:\n\r]+', ' ', title).strip()
 title = re.sub(r'\s+', ' ', title)
 
-# Duration enforce (schema ne already constrain kiya, but double-check)
 try:
     dur_int = max(12, min(45, int(duration)))
 except:
     dur_int = 15
 
-# Final Valid Output
+dbg(f"✅ Final title: '{title}'")
+dbg(f"✅ Final duration: {dur_int}")
+
 print(json.dumps({
     "status": "success",
     "requested_model": req_m,
@@ -228,4 +340,4 @@ print(json.dumps({
     "start_time": str(start_time),
     "duration": dur_int
 }))
-EOF
+PYEOF
