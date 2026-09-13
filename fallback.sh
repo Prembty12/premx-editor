@@ -1,12 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# 🤖 OPENROUTER INTELLIGENT VIDEO AGENT — PRODUCTION READY (STRICT HYBRID v3)
-# ==============================================================================
-# Upgrades included:
-# • Key pool rotation & PID handling from v2
-# • Advanced Balanced-brace + Reasoning JSON Extraction Engine
-# • Strict "is_invalid_title" filter (Blocks: safety errors, prompt text, single words)
-# • High-engagement Curiosity Hook Prompt Directives with generic word bans
+# 🤖 OPENROUTER INTELLIGENT VIDEO AGENT — SYNTAX FIXED (v4)
 # ==============================================================================
 
 set -o pipefail
@@ -122,8 +116,8 @@ for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
 
     PAYLOAD_FILE="temp_frames/or_payload_${attempt}.json"
 
-    GRID_PATH="$GRID_PATH" CURRENT_MODEL="$CURRENT_MODEL" PROMPT_TEXT="$PROMPT_TEXT" PAYLOAD_FILE="$PAYLOAD_FILE" \
-    python3 -c "
+    export GRID_PATH CURRENT_MODEL PROMPT_TEXT PAYLOAD_FILE
+    python3 - << 'EOF'
 import os, json, base64
 
 grid_path = os.environ['GRID_PATH']
@@ -158,7 +152,12 @@ with open(out_file, 'w') as f:
     json.dump(payload, f)
 
 print(f' 📤 Payload created: {os.path.getsize(out_file)} bytes', flush=True)
-" || { err "Payload build failed"; continue; }
+EOF
+
+    if [ ! -f "$PAYLOAD_FILE" ]; then
+        err "Payload build failed"
+        continue
+    fi
 
     # ─── API Call ──────────────────────────────────────────────────────────────
     info "Sending request to OpenRouter..."
@@ -250,8 +249,8 @@ echo "════════════════════════�
 echo "🧹 PARSING PHASE"
 echo "════════════════════════════════════════════════════════════════"
 
-REQUESTED_MODEL="$SUCCESS_MODEL" ROUTED_MODEL="$SUCCESS_ROUTED" RESPONSE_FILE="$RESP_FILE" DEBUG="$DEBUG" \
-python3 -c '
+export REQUESTED_MODEL="$SUCCESS_MODEL" ROUTED_MODEL="$SUCCESS_ROUTED" RESPONSE_FILE="$RESP_FILE" DEBUG="$DEBUG"
+python3 - << 'EOF'
 import os, json, re, sys
 
 def dbg(m):
@@ -303,7 +302,7 @@ try:
 except Exception:
     pass
 
-# Strategy 2: Balanced-brace scan (handles embedded JSON)
+# Strategy 2: Balanced-brace scan
 if not title:
     start_idxs = [i for i, ch in enumerate(raw) if ch == "{"]
     for start in start_idxs:
@@ -332,7 +331,7 @@ if not title:
 
 # Strategy 3: Rescue Title from AI Reasoning Quotes
 if not title:
-    quoted_candidates = re.findall(r'["\']([A-Z][^"\'\n]{3,50}?[⚔️🔥💥🎯⚡🏹💥🐾🐆💣⚔️].*?)["\']', raw)
+    quoted_candidates = re.findall(r'["\']([A-Z][^"\'\n]{3,50}?[⚔️🔥💥🎯⚡🏹🐾🐆💣].*?)["\']', raw)
     for cand in quoted_candidates:
         if not is_invalid_title(cand):
             title = cand
@@ -380,7 +379,7 @@ print(json.dumps({
     "start_time": str(start_time),
     "duration": dur_int
 }, ensure_ascii=False))
-'
+EOF
 
 echo ""
 echo "════════════════════════════════════════════════════════════════"
