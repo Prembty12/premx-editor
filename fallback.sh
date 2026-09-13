@@ -1,15 +1,12 @@
 #!/bin/bash
 # ==============================================================================
-# 🤖 OPENROUTER INTELLIGENT VIDEO AGENT — PRODUCTION READY (FIXED v2)
+# 🤖 OPENROUTER INTELLIGENT VIDEO AGENT — PRODUCTION READY (STRICT HYBRID v3)
 # ==============================================================================
-# Fixes applied:
-#   • Fixed ${$} typo -> $$ for PID in temp filename
-#   • Fixed invalid FALLBACK_MODEL (openrouter/free is a real router ID,
-#     added a second real vision-capable free model as a 3rd rung)
-#   • Added HTTP error body surfacing (so failures are debuggable)
-#   • Made response_format conditional (not all free models support it)
-#   • Key pool no longer reuses a key that just failed within the same run
-#   • MAX_RETRIES now matches the number of distinct models in the chain
+# Upgrades included:
+# • Key pool rotation & PID handling from v2
+# • Advanced Balanced-brace + Reasoning JSON Extraction Engine
+# • Strict "is_invalid_title" filter (Blocks: safety errors, prompt text, single words)
+# • High-engagement Curiosity Hook Prompt Directives with generic word bans
 # ==============================================================================
 
 set -o pipefail
@@ -20,13 +17,9 @@ SOURCE_DURATION="${SOURCE_DURATION:-60}"
 INSIGHTS_SUMMARY="${INSIGHTS_SUMMARY:-}"
 STYLE_PROMPT="${STYLE_PROMPT:-}"
 
-# Model fallback chain (order matters). Verify these IDs against
-# https://openrouter.ai/models?max_price=0 before relying on them —
-# free-tier model availability changes frequently.
 PRIMARY_MODEL="${OPENROUTER_MODEL:-nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free}"
 FALLBACK_MODEL_1="${OPENROUTER_FALLBACK_1:-google/gemma-4-26b-a4b-it:free}"
 FALLBACK_MODEL_2="${OPENROUTER_FALLBACK_2:-openrouter/free}"
-
 MODEL_CHAIN=("$PRIMARY_MODEL" "$FALLBACK_MODEL_1" "$FALLBACK_MODEL_2")
 
 DEBUG="${DEBUG:-1}"
@@ -37,15 +30,15 @@ RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
 BLUE='\033[0;34m'; CYAN='\033[0;36m'; NC='\033[0m'
 
 # ─── Helpers ───────────────────────────────────────────────────────────────────
-log()   { [ "$DEBUG" = "1" ] && echo -e "${BLUE}[$(date +%H:%M:%S)]${NC} $*" >&2; }
-ok()    { echo -e "${GREEN}✅ $*${NC}" >&2; }
-warn()  { echo -e "${YELLOW}⚠️  $*${NC}" >&2; }
-err()   { echo -e "${RED}❌ $*${NC}" >&2; }
-info()  { echo -e "${CYAN}ℹ️  $*${NC}" >&2; }
+log() { [ "$DEBUG" = "1" ] && echo -e "${BLUE}[$(date +%H:%M:%S)]${NC} $*" >&2; }
+ok() { echo -e "${GREEN}✅ $*${NC}" >&2; }
+warn() { echo -e "${YELLOW}⚠️ $*${NC}" >&2; }
+err() { echo -e "${RED}❌ $*${NC}" >&2; }
+info() { echo -e "${CYAN}ℹ️ $*${NC}" >&2; }
 
 # ─── API Key Pool ──────────────────────────────────────────────────────────────
 declare -a KEYS=()
-[ -n "$OPENROUTER_API_KEY" ]   && KEYS+=("$OPENROUTER_API_KEY")
+[ -n "$OPENROUTER_API_KEY" ] && KEYS+=("$OPENROUTER_API_KEY")
 [ -n "$OPENROUTER_API_KEY_2" ] && KEYS+=("$OPENROUTER_API_KEY_2")
 [ -n "$OPENROUTER_API_KEY_3" ] && KEYS+=("$OPENROUTER_API_KEY_3")
 [ -n "$OPENROUTER_API_KEY_4" ] && KEYS+=("$OPENROUTER_API_KEY_4")
@@ -54,8 +47,6 @@ declare -a KEYS=()
 declare -a FAILED_KEY_IDXS=()
 
 get_next_key() {
-    # Prefer a key that hasn't failed yet this run; fall back to random reuse
-    # if every key has already failed once.
     local candidates=()
     for i in "${!KEYS[@]}"; do
         local already_failed=0
@@ -64,9 +55,11 @@ get_next_key() {
         done
         [ "$already_failed" = "0" ] && candidates+=("$i")
     done
+
     if [ ${#candidates[@]} -eq 0 ]; then
         candidates=("${!KEYS[@]}")
     fi
+
     local pick=${candidates[$((RANDOM % ${#candidates[@]}))]}
     echo "$pick"
 }
@@ -95,21 +88,17 @@ ok "API keys loaded: ${#KEYS[@]}"
 info "Model chain: ${MODEL_CHAIN[*]}"
 echo ""
 
-# ─── Prompt ────────────────────────────────────────────────────────────────────
+# ─── Prompt Directives ─────────────────────────────────────────────────────────
 PROMPT_TEXT="Analyze the provided 9:16 gaming screenshot grid. Total video source duration is ${SOURCE_DURATION} seconds.
 Insights Context: ${INSIGHTS_SUMMARY}
 Style Directive: ${STYLE_PROMPT}
 
-Find the most thrilling, high-action segment, skipping dull introductions.
-
-STRICT OUTPUT RULES:
-1. Return ONLY ONE JSON object.
-2. Do NOT list multiple titles.
-3. Do NOT use markdown code blocks.
-4. Output must start with { and end with }.
-
-JSON format:
-{\"title\": \"Single Best Title\", \"start_time\": \"HH:MM:SS\", \"clip_duration\": 30}"
+Your primary job as an expert video editor is to find the most thrilling, high-action segment, skipping dull introductions.
+Return a JSON object with EXACTLY three keys:
+1. 'title' (string: ONLY THE SINGLE VIRAL TITLE under 6 words based on visuals with 1-3 emojis creating curiosity and engagement strictly NO generic words like Epic Insane Crazy Best or Gameplay)
+2. 'start_time' (string format HH:MM:SS indicating exact peak action start time based on grid timestamps)
+3. 'clip_duration' (integer: length between 12 and 45 seconds meeting monetization rules)
+Return ONLY valid JSON format, no markdown wrapping."
 
 # ─── Main Loop ─────────────────────────────────────────────────────────────────
 RAW_RESPONSE=""
@@ -129,9 +118,8 @@ for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
     echo "🤖 ATTEMPT $attempt / $MAX_RETRIES"
     echo "────────────────────────────────────────────────────────"
     info "Model: $CURRENT_MODEL"
-    info "Key:   $KEY_DISPLAY"
+    info "Key: $KEY_DISPLAY"
 
-    # ─── Build Payload ─────────────────────────────────────────────────────────
     PAYLOAD_FILE="temp_frames/or_payload_${attempt}.json"
 
     GRID_PATH="$GRID_PATH" CURRENT_MODEL="$CURRENT_MODEL" PROMPT_TEXT="$PROMPT_TEXT" PAYLOAD_FILE="$PAYLOAD_FILE" \
@@ -139,9 +127,9 @@ for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
 import os, json, base64
 
 grid_path = os.environ['GRID_PATH']
-model     = os.environ['CURRENT_MODEL']
-prompt    = os.environ['PROMPT_TEXT']
-out_file  = os.environ['PAYLOAD_FILE']
+model = os.environ['CURRENT_MODEL']
+prompt = os.environ['PROMPT_TEXT']
+out_file = os.environ['PAYLOAD_FILE']
 
 with open(grid_path, 'rb') as f:
     b64 = base64.b64encode(f.read()).decode()
@@ -156,12 +144,12 @@ payload = {
         ]
     }],
     'max_tokens': 1024,
-    'temperature': 0.3
+    'temperature': 0.3,
+    'provider': {
+        'ignore': ['nvidia/nemotron-3.5-content-safety:free']
+    }
 }
 
-# response_format is not supported by every free/vision model on OpenRouter.
-# Only request it for models known to honor structured outputs; otherwise
-# rely on the multi-strategy text parser downstream.
 STRUCTURED_OUTPUT_MODELS = ('openai/', 'google/gemini', 'anthropic/')
 if model.startswith(STRUCTURED_OUTPUT_MODELS):
     payload['response_format'] = {'type': 'json_object'}
@@ -169,13 +157,13 @@ if model.startswith(STRUCTURED_OUTPUT_MODELS):
 with open(out_file, 'w') as f:
     json.dump(payload, f)
 
-print(f'   📤 Payload created: {os.path.getsize(out_file)} bytes', flush=True)
+print(f' 📤 Payload created: {os.path.getsize(out_file)} bytes', flush=True)
 " || { err "Payload build failed"; continue; }
 
     # ─── API Call ──────────────────────────────────────────────────────────────
     info "Sending request to OpenRouter..."
-
     RESP_FILE="/tmp/or_resp_$$_${attempt}.json"
+
     HTTP_CODE=$(curl -s -o "$RESP_FILE" -w "%{http_code}" \
         --connect-timeout 20 -m 180 \
         -X POST "https://openrouter.ai/api/v1/chat/completions" \
@@ -200,11 +188,9 @@ except Exception:
 " 2>/dev/null)
         warn "HTTP $HTTP_CODE from OpenRouter: $ERR_MSG"
 
-        # A bad/exhausted key shouldn't be retried again this run.
         if [ "$HTTP_CODE" = "401" ] || [ "$HTTP_CODE" = "429" ]; then
             FAILED_KEY_IDXS+=("$KEY_IDX")
         fi
-
         sleep $((attempt * 3))
         continue
     fi
@@ -225,28 +211,22 @@ except Exception:
 
     ROUTED=$(echo "$RESP" | python3 -c "
 import sys, json
-try: print(json.load(sys.stdin).get('model',''))
-except Exception: pass
-" 2>/dev/null)
-
-    FINISH=$(echo "$RESP" | python3 -c "
-import sys, json
 try:
-    r = json.load(sys.stdin)
-    c = r.get('choices', [])
-    if c: print(c[0].get('finish_reason',''))
-except Exception: pass
+    print(json.load(sys.stdin).get('model',''))
+except Exception:
+    pass
 " 2>/dev/null)
-
-    log "Finish reason: $FINISH"
-    log "Content length: ${#CONTENT} chars"
-    log "Routed model: $ROUTED"
 
     if [ -n "$CONTENT" ] && [ "$CONTENT" != "None" ]; then
-        ok "Model responded successfully"
+        echo "--------------------------------------------------" >&2
+        echo "🔍 [AI RAW RESPONSE / CHATBOARD OUTPUT]:" >&2
+        echo "$CONTENT" >&2
+        echo "--------------------------------------------------" >&2
+
         RAW_RESPONSE="$CONTENT"
         SUCCESS_MODEL="$CURRENT_MODEL"
         SUCCESS_ROUTED="$ROUTED"
+        ok "Model responded successfully"
         break
     else
         warn "Empty response body, retrying after backoff..."
@@ -275,42 +255,56 @@ python3 -c '
 import os, json, re, sys
 
 def dbg(m):
-    if os.environ.get("DEBUG")=="1": print(m, file=sys.stderr)
+    if os.environ.get("DEBUG")=="1":
+        print(m, file=sys.stderr)
 
 resp_file = os.environ["RESPONSE_FILE"]
 req_m = os.environ.get("REQUESTED_MODEL", "")
 rout_m = os.environ.get("ROUTED_MODEL", "")
 
-with open(resp_file) as f:
+with open(resp_file, "r", encoding="utf-8") as f:
     raw = f.read()
 
 if os.path.exists(resp_file):
     os.remove(resp_file)
 
 dbg(f"📄 Raw length: {len(raw)}")
-dbg(f"🔎 First 400 chars:\n{raw[:400]}")
 
-data = None
-strategies_tried = []
+def is_invalid_title(t):
+    if not t: return True
+    t_lower = str(t).lower().strip()
+    bad_phrases = [
+        "analyze", "thinking", "thought", "reasoning", "step", "here is", 
+        "json", "output", "note", "need answer", "exact keys", "screenshot", 
+        "video editor", "viral title", "format", "grid frames", "the grid", 
+        "inspect grid", "timestamps", "prompt", "user safety", "safety safe", 
+        "content-safety", "safety"
+    ]
+    if any(bp in t_lower for bp in bad_phrases):
+        return True
+    if len(t_lower.split()) < 2:
+        return True
+    return False
 
-# Strategy 1: Direct parse
+title = None
+start_time = None
+duration = 20
+
+# Strategy 1: Direct JSON parse
+cleaned = re.sub(r"```json\s*|\s*```", "", raw, flags=re.I).strip()
 try:
-    data = json.loads(raw.strip())
-    dbg("✅ Strategy 1: Direct parse")
-except Exception as e:
-    strategies_tried.append(f"direct: {e}")
+    data = json.loads(cleaned)
+    t_cand = data.get("title")
+    if not is_invalid_title(t_cand):
+        title = t_cand
+        start_time = data.get("start_time")
+        duration = data.get("clip_duration", data.get("duration", 20))
+    dbg("✅ Strategy 1: Direct parse succeeded")
+except Exception:
+    pass
 
-# Strategy 2: Strip markdown then parse
-if data is None:
-    cleaned = re.sub(r"```json\s*|\s*```", "", raw, flags=re.I).strip()
-    try:
-        data = json.loads(cleaned)
-        dbg("✅ Strategy 2: Markdown-stripped parse")
-    except Exception as e:
-        strategies_tried.append(f"markdown: {e}")
-
-# Strategy 3: Balanced-brace scan (handles nested braces, unlike a flat regex)
-if data is None:
+# Strategy 2: Balanced-brace scan (handles embedded JSON)
+if not title:
     start_idxs = [i for i, ch in enumerate(raw) if ch == "{"]
     for start in start_idxs:
         depth = 0
@@ -319,45 +313,59 @@ if data is None:
                 depth += 1
             elif raw[end] == "}":
                 depth -= 1
-                if depth == 0:
-                    candidate = raw[start:end+1]
-                    if "\"title\"" in candidate:
-                        try:
-                            data = json.loads(candidate)
-                            dbg("✅ Strategy 3: Balanced-brace scan")
-                        except Exception as e:
-                            strategies_tried.append(f"brace-scan: {e}")
-                    break
-        if data is not None:
+            if depth == 0:
+                candidate = raw[start:end+1]
+                if "\"title\"" in candidate:
+                    try:
+                        data = json.loads(candidate)
+                        t_cand = data.get("title")
+                        if not is_invalid_title(t_cand):
+                            title = t_cand
+                            start_time = data.get("start_time")
+                            duration = data.get("clip_duration", data.get("duration", 20))
+                            dbg("✅ Strategy 2: Balanced-brace scan succeeded")
+                            break
+                    except Exception:
+                        pass
+                break
+        if title: break
+
+# Strategy 3: Rescue Title from AI Reasoning Quotes
+if not title:
+    quoted_candidates = re.findall(r'["\']([A-Z][^"\'\n]{3,50}?[⚔️🔥💥🎯⚡🏹💥🐾🐆💣⚔️].*?)["\']', raw)
+    for cand in quoted_candidates:
+        if not is_invalid_title(cand):
+            title = cand
+            dbg("✅ Strategy 3: Reasoning quote rescue succeeded")
             break
 
-# Strategy 4: Loose regex fallback (last resort, flat objects only)
-if data is None:
-    pattern = r"\{[^{}]*\"title\"[^{}]*\}"
-    for m in re.finditer(pattern, raw, re.DOTALL):
-        try:
-            data = json.loads(m.group(0))
-            dbg("✅ Strategy 4: Regex JSON pattern")
+# Strategy 4: Fallback Line Search
+if not title:
+    lines = [line.strip() for line in raw.split("\n") if line.strip()]
+    for line in reversed(lines):
+        clean_line = re.sub(r"^[\*\-\d\.\s#]+", "", line).strip()
+        if not is_invalid_title(clean_line) and len(clean_line) > 5:
+            title = clean_line[:60]
+            dbg("✅ Strategy 4: Line fallback succeeded")
             break
-        except Exception as e:
-            strategies_tried.append(f"regex: {e}")
 
-if data is None:
-    dbg(f"❌ All strategies failed: {strategies_tried}")
-    print(json.dumps({"status": "failed", "error": "No valid JSON found"}))
+if not title or is_invalid_title(title):
+    dbg("❌ All parsing strategies failed to yield a valid title")
+    print(json.dumps({"status": "failed", "error": "Invalid title generated"}))
     sys.exit(1)
 
-title      = str(data.get("title", "")).strip()
-start_time = str(data.get("start_time", "00:00:10")).strip()
-duration   = data.get("clip_duration", 20)
-
-if not title or len(title) < 3:
-    print(json.dumps({"status": "failed", "error": "Title too short"}))
-    sys.exit(1)
-
-# Clean title formatting
+# Clean title for FFmpeg safety
+title = str(title).split("\n")[0].strip()
 title = re.sub(r"[,\x27\"\x22\-:\n\r\t]+", " ", title)
 title = re.sub(r"\s+", " ", title).strip()
+
+if not start_time:
+    time_match = re.search(r"\b\d{2}:\d{2}:\d{2}\b", raw)
+    if time_match:
+        start_time = time_match.group(0)
+    else:
+        time_short = re.search(r"\b(\d{2}:\d{2})\b", raw)
+        start_time = f"00:{time_short.group(1)}" if time_short else "00:00:10"
 
 try:
     dur_int = max(12, min(45, int(duration)))
@@ -368,8 +376,8 @@ print(json.dumps({
     "status": "success",
     "requested_model": req_m,
     "routed_model": rout_m,
-    "title": title,
-    "start_time": start_time,
+    "title": str(title),
+    "start_time": str(start_time),
     "duration": dur_int
 }, ensure_ascii=False))
 '
