@@ -1,9 +1,8 @@
 #!/bin/bash
 # ==============================================================================
-# 🚀 OPENROUTER BASH AGENT - FINAL FIXED VERSION
+# 🚀 OPENROUTER BASH AGENT - FINAL (FULL max_tokens, WAIT FOR COMPLETE)
 # Fallback: openrouter/free (NO CHANGE)
-# Text models: BLOCKED
-# Output: SINGLE TITLE JSON only
+# max_tokens: 4096 (full response)
 # ==============================================================================
 
 GRID_PATH="${GRID_PATH:-temp_frames/merged_60_grid_screenshot.jpg}"
@@ -48,14 +47,11 @@ Style Directive: ${STYLE_PROMPT}
 
 Find the most thrilling, high-action segment, skipping dull introductions.
 
-IMPORTANT: Do all your analysis internally. Do NOT write out your thinking, reasoning, or thought process. Just give me the final answer directly.
-
 STRICT OUTPUT RULES:
 1. Return ONLY ONE JSON object.
-2. Do NOT write thinking process, reasoning, or analysis in the output.
-3. Do NOT list multiple titles.
-4. Do NOT use markdown code blocks.
-5. Output must start with { and end with }.
+2. Do NOT list multiple titles.
+3. Do NOT use markdown code blocks.
+4. Output must start with { and end with }.
 
 JSON format:
 {\"title\": \"Single Best Title\", \"start_time\": \"HH:MM:SS\", \"clip_duration\": 30}"
@@ -108,7 +104,7 @@ with open(grid_path, 'rb') as f:
     img_bytes = f.read()
     b64_img = base64.b64encode(img_bytes).decode('utf-8')
 
-print(f"   📸 Image Size : {len(img_bytes)} bytes (b64: {len(b64_img)} chars)", flush=True)
+print(f"   📸 Image Size : {len(img_bytes)} bytes", flush=True)
 
 schema = {
     "type": "object",
@@ -130,7 +126,7 @@ payload = {
             {'type': 'image_url', 'image_url': {'url': f'data:image/jpeg;base64,{b64_img}'}}
         ]
     }],
-    'max_tokens': 150,
+    'max_tokens': 4096,
     'temperature': 0.2,
     'response_format': {
         'type': 'json_schema',
@@ -150,15 +146,15 @@ payload = {
 with open(payload_file, 'w') as f:
     json.dump(payload, f)
 
-print(f"   🔧 require_parameters: True (Text models BLOCKED)", flush=True)
+print(f"   🔧 require_parameters: True", flush=True)
 print(f"   📤 Payload ready: {os.path.getsize(payload_file)} bytes", flush=True)
 PYEOF
 
     dbg ""
-    dbg "   📡 Sending request to OpenRouter..."
+    dbg "   📡 Sending request to OpenRouter... (waiting for FULL response)"
     
     HTTP_CODE=$(curl -s -o /tmp/or_response_$$.json -w "%{http_code}" \
-        --connect-timeout 15 -m 90 \
+        --connect-timeout 15 -m 180 \
         -X POST "https://openrouter.ai/api/v1/chat/completions" \
         -H "Authorization: Bearer $CURRENT_KEY" \
         -H "Content-Type: application/json" \
@@ -172,7 +168,7 @@ PYEOF
     
     if [ "$DEBUG" = "1" ]; then
         dbg "   📥 Raw Response :"
-        echo "$RESP" | head -c 2000 | sed 's/^/      /' >&2
+        echo "$RESP" | head -c 3000 | sed 's/^/      /' >&2
         echo "" >&2
     fi
 
@@ -190,35 +186,34 @@ try:
 except: print('')
 " 2>/dev/null)
     
+    FINISH_REASON=$(echo "$RESP" | python3 -c "
+import sys, json
+try:
+    res = json.load(sys.stdin)
+    choices = res.get('choices', [])
+    if choices:
+        print(choices[0].get('finish_reason', ''))
+except: print('')
+" 2>/dev/null)
+    
     ROUTED=$(echo "$RESP" | python3 -c "
 import sys, json
 try: print(json.load(sys.stdin).get('model', ''))
 except: print('')
 " 2>/dev/null)
-    
-    ERROR_MSG=$(echo "$RESP" | python3 -c "
-import sys, json
-try:
-    res = json.load(sys.stdin)
-    err = res.get('error', {})
-    if err: print(f\"{err.get('code','')} - {err.get('message','')}\")
-except: pass
-" 2>/dev/null)
 
-    if [ -n "$ERROR_MSG" ]; then
-        dbg "   ❌ API Error    : $ERROR_MSG"
-    fi
+    dbg "   🏁 Finish Reason: $FINISH_REASON"
+    dbg "   📝 Content Len  : ${#CONTENT} chars"
 
     if [ -n "$CONTENT" ] && [ "$CONTENT" != "None" ]; then
         dbg ""
         dbg "   ✅ SUCCESS — Model responded!"
         dbg "   🎯 Routed Model : ${ROUTED:-unknown}"
-        dbg "   📝 Content Len  : ${#CONTENT} chars"
         dbg ""
         dbg "   ┌─────────────────────────────────────────────"
-        dbg "   │ 🔍 AI RAW OUTPUT:"
+        dbg "   │ 🔍 AI RAW OUTPUT (last 1000 chars):"
         dbg "   └─────────────────────────────────────────────"
-        echo "$CONTENT" | sed 's/^/   │ /' >&2
+        echo "$CONTENT" | tail -c 1000 | sed 's/^/   │ /' >&2
         dbg "   ─────────────────────────────────────────────"
         
         RAW_RESPONSE="$CONTENT"
@@ -226,16 +221,12 @@ except: pass
         SUCCESS_ROUTED_MODEL="${ROUTED:-$CURRENT_MODEL}"
         break
     else
-        dbg "   ⚠️  Empty content in response. Retrying..."
+        dbg "   ⚠️  Empty content. Retrying..."
         sleep 2
     fi
 done
 
 if [ -z "$RAW_RESPONSE" ]; then
-    dbg ""
-    dbg "════════════════════════════════════════════════════════"
-    dbg "❌ ALL ATTEMPTS FAILED"
-    dbg "════════════════════════════════════════════════════════"
     echo '{"status": "failed", "error": "All OpenRouter attempts failed"}'
     exit 1
 fi
@@ -245,7 +236,7 @@ printf "%s" "$RAW_RESPONSE" > "$RESPONSE_FILE"
 
 dbg ""
 dbg "════════════════════════════════════════════════════════"
-dbg "🧹 PARSING PHASE"
+dbg "🧹 PARSING PHASE (Full response received)"
 dbg "════════════════════════════════════════════════════════"
 
 export REQUESTED_MODEL="$SUCCESS_REQUESTED_MODEL" ROUTED_MODEL="$SUCCESS_ROUTED_MODEL" RESPONSE_FILE DEBUG
@@ -260,61 +251,78 @@ debug = os.environ.get('DEBUG', '0') == '1'
 def dbg(msg):
     if debug: print(msg, file=sys.stderr)
 
-try:
-    with open(response_file, 'r', encoding='utf-8') as f:
-        raw = f.read()
-except:
-    raw = ""
+with open(response_file, 'r', encoding='utf-8') as f:
+    raw = f.read()
 
 if os.path.exists(response_file):
     os.remove(response_file)
 
 dbg(f"📄 Raw length: {len(raw)} chars")
+
 cleaned = re.sub(r'```json\s*|\s*```', '', raw, flags=re.IGNORECASE).strip()
 dbg(f"🧽 After cleanup: {len(cleaned)} chars")
 
 data = None
+
+# Strategy 1: Direct parse
 try:
     data = json.loads(cleaned)
     dbg("✅ Direct JSON parse SUCCESS")
 except json.JSONDecodeError:
-    dbg("⚠️  Direct parse failed, trying last JSON block...")
-    first_brace = cleaned.find('{')
-    last_brace = cleaned.rfind('}')
-    if first_brace != -1 and last_brace != -1 and last_brace > first_brace:
-        json_candidate = cleaned[first_brace:last_brace+1]
-        dbg(f"🔎 JSON candidate (first 300): {json_candidate[:300]}")
-        try:
-            data = json.loads(json_candidate)
-            dbg("✅ Parsed JSON from last block SUCCESS")
-        except Exception as e:
-            dbg(f"❌ Last block parse failed: {e}")
-    if data is None:
-        match = re.search(r'\{[^{}]*"title"[^{}]*\}', raw, re.DOTALL)
-        if match:
-            try:
-                data = json.loads(match.group(0))
-                dbg("✅ Parsed via title-specific regex")
-            except Exception as e:
-                dbg(f"❌ Title regex parse failed: {e}")
-    if data is None:
-        dbg("❌ All parse attempts failed")
-        print(json.dumps({"status": "failed", "error": "No valid JSON found"}))
-        sys.exit(1)
+    dbg("⚠️  Direct parse failed")
 
-dbg(f"📋 Parsed keys: {list(data.keys())}")
-dbg(f"📋 Parsed data: {json.dumps(data, ensure_ascii=False)[:500]}")
+# Strategy 2: Strict title pattern
+if data is None:
+    match = re.search(
+        r'\{\s*"title"\s*:\s*"[^"]+"\s*,\s*"start_time"\s*:\s*"[^"]+"\s*,\s*"clip_duration"\s*:\s*\d+\s*\}',
+        raw, re.DOTALL
+    )
+    if match:
+        try:
+            data = json.loads(match.group(0))
+            dbg("✅ Parsed via strict title pattern")
+        except Exception as e:
+            dbg(f"❌ Strict pattern failed: {e}")
+
+# Strategy 3: Find any JSON with title + start_time
+if data is None:
+    for match in re.finditer(r'\{[^{}]*"title"[^{}]*\}', raw, re.DOTALL):
+        try:
+            candidate = json.loads(match.group(0))
+            if 'title' in candidate and 'start_time' in candidate:
+                data = candidate
+                dbg("✅ Parsed via loose title pattern")
+                break
+        except:
+            continue
+
+# Strategy 4: Last resort - find any JSON object
+if data is None:
+    for match in re.finditer(r'\{[^{}]*\}', raw, re.DOTALL):
+        try:
+            candidate = json.loads(match.group(0))
+            if 'title' in candidate:
+                data = candidate
+                dbg("✅ Parsed via last-resort pattern")
+                break
+        except:
+            continue
+
+if data is None:
+    dbg("❌ All parse attempts failed")
+    dbg(f"🔎 First 500 chars of raw: {raw[:500]}")
+    print(json.dumps({"status": "failed", "error": "No valid JSON found"}))
+    sys.exit(1)
 
 title = data.get('title', '').strip()
 start_time = data.get('start_time', '00:00:10')
 duration = data.get('clip_duration', 15)
 
-dbg(f"🎬 Extracted title: '{title}'")
-dbg(f"⏰ Extracted start_time: '{start_time}'")
-dbg(f"⏱️  Extracted duration: {duration}")
+dbg(f"🎬 Title: '{title}'")
+dbg(f"⏰ Start: '{start_time}'")
+dbg(f"⏱️  Duration: {duration}")
 
 if not title or len(title.split()) < 2:
-    dbg(f"❌ Title invalid: '{title}'")
     print(json.dumps({"status": "failed", "error": "Title too short"}))
     sys.exit(1)
 
@@ -325,9 +333,6 @@ try:
     dur_int = max(12, min(45, int(duration)))
 except:
     dur_int = 15
-
-dbg(f"✅ Final title: '{title}'")
-dbg(f"✅ Final duration: {dur_int}")
 
 print(json.dumps({
     "status": "success",
