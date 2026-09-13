@@ -401,9 +401,24 @@ if [ "$PARSED_STATUS" != "success" ]; then
     export INSIGHTS_SUMMARY
     export STYLE_PROMPT
     
-    PARSED_JSON_DATA=$(bash fallback.sh)
+        PARSED_JSON_DATA=$(bash fallback.sh)
     echo "🧠 Fallback AI Final Response: $PARSED_JSON_DATA"
     
+    # 🛡️ Safety filter: Sirf last wala valid JSON block extract karega
+    PARSED_JSON_DATA=$(echo "$PARSED_JSON_DATA" | python3 -c "
+import sys, re, json
+raw = sys.stdin.read()
+match = re.search(r'\{.*\}', raw, re.DOTALL)
+if match:
+    try:
+        data = json.loads(match.group(0))
+        print(json.dumps(data))
+    except:
+        print('{\"status\": \"failed\"}')
+else:
+    print('{\"status\": \"failed\"}')
+")
+
     PARSED_STATUS=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status', 'failed'))" 2>/dev/null)
 fi
 
