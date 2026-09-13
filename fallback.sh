@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# 🚀 OPENROUTER BASH AGENT (WITH openrouter/free SAVED & RIGID FILTERING)
+# 🚀 OPENROUTER BASH AGENT (REASONING RESCUE & BULLETPROOF PARSING)
 # ==============================================================================
 
 GRID_PATH="${GRID_PATH:-temp_frames/merged_60_grid_screenshot.jpg}"
@@ -85,7 +85,7 @@ payload = {
         ]
     }],
     'max_tokens': 1024,
-    'temperature': 0.4,
+    'temperature': 0.2,
     'response_format': {'type': 'json_object'}
 }
 
@@ -125,7 +125,7 @@ if [ -z "$RAW_RESPONSE" ]; then
     exit 1
 fi
 
-# 3. 🧹 Strict Multi-Layer JSON & Fallback Parsing
+# 3. 🧹 Safe File Passing & Smart Reasoning Title Parser
 RESPONSE_FILE="temp_frames/or_response.txt"
 printf "%s" "$RAW_RESPONSE" > "$RESPONSE_FILE"
 
@@ -159,7 +159,7 @@ def is_invalid_title(t):
         "analyze", "thinking", "thought", "reasoning", "step", "here is", 
         "json", "output", "note", "need answer", "exact keys", "screenshot", 
         "video editor", "viral title", "format", "grid frames", "the grid", 
-        "inspect grid", "timestamps"
+        "inspect grid", "timestamps", "prompt"
     ]
     if any(bp in t_lower for bp in bad_phrases):
         return True
@@ -178,7 +178,7 @@ try:
 except Exception:
     pass
 
-# Layer 2: Extract last structural JSON match in case of preceding reasoning
+# Layer 2: Extract nested JSON from text
 if not title:
     matches = re.findall(r'\{[^{}]*"title"[^{}]*\}', cleaned, re.DOTALL)
     for m in reversed(matches):
@@ -193,28 +193,52 @@ if not title:
         except Exception:
             pass
 
-# Strict Exit on Bad Title
+# Layer 3: Rescue Title from AI Thinking/Reasoning Text
+if not title:
+    quoted_candidates = re.findall(r'["\']([A-Z][^"\'\n]{3,50}?[⚔️🔥💥🎯⚡🏹💥🐾🐆💣⚔️].*?)["\']', raw)
+    for cand in quoted_candidates:
+        if not is_invalid_title(cand):
+            title = cand
+            break
+
+# Layer 4: Fallback Line Search
+if not title:
+    lines = [line.strip() for line in cleaned.split('\n') if line.strip()]
+    for line in reversed(lines):
+        clean_line = re.sub(r'^[\*\-\d\.\s#]+', '', line).strip()
+        if not is_invalid_title(clean_line) and len(clean_line) > 5 and len(clean_line.split()) >= 2:
+            title = clean_line[:60]
+            break
+
+# Strict Check: If no title found anywhere, exit cleanly
 if not title or is_invalid_title(title):
     print(json.dumps({
         "status": "failed",
-        "error": "Strict Parse Failed: AI output contained no valid JSON title structure."
+        "error": "Strict Parse Failed: Could not extract valid viral title from AI response."
     }))
     sys.exit(1)
 
-# Clean title formatting
+# Clean title for shell/FFmpeg safety
 title = str(title).split('\n')[0].strip()
 title = re.sub(r'[,\'"\-:\n\r]+', ' ', title).strip()
 title = re.sub(r'\s+', ' ', title)
 
+# Timestamp Extraction
 if not start_time:
-    time_match = re.search(r'\b\d{2}:\d{2}:\d{2}\b', cleaned)
-    start_time = time_match.group(0) if time_match else "00:00:10"
+    time_match = re.search(r'\b\d{2}:\d{2}:\d{2}\b', raw)
+    if time_match:
+        start_time = time_match.group(0)
+    else:
+        # Check standard timestamp formats inside text (e.g. 00:29 or 00:23)
+        time_short = re.search(r'\b(\d{2}:\d{2})\b', raw)
+        start_time = f"00:{time_short.group(1)}" if time_short else "00:00:10"
 
 try:
     dur_int = max(12, min(45, int(duration)))
 except Exception:
     dur_int = 15
 
+# Final Valid Output
 print(json.dumps({
     "status": "success",
     "requested_model": req_m,
