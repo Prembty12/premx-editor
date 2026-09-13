@@ -88,9 +88,9 @@ for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
     dbg "────────────────────────────────────────────────────────"
     dbg "🤖 ATTEMPT $attempt / $MAX_RETRIES"
     dbg "────────────────────────────────────────────────────────"
-    dbg "   Model     : $CURRENT_MODEL"
-    dbg "   API Key   : $KEY_DISPLAY"
-    dbg "   Time      : $(date +%H:%M:%S)"
+    dbg "    Model     : $CURRENT_MODEL"
+    dbg "    API Key   : $KEY_DISPLAY"
+    dbg "    Time      : $(date +%H:%M:%S)"
 
     PAYLOAD_FILE="temp_frames/or_payload.json"
     mkdir -p temp_frames
@@ -108,7 +108,7 @@ with open(grid_path, 'rb') as f:
     img_bytes = f.read()
     b64_img = base64.b64encode(img_bytes).decode('utf-8')
 
-print(f"   📸 Image Size : {len(img_bytes)} bytes (b64: {len(b64_img)} chars)", flush=True)
+print(f"    📸 Image Size : {len(img_bytes)} bytes (b64: {len(b64_img)} chars)", flush=True)
 
 schema = {
     "type": "object",
@@ -130,7 +130,7 @@ payload = {
             {'type': 'image_url', 'image_url': {'url': f'data:image/jpeg;base64,{b64_img}'}}
         ]
     }],
-    'max_tokens': 4096,                # ✅ FIX #1: reasoning buffer
+    'max_tokens': 4096,                 # ✅ FIX #1: reasoning buffer
     'temperature': 0.2,
     'reasoning': {                     # ✅ FIX #2: reasoning hide
         'exclude': True
@@ -153,14 +153,14 @@ payload = {
 with open(payload_file, 'w') as f:
     json.dump(payload, f)
 
-print(f"   🔧 require_parameters : {payload['provider']['require_parameters']}", flush=True)
-print(f"   🧠 reasoning.exclude  : {payload['reasoning']['exclude']}", flush=True)
-print(f"   📏 max_tokens         : {payload['max_tokens']}", flush=True)
-print(f"   📤 Payload ready: {os.path.getsize(payload_file)} bytes", flush=True)
+print(f"    🔧 require_parameters : {payload['provider']['require_parameters']}", flush=True)
+print(f"    🧠 reasoning.exclude  : {payload['reasoning']['exclude']}", flush=True)
+print(f"    📏 max_tokens         : {payload['max_tokens']}", flush=True)
+print(f"    📤 Payload ready: {os.path.getsize(payload_file)} bytes", flush=True)
 PYEOF
 
     dbg ""
-    dbg "   📡 Sending request to OpenRouter..."
+    dbg "    📡 Sending request to OpenRouter..."
 
     HTTP_CODE=$(curl -s -o /tmp/or_response_$$.json -w "%{http_code}" \
         --connect-timeout 15 -m 120 \
@@ -173,21 +173,21 @@ PYEOF
     rm -f /tmp/or_response_$$.json
     rm -f "$PAYLOAD_FILE"
 
-    dbg "   📥 HTTP Status  : $HTTP_CODE"
+    dbg "    📥 HTTP Status  : $HTTP_CODE"
 
     # ✅ HTTP error handling
     case "$HTTP_CODE" in
         200) ;;
-        429) dbg "   ⏳ Rate limit — waiting 20s..."; sleep 20 ;;
-        402) dbg "   💰 Credit/payment issue"; sleep 5 ;;
-        503) dbg "   🔧 Model overloaded"; sleep 5 ;;
-        000) dbg "   🌐 Network timeout"; sleep 5 ;;
-        *)   dbg "   ❌ HTTP $HTTP_CODE — retrying"; sleep 3 ;;
+        429) dbg "    ⏳ Rate limit — waiting 20s..."; sleep 20 ;;
+        402) dbg "    💰 Credit/payment issue"; sleep 5 ;;
+        503) dbg "    🔧 Model overloaded"; sleep 5 ;;
+        000) dbg "    🌐 Network timeout"; sleep 5 ;;
+        *)   dbg "    ❌ HTTP $HTTP_CODE — retrying"; sleep 3 ;;
     esac
 
     if [ "$DEBUG" = "1" ]; then
-        dbg "   📥 Raw Response (first 800 chars):"
-        echo "$RESP" | head -c 800 | sed 's/^/      /' >&2
+        dbg "    📥 Raw Response (first 800 chars):"
+        echo "$RESP" | head -c 800 | sed 's/^/     /' >&2
         echo "" >&2
     fi
 
@@ -229,11 +229,11 @@ except: pass
 " 2>/dev/null)
 
     if [ -n "$ERROR_MSG" ]; then
-        dbg "   ❌ API Error    : $ERROR_MSG"
+        dbg "    ❌ API Error    : $ERROR_MSG"
     fi
 
     if [ "$FINISH_REASON" = "length" ]; then
-        dbg "   ⚠️  finish_reason=length — response truncated!"
+        dbg "    ⚠️  finish_reason=length — response truncated!"
     fi
 
     # ── SMART VALIDATION ──
@@ -261,31 +261,31 @@ except: pass
 
         if [ "$REJECT" = "1" ]; then
             dbg ""
-            dbg "   🚨 REJECTED — $REJECT_REASON"
-            dbg "   🔄 Retrying with next attempt..."
+            dbg "    🚨 REJECTED — $REJECT_REASON"
+            dbg "    🔄 Retrying with next attempt..."
             sleep 2
             continue
         fi
 
         # ── SUCCESS ──
         dbg ""
-        dbg "   ✅ SUCCESS — Model responded!"
-        dbg "   🎯 Routed Model : ${ROUTED:-unknown}"
-        dbg "   📝 Content Len  : ${#CONTENT} chars"
-        dbg "   🏁 Finish Reason: ${FINISH_REASON:-unknown}"
+        dbg "    ✅ SUCCESS — Model responded!"
+        dbg "    🎯 Routed Model : ${ROUTED:-unknown}"
+        dbg "    📝 Content Len  : ${#CONTENT} chars"
+        dbg "    🏁 Finish Reason: ${FINISH_REASON:-unknown}"
         dbg ""
-        dbg "   ┌─────────────────────────────────────────────"
-        dbg "   │ 🔍 AI RAW OUTPUT:"
-        dbg "   └─────────────────────────────────────────────"
-        echo "$CONTENT" | head -c 1500 | sed 's/^/   │ /' >&2
-        dbg "   ─────────────────────────────────────────────"
+        dbg "    ┌─────────────────────────────────────────────"
+        dbg "    │ 🔍 AI RAW OUTPUT:"
+        dbg "    └─────────────────────────────────────────────"
+        echo "$CONTENT" | head -c 1500 | sed 's/^/    │ /' >&2
+        dbg "    ─────────────────────────────────────────────"
 
         RAW_RESPONSE="$CONTENT"
         SUCCESS_REQUESTED_MODEL="$CURRENT_MODEL"
         SUCCESS_ROUTED_MODEL="${ROUTED:-$CURRENT_MODEL}"
         break
     else
-        dbg "   ⚠️  Empty content. Retrying..."
+        dbg "    ⚠️  Empty content. Retrying..."
         sleep 2
     fi
 done
@@ -387,11 +387,17 @@ title = data.get('title', '').strip()
 start_time = data.get('start_time', '00:00:10')
 duration = data.get('clip_duration', 30)
 
+# ✅ FIX: Normalize start_time format if model returns "00:00" instead of "00:00:00" or similar
+if start_time.count(':') == 1:
+    start_time = "00:" + start_time
+elif not start_time:
+    start_time = "00:00:10"
+
 dbg(f"🎬 Title: '{title}'")
 dbg(f"⏰ Start: '{start_time}'")
 dbg(f"⏱️  Duration: {duration}")
 
-if not title or len(title.split()) < 2:
+if not title or len(title.split()) < 1:
     dbg(f"❌ Title invalid: '{title}'")
     print(json.dumps({"status": "failed", "error": "Title too short"}))
     sys.exit(0)
