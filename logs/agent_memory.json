@@ -1,8 +1,8 @@
 {
     "game_scores": {
-        "Ghost_soap_escap": 5,
+        "Ghost_soap_escap": 10,
         "ghostwork": 5,
-        "Ghost Destroys Mexican": 10,
+        "Ghost Destroys Mexican": 5,
         "combatopration": 5,
         "Callofdutyaw": 5,
         "codBlackops6": 5,
@@ -16,7 +16,7 @@
         " UkraineCovertMission": 5,
         "AfghanistanRedZone": 5,
         "DiabloIV": 5,
-        "GODOFWAR3": 6,
+        "GODOFWAR3": 5,
         "GodofWarLaufey ": 5,
         "MarvelsSpiderMan2": 5,
         "ghostandela": 5,
@@ -25,12 +25,12 @@
     },
     "title_styles": {
         "curiosity": 31,
-        "aggressive": 34,
+        "aggressive": 37,
         "question": 28,
         "emoji_heavy": 28
     },
     "last_used_style": "aggressive",
-    "last_played_game": "Ghost Destroys Mexican",
+    "last_played_game": "Ghost_soap_escap",
     "streak_game": "",
     "streak_count": 0,
     "winning_title_context": ""

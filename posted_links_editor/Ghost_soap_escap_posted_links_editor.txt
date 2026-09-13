@@ -22,3 +22,6 @@ Video id : 18111366068048394
 Ghost_soap_escaps19 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps19.mp4
 Video id : 18006753671992334
 
+Ghost_soap_escaps13 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps13.mp4
+Video id : 18469725373115712
+
