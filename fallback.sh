@@ -39,7 +39,7 @@ Style Directive: ${STYLE_PROMPT}
 
 Your primary job as an expert video editor is to find the most thrilling, high-action segment, skipping dull introductions.
 Return a JSON object with EXACTLY three keys:
-1. 'title' (string: viral title with 1-3 emojis)
+1. 'title' (string: ONLY THE SINGLE VIRAL TITLE under 6-14 words based on visuals with 1-3 emojis creating curiosity and engagement strictly NO generic words like Epic Insane Crazy Best or Gameplay)
 2. 'start_time' (string format HH:MM:SS indicating exact peak action start time based on grid timestamps)
 3. 'clip_duration' (integer: length between 12 and 45 seconds meeting monetization rules)
 Return ONLY valid JSON format, no markdown wrapping."
