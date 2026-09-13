@@ -360,6 +360,7 @@ elif isinstance(raw_title, str):
     raw_title = lines[0] if lines else "Pro Gaming Moments 🎯🔥"
 
 title = re.sub(r'^\d+[\.\)]\s*|^[\-\*]\s*|[\*\#\`\"]', '', str(raw_title)).strip()
+title = title.strip("'\"")  # 👈 Is line ko yahan beech me paste karna hai
 title = re.sub(r'\s+', ' ', title)
 
 if not title:
