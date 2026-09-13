@@ -156,9 +156,12 @@ payload = {
 with open(payload_file, 'w') as f:
     json.dump(payload, f)
 
-print(f"   🧠 Is Reasoning: {is_reasoning}", flush=True)
-print(f"   🔧 require_parameters: {payload['provider']['require_parameters']}", flush=True)
-print(f"   📤 Payload ready: {os.path.getsize(payload_file)} bytes", flush=True)
+import sys  # ensure sys is imported or available
+
+print(f"   📸 Image Size : {len(img_bytes)} bytes (b64: {len(b64_img)} chars)", file=sys.stderr, flush=True)
+print(f"   🧠 Is Reasoning: {is_reasoning}", file=sys.stderr, flush=True)
+print(f"   🔧 require_parameters: {payload['provider']['require_parameters']}", file=sys.stderr, flush=True)
+print(f"   📤 Payload ready: {os.path.getsize(payload_file)} bytes", file=sys.stderr, flush=True)
 PYEOF
 
     dbg ""
