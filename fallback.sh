@@ -1,14 +1,15 @@
 #!/bin/bash
 # ==============================================================================
-# 🚀 OPENROUTER BASH AGENT (PRODUCTION-READY & 100% BULLETPROOF)
+# 🚀 OPENROUTER BASH AGENT (WITH RAW AI RESPONSE LOGGING)
 # ==============================================================================
 
 GRID_PATH="${GRID_PATH:-temp_frames/merged_60_grid_screenshot.jpg}"
 SOURCE_DURATION="${SOURCE_DURATION:-60}"
 INSIGHTS_SUMMARY="${INSIGHTS_SUMMARY:-}"
 STYLE_PROMPT="${STYLE_PROMPT:-}"
+
 PRIMARY_MODEL="${OPENROUTER_MODEL:-nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free}"
-FALLBACK_MODEL="openrouter/free"
+FALLBACK_MODEL="google/gemma-4-31b-it:free"
 
 # 1. 🔑 Collect OpenRouter Keys Safely
 declare -a KEYS=()
@@ -39,7 +40,7 @@ Style Directive: ${STYLE_PROMPT}
 
 Your primary job as an expert video editor is to find the most thrilling, high-action segment, skipping dull introductions.
 Return a JSON object with EXACTLY three keys:
-1. 'title' (string: ONLY THE SINGLE VIRAL TITLE under 6-14 words based on visuals with 1-3 emojis creating curiosity and engagement strictly NO generic words like Epic Insane Crazy Best or Gameplay)
+1. 'title' (string: ONLY THE SINGLE VIRAL TITLE under 6 words based on visuals with 1-3 emojis creating curiosity and engagement strictly NO generic words like Epic Insane Crazy Best or Gameplay)
 2. 'start_time' (string format HH:MM:SS indicating exact peak action start time based on grid timestamps)
 3. 'clip_duration' (integer: length between 12 and 45 seconds meeting monetization rules)
 Return ONLY valid JSON format, no markdown wrapping."
@@ -101,14 +102,21 @@ EOF
     CONTENT=$(echo "$RESP" | python3 -c "import sys, json; res=json.load(sys.stdin); print(res.get('choices', [{}])[0].get('message', {}).get('content', '') or res.get('choices', [{}])[0].get('message', {}).get('reasoning', ''))" 2>/dev/null)
     ROUTED=$(echo "$RESP" | python3 -c "import sys, json; print(json.load(sys.stdin).get('model', ''))" 2>/dev/null)
 
+    # 🔍 PRINT CHATBOARD RESPONSE TO TERMINAL FOR DEBUGGING
     if [ -n "$CONTENT" ] && [ "$CONTENT" != "None" ]; then
+        echo "--------------------------------------------------" >&2
+        echo "🔍 [AI RAW RESPONSE / CHATBOARD OUTPUT]:" >&2
+        echo "$CONTENT" >&2
+        echo "--------------------------------------------------" >&2
+        
         RAW_RESPONSE="$CONTENT"
         SUCCESS_REQUESTED_MODEL="$CURRENT_MODEL"
         SUCCESS_ROUTED_MODEL="${ROUTED:-$CURRENT_MODEL}"
         echo "✅ [$(date +%H:%M:%S)] Success on Attempt $attempt! Routed Model: $SUCCESS_ROUTED_MODEL" >&2
         break
     else
-        echo "⚠️ [$(date +%H:%M:%S)] Attempt $attempt failed or timed out. Rotating key instantly..." >&2
+        echo "⚠️ [$(date +%H:%M:%S)] Attempt $attempt failed or returned empty text. Output was:" >&2
+        echo "$RESP" >&2
         sleep 1
     fi
 done
@@ -118,7 +126,7 @@ if [ -z "$RAW_RESPONSE" ]; then
     exit 1
 fi
 
-# 3. 🧹 Safe File-Based Passing & Strict Parsing (No Fallbacks)
+# 3. 🧹 File Passing & Parsing
 RESPONSE_FILE="temp_frames/or_response.txt"
 printf "%s" "$RAW_RESPONSE" > "$RESPONSE_FILE"
 
@@ -143,20 +151,23 @@ title = None
 start_time = None
 duration = 15
 
-# Strip markdown block wrappers
 cleaned = re.sub(r'```json\s*|\s*```', '', raw, flags=re.IGNORECASE).strip()
 
 def is_invalid_title(t):
     if not t: return True
     t_lower = t.lower()
-    bad_phrases = ["analyze", "thinking", "thought", "reasoning", "step", "here is", "json", "output", "note"]
-    if any(bp in t_lower for bp in bad_phrases) and len(t) < 25:
+    bad_phrases = [
+        "analyze", "thinking", "thought", "reasoning", "step", "here is", 
+        "json", "output", "note", "need answer", "exact keys", "screenshot", 
+        "video editor", "viral title", "format"
+    ]
+    if any(bp in t_lower for bp in bad_phrases):
         return True
     if re.match(r'^\d+\s*[\.\-:]+\s*\*\*', t):
         return True
     return False
 
-# Layer 1: Try Direct JSON Parse
+# Layer 1: Direct JSON Parse
 try:
     data = json.loads(cleaned)
     t_candidate = data.get('title')
@@ -167,7 +178,7 @@ try:
 except Exception:
     pass
 
-# Layer 2: Extract nested JSON using Regex
+# Layer 2: Extract nested JSON
 if not title:
     match = re.search(r'\{.*\}', cleaned, re.DOTALL)
     if match:
@@ -181,7 +192,7 @@ if not title:
         except Exception:
             pass
 
-# Layer 3: Scan lines strictly rejecting reasoning/thinking lines
+# Layer 3: Regex Line Fallback
 if not title:
     lines = [line.strip() for line in cleaned.split('\n') if line.strip()]
     for line in lines:
@@ -190,7 +201,7 @@ if not title:
             title = clean_line[:60]
             break
 
-# STRICT FAILURE: No dummy fallback, fail directly if title is missing or garbage
+# Strict Failure on Bad Title
 if not title or is_invalid_title(title):
     print(json.dumps({
         "status": "failed",
@@ -198,7 +209,12 @@ if not title or is_invalid_title(title):
     }))
     sys.exit(1)
 
-# Extract Timestamp from AI output
+# Clean title for FFmpeg safety
+title = str(title).split('\n')[0].strip()
+title = re.sub(r'[,\'"\-:\n\r]+', ' ', title).strip()
+title = re.sub(r'\s+', ' ', title)
+
+# Extract Timestamp
 if not start_time:
     time_match = re.search(r'\b\d{2}:\d{2}:\d{2}\b', cleaned)
     if time_match:
