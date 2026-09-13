@@ -169,24 +169,37 @@ if not title:
 
 # Layer 3: Dynamic Regex Extraction directly from AI Text
 if not title:
-    # Key-value match (e.g., "title": "My Title")
+    # 1. Look for JSON-like key value inside reasoning blocks
     title_match = re.search(r'["\']?title["\']?\s*[:=]\s*["\']([^"\']+)["\']', cleaned, re.IGNORECASE)
     if title_match:
-        title = title_match.group(1)
+        extracted = title_match.group(1).strip()
+        # Ensure extracted title isn't just a label header
+        if extracted.lower() not in ["thinking process:", "thinking process", "reasoning", "thought"]:
+            title = extracted
 
 if not title:
-    # First line fallback if AI answered in plain sentences
+    # 2. Filter out internal AI monologue/thinking lines to find real title
+    ignore_patterns = [r'^thinking process', r'^thought', r'^reasoning', r'^analysis', r'^step \d']
     lines = [line.strip() for line in cleaned.split('\n') if line.strip()]
+    
     for line in lines:
-        if not line.startswith('{') and not line.startswith('}'):
-            title = line[:60]
-            break
+        # Skip brackets and internal thinking headings
+        if line.startswith('{') or line.startswith('}') or line.startswith('```'):
+            continue
+        
+        is_thinking_line = any(re.match(pat, line, re.IGNORECASE) for pat in ignore_patterns)
+        if not is_thinking_line:
+            # Clean up leading colon if present
+            clean_title = re.sub(r'^[^\w\s]+', '', line).strip()
+            if len(clean_title) > 3:
+                title = clean_title[:60]
+                break
 
 # Strict Failure - Halts only if AI output is completely empty/unreadable
 if not title:
     print(json.dumps({
         "status": "failed",
-        "error": "AI response was empty or completely unparseable."
+        "error": "AI response was empty or contained no valid title."
     }))
     sys.exit(1)
 
