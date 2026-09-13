@@ -124,7 +124,7 @@ printf "%s" "$RAW_RESPONSE" > "$RESPONSE_FILE"
 
 export REQUESTED_MODEL="$SUCCESS_REQUESTED_MODEL" ROUTED_MODEL="$SUCCESS_ROUTED_MODEL" RESPONSE_FILE
 python3 - << 'EOF'
-import os, json, re
+import os, json, re, sys
 
 response_file = os.environ.get('RESPONSE_FILE')
 req_m = os.environ.get('REQUESTED_MODEL', '')
