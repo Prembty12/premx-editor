@@ -9,7 +9,7 @@ INSIGHTS_SUMMARY="${INSIGHTS_SUMMARY:-}"
 STYLE_PROMPT="${STYLE_PROMPT:-}"
 
 PRIMARY_MODEL="${OPENROUTER_MODEL:-nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free}"
-FALLBACK_MODEL="google/gemma-4-31b-it:free"
+FALLBACK_MODEL="openrouter/free"
 
 # 1. 🔑 Collect OpenRouter Keys Safely
 declare -a KEYS=()
