@@ -7,7 +7,7 @@ GRID_PATH="${GRID_PATH:-temp_frames/merged_60_grid_screenshot.jpg}"
 SOURCE_DURATION="${SOURCE_DURATION:-60}"
 INSIGHTS_SUMMARY="${INSIGHTS_SUMMARY:-}"
 STYLE_PROMPT="${STYLE_PROMPT:-}"
-PRIMARY_MODEL="${OPENROUTER_MODEL:-dots-studio/dots-3-note-preview:free}"
+PRIMARY_MODEL="${OPENROUTER_MODEL:-nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free}"
 FALLBACK_MODEL="openrouter/free"
 
 # 1. 🔑 Collect OpenRouter Keys Safely
@@ -83,7 +83,7 @@ payload = {
             {'type': 'image_url', 'image_url': {'url': f'data:image/jpeg;base64,{b64_img}'}}
         ]
     }],
-    'max_tokens': 2048,
+    'max_tokens': 1024,
     'temperature': 0.4
 }
 
@@ -143,32 +143,54 @@ title = None
 start_time = None
 duration = 15
 
-cleaned = re.sub(r'```json|```', '', raw).strip()
+# Strip markdown block wrappers
+cleaned = re.sub(r'```json\s*|\s*```', '', raw, flags=re.IGNORECASE).strip()
 
-# 1. Try safe JSON extraction if brackets exist
-match = re.search(r'\{.*?\}', cleaned, re.DOTALL)
-if match:
-    try:
-        data = json.loads(match.group(0))
-        title = data.get('title')
-        start_time = data.get('start_time')
-        duration = data.get('clip_duration', data.get('duration', 15))
-    except:
-        pass
+# Layer 1: Try Direct JSON Parse
+try:
+    data = json.loads(cleaned)
+    title = data.get('title')
+    start_time = data.get('start_time')
+    duration = data.get('clip_duration', data.get('duration', 15))
+except Exception:
+    pass
 
-# 2. Fallback Regex for Title if JSON parse failed or missing
+# Layer 2: Extract nested JSON using Regex
 if not title:
-    title_match = re.search(r'["\']title["\']\s*:\s*["\']([^"\']+)["\']', cleaned)
+    match = re.search(r'\{.*\}', cleaned, re.DOTALL)
+    if match:
+        try:
+            data = json.loads(match.group(0))
+            title = data.get('title')
+            start_time = data.get('start_time')
+            duration = data.get('clip_duration', data.get('duration', 15))
+        except Exception:
+            pass
+
+# Layer 3: Dynamic Regex Extraction directly from AI Text
+if not title:
+    # Key-value match (e.g., "title": "My Title")
+    title_match = re.search(r'["\']?title["\']?\s*[:=]\s*["\']([^"\']+)["\']', cleaned, re.IGNORECASE)
     if title_match:
         title = title_match.group(1)
-    else:
-        print(json.dumps({
-            "status": "failed",
-            "error": "Title not found in response; zero default applied."
-        }))
-        sys.exit(1)
 
-# 3. Fallback Regex for Timestamp if missing
+if not title:
+    # First line fallback if AI answered in plain sentences
+    lines = [line.strip() for line in cleaned.split('\n') if line.strip()]
+    for line in lines:
+        if not line.startswith('{') and not line.startswith('}'):
+            title = line[:60]
+            break
+
+# Strict Failure - Halts only if AI output is completely empty/unreadable
+if not title:
+    print(json.dumps({
+        "status": "failed",
+        "error": "AI response was empty or completely unparseable."
+    }))
+    sys.exit(1)
+
+# Extract Timestamp from AI output
 if not start_time:
     time_match = re.search(r'\b\d{2}:\d{2}:\d{2}\b', cleaned)
     if time_match:
@@ -178,9 +200,10 @@ if not start_time:
 
 try:
     dur_int = max(12, min(45, int(duration)))
-except:
+except Exception:
     dur_int = 15
 
+# Successful Output with AI Generated Title
 print(json.dumps({
     "status": "success",
     "requested_model": req_m,
