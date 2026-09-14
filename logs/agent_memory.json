@@ -29,7 +29,7 @@
         "question": 10,
         "emoji_heavy": 10,
         "gaming_hype": 13,
-        "clickbait": 10,
+        "clickbait": 13,
         "informative": 10,
         "epic_cinematic": 10,
         "funny_roast": 16,
@@ -40,11 +40,11 @@
         "secret": 10,
         "shocking": 10
     },
-    "last_used_style": "funny_roast",
+    "last_used_style": "clickbait",
     "last_played_game": "SpiderMan2",
     "streak_game": "SpiderMan2",
-    "streak_count": 3,
+    "streak_count": 4,
     "winning_title_context": "SPIDER-FURY: MILES MORALES UNLEASHES MAXIMUM COMBAT POWER!\n\n#videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingreels #reels",
     "winning_title_game": "SpiderMan2",
-    "winning_title_uses": 1
+    "winning_title_uses": 2
 }
