@@ -1,7 +1,7 @@
 {
     "game_scores": {
         "SpiderMan2": 5,
-        "AfghanistanRedZone": 10,
+        "AfghanistanRedZone": 5,
         "Ghost_soap_escap": 5,
         "ghostwork": 5,
         "Ghost Destroys Mexican": 5,
@@ -9,7 +9,7 @@
         "ghostandela": 5,
         "combatopration": 5,
         "GODOFWAR3": 5,
-        "Callofdutyaw": 5,
+        "Callofdutyaw": 10,
         "codBlackops6": 5,
         "Ghost_price": 5,
         "VietnamCavePrison": 5,
@@ -35,16 +35,16 @@
         "funny_roast": 16,
         "secret_hidden": 10,
         "exposed": 10,
-        "unbelievable": 10,
+        "unbelievable": 13,
         "crazy": 10,
         "secret": 10,
         "shocking": 10
     },
-    "last_used_style": "emoji_heavy",
-    "last_played_game": "AfghanistanRedZone",
-    "streak_game": "SpiderMan2",
-    "streak_count": 4,
-    "winning_title_context": "SPIDER-FURY: MILES MORALES UNLEASHES MAXIMUM COMBAT POWER!\n\n#videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingreels #reels",
+    "last_used_style": "unbelievable",
+    "last_played_game": "Callofdutyaw",
+    "streak_game": "",
+    "streak_count": 0,
+    "winning_title_context": "",
     "winning_title_game": "SpiderMan2",
     "winning_title_uses": 3
 }
