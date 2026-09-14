@@ -242,22 +242,40 @@ except: pass
         dbg "   ❌ API Error    : $ERROR_MSG"
     fi
 
-    if [ -n "$CONTENT" ] && [ "$CONTENT" != "None" ]; then
-        dbg ""
-        dbg "   ✅ SUCCESS — Model responded!"
-        dbg "   🎯 Routed Model : ${ROUTED:-unknown}"
-        dbg "   📝 Content Len  : ${#CONTENT} chars"
-        dbg ""
-        dbg "   ┌─────────────────────────────────────────────"
-        dbg "   │ 🔍 AI RAW OUTPUT:"
-        dbg "   └─────────────────────────────────────────────"
-        echo "$CONTENT" | sed 's/^/   │ /' >&2
-        dbg "   ─────────────────────────────────────────────"
-        
-        RAW_RESPONSE="$CONTENT"
-        SUCCESS_REQUESTED_MODEL="$CURRENT_MODEL"
-        SUCCESS_ROUTED_MODEL="${ROUTED:-$CURRENT_MODEL}"
-        break
+        if [ -n "$CONTENT" ] && [ "$CONTENT" != "None" ]; then
+        # --- PYTHON STRICT VALIDATION SNIPPET (Loop ke andar retry ke liye) ---
+        IS_VALID_JSON=$(python3 -c '
+import json, sys, re
+raw_output = sys.argv[1]
+try:
+    clean_output = re.sub(r"```json\s*|\s*```", "", raw_output, flags=sys.re.IGNORECASE if hasattr(sys, "re") else 0).strip()
+    # Agar <think> tags hain toh unko hatao validation ke liye
+    clean_output = re.sub(r"<think>.*?</think>", "", clean_output, flags=json.__all__ and 0 or 0).strip() # basic strip
+    
+    data = json.loads(clean_output)
+    if not isinstance(data, dict) or not all(k in data for k in ("title", "start_time", "clip_duration")):
+        print("invalid")
+        sys.exit(0)
+    
+    print("valid")
+except Exception:
+    print("invalid")
+' "$CONTENT")
+
+        if [ "$IS_VALID_JSON" = "valid" ]; then
+            dbg ""
+            dbg "   ✅ SUCCESS — Model responded with valid JSON!"
+            dbg "   🎯 Routed Model : ${ROUTED:-unknown}"
+            
+            RAW_RESPONSE="$CONTENT"
+            SUCCESS_REQUESTED_MODEL="$CURRENT_MODEL"
+            SUCCESS_ROUTED_MODEL="${ROUTED:-$CURRENT_MODEL}"
+            break
+        else
+            dbg "   ⚠️  Model ($CURRENT_MODEL) returned invalid JSON or missing keys. Retrying..."
+            sleep 1.5
+            continue
+        fi
     else
         dbg "   ⚠️  Empty content in response. Retrying..."
         sleep 1.5
