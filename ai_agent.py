@@ -101,6 +101,17 @@ def run_agent_brain():
             "aggressive": 10, 
             "question": 10, 
             "emoji_heavy": 10
+            "gaming_hype": 10,
+            "clickbait": 10,
+            "informative": 10,
+            "epic_cinematic": 10,
+            "funny_roast": 10,
+            "secret_hidden": 10,
+            "exposed": 10,
+            "unbelievable": 10,
+            "crazy": 10,
+            "secret": 10,
+            "shocking": 10
         },
         "last_used_style": "curiosity",
         "last_played_game": "",
