@@ -1,10 +1,31 @@
 {
     "game_scores": {
-        "SpiderMan2": 15
+        "SpiderMan2": 10,
+        "AfghanistanRedZone": 6,
+        "Ghost_soap_escap": 5,
+        "ghostwork": 8,
+        "Ghost Destroys Mexican": 5,
+        "GodofWarLaufey ": 6,
+        "ghostandela": 8,
+        "combatopration": 5,
+        "GODOFWAR3": 6,
+        "Callofdutyaw": 5,
+        "codBlackops6": 5,
+        "Ghost_price": 5,
+        "VietnamCavePrison": 5,
+        "DiabloIV": 6,
+        "MexicanBorderwar": 5,
+        "Russian_secret_missions": 5,
+        "sifu": 8,
+        "mm2remastered": 6,
+        "monkeyKing": 8,
+        " UkraineCovertMission": 6,
+        "MarvelsSpiderMan2": 6,
+        "RescueOperation": 5
     },
     "title_styles": {
         "curiosity": 10,
-        "aggressive": 10,
+        "aggressive": 13,
         "question": 10,
         "emoji_heavy": 10,
         "gaming_hype": 13,
@@ -19,9 +40,9 @@
         "secret": 10,
         "shocking": 10
     },
-    "last_used_style": "gaming_hype",
+    "last_used_style": "aggressive",
     "last_played_game": "SpiderMan2",
     "streak_game": "SpiderMan2",
-    "streak_count": 1,
+    "streak_count": 2,
     "winning_title_context": "SPIDER-FURY: MILES MORALES UNLEASHES MAXIMUM COMBAT POWER!\n\n#videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingreels #reels"
 }
