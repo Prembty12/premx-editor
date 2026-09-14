@@ -49,3 +49,6 @@ Video id : 17994534956831105
 SpiderMan210 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan210.mp4
 Video id : 18109353574882135
 
+SpiderMan25 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan25.mp4
+Video id : 18128908843688145
+
