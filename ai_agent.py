@@ -28,7 +28,7 @@ def run_agent_brain():
             "curiosity": 10, 
             "aggressive": 10, 
             "question": 10, 
-            "emoji_heavy": 10
+            "emoji_heavy": 10,
             "gaming_hype": 13,
             "clickbait": 13,
             "informative": 10,
