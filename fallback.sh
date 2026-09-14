@@ -10,15 +10,27 @@ STYLE_PROMPT="${STYLE_PROMPT:-}"
 
 # ⬇️ Yahan paste karna hai
 MEMORY_FILE="logs/agent_memory.json"
+
 if [ -z "$INSIGHTS_SUMMARY" ] && [ -f "$MEMORY_FILE" ]; then
     INSIGHTS_SUMMARY=$(python3 -c "
 import json
+
 try:
     with open('$MEMORY_FILE', 'r', encoding='utf-8') as f:
         data = json.load(f)
-        ctx = data.get('winning_title_context', '')
-        styles = data.get('title_styles', {})
+
+    ctx = data.get('winning_title_context', '')
+    styles = data.get('title_styles', {})
+    uses = int(data.get('winning_title_uses', 0))
+
+    # Winning title sirf first 3 uses tak AI ko bhejna hai
+    if uses < 3 and ctx:
         print(f'Reference Winning Title: {ctx} | Styles Performance: {styles}')
+    else:
+        # Score/style performance AI ko milega
+        # Lekin exhausted winning title bilkul nahi milega
+        print(f'Styles Performance: {styles}')
+
 except Exception:
     pass
 ")
