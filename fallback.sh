@@ -8,6 +8,23 @@ SOURCE_DURATION="${SOURCE_DURATION:-60}"
 INSIGHTS_SUMMARY="${INSIGHTS_SUMMARY:-}"
 STYLE_PROMPT="${STYLE_PROMPT:-}"
 
+# ⬇️ Yahan paste karna hai
+MEMORY_FILE="logs/agent_memory.json"
+if [ -z "$INSIGHTS_SUMMARY" ] && [ -f "$MEMORY_FILE" ]; then
+    INSIGHTS_SUMMARY=$(python3 -c "
+import json
+try:
+    with open('$MEMORY_FILE', 'r', encoding='utf-8') as f:
+        data = json.load(f)
+        ctx = data.get('winning_title_context', '')
+        styles = data.get('title_styles', {})
+        print(f'Reference Winning Title: {ctx} | Styles Performance: {styles}')
+except Exception:
+    pass
+")
+fi
+# ⬆️ Yahan tak
+
 PRIMARY_MODEL="${OPENROUTER_MODEL:-nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free}"
 FALLBACK_MODEL="openrouter/free"
 
