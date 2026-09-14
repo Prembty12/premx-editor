@@ -1,7 +1,7 @@
 {
     "game_scores": {
         "SpiderMan2": 5,
-        "AfghanistanRedZone": 5,
+        "AfghanistanRedZone": 10,
         "Ghost_soap_escap": 5,
         "ghostwork": 5,
         "Ghost Destroys Mexican": 5,
@@ -27,7 +27,7 @@
         "curiosity": 10,
         "aggressive": 13,
         "question": 10,
-        "emoji_heavy": 10,
+        "emoji_heavy": 13,
         "gaming_hype": 13,
         "clickbait": 13,
         "informative": 10,
@@ -40,8 +40,8 @@
         "secret": 10,
         "shocking": 10
     },
-    "last_used_style": "clickbait",
-    "last_played_game": "SpiderMan2",
+    "last_used_style": "emoji_heavy",
+    "last_played_game": "AfghanistanRedZone",
     "streak_game": "SpiderMan2",
     "streak_count": 4,
     "winning_title_context": "SPIDER-FURY: MILES MORALES UNLEASHES MAXIMUM COMBAT POWER!\n\n#videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingreels #reels",
