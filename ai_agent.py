@@ -156,15 +156,21 @@ def run_agent_brain():
 
     chosen_game = ""
 
+    # Strict 3-time streak logic
     if high_perf_game and current_streak_count < 3:
         if current_streak_game == high_perf_game:
             current_streak_count += 1
         else:
             current_streak_game = high_perf_game
             current_streak_count = 1
+            
         chosen_game = high_perf_game
-        memory["winning_title_context"] = winning_title
+        if winning_title:
+            memory["winning_title_context"] = winning_title
+        memory["streak_game"] = current_streak_game
+        memory["streak_count"] = current_streak_count
     else:
+        # Agar streak 3 poori ho gayi ya naya high perf game nahi mila
         memory["streak_game"] = ""
         memory["streak_count"] = 0
         memory["winning_title_context"] = ""
@@ -177,12 +183,10 @@ def run_agent_brain():
         else:
             chosen_game = game_list[0]
 
-    memory["streak_game"] = chosen_game if high_perf_game and chosen_game == high_perf_game else ""
-    memory["streak_count"] = current_streak_count if memory["streak_game"] else 0
+    winning_context = memory.get("winning_title_context", "None")
 
     styles = memory.get("title_styles", {"curiosity": 10, "aggressive": 10, "question": 10, "emoji_heavy": 10})
     chosen_style = random.choice(list(styles.keys()))
-    winning_context = memory.get("winning_title_context", "None")
 
     try:
         api_key = get_active_key()
