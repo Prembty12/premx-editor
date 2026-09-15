@@ -33,20 +33,22 @@
         "informative": 10,
         "epic_cinematic": 10,
         "funny_roast": 22,
-        "secret_hidden": 10,
+        "secret_hidden": 13,
         "exposed": 10,
         "unbelievable": 13,
         "crazy": 13,
         "secret": 10,
         "shocking": 13
     },
-    "last_used_style": "aggressive",
+    "last_used_style": "secret_hidden",
     "last_played_game": "MarvelsSpiderMan2",
     "streak_game": "MarvelsSpiderMan2",
-    "streak_count": 2,
+    "streak_count": 3,
     "winning_title_context": "SPIDER-FURY: MILES MORALES UNLEASHES MAXIMUM COMBAT POWER!\n\n#videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingreels #reels",
     "winning_video_id": "1444317791239680",
-    "processed_viral_ids": [],
+    "processed_viral_ids": [
+        "1444317791239680"
+    ],
     "style_history": {},
     "winning_title_game": "SpiderMan2",
     "winning_title_uses": 3
