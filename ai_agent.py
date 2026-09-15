@@ -25,7 +25,7 @@ def get_active_key():
     return random.choice(valid)
 
 def fetch_and_calculate_scores(game_list, memory):
-    """Facebook API se data fetch karke naye 7k+ viral hits ko track karega aur scores update karega"""
+    """Facebook API se data fetch karke naye 7k+ viral hits ko track karega aur highest views terminal par dikhayega"""
     if not FB_PAGE_ID or not FB_ACCESS_TOKEN:
         log("⚠️ WARNING: Facebook Page ID ya Access Token missing hai!")
         return None, "", "", memory
@@ -61,6 +61,7 @@ def fetch_and_calculate_scores(game_list, memory):
         winning_title = ""
         winning_video_id = ""
         highest_found = 0
+        highest_video_title = "" # Highest view wali video ka title track karne ke liye
 
         temp_game_views = {g: 0 for g in game_list}
         temp_game_counts = {g: 0 for g in game_list}
@@ -77,8 +78,10 @@ def fetch_and_calculate_scores(game_list, memory):
             text = (title + " " + description).lower()
             views = video.get("views", 0)
             
+            # 🏆 Track Highest Views in Last 28 Days
             if views > highest_found:
                 highest_found = views
+                highest_video_title = title if title else description
             
             # Style performance tracking
             used_style = style_history.get(video_id)
@@ -97,7 +100,7 @@ def fetch_and_calculate_scores(game_list, memory):
                     if views >= 7000:
                         temp_viral_counts[game] += 1
                     
-                    # 🚨 Sabse Zaroori Check: Agar video 7k+ hai AUR blacklist (processed_viral_ids) mein nahi hai tabhi uthao!
+                    # Check if 7k+ and not blacklisted
                     if views >= 7000 and video_id not in processed_viral_ids:
                         if views > best_views or winning_game is None:
                             best_views = views
@@ -105,7 +108,7 @@ def fetch_and_calculate_scores(game_list, memory):
                             winning_title = title if title else description
                             winning_video_id = video_id
 
-        # 📊 Game Scores Update (Safety floor 10)
+        # 📊 Game Scores Update
         for game in game_list:
             total_v = temp_game_views[game]
             count_v = temp_game_counts[game]
@@ -132,9 +135,13 @@ def fetch_and_calculate_scores(game_list, memory):
         memory["game_scores"] = game_scores
         memory["title_styles"] = title_styles
 
-        log(f"📊 CHECK: Highest views pichle 28 dino mein {highest_found} mile.")
+        # 🖥️ Terminal par saaf-saaf Highest Views dikhao
+        log(f"🔥 [PERFORMANCE REPORT] Pichle 28 dino mein sabse zyada views: {highest_found} views")
+        if highest_video_title:
+            log(f"📌 Top Video Title: \"{highest_video_title[:60]}...\"")
+
         if winning_game:
-            log(f"🔥 NAYA UNPROCESSED VIRAL MATCH MIL GAYA: Game: {winning_game}, Video ID: {winning_video_id} ({best_views} views)")
+            log(f"🚀 NAYA UNPROCESSED VIRAL MATCH MIL GAYA: Game: {winning_game}, Video ID: {winning_video_id} ({best_views} views)")
         else:
             log("⏳ Naya koi 7k+ unprocessed video nahi mila. Normal rotation chalegi.")
 
@@ -215,34 +222,40 @@ def run_agent_brain():
     high_perf_game, winning_title, current_video_id, memory = fetch_and_calculate_scores(game_list, memory)
     
     processed_viral_ids = memory.get("processed_viral_ids", [])
+    
+    # 🛑 4TH TIME SKIP CHECK
+    if current_video_id and current_video_id in processed_viral_ids:
+        log(f"🛑 SKIP NOTICE: Video ID '{current_video_id}' pehle hi 3 reels/posts ki limit poori kar chuka hai (Blacklisted). 4th time ke liye skip kiya ja raha hai!")
+        high_perf_game = None
+        winning_title = ""
+        current_video_id = ""
+
     stored_video_id = memory.get("winning_video_id", "")
     current_streak_count = memory.get("streak_count", 0)
 
     chosen_game = ""
 
-    # 🎮 3-Reels Streak Logic vs Fair Round-Robin Rotation
     if high_perf_game and current_video_id:
         if current_video_id != stored_video_id:
-            # Pehli baar naya viral video mila hai -> Streak shuru (Count = 1)
             current_streak_count = 1
             memory["winning_video_id"] = current_video_id
             memory["winning_title_context"] = winning_title
             memory["streak_game"] = high_perf_game
             memory["streak_count"] = current_streak_count
             chosen_game = high_perf_game
+            log(f"🚀 STREAK START (Post 1/3): Game -> {chosen_game}")
         elif current_streak_count < 3:
-            # Streak chal rahi hai (2 ya 3 reels tak)
             current_streak_count += 1
             memory["streak_count"] = current_streak_count
             chosen_game = high_perf_game
+            log(f"📈 STREAK RUNNING (Post {current_streak_count}/3): Game -> {chosen_game}")
             
-            # Agar 3 reels poori ho gayi, toh is video id ko permanently blacklist (processed) mein daal do!
             if current_streak_count >= 3:
                 if current_video_id not in processed_viral_ids:
                     processed_viral_ids.append(current_video_id)
                 memory["processed_viral_ids"] = processed_viral_ids
+                log(f"🔒 STREAK COMPLETED (3/3): Video ID '{current_video_id}' ab permanently blacklist ho gayi hai.")
         else:
-            # 3 reels streak khatam! Ab wapas Normal Fair Rotation par jao
             memory["streak_game"] = ""
             memory["streak_count"] = 0
             memory["winning_title_context"] = ""
@@ -255,8 +268,8 @@ def run_agent_brain():
                 chosen_game = game_list[next_index]
             else:
                 chosen_game = game_list[0]
+            log(f"🔄 NORMAL ROTATION (Streak Over): Agla game select hua -> {chosen_game}")
     else:
-        # Koi naya 7k+ video nahi hai -> Normal Fair Round-Robin Rotation (Ek ke baad ek sabhi games)
         memory["streak_game"] = ""
         memory["streak_count"] = 0
         
@@ -267,11 +280,11 @@ def run_agent_brain():
             chosen_game = game_list[next_index]
         else:
             chosen_game = game_list[0]
+        log(f"🔄 NORMAL ROTATION: Agla game select hua -> {chosen_game}")
 
     winning_context = memory.get("winning_title_context", "None")
     styles = memory.get("title_styles", {})
     
-    # Title style rotation selection
     style_names = list(styles.keys())
     style_weights = list(styles.values())
     chosen_style = random.choices(style_names, weights=style_weights, k=1)[0]
