@@ -83,9 +83,20 @@ for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
     dbg "────────────────────────────────────────────────────────"
     dbg "🤖 ATTEMPT $attempt / $MAX_RETRIES"
     dbg "────────────────────────────────────────────────────────"
-    dbg "   Model     : $CURRENT_MODEL"
-    dbg "   API Key   : $KEY_DISPLAY"
-    dbg "   Time      : $(date +%H:%M:%S)"
+    dbg "    Model      : $CURRENT_MODEL"
+    dbg "    API Key    : $KEY_DISPLAY"
+    dbg "    Time       : $(date +%H:%M:%S)"
+    
+    # 🔍 Live Terminal Display of what is being sent to AI
+    dbg "--------------------------------------------------------"
+    dbg "📤 AI KO KYA-KYA BHEJ RAHA HAI (PAYLOAD DETAILS):"
+    dbg "--------------------------------------------------------"
+    dbg "  📁 Grid Image Path : $GRID_PATH"
+    dbg "  ⏱️ Source Duration : ${SOURCE_DURATION}s"
+    dbg "  💡 Insights Sent   : ${INSIGHTS_SUMMARY:-[Khaali / Kuch nahi]}"
+    dbg "  🎨 Style Directive : ${STYLE_PROMPT:-[Khaali / Kuch nahi]}"
+    dbg "  🤖 Target Model    : $CURRENT_MODEL"
+    dbg "--------------------------------------------------------"
     
     PAYLOAD_FILE="temp_frames/or_payload.json"
     mkdir -p temp_frames
@@ -102,8 +113,6 @@ payload_file = os.environ.get('PAYLOAD_FILE')
 with open(grid_path, 'rb') as f:
     img_bytes = f.read()
     b64_img = base64.b64encode(img_bytes).decode('utf-8')
-
-print(f"   📸 Image Size : {len(img_bytes)} bytes (b64: {len(b64_img)} chars)", flush=True)
 
 schema = {
     "type": "object",
@@ -158,14 +167,14 @@ with open(payload_file, 'w') as f:
 
 import sys  # ensure sys is imported or available
 
-print(f"   📸 Image Size : {len(img_bytes)} bytes (b64: {len(b64_img)} chars)", file=sys.stderr, flush=True)
-print(f"   🧠 Is Reasoning: {is_reasoning}", file=sys.stderr, flush=True)
-print(f"   🔧 require_parameters: {payload['provider']['require_parameters']}", file=sys.stderr, flush=True)
-print(f"   📤 Payload ready: {os.path.getsize(payload_file)} bytes", file=sys.stderr, flush=True)
+print(f"    📸 Image Size : {len(img_bytes)} bytes (b64: {len(b64_img)} chars)", file=sys.stderr, flush=True)
+print(f"    🧠 Is Reasoning: {is_reasoning}", file=sys.stderr, flush=True)
+print(f"    🔧 require_parameters: {payload['provider']['require_parameters']}", file=sys.stderr, flush=True)
+print(f"    📤 Payload ready: {os.path.getsize(payload_file)} bytes", file=sys.stderr, flush=True)
 PYEOF
 
     dbg ""
-    dbg "   📡 Sending request to OpenRouter..."
+    dbg "    📡 Sending request to OpenRouter..."
     
     # Curl with verbose status capture
     HTTP_CODE=$(curl -s -o /tmp/or_response_$$.json -w "%{http_code}" \
@@ -179,11 +188,11 @@ PYEOF
     rm -f /tmp/or_response_$$.json
     rm -f "$PAYLOAD_FILE"
 
-    dbg "   📥 HTTP Status  : $HTTP_CODE"
+    dbg "    📥 HTTP Status  : $HTTP_CODE"
     
     if [ "$DEBUG" = "1" ]; then
-        dbg "   📥 Raw Response :"
-        echo "$RESP" | head -c 2000 | sed 's/^/      /' >&2
+        dbg "    📥 Raw Response :"
+        echo "$RESP" | head -c 2000 | sed 's/^/     /' >&2
         echo "" >&2
     fi
 
@@ -207,7 +216,7 @@ else:
 ")
 
     if [ "$IS_TEXT_AI" = "yes" ]; then
-        dbg "   ❌ OpenRouter routed a text-only model ($ROUTED). Retrying..."
+        dbg "    ❌ OpenRouter routed a text-only model ($ROUTED). Retrying..."
         sleep 1
         continue
     fi
@@ -239,7 +248,7 @@ except: pass
 " 2>/dev/null)
 
     if [ -n "$ERROR_MSG" ]; then
-        dbg "   ❌ API Error    : $ERROR_MSG"
+        dbg "    ❌ API Error    : $ERROR_MSG"
     fi
 
         if [ -n "$CONTENT" ] && [ "$CONTENT" != "None" ]; then
@@ -264,20 +273,20 @@ except Exception:
 
         if [ "$IS_VALID_JSON" = "valid" ]; then
             dbg ""
-            dbg "   ✅ SUCCESS — Model responded with valid JSON!"
-            dbg "   🎯 Routed Model : ${ROUTED:-unknown}"
+            dbg "    ✅ SUCCESS — Model responded with valid JSON!"
+            dbg "    🎯 Routed Model : ${ROUTED:-unknown}"
             
             RAW_RESPONSE="$CONTENT"
             SUCCESS_REQUESTED_MODEL="$CURRENT_MODEL"
             SUCCESS_ROUTED_MODEL="${ROUTED:-$CURRENT_MODEL}"
             break
         else
-            dbg "   ⚠️  Model ($CURRENT_MODEL) returned invalid JSON or missing keys. Retrying..."
+            dbg "    ⚠️  Model ($CURRENT_MODEL) returned invalid JSON or missing keys. Retrying..."
             sleep 1.5
             continue
         fi
     else
-        dbg "   ⚠️  Empty content in response. Retrying..."
+        dbg "    ⚠️  Empty content in response. Retrying..."
         sleep 1.5
     fi
 done
