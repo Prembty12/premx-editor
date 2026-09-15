@@ -8,6 +8,21 @@ SOURCE_DURATION="${SOURCE_DURATION:-60}"
 INSIGHTS_SUMMARY="${INSIGHTS_SUMMARY:-}"
 STYLE_PROMPT="${STYLE_PROMPT:-}"
 
+# 🧠 1. Agar INSIGHTS_SUMMARY khaali hai, toh memory file se apne aap scores aur insights utha lo
+if [ -z "$INSIGHTS_SUMMARY" ] && [ -f "logs/agent_memory.json" ]; then
+    INSIGHTS_SUMMARY=$(python3 -c "
+import json
+try:
+    with open('logs/agent_memory.json', 'r') as f:
+        data = json.load(f)
+        scores = data.get('game_scores', {})
+        styles = data.get('title_styles', {})
+        print(f'Game Scores: {scores} | Best Styles: {styles}')
+except:
+    print('')
+")
+fi
+
 PRIMARY_MODEL="${OPENROUTER_MODEL:-dots-studio/dots-3-note-preview:free}"
 FALLBACK_MODEL="openrouter/free"
 
@@ -72,7 +87,6 @@ for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
     CURRENT_KEY=$(get_random_openrouter_key)
     KEY_DISPLAY="${CURRENT_KEY:0:12}...${CURRENT_KEY: -4}"
     
-    # Attempt 1: Primary Model | Attempt 2-21: Fallback Model (openrouter/free)
     if [ $attempt -eq 1 ]; then
         CURRENT_MODEL="$PRIMARY_MODEL"
     else
@@ -87,21 +101,21 @@ for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
     dbg "    API Key    : $KEY_DISPLAY"
     dbg "    Time       : $(date +%H:%M:%S)"
     
-    # 🔍 Live Terminal Display of what is being sent to AI
+    # 🔍 Live Terminal Display of what is being sent to AI (Updated with proper info)
     dbg "--------------------------------------------------------"
     dbg "📤 AI KO KYA-KYA BHEJ RAHA HAI (PAYLOAD DETAILS):"
     dbg "--------------------------------------------------------"
-    dbg "  📁 Grid Image Path : $GRID_PATH"
-    dbg "  ⏱️ Source Duration : ${SOURCE_DURATION}s"
-    dbg "  💡 Insights Sent   : ${INSIGHTS_SUMMARY:-[Khaali / Kuch nahi]}"
-    dbg "  🎨 Style Directive : ${STYLE_PROMPT:-[Khaali / Kuch nahi]}"
-    dbg "  🤖 Target Model    : $CURRENT_MODEL"
+    dbg "  📁 Grid Image Path        : $GRID_PATH"
+    dbg "  ⏱️ Source Duration        : ${SOURCE_DURATION}s"
+    dbg "  💡 Insights / Memory Sent : ${INSIGHTS_SUMMARY:-[Khaali / Kuch nahi]}"
+    dbg "  🎨 Style Directive        : ${STYLE_PROMPT:-[Khaali / Kuch nahi]}"
+    dbg "  🤖 Target Model           : $CURRENT_MODEL"
     dbg "--------------------------------------------------------"
     
     PAYLOAD_FILE="temp_frames/or_payload.json"
     mkdir -p temp_frames
     
-    export GRID_PATH CURRENT_MODEL PROMPT_TEXT PAYLOAD_FILE
+    export GRID_PATH CURRENT_MODEL PROMPT_TEXT PAYLOAD_FILE INSIGHTS_SUMMARY STYLE_PROMPT
     python3 - << 'PYEOF'
 import os, json, base64
 
@@ -165,7 +179,7 @@ payload = {
 with open(payload_file, 'w') as f:
     json.dump(payload, f)
 
-import sys  # ensure sys is imported or available
+import sys
 
 print(f"    📸 Image Size : {len(img_bytes)} bytes (b64: {len(b64_img)} chars)", file=sys.stderr, flush=True)
 print(f"    🧠 Is Reasoning: {is_reasoning}", file=sys.stderr, flush=True)
@@ -176,7 +190,6 @@ PYEOF
     dbg ""
     dbg "    📡 Sending request to OpenRouter..."
     
-    # Curl with verbose status capture
     HTTP_CODE=$(curl -s -o /tmp/or_response_$$.json -w "%{http_code}" \
         --connect-timeout 15 -m 90 \
         -X POST "https://openrouter.ai/api/v1/chat/completions" \
@@ -203,7 +216,6 @@ try:
 except: print('')
 " 2>/dev/null)
 
-    # Text-only model skip logic
     export ROUTED_CHECK="$ROUTED"
     IS_TEXT_AI=$(python3 -c "
 import os
@@ -221,7 +233,6 @@ else:
         continue
     fi
 
-    # Extract fields
     CONTENT=$(echo "$RESP" | python3 -c "
 import sys, json
 try:
@@ -251,15 +262,13 @@ except: pass
         dbg "    ❌ API Error    : $ERROR_MSG"
     fi
 
-        if [ -n "$CONTENT" ] && [ "$CONTENT" != "None" ]; then
-        # --- PYTHON STRICT VALIDATION SNIPPET (Loop ke andar retry ke liye) ---
+    if [ -n "$CONTENT" ] && [ "$CONTENT" != "None" ]; then
         IS_VALID_JSON=$(python3 -c '
 import json, sys, re
 raw_output = sys.argv[1]
 try:
-    clean_output = re.sub(r"```json\s*|\s*```", "", raw_output, flags=sys.re.IGNORECASE if hasattr(sys, "re") else 0).strip()
-    # Agar <think> tags hain toh unko hatao validation ke liye
-    clean_output = re.sub(r"<think>.*?</think>", "", clean_output, flags=json.__all__ and 0 or 0).strip() # basic strip
+    clean_output = re.sub(r"```json\s*|\s*```", "", raw_output, flags=re.IGNORECASE).strip()
+    clean_output = re.sub(r"<think>.*?</think>", "", clean_output, flags=re.DOTALL).strip()
     
     data = json.loads(clean_output)
     if not isinstance(data, dict) or not all(k in data for k in ("title", "start_time", "clip_duration")):
@@ -300,7 +309,6 @@ if [ -z "$RAW_RESPONSE" ]; then
     exit 1
 fi
 
-# 🧹 PARSER (Fail-proof Single Title Extractor)
 RESPONSE_FILE="temp_frames/or_response.txt"
 printf "%s" "$RAW_RESPONSE" > "$RESPONSE_FILE"
 
@@ -336,12 +344,10 @@ dbg(f"📄 Raw length: {len(raw)} chars")
 cleaned = re.sub(r'```json\s*|\s*```', '', raw, flags=re.IGNORECASE).strip()
 data = None
 
-# Step 1: Direct JSON Parse
 try:
     data = json.loads(cleaned)
     dbg("✅ Direct JSON parse SUCCESS")
 except Exception:
-    # Step 2: Strip <think> tags & regex extract JSON
     no_think = re.sub(r'<think>.*?</think>', '', cleaned, flags=re.DOTALL).strip()
     match = re.search(r'\{.*\}', no_think, re.DOTALL)
     if match:
@@ -351,7 +357,6 @@ except Exception:
         except Exception:
             pass
 
-# Step 3: ULTRA-FALLBACK (Extracts title & time from raw text if zero JSON was given)
 if not data or not isinstance(data, dict):
     dbg("⚠️ JSON extraction completely failed. Running Bulletproof Text Scanner...")
     
@@ -380,7 +385,6 @@ if not data or not isinstance(data, dict):
         "clip_duration": 20
     }
 
-# Step 4: Strict Title Normalization & Single Title Extraction
 raw_title = data.get('title', 'Pro Gaming Moments 🎯🔥')
 
 if isinstance(raw_title, list):
@@ -390,7 +394,7 @@ elif isinstance(raw_title, str):
     raw_title = lines[0] if lines else "Pro Gaming Moments 🎯🔥"
 
 title = re.sub(r'^\d+[\.\)]\s*|^[\-\*]\s*|[\*\#\`\"]', '', str(raw_title)).strip()
-title = title.strip("'\"")  # 👈 Is line ko yahan beech me paste karna hai
+title = title.strip("'\"")
 title = re.sub(r'\s+', ' ', title)
 
 if not title:
