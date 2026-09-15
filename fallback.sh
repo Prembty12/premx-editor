@@ -8,7 +8,7 @@ SOURCE_DURATION="${SOURCE_DURATION:-60}"
 INSIGHTS_SUMMARY="${INSIGHTS_SUMMARY:-}"
 STYLE_PROMPT="${STYLE_PROMPT:-}"
 
-# 🧠 1. Agar INSIGHTS_SUMMARY khaali hai, toh memory file se apne aap scores aur insights utha lo
+# 🧠 Complete Insights Loader: Scores, Styles aur Winning Context sabhi jayenge (Strict instruction ke sath)
 if [ -z "$INSIGHTS_SUMMARY" ] && [ -f "logs/agent_memory.json" ]; then
     INSIGHTS_SUMMARY=$(python3 -c "
 import json
@@ -17,7 +17,8 @@ try:
         data = json.load(f)
         scores = data.get('game_scores', {})
         styles = data.get('title_styles', {})
-        print(f'Game Scores: {scores} | Best Styles: {styles}')
+        winning_context = data.get('winning_title_context', 'No prior context')
+        print(f'Engagement Scores & Title Styles Performance: {styles} | Game Scores: {scores} | Past Winning Context: {winning_context}. STRICT INSTRUCTION: Use these scores and styles to understand viewer preferences, but DO NOT copy past game names or past titles. Write a brand-new, unique title strictly based on the current video grid image.')
 except:
     print('')
 ")
@@ -101,7 +102,7 @@ for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
     dbg "    API Key    : $KEY_DISPLAY"
     dbg "    Time       : $(date +%H:%M:%S)"
     
-    # 🔍 Live Terminal Display of what is being sent to AI (Updated with proper info)
+    # 🔍 Live Terminal Display of what is being sent to AI
     dbg "--------------------------------------------------------"
     dbg "📤 AI KO KYA-KYA BHEJ RAHA HAI (PAYLOAD DETAILS):"
     dbg "--------------------------------------------------------"
