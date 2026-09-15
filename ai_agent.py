@@ -16,7 +16,6 @@ FB_PAGE_ID = os.environ.get("PAGE_ID")
 FB_ACCESS_TOKEN = os.environ.get("PAGE_ACCESS_TOKEN")
 
 def log(msg):
-    """Logs ko stderr me bhejne ke liye taaki stdout JSON ko disturb na kare"""
     sys.stderr.write(f"{msg}\n")
 
 def get_active_key():
@@ -25,38 +24,54 @@ def get_active_key():
         raise ValueError("No valid Gemini API keys found.")
     return random.choice(valid)
 
-def check_facebook_high_performance(game_list):
+def fetch_and_calculate_scores(game_list, memory):
+    """Facebook API se data fetch karke naye 7k+ viral hits ko track karega aur scores update karega"""
     if not FB_PAGE_ID or not FB_ACCESS_TOKEN:
         log("⚠️ WARNING: Facebook Page ID ya Access Token missing hai!")
-        return None, ""
+        return None, "", "", memory
     
     try:
-        log("🔄 Facebook Graph API se pichle 14 dino ka data fetch ho raha hai...")
-        fourteen_days_ago = datetime.now() - timedelta(days=14)
-        since_timestamp = int(fourteen_days_ago.timestamp())
+        log("🔄 Facebook Graph API se pichle 28 dino ka data fetch ho raha hai...")
+        twenty_eight_days_ago = datetime.now() - timedelta(days=28)
+        since_timestamp = int(twenty_eight_days_ago.timestamp())
 
         url = f"https://graph.facebook.com/v19.0/{FB_PAGE_ID}/videos"
         params = {
-            "fields": "title,description,views,created_time",
+            "fields": "id,title,description,views,created_time",
             "since": since_timestamp,
             "access_token": FB_ACCESS_TOKEN,
-            "limit": 50
+            "limit": 100
         }
         response = requests.get(url, params=params, timeout=15)
         
         if response.status_code != 200:
             log(f"❌ ERROR: Facebook API fail ho gayi. Status: {response.status_code}")
-            return None, ""
+            return None, "", "", memory
             
         data = response.json().get("data", [])
         log(f"✅ SUCCESS: Facebook se {len(data)} videos ka data successfully fetch hua!")
         
+        processed_viral_ids = memory.get("processed_viral_ids", [])
+        game_scores = memory.get("game_scores", {})
+        title_styles = memory.get("title_styles", {})
+        style_history = memory.get("style_history", {})
+        
         best_views = 7000
         winning_game = None
         winning_title = ""
+        winning_video_id = ""
         highest_found = 0
 
+        temp_game_views = {g: 0 for g in game_list}
+        temp_game_counts = {g: 0 for g in game_list}
+        temp_viral_counts = {g: 0 for g in game_list}
+
+        style_total_views = {s: 0 for s in title_styles}
+        style_counts = {s: 0 for s in title_styles}
+        style_viral_hits = {s: 0 for s in title_styles}
+        
         for video in data:
+            video_id = video.get("id", "")
             title = video.get("title", "")
             description = video.get("description", "")
             text = (title + " " + description).lower()
@@ -65,26 +80,70 @@ def check_facebook_high_performance(game_list):
             if views > highest_found:
                 highest_found = views
             
-            if views > best_views:
-                for game in game_list:
-                    if game.lower() in text:
-                        best_views = views
-                        winning_game = game
-                        winning_title = title if title else description
+            # Style performance tracking
+            used_style = style_history.get(video_id)
+            if used_style in title_styles:
+                style_total_views[used_style] += views
+                style_counts[used_style] += 1
+                if views >= 7000:
+                    style_viral_hits[used_style] += 1
 
-        log(f"📊 CHECK: Highest views pichle 14 dino mein {highest_found} mile.")
-        
+            # Game matching
+            for game in game_list:
+                if game.lower() in text:
+                    temp_game_views[game] += views
+                    temp_game_counts[game] += 1
+                    
+                    if views >= 7000:
+                        temp_viral_counts[game] += 1
+                    
+                    # 🚨 Sabse Zaroori Check: Agar video 7k+ hai AUR blacklist (processed_viral_ids) mein nahi hai tabhi uthao!
+                    if views >= 7000 and video_id not in processed_viral_ids:
+                        if views > best_views or winning_game is None:
+                            best_views = views
+                            winning_game = game
+                            winning_title = title if title else description
+                            winning_video_id = video_id
+
+        # 📊 Game Scores Update (Safety floor 10)
+        for game in game_list:
+            total_v = temp_game_views[game]
+            count_v = temp_game_counts[game]
+            viral_c = temp_viral_counts[game]
+            if count_v > 0:
+                avg_v = total_v / count_v
+                calculated_score = int(10 + (avg_v / 500) + (viral_c * 25))
+            else:
+                calculated_score = 10
+            game_scores[game] = max(10, calculated_score)
+
+        # 📊 Title Styles Scores Update
+        for style in title_styles:
+            s_views = style_total_views[style]
+            s_count = style_counts[style]
+            s_viral = style_viral_hits[style]
+            if s_count > 0:
+                s_avg = s_views / s_count
+                style_score = int(10 + (s_avg / 500) + (s_viral * 20))
+            else:
+                style_score = title_styles.get(style, 10)
+            title_styles[style] = max(10, style_score)
+
+        memory["game_scores"] = game_scores
+        memory["title_styles"] = title_styles
+
+        log(f"📊 CHECK: Highest views pichle 28 dino mein {highest_found} mile.")
         if winning_game:
-            log(f"🔥 VIRAL MATCH: 7k+ cross ho gaya! Game: {winning_game} ({best_views} views)")
+            log(f"🔥 NAYA UNPROCESSED VIRAL MATCH MIL GAYA: Game: {winning_game}, Video ID: {winning_video_id} ({best_views} views)")
         else:
-            log("⏳ NO VIRAL MATCH: Kisi video ne 7k ka target cross nahi kiya ya game list se match nahi hua.")
+            log("⏳ Naya koi 7k+ unprocessed video nahi mila. Normal rotation chalegi.")
 
-        return winning_game, winning_title
+        return winning_game, winning_title, winning_video_id, memory
         
     except Exception as e:
         log(f"❌ ERROR: Facebook data fetch karne me dikkat aayi: {e}")
         
-    return None, ""
+    return None, "", "", memory
 
 def run_agent_brain():
     links_dir = "game_links_editor"
@@ -97,16 +156,19 @@ def run_agent_brain():
     memory = {
         "game_scores": {}, 
         "title_styles": {
-            "curiosity": 10, 
-            "aggressive": 10, 
-            "question": 10, 
-            "emoji_heavy": 10
+            "curiosity": 10, "aggressive": 10, "question": 10, "emoji_heavy": 10,
+            "gaming_hype": 10, "clickbait": 10, "informative": 10, "epic_cinematic": 10,
+            "funny_roast": 10, "secret_hidden": 10, "exposed": 10, "unbelievable": 10,
+            "crazy": 10, "secret": 10, "shocking": 10
         },
         "last_used_style": "curiosity",
         "last_played_game": "",
         "streak_game": "",
         "streak_count": 0,
-        "winning_title_context": ""
+        "winning_title_context": "",
+        "winning_video_id": "",
+        "processed_viral_ids": [],
+        "style_history": {}
     }
     
     if os.path.exists(memory_file):
@@ -149,31 +211,54 @@ def run_agent_brain():
 
     game_list.sort()
 
-    high_perf_game, winning_title = check_facebook_high_performance(game_list)
+    # Data fetch & score calculations
+    high_perf_game, winning_title, current_video_id, memory = fetch_and_calculate_scores(game_list, memory)
     
-    current_streak_game = memory.get("streak_game", "")
+    processed_viral_ids = memory.get("processed_viral_ids", [])
+    stored_video_id = memory.get("winning_video_id", "")
     current_streak_count = memory.get("streak_count", 0)
 
     chosen_game = ""
 
-    # Strict 3-time streak logic
-    if high_perf_game and current_streak_count < 3:
-        if current_streak_game == high_perf_game:
-            current_streak_count += 1
-        else:
-            current_streak_game = high_perf_game
+    # 🎮 3-Reels Streak Logic vs Fair Round-Robin Rotation
+    if high_perf_game and current_video_id:
+        if current_video_id != stored_video_id:
+            # Pehli baar naya viral video mila hai -> Streak shuru (Count = 1)
             current_streak_count = 1
-            
-        chosen_game = high_perf_game
-        if winning_title:
+            memory["winning_video_id"] = current_video_id
             memory["winning_title_context"] = winning_title
-        memory["streak_game"] = current_streak_game
-        memory["streak_count"] = current_streak_count
+            memory["streak_game"] = high_perf_game
+            memory["streak_count"] = current_streak_count
+            chosen_game = high_perf_game
+        elif current_streak_count < 3:
+            # Streak chal rahi hai (2 ya 3 reels tak)
+            current_streak_count += 1
+            memory["streak_count"] = current_streak_count
+            chosen_game = high_perf_game
+            
+            # Agar 3 reels poori ho gayi, toh is video id ko permanently blacklist (processed) mein daal do!
+            if current_streak_count >= 3:
+                if current_video_id not in processed_viral_ids:
+                    processed_viral_ids.append(current_video_id)
+                memory["processed_viral_ids"] = processed_viral_ids
+        else:
+            # 3 reels streak khatam! Ab wapas Normal Fair Rotation par jao
+            memory["streak_game"] = ""
+            memory["streak_count"] = 0
+            memory["winning_title_context"] = ""
+            memory["winning_video_id"] = ""
+            
+            last_game = memory.get("last_played_game", "")
+            if last_game in game_list:
+                last_index = game_list.index(last_game)
+                next_index = (last_index + 1) % len(game_list)
+                chosen_game = game_list[next_index]
+            else:
+                chosen_game = game_list[0]
     else:
-        # Agar streak 3 poori ho gayi ya naya high perf game nahi mila
+        # Koi naya 7k+ video nahi hai -> Normal Fair Round-Robin Rotation (Ek ke baad ek sabhi games)
         memory["streak_game"] = ""
         memory["streak_count"] = 0
-        memory["winning_title_context"] = ""
         
         last_game = memory.get("last_played_game", "")
         if last_game in game_list:
@@ -184,30 +269,36 @@ def run_agent_brain():
             chosen_game = game_list[0]
 
     winning_context = memory.get("winning_title_context", "None")
-
-    styles = memory.get("title_styles", {"curiosity": 10, "aggressive": 10, "question": 10, "emoji_heavy": 10})
-    chosen_style = random.choice(list(styles.keys()))
+    styles = memory.get("title_styles", {})
+    
+    # Title style rotation selection
+    style_names = list(styles.keys())
+    style_weights = list(styles.values())
+    chosen_style = random.choices(style_names, weights=style_weights, k=1)[0]
 
     try:
         api_key = get_active_key()
         url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
         
-        prompt = f"""You are an advanced AI Social Media Manager and Gaming Content Agent.
+        prompt = f"""You are an advanced AI Social Media Manager and Gaming Content Agent specializing in viral gaming reels.
 Target Game for today: {chosen_game}
-Title Styles Performance: {styles}
-Reference Winning Title (from recent high-performing video with 7k+ views): "{winning_context}"
+Title Styles Performance Scores: {styles}
+Reference Winning Title: "{winning_context}"
+Selected Style for this Reel: {chosen_style}
 
 Task: 
 1. Use the selected game: '{chosen_game}'.
-2. Pick or generate a catchy title style inspired by the reference winning title context if available.
-3. Choose the best title style from: {list(styles.keys())}.
+2. Generate a compelling title strictly following the selected style.
+3. Ensure the title is punchy and fully optimized for Facebook Reels.
 
 Respond ONLY in a strict JSON format with no extra text or markdown wrappers:
-{{"chosen_game": "{chosen_game}", "chosen_style": "style_here", "reasoning": "short reason"}}"""
+{{"chosen_game": "{chosen_game}", "chosen_style": "{chosen_style}", "reasoning": "short reason"}}"""
 
         payload = {
             "contents": [{
-                "parts": [{"text": prompt}]
+                "parts": [{
+                    "text": prompt
+                }]
             }]
         }
 
@@ -230,19 +321,20 @@ Respond ONLY in a strict JSON format with no extra text or markdown wrappers:
     
     memory["last_used_style"] = chosen_style
     memory["last_played_game"] = chosen_game
+    
     try:
         with open(memory_file, 'w', encoding='utf-8') as f:
             json.dump(memory, f, indent=4)
     except IOError:
         pass
 
-    # Standard output me sirf JSON aayega
     print(json.dumps({
         "target_file": target_file,
         "game_name": chosen_game,
         "chosen_style": chosen_style,
         "streak_count": memory.get("streak_count", 0),
-        "inspired_by_title": winning_context
+        "inspired_by_title": winning_context,
+        "tracked_video_id": memory.get("winning_video_id", "")
     }))
 
 if __name__ == "__main__":
