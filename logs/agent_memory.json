@@ -20,8 +20,8 @@
         "mm2remastered": 10,
         "monkeyKing": 10,
         " UkraineCovertMission": 13,
-        "MarvelsSpiderMan2": 52,
-        "RescueOperation": 16
+        "MarvelsSpiderMan2": 57,
+        "RescueOperation": 11
     },
     "title_styles": {
         "curiosity": 10,
@@ -32,7 +32,7 @@
         "clickbait": 13,
         "informative": 10,
         "epic_cinematic": 10,
-        "funny_roast": 19,
+        "funny_roast": 22,
         "secret_hidden": 10,
         "exposed": 10,
         "unbelievable": 13,
@@ -40,12 +40,12 @@
         "secret": 10,
         "shocking": 13
     },
-    "last_used_style": "aggressive",
-    "last_played_game": "RescueOperation",
-    "streak_game": "",
-    "streak_count": 0,
-    "winning_title_context": "",
-    "winning_video_id": "",
+    "last_used_style": "funny_roast",
+    "last_played_game": "MarvelsSpiderMan2",
+    "streak_game": "MarvelsSpiderMan2",
+    "streak_count": 1,
+    "winning_title_context": "SPIDER-FURY: MILES MORALES UNLEASHES MAXIMUM COMBAT POWER!\n\n#videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingreels #reels",
+    "winning_video_id": "1444317791239680",
     "processed_viral_ids": [],
     "style_history": {},
     "winning_title_game": "SpiderMan2",
