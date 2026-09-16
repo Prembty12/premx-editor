@@ -8,17 +8,16 @@ SOURCE_DURATION="${SOURCE_DURATION:-60}"
 INSIGHTS_SUMMARY="${INSIGHTS_SUMMARY:-}"
 STYLE_PROMPT="${STYLE_PROMPT:-}"
 
-# 🧠 Complete Insights Loader: Scores, Styles aur Winning Context sabhi jayenge (Strict instruction ke sath)
+# 🧠 Round-Robin Friendly Memory Loader: Sirf title styles aur winning context jayega (Game scores removed)
 if [ -z "$INSIGHTS_SUMMARY" ] && [ -f "logs/agent_memory.json" ]; then
     INSIGHTS_SUMMARY=$(python3 -c "
 import json
 try:
     with open('logs/agent_memory.json', 'r') as f:
         data = json.load(f)
-        scores = data.get('game_scores', {})
         styles = data.get('title_styles', {})
         winning_context = data.get('winning_title_context', 'No prior context')
-        print(f'Engagement Scores & Title Styles Performance: {styles} | Game Scores: {scores} | Past Winning Context: {winning_context}. STRICT INSTRUCTION: Use these scores and styles to understand viewer preferences, but DO NOT copy past game names or past titles. Write a brand-new, unique title strictly based on the current video grid image.')
+        print(f'Title Styles Performance: {styles} | Past Winning Context: {winning_context}. STRICT INSTRUCTION: Since this runs on a round-robin game rotation, use these styles to understand what viewers like, but DO NOT copy past game names or scores. Write a brand-new, unique title strictly based on the current video grid image.')
 except:
     print('')
 ")
