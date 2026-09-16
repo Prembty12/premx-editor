@@ -5,23 +5,7 @@
 
 GRID_PATH="${GRID_PATH:-temp_frames/merged_60_grid_screenshot.jpg}"
 SOURCE_DURATION="${SOURCE_DURATION:-60}"
-INSIGHTS_SUMMARY="${INSIGHTS_SUMMARY:-}"
 STYLE_PROMPT="${STYLE_PROMPT:-}"
-
-# 🧠 Round-Robin Friendly Memory Loader: Sirf title styles aur winning context jayega (Game scores removed)
-if [ -z "$INSIGHTS_SUMMARY" ] && [ -f "logs/agent_memory.json" ]; then
-    INSIGHTS_SUMMARY=$(python3 -c "
-import json
-try:
-    with open('logs/agent_memory.json', 'r') as f:
-        data = json.load(f)
-        styles = data.get('title_styles', {})
-        winning_context = data.get('winning_title_context', 'No prior context')
-        print(f'Title Styles Performance: {styles} | Past Winning Context: {winning_context}. STRICT INSTRUCTION: Since this runs on a round-robin game rotation, use these styles to understand what viewers like, but DO NOT copy past game names or scores. Write a brand-new, unique title strictly based on the current video grid image.')
-except:
-    print('')
-")
-fi
 
 PRIMARY_MODEL="${OPENROUTER_MODEL:-dots-studio/dots-3-note-preview:free}"
 FALLBACK_MODEL="openrouter/free"
@@ -57,12 +41,16 @@ dbg() {
     [ "$DEBUG" = "1" ] && echo "$@" >&2
 }
 
+# 🚀 Ultra-Engaging Prompt Focused on Flow & Natural Ending (No Mid-Cut)
 PROMPT_TEXT="Analyze the provided 9:16 gaming screenshot grid. Total video source duration is ${SOURCE_DURATION} seconds.
-Insights Context: ${INSIGHTS_SUMMARY}
 Style Directive: ${STYLE_PROMPT}
 
-Find the most thrilling, high-action segment, skipping dull introductions.
-Return JSON with exactly three keys as specified in the schema."
+CRITICAL INSTRUCTIONS FOR SEAMLESS ENGAGEMENT:
+1. TITLE RULES: Create a short, viral title under 6 words with 1-3 emojis. DO NOT use generic boring words like 'Epic', 'Insane', 'Crazy', 'Best', or 'Gameplay'. Make it unique based strictly on what's visible in the current grid image.
+2. ENGAGING FLOW & TIMING RULES: Do not just look for a quick action flash. Scan the grid for the complete **engaging, emotional, or high-tension moment**. 
+3. Choose a precise 'start_time' and let the sequence run naturally. The 'clip_duration' must be at least 15 seconds and extend smoothly until the engaging moment reaches its natural conclusion (up to 45 seconds). 
+4. STRICT GUARDRAIL: NEVER cut abruptly in the middle of an ongoing engaging sequence. Ensure the ending feels satisfying and complete.
+5. Return JSON with exactly three keys (title, start_time, clip_duration) as specified in the schema."
 
 RAW_RESPONSE=""
 SUCCESS_REQUESTED_MODEL=""
@@ -101,21 +89,22 @@ for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
     dbg "    API Key    : $KEY_DISPLAY"
     dbg "    Time       : $(date +%H:%M:%S)"
     
-    # 🔍 Live Terminal Display of what is being sent to AI
+    # 🔍 Live Terminal Display of what is being sent to AI (Including Full Prompt Text)
     dbg "--------------------------------------------------------"
     dbg "📤 AI KO KYA-KYA BHEJ RAHA HAI (PAYLOAD DETAILS):"
     dbg "--------------------------------------------------------"
     dbg "  📁 Grid Image Path        : $GRID_PATH"
     dbg "  ⏱️ Source Duration        : ${SOURCE_DURATION}s"
-    dbg "  💡 Insights / Memory Sent : ${INSIGHTS_SUMMARY:-[Khaali / Kuch nahi]}"
     dbg "  🎨 Style Directive        : ${STYLE_PROMPT:-[Khaali / Kuch nahi]}"
     dbg "  🤖 Target Model           : $CURRENT_MODEL"
+    dbg "  📝 Prompt Text            :"
+    echo "$PROMPT_TEXT" | sed 's/^/      /' >&2
     dbg "--------------------------------------------------------"
     
     PAYLOAD_FILE="temp_frames/or_payload.json"
     mkdir -p temp_frames
     
-    export GRID_PATH CURRENT_MODEL PROMPT_TEXT PAYLOAD_FILE INSIGHTS_SUMMARY STYLE_PROMPT
+    export GRID_PATH CURRENT_MODEL PROMPT_TEXT PAYLOAD_FILE STYLE_PROMPT
     python3 - << 'PYEOF'
 import os, json, base64
 
@@ -137,12 +126,13 @@ schema = {
         },
         "start_time": {
             "type": "string",
-            "description": "HH:MM:SS format indicating peak action start time"
+            "description": "HH:MM:SS format indicating exact start time of the engaging sequence"
         },
         "clip_duration": {
             "type": "integer",
-            "minimum": 12,
-            "maximum": 45
+            "minimum": 15,
+            "maximum": 45,
+            "description": "Dynamic engaging duration ensuring no mid-action cuts, strictly >= 15 seconds."
         }
     },
     "required": ["title", "start_time", "clip_duration"],
@@ -161,7 +151,7 @@ payload = {
         ]
     }],
     'max_tokens': 4096,
-    'temperature': 0.2,
+    'temperature': 0.3,
     'response_format': {
         'type': 'json_schema',
         'json_schema': {
@@ -382,7 +372,7 @@ if not data or not isinstance(data, dict):
     data = {
         "title": title,
         "start_time": start_time,
-        "clip_duration": 20
+        "clip_duration": 25
     }
 
 raw_title = data.get('title', 'Pro Gaming Moments 🎯🔥')
@@ -401,15 +391,16 @@ if not title:
     title = "Unstoppable Gaming Highlights 🎯🔥"
 
 start_time = str(data.get('start_time', '00:00:15')).strip()
-duration = data.get('clip_duration', 20)
+duration = data.get('clip_duration', 25)
 
 try:
-    dur_int = max(12, min(45, int(duration)))
+    dur_int = max(15, min(45, int(duration)))
 except Exception:
-    dur_int = 20
+    dur_int = 25
 
 dbg(f"✅ Final Output Title: '{title}'")
 dbg(f"✅ Final Start Time  : '{start_time}'")
+dbg(f"✅ Final Duration    : '{dur_int}s'")
 
 print(json.dumps({
     "status": "success",
