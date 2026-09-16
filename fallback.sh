@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# 🚀 OPENROUTER BASH AGENT (1 PRIMARY TRY + 20 FALLBACK RETRIES + BULLETPROOF PARSER)
+# 🚀 OPENROUTER BASH AGENT (1 PRIMARY TRY + 20 FALLBACK RETRIES + STRICT PARSER)
 # ==============================================================================
 
 GRID_PATH="${GRID_PATH:-temp_frames/merged_60_grid_screenshot.jpg}"
@@ -41,14 +41,14 @@ dbg() {
     [ "$DEBUG" = "1" ] && echo "$@" >&2
 }
 
-# 🚀 Ultra-Engaging Prompt Focused on Flow & Natural Ending (No Mid-Cut)
+# 🚀 Ultra-Engaging Prompt Focused on Flow & Natural Ending (Up to 60s)
 PROMPT_TEXT="Analyze the provided 9:16 gaming screenshot grid. Total video source duration is ${SOURCE_DURATION} seconds.
 Style Directive: ${STYLE_PROMPT}
 
 CRITICAL INSTRUCTIONS FOR SEAMLESS ENGAGEMENT:
 1. TITLE RULES: Create a short, viral title under 6 words with 1-3 emojis. DO NOT use generic boring words like 'Epic', 'Insane', 'Crazy', 'Best', or 'Gameplay'. Make it unique based strictly on what's visible in the current grid image.
 2. ENGAGING FLOW & TIMING RULES: Do not just look for a quick action flash. Scan the grid for the complete **engaging, emotional, or high-tension moment**. 
-3. Choose a precise 'start_time' and let the sequence run naturally. The 'clip_duration' must be at least 15 seconds and extend smoothly until the engaging moment reaches its natural conclusion (up to 45 seconds). 
+3. Choose a precise 'start_time' and let the sequence run naturally. The 'clip_duration' must be at least 15 seconds and extend smoothly until the engaging moment reaches its natural conclusion (up to 60 seconds). 
 4. STRICT GUARDRAIL: NEVER cut abruptly in the middle of an ongoing engaging sequence. Ensure the ending feels satisfying and complete.
 5. Return JSON with exactly three keys (title, start_time, clip_duration) as specified in the schema."
 
@@ -104,7 +104,7 @@ for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
     PAYLOAD_FILE="temp_frames/or_payload.json"
     mkdir -p temp_frames
     
-    export GRID_PATH CURRENT_MODEL PROMPT_TEXT PAYLOAD_FILE STYLE_PROMPT
+    export GRID_PATH CURRENT_MODEL PROMPT_TEXT PAYLOAD_FILE STYLE_PROMPT SOURCE_DURATION
     python3 - << 'PYEOF'
 import os, json, base64
 
@@ -112,6 +112,7 @@ grid_path = os.environ.get('GRID_PATH')
 model = os.environ.get('CURRENT_MODEL')
 prompt = os.environ.get('PROMPT_TEXT')
 payload_file = os.environ.get('PAYLOAD_FILE')
+source_duration = int(os.environ.get('SOURCE_DURATION', 60))
 
 with open(grid_path, 'rb') as f:
     img_bytes = f.read()
@@ -131,8 +132,8 @@ schema = {
         "clip_duration": {
             "type": "integer",
             "minimum": 15,
-            "maximum": 45,
-            "description": "Dynamic engaging duration ensuring no mid-action cuts, strictly >= 15 seconds."
+            "maximum": source_duration,
+            "description": f"Dynamic engaging duration ensuring no mid-action cuts, strictly >= 15 seconds up to {source_duration} seconds."
         }
     },
     "required": ["title", "start_time", "clip_duration"],
@@ -304,10 +305,10 @@ printf "%s" "$RAW_RESPONSE" > "$RESPONSE_FILE"
 
 dbg ""
 dbg "════════════════════════════════════════════════════════"
-dbg "🧹 PARSING PHASE"
+dbg "🧹 STRICT PARSING PHASE"
 dbg "════════════════════════════════════════════════════════"
 
-export REQUESTED_MODEL="$SUCCESS_REQUESTED_MODEL" ROUTED_MODEL="$SUCCESS_ROUTED_MODEL" RESPONSE_FILE DEBUG
+export REQUESTED_MODEL="$SUCCESS_REQUESTED_MODEL" ROUTED_MODEL="$SUCCESS_ROUTED_MODEL" RESPONSE_FILE DEBUG SOURCE_DURATION
 python3 - << 'PYEOF'
 import os, json, re, sys
 
@@ -315,6 +316,7 @@ response_file = os.environ.get('RESPONSE_FILE')
 req_m = os.environ.get('REQUESTED_MODEL', '')
 rout_m = os.environ.get('ROUTED_MODEL', '')
 debug = os.environ.get('DEBUG', '0') == '1'
+source_duration = int(os.environ.get('SOURCE_DURATION', 60))
 
 def dbg(msg):
     if debug:
@@ -329,74 +331,47 @@ except:
 if os.path.exists(response_file):
     os.remove(response_file)
 
-dbg(f"📄 Raw length: {len(raw)} chars")
-
 cleaned = re.sub(r'```json\s*|\s*```', '', raw, flags=re.IGNORECASE).strip()
-data = None
+cleaned = re.sub(r'<think>.*?</think>', '', cleaned, flags=re.DOTALL).strip()
 
+data = None
 try:
     data = json.loads(cleaned)
-    dbg("✅ Direct JSON parse SUCCESS")
 except Exception:
-    no_think = re.sub(r'<think>.*?</think>', '', cleaned, flags=re.DOTALL).strip()
-    match = re.search(r'\{.*\}', no_think, re.DOTALL)
+    match = re.search(r'\{.*\}', cleaned, re.DOTALL)
     if match:
         try:
             data = json.loads(match.group(0))
-            dbg("✅ Regex JSON extract SUCCESS")
         except Exception:
             pass
 
-if not data or not isinstance(data, dict):
-    dbg("⚠️ JSON extraction completely failed. Running Bulletproof Text Scanner...")
-    
-    time_match = re.search(r'(\d{2}:\d{2}(?::\d{2})?)', raw)
-    start_time = time_match.group(1) if time_match else "00:00:15"
-    if len(start_time.split(':')) == 2:
-        start_time = f"00:{start_time}"
+if not data or not isinstance(data, dict) or not all(k in data for k in ("title", "start_time", "clip_duration")):
+    dbg("❌ Strict JSON parsing failed completely. No fallback allowed.")
+    print(json.dumps({"status": "failed", "error": "Strict JSON parse failed"}))
+    sys.exit(1)
 
-    title = "Insane Tactical Play 🎯🔥"
-    pure_text = re.sub(r'<think>.*?</think>', '', raw, flags=re.DOTALL).strip()
-    lines = [l.strip() for l in pure_text.split('\n') if l.strip()]
-    if not lines:
-        lines = [l.strip() for l in raw.split('\n') if l.strip()]
-        
-    for line in lines:
-        if any(skip in line.lower() for skip in ['parsing', 'scanning', 'analyze', 'schema', 'properties', 'json']):
-            continue
-        clean_l = re.sub(r'^\d+[\.\)]\s*|^[\-\*]\s*|[\*\#\`\"]', '', line).strip()
-        if 10 <= len(clean_l) <= 50:
-            title = clean_l
-            break
-
-    data = {
-        "title": title,
-        "start_time": start_time,
-        "clip_duration": 25
-    }
-
-raw_title = data.get('title', 'Pro Gaming Moments 🎯🔥')
-
+raw_title = data.get('title', '')
 if isinstance(raw_title, list):
-    raw_title = raw_title[0] if len(raw_title) > 0 else "Pro Gaming Moments 🎯🔥"
+    raw_title = raw_title[0] if len(raw_title) > 0 else ""
 elif isinstance(raw_title, str):
     lines = [line.strip() for line in raw_title.split('\n') if line.strip()]
-    raw_title = lines[0] if lines else "Pro Gaming Moments 🎯🔥"
+    raw_title = lines[0] if lines else ""
 
 title = re.sub(r'^\d+[\.\)]\s*|^[\-\*]\s*|[\*\#\`\"]', '', str(raw_title)).strip()
 title = title.strip("'\"")
 title = re.sub(r'\s+', ' ', title)
 
-if not title:
-    title = "Unstoppable Gaming Highlights 🎯🔥"
-
-start_time = str(data.get('start_time', '00:00:15')).strip()
-duration = data.get('clip_duration', 25)
+start_time = str(data.get('start_time', '')).strip()
+duration = data.get('clip_duration', 0)
 
 try:
-    dur_int = max(15, min(45, int(duration)))
-except Exception:
-    dur_int = 25
+    dur_int = int(duration)
+    if dur_int < 15 or dur_int > source_duration:
+        raise ValueError(f"Duration out of bounds (15 to {source_duration}s)")
+except Exception as e:
+    dbg(f"❌ Invalid duration value received: {duration} ({e})")
+    print(json.dumps({"status": "failed", "error": f"Invalid clip duration: {duration}"}))
+    sys.exit(1)
 
 dbg(f"✅ Final Output Title: '{title}'")
 dbg(f"✅ Final Start Time  : '{start_time}'")
