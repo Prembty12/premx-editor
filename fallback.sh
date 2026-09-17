@@ -1,7 +1,8 @@
 #!/bin/bash
 # ==============================================================================
 # 🚀 OPENROUTER FALLBACK AGENT
-# APPROVE/REJECT + Reason + Multi-Method JSON Parser + Full Debug
+# Strict JSON Prompt + Schema + Multi-Method Parser
+# APPROVE/REJECT + Reason + Full Debug
 # ==============================================================================
 
 export TZ='Asia/Kolkata'
@@ -30,7 +31,7 @@ if [ ${#KEYS[@]} -eq 0 ]; then
 fi
 
 if [ ! -f "$GRID_PATH" ]; then
-    echo "{\"status\": \"failed\", \"error\": \"Grid not found at $GRID_PATH\"}"
+    echo "{\"status\": \"failed\", \"error\": \"Grid image not found at $GRID_PATH\"}"
     exit 1
 fi
 
@@ -44,7 +45,7 @@ dbg() {
 }
 
 # ══════════════════════════════════════════════════════════════
-# 🚀 PROMPT with APPROVE/REJECT + Reason
+# 🚀 STRICT PROMPT — status MANDATORY
 # ══════════════════════════════════════════════════════════════
 PROMPT_TEXT="Analyze the provided 9:16 gaming screenshot grid. Total video source duration is ${SOURCE_DURATION} seconds.
 Style Directive: ${STYLE_PROMPT}
@@ -63,20 +64,30 @@ APPROVE IF:
 - Any action, movement, or engaging moment exists
 - High-tension, emotional, or thrilling segments present
 
-TITLE RULES (only for APPROVE):
-- Create a short, viral title under 6 words with 1-3 emojis
-- DO NOT use generic boring words like Epic, Insane, Crazy, Best, Gameplay
-- Make it unique based strictly on what's visible in the grid
-
-STRICT JSON OUTPUT (no markdown, no extra text):
+STRICT JSON OUTPUT — FOLLOW EXACTLY:
 
 If REJECT:
-{\"status\": \"REJECT\", \"reason\": \"<1-line explanation>\"}
+{
+  \"status\": \"REJECT\",
+  \"reason\": \"<1-line explanation why rejected>\"
+}
 
 If APPROVE:
-{\"status\": \"APPROVE\", \"title\": \"<viral title 6 words max with 1-3 emojis>\", \"start_time\": <integer seconds 0 to $((SOURCE_DURATION - 15))>, \"clip_duration\": <integer 15-${SOURCE_DURATION}>, \"reason\": \"<1-line explanation>\"}
+{
+  \"status\": \"APPROVE\",
+  \"title\": \"<viral title 6 words max with 1-3 emojis>\",
+  \"start_time\": <integer seconds 0 to $((SOURCE_DURATION - 15))>,
+  \"clip_duration\": <integer seconds 15 to ${SOURCE_DURATION}>,
+  \"reason\": \"<1-line explanation why approved>\"
+}
 
-Return ONLY the JSON object. No markdown. No extra text. No escaped quotes."
+CRITICAL RULES:
+1. ALWAYS include 'status' field — either 'APPROVE' or 'REJECT'
+2. If APPROVE, you MUST include all 5 fields: status, title, start_time, clip_duration, reason
+3. If REJECT, you MUST include 2 fields: status, reason
+4. NO markdown, NO extra text, NO escaped quotes, ONLY the JSON object
+
+Return the JSON object now:"
 
 RAW_RESPONSE=""
 SUCCESS_REQUESTED_MODEL=""
@@ -140,7 +151,7 @@ schema = {
         "clip_duration": {"type": "integer", "minimum": 15, "maximum": source_duration},
         "reason": {"type": "string"}
     },
-    "required": ["status"],
+    "required": ["status", "reason"],
     "additionalProperties": False
 }
 
@@ -235,7 +246,7 @@ except: print('')
         dbg "    📝 Content (first 250 chars): ${CONTENT:0:250}"
         
         # ══════════════════════════════════════════════════════════
-        # VALIDATION — Multi-Method JSON Parser
+        # 🔥 MULTI-METHOD JSON VALIDATION
         # ══════════════════════════════════════════════════════════
         IS_VALID_JSON=$(python3 -c '
 import json, sys, re
@@ -246,165 +257,7 @@ def parse_json(raw_input):
     if not raw_input:
         return None
     
-    # Method 1: Clean markdown + direct parse
-    clean = re.sub(r"```json\s*|\s*```", "", raw_input, flags=re.IGNORECASE).strip()
-    clean = re.sub(r"<think>.*?</think>", "", clean, flags=re.DOTALL).strip()
-    clean = clean.rstrip().rstrip(",")
-    
-    try:
-        d = json.loads(clean)
-        if isinstance(d, dict): return d
-    except: pass
-    
-    # Method 2: Regex extract { ... }
-    match = re.search(r"\{.*\}", clean, re.DOTALL)
-    if match:
-        try:
-            d = json.loads(match.group(0))
-            if isinstance(d, dict): return d
-        except: pass
-    
-    # Method 3: Fix escaped quotes (\" -> ")
-    fixed = clean.replace(chr(92) + chr(34), chr(34))
-    try:
-        d = json.loads(fixed)
-        if isinstance(d, dict): return d
-    except: pass
-    
-    # Method 4: Double-encoded (string that contains JSON)
-    if clean.startswith(chr(34)):
-        try:
-            inner = json.loads(clean)
-            if isinstance(inner, str):
-                inner_clean = inner.strip()
-                inner_clean = re.sub(r"```json\s*|\s*```", "", inner_clean, flags=re.IGNORECASE).strip()
-                try:
-                    d = json.loads(inner_clean)
-                    if isinstance(d, dict): return d
-                except: pass
-                match = re.search(r"\{.*\}", inner_clean, re.DOTALL)
-                if match:
-                    try:
-                        d = json.loads(match.group(0))
-                        if isinstance(d, dict): return d
-                    except: pass
-        except: pass
-    
-    # Method 5: Manual regex extraction (LAST RESORT — always works)
-    status_match = re.search(r\'"status"\s*:\s*"([^"]+)"\', clean)
-    if status_match:
-        status_val = status_match.group(1).upper()
-        title_match = re.search(r\'"title"\s*:\s*"([^"]*)"\', clean)
-        st_match = re.search(r\'"start_time"\s*:\s*(\d+)\', clean)
-        dur_match = re.search(r\'"clip_duration"\s*:\s*(\d+)\', clean)
-        reason_match = re.search(r\'"reason"\s*:\s*"([^"]*)"\', clean)
-        
-        if status_val == "REJECT":
-            return {"status": "REJECT", "reason": reason_match.group(1) if reason_match else ""}
-        if status_val == "APPROVE" and title_match and st_match and dur_match:
-            return {
-                "status": "APPROVE",
-                "title": title_match.group(1),
-                "start_time": int(st_match.group(1)),
-                "clip_duration": int(dur_match.group(1)),
-                "reason": reason_match.group(1) if reason_match else ""
-            }
-    
-    return None
-
-
-data = parse_json(raw)
-
-if not data or not isinstance(data, dict):
-    print("invalid")
-    sys.exit(0)
-
-status = str(data.get("status", "")).upper()
-
-if status == "REJECT":
-    print("valid")
-    sys.exit(0)
-if status == "APPROVE" and all(k in data for k in ("title", "start_time", "clip_duration")):
-    print("valid")
-    sys.exit(0)
-if all(k in data for k in ("title", "start_time", "clip_duration")):
-    print("valid")
-    sys.exit(0)
-print("invalid")
-' "$CONTENT")
-
-        if [ "$IS_VALID_JSON" = "valid" ]; then
-            dbg ""
-            dbg "    ✅ SUCCESS — Valid JSON detected!"
-            RAW_RESPONSE="$CONTENT"
-            SUCCESS_REQUESTED_MODEL="$CURRENT_MODEL"
-            SUCCESS_ROUTED_MODEL="${ROUTED:-$CURRENT_MODEL}"
-            break
-        else
-            dbg "    ⚠️  Invalid JSON. Retrying..."
-            sleep 1.5
-            continue
-        fi
-    else
-        dbg "    ⚠️  Empty content. Retrying..."
-        sleep 1.5
-    fi
-done
-
-if [ -z "$RAW_RESPONSE" ]; then
-    dbg "❌ ALL ATTEMPTS FAILED"
-    echo '{"status": "failed", "error": "All 21 OpenRouter attempts failed"}'
-    exit 1
-fi
-
-RESPONSE_FILE="temp_frames/or_response.txt"
-printf "%s" "$RAW_RESPONSE" > "$RESPONSE_FILE"
-
-dbg ""
-dbg "════════════════════════════════════════════════════════"
-dbg "🧹 STRICT PARSING PHASE"
-dbg "════════════════════════════════════════════════════════"
-
-export REQUESTED_MODEL="$SUCCESS_REQUESTED_MODEL" ROUTED_MODEL="$SUCCESS_ROUTED_MODEL" RESPONSE_FILE DEBUG SOURCE_DURATION
-python3 - << 'PYEOF'
-import os, json, re, sys
-from datetime import datetime, timedelta, timezone
-
-def get_ist_now():
-    try:
-        from zoneinfo import ZoneInfo
-        return datetime.now(ZoneInfo("Asia/Kolkata")).strftime("%Y-%m-%d %H:%M:%S IST")
-    except: pass
-    ist = timezone(timedelta(hours=5, minutes=30))
-    return datetime.now(ist).strftime("%Y-%m-%d %H:%M:%S IST")
-
-ist_now = get_ist_now()
-
-rf = os.environ.get('RESPONSE_FILE')
-req_m = os.environ.get('REQUESTED_MODEL', '')
-rout_m = os.environ.get('ROUTED_MODEL', '')
-debug = os.environ.get('DEBUG', '0') == '1'
-sd = int(os.environ.get('SOURCE_DURATION', 60))
-
-def dbg(msg):
-    if debug:
-        print(msg, file=sys.stderr, flush=True)
-
-try:
-    with open(rf, 'r', encoding='utf-8') as f:
-        raw = f.read()
-except:
-    raw = ""
-
-if os.path.exists(rf):
-    os.remove(rf)
-
-
-def parse_json(raw_input):
-    if not raw_input:
-        return None
-    
-    # Method 1: Clean markdown + direct parse
+    # Method 1: Clean + direct parse
     clean = re.sub(r"```json\s*|\s*```", "", raw_input, flags=re.IGNORECASE).strip()
     clean = re.sub(r"<think>.*?</think>", "", clean, flags=re.DOTALL).strip()
     clean = clean.rstrip().rstrip(",")
@@ -448,7 +301,161 @@ def parse_json(raw_input):
                     except: pass
         except: pass
     
-    # Method 5: Manual regex extraction (LAST RESORT)
+    # Method 5: MANUAL REGEX EXTRACTION
+    status_match = re.search(r\'"status"\s*:\s*"([^"]+)"\', clean)
+    if status_match:
+        status_val = status_match.group(1).upper()
+        title_match = re.search(r\'"title"\s*:\s*"([^"]*)"\', clean)
+        st_match = re.search(r\'"start_time"\s*:\s*(\d+)\', clean)
+        dur_match = re.search(r\'"clip_duration"\s*:\s*(\d+)\', clean)
+        reason_match = re.search(r\'"reason"\s*:\s*"([^"]*)"\', clean)
+        
+        if status_val == "REJECT":
+            return {"status": "REJECT", "reason": reason_match.group(1) if reason_match else ""}
+        if status_val == "APPROVE" and title_match and st_match and dur_match:
+            return {
+                "status": "APPROVE",
+                "title": title_match.group(1),
+                "start_time": int(st_match.group(1)),
+                "clip_duration": int(dur_match.group(1)),
+                "reason": reason_match.group(1) if reason_match else ""
+            }
+    
+    return None
+
+
+data = parse_json(raw)
+
+if not data or not isinstance(data, dict):
+    print("invalid")
+    sys.exit(0)
+
+status = str(data.get("status", "")).upper()
+
+# ✅ REJECT
+if status == "REJECT":
+    print("valid")
+    sys.exit(0)
+
+# ✅ APPROVE
+if status == "APPROVE" and all(k in data for k in ("title", "start_time", "clip_duration")):
+    print("valid")
+    sys.exit(0)
+
+print("invalid")
+' "$CONTENT")
+
+        if [ "$IS_VALID_JSON" = "valid" ]; then
+            dbg ""
+            dbg "    ✅ SUCCESS — Valid JSON detected!"
+            RAW_RESPONSE="$CONTENT"
+            SUCCESS_REQUESTED_MODEL="$CURRENT_MODEL"
+            SUCCESS_ROUTED_MODEL="${ROUTED:-$CURRENT_MODEL}"
+            break
+        else
+            dbg "    ⚠️  Invalid JSON. Retrying..."
+            sleep 1.5
+            continue
+        fi
+    else
+        dbg "    ⚠️  Empty content. Retrying..."
+        sleep 1.5
+    fi
+done
+
+if [ -z "$RAW_RESPONSE" ]; then
+    dbg "❌ ALL ATTEMPTS FAILED"
+    echo '{"status": "failed", "error": "All 21 OpenRouter attempts failed"}'
+    exit 1
+fi
+
+RESPONSE_FILE="temp_frames/or_response.txt"
+printf "%s" "$RAW_RESPONSE" > "$RESPONSE_FILE"
+
+dbg ""
+dbg "════════════════════════════════════════════════════════"
+dbg "🧹 FINAL PARSING PHASE"
+dbg "════════════════════════════════════════════════════════"
+
+export REQUESTED_MODEL="$SUCCESS_REQUESTED_MODEL" ROUTED_MODEL="$SUCCESS_ROUTED_MODEL" RESPONSE_FILE DEBUG SOURCE_DURATION
+python3 - << 'PYEOF'
+import os, json, re, sys
+from datetime import datetime, timedelta, timezone
+
+def get_ist_now():
+    try:
+        from zoneinfo import ZoneInfo
+        return datetime.now(ZoneInfo("Asia/Kolkata")).strftime("%Y-%m-%d %H:%M:%S IST")
+    except: pass
+    ist = timezone(timedelta(hours=5, minutes=30))
+    return datetime.now(ist).strftime("%Y-%m-%d %H:%M:%S IST")
+
+ist_now = get_ist_now()
+
+rf = os.environ.get('RESPONSE_FILE')
+req_m = os.environ.get('REQUESTED_MODEL', '')
+rout_m = os.environ.get('ROUTED_MODEL', '')
+debug = os.environ.get('DEBUG', '0') == '1'
+sd = int(os.environ.get('SOURCE_DURATION', 60))
+
+def dbg(msg):
+    if debug:
+        print(msg, file=sys.stderr, flush=True)
+
+try:
+    with open(rf, 'r', encoding='utf-8') as f:
+        raw = f.read()
+except:
+    raw = ""
+
+if os.path.exists(rf):
+    os.remove(rf)
+
+
+def parse_json(raw_input):
+    if not raw_input:
+        return None
+    
+    clean = re.sub(r"```json\s*|\s*```", "", raw_input, flags=re.IGNORECASE).strip()
+    clean = re.sub(r"<think>.*?</think>", "", clean, flags=re.DOTALL).strip()
+    clean = clean.rstrip().rstrip(",")
+    
+    try:
+        d = json.loads(clean)
+        if isinstance(d, dict): return d
+    except: pass
+    
+    match = re.search(r"\{.*\}", clean, re.DOTALL)
+    if match:
+        try:
+            d = json.loads(match.group(0))
+            if isinstance(d, dict): return d
+        except: pass
+    
+    fixed = clean.replace(chr(92) + chr(34), chr(34))
+    try:
+        d = json.loads(fixed)
+        if isinstance(d, dict): return d
+    except: pass
+    
+    if clean.startswith(chr(34)):
+        try:
+            inner = json.loads(clean)
+            if isinstance(inner, str):
+                inner_clean = inner.strip()
+                inner_clean = re.sub(r"```json\s*|\s*```", "", inner_clean, flags=re.IGNORECASE).strip()
+                try:
+                    d = json.loads(inner_clean)
+                    if isinstance(d, dict): return d
+                except: pass
+                match = re.search(r"\{.*\}", inner_clean, re.DOTALL)
+                if match:
+                    try:
+                        d = json.loads(match.group(0))
+                        if isinstance(d, dict): return d
+                    except: pass
+        except: pass
+    
     status_match = re.search(r'"status"\s*:\s*"([^"]+)"', clean)
     if status_match:
         status_val = status_match.group(1).upper()
@@ -474,16 +481,14 @@ def parse_json(raw_input):
 data = parse_json(raw)
 
 if not data or not isinstance(data, dict):
-    dbg("❌ Strict JSON parsing failed completely.")
-    print(json.dumps({"status": "failed", "error": "Strict JSON parse failed"}))
+    dbg("❌ Parsing failed completely.")
+    print(json.dumps({"status": "failed", "error": "Parse failed"}))
     sys.exit(1)
 
 status_field = str(data.get('status', '')).strip().upper()
 reason_text = str(data.get('reason', '')).strip() or "(no reason provided)"
 
-# ══════════════════════════════════════════════════════════════
-# 🚫 REJECT CASE
-# ══════════════════════════════════════════════════════════════
+# 🚫 REJECT
 if status_field == 'REJECT':
     dbg("")
     dbg("════════════════════════════════════════════════════════")
@@ -491,7 +496,6 @@ if status_field == 'REJECT':
     dbg("════════════════════════════════════════════════════════")
     dbg(f"  💬 Reason     : {reason_text}")
     dbg(f"  🤖 Routed     : {rout_m}")
-    dbg(f"  🎯 Requested  : {req_m}")
     dbg(f"  🕐 Time (IST) : {ist_now}")
     dbg("")
     
@@ -504,9 +508,7 @@ if status_field == 'REJECT':
     }))
     sys.exit(0)
 
-# ══════════════════════════════════════════════════════════════
-# ✅ APPROVE CASE
-# ══════════════════════════════════════════════════════════════
+# ✅ APPROVE
 if not all(k in data for k in ("title", "start_time", "clip_duration")):
     dbg("❌ APPROVE status par required keys missing")
     print(json.dumps({"status": "failed", "error": "Missing required keys"}))
