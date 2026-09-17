@@ -1,7 +1,7 @@
 #!/bin/bash
 # ==============================================================================
 # 🚀 OPENROUTER FALLBACK AGENT
-# APPROVE/REJECT + Reason + Double-Encoded JSON Fix + Full Debug
+# APPROVE/REJECT + Reason + Multi-Method JSON Parser + Full Debug
 # ==============================================================================
 
 export TZ='Asia/Kolkata'
@@ -76,7 +76,7 @@ If REJECT:
 If APPROVE:
 {\"status\": \"APPROVE\", \"title\": \"<viral title 6 words max with 1-3 emojis>\", \"start_time\": <integer seconds 0 to $((SOURCE_DURATION - 15))>, \"clip_duration\": <integer 15-${SOURCE_DURATION}>, \"reason\": \"<1-line explanation>\"}
 
-Return ONLY the JSON object."
+Return ONLY the JSON object. No markdown. No extra text. No escaped quotes."
 
 RAW_RESPONSE=""
 SUCCESS_REQUESTED_MODEL=""
@@ -234,22 +234,22 @@ except: print('')
     if [ -n "$CONTENT" ] && [ "$CONTENT" != "None" ]; then
         dbg "    📝 Content (first 250 chars): ${CONTENT:0:250}"
         
-        # ═══════════════════════════════════════════
-        # VALIDATION with multi-method JSON parser
-        # ═══════════════════════════════════════════
+        # ══════════════════════════════════════════════════════════
+        # VALIDATION — Multi-Method JSON Parser
+        # ══════════════════════════════════════════════════════════
         IS_VALID_JSON=$(python3 -c '
 import json, sys, re
 
 raw = sys.argv[1]
 
 def parse_json(raw_input):
-    """Try multiple methods to parse JSON (handles double-encoded)"""
     if not raw_input:
         return None
     
-    # Method 1: Clean markdown + parse
+    # Method 1: Clean markdown + direct parse
     clean = re.sub(r"```json\s*|\s*```", "", raw_input, flags=re.IGNORECASE).strip()
     clean = re.sub(r"<think>.*?</think>", "", clean, flags=re.DOTALL).strip()
+    clean = clean.rstrip().rstrip(",")
     
     try:
         d = json.loads(clean)
@@ -264,13 +264,20 @@ def parse_json(raw_input):
             if isinstance(d, dict): return d
         except: pass
     
-    # Method 3: Double-encoded JSON (escaped string)
-    if clean.startswith(chr(34)) and clean.endswith(chr(34)):
+    # Method 3: Fix escaped quotes (\" -> ")
+    fixed = clean.replace(chr(92) + chr(34), chr(34))
+    try:
+        d = json.loads(fixed)
+        if isinstance(d, dict): return d
+    except: pass
+    
+    # Method 4: Double-encoded (string that contains JSON)
+    if clean.startswith(chr(34)):
         try:
             inner = json.loads(clean)
             if isinstance(inner, str):
-                inner_clean = re.sub(r"```json\s*|\s*```", "", inner, flags=re.IGNORECASE).strip()
-                inner_clean = re.sub(r"<think>.*?</think>", "", inner_clean, flags=re.DOTALL).strip()
+                inner_clean = inner.strip()
+                inner_clean = re.sub(r"```json\s*|\s*```", "", inner_clean, flags=re.IGNORECASE).strip()
                 try:
                     d = json.loads(inner_clean)
                     if isinstance(d, dict): return d
@@ -283,15 +290,28 @@ def parse_json(raw_input):
                     except: pass
         except: pass
     
-    # Method 4: Search for status-containing JSON
-    match = re.search(r"\{[^{}]*" + chr(34) + r"status" + chr(34) + r"[^{}]*\}", clean, re.DOTALL)
-    if match:
-        try:
-            d = json.loads(match.group(0))
-            if isinstance(d, dict): return d
-        except: pass
+    # Method 5: Manual regex extraction (LAST RESORT — always works)
+    status_match = re.search(r\'"status"\s*:\s*"([^"]+)"\', clean)
+    if status_match:
+        status_val = status_match.group(1).upper()
+        title_match = re.search(r\'"title"\s*:\s*"([^"]*)"\', clean)
+        st_match = re.search(r\'"start_time"\s*:\s*(\d+)\', clean)
+        dur_match = re.search(r\'"clip_duration"\s*:\s*(\d+)\', clean)
+        reason_match = re.search(r\'"reason"\s*:\s*"([^"]*)"\', clean)
+        
+        if status_val == "REJECT":
+            return {"status": "REJECT", "reason": reason_match.group(1) if reason_match else ""}
+        if status_val == "APPROVE" and title_match and st_match and dur_match:
+            return {
+                "status": "APPROVE",
+                "title": title_match.group(1),
+                "start_time": int(st_match.group(1)),
+                "clip_duration": int(dur_match.group(1)),
+                "reason": reason_match.group(1) if reason_match else ""
+            }
     
     return None
+
 
 data = parse_json(raw)
 
@@ -315,7 +335,7 @@ print("invalid")
 
         if [ "$IS_VALID_JSON" = "valid" ]; then
             dbg ""
-            dbg "    ✅ SUCCESS — Model responded with valid JSON!"
+            dbg "    ✅ SUCCESS — Valid JSON detected!"
             RAW_RESPONSE="$CONTENT"
             SUCCESS_REQUESTED_MODEL="$CURRENT_MODEL"
             SUCCESS_ROUTED_MODEL="${ROUTED:-$CURRENT_MODEL}"
@@ -360,40 +380,41 @@ def get_ist_now():
 
 ist_now = get_ist_now()
 
-response_file = os.environ.get('RESPONSE_FILE')
+rf = os.environ.get('RESPONSE_FILE')
 req_m = os.environ.get('REQUESTED_MODEL', '')
 rout_m = os.environ.get('ROUTED_MODEL', '')
 debug = os.environ.get('DEBUG', '0') == '1'
-source_duration = int(os.environ.get('SOURCE_DURATION', 60))
+sd = int(os.environ.get('SOURCE_DURATION', 60))
 
 def dbg(msg):
     if debug:
         print(msg, file=sys.stderr, flush=True)
 
 try:
-    with open(response_file, 'r', encoding='utf-8') as f:
+    with open(rf, 'r', encoding='utf-8') as f:
         raw = f.read()
 except:
     raw = ""
 
-if os.path.exists(response_file):
-    os.remove(response_file)
+if os.path.exists(rf):
+    os.remove(rf)
 
 
 def parse_json(raw_input):
-    """Multi-method JSON parser (handles double-encoded strings)"""
     if not raw_input:
         return None
     
-    # Method 1: Clean + parse
+    # Method 1: Clean markdown + direct parse
     clean = re.sub(r"```json\s*|\s*```", "", raw_input, flags=re.IGNORECASE).strip()
     clean = re.sub(r"<think>.*?</think>", "", clean, flags=re.DOTALL).strip()
+    clean = clean.rstrip().rstrip(",")
+    
     try:
         d = json.loads(clean)
         if isinstance(d, dict): return d
     except: pass
     
-    # Method 2: Regex { }
+    # Method 2: Regex extract
     match = re.search(r"\{.*\}", clean, re.DOTALL)
     if match:
         try:
@@ -401,13 +422,20 @@ def parse_json(raw_input):
             if isinstance(d, dict): return d
         except: pass
     
-    # Method 3: Double-encoded
-    if clean.startswith(chr(34)) and clean.endswith(chr(34)):
+    # Method 3: Fix escaped quotes
+    fixed = clean.replace(chr(92) + chr(34), chr(34))
+    try:
+        d = json.loads(fixed)
+        if isinstance(d, dict): return d
+    except: pass
+    
+    # Method 4: Double-encoded
+    if clean.startswith(chr(34)):
         try:
             inner = json.loads(clean)
             if isinstance(inner, str):
-                inner_clean = re.sub(r"```json\s*|\s*```", "", inner, flags=re.IGNORECASE).strip()
-                inner_clean = re.sub(r"<think>.*?</think>", "", inner_clean, flags=re.DOTALL).strip()
+                inner_clean = inner.strip()
+                inner_clean = re.sub(r"```json\s*|\s*```", "", inner_clean, flags=re.IGNORECASE).strip()
                 try:
                     d = json.loads(inner_clean)
                     if isinstance(d, dict): return d
@@ -420,13 +448,25 @@ def parse_json(raw_input):
                     except: pass
         except: pass
     
-    # Method 4: Status search
-    match = re.search(r"\{[^{}]*" + chr(34) + r"status" + chr(34) + r"[^{}]*\}", clean, re.DOTALL)
-    if match:
-        try:
-            d = json.loads(match.group(0))
-            if isinstance(d, dict): return d
-        except: pass
+    # Method 5: Manual regex extraction (LAST RESORT)
+    status_match = re.search(r'"status"\s*:\s*"([^"]+)"', clean)
+    if status_match:
+        status_val = status_match.group(1).upper()
+        title_match = re.search(r'"title"\s*:\s*"([^"]*)"', clean)
+        st_match = re.search(r'"start_time"\s*:\s*(\d+)', clean)
+        dur_match = re.search(r'"clip_duration"\s*:\s*(\d+)', clean)
+        reason_match = re.search(r'"reason"\s*:\s*"([^"]*)"', clean)
+        
+        if status_val == "REJECT":
+            return {"status": "REJECT", "reason": reason_match.group(1) if reason_match else ""}
+        if status_val == "APPROVE" and title_match and st_match and dur_match:
+            return {
+                "status": "APPROVE",
+                "title": title_match.group(1),
+                "start_time": int(st_match.group(1)),
+                "clip_duration": int(dur_match.group(1)),
+                "reason": reason_match.group(1) if reason_match else ""
+            }
     
     return None
 
@@ -447,13 +487,13 @@ reason_text = str(data.get('reason', '')).strip() or "(no reason provided)"
 if status_field == 'REJECT':
     dbg("")
     dbg("════════════════════════════════════════════════════════")
-    dbg "🚫 AI NE REJECT KIYA"
-    dbg "════════════════════════════════════════════════════════"
-    dbg f"  💬 Reason     : {reason_text}"
-    dbg f"  🤖 Routed     : {rout_m}"
-    dbg f"  🎯 Requested  : {req_m}"
-    dbg f"  🕐 Time (IST) : {ist_now}"
-    dbg ""
+    dbg("🚫 AI NE REJECT KIYA")
+    dbg("════════════════════════════════════════════════════════")
+    dbg(f"  💬 Reason     : {reason_text}")
+    dbg(f"  🤖 Routed     : {rout_m}")
+    dbg(f"  🎯 Requested  : {req_m}")
+    dbg(f"  🕐 Time (IST) : {ist_now}")
+    dbg("")
     
     print(json.dumps({
         "status": "reject",
@@ -495,24 +535,24 @@ duration = data.get('clip_duration', 15)
 
 try:
     dur_int = int(duration)
-    if dur_int < 15 or dur_int > source_duration:
-        raise ValueError(f"Duration out of bounds (15 to {source_duration}s)")
+    if dur_int < 15 or dur_int > sd:
+        raise ValueError(f"Duration out of bounds")
 except Exception as e:
-    dbg(f"❌ Invalid duration value: {duration} ({e})")
+    dbg(f"❌ Invalid duration: {duration} ({e})")
     print(json.dumps({"status": "failed", "error": f"Invalid clip duration: {duration}"}))
     sys.exit(1)
 
 dbg("")
-dbg "════════════════════════════════════════════════════════"
-dbg "✅ AI NE APPROVE KIYA"
-dbg "════════════════════════════════════════════════════════"
-dbg f"  🎬 Title      : {title}"
-dbg f"  ⏱️  Start Time : {start_time_val}s"
-dbg f"  ⏳ Duration   : {dur_int}s"
-dbg f"  💬 Reason     : {reason_text}"
-dbg f"  🤖 Routed     : {rout_m}"
-dbg f"  🕐 Time (IST) : {ist_now}"
-dbg ""
+dbg("════════════════════════════════════════════════════════")
+dbg("✅ AI NE APPROVE KIYA")
+dbg("════════════════════════════════════════════════════════")
+dbg(f"  🎬 Title      : {title}")
+dbg(f"  ⏱️  Start Time : {start_time_val}s")
+dbg(f"  ⏳ Duration   : {dur_int}s")
+dbg(f"  💬 Reason     : {reason_text}")
+dbg(f"  🤖 Routed     : {rout_m}")
+dbg(f"  🕐 Time (IST) : {ist_now}")
+dbg("")
 
 print(json.dumps({
     "status": "success",
