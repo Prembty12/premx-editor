@@ -1,1 +1,1 @@
-{"reason": "Active first-person shooter gameplay with aiming, tactical movement, and combat action.", "start_time": 0, "status": "APPROVE", "title": "Tactical Sniper Clutch Play 🎯🔥"}
+{"reason": "Active first-person shooter gameplay showing tactical movement, scoping, and red-lit combat sequences.", "start_time": 10, "status": "APPROVE", "title": "Red Hot Kill Zone 🔥🎯"}
