@@ -1,1 +1,1 @@
-{"reason":"Tactical sniper aiming and enemy movement create high-tension stealth gameplay.","start_time":5,"status":"APPROVE","title":"He walked into the sniper trap 🎯💀 clip_duration"}
+{"reason": "Active first-person shooter gameplay with aiming, tactical movement, and combat action.", "start_time": 0, "status": "APPROVE", "title": "Tactical Sniper Clutch Play 🎯🔥"}

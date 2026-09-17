@@ -1,0 +1,7 @@
+{
+  "reason": "FPS combat with sniper fire, movement, and indoor firefight visible."
+  ,
+  "start_time": 0,
+  "status": "APPROVE",
+  "title": "Sniper Shot Into Chaos 🔥"
+  	}
