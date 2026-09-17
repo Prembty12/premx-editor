@@ -6,6 +6,7 @@
 GRID_PATH="${GRID_PATH:-temp_frames/merged_60_grid_screenshot.jpg}"
 SOURCE_DURATION="${SOURCE_DURATION:-60}"
 STYLE_PROMPT="${STYLE_PROMPT:-}"
+CURRENT_LINK="${CURRENT_LINK:-}" # Video link/path for skipped.txt tracking
 
 PRIMARY_MODEL="${OPENROUTER_MODEL:-dots-studio/dots-3-note-preview:free}"
 FALLBACK_MODEL="openrouter/free"
@@ -41,16 +42,22 @@ dbg() {
     [ "$DEBUG" = "1" ] && echo "$@" >&2
 }
 
-# 🚀 Ultra-Engaging Prompt Focused on Flow & Natural Ending (Up to 60s)
-PROMPT_TEXT="Analyze the provided 9:16 gaming screenshot grid. Total video source duration is ${SOURCE_DURATION} seconds.
+# 🚀 Ultra-Engaging Prompt Focused on Gameplay Quality, Flow & JSON Schema Output
+PROMPT_TEXT="Analyze the provided 9:16 gaming screenshot grid (60-grid frames). Total video source duration is ${SOURCE_DURATION} seconds.
 Style Directive: ${STYLE_PROMPT}
 
+### QUALITY ASSURANCE & GAMEPLAY EVALUATION:
+1. ACTUAL GAMEPLAY REQUIREMENT: 
+   - The video MUST contain real, visible, and engaging video game footage, player interaction, active missions, combat, or useful gaming content/walkthroughs (including titles like Call of Duty, PS5 games, etc.).
+   - Reject immediately if it is just abstract cinematic AI-generated visuals, random floating sci-fi/fantasy landscapes, generic face close-ups with no game substance, or empty aesthetic fluff. If there's no actual game here, set status to REJECT.
+
 CRITICAL INSTRUCTIONS FOR SEAMLESS ENGAGEMENT:
-1. TITLE RULES: Create a short, viral title under 6 words with 1-3 emojis. DO NOT use generic boring words like 'Epic', 'Insane', 'Crazy', 'Best', or 'Gameplay'. Make it unique based strictly on what's visible in the current grid image.
-2. ENGAGING FLOW & TIMING RULES: Do not just look for a quick action flash. Scan the grid for the complete **engaging, emotional, or high-tension moment**. 
-3. Choose a precise numerical 'start_time' in seconds (e.g. 15, 30) as an integer and let the sequence run naturally. The 'clip_duration' must be at least 15 seconds and extend smoothly until the engaging moment reaches its natural conclusion (up to 60 seconds). 
-4. STRICT GUARDRAIL: NEVER cut abruptly in the middle of an ongoing engaging sequence. Ensure the ending feels satisfying and complete.
-5. Return JSON with exactly three keys (title, start_time, clip_duration) as specified in the schema."
+1. STATUS: Set 'status' to APPROVE if it contains real gameplay, or REJECT if it is empty cinematic/AI fluff.
+2. TITLE RULES: Create a short, viral title under 6 words with 1-3 emojis. DO NOT use generic boring words like 'Epic', 'Insane', 'Crazy', 'Best', or 'Gameplay'. Make it unique based strictly on what's visible in the current grid image.
+3. ENGAGING FLOW & TIMING RULES: Scan the grid for the complete **engaging, emotional, or high-tension moment**. 
+4. Choose a precise numerical 'start_time' in seconds (e.g. 15, 30) as an integer and let the sequence run naturally. The 'clip_duration' must be at least 15 seconds and extend smoothly until the engaging moment reaches its natural conclusion (up to 60 seconds). 
+5. STRICT GUARDRAIL: NEVER cut abruptly in the middle of an ongoing engaging sequence. Ensure the ending feels satisfying and complete.
+6. Return JSON with exactly four keys (status, title, start_time, clip_duration) as specified in the schema."
 
 RAW_RESPONSE=""
 SUCCESS_REQUESTED_MODEL=""
@@ -121,6 +128,11 @@ with open(grid_path, 'rb') as f:
 schema = {
     "type": "object",
     "properties": {
+        "status": {
+            "type": "string",
+            "enum": ["APPROVE", "REJECT"],
+            "description": "APPROVE if real gameplay exists, REJECT if empty cinematic/AI fluff."
+        },
         "title": {
             "type": "string",
             "description": "Viral title under 6 words with 1-3 emojis. NO generic words like Epic, Insane, Crazy, Best, Gameplay."
@@ -138,7 +150,7 @@ schema = {
             "description": f"Dynamic engaging duration ensuring no mid-action cuts, strictly >= 15 seconds up to {source_duration} seconds."
         }
     },
-    "required": ["title", "start_time", "clip_duration"],
+    "required": ["status", "title", "start_time", "clip_duration"],
     "additionalProperties": False
 }
 
@@ -264,7 +276,7 @@ try:
     clean_output = re.sub(r"<think>.*?</think>", "", clean_output, flags=re.DOTALL).strip()
     
     data = json.loads(clean_output)
-    if not isinstance(data, dict) or not all(k in data for k in ("title", "start_time", "clip_duration")):
+    if not isinstance(data, dict) or not all(k in data for k in ("status", "title", "start_time", "clip_duration")):
         print("invalid")
         sys.exit(0)
     
@@ -307,10 +319,10 @@ printf "%s" "$RAW_RESPONSE" > "$RESPONSE_FILE"
 
 dbg ""
 dbg "════════════════════════════════════════════════════════"
-dbg "🧹 STRICT PARSING PHASE"
+dbg "🧹 STRICT PARSING & QUALITY CHECK PHASE"
 dbg "════════════════════════════════════════════════════════"
 
-export REQUESTED_MODEL="$SUCCESS_REQUESTED_MODEL" ROUTED_MODEL="$SUCCESS_ROUTED_MODEL" RESPONSE_FILE DEBUG SOURCE_DURATION
+export REQUESTED_MODEL="$SUCCESS_REQUESTED_MODEL" ROUTED_MODEL="$SUCCESS_ROUTED_MODEL" RESPONSE_FILE DEBUG SOURCE_DURATION CURRENT_LINK
 python3 - << 'PYEOF'
 import os, json, re, sys
 
@@ -319,6 +331,7 @@ req_m = os.environ.get('REQUESTED_MODEL', '')
 rout_m = os.environ.get('ROUTED_MODEL', '')
 debug = os.environ.get('DEBUG', '0') == '1'
 source_duration = int(os.environ.get('SOURCE_DURATION', 60))
+current_link = os.environ.get('CURRENT_LINK', '').strip()
 
 def dbg(msg):
     if debug:
@@ -347,9 +360,20 @@ except Exception:
         except Exception:
             pass
 
-if not data or not isinstance(data, dict) or not all(k in data for k in ("title", "start_time", "clip_duration")):
-    dbg("❌ Strict JSON parsing failed completely. No fallback allowed.")
+if not data or not isinstance(data, dict) or not all(k in data for k in ("status", "title", "start_time", "clip_duration")):
+    dbg("❌ Strict JSON parsing failed completely.")
     print(json.dumps({"status": "failed", "error": "Strict JSON parse failed"}))
+    sys.exit(1)
+
+# 🛑 Check AI Status (APPROVE vs REJECT)
+ai_status = str(data.get('status', 'APPROVE')).upper()
+if ai_status == "REJECT":
+    dbg("❌ AI Quality Check: REJECTED (Empty cinematic/AI fluff detected).")
+    if current_link:
+        with open("skipped.txt", "a") as sf:
+            sf.write(current_link + "\n")
+        dbg(f"📁 Link added to skipped.txt: {current_link}")
+    print(json.dumps({"status": "rejected", "error": "Video rejected by AI quality evaluator"}))
     sys.exit(1)
 
 raw_title = data.get('title', '')
@@ -363,7 +387,7 @@ title = re.sub(r'^\d+[\.\)]\s*|^[\-\*]\s*|[\*\#\`\"]', '', str(raw_title)).strip
 title = title.strip("'\"")
 title = re.sub(r'\s+', ' ', title)
 
-# 🔒 STRICT NUMERICAL EXTRACTION FOR START TIME (BLOCKS 'title15' OR STRINGS)
+# 🔒 STRICT NUMERICAL EXTRACTION FOR START TIME
 try:
     start_time_val = int(data.get('start_time', 0))
     if start_time_val < 0:
@@ -396,3 +420,9 @@ print(json.dumps({
     "duration": dur_int
 }))
 PYEOF
+
+# Capture python exit status. If python exited with 1 (due to REJECT), exit bash script with 1.
+py_exit=$?
+if [ $py_exit -ne 0 ]; then
+    exit 1
+fi
