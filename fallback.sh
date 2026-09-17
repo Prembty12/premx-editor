@@ -1,635 +1,440 @@
 #!/bin/bash
-# ==========================================
-# 🤖 TRUE AI AGENT FULLY AUTOMATED PIPELINE (FIXED PARSING & MODEL)
-# ==========================================
+# ==============================================================================
+# 🚀 OPENROUTER FALLBACK AGENT (Full Debug Version)
+# 1 PRIMARY TRY + 20 FALLBACK RETRIES + STRICT PARSER
+# ==============================================================================
 
-BASE="."
-API="https://graph.facebook.com/v24.0"
-LINKS_DIR="game_links_editor"
-POSTED_DIR="posted_links_editor"
-FRAMES_DIR="temp_frames"
+export TZ='Asia/Kolkata'
+if ! date '+%Z' 2>/dev/null | grep -qi 'IST'; then
+    export TZ='IST-5:30'
+fi
 
-GAME_LINKS_DIR="$BASE/$LINKS_DIR"
-POSTED_LINKS_DIR="$BASE/$POSTED_DIR"
-mkdir -p "$GAME_LINKS_DIR" "$POSTED_LINKS_DIR" "$FRAMES_DIR" "logs"
+GRID_PATH="${GRID_PATH:-temp_frames/merged_60_grid_screenshot.jpg}"
+SOURCE_DURATION="${SOURCE_DURATION:-60}"
+STYLE_PROMPT="${STYLE_PROMPT:-}"
 
-LOG_FILE="logs/pipeline_debug.log"
-exec > >(tee -a "$LOG_FILE") 2>&1
+PRIMARY_MODEL="${OPENROUTER_MODEL:-dots-studio/dots-3-note-preview:free}"
+FALLBACK_MODEL="openrouter/free"
 
-echo "===================================================="
-echo "🚀 Pipeline Started at: $(date)"
-echo "===================================================="
+DEBUG="${DEBUG:-1}"
 
-GEMINI_KEYS=("$GEMINI_API_KEY_1" "$GEMINI_API_KEY_2" "$GEMINI_API_KEY_3")
+# 🔑 API keys collect
+declare -a KEYS=()
+[ -n "$OPENROUTER_API_KEY" ]   && KEYS+=("$OPENROUTER_API_KEY")
+[ -n "$OPENROUTER_API_KEY_2" ] && KEYS+=("$OPENROUTER_API_KEY_2")
+[ -n "$OPENROUTER_API_KEY_3" ] && KEYS+=("$OPENROUTER_API_KEY_3")
+[ -n "$OPENROUTER_API_KEY_4" ] && KEYS+=("$OPENROUTER_API_KEY_4")
+[ -n "$OPENROUTER_API_KEY_5" ] && KEYS+=("$OPENROUTER_API_KEY_5")
 
-get_random_gemini_key() {
-    local valid_keys=()
-    for k in "${GEMINI_KEYS[@]}"; do
-        if [ -n "$k" ]; then
-            valid_keys+=("$k")
-        fi
-    done
-    if [ ${#valid_keys[@]} -eq 0 ]; then
-        echo "$GEMINI_API_KEY_1"
-    else
-        local idx=$((RANDOM % ${#valid_keys[@]}))
-        echo "${valid_keys[$idx]}"
-    fi
+if [ ${#KEYS[@]} -eq 0 ]; then
+    echo '{"status": "failed", "error": "No OpenRouter API keys found"}'
+    exit 1
+fi
+
+if [ ! -f "$GRID_PATH" ]; then
+    echo "{\"status\": \"failed\", \"error\": \"Grid image not found at $GRID_PATH\"}"
+    exit 1
+fi
+
+get_random_openrouter_key() {
+    local idx=$((RANDOM % ${#KEYS[@]}))
+    echo "${KEYS[$idx]}"
 }
 
-DEFAULT_POST_MODE="${POST_MODE:-1}"
-MIN_CLIP_DURATION=12
+# Debug helper
+dbg() {
+    [ "$DEBUG" = "1" ] && echo "$@" >&2
+}
 
-# 0. 🍪 Pre-Flight Cookie Health Check
-echo "🔍 [STEP 0] Checking Facebook Cookie Session Health..."
-python3 cookie_checker.py
-if [ $? -ne 0 ]; then
-    echo "❌ [ERROR] Pipeline halted due to invalid or expired Facebook cookies."
-    exit 1
-fi
+# 🚀 Prompt with APPROVE/REJECT
+PROMPT_TEXT="Analyze the provided 9:16 gaming screenshot grid. Total video source duration is ${SOURCE_DURATION} seconds.
+Style Directive: ${STYLE_PROMPT}
 
-# 1. 📊 Update Past Performance & Insights
-echo "📈 [STEP 1] Pulling real analytics and insights from past posts..."
-python3 insights_tracker.py
+YOUR TASK: Decide APPROVE or REJECT for this video.
 
-# 2. ⏳ Check 3 Hours Gap
-if [ "$DEFAULT_POST_MODE" != "2" ] && [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$PAGE_ID" ]; then
-    echo "🔍 [STEP 2] Checking last post time on Facebook Page..."
+REJECT IF:
+- Grid shows ONLY menus, login screens, or loading screens
+- No actual gameplay visible in ANY frame
+- All frames look identical (frozen/paused)
+- Crash screen, error, or black frames dominate
+- Absolutely no exciting/engaging moment
+
+APPROVE IF:
+- Real gameplay is visible (even if not super exciting)
+- Any action, movement, or engaging moment exists
+- High-tension, emotional, or thrilling segments present
+
+RESPONSE FORMAT (STRICT JSON, no markdown):
+
+If REJECT:
+{\"status\": \"REJECT\", \"reason\": \"<1-line explanation>\"}
+
+If APPROVE:
+{\"status\": \"APPROVE\", \"title\": \"<viral title under 6 words with 1-3 emojis>\", \"start_time\": <integer seconds 0 to $((SOURCE_DURATION - 15))>, \"clip_duration\": <integer 15-${SOURCE_DURATION}>, \"reason\": \"<1-line reason>\"}
+
+Return ONLY the JSON object. No markdown. No extra text."
+
+RAW_RESPONSE=""
+SUCCESS_REQUESTED_MODEL=""
+SUCCESS_ROUTED_MODEL=""
+
+# 1 Primary Try + 20 Fallback Retries = Total 21 Attempts max
+MAX_RETRIES=21
+
+dbg ""
+dbg "════════════════════════════════════════════════════════"
+dbg "🚀 OPENROUTER FALLBACK AGENT START — $(date '+%Y-%m-%d %H:%M:%S IST')"
+dbg "📁 Grid Path       : $GRID_PATH"
+dbg "🎞️  Source Duration : ${SOURCE_DURATION}s"
+dbg "🔑 Keys Loaded     : ${#KEYS[@]}"
+dbg "🎯 Primary Model   : $PRIMARY_MODEL (Max 1 Try)"
+dbg "🔄 Fallback Model  : $FALLBACK_MODEL (Max 20 Tries)"
+dbg "🎨 Style Prompt    : ${STYLE_PROMPT:-[empty]}"
+dbg "════════════════════════════════════════════════════════"
+dbg ""
+
+# 🔄 Retry loop
+for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
+    CURRENT_KEY=$(get_random_openrouter_key)
+    KEY_DISPLAY="${CURRENT_KEY:0:12}...${CURRENT_KEY: -4}"
     
-    LAST_POST_CHECK=$(python3 -c "
-import requests
-from datetime import datetime, timezone
-
-page_id = '$PAGE_ID'
-token = '$PAGE_ACCESS_TOKEN'
-url = f'https://graph.facebook.com/v24.0/{page_id}/feed?access_token={token}&limit=1'
-
-try:
-    res = requests.get(url).json()
-    if 'data' in res and len(res['data']) > 0:
-        created_time_str = res['data'][0].get('created_time')
-        last_time = datetime.strptime(created_time_str, '%Y-%m-%dT%H:%M:%S%z')
-        now = datetime.now(timezone.utc)
-        diff_hours = (now - last_time).total_seconds() / 3600
-        print(f'LAST_POST_HOURS:{diff_hours}')
-    else:
-        print('LAST_POST_HOURS:999')
-except Exception as e:
-    print(f'LAST_POST_HOURS:999 (Error: {e})')
-")
-
-    HOURS_AGO=$(echo "$LAST_POST_CHECK" | grep "LAST_POST_HOURS" | cut -d':' -f2)
-    echo "📊 Hours since last post: $HOURS_AGO"
-    
-    if [ -n "$HOURS_AGO" ]; then
-        IS_LESS_THAN_3=$(python3 -c "print('yes' if float('$HOURS_AGO' or '0') < 3.0 else 'no')")
-        if [ "$IS_LESS_THAN_3" == "yes" ]; then
-            echo "⏳ 3 ghante ka gap poora nahi hua hai! Sirf $HOURS_AGO ghante hue hain."
-            exit 0
-        else
-            echo "✅ 3 ghante ka gap poora ho chuka hai."
-        fi
-    fi
-fi
-
-# 3. 🧠 AI AGENT BRAIN
-echo "🤖 [STEP 3] Consulting AI Agent Brain (ai_agent.py)..."
-AGENT_OUTPUT=$(python3 ai_agent.py)
-echo "🧠 AI Agent Raw Output: $AGENT_OUTPUT"
-
-TARGET_FILE=$(echo "$AGENT_OUTPUT" | python3 -c "import sys, json; print(json.load(sys.stdin).get('target_file', ''))" 2>/dev/null)
-SELECTED_GAME_NAME=$(echo "$AGENT_OUTPUT" | python3 -c "import sys, json; print(json.load(sys.stdin).get('game_name', ''))" 2>/dev/null)
-SELECTED_STYLE=$(echo "$AGENT_OUTPUT" | python3 -c "import sys, json; print(json.load(sys.stdin).get('chosen_style', 'curiosity'))" 2>/dev/null)
-
-if [ -z "$TARGET_FILE" ] || [ "$TARGET_FILE" == "None" ] || [ ! -f "$TARGET_FILE" ]; then
-    echo "⚠️ [WARNING] AI Agent ko koi valid game file nahi mili! Target File: $TARGET_FILE"
-    exit 0
-fi
-
-GAME_POSTED_LOG="$POSTED_LINKS_DIR/${SELECTED_GAME_NAME}_posted_links_editor.txt"
-echo "🎮 Selected Game: $SELECTED_GAME_NAME | Target File: $TARGET_FILE | Style: $SELECTED_STYLE"
-
-# 4. Parse and Validate Link
-echo "🔗 [STEP 4] Parsing and validating link from target file..."
-PARSED_DATA=$(TARGET_FILE="$TARGET_FILE" python3 -c "
-import sys, json, os, random
-target = os.environ.get('TARGET_FILE', '')
-if not os.path.exists(target):
-    print('{}')
-    sys.exit(0)
-
-with open(target, 'r', encoding='utf-8', errors='ignore') as f:
-    content = f.read()
-
-lines = [l.strip() for l in content.split('\n') if l.strip()]
-valid_pairs = []
-for line in lines:
-    if 'http://' in line or 'https://' in line:
-        parts = line.split()
-        url = ''
-        for p in parts:
-            if p.startswith('http://') or p.startswith('https://'):
-                url = p
-                break
-        if url:
-            title = line.replace(url, '').replace('| Link:', '').replace('|', '').strip()
-            if not title:
-                title = os.path.basename(url).split('?')[0]
-            valid_pairs.append({'title': title, 'url': url, 'raw': line})
-
-if not valid_pairs:
-    print('{}')
-    sys.exit(0)
-
-chosen = random.choice(valid_pairs)
-print(json.dumps({'title': chosen['title'], 'url': chosen['url'], 'raw': chosen['raw']}))
-")
-
-SELECTED_URL=$(echo "$PARSED_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('url', ''))" 2>/dev/null)
-SELECTED_LINE=$(echo "$PARSED_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('raw', ''))" 2>/dev/null)
-
-if [ -z "$SELECTED_URL" ]; then
-    echo "⚠️ [WARNING] Is file me koi valid link nahi mila."
-    exit 0
-fi
-
-echo "🔗 Validated Link Found: $SELECTED_URL"
-
-# 5. ⏱️ Get Source Video Duration
-echo "✂️ [STEP 5] Checking source video total duration via ffprobe..."
-SOURCE_DURATION=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$SELECTED_URL" 2>/dev/null)
-echo "⏱️ Raw ffprobe duration output: '$SOURCE_DURATION'"
-SOURCE_DURATION=${SOURCE_DURATION%.*}
-
-if [ -z "$SOURCE_DURATION" ] || [ "$SOURCE_DURATION" -le 0 ] 2>/dev/null; then
-    echo "⚠️ [WARNING] ffprobe duration failed or returned 0. Defaulting source duration to 60s."
-    SOURCE_DURATION=60
-fi
-
-# 6. 📸 Frame Extraction & 6x10 Grid Generation Across Full Video
-rm -f "$FRAMES_DIR"/*.jpg
-echo "📸 [STEP 6] Extracting 60 dynamic frames across source video..."
-
-NUM_FRAMES=60
-interval=$((SOURCE_DURATION / NUM_FRAMES))
-[ "$interval" -lt 1 ] && interval=1
-
-timestamps=()
-for ((i=1; i<=NUM_FRAMES; i++)); do
-    t=$(( (i - 1) * interval ))
-    [ "$t" -ge "$SOURCE_DURATION" ] && t=$((SOURCE_DURATION - 1))
-    [ "$t" -lt 0 ] && t=0
-    min=$((t / 60))
-    sec=$((t % 60))
-    timestamps+=($(printf "00:%02d:%02d" $((10#$min)) $((10#$sec)) ))
-done
-
-for i in "${!timestamps[@]}"; do
-    idx=$((i+1))
-    ts="${timestamps[$i]}"
-    frame_path="$FRAMES_DIR/frame_$idx.jpg"
-    ffmpeg -y -ss "$ts" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel info
-    if [ ! -f "$frame_path" ] || [ ! -s "$frame_path" ]; then
-        ffmpeg -y -ss "00:00:01" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel info
-    fi
-done
-
-GRID_PATH="$FRAMES_DIR/merged_60_grid_screenshot.jpg"
-echo "🧩 Merging frames into 6x10 vertical grid (2592x3840)..."
-
-TIMESTAMPS_STR="${timestamps[*]}" python3 - << 'EOF'
-import os
-import subprocess
-
-frames_dir = 'temp_frames'
-grid_path = os.path.join(frames_dir, 'merged_60_grid_screenshot.jpg')
-
-try:
-    from PIL import Image, ImageDraw
-except ImportError:
-    subprocess.run(["pip", "install", "Pillow"], check=True)
-    from PIL import Image, ImageDraw
-
-timestamps_env = os.environ.get('TIMESTAMPS_STR', '')
-timestamps = timestamps_env.split()
-
-for i in range(1, 61):
-    frame_path = os.path.join(frames_dir, f'frame_{i}.jpg')
-    ts = timestamps[i-1] if (i-1) < len(timestamps) else "00:00:00"
-    if os.path.exists(frame_path) and os.path.getsize(frame_path) > 0:
-        try:
-            # Resize each frame to 432x384
-            im = Image.open(frame_path).resize((432, 384))
-            draw = ImageDraw.Draw(im)
-            draw.rectangle([10, 10, 120, 40], fill=(0, 0, 0))
-            draw.text((13, 15), ts, fill=(255, 255, 255))
-            im.save(frame_path, 'JPEG', quality=80)
-        except Exception as e:
-            print(f"⚠️ Frame processing error at {i}: {e}")
-
-images = []
-for i in range(1, 61):
-    img_path = os.path.join(frames_dir, f'frame_{i}.jpg')
-    if os.path.exists(img_path) and os.path.getsize(img_path) > 0:
-        try:
-            im = Image.open(img_path)
-        except Exception:
-            im = Image.new('RGB', (432, 384), (0, 0, 0))
-    else:
-        im = Image.new('RGB', (432, 384), (0, 0, 0))
-    images.append(im)
-
-# Canvas size: 2592 x 3840 (6 columns, 10 rows)
-grid_img = Image.new('RGB', (2592, 3840))
-for idx, im in enumerate(images):
-    col = idx % 6
-    row = idx // 6
-    grid_img.paste(im, (col * 432, row * 384))
-
-grid_img.save(grid_path, 'JPEG', quality=85)
-print("✅ 60-frame grid screenshot created successfully.")
-EOF
-
-# 7. 🤖 Gemini Smart JSON Analysis
-echo "🤖 [STEP 7] Sending grid & past insights to Gemini for Smart Action Cutting Decision..."
-
-INSIGHTS_SUMMARY=$(python3 -c "
-import os, json
-memory_file = 'logs/agent_memory.json'
-if os.path.exists(memory_file):
-    try:
-        with open(memory_file, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            print(f'Top Game Scores: {data.get(\"game_scores\", {})}, Styles: {data.get(\"title_styles\", {})}')
-    except:
-        print('No prior memory stats.')
-else:
-    print('Fresh run.')
-")
-
-if [ "$SELECTED_STYLE" == "aggressive" ]; then
-    STYLE_PROMPT="Create a bold, intense, high-energy aggressive gaming hook title."
-elif [ "$SELECTED_STYLE" == "question" ]; then
-    STYLE_PROMPT="Create a curiosity-driven question hook title."
-elif [ "$SELECTED_STYLE" == "emoji_heavy" ]; then
-    STYLE_PROMPT="Create a fast-paced viral gaming title with strong emojis."
-else
-    STYLE_PROMPT="Create a high-curiosity viral Facebook/Instagram Reels hook title (6-10 words preferred)."
-fi
-
-GEMINI_JSON_RESULT=""
-MAX_TOTAL_RETRIES=4
-
-for ((attempt=1; attempt<=MAX_TOTAL_RETRIES; attempt++)); do
-    CURRENT_GEMINI_KEY=$(get_random_gemini_key)
-    echo "🤖 Gemini Attempt $attempt/$MAX_TOTAL_RETRIES (Key used: ${CURRENT_GEMINI_KEY:0,6}...)"
-    
-    if [ -f "$GRID_PATH" ]; then
-        file_size=$(wc -c < "$GRID_PATH")
-        upload_res=$(curl -s -D - -X POST "https://generativelanguage.googleapis.com/upload/v1beta/files?key=$CURRENT_GEMINI_KEY" \
-          -H "X-Goog-Upload-Protocol: resumable" \
-          -H "X-Goog-Upload-Command: start" \
-          -H "X-Goog-Upload-Header-Content-Length: $file_size" \
-          -H "X-Goog-Upload-Header-Content-Type: image/jpeg" \
-          -H "Content-Type: application/json" \
-          -d '{"file": {"display_name": "GridScreenshot"}}')
-
-        gemini_upload_url=$(echo "$upload_res" | grep -i "x-goog-upload-url:" | tr -d '\r' | cut -d' ' -f2)
-
-        if [ -n "$gemini_upload_url" ]; then
-            finalize_res=$(curl -s -X POST "$gemini_upload_url" \
-              -H "X-Goog-Upload-Protocol: resumable" \
-              -H "X-Goog-Upload-Command: upload, finalize" \
-              -H "X-Goog-Upload-Offset: 0" \
-              -H "Content-Length: $file_size" \
-              --data-binary "@$GRID_PATH")
-
-            file_uri=$(echo "$finalize_res" | jq -r '.file.uri // empty')
-            
-            if [ -n "$file_uri" ]; then
-                file_name_g_api=$(echo "$file_uri" | awk -F'/' '{print $NF}')
-                
-                state_check_counter=0
-                while [ $state_check_counter -lt 10 ]; do
-                    state=$(curl -s "https://generativelanguage.googleapis.com/v1beta/files/$file_name_g_api?key=$CURRENT_GEMINI_KEY" | jq -r '.state // empty')
-                    [ "$state" = "ACTIVE" ] && break
-                    sleep 1
-                    state_check_counter=$((state_check_counter + 1))
-                done
-
-                if [ "$state" = "ACTIVE" ]; then
-                    prompt_text="Analyze the provided 9:16 gaming screenshot grid. Total video source duration is $SOURCE_DURATION seconds.
-Insights Context: $INSIGHTS_SUMMARY
-Style Directive: $STYLE_PROMPT
-
-Your primary job as an expert video editor is to find the most thrilling, high-action segment, skipping dull introductions.
-Return a JSON object with EXACTLY three keys:
-1. 'title' (string: viral title with 1-3 emojis)
-2. 'start_time' (string format HH:MM:SS indicating exact peak action start time based on grid timestamps)
-3. 'clip_duration' (integer: length between 12 and 45 seconds meeting monetization rules)
-Return ONLY valid JSON format, no markdown wrapping."
-
-                    payload=$(jq -n \
-                      --arg uri "$file_uri" \
-                      --arg mime "image/jpeg" \
-                      --arg ptext "$prompt_text" \
-                      '{contents: [{parts: [{file_data: {file_uri: $uri, mime_type: $mime}}, {text: $ptext}]}]}')
-
-                    gemini_resp=$(curl -s -X POST -H "Content-Type: application/json" \
-                      "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$CURRENT_GEMINI_KEY" \
-                      -d "$payload")
-
-                    GEMINI_JSON_RESULT=$(echo "$gemini_resp" | jq -r '.candidates[0].content.parts[0].text // empty')
-                    echo "🤖 Gemini JSON Response: '$GEMINI_JSON_RESULT'"
-                fi
-            fi
-        fi
-    fi
-
-    if [ -n "$GEMINI_JSON_RESULT" ] && [ "$GEMINI_JSON_RESULT" != "null" ]; then
-        break
+    if [ $attempt -eq 1 ]; then
+        CURRENT_MODEL="$PRIMARY_MODEL"
     else
-        echo "⚠️ Gemini attempt $attempt failed. Retrying..."
-        GEMINI_JSON_RESULT=""
-        sleep 3
+        CURRENT_MODEL="$FALLBACK_MODEL"
+    fi
+    
+    dbg ""
+    dbg "────────────────────────────────────────────────────────"
+    dbg "🤖 ATTEMPT $attempt / $MAX_RETRIES"
+    dbg "────────────────────────────────────────────────────────"
+    dbg "    Model      : $CURRENT_MODEL"
+    dbg "    API Key    : $KEY_DISPLAY"
+    dbg "    Time       : $(date '+%H:%M:%S IST')"
+    dbg "--------------------------------------------------------"
+    dbg "📤 AI KO KYA-KYA BHEJ RAHA HAI (PAYLOAD DETAILS):"
+    dbg "--------------------------------------------------------"
+    dbg "  📁 Grid Image Path        : $GRID_PATH"
+    dbg "  🎞️  Source Duration        : ${SOURCE_DURATION}s"
+    dbg "  🎨 Style Directive        : ${STYLE_PROMPT:-[Khaali / Kuch nahi]}"
+    dbg "  🤖 Target Model           : $CURRENT_MODEL"
+    dbg "  📝 Prompt Text            :"
+    echo "$PROMPT_TEXT" | sed 's/^/      /' >&2
+    dbg "--------------------------------------------------------"
+    
+    PAYLOAD_FILE="temp_frames/or_payload.json"
+    mkdir -p temp_frames
+    
+    export GRID_PATH CURRENT_MODEL PROMPT_TEXT PAYLOAD_FILE STYLE_PROMPT SOURCE_DURATION
+    python3 - << 'PYEOF'
+import os, json, base64
+
+grid_path = os.environ.get('GRID_PATH')
+model = os.environ.get('CURRENT_MODEL')
+prompt = os.environ.get('PROMPT_TEXT')
+payload_file = os.environ.get('PAYLOAD_FILE')
+source_duration = int(os.environ.get('SOURCE_DURATION', 60))
+
+with open(grid_path, 'rb') as f:
+    img_bytes = f.read()
+    b64_img = base64.b64encode(img_bytes).decode('utf-8')
+
+schema = {
+    "type": "object",
+    "properties": {
+        "status": {"type": "string", "enum": ["APPROVE", "REJECT"]},
+        "title": {"type": "string"},
+        "start_time": {"type": "integer", "minimum": 0, "maximum": max(0, source_duration - 15)},
+        "clip_duration": {"type": "integer", "minimum": 15, "maximum": source_duration},
+        "reason": {"type": "string"}
+    },
+    "required": ["status"],
+    "additionalProperties": False
+}
+
+is_reasoning = any(k in model.lower() for k in ['reasoning', 'nemotron', 'nano-omni'])
+
+payload = {
+    'model': model,
+    'messages': [{
+        'role': 'user',
+        'content': [
+            {'type': 'text', 'text': prompt},
+            {'type': 'image_url', 'image_url': {'url': f'data:image/jpeg;base64,{b64_img}'}}
+        ]
+    }],
+    'max_tokens': 4096,
+    'temperature': 0.3,
+    'response_format': {
+        'type': 'json_schema',
+        'json_schema': {
+            'name': 'video_edit_params',
+            'strict': False,
+            'schema': schema
+        }
+    },
+    'provider': {
+        'require_parameters': False if is_reasoning else True,
+        'ignore': ['nvidia/nemotron-3.5-content-safety:free']
+    }
+}
+
+with open(payload_file, 'w') as f:
+    json.dump(payload, f)
+
+import sys
+print(f"    📸 Image Size : {len(img_bytes)} bytes (b64: {len(b64_img)} chars)", file=sys.stderr, flush=True)
+print(f"    🧠 Is Reasoning: {is_reasoning}", file=sys.stderr, flush=True)
+print(f"    🔧 require_parameters: {payload['provider']['require_parameters']}", file=sys.stderr, flush=True)
+print(f"    📤 Payload ready: {os.path.getsize(payload_file)} bytes", file=sys.stderr, flush=True)
+PYEOF
+
+    dbg ""
+    dbg "    📡 Sending request to OpenRouter..."
+    
+    HTTP_CODE=$(curl -s -o /tmp/or_response_$$.json -w "%{http_code}" \
+        --connect-timeout 15 -m 90 \
+        -X POST "https://openrouter.ai/api/v1/chat/completions" \
+        -H "Authorization: Bearer $CURRENT_KEY" \
+        -H "Content-Type: application/json" \
+        -d @"$PAYLOAD_FILE")
+    
+    RESP=$(cat /tmp/or_response_$$.json 2>/dev/null)
+    rm -f /tmp/or_response_$$.json
+    rm -f "$PAYLOAD_FILE"
+
+    dbg "    📥 HTTP Status  : $HTTP_CODE"
+    
+    if [ "$DEBUG" = "1" ]; then
+        dbg "    📥 Raw Response :"
+        echo "$RESP" | head -c 2000 | sed 's/^/     /' >&2
+        echo "" >&2
+    fi
+
+    ROUTED=$(echo "$RESP" | python3 -c "
+import sys, json
+try:
+    print(json.load(sys.stdin).get('model', ''))
+except: print('')
+" 2>/dev/null)
+
+    dbg "    🎯 Routed Model : ${ROUTED:-unknown}"
+
+    export ROUTED_CHECK="$ROUTED"
+    IS_TEXT_AI=$(python3 -c "
+import os
+m = os.environ.get('ROUTED_CHECK', '').lower()
+text_indicators = ['r1-distill', 'llama-3-8b', 'qwen-2.5-7b', 'gemma-2-9b', 'deepseek-chat', 'mistral-7b', 'text-only']
+if any(t in m for t in text_indicators):
+    print('yes')
+else:
+    print('no')
+")
+
+    if [ "$IS_TEXT_AI" = "yes" ]; then
+        dbg "    ❌ OpenRouter routed a text-only model ($ROUTED). Retrying..."
+        sleep 1
+        continue
+    fi
+
+    CONTENT=$(echo "$RESP" | python3 -c "
+import sys, json
+try:
+    res = json.load(sys.stdin)
+    choices = res.get('choices', [])
+    if choices:
+        msg = choices[0].get('message', {})
+        content = msg.get('content', '') or msg.get('reasoning', '')
+        print(content)
+    else:
+        print('')
+except Exception as e:
+    print('')
+" 2>/dev/null)
+
+    ERROR_MSG=$(echo "$RESP" | python3 -c "
+import sys, json
+try:
+    res = json.load(sys.stdin)
+    err = res.get('error', {})
+    if err:
+        print(f\"{err.get('code','')} - {err.get('message','')}\")
+except: pass
+" 2>/dev/null)
+
+    if [ -n "$ERROR_MSG" ]; then
+        dbg "    ❌ API Error    : $ERROR_MSG"
+    fi
+
+    if [ -n "$CONTENT" ] && [ "$CONTENT" != "None" ]; then
+        dbg "    📝 Content (first 200 chars): ${CONTENT:0:200}"
+        
+        IS_VALID_JSON=$(python3 -c '
+import json, sys, re
+raw_output = sys.argv[1]
+try:
+    clean_output = re.sub(r"```json\s*|\s*```", "", raw_output, flags=re.IGNORECASE).strip()
+    clean_output = re.sub(r"<think>.*?</think>", "", clean_output, flags=re.DOTALL).strip()
+    
+    data = json.loads(clean_output)
+    if not isinstance(data, dict):
+        print("invalid")
+        sys.exit(0)
+    status = str(data.get("status", "")).upper()
+    if status == "REJECT":
+        print("valid")
+        sys.exit(0)
+    if status == "APPROVE" and all(k in data for k in ("title", "start_time", "clip_duration")):
+        print("valid")
+        sys.exit(0)
+    if all(k in data for k in ("title", "start_time", "clip_duration")):
+        print("valid")
+        sys.exit(0)
+    print("invalid")
+except Exception:
+    print("invalid")
+' "$CONTENT")
+
+        if [ "$IS_VALID_JSON" = "valid" ]; then
+            dbg ""
+            dbg "    ✅ SUCCESS — Model responded with valid JSON!"
+            dbg "    🎯 Routed Model : ${ROUTED:-unknown}"
+            
+            RAW_RESPONSE="$CONTENT"
+            SUCCESS_REQUESTED_MODEL="$CURRENT_MODEL"
+            SUCCESS_ROUTED_MODEL="${ROUTED:-$CURRENT_MODEL}"
+            break
+        else
+            dbg "    ⚠️  Model ($CURRENT_MODEL) returned invalid JSON or missing keys. Retrying..."
+            sleep 1.5
+            continue
+        fi
+    else
+        dbg "    ⚠️  Empty content in response. Retrying..."
+        sleep 1.5
     fi
 done
 
-# Safe Python JSON Parser using Heredoc (Fixed Syntax Error)
-PARSED_JSON_DATA=$(GEMINI_RAW="$GEMINI_JSON_RESULT" python3 - << 'EOF'
-import json, re, sys, os
+if [ -z "$RAW_RESPONSE" ]; then
+    dbg ""
+    dbg "════════════════════════════════════════════════════════"
+    dbg "❌ ALL ATTEMPTS FAILED"
+    dbg "════════════════════════════════════════════════════════"
+    echo '{"status": "failed", "error": "All 21 OpenRouter attempts failed"}'
+    exit 1
+fi
 
-raw = os.environ.get('GEMINI_RAW', '')
-cleaned = re.sub(r'```json', '', raw, flags=re.IGNORECASE)
-cleaned = re.sub(r'```', '', cleaned).strip()
+RESPONSE_FILE="temp_frames/or_response.txt"
+printf "%s" "$RAW_RESPONSE" > "$RESPONSE_FILE"
 
-data = {}
+dbg ""
+dbg "════════════════════════════════════════════════════════"
+dbg "🧹 STRICT PARSING PHASE"
+dbg "════════════════════════════════════════════════════════"
+
+export REQUESTED_MODEL="$SUCCESS_REQUESTED_MODEL" ROUTED_MODEL="$SUCCESS_ROUTED_MODEL" RESPONSE_FILE DEBUG SOURCE_DURATION
+python3 - << 'PYEOF'
+import os, json, re, sys
+
+response_file = os.environ.get('RESPONSE_FILE')
+req_m = os.environ.get('REQUESTED_MODEL', '')
+rout_m = os.environ.get('ROUTED_MODEL', '')
+debug = os.environ.get('DEBUG', '0') == '1'
+source_duration = int(os.environ.get('SOURCE_DURATION', 60))
+
+def dbg(msg):
+    if debug:
+        print(msg, file=sys.stderr)
+
 try:
-    match = re.search(r'\{.*?\}', cleaned, re.DOTALL)
+    with open(response_file, 'r', encoding='utf-8') as f:
+        raw = f.read()
+except:
+    raw = ""
+
+if os.path.exists(response_file):
+    os.remove(response_file)
+
+cleaned = re.sub(r'```json\s*|\s*```', '', raw, flags=re.IGNORECASE).strip()
+cleaned = re.sub(r'<think>.*?</think>', '', cleaned, flags=re.DOTALL).strip()
+
+data = None
+try:
+    data = json.loads(cleaned)
+except Exception:
+    match = re.search(r'\{.*\}', cleaned, re.DOTALL)
     if match:
-        data = json.loads(match.group(0))
-    else:
-        data = json.loads(cleaned)
-except Exception as e:
-    print(json.dumps({'status': 'failed', 'error': str(e), 'raw': raw}))
+        try:
+            data = json.loads(match.group(0))
+        except Exception:
+            pass
+
+if not data or not isinstance(data, dict):
+    dbg("❌ Strict JSON parsing failed completely.")
+    print(json.dumps({"status": "failed", "error": "Strict JSON parse failed"}))
+    sys.exit(1)
+
+status_field = str(data.get('status', '')).strip().upper()
+reason_text = str(data.get('reason', '')).strip() or "(no reason provided)"
+
+# 🚫 REJECT case
+if status_field == 'REJECT':
+    dbg(f"🚫 AI REJECTED: {reason_text}")
+    print(json.dumps({
+        "status": "reject",
+        "reason": reason_text,
+        "requested_model": req_m,
+        "routed_model": rout_m
+    }))
     sys.exit(0)
 
-title = data.get('title')
-start_time = data.get('start_time')
-duration = data.get('clip_duration')
+# ✅ APPROVE case
+if not all(k in data for k in ("title", "start_time", "clip_duration")):
+    dbg("❌ APPROVE status par required keys missing")
+    print(json.dumps({"status": "failed", "error": "Missing required keys"}))
+    sys.exit(1)
 
-if not title or not start_time or not duration:
-    print(json.dumps({'status': 'failed', 'error': 'Missing keys in JSON'}))
-else:
-    try:
-        dur_int = int(duration)
-        if dur_int < 12: dur_int = 12
-        print(json.dumps({'status': 'success', 'title': title, 'start_time': start_time, 'duration': dur_int}))
-    except:
-        print(json.dumps({'status': 'failed', 'error': 'Invalid duration format'}))
-EOF
-)
+raw_title = data.get('title', '')
+if isinstance(raw_title, list):
+    raw_title = raw_title[0] if len(raw_title) > 0 else ""
+elif isinstance(raw_title, str):
+    lines = [line.strip() for line in raw_title.split('\n') if line.strip()]
+    raw_title = lines[0] if lines else ""
 
-PARSED_STATUS=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status', 'failed'))" 2>/dev/null)
+title = re.sub(r'^\d+[\.\)]\s*|^[\-\*]\s*|[\*\#\`\"]', '', str(raw_title)).strip()
+title = title.strip("'\"")
+title = re.sub(r'\s+', ' ', title)
 
-# Agar Gemini fail ho gaya, toh exit karne ke bajaye Fallback Brain ko bulao
-if [ "$PARSED_STATUS" != "success" ]; then
-    echo "⚠️ Gemini failed. Triggering Fallback Brain (Pollinations.ai)..."
-    
-    export GRID_PATH
-    export SOURCE_DURATION
-    export INSIGHTS_SUMMARY
-    export STYLE_PROMPT
-    
-        PARSED_JSON_DATA=$(bash fallback.sh)
-    echo "🧠 Fallback AI Final Response: $PARSED_JSON_DATA"
-    
-    # 🛡️ Safety filter: Sirf last wala valid JSON block extract karega
-    PARSED_JSON_DATA=$(echo "$PARSED_JSON_DATA" | python3 -c "
-import sys, re, json
-raw = sys.stdin.read()
-match = re.search(r'\{.*\}', raw, re.DOTALL)
-if match:
-    try:
-        data = json.loads(match.group(0))
-        print(json.dumps(data))
-    except:
-        print('{\"status\": \"failed\"}')
-else:
-    print('{\"status\": \"failed\"}')
-")
+try:
+    start_time_val = int(data.get('start_time', 0))
+    if start_time_val < 0:
+        start_time_val = 0
+except Exception:
+    match_num = re.search(r'\d+', str(data.get('start_time', '0')))
+    start_time_val = int(match_num.group(0)) if match_num else 0
 
-    PARSED_STATUS=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status', 'failed'))" 2>/dev/null)
-fi
+duration = data.get('clip_duration', 15)
 
-# Agar Gemini aur Fallback dono fail ho gaye, tabhi pipeline rukegi
-if [ "$PARSED_STATUS" != "success" ]; then
-    echo "❌ [ERROR] Gemini aur Fallback dono fail ho gaye! Pipeline halted."
-    exit 1
-fi
+try:
+    dur_int = int(duration)
+    if dur_int < 15 or dur_int > source_duration:
+        raise ValueError(f"Duration out of bounds (15 to {source_duration}s)")
+except Exception as e:
+    dbg(f"❌ Invalid duration value received: {duration} ({e})")
+    print(json.dumps({"status": "failed", "error": f"Invalid clip duration: {duration}"}))
+    sys.exit(1)
 
-AI_TITLE=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('title', ''))" 2>/dev/null)
-FINAL_START_TIME=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('start_time', ''))" 2>/dev/null)
-FINAL_CLIP_DURATION=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('duration', 15))" 2>/dev/null)
+dbg(f"✅ Final Title    : '{title}'")
+dbg(f"✅ Final Start    : '{start_time_val}s'")
+dbg(f"✅ Final Duration : '{dur_int}s'")
 
-echo "🎯 Strict Gemini Decisions Loaded Successfully:"
-echo "   - Title: $AI_TITLE"
-echo "   - Start Time: $FINAL_START_TIME"
-echo "   - Clip Duration: $FINAL_CLIP_DURATION seconds"
-
-CAPTION="$AI_TITLE
-
-#videogames #gamingcommunity #gaming #${SELECTED_GAME_NAME,,} #gamingreels #reels"
-
-# 8. ✂️ Actual Video Cutting via FFmpeg strictly using Gemini's Decision
-FINAL_CLIP_PATH="$FRAMES_DIR/final_cut_clip.mp4"
-echo "✂️ [STEP 8] Cutting thrilling clip via FFmpeg from $FINAL_START_TIME for $FINAL_CLIP_DURATION seconds..."
-ffmpeg -y -ss "$FINAL_START_TIME" -i "$SELECTED_URL" -t "$FINAL_CLIP_DURATION" -c:v copy -c:a copy "$FINAL_CLIP_PATH" -loglevel info
-
-if [ ! -f "$FINAL_CLIP_PATH" ] || [ ! -s "$FINAL_CLIP_PATH" ]; then
-    echo "⚠️ Stream copy cut failed. Retrying re-encoding cut..."
-    ffmpeg -y -ss "$FINAL_START_TIME" -i "$SELECTED_URL" -t "$FINAL_CLIP_DURATION" -c:v libx264 -preset veryfast -c:a aac "$FINAL_CLIP_PATH" -loglevel info
-fi
-
-if [ -f "$FINAL_CLIP_PATH" ] && [ -s "$FINAL_CLIP_PATH" ]; then
-    echo "✅ Optimized action clip successfully saved at: $FINAL_CLIP_PATH"
-else
-    echo "❌ [ERROR] FFmpeg failed to cut the video clip based on Gemini's timing!"
-    exit 1
-fi
-
-# ================= 5. 🚀 CRON-SAFE PLATFORM CONTROLLER =================
-POST_MODE="$DEFAULT_POST_MODE"
-echo "🚀 Using Posting Mode: $POST_MODE (1: Both, 2: Insta Only, 3: FB Only)"
-
-PUBLISH_ID=""
-FB_POST_ID=""
-
-# --- A. Instagram Reels Upload via GitHub Release Asset ---
-if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "2" ]; then
-    if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$IG_ID" ]; then
-        echo "🚀 Uploading to Instagram Reels via GitHub Release Asset..."
-        
-        TAG_NAME="clip-release-$(date +%s)"
-        REPO="${GITHUB_REPOSITORY}"
-        TOKEN="${GITHUB_TOKEN:-$GH_PAT}"
-        
-        echo "🏷️ Creating temporary GitHub Release ($TAG_NAME)..."
-        RELEASE_RES=$(curl -s -X POST "https://api.github.com/repos/$REPO/releases" \
-          -H "Authorization: token $TOKEN" \
-          -H "Content-Type: application/json" \
-          -d "{
-            \"tag_name\": \"$TAG_NAME\",
-            \"name\": \"Temporary Clip Release\",
-            \"draft\": false,
-            \"prerelease\": true
-          }")
-          
-        RELEASE_ID=$(echo "$RELEASE_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
-        
-        if [ -n "$RELEASE_ID" ] && [ "$RELEASE_ID" != "None" ]; then
-            echo "📦 Release created successfully (ID: $RELEASE_ID). Uploading video asset..."
-            
-            UPLOAD_URL="https://uploads.github.com/repos/$REPO/releases/$RELEASE_ID/assets?name=final_clip.mp4"
-            ASSET_RES=$(curl -s -X POST "$UPLOAD_URL" \
-              -H "Authorization: token $TOKEN" \
-              -H "Content-Type: video/mp4" \
-              --data-binary "@$FINAL_CLIP_PATH")
-              
-            PUBLIC_VIDEO_URL=$(echo "$ASSET_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('browser_download_url', ''))" 2>/dev/null)
-            
-            if [ -n "$PUBLIC_VIDEO_URL" ] && [ "$PUBLIC_VIDEO_URL" != "None" ]; then
-                echo "🔗 Generated Release Asset Public URL: $PUBLIC_VIDEO_URL"
-                
-                CONTAINER_RES=$(curl -s -X POST "$API/$IG_ID/media" \
-                  --data-urlencode "media_type=REELS" \
-                  --data-urlencode "video_url=$PUBLIC_VIDEO_URL" \
-                  --data-urlencode "caption=$CAPTION" \
-                  --data-urlencode "access_token=$PAGE_ACCESS_TOKEN")
-
-                echo "📦 IG Container Response: $CONTAINER_RES"
-                CREATION_ID=$(echo "$CONTAINER_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
-
-                if [ -n "$CREATION_ID" ] && [ "$CREATION_ID" != "None" ]; then
-                    echo "⏳ Container created (ID: $CREATION_ID). Checking processing status..."
-                    
-                    for i in {1..45}; do
-                        sleep 5
-                        STATUS_RES=$(curl -s "$API/$CREATION_ID?fields=status_code,status&access_token=$PAGE_ACCESS_TOKEN")
-                        STATUS_CODE=$(echo "$STATUS_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status_code', ''))" 2>/dev/null)
-                        
-                        if [ "$STATUS_CODE" == "FINISHED" ]; then
-                            echo "✅ Video processing finished by Instagram!"
-                            break
-                        else
-                            echo "⏳ Video still processing (Status: $STATUS_CODE)..."
-                        fi
-                    done
-
-                    PUBLISH_RES=$(curl -s -X POST "$API/$IG_ID/media_publish" \
-                      -d "creation_id=$CREATION_ID" \
-                      -d "access_token=$PAGE_ACCESS_TOKEN")
-                    
-                    echo "📢 IG Publish Response: $PUBLISH_RES"
-                    PUBLISH_ID=$(echo "$PUBLISH_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
-                    
-                    if [ -n "$PUBLISH_ID" ] && [ "$PUBLISH_ID" != "None" ]; then
-                        echo "🎉 Instagram Post Published Successfully! ID: $PUBLISH_ID"
-                    else
-                        echo "❌ Error: Failed to publish container to Instagram!"
-                    fi
-                fi
-            else
-                echo "❌ Error: Failed to upload video asset to GitHub release!"
-                echo "Response: $ASSET_RES"
-            fi
-            
-            echo "🗑️ Cleaning up temporary GitHub release and tag..."
-            curl -s -X DELETE "https://api.github.com/repos/$REPO/releases/$RELEASE_ID" \
-              -H "Authorization: token $TOKEN" > /dev/null
-              
-            curl -s -X DELETE "https://api.github.com/repos/$REPO/git/refs/tags/$TAG_NAME" \
-              -H "Authorization: token $TOKEN" > /dev/null
-            echo "✨ GitHub release and tag cleaned up successfully."
-            
-        else
-            echo "❌ Error: Failed to create temporary GitHub Release!"
-            echo "Response: $RELEASE_RES"
-        fi
-    fi
-fi
-
-# --- B. Facebook Page Video Upload ---
-if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "3" ]; then
-    if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$PAGE_ID" ]; then
-        echo "🚀 Uploading to Facebook Page..."
-        FB_RES=$(curl -s -X POST "$API/$PAGE_ID/videos" \
-          --data-urlencode "source=@$FINAL_CLIP_PATH" \
-          --data-urlencode "description=$CAPTION" \
-          --data-urlencode "access_token=$PAGE_ACCESS_TOKEN")
-
-        echo "📦 FB Upload Response: $FB_RES"
-        FB_POST_ID=$(echo "$FB_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
-
-        if [ -n "$FB_POST_ID" ] && [ "$FB_POST_ID" != "None" ]; then
-            echo "🎉 Successfully Published to Facebook Page! Video ID: $FB_POST_ID"
-        else
-            echo "❌ Error: Failed to publish video to Facebook Page!"
-        fi
-    fi
-fi
-
-# 10. 🧠 Memory & Adaptive Feedback Update & File Cleanup
-ACTIVE_ID="${PUBLISH_ID:-$FB_POST_ID}"
-echo "📝 [STEP 10] Updating memory and file sync. Active ID: $ACTIVE_ID"
-
-if [ -n "$ACTIVE_ID" ] && [ "$ACTIVE_ID" != "None" ]; then
-    python3 -c "
-import os, json
-memory_file = 'logs/agent_memory.json'
-memory = {'game_scores': {}, 'title_styles': {'curiosity': 10, 'aggressive': 10, 'question': 10, 'emoji_heavy': 10}}
-if os.path.exists(memory_file):
-    try:
-        with open(memory_file, 'r', encoding='utf-8') as f:
-            memory.update(json.load(f))
-    except:
-        pass
-
-g_name = '$SELECTED_GAME_NAME'
-memory['game_scores'][g_name] = memory['game_scores'].get(g_name, 10) + 5
-used_style = '$SELECTED_STYLE'
-if used_style in memory['title_styles']:
-    memory['title_styles'][used_style] += 3
-
-os.makedirs('logs', exist_ok=True)
-with open(memory_file, 'w', encoding='utf-8') as f:
-    json.dump(memory, f, indent=4)
-print('🧠 Agent Memory Updated Successfully!')
-"
-
-    python3 -c "
-import os
-target_file = '$TARGET_FILE'
-posted_log = '$GAME_POSTED_LOG'
-selected_line = '''$SELECTED_LINE'''
-act_id = '$ACTIVE_ID'
-
-if os.path.exists(target_file):
-    with open(target_file, 'r', encoding='utf-8', errors='ignore') as f:
-        content = f.read()
-    cleaned = content.replace(selected_line, '').strip()
-    with open(target_file, 'w', encoding='utf-8') as f:
-        f.write(cleaned + '\n\n')
-
-os.makedirs(os.path.dirname(posted_log), exist_ok=True)
-with open(posted_log, 'a', encoding='utf-8') as f:
-    f.write(selected_line + f'\nVideo id : {act_id}\n\n')
-print('✅ Link successfully removed from temp file and shifted to posted folder!')
-"
-else
-    echo "⚠️ [WARNING] Skipped file sync because no active post ID was generated."
-fi
-
-echo "===================================================="
-echo "🏁 Pipeline Finished at: $(date)"
-echo "===================================================="
+print(json.dumps({
+    "status": "success",
+    "requested_model": req_m,
+    "routed_model": rout_m,
+    "title": title,
+    "start_time": start_time_val,
+    "duration": dur_int,
+    "reason": reason_text
+}))
+PYEOF
