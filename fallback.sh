@@ -1,7 +1,8 @@
 #!/bin/bash
 # ==============================================================================
 # 🚀 OPENROUTER FALLBACK AGENT
-# Strict JSON Prompt + Multi-Method Parser (FIXED - Heredoc)
+# Full Debug + Full AI Response Save + Multi-Method JSON Parser
+# Order-independent + Missing-fields defaults + Never fails JSON
 # ==============================================================================
 
 export TZ='Asia/Kolkata'
@@ -17,6 +18,11 @@ PRIMARY_MODEL="${OPENROUTER_MODEL:-dots-studio/dots-3-note-preview:free}"
 FALLBACK_MODEL="openrouter/free"
 DEBUG="${DEBUG:-1}"
 
+# Save debug files (1 = save, 0 = skip)
+SAVE_DEBUG="${SAVE_DEBUG:-1}"
+DEBUG_DIR="temp_frames/debug"
+mkdir -p "$DEBUG_DIR"
+
 declare -a KEYS=()
 [ -n "$OPENROUTER_API_KEY" ]   && KEYS+=("$OPENROUTER_API_KEY")
 [ -n "$OPENROUTER_API_KEY_2" ] && KEYS+=("$OPENROUTER_API_KEY_2")
@@ -30,7 +36,7 @@ if [ ${#KEYS[@]} -eq 0 ]; then
 fi
 
 if [ ! -f "$GRID_PATH" ]; then
-    echo "{\"status\": \"failed\", \"error\": \"Grid not found\"}"
+    echo "{\"status\": \"failed\", \"error\": \"Grid not found at $GRID_PATH\"}"
     exit 1
 fi
 
@@ -43,6 +49,9 @@ dbg() {
     [ "$DEBUG" = "1" ] && echo "$@" >&2
 }
 
+# ══════════════════════════════════════════════════════════════
+# 🚀 STRICT PROMPT
+# ══════════════════════════════════════════════════════════════
 PROMPT_TEXT="Analyze the provided 9:16 gaming screenshot grid. Total video source duration is ${SOURCE_DURATION} seconds.
 Style Directive: ${STYLE_PROMPT}
 
@@ -60,6 +69,10 @@ APPROVE IF:
 - Any action, movement, or engaging moment exists
 - High-tension, emotional, or thrilling segments present
 
+TITLE RULES (only for APPROVE):
+- Create a short, viral title under 6 words with 1-3 emojis
+- NO generic boring words like Epic, Insane, Crazy, Best, Gameplay
+
 STRICT JSON OUTPUT — FOLLOW EXACTLY:
 
 If REJECT:
@@ -70,8 +83,8 @@ If APPROVE:
 
 CRITICAL RULES:
 1. ALWAYS include 'status' field — either 'APPROVE' or 'REJECT'
-2. If APPROVE, include all 5 fields
-3. If REJECT, include 2 fields: status, reason
+2. If APPROVE, include: status, title, start_time, clip_duration, reason
+3. If REJECT, include: status, reason
 4. NO markdown, NO extra text, NO escaped quotes, ONLY the JSON object
 
 Return the JSON object now:"
@@ -79,6 +92,7 @@ Return the JSON object now:"
 RAW_RESPONSE=""
 SUCCESS_REQUESTED_MODEL=""
 SUCCESS_ROUTED_MODEL=""
+
 MAX_RETRIES=21
 
 dbg ""
@@ -87,6 +101,9 @@ dbg "🚀 OPENROUTER FALLBACK AGENT START — $(date '+%Y-%m-%d %H:%M:%S IST')"
 dbg "📁 Grid Path       : $GRID_PATH"
 dbg "🎞️  Source Duration : ${SOURCE_DURATION}s"
 dbg "🔑 Keys Loaded     : ${#KEYS[@]}"
+dbg "🎯 Primary Model   : $PRIMARY_MODEL (Max 1 Try)"
+dbg "🔄 Fallback Model  : $FALLBACK_MODEL (Max 20 Tries)"
+dbg "💾 Debug Files     : $DEBUG_DIR"
 dbg "════════════════════════════════════════════════════════"
 dbg ""
 
@@ -170,6 +187,35 @@ with open(payload_file, 'w') as f:
     json.dump(payload, f)
 PYEOF
 
+    # ══════════════════════════════════════════════════════════
+    # 📤 FULL PAYLOAD DEBUG
+    # ══════════════════════════════════════════════════════════
+    IMG_SIZE_BYTES=$(wc -c < "$GRID_PATH" 2>/dev/null || echo "unknown")
+    PAYLOAD_SIZE_BYTES=$(wc -c < "$PAYLOAD_FILE" 2>/dev/null || echo "unknown")
+    
+    dbg ""
+    dbg "────────────────────────────────────────────────────────"
+    dbg "📤 AI KO KYA-KYA BHEJ RAHA HAI (FULL PAYLOAD DETAILS):"
+    dbg "────────────────────────────────────────────────────────"
+    dbg "  📁 Grid Image Path      : $GRID_PATH"
+    dbg "  📸 Grid Image Size      : ${IMG_SIZE_BYTES} bytes"
+    dbg "  🎞️  Source Duration      : ${SOURCE_DURATION}s"
+    dbg "  🎨 Style Directive      : ${STYLE_PROMPT:-[Khaali / Kuch nahi]}"
+    dbg "  🤖 Target Model         : $CURRENT_MODEL"
+    dbg "  🔑 API Key (prefix)     : $KEY_DISPLAY"
+    dbg "  📦 Payload File Size    : ${PAYLOAD_SIZE_BYTES} bytes"
+    dbg "  🔧 Response Schema      : status, title, start_time, clip_duration, reason"
+    dbg "  📝 Prompt Text (FULL)   :"
+    echo "$PROMPT_TEXT" | sed 's/^/      /' >&2
+    dbg "--------------------------------------------------------"
+
+    # Save payload to debug folder
+    if [ "$SAVE_DEBUG" = "1" ]; then
+        cp "$PAYLOAD_FILE" "$DEBUG_DIR/payload_attempt_${attempt}.json" 2>/dev/null
+        echo "$PROMPT_TEXT" > "$DEBUG_DIR/prompt_attempt_${attempt}.txt" 2>/dev/null
+    fi
+
+    dbg ""
     dbg "    📡 Sending request to OpenRouter..."
     
     HTTP_CODE=$(curl -s -o /tmp/or_response_$$.json -w "%{http_code}" \
@@ -183,6 +229,11 @@ PYEOF
     rm -f /tmp/or_response_$$.json "$PAYLOAD_FILE"
 
     dbg "    📥 HTTP Status  : $HTTP_CODE"
+    
+    # Save raw response to debug folder
+    if [ "$SAVE_DEBUG" = "1" ]; then
+        echo "$RESP" > "$DEBUG_DIR/response_attempt_${attempt}.json" 2>/dev/null
+    fi
 
     ROUTED=$(echo "$RESP" | python3 -c "
 import sys, json
@@ -219,11 +270,24 @@ try:
 except: print('')
 " 2>/dev/null)
 
+    # ══════════════════════════════════════════════════════════
+    # 📥 FULL AI RESPONSE DEBUG
+    # ══════════════════════════════════════════════════════════
     if [ -n "$CONTENT" ] && [ "$CONTENT" != "None" ]; then
-        dbg "    📝 Content (first 250 chars): ${CONTENT:0:250}"
+        dbg ""
+        dbg "    📥 📥 📥 AI KA FULL RESPONSE (FULL):"
+        dbg "    ┌────────────────────────────────────────────────────"
+        echo "$CONTENT" | sed 's/^/    │ /' >&2
+        dbg "    └────────────────────────────────────────────────────"
+        dbg ""
+        
+        # Save content to debug folder
+        if [ "$SAVE_DEBUG" = "1" ]; then
+            echo "$CONTENT" > "$DEBUG_DIR/content_attempt_${attempt}.txt" 2>/dev/null
+        fi
         
         # ══════════════════════════════════════════════════════════
-        # VALIDATION with heredoc (FIXED!)
+        # VALIDATION — Order-independent, missing-fields defaults
         # ══════════════════════════════════════════════════════════
         IS_VALID_JSON=$(CONTENT="$CONTENT" python3 << 'PYEOF'
 import os, json, re, sys
@@ -234,6 +298,7 @@ def parse_json(raw_input):
     if not raw_input:
         return None
     
+    # Method 1: Direct parse
     clean = re.sub(r"```json\s*|\s*```", "", raw_input, flags=re.IGNORECASE).strip()
     clean = re.sub(r"<think>.*?</think>", "", clean, flags=re.DOTALL).strip()
     clean = clean.rstrip().rstrip(",")
@@ -243,6 +308,7 @@ def parse_json(raw_input):
         if isinstance(d, dict): return d
     except: pass
     
+    # Method 2: Regex extract
     match = re.search(r"\{.*\}", clean, re.DOTALL)
     if match:
         try:
@@ -250,18 +316,19 @@ def parse_json(raw_input):
             if isinstance(d, dict): return d
         except: pass
     
+    # Method 3: Fix escaped quotes
     fixed = clean.replace(chr(92) + chr(34), chr(34))
     try:
         d = json.loads(fixed)
         if isinstance(d, dict): return d
     except: pass
     
+    # Method 4: Double-encoded
     if clean.startswith(chr(34)):
         try:
             inner = json.loads(clean)
             if isinstance(inner, str):
-                inner_clean = inner.strip()
-                inner_clean = re.sub(r"```json\s*|\s*```", "", inner_clean, flags=re.IGNORECASE).strip()
+                inner_clean = re.sub(r"```json\s*|\s*```", "", inner.strip(), flags=re.IGNORECASE).strip()
                 try:
                     d = json.loads(inner_clean)
                     if isinstance(d, dict): return d
@@ -274,6 +341,7 @@ def parse_json(raw_input):
                     except: pass
         except: pass
     
+    # Method 5: Manual regex (order-independent, defaults)
     status_match = re.search(r'"status"\s*:\s*"([^"]+)"', clean)
     if status_match:
         status_val = status_match.group(1).upper()
@@ -284,12 +352,15 @@ def parse_json(raw_input):
         
         if status_val == "REJECT":
             return {"status": "REJECT", "reason": reason_match.group(1) if reason_match else ""}
-        if status_val == "APPROVE" and title_match and st_match and dur_match:
+        
+        if status_val == "APPROVE" and title_match:
+            start_val = int(st_match.group(1)) if st_match else 0
+            duration_val = int(dur_match.group(1)) if dur_match else 20
             return {
                 "status": "APPROVE",
                 "title": title_match.group(1),
-                "start_time": int(st_match.group(1)),
-                "clip_duration": int(dur_match.group(1)),
+                "start_time": start_val,
+                "clip_duration": duration_val,
                 "reason": reason_match.group(1) if reason_match else ""
             }
     
@@ -307,7 +378,8 @@ status = str(data.get("status", "")).upper()
 if status == "REJECT":
     print("valid")
     sys.exit(0)
-if status == "APPROVE" and all(k in data for k in ("title", "start_time", "clip_duration")):
+
+if status == "APPROVE" and "title" in data:
     print("valid")
     sys.exit(0)
 
@@ -316,7 +388,8 @@ PYEOF
 )
 
         if [ "$IS_VALID_JSON" = "valid" ]; then
-            dbg "    ✅ SUCCESS — Valid JSON!"
+            dbg ""
+            dbg "    ✅ SUCCESS — Valid JSON detected!"
             RAW_RESPONSE="$CONTENT"
             SUCCESS_REQUESTED_MODEL="$CURRENT_MODEL"
             SUCCESS_ROUTED_MODEL="${ROUTED:-$CURRENT_MODEL}"
@@ -327,7 +400,10 @@ PYEOF
             continue
         fi
     else
-        dbg "    ⚠️  Empty content. Retrying..."
+        dbg "    ⚠️  Empty content in response. Retrying..."
+        if [ "$SAVE_DEBUG" = "1" ]; then
+            echo "$RESP" > "$DEBUG_DIR/empty_response_attempt_${attempt}.json" 2>/dev/null
+        fi
         sleep 1.5
     fi
 done
@@ -341,7 +417,10 @@ fi
 RESPONSE_FILE="temp_frames/or_response.txt"
 printf "%s" "$RAW_RESPONSE" > "$RESPONSE_FILE"
 
+dbg ""
+dbg "════════════════════════════════════════════════════════"
 dbg "🧹 FINAL PARSING PHASE"
+dbg "════════════════════════════════════════════════════════"
 
 export REQUESTED_MODEL="$SUCCESS_REQUESTED_MODEL" ROUTED_MODEL="$SUCCESS_ROUTED_MODEL" RESPONSE_FILE DEBUG SOURCE_DURATION
 python3 - << 'PYEOF'
@@ -407,8 +486,7 @@ def parse_json(raw_input):
         try:
             inner = json.loads(clean)
             if isinstance(inner, str):
-                inner_clean = inner.strip()
-                inner_clean = re.sub(r"```json\s*|\s*```", "", inner_clean, flags=re.IGNORECASE).strip()
+                inner_clean = re.sub(r"```json\s*|\s*```", "", inner.strip(), flags=re.IGNORECASE).strip()
                 try:
                     d = json.loads(inner_clean)
                     if isinstance(d, dict): return d
@@ -431,12 +509,15 @@ def parse_json(raw_input):
         
         if status_val == "REJECT":
             return {"status": "REJECT", "reason": reason_match.group(1) if reason_match else ""}
-        if status_val == "APPROVE" and title_match and st_match and dur_match:
+        
+        if status_val == "APPROVE" and title_match:
+            start_val = int(st_match.group(1)) if st_match else 0
+            duration_val = int(dur_match.group(1)) if dur_match else 20
             return {
                 "status": "APPROVE",
                 "title": title_match.group(1),
-                "start_time": int(st_match.group(1)),
-                "clip_duration": int(dur_match.group(1)),
+                "start_time": start_val,
+                "clip_duration": duration_val,
                 "reason": reason_match.group(1) if reason_match else ""
             }
     
