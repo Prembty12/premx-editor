@@ -1,21 +1,31 @@
 #!/bin/bash
 # ==============================================================================
-# 🚀 OPENROUTER BASH AGENT (1 PRIMARY TRY + 20 FALLBACK RETRIES + STRICT PARSER)
+# 🚀 OPENROUTER BASH AGENT
+# 3 Attempts Loop + Har REJECT pe Shift + Fallback Support
 # ==============================================================================
+
+export TZ='Asia/Kolkata'
+if ! date '+%Z' 2>/dev/null | grep -qi 'IST'; then
+    export TZ='IST-5:30'
+fi
 
 GRID_PATH="${GRID_PATH:-temp_frames/merged_60_grid_screenshot.jpg}"
 SOURCE_DURATION="${SOURCE_DURATION:-60}"
 STYLE_PROMPT="${STYLE_PROMPT:-}"
+EDITOR_FILE="${EDITOR_FILE:-game_links_editor/game.txt}"
+GAME_NAME="${GAME_NAME:-game}"
+
+SHIFT_DIR="game_links_shift"
+mkdir -p "$SHIFT_DIR" "temp_frames" "logs"
+SHIFT_LOG="$SHIFT_DIR/${GAME_NAME}_shift_links.txt"
 
 PRIMARY_MODEL="${OPENROUTER_MODEL:-dots-studio/dots-3-note-preview:free}"
 FALLBACK_MODEL="openrouter/free"
 
-# Debug flag (0 = silent, 1 = full debug)
 DEBUG="${DEBUG:-1}"
 
-# 🔑 API keys collect
 declare -a KEYS=()
-[ -n "$OPENROUTER_API_KEY" ] && KEYS+=("$OPENROUTER_API_KEY")
+[ -n "$OPENROUTER_API_KEY" ]   && KEYS+=("$OPENROUTER_API_KEY")
 [ -n "$OPENROUTER_API_KEY_2" ] && KEYS+=("$OPENROUTER_API_KEY_2")
 [ -n "$OPENROUTER_API_KEY_3" ] && KEYS+=("$OPENROUTER_API_KEY_3")
 [ -n "$OPENROUTER_API_KEY_4" ] && KEYS+=("$OPENROUTER_API_KEY_4")
@@ -36,76 +46,122 @@ get_random_openrouter_key() {
     echo "${KEYS[$idx]}"
 }
 
-# Debug helper
 dbg() {
     [ "$DEBUG" = "1" ] && echo "$@" >&2
 }
 
-# 🚀 Ultra-Engaging Prompt Focused on Flow & Natural Ending (Up to 60s)
+# ══════════════════════════════════════════════════════════════
+# PROMPT WITH APPROVE/REJECT
+# ══════════════════════════════════════════════════════════════
 PROMPT_TEXT="Analyze the provided 9:16 gaming screenshot grid. Total video source duration is ${SOURCE_DURATION} seconds.
 Style Directive: ${STYLE_PROMPT}
 
-CRITICAL INSTRUCTIONS FOR SEAMLESS ENGAGEMENT:
-1. TITLE RULES: Create a short, viral title under 6 words with 1-3 emojis. DO NOT use generic boring words like 'Epic', 'Insane', 'Crazy', 'Best', or 'Gameplay'. Make it unique based strictly on what's visible in the current grid image.
-2. ENGAGING FLOW & TIMING RULES: Do not just look for a quick action flash. Scan the grid for the complete **engaging, emotional, or high-tension moment**. 
-3. Choose a precise numerical 'start_time' in seconds (e.g. 15, 30) as an integer and let the sequence run naturally. The 'clip_duration' must be at least 15 seconds and extend smoothly until the engaging moment reaches its natural conclusion (up to 60 seconds). 
-4. STRICT GUARDRAIL: NEVER cut abruptly in the middle of an ongoing engaging sequence. Ensure the ending feels satisfying and complete.
-5. Return JSON with exactly three keys (title, start_time, clip_duration) as specified in the schema."
+YOUR TASK: Decide APPROVE or REJECT for this video.
 
-RAW_RESPONSE=""
-SUCCESS_REQUESTED_MODEL=""
-SUCCESS_ROUTED_MODEL=""
+REJECT IF:
+- Grid shows ONLY menus, login screens, or loading screens
+- No actual gameplay visible in ANY frame
+- All frames look identical (frozen/paused)
+- Crash screen, error, or black frames dominate
+- Absolutely no exciting/engaging moment
 
-# 1 Primary Try + 20 Fallback Retries = Total 21 Attempts max
-MAX_RETRIES=21
+APPROVE IF:
+- Real gameplay is visible (even if not super exciting)
+- Any action, movement, or engaging moment exists
+- High-tension, emotional, or thrilling segments present
 
-dbg ""
-dbg "════════════════════════════════════════════════════════"
-dbg "🚀 OPENROUTER AGENT START — $(date '+%Y-%m-%d %H:%M:%S')"
-dbg "📁 Grid Path       : $GRID_PATH"
-dbg "⏱️  Source Duration : ${SOURCE_DURATION}s"
-dbg "🔑 Keys Loaded     : ${#KEYS[@]}"
-dbg "🎯 Primary Model   : $PRIMARY_MODEL (Max 1 Try)"
-dbg "🔄 Fallback Model  : $FALLBACK_MODEL (Max 20 Tries)"
-dbg "════════════════════════════════════════════════════════"
-dbg ""
+RESPONSE FORMAT (STRICT JSON, no markdown):
 
-# 🔄 Retry loop
-for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
-    CURRENT_KEY=$(get_random_openrouter_key)
-    KEY_DISPLAY="${CURRENT_KEY:0:12}...${CURRENT_KEY: -4}"
-    
-    if [ $attempt -eq 1 ]; then
-        CURRENT_MODEL="$PRIMARY_MODEL"
-    else
-        CURRENT_MODEL="$FALLBACK_MODEL"
-    fi
+If REJECT:
+{\"status\": \"REJECT\", \"reason\": \"<1-line explanation>\"}
+
+If APPROVE:
+{\"status\": \"APPROVE\", \"title\": \"<viral title under 6 words with 1-3 emojis>\", \"start_time\": <integer seconds, 0 to $((SOURCE_DURATION - 15))>, \"clip_duration\": <integer 15-${SOURCE_DURATION}>, \"reason\": \"<1-line reason>\"}
+
+Return ONLY the JSON object."
+
+# ══════════════════════════════════════════════════════════════
+# MAIN LOOP — 3 Attempts
+# ══════════════════════════════════════════════════════════════
+MAX_ATTEMPTS=3
+ATTEMPT_NUM=0
+FINAL_STATUS=""
+FINAL_RESULT=""
+LAST_REASON=""
+
+while [ $ATTEMPT_NUM -lt $MAX_ATTEMPTS ]; do
+    ATTEMPT_NUM=$((ATTEMPT_NUM + 1))
     
     dbg ""
-    dbg "────────────────────────────────────────────────────────"
-    dbg "🤖 ATTEMPT $attempt / $MAX_RETRIES"
-    dbg "────────────────────────────────────────────────────────"
-    dbg "    Model      : $CURRENT_MODEL"
-    dbg "    API Key    : $KEY_DISPLAY"
-    dbg "    Time       : $(date +%H:%M:%S)"
+    dbg "════════════════════════════════════════════════════════"
+    dbg "🔁 SCRIPT ATTEMPT $ATTEMPT_NUM / $MAX_ATTEMPTS"
+    dbg "   🕐 $(date '+%Y-%m-%d %H:%M:%S IST')"
+    dbg "════════════════════════════════════════════════════════"
     
-    # 🔍 Live Terminal Display of what is being sent to AI (Including Full Prompt Text)
-    dbg "--------------------------------------------------------"
-    dbg "📤 AI KO KYA-KYA BHEJ RAHA HAI (PAYLOAD DETAILS):"
-    dbg "--------------------------------------------------------"
-    dbg "  📁 Grid Image Path        : $GRID_PATH"
-    dbg "  ⏱️ Source Duration        : ${SOURCE_DURATION}s"
-    dbg "  🎨 Style Directive        : ${STYLE_PROMPT:-[Khaali / Kuch nahi]}"
-    dbg "  🤖 Target Model           : $CURRENT_MODEL"
-    dbg "  📝 Prompt Text            :"
-    echo "$PROMPT_TEXT" | sed 's/^/      /' >&2
-    dbg "--------------------------------------------------------"
+    # ────────────────────────────────────────
+    # Pick a new link from editor
+    # ────────────────────────────────────────
+    if [ ! -f "$EDITOR_FILE" ]; then
+        echo "❌ Editor file nahi mili: $EDITOR_FILE"
+        FINAL_STATUS="failed"
+        break
+    fi
     
-    PAYLOAD_FILE="temp_frames/or_payload.json"
-    mkdir -p temp_frames
+    CURRENT_LINK=$(python3 -c "
+import os, random, sys
+ef = os.environ.get('EDITOR_FILE')
+if not os.path.exists(ef):
+    print(''); sys.exit(0)
+with open(ef, 'r', encoding='utf-8', errors='ignore') as f:
+    lines = [l.strip() for l in f if l.strip() and not l.strip().startswith('#')]
+if not lines:
+    print(''); sys.exit(0)
+print(random.choice(lines))
+")
     
-    export GRID_PATH CURRENT_MODEL PROMPT_TEXT PAYLOAD_FILE STYLE_PROMPT SOURCE_DURATION
-    python3 - << 'PYEOF'
+    if [ -z "$CURRENT_LINK" ]; then
+        echo "❌ Editor mein koi link nahi bacha"
+        FINAL_STATUS="failed"
+        break
+    fi
+    
+    export CURRENT_LINK
+    
+    echo "🔗 Link      : $CURRENT_LINK"
+    echo "   (Editor se naya link uthaya)"
+    echo ""
+    
+    # ────────────────────────────────────────
+    # OpenRouter AI Call
+    # ────────────────────────────────────────
+    RAW_RESPONSE=""
+    SUCCESS_REQUESTED_MODEL=""
+    SUCCESS_ROUTED_MODEL=""
+    MAX_RETRIES=21
+    
+    for ((a=1; a<=MAX_RETRIES; a++)); do
+        CURRENT_KEY=$(get_random_openrouter_key)
+        KEY_DISPLAY="${CURRENT_KEY:0:12}...${CURRENT_KEY: -4}"
+        
+        if [ $a -eq 1 ]; then
+            CURRENT_MODEL="$PRIMARY_MODEL"
+        else
+            CURRENT_MODEL="$FALLBACK_MODEL"
+        fi
+        
+        dbg ""
+        dbg "────────────────────────────────────────────────────────"
+        dbg "🤖 OpenRouter ATTEMPT $a / $MAX_RETRIES"
+        dbg "────────────────────────────────────────────────────────"
+        dbg "    Model      : $CURRENT_MODEL"
+        dbg "    API Key    : $KEY_DISPLAY"
+        dbg "    Time       : $(date '+%H:%M:%S IST')"
+        
+        PAYLOAD_FILE="temp_frames/or_payload.json"
+        mkdir -p temp_frames
+        
+        export GRID_PATH CURRENT_MODEL PROMPT_TEXT PAYLOAD_FILE SOURCE_DURATION
+        python3 - << 'PYEOF'
 import os, json, base64
 
 grid_path = os.environ.get('GRID_PATH')
@@ -121,24 +177,13 @@ with open(grid_path, 'rb') as f:
 schema = {
     "type": "object",
     "properties": {
-        "title": {
-            "type": "string",
-            "description": "Viral title under 6 words with 1-3 emojis. NO generic words like Epic, Insane, Crazy, Best, Gameplay."
-        },
-        "start_time": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": source_duration - 15,
-            "description": "Exact start time in seconds (integer only, e.g., 15, 30)"
-        },
-        "clip_duration": {
-            "type": "integer",
-            "minimum": 15,
-            "maximum": source_duration,
-            "description": f"Dynamic engaging duration ensuring no mid-action cuts, strictly >= 15 seconds up to {source_duration} seconds."
-        }
+        "status": {"type": "string", "enum": ["APPROVE", "REJECT"]},
+        "title": {"type": "string"},
+        "start_time": {"type": "integer", "minimum": 0, "maximum": max(0, source_duration - 15)},
+        "clip_duration": {"type": "integer", "minimum": 15, "maximum": source_duration},
+        "reason": {"type": "string"}
     },
-    "required": ["title", "start_time", "clip_duration"],
+    "required": ["status"],
     "additionalProperties": False
 }
 
@@ -159,7 +204,7 @@ payload = {
         'type': 'json_schema',
         'json_schema': {
             'name': 'video_edit_params',
-            'strict': True,
+            'strict': False,
             'schema': schema
         }
     },
@@ -171,228 +216,286 @@ payload = {
 
 with open(payload_file, 'w') as f:
     json.dump(payload, f)
-
-import sys
-
-print(f"    📸 Image Size : {len(img_bytes)} bytes (b64: {len(b64_img)} chars)", file=sys.stderr, flush=True)
-print(f"    🧠 Is Reasoning: {is_reasoning}", file=sys.stderr, flush=True)
-print(f"    🔧 require_parameters: {payload['provider']['require_parameters']}", file=sys.stderr, flush=True)
-print(f"    📤 Payload ready: {os.path.getsize(payload_file)} bytes", file=sys.stderr, flush=True)
 PYEOF
 
-    dbg ""
-    dbg "    📡 Sending request to OpenRouter..."
-    
-    HTTP_CODE=$(curl -s -o /tmp/or_response_$$.json -w "%{http_code}" \
-        --connect-timeout 15 -m 90 \
-        -X POST "https://openrouter.ai/api/v1/chat/completions" \
-        -H "Authorization: Bearer $CURRENT_KEY" \
-        -H "Content-Type: application/json" \
-        -d @"$PAYLOAD_FILE")
-    
-    RESP=$(cat /tmp/or_response_$$.json 2>/dev/null)
-    rm -f /tmp/or_response_$$.json
-    rm -f "$PAYLOAD_FILE"
-
-    dbg "    📥 HTTP Status  : $HTTP_CODE"
-    
-    if [ "$DEBUG" = "1" ]; then
-        dbg "    📥 Raw Response :"
-        echo "$RESP" | head -c 2000 | sed 's/^/     /' >&2
-        echo "" >&2
-    fi
-
-    ROUTED=$(echo "$RESP" | python3 -c "
+        dbg "    📡 Sending to OpenRouter..."
+        
+        HTTP_CODE=$(curl -s -o /tmp/or_resp_$$.json -w "%{http_code}" \
+            --connect-timeout 15 -m 90 \
+            -X POST "https://openrouter.ai/api/v1/chat/completions" \
+            -H "Authorization: Bearer $CURRENT_KEY" \
+            -H "Content-Type: application/json" \
+            -d @"$PAYLOAD_FILE")
+        
+        RESP=$(cat /tmp/or_resp_$$.json 2>/dev/null)
+        rm -f /tmp/or_resp_$$.json "$PAYLOAD_FILE"
+        
+        dbg "    📥 HTTP Status  : $HTTP_CODE"
+        
+        ROUTED=$(echo "$RESP" | python3 -c "
 import sys, json
-try:
-    print(json.load(sys.stdin).get('model', ''))
+try: print(json.load(sys.stdin).get('model', ''))
 except: print('')
 " 2>/dev/null)
-
-    export ROUTED_CHECK="$ROUTED"
-    IS_TEXT_AI=$(python3 -c "
+        
+        export ROUTED_CHECK="$ROUTED"
+        IS_TEXT_AI=$(python3 -c "
 import os
 m = os.environ.get('ROUTED_CHECK', '').lower()
-text_indicators = ['r1-distill', 'llama-3-8b', 'qwen-2.5-7b', 'gemma-2-9b', 'deepseek-chat', 'mistral-7b', 'text-only']
-if any(t in m for t in text_indicators):
-    print('yes')
-else:
-    print('no')
+ti = ['r1-distill', 'llama-3-8b', 'qwen-2.5-7b', 'gemma-2-9b', 'deepseek-chat', 'mistral-7b', 'text-only']
+print('yes' if any(t in m for t in ti) else 'no')
 ")
-
-    if [ "$IS_TEXT_AI" = "yes" ]; then
-        dbg "    ❌ OpenRouter routed a text-only model ($ROUTED). Retrying..."
-        sleep 1
-        continue
-    fi
-
-    CONTENT=$(echo "$RESP" | python3 -c "
-import sys, json
-try:
-    res = json.load(sys.stdin)
-    choices = res.get('choices', [])
-    if choices:
-        msg = choices[0].get('message', {})
-        content = msg.get('content', '') or msg.get('reasoning', '')
-        print(content)
-    else:
-        print('')
-except Exception as e:
-    print('')
-" 2>/dev/null)
-
-    ERROR_MSG=$(echo "$RESP" | python3 -c "
-import sys, json
-try:
-    res = json.load(sys.stdin)
-    err = res.get('error', {})
-    if err:
-        print(f\"{err.get('code','')} - {err.get('message','')}\")
-except: pass
-" 2>/dev/null)
-
-    if [ -n "$ERROR_MSG" ]; then
-        dbg "    ❌ API Error    : $ERROR_MSG"
-    fi
-
-    if [ -n "$CONTENT" ] && [ "$CONTENT" != "None" ]; then
-        IS_VALID_JSON=$(python3 -c '
-import json, sys, re
-raw_output = sys.argv[1]
-try:
-    clean_output = re.sub(r"```json\s*|\s*```", "", raw_output, flags=re.IGNORECASE).strip()
-    clean_output = re.sub(r"<think>.*?</think>", "", clean_output, flags=re.DOTALL).strip()
-    
-    data = json.loads(clean_output)
-    if not isinstance(data, dict) or not all(k in data for k in ("title", "start_time", "clip_duration")):
-        print("invalid")
-        sys.exit(0)
-    
-    print("valid")
-except Exception:
-    print("invalid")
-' "$CONTENT")
-
-        if [ "$IS_VALID_JSON" = "valid" ]; then
-            dbg ""
-            dbg "    ✅ SUCCESS — Model responded with valid JSON!"
-            dbg "    🎯 Routed Model : ${ROUTED:-unknown}"
-            
-            RAW_RESPONSE="$CONTENT"
-            SUCCESS_REQUESTED_MODEL="$CURRENT_MODEL"
-            SUCCESS_ROUTED_MODEL="${ROUTED:-$CURRENT_MODEL}"
-            break
-        else
-            dbg "    ⚠️  Model ($CURRENT_MODEL) returned invalid JSON or missing keys. Retrying..."
-            sleep 1.5
+        
+        if [ "$IS_TEXT_AI" = "yes" ]; then
+            dbg "    ❌ Text-only model ($ROUTED). Retrying..."
+            sleep 1
             continue
         fi
+        
+        CONTENT=$(echo "$RESP" | python3 -c "
+import sys, json
+try:
+    r = json.load(sys.stdin)
+    ch = r.get('choices', [])
+    if ch:
+        m = ch[0].get('message', {})
+        print(m.get('content', '') or m.get('reasoning', ''))
+    else: print('')
+except: print('')
+" 2>/dev/null)
+        
+        if [ -n "$CONTENT" ] && [ "$CONTENT" != "None" ]; then
+            IS_VALID=$(python3 -c '
+import json, sys, re
+raw = sys.argv[1]
+try:
+    c = re.sub(r"```json\s*|\s*```", "", raw, flags=re.IGNORECASE).strip()
+    c = re.sub(r"<think>.*?</think>", "", c, flags=re.DOTALL).strip()
+    d = json.loads(c)
+    if not isinstance(d, dict): print("invalid"); sys.exit(0)
+    s = str(d.get("status", "")).upper()
+    if s == "REJECT": print("valid"); sys.exit(0)
+    if s == "APPROVE" and all(k in d for k in ("title","start_time","clip_duration")):
+        print("valid"); sys.exit(0)
+    if all(k in d for k in ("title","start_time","clip_duration")):
+        print("valid"); sys.exit(0)
+    print("invalid")
+except: print("invalid")
+' "$CONTENT")
+            
+            if [ "$IS_VALID" = "valid" ]; then
+                dbg "    ✅ SUCCESS — Valid JSON!"
+                RAW_RESPONSE="$CONTENT"
+                SUCCESS_REQUESTED_MODEL="$CURRENT_MODEL"
+                SUCCESS_ROUTED_MODEL="${ROUTED:-$CURRENT_MODEL}"
+                break
+            else
+                dbg "    ⚠️  Invalid JSON. Retrying..."
+                sleep 1.5
+                continue
+            fi
+        else
+            dbg "    ⚠️  Empty content. Retrying..."
+            sleep 1.5
+        fi
+    done
+    
+    # ────────────────────────────────────────
+    # Parse Response
+    # ────────────────────────────────────────
+    if [ -z "$RAW_RESPONSE" ]; then
+        PARSED_STATUS="failed"
+        PARSED_REASON="All OpenRouter attempts failed"
     else
-        dbg "    ⚠️  Empty content in response. Retrying..."
-        sleep 1.5
-    fi
-done
-
-if [ -z "$RAW_RESPONSE" ]; then
-    dbg ""
-    dbg "════════════════════════════════════════════════════════"
-    dbg "❌ ALL ATTEMPTS FAILED"
-    dbg "════════════════════════════════════════════════════════"
-    echo '{"status": "failed", "error": "All 21 OpenRouter attempts failed"}'
-    exit 1
-fi
-
-RESPONSE_FILE="temp_frames/or_response.txt"
-printf "%s" "$RAW_RESPONSE" > "$RESPONSE_FILE"
-
-dbg ""
-dbg "════════════════════════════════════════════════════════"
-dbg "🧹 STRICT PARSING PHASE"
-dbg "════════════════════════════════════════════════════════"
-
-export REQUESTED_MODEL="$SUCCESS_REQUESTED_MODEL" ROUTED_MODEL="$SUCCESS_ROUTED_MODEL" RESPONSE_FILE DEBUG SOURCE_DURATION
-python3 - << 'PYEOF'
+        RESPONSE_FILE="temp_frames/or_response.txt"
+        printf "%s" "$RAW_RESPONSE" > "$RESPONSE_FILE"
+        
+        export REQUESTED_MODEL="$SUCCESS_REQUESTED_MODEL" ROUTED_MODEL="$SUCCESS_ROUTED_MODEL" RESPONSE_FILE DEBUG SOURCE_DURATION CURRENT_LINK
+        PARSE_OUTPUT=$(python3 - << 'PYEOF'
 import os, json, re, sys
-
-response_file = os.environ.get('RESPONSE_FILE')
+rf = os.environ.get('RESPONSE_FILE')
 req_m = os.environ.get('REQUESTED_MODEL', '')
 rout_m = os.environ.get('ROUTED_MODEL', '')
-debug = os.environ.get('DEBUG', '0') == '1'
-source_duration = int(os.environ.get('SOURCE_DURATION', 60))
-
-def dbg(msg):
-    if debug:
-        print(msg, file=sys.stderr)
+sd = int(os.environ.get('SOURCE_DURATION', 60))
 
 try:
-    with open(response_file, 'r', encoding='utf-8') as f:
-        raw = f.read()
+    with open(rf) as f: raw = f.read()
+except: raw = ""
+if os.path.exists(rf): os.remove(rf)
+
+clean = re.sub(r'```json\s*|\s*```', '', raw, flags=re.IGNORECASE).strip()
+clean = re.sub(r'<think>.*?</think>', '', clean, flags=re.DOTALL).strip()
+
+d = None
+try: d = json.loads(clean)
 except:
-    raw = ""
+    m = re.search(r'\{.*\}', clean, re.DOTALL)
+    if m:
+        try: d = json.loads(m.group(0))
+        except: pass
 
-if os.path.exists(response_file):
-    os.remove(response_file)
+if not d or not isinstance(d, dict):
+    print(json.dumps({"status": "failed", "error": "parse fail"}))
+    sys.exit(0)
 
-cleaned = re.sub(r'```json\s*|\s*```', '', raw, flags=re.IGNORECASE).strip()
-cleaned = re.sub(r'<think>.*?</think>', '', cleaned, flags=re.DOTALL).strip()
+sf = str(d.get('status', '')).upper()
+rn = str(d.get('reason', '')).strip() or "(no reason)"
 
-data = None
-try:
-    data = json.loads(cleaned)
-except Exception:
-    match = re.search(r'\{.*\}', cleaned, re.DOTALL)
-    if match:
-        try:
-            data = json.loads(match.group(0))
-        except Exception:
-            pass
+if sf == 'REJECT':
+    print(json.dumps({"status": "reject", "reason": rn, "requested_model": req_m, "routed_model": rout_m}))
+    sys.exit(0)
 
-if not data or not isinstance(data, dict) or not all(k in data for k in ("title", "start_time", "clip_duration")):
-    dbg("❌ Strict JSON parsing failed completely. No fallback allowed.")
-    print(json.dumps({"status": "failed", "error": "Strict JSON parse failed"}))
-    sys.exit(1)
+if not all(k in d for k in ("title","start_time","clip_duration")):
+    print(json.dumps({"status": "failed", "error": "missing keys"}))
+    sys.exit(0)
 
-raw_title = data.get('title', '')
-if isinstance(raw_title, list):
-    raw_title = raw_title[0] if len(raw_title) > 0 else ""
-elif isinstance(raw_title, str):
-    lines = [line.strip() for line in raw_title.split('\n') if line.strip()]
-    raw_title = lines[0] if lines else ""
+rt = d.get('title', '')
+if isinstance(rt, list): rt = rt[0] if rt else ""
+elif isinstance(rt, str):
+    ls = [l.strip() for l in rt.split('\n') if l.strip()]
+    rt = ls[0] if ls else ""
 
-title = re.sub(r'^\d+[\.\)]\s*|^[\-\*]\s*|[\*\#\`\"]', '', str(raw_title)).strip()
-title = title.strip("'\"")
-title = re.sub(r'\s+', ' ', title)
+title = re.sub(r'^\d+[\.\)]\s*|^[\-\*]\s*|[\*\#\`\"]', '', str(rt)).strip().strip("'\"")
 
-# 🔒 STRICT NUMERICAL EXTRACTION FOR START TIME (BLOCKS 'title15' OR STRINGS)
-try:
-    start_time_val = int(data.get('start_time', 0))
-    if start_time_val < 0:
-        start_time_val = 0
-except Exception:
-    match_num = re.search(r'\d+', str(data.get('start_time', '0')))
-    start_time_val = int(match_num.group(0)) if match_num else 0
-
-duration = data.get('clip_duration', 15)
+try: st = int(d.get('start_time', 0))
+except:
+    m = re.search(r'\d+', str(d.get('start_time', '0')))
+    st = int(m.group(0)) if m else 0
+if st < 0: st = 0
 
 try:
-    dur_int = int(duration)
-    if dur_int < 15 or dur_int > source_duration:
-        raise ValueError(f"Duration out of bounds (15 to {source_duration}s)")
-except Exception as e:
-    dbg(f"❌ Invalid duration value received: {duration} ({e})")
-    print(json.dumps({"status": "failed", "error": f"Invalid clip duration: {duration}"}))
-    sys.exit(1)
-
-dbg(f"✅ Final Output Title: '{title}'")
-dbg(f"✅ Final Start Time  : '{start_time_val}'")
-dbg(f"✅ Final Duration    : '{dur_int}s'")
+    dr = int(d.get('clip_duration', 15))
+    if dr < 15 or dr > sd: raise ValueError()
+except:
+    print(json.dumps({"status": "failed", "error": "invalid duration"}))
+    sys.exit(0)
 
 print(json.dumps({
     "status": "success",
     "requested_model": req_m,
     "routed_model": rout_m,
     "title": title,
-    "start_time": start_time_val,
-    "duration": dur_int
+    "start_time": st,
+    "duration": dr,
+    "reason": rn
 }))
 PYEOF
+)
+        PARSED_STATUS=$(echo "$PARSE_OUTPUT" | python3 -c "import sys,json;print(json.load(sys.stdin).get('status','failed'))" 2>/dev/null)
+        PARSED_REASON=$(echo "$PARSE_OUTPUT" | python3 -c "import sys,json;print(json.load(sys.stdin).get('reason',''))" 2>/dev/null)
+        FINAL_RESULT="$PARSE_OUTPUT"
+    fi
+    
+    # ────────────────────────────────────────
+    # If OpenRouter FAILED → try fallback.sh
+    # ────────────────────────────────────────
+    if [ "$PARSED_STATUS" == "failed" ]; then
+        if [ -f "fallback.sh" ]; then
+            echo "⚠️  OpenRouter failed — Fallback AI try kar raha hoon..."
+            export GRID_PATH SOURCE_DURATION STYLE_PROMPT CURRENT_LINK
+            
+            FB_OUTPUT=$(bash fallback.sh)
+            FB_STATUS=$(echo "$FB_OUTPUT" | python3 -c "import sys,json;print(json.load(sys.stdin).get('status','failed'))" 2>/dev/null)
+            FB_REASON=$(echo "$FB_OUTPUT" | python3 -c "import sys,json;print(json.load(sys.stdin).get('reason',''))" 2>/dev/null)
+            
+            echo "   🧠 Fallback status: $FB_STATUS"
+            
+            if [ "$FB_STATUS" == "success" ]; then
+                PARSED_STATUS="success"
+                PARSED_REASON="$FB_REASON"
+                FINAL_RESULT="$FB_OUTPUT"
+            elif [ "$FB_STATUS" == "reject" ]; then
+                PARSED_STATUS="reject"
+                PARSED_REASON="$FB_REASON (fallback)"
+                FINAL_RESULT="$FB_OUTPUT"
+            fi
+        else
+            echo "⚠️  fallback.sh not found — skipping fallback"
+        fi
+    fi
+    
+    # ════════════════════════════════════════════
+    # DECIDE
+    # ════════════════════════════════════════════
+    
+    # ✅ APPROVE → SCRIPT BAND
+    if [ "$PARSED_STATUS" == "success" ]; then
+        echo ""
+        echo "✅ AI NE APPROVE KIYA (Attempt $ATTEMPT_NUM/$MAX_ATTEMPTS)"
+        echo "🏁 Script band — kaam khatam!"
+        FINAL_STATUS="approved"
+        break
+    fi
+    
+    # 🚫 REJECT → SHIFT LINK
+    if [ "$PARSED_STATUS" == "reject" ]; then
+        LAST_REASON="$PARSED_REASON"
+        echo ""
+        echo "🚫 AI NE REJECT KIYA (Attempt $ATTEMPT_NUM/$MAX_ATTEMPTS)"
+        echo "   💬 Reason : $PARSED_REASON"
+        echo "   🔗 Link   : $CURRENT_LINK"
+        echo ""
+        echo "📦 Link ko SHIFT kar raha hoon..."
+        
+        echo "$CURRENT_LINK | REJECT: $PARSED_REASON" >> "$SHIFT_LOG"
+        echo "   ✅ Shift file: $SHIFT_LOG"
+        
+        if [ -f "$EDITOR_FILE" ]; then
+            grep -vxF "$CURRENT_LINK" "$EDITOR_FILE" > "${EDITOR_FILE}.tmp"
+            mv "${EDITOR_FILE}.tmp" "$EDITOR_FILE"
+            echo "   🗑️  Editor se remove: $EDITOR_FILE"
+        fi
+        
+        if [ $ATTEMPT_NUM -lt $MAX_ATTEMPTS ]; then
+            echo ""
+            echo "   🔁 Naya link try karega (attempt $((ATTEMPT_NUM+1))/$MAX_ATTEMPTS)..."
+            sleep 3
+            continue
+        else
+            echo ""
+            echo "   ⚠️  3 attempts khatam — script band"
+            FINAL_STATUS="exhausted"
+            break
+        fi
+    fi
+    
+    # ❌ FAIL (both OpenRouter and fallback failed)
+    if [ "$PARSED_STATUS" == "failed" ]; then
+        echo ""
+        echo "❌ AI FAILED (Attempt $ATTEMPT_NUM/$MAX_ATTEMPTS)"
+        echo "   💬 Error: $PARSED_REASON"
+        
+        if [ $ATTEMPT_NUM -lt $MAX_ATTEMPTS ]; then
+            echo "   🔁 Retry..."
+            sleep 3
+            continue
+        else
+            FINAL_STATUS="failed"
+            break
+        fi
+    fi
+done
+
+# ══════════════════════════════════════════════════════════════
+# FINAL RESULT
+# ══════════════════════════════════════════════════════════════
+
+if [ "$FINAL_STATUS" == "approved" ]; then
+    echo "$FINAL_RESULT"
+    exit 0
+fi
+
+if [ "$FINAL_STATUS" == "exhausted" ]; then
+    echo ""
+    echo "════════════════════════════════════════════════════════"
+    echo "🚫 3 ATTEMPTS KHATAM — Sab REJECT"
+    echo "   🕐 $(date '+%Y-%m-%d %H:%M:%S IST')"
+    echo "════════════════════════════════════════════════════════"
+    echo '{"status": "exhausted", "error": "3 attempts completed, all rejected"}'
+    exit 0
+fi
+
+if [ "$FINAL_STATUS" == "failed" ]; then
+    echo '{"status": "failed", "error": "All attempts failed"}'
+    exit 1
+fi
