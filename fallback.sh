@@ -1,6 +1,7 @@
 #!/bin/bash
 # ==============================================================================
-# 🚀 OPENROUTER FALLBACK AGENT (Full Debug Version)
+# 🚀 OPENROUTER FALLBACK AGENT
+# APPROVE/REJECT + Reason + Full Debug
 # 1 PRIMARY TRY + 20 FALLBACK RETRIES + STRICT PARSER
 # ==============================================================================
 
@@ -41,12 +42,13 @@ get_random_openrouter_key() {
     echo "${KEYS[$idx]}"
 }
 
-# Debug helper
 dbg() {
     [ "$DEBUG" = "1" ] && echo "$@" >&2
 }
 
-# 🚀 Prompt with APPROVE/REJECT
+# ══════════════════════════════════════════════════════════════
+# 🚀 PROMPT with APPROVE/REJECT + Reason
+# ══════════════════════════════════════════════════════════════
 PROMPT_TEXT="Analyze the provided 9:16 gaming screenshot grid. Total video source duration is ${SOURCE_DURATION} seconds.
 Style Directive: ${STYLE_PROMPT}
 
@@ -64,21 +66,25 @@ APPROVE IF:
 - Any action, movement, or engaging moment exists
 - High-tension, emotional, or thrilling segments present
 
-RESPONSE FORMAT (STRICT JSON, no markdown):
+TITLE RULES (only for APPROVE):
+- Create a short, viral title under 6 words with 1-3 emojis
+- DO NOT use generic boring words like 'Epic', 'Insane', 'Crazy', 'Best', 'Gameplay'
+- Make it unique based strictly on what's visible in the grid
+
+STRICT JSON OUTPUT (no markdown, no extra text):
 
 If REJECT:
-{\"status\": \"REJECT\", \"reason\": \"<1-line explanation>\"}
+{\"status\": \"REJECT\", \"reason\": \"<1-line explanation why rejected>\"}
 
 If APPROVE:
-{\"status\": \"APPROVE\", \"title\": \"<viral title under 6 words with 1-3 emojis>\", \"start_time\": <integer seconds 0 to $((SOURCE_DURATION - 15))>, \"clip_duration\": <integer 15-${SOURCE_DURATION}>, \"reason\": \"<1-line reason>\"}
+{\"status\": \"APPROVE\", \"title\": \"<viral title 6 words max with 1-3 emojis>\", \"start_time\": <integer seconds 0 to $((SOURCE_DURATION - 15))>, \"clip_duration\": <integer 15-${SOURCE_DURATION}>, \"reason\": \"<1-line explanation why approved>\"}
 
-Return ONLY the JSON object. No markdown. No extra text."
+Return ONLY the JSON object."
 
 RAW_RESPONSE=""
 SUCCESS_REQUESTED_MODEL=""
 SUCCESS_ROUTED_MODEL=""
 
-# 1 Primary Try + 20 Fallback Retries = Total 21 Attempts max
 MAX_RETRIES=21
 
 dbg ""
@@ -185,7 +191,6 @@ with open(payload_file, 'w') as f:
 import sys
 print(f"    📸 Image Size : {len(img_bytes)} bytes (b64: {len(b64_img)} chars)", file=sys.stderr, flush=True)
 print(f"    🧠 Is Reasoning: {is_reasoning}", file=sys.stderr, flush=True)
-print(f"    🔧 require_parameters: {payload['provider']['require_parameters']}", file=sys.stderr, flush=True)
 print(f"    📤 Payload ready: {os.path.getsize(payload_file)} bytes", file=sys.stderr, flush=True)
 PYEOF
 
@@ -206,8 +211,8 @@ PYEOF
     dbg "    📥 HTTP Status  : $HTTP_CODE"
     
     if [ "$DEBUG" = "1" ]; then
-        dbg "    📥 Raw Response :"
-        echo "$RESP" | head -c 2000 | sed 's/^/     /' >&2
+        dbg "    📥 Raw Response (first 1000 chars) :"
+        echo "$RESP" | head -c 1000 | sed 's/^/     /' >&2
         echo "" >&2
     fi
 
@@ -225,10 +230,7 @@ except: print('')
 import os
 m = os.environ.get('ROUTED_CHECK', '').lower()
 text_indicators = ['r1-distill', 'llama-3-8b', 'qwen-2.5-7b', 'gemma-2-9b', 'deepseek-chat', 'mistral-7b', 'text-only']
-if any(t in m for t in text_indicators):
-    print('yes')
-else:
-    print('no')
+print('yes' if any(t in m for t in text_indicators) else 'no')
 ")
 
     if [ "$IS_TEXT_AI" = "yes" ]; then
@@ -267,7 +269,7 @@ except: pass
     fi
 
     if [ -n "$CONTENT" ] && [ "$CONTENT" != "None" ]; then
-        dbg "    📝 Content (first 200 chars): ${CONTENT:0:200}"
+        dbg "    📝 Content (first 300 chars): ${CONTENT:0:300}"
         
         IS_VALID_JSON=$(python3 -c '
 import json, sys, re
@@ -377,9 +379,20 @@ if not data or not isinstance(data, dict):
 status_field = str(data.get('status', '')).strip().upper()
 reason_text = str(data.get('reason', '')).strip() or "(no reason provided)"
 
-# 🚫 REJECT case
+# ══════════════════════════════════════════════════════════════
+# 🚫 REJECT CASE
+# ══════════════════════════════════════════════════════════════
 if status_field == 'REJECT':
-    dbg(f"🚫 AI REJECTED: {reason_text}")
+    dbg("")
+    dbg("╔══════════════════════════════════════════════════════╗")
+    dbg("║  🚫 AI NE REJECT KIYA                                ║")
+    dbg("╚══════════════════════════════════════════════════════╝")
+    dbg(f"  💬 Reason     : {reason_text}")
+    dbg(f"  🤖 Routed     : {rout_m}")
+    dbg(f"  🎯 Requested  : {req_m}")
+    dbg(f"  🕐 Time (IST) : $(date '+%Y-%m-%d %H:%M:%S IST')")
+    dbg("")
+    
     print(json.dumps({
         "status": "reject",
         "reason": reason_text,
@@ -388,7 +401,9 @@ if status_field == 'REJECT':
     }))
     sys.exit(0)
 
-# ✅ APPROVE case
+# ══════════════════════════════════════════════════════════════
+# ✅ APPROVE CASE
+# ══════════════════════════════════════════════════════════════
 if not all(k in data for k in ("title", "start_time", "clip_duration")):
     dbg("❌ APPROVE status par required keys missing")
     print(json.dumps({"status": "failed", "error": "Missing required keys"}))
@@ -424,9 +439,17 @@ except Exception as e:
     print(json.dumps({"status": "failed", "error": f"Invalid clip duration: {duration}"}))
     sys.exit(1)
 
-dbg(f"✅ Final Title    : '{title}'")
-dbg(f"✅ Final Start    : '{start_time_val}s'")
-dbg(f"✅ Final Duration : '{dur_int}s'")
+dbg("")
+dbg("╔══════════════════════════════════════════════════════╗")
+dbg("║  ✅ AI NE APPROVE KIYA                               ║")
+dbg("╚══════════════════════════════════════════════════════╝")
+dbg(f"  🎬 Title      : {title}")
+dbg(f"  ⏱️  Start Time : {start_time_val}s")
+dbg(f"  ⏳ Duration   : {dur_int}s")
+dbg(f"  💬 Reason     : {reason_text}")
+dbg(f"  🤖 Routed     : {rout_m}")
+dbg(f"  🕐 Time (IST) : $(date '+%Y-%m-%d %H:%M:%S IST')")
+dbg("")
 
 print(json.dumps({
     "status": "success",
