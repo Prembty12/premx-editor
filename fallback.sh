@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# 🚀 OPENROUTER BASH AGENT (1 PRIMARY TRY + 20 FALLBACK RETRIES + STRICT PARSER)
+# 🚀 OPENROUTER BASH AGENT (CLEAN START + 1 PRIMARY + 20 RETRIES + STRICT PARSER)
 # ==============================================================================
 
 GRID_PATH="${GRID_PATH:-temp_frames/merged_60_grid_screenshot.jpg}"
@@ -12,6 +12,9 @@ FALLBACK_MODEL="openrouter/free"
 
 # Debug flag (0 = silent, 1 = full debug)
 DEBUG="${DEBUG:-1}"
+
+# 🧹 FRESH START: Remove any leftover temporary files to prevent data mismatch
+rm -f temp_frames/or_payload.json temp_frames/or_response.txt /tmp/or_response_$$.json
 
 # 🔑 API keys collect
 declare -a KEYS=()
@@ -48,7 +51,7 @@ Style Directive: ${STYLE_PROMPT}
 CRITICAL INSTRUCTIONS FOR SEAMLESS ENGAGEMENT:
 1. TITLE RULES: Create a short, viral title under 6 words with 1-3 emojis. DO NOT use generic boring words like 'Epic', 'Insane', 'Crazy', 'Best', or 'Gameplay'. Make it unique based strictly on what's visible in the current grid image.
 2. ENGAGING FLOW & TIMING RULES: Do not just look for a quick action flash. Scan the grid for the complete **engaging, emotional, or high-tension moment**. 
-3. Choose a precise 'start_time' and let the sequence run naturally. The 'clip_duration' must be at least 15 seconds and extend smoothly until the engaging moment reaches its natural conclusion (up to 60 seconds). 
+3. Choose a precise 'start_time' and let the sequence run naturally. The 'clip_duration' must be at least 15 seconds and extend smoothly until the engaging moment reaches its natural conclusion (up to ${SOURCE_DURATION} seconds). 
 4. STRICT GUARDRAIL: NEVER cut abruptly in the middle of an ongoing engaging sequence. Ensure the ending feels satisfying and complete.
 5. Return JSON with exactly three keys (title, start_time, clip_duration) as specified in the schema."
 
@@ -89,7 +92,7 @@ for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
     dbg "    API Key    : $KEY_DISPLAY"
     dbg "    Time       : $(date +%H:%M:%S)"
     
-    # 🔍 Live Terminal Display of what is being sent to AI (Including Full Prompt Text)
+    # 🔍 Live Terminal Display of what is being sent to AI
     dbg "--------------------------------------------------------"
     dbg "📤 AI KO KYA-KYA BHEJ RAHA HAI (PAYLOAD DETAILS):"
     dbg "--------------------------------------------------------"
