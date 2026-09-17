@@ -1,7 +1,7 @@
 #!/bin/bash
 # ==============================================================================
 # 🚀 OPENROUTER FALLBACK AGENT
-# No Defaults + All Fields Mandatory + Multi-Method Parser + Full Debug
+# Full Prompt Debug + All Fields Mandatory + Multi-Method Parser
 # ==============================================================================
 
 export TZ='Asia/Kolkata'
@@ -194,7 +194,7 @@ with open(payload_file, 'w') as f:
     json.dump(payload, f)
 PYEOF
 
-    # 📤 Full payload debug
+    # 📤 FULL PAYLOAD DEBUG (with prompt text)
     IMG_SIZE_BYTES=$(wc -c < "$GRID_PATH" 2>/dev/null || echo "unknown")
     PAYLOAD_SIZE_BYTES=$(wc -c < "$PAYLOAD_FILE" 2>/dev/null || echo "unknown")
     
@@ -207,10 +207,13 @@ PYEOF
     dbg "  🎨 Style      : ${STYLE_PROMPT:-[empty]}"
     dbg "  🤖 Model      : $CURRENT_MODEL"
     dbg "  📦 Payload    : ${PAYLOAD_SIZE_BYTES} bytes"
+    dbg "  📝 Prompt Text (FULL)  :"
+    echo "$PROMPT_TEXT" | sed 's/^/      /' >&2
     dbg "--------------------------------------------------------"
 
     if [ "$SAVE_DEBUG" = "1" ]; then
         cp "$PAYLOAD_FILE" "$DEBUG_DIR/payload_attempt_${attempt}.json" 2>/dev/null
+        echo "$PROMPT_TEXT" > "$DEBUG_DIR/prompt_attempt_${attempt}.txt" 2>/dev/null
     fi
 
     dbg "    📡 Sending request to OpenRouter..."
@@ -280,7 +283,7 @@ except: print('')
         fi
         
         # ══════════════════════════════════════════════════════════
-        # VALIDATION — ALL FIELDS MANDATORY (no defaults)
+        # VALIDATION — ALL FIELDS MANDATORY
         # ══════════════════════════════════════════════════════════
         IS_VALID_JSON=$(CONTENT="$CONTENT" python3 << 'PYEOF'
 import os, json, re, sys
@@ -295,13 +298,11 @@ def parse_json(raw_input):
     clean = re.sub(r"<think>.*?</think>", "", clean, flags=re.DOTALL).strip()
     clean = clean.rstrip().rstrip(",")
     
-    # Method 1: Direct parse
     try:
         d = json.loads(clean)
         if isinstance(d, dict): return d
     except: pass
     
-    # Method 2: Regex extract
     match = re.search(r"\{.*\}", clean, re.DOTALL)
     if match:
         try:
@@ -309,14 +310,12 @@ def parse_json(raw_input):
             if isinstance(d, dict): return d
         except: pass
     
-    # Method 3: Fix escaped quotes
     fixed = clean.replace(chr(92) + chr(34), chr(34))
     try:
         d = json.loads(fixed)
         if isinstance(d, dict): return d
     except: pass
     
-    # Method 4: Double-encoded
     if clean.startswith(chr(34)):
         try:
             inner = json.loads(clean)
@@ -334,7 +333,7 @@ def parse_json(raw_input):
                     except: pass
         except: pass
     
-    # Method 5: Manual regex — ALL FIELDS MANDATORY
+    # Method 5: ALL FIELDS MANDATORY
     status_match = re.search(r'"status"\s*:\s*"([^"]+)"', clean)
     if status_match:
         status_val = status_match.group(1).upper()
@@ -343,22 +342,12 @@ def parse_json(raw_input):
         dur_match = re.search(r'"clip_duration"\s*:\s*(\d+)', clean)
         reason_match = re.search(r'"reason"\s*:\s*"([^"]*)"', clean)
         
-        # 🚫 REJECT
         if status_val == "REJECT":
             return {"status": "REJECT", "reason": reason_match.group(1) if reason_match else ""}
         
-        # ✅ APPROVE — ALL FIELDS MANDATORY (no defaults!)
         if status_val == "APPROVE":
-            # Title mandatory
-            if not title_match:
+            if not title_match or not st_match or not dur_match:
                 return None
-            # start_time mandatory
-            if not st_match:
-                return None
-            # clip_duration mandatory
-            if not dur_match:
-                return None
-            
             return {
                 "status": "APPROVE",
                 "title": title_match.group(1),
@@ -378,12 +367,10 @@ if not data or not isinstance(data, dict):
 
 status = str(data.get("status", "")).upper()
 
-# ✅ REJECT
 if status == "REJECT":
     print("valid")
     sys.exit(0)
 
-# ✅ APPROVE — all fields must be present
 if status == "APPROVE" and all(k in data for k in ("title", "start_time", "clip_duration")):
     print("valid")
     sys.exit(0)
@@ -500,7 +487,6 @@ def parse_json(raw_input):
                     except: pass
         except: pass
     
-    # Method 5: Manual regex — ALL FIELDS MANDATORY
     status_match = re.search(r'"status"\s*:\s*"([^"]+)"', clean)
     if status_match:
         status_val = status_match.group(1).upper()
@@ -556,7 +542,7 @@ if status_field == 'REJECT':
     }))
     sys.exit(0)
 
-# ✅ APPROVE — ALL FIELDS MANDATORY (no defaults)
+# ✅ APPROVE — ALL FIELDS MANDATORY
 missing = [k for k in ("title", "start_time", "clip_duration") if k not in data]
 if missing:
     dbg(f"❌ Missing fields: {missing}")
