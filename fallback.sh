@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# 🚀 OPENROUTER BASH AGENT (CLEAN START + 1 PRIMARY + 20 RETRIES + STRICT PARSER)
+# 🚀 OPENROUTER BASH AGENT (1 PRIMARY TRY + 20 FALLBACK RETRIES + STRICT PARSER)
 # ==============================================================================
 
 GRID_PATH="${GRID_PATH:-temp_frames/merged_60_grid_screenshot.jpg}"
@@ -12,9 +12,6 @@ FALLBACK_MODEL="openrouter/free"
 
 # Debug flag (0 = silent, 1 = full debug)
 DEBUG="${DEBUG:-1}"
-
-# 🧹 FRESH START: Remove any leftover temporary files to prevent data mismatch
-rm -f temp_frames/or_payload.json temp_frames/or_response.txt /tmp/or_response_$$.json
 
 # 🔑 API keys collect
 declare -a KEYS=()
@@ -51,7 +48,7 @@ Style Directive: ${STYLE_PROMPT}
 CRITICAL INSTRUCTIONS FOR SEAMLESS ENGAGEMENT:
 1. TITLE RULES: Create a short, viral title under 6 words with 1-3 emojis. DO NOT use generic boring words like 'Epic', 'Insane', 'Crazy', 'Best', or 'Gameplay'. Make it unique based strictly on what's visible in the current grid image.
 2. ENGAGING FLOW & TIMING RULES: Do not just look for a quick action flash. Scan the grid for the complete **engaging, emotional, or high-tension moment**. 
-3. Choose a precise 'start_time' and let the sequence run naturally. The 'clip_duration' must be at least 15 seconds and extend smoothly until the engaging moment reaches its natural conclusion (up to ${SOURCE_DURATION} seconds). 
+3. Choose a precise numerical 'start_time' in seconds (e.g. 15, 30) as an integer and let the sequence run naturally. The 'clip_duration' must be at least 15 seconds and extend smoothly until the engaging moment reaches its natural conclusion (up to 60 seconds). 
 4. STRICT GUARDRAIL: NEVER cut abruptly in the middle of an ongoing engaging sequence. Ensure the ending feels satisfying and complete.
 5. Return JSON with exactly three keys (title, start_time, clip_duration) as specified in the schema."
 
@@ -92,7 +89,7 @@ for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
     dbg "    API Key    : $KEY_DISPLAY"
     dbg "    Time       : $(date +%H:%M:%S)"
     
-    # 🔍 Live Terminal Display of what is being sent to AI
+    # 🔍 Live Terminal Display of what is being sent to AI (Including Full Prompt Text)
     dbg "--------------------------------------------------------"
     dbg "📤 AI KO KYA-KYA BHEJ RAHA HAI (PAYLOAD DETAILS):"
     dbg "--------------------------------------------------------"
@@ -129,8 +126,10 @@ schema = {
             "description": "Viral title under 6 words with 1-3 emojis. NO generic words like Epic, Insane, Crazy, Best, Gameplay."
         },
         "start_time": {
-            "type": "string",
-            "description": "HH:MM:SS format indicating exact start time of the engaging sequence"
+            "type": "integer",
+            "minimum": 0,
+            "maximum": source_duration - 15,
+            "description": "Exact start time in seconds (integer only, e.g., 15, 30)"
         },
         "clip_duration": {
             "type": "integer",
@@ -364,8 +363,16 @@ title = re.sub(r'^\d+[\.\)]\s*|^[\-\*]\s*|[\*\#\`\"]', '', str(raw_title)).strip
 title = title.strip("'\"")
 title = re.sub(r'\s+', ' ', title)
 
-start_time = str(data.get('start_time', '')).strip()
-duration = data.get('clip_duration', 0)
+# 🔒 STRICT NUMERICAL EXTRACTION FOR START TIME (BLOCKS 'title15' OR STRINGS)
+try:
+    start_time_val = int(data.get('start_time', 0))
+    if start_time_val < 0:
+        start_time_val = 0
+except Exception:
+    match_num = re.search(r'\d+', str(data.get('start_time', '0')))
+    start_time_val = int(match_num.group(0)) if match_num else 0
+
+duration = data.get('clip_duration', 15)
 
 try:
     dur_int = int(duration)
@@ -377,7 +384,7 @@ except Exception as e:
     sys.exit(1)
 
 dbg(f"✅ Final Output Title: '{title}'")
-dbg(f"✅ Final Start Time  : '{start_time}'")
+dbg(f"✅ Final Start Time  : '{start_time_val}'")
 dbg(f"✅ Final Duration    : '{dur_int}s'")
 
 print(json.dumps({
@@ -385,7 +392,7 @@ print(json.dumps({
     "requested_model": req_m,
     "routed_model": rout_m,
     "title": title,
-    "start_time": start_time,
+    "start_time": start_time_val,
     "duration": dur_int
 }))
 PYEOF
