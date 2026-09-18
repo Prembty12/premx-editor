@@ -166,43 +166,47 @@ if [ -z "$SOURCE_DURATION" ] || [ "$SOURCE_DURATION" -le 0 ] 2>/dev/null; then
     SOURCE_DURATION=60
 fi
 
-# 6. 📸 Frame Extraction & 6x10 Grid Generation Across Full Video
+# 6. 📸 Frame Extraction & 9x10 Grid Generation Across Full Video (Supports < 1s intervals)
 rm -f "$FRAMES_DIR"/*.jpg
-echo "📸 [STEP 6] Extracting 60 dynamic frames across source video..."
+echo "📸 [STEP 6] Extracting 90 dynamic frames across source video (sub-second precision)..."
 
-NUM_FRAMES=60
-interval=$((SOURCE_DURATION / NUM_FRAMES))
-[ "$interval" -lt 1 ] && interval=1
+NUM_FRAMES=90
 
+# Generate precise fractional timestamps using Python (handles intervals < 1 second automatically)
 timestamps=()
-for ((i=1; i<=NUM_FRAMES; i++)); do
-    t=$(( (i - 1) * interval ))
-    [ "$t" -ge "$SOURCE_DURATION" ] && t=$((SOURCE_DURATION - 1))
-    [ "$t" -lt 0 ] && t=0
-    min=$((t / 60))
-    sec=$((t % 60))
-    timestamps+=($(printf "00:%02d:%02d" $((10#$min)) $((10#$sec)) ))
-done
+while IFS= read -r ts; do
+    timestamps+=("$ts")
+done < <(python3 -c "
+duration = float($SOURCE_DURATION)
+num_frames = $NUM_FRAMES
+for i in range(num_frames):
+    t = i * (duration / num_frames) if num_frames > 0 else 0
+    print(f'{t:.3f}')
+")
 
 for i in "${!timestamps[@]}"; do
     idx=$((i+1))
     ts="${timestamps[$i]}"
     frame_path="$FRAMES_DIR/frame_$idx.jpg"
+    
+    # Extract frame using exact sub-second timestamp
     ffmpeg -y -ss "$ts" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel info
+    
+    # Fallback if frame extraction fails
     if [ ! -f "$frame_path" ] || [ ! -s "$frame_path" ]; then
-        ffmpeg -y -ss "00:00:01" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel info
+        ffmpeg -y -ss "0" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel info
     fi
 done
 
-GRID_PATH="$FRAMES_DIR/merged_60_grid_screenshot.jpg"
-echo "🧩 Merging frames into 6x10 vertical grid (2592x3840)..."
+GRID_PATH="$FRAMES_DIR/merged_90_grid_screenshot.jpg"
+echo "🧩 Merging frames into 9x10 grid (3840x2160)..."
 
 TIMESTAMPS_STR="${timestamps[*]}" python3 - << 'EOF'
 import os
 import subprocess
 
 frames_dir = 'temp_frames'
-grid_path = os.path.join(frames_dir, 'merged_60_grid_screenshot.jpg')
+grid_path = os.path.join(frames_dir, 'merged_90_grid_screenshot.jpg')
 
 try:
     from PIL import Image, ImageDraw
@@ -213,41 +217,51 @@ except ImportError:
 timestamps_env = os.environ.get('TIMESTAMPS_STR', '')
 timestamps = timestamps_env.split()
 
-for i in range(1, 61):
+for i in range(1, 91):
     frame_path = os.path.join(frames_dir, f'frame_{i}.jpg')
-    ts = timestamps[i-1] if (i-1) < len(timestamps) else "00:00:00"
+    raw_ts = timestamps[i-1] if (i-1) < len(timestamps) else "0.000"
+    
+    # Convert raw seconds into clean MM:SS format for the visual label
+    try:
+        total_sec = float(raw_ts)
+        m = int(total_sec // 60)
+        s = int(total_sec % 60)
+        ts_label = f"00:{m:02d}:{s:02d}"
+    except Exception:
+        ts_label = "00:00:00"
+
     if os.path.exists(frame_path) and os.path.getsize(frame_path) > 0:
         try:
-            # Resize each frame to 432x384
-            im = Image.open(frame_path).resize((432, 384))
+            # Resize each frame to 384x240 for 9x10 layout (Total 4K: 3840x2160)
+            im = Image.open(frame_path).resize((384, 240))
             draw = ImageDraw.Draw(im)
-            draw.rectangle([10, 10, 120, 40], fill=(0, 0, 0))
-            draw.text((13, 15), ts, fill=(255, 255, 255))
-            im.save(frame_path, 'JPEG', quality=80)
+            draw.rectangle([8, 8, 95, 30], fill=(0, 0, 0))
+            draw.text((12, 12), ts_label, fill=(255, 255, 255))
+            im.save(frame_path, 'JPEG', quality=90)
         except Exception as e:
             print(f"⚠️ Frame processing error at {i}: {e}")
 
 images = []
-for i in range(1, 61):
+for i in range(1, 91):
     img_path = os.path.join(frames_dir, f'frame_{i}.jpg')
     if os.path.exists(img_path) and os.path.getsize(img_path) > 0:
         try:
             im = Image.open(img_path)
         except Exception:
-            im = Image.new('RGB', (432, 384), (0, 0, 0))
+            im = Image.new('RGB', (384, 240), (0, 0, 0))
     else:
-        im = Image.new('RGB', (432, 384), (0, 0, 0))
+        im = Image.new('RGB', (384, 240), (0, 0, 0))
     images.append(im)
 
-# Canvas size: 2592 x 3840 (6 columns, 10 rows)
-grid_img = Image.new('RGB', (2592, 3840))
+# Canvas size: 3840 x 2160 (10 columns, 9 rows for 90 frames)
+grid_img = Image.new('RGB', (3840, 2160))
 for idx, im in enumerate(images):
-    col = idx % 6
-    row = idx // 6
-    grid_img.paste(im, (col * 432, row * 384))
+    col = idx % 10
+    row = idx // 10
+    grid_img.paste(im, (col * 384, row * 240))
 
-grid_img.save(grid_path, 'JPEG', quality=85)
-print("✅ 60-frame grid screenshot created successfully.")
+grid_img.save(grid_path, 'JPEG', quality=90)
+print("✅ 90-frame grid screenshot created successfully.")
 EOF
 
 # 7. 🤖 Gemini Smart JSON Analysis
