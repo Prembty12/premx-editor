@@ -216,15 +216,16 @@ except ImportError:
 timestamps_env = os.environ.get('TIMESTAMPS_STR', '')
 timestamps = timestamps_env.split()
 
-# --- PORTRAIT FULL-SCREEN CONFIGURATION ---
+# --- HIGH-QUALITY 8K PORTRAIT CONFIGURATION ---
 TOTAL_COLS = 10
 TOTAL_ROWS = 9
 
-GRID_WIDTH = 2160
-GRID_HEIGHT = 3840
+# Resolution ko double karke 8K portrait kar diya taaki quality ultra-sharp ho
+GRID_WIDTH = 4320
+GRID_HEIGHT = 7680
 
-FRAME_WIDTH = GRID_WIDTH // TOTAL_COLS
-FRAME_HEIGHT = GRID_HEIGHT // TOTAL_ROWS
+FRAME_WIDTH = GRID_WIDTH // TOTAL_COLS   # Ab har frame ki width double ho jayegi
+FRAME_HEIGHT = GRID_HEIGHT // TOTAL_ROWS # Ab har frame ki height double ho jayegi
 # ------------------------------------------
 
 for i in range(1, 91):
