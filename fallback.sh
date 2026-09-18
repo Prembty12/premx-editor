@@ -67,7 +67,7 @@ REJECT IF (Strictly reject if content is boring, empty, or lacks engagement):
 APPROVE IF:
 - Real gameplay has a clear, powerful \"Engaging Highlight Window\" (combat, intense fights, epic boss battles, explosions, emotional cutscenes, hilarious fails, or high-stakes clutch moments).
 - The moment has a clear start and end point in the timestamps.
-
+- Absolute Cinematic & Engagement Mastery Rule: Prioritize pure hype, adrenaline, emotion, comedy, and entertainment above all else. Whether it's an epic fight, a deep emotional drama, a hilarious adventure, or a high-stakes moment that is genuinely gripping, commit to the *full sequence* from its absolute beginning to its natural end. Never force an artificial cut or clip truncation on a brilliant moment—allow the entire momentum, tension, comedy, and payoff of the gameplay to breathe and play out completely so the audience gets maximum satisfaction.
 TITLE RULES (only for APPROVE):
 - Create a short, viral title under 6 words with 1-3 emojis
 - NO generic boring words like Epic, Insane, Crazy, Best, Gameplay
