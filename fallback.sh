@@ -62,9 +62,8 @@ REJECT IF:
 - Absolutely no exciting/engaging moment
 
 APPROVE IF:
-- Real gameplay is visible (even if not super exciting)
-- Any action, movement, or engaging moment exists
-- High-tension, emotional, or thrilling segments present
+- Real gameplay has a clear \"Engaging Highlight Window\" (combat, explosions, emotional cutscenes, epic fails, funny bugs, or high-stakes moments).
+- The moment has a clear start and end point in the timestamps.
 
 TITLE RULES (only for APPROVE):
 - Create a short, viral title under 6 words with 1-3 emojis
@@ -79,10 +78,19 @@ If APPROVE, ALL 5 FIELDS ARE MANDATORY:
 {
   \"status\": \"APPROVE\",
   \"title\": \"<viral title 6 words max with 1-3 emojis>\",
-  \"start_time\": <integer seconds 0 to $((SOURCE_DURATION - 15))>,
-  \"clip_duration\": <integer seconds 15 to ${SOURCE_DURATION}>,
+  \"start_time\": <integer seconds, exact second where the engaging moment starts>,
+  \"clip_duration\": <integer seconds, MINIMUM 12 seconds, exact duration of the engaging moment>,
   \"reason\": \"<1-line explanation why approved>\"
 }
+
+CRITICAL - HOW TO CALCULATE START_TIME AND CLIP_DURATION:
+1. Look at the timestamps on the grid carefully (e.g., 00:00:05 to 00:00:25).
+2. Identify the exact second the ENGAGING MOMENT STARTS and the exact second it ENDS. This could be a fight, a tense dialogue, an emotional scene, a massive explosion, or a hilarious fail. DO NOT just look for combat.
+3. Set 'start_time' to when this moment begins.
+4. Calculate 'clip_duration' by subtracting start_time from end_time (e.g., 25 - 5 = 20 seconds).
+5. MINIMUM DURATION: The clip must be at least 12 seconds. If the actual highlight is only 5-6 seconds, find the 5 seconds of highlight and add 3-4 seconds before and after to make it 12-15 seconds.
+6. DO NOT include long non-engaging sequences before or after the highlight. Skip boring running, walking, menu checking, or exploring sequences.
+7. NEVER take a 30-40 second clip if the actual highlight is only 15-20 seconds long.
 
 ⚠️ CRITICAL — MISSING ANY FIELD = INVALID RESPONSE:
 1. 'status' is MANDATORY (APPROVE or REJECT)
@@ -156,11 +164,11 @@ schema = {
     "properties": {
         "status": {"type": "string", "enum": ["APPROVE", "REJECT"]},
         "title": {"type": "string"},
-        "start_time": {"type": "integer", "minimum": 0, "maximum": max(0, source_duration - 15)},
-        "clip_duration": {"type": "integer", "minimum": 15, "maximum": source_duration},
+       "start_time": {"type": "integer", "minimum": 0, "maximum": max(0, source_duration - 12)},
+"clip_duration": {"type": "integer", "minimum": 12, "maximum": source_duration},
         "reason": {"type": "string"}
     },
-    "required": ["status", "reason", "title", "start_time", "clip_duration"],
+    "required": ["status", "reason"],
     "additionalProperties": False
 }
 
@@ -593,11 +601,18 @@ duration = data.get('clip_duration', 15)
 
 try:
     dur_int = int(duration)
-    if dur_int < 15 or dur_int > sd:
-        raise ValueError(f"Duration out of bounds")
+    
+    # 1. AI ki limitation ke hisaab se Minimum 12s ka check (No Defaults)
+    if dur_int < 12 or dur_int > sd:
+        raise ValueError(f"Duration out of bounds (Must be 12s to {sd}s, AI gave {dur_int}s)")
+    
+    # 2. Strict Math Check: Start time + Duration video ki total length se bahar nahi hona chahiye
+    if (start_time_val + dur_int) > sd:
+        raise ValueError(f"Time Conflict: Start ({start_time_val}s) + Duration ({dur_int}s) exceeds total video length ({sd}s)")
+        
 except Exception as e:
-    dbg(f"❌ Invalid duration: {duration} ({e})")
-    print(json.dumps({"status": "failed", "error": f"Invalid duration: {duration}"}))
+    dbg(f"❌ Invalid duration/time: {duration} ({e})")
+    print(json.dumps({"status": "failed", "error": f"Invalid time calculation: {e}"}))
     sys.exit(1)
 
 dbg("")
