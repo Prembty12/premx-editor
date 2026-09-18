@@ -486,7 +486,7 @@ if [ "$PARSED_STATUS" == "reject" ]; then
     SHIFT_LOG="$SHIFT_DIR/${SELECTED_GAME_NAME}_shift_links.txt"
     
     echo "$SELECTED_LINE | REJECT (OpenRouter): $PARSED_REASON" >> "$SHIFT_LOG"
-    echo "   ✅ Shift file: $SHIFT_LOG"
+    echo "    ✅ Shift file: $SHIFT_LOG"
     
     python3 -c "
 import os
@@ -498,9 +498,19 @@ if os.path.exists(tf):
     cl = c.replace(sl, '').strip()
     with open(tf, 'w', encoding='utf-8') as f:
         f.write(cl + '\n\n')
-    print(f'   🗑️  Editor removed: {tf}')
+    print(f'    🗑️  Editor removed: {tf}')
 "
+
+    # 🛠️ GITHUB AUTO-COMMIT & PUSH (Root folder update karne ke liye)
+    echo "🚀 Pushing updated links to GitHub root repository..."
+    git config --global user.name "GitHub Actions Bot"
+    git config --global user.email "actions@github.com"
     
+    # Target file aur shift log dono ko git me add karo
+    git add "$TARGET_FILE" "$SHIFT_LOG"
+    git commit -m "Auto-shift: Rejected link removed & shifted [skip ci]"
+    git push origin HEAD:main  # ya origin master (agar aapka default branch master hai)
+
     RETRY_COUNT="${RETRY_COUNT:-0}"
     MAX_SCRIPT_RETRIES=3
     RETRY_COUNT=$((RETRY_COUNT + 1))
