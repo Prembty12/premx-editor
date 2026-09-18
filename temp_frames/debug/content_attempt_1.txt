@@ -1,1 +1,1 @@
-{"clip_duration": 35, "reason": "The grid displays continuous, active gameplay with a character running, exploring, and engaging in combat with visual effects in a forest setting.", "start_time": 5, "status": "APPROVE", "title": "Deep Forest Survival Run 🌲⚔️"}
+{"clip_duration": 20, "reason": "Real martial arts gameplay with active stick fighting and dynamic movement.", "start_time": 5, "status": "APPROVE", "title": "Stick Fight Fury 🥋🔥"}
