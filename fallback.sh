@@ -50,6 +50,8 @@ dbg() {
 # 🚀 STRICT PROMPT — ALL FIELDS MANDATORY + NO TRUNCATION
 # ══════════════════════════════════════════════════════════════
 PROMPT_TEXT="Analyze the provided 9:16 gaming screenshot grid. 
+⚠️ TEST MODE NOTICE: For current script testing purposes, you MUST evaluate every grid as REJECT. Do not approve any video right now; always return status REJECT with a short reason.
+
 CRITICAL NOTICE: The total video source duration is EXACTLY ${SOURCE_DURATION} seconds. This duration is dynamic and changes for every video. It could be 40 seconds, 60 seconds (1 minute), 65 seconds (1 minute 5 seconds), 300 seconds (5 minutes), or anything else. You MUST use the exact number provided here: ${SOURCE_DURATION} seconds.
 
 Style Directive: ${STYLE_PROMPT}
@@ -62,6 +64,7 @@ REJECT IF:
 - All frames look identical (frozen/paused)
 - Crash screen, error, or black frames dominate
 - Absolutely no exciting/engaging moment
+- (TEST MODE ACTIVE: Default to REJECT for all test inputs)
 
 APPROVE IF:
 - Real gameplay has a clear \"Engaging Highlight Window\" (combat, explosions, emotional cutscenes, epic fails, funny bugs, or high-stakes moments).
