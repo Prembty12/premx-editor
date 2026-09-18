@@ -1,7 +1,7 @@
 #!/bin/bash
 # ==============================================================================
-# 🚀 OPENROUTER FALLBACK AGENT
-# No Defaults + All Fields Mandatory + Multi-Method Parser + Full Debug
+# 🚀 OPENROUTER FALLBACK AGENT (STRICT NO-DEFAULTS EDITION)
+# Strict JSON Validation + No Defaults + Detailed Missing Field Debug
 # ==============================================================================
 
 export TZ='Asia/Kolkata'
@@ -47,7 +47,7 @@ dbg() {
 }
 
 # ══════════════════════════════════════════════════════════════
-# 🚀 STRICT PROMPT — ALL FIELDS MANDATORY
+# 🚀 STRICT PROMPT — ALL FIELDS MANDATORY + NO TRUNCATION
 # ══════════════════════════════════════════════════════════════
 PROMPT_TEXT="Analyze the provided 9:16 gaming screenshot grid. Total video source duration is ${SOURCE_DURATION} seconds.
 Style Directive: ${STYLE_PROMPT}
@@ -90,6 +90,7 @@ If APPROVE, ALL 5 FIELDS ARE MANDATORY:
 3. If REJECT: only status and reason required
 4. NO markdown, NO extra text, NO escaped quotes, ONLY the JSON object
 5. NO null values, NO empty values
+6. STOP GENERATING immediately after the closing curly bracket '}'. DO NOT TRUNCATE.
 
 VALID EXAMPLE:
 {\"status\": \"APPROVE\", \"title\": \"Epic Clutch 1v4 💀\", \"start_time\": 5, \"clip_duration\": 20, \"reason\": \"High tension clutch moment\"}
@@ -110,7 +111,7 @@ dbg "🎞️  Source Duration : ${SOURCE_DURATION}s"
 dbg "🔑 Keys Loaded     : ${#KEYS[@]}"
 dbg "🎯 Primary Model   : $PRIMARY_MODEL (Max 1 Try)"
 dbg "🔄 Fallback Model  : $FALLBACK_MODEL (Max 20 Tries)"
-dbg "⚙️  Defaults        : NONE (all fields mandatory)"
+dbg "⚙️  Defaults        : NONE (Strict No-Defaults Policy)"
 dbg "════════════════════════════════════════════════════════"
 dbg ""
 
@@ -159,7 +160,7 @@ schema = {
         "clip_duration": {"type": "integer", "minimum": 15, "maximum": source_duration},
         "reason": {"type": "string"}
     },
-    "required": ["status", "reason"],
+    "required": ["status", "reason", "title", "start_time", "clip_duration"],
     "additionalProperties": False
 }
 
@@ -174,18 +175,18 @@ payload = {
             {'type': 'image_url', 'image_url': {'url': f'data:image/jpeg;base64,{b64_img}'}}
         ]
     }],
-    'max_tokens': 4096,
-    'temperature': 0.3,
+    'max_tokens': 8192,       # Increased to prevent truncation
+    'temperature': 0.1,       # Decreased for strict JSON adherence
     'response_format': {
         'type': 'json_schema',
         'json_schema': {
             'name': 'video_edit_params',
-            'strict': False,
+            'strict': True,   # Enforce strict schema at API level
             'schema': schema
         }
     },
     'provider': {
-        'require_parameters': False if is_reasoning else True,
+        'require_parameters': True, # Force model to respect schema
         'ignore': ['nvidia/nemotron-3.5-content-safety:free']
     }
 }
@@ -280,7 +281,7 @@ except: print('')
         fi
         
         # ══════════════════════════════════════════════════════════
-        # VALIDATION — ALL FIELDS MANDATORY (no defaults)
+        # VALIDATION — NO DEFAULTS, EXACT MISSING FIELD TRACKING
         # ══════════════════════════════════════════════════════════
         IS_VALID_JSON=$(CONTENT="$CONTENT" python3 << 'PYEOF'
 import os, json, re, sys
@@ -289,7 +290,7 @@ raw = os.environ.get('CONTENT', '')
 
 def parse_json(raw_input):
     if not raw_input:
-        return None
+        return "invalid"
     
     clean = re.sub(r"```json\s*|\s*```", "", raw_input, flags=re.IGNORECASE).strip()
     clean = re.sub(r"<think>.*?</think>", "", clean, flags=re.DOTALL).strip()
@@ -334,7 +335,7 @@ def parse_json(raw_input):
                     except: pass
         except: pass
     
-    # Method 5: Manual regex — ALL FIELDS MANDATORY
+    # Method 5: Manual regex — EXACT MISSING FIELDS LOGGING
     status_match = re.search(r'"status"\s*:\s*"([^"]+)"', clean)
     if status_match:
         status_val = status_match.group(1).upper()
@@ -347,17 +348,15 @@ def parse_json(raw_input):
         if status_val == "REJECT":
             return {"status": "reject", "reason": reason_match.group(1) if reason_match else ""}
         
-        # ✅ APPROVE — ALL FIELDS MANDATORY (no defaults!)
+        # ✅ APPROVE — STRICT CHECK, NO DEFAULTS
         if status_val == "APPROVE":
-            # Title mandatory
-            if not title_match:
-                return None
-            # start_time mandatory
-            if not st_match:
-                return None
-            # clip_duration mandatory
-            if not dur_match:
-                return None
+            missing = []
+            if not title_match: missing.append("title")
+            if not st_match: missing.append("start_time")
+            if not dur_match: missing.append("clip_duration")
+            
+            if missing:
+                return f"invalid:missing:{','.join(missing)}"
             
             return {
                 "status": "APPROVE",
@@ -367,13 +366,16 @@ def parse_json(raw_input):
                 "reason": reason_match.group(1) if reason_match else ""
             }
     
-    return None
+    return "invalid"
 
 
 data = parse_json(raw)
 
-if not data or not isinstance(data, dict):
-    print("invalid")
+if data == "invalid" or not isinstance(data, dict):
+    if isinstance(data, str) and data.startswith("invalid:"):
+        print(data)
+    else:
+        print("invalid")
     sys.exit(0)
 
 status = str(data.get("status", "")).upper()
@@ -398,8 +400,13 @@ PYEOF
             SUCCESS_REQUESTED_MODEL="$CURRENT_MODEL"
             SUCCESS_ROUTED_MODEL="${ROUTED:-$CURRENT_MODEL}"
             break
+        elif [[ "$IS_VALID_JSON" == invalid:missing:* ]]; then
+            MISSING_FIELDS="${IS_VALID_JSON#invalid:missing:}"
+            dbg "    ⚠️  Invalid JSON. Missing fields: $MISSING_FIELDS. Retrying..."
+            sleep 1.5
+            continue
         else
-            dbg "    ⚠️  Invalid JSON (missing fields). Retrying..."
+            dbg "    ⚠️  Invalid JSON (format issue). Retrying..."
             sleep 1.5
             continue
         fi
@@ -500,7 +507,7 @@ def parse_json(raw_input):
                     except: pass
         except: pass
     
-    # Method 5: Manual regex — ALL FIELDS MANDATORY
+    # Method 5: Manual regex — NO DEFAULTS
     status_match = re.search(r'"status"\s*:\s*"([^"]+)"', clean)
     if status_match:
         status_val = status_match.group(1).upper()
@@ -514,7 +521,7 @@ def parse_json(raw_input):
         
         if status_val == "APPROVE":
             if not title_match or not st_match or not dur_match:
-                return None
+                return None # Strictly return None if missing, NO DEFAULTS
             return {
                 "status": "APPROVE",
                 "title": title_match.group(1),
@@ -556,11 +563,11 @@ if status_field == 'REJECT':
     }))
     sys.exit(0)
 
-# ✅ APPROVE — ALL FIELDS MANDATORY (no defaults)
+# ✅ APPROVE — STRICT CHECK, NO DEFAULTS
 missing = [k for k in ("title", "start_time", "clip_duration") if k not in data]
 if missing:
-    dbg(f"❌ Missing fields: {missing}")
-    print(json.dumps({"status": "failed", "error": f"Missing fields: {missing}"}))
+    dbg(f"❌ Missing fields at final validation: {missing}")
+    print(json.dumps({"status": "failed", "error": f"Missing fields at final validation: {missing}"}))
     sys.exit(1)
 
 raw_title = data.get('title', '')
