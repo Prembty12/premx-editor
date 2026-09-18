@@ -1,1 +1,1 @@
-{"clip_duration": 18, "reason": "Intense sniper bloodbath with explosions.", "start_time": 24, "status": "APPROVE", "title": "City Sniper Bloodbath Action 🩸🎯"}
+{"clip_duration": 15, "reason": "Test mode active: rejecting all test inputs.", "start_time": 10, "status": "REJECT", "title": "Tank battle action unfolds 🔥"}
