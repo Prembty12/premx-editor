@@ -166,13 +166,13 @@ if [ -z "$SOURCE_DURATION" ] || [ "$SOURCE_DURATION" -le 0 ] 2>/dev/null; then
     SOURCE_DURATION=60
 fi
 
-# 6. 📸 Frame Extraction & 9x10 Grid Generation Across Full Video (Supports < 1s intervals)
+# 6. 📸 Frame Extraction & Portrait Full-Screen 90-Grid Generation (Original Ratio Extraction)
 rm -f "$FRAMES_DIR"/*.jpg
-echo "📸 [STEP 6] Extracting 90 dynamic frames across source video (sub-second precision)..."
+echo "📸 [STEP 6] Extracting 90 frames preserving original proportions..."
 
 NUM_FRAMES=90
 
-# Generate precise fractional timestamps using Python (handles intervals < 1 second automatically)
+# Generate precise fractional timestamps
 timestamps=()
 while IFS= read -r ts; do
     timestamps+=("$ts")
@@ -189,24 +189,23 @@ for i in "${!timestamps[@]}"; do
     ts="${timestamps[$i]}"
     frame_path="$FRAMES_DIR/frame_$idx.jpg"
     
-    # Extract frame using exact sub-second timestamp
-    ffmpeg -y -ss "$ts" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel info
+    # Bina kisi forced crop ke, original source dimensions par extract karega taaki subtitles na katein
+    ffmpeg -y -ss "$ts" -i "$SELECTED_URL" -frames:v 1 -q:v 2 -vf "scale=iw:ih" "$frame_path" -loglevel info
     
-    # Fallback if frame extraction fails
     if [ ! -f "$frame_path" ] || [ ! -s "$frame_path" ]; then
-        ffmpeg -y -ss "0" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel info
+        ffmpeg -y -ss "0" -i "$SELECTED_URL" -frames:v 1 -q:v 2 -vf "scale=iw:ih" "$frame_path" -loglevel info
     fi
 done
 
-GRID_PATH="$FRAMES_DIR/merged_90_grid_screenshot.jpg"
-echo "🧩 Merging frames into 9x10 grid (3840x2160)..."
+GRID_PATH="$FRAMES_DIR/merged_90_grid_portrait.jpg"
+echo "🧩 Merging frames into Portrait 9x10 grid..."
 
 TIMESTAMPS_STR="${timestamps[*]}" python3 - << 'EOF'
 import os
 import subprocess
 
 frames_dir = 'temp_frames'
-grid_path = os.path.join(frames_dir, 'merged_90_grid_screenshot.jpg')
+grid_path = os.path.join(frames_dir, 'merged_90_grid_portrait.jpg')
 
 try:
     from PIL import Image, ImageDraw
@@ -217,11 +216,21 @@ except ImportError:
 timestamps_env = os.environ.get('TIMESTAMPS_STR', '')
 timestamps = timestamps_env.split()
 
+# --- PORTRAIT FULL-SCREEN CONFIGURATION ---
+TOTAL_COLS = 10
+TOTAL_ROWS = 9
+
+GRID_WIDTH = 2160
+GRID_HEIGHT = 3840
+
+FRAME_WIDTH = GRID_WIDTH // TOTAL_COLS
+FRAME_HEIGHT = GRID_HEIGHT // TOTAL_ROWS
+# ------------------------------------------
+
 for i in range(1, 91):
     frame_path = os.path.join(frames_dir, f'frame_{i}.jpg')
     raw_ts = timestamps[i-1] if (i-1) < len(timestamps) else "0.000"
     
-    # Convert raw seconds into clean MM:SS format for the visual label
     try:
         total_sec = float(raw_ts)
         m = int(total_sec // 60)
@@ -232,12 +241,14 @@ for i in range(1, 91):
 
     if os.path.exists(frame_path) and os.path.getsize(frame_path) > 0:
         try:
-            # Resize each frame to 384x240 for 9x10 layout (Total 4K: 3840x2160)
-            im = Image.open(frame_path).resize((384, 240))
+            im = Image.open(frame_path).resize((FRAME_WIDTH, FRAME_HEIGHT), Image.Resampling.LANCZOS)
+            
+            # Aapka pasandida compact timestamp box aur default font style
             draw = ImageDraw.Draw(im)
-            draw.rectangle([8, 8, 95, 30], fill=(0, 0, 0))
-            draw.text((12, 12), ts_label, fill=(255, 255, 255))
-            im.save(frame_path, 'JPEG', quality=90)
+            draw.rectangle([6, 6, 85, 26], fill=(0, 0, 0))
+            draw.text((9, 9), ts_label, fill=(255, 255, 255))
+            
+            im.save(frame_path, 'JPEG', quality=95)
         except Exception as e:
             print(f"⚠️ Frame processing error at {i}: {e}")
 
@@ -248,20 +259,23 @@ for i in range(1, 91):
         try:
             im = Image.open(img_path)
         except Exception:
-            im = Image.new('RGB', (384, 240), (0, 0, 0))
+            im = Image.new('RGB', (FRAME_WIDTH, FRAME_HEIGHT), (0, 0, 0))
     else:
-        im = Image.new('RGB', (384, 240), (0, 0, 0))
+        im = Image.new('RGB', (FRAME_WIDTH, FRAME_HEIGHT), (0, 0, 0))
     images.append(im)
 
-# Canvas size: 3840 x 2160 (10 columns, 9 rows for 90 frames)
-grid_img = Image.new('RGB', (3840, 2160))
-for idx, im in enumerate(images):
-    col = idx % 10
-    row = idx // 10
-    grid_img.paste(im, (col * 384, row * 240))
+# --- CREATE PORTRAIT FULL-SCREEN GRID ---
+grid_img = Image.new('RGB', (GRID_WIDTH, GRID_HEIGHT))
 
-grid_img.save(grid_path, 'JPEG', quality=90)
-print("✅ 90-frame grid screenshot created successfully.")
+print(f"Creating Portrait Full-Screen grid of size: {GRID_WIDTH} x {GRID_HEIGHT}")
+
+for idx, im in enumerate(images):
+    col = idx % TOTAL_COLS
+    row = idx // TOTAL_COLS
+    grid_img.paste(im, (col * FRAME_WIDTH, row * FRAME_HEIGHT))
+
+grid_img.save(grid_path, 'JPEG', quality=95)
+print(f"✅ Portrait Full-Screen 90-frame grid created successfully at '{grid_path}'.")
 EOF
 
 # 7. 🤖 Gemini Smart JSON Analysis
