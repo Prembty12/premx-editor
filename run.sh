@@ -1,55 +1,33 @@
 #!/bin/bash
 # ==========================================
-# 🤖 TRUE AI AGENT FULLY AUTOMATED PIPELINE
-# 3 Retries on REJECT + Link Shift + Full Debug
+# 🤖 TRUE AI AGENT FULLY AUTOMATED PIPELINE (FIXED PARSING & MODEL)
 # ==========================================
-
-export TZ='Asia/Kolkata'
-if ! date '+%Z' 2>/dev/null | grep -qi 'IST'; then
-    export TZ='IST-5:30'
-fi
 
 BASE="."
 API="https://graph.facebook.com/v24.0"
 LINKS_DIR="game_links_editor"
 POSTED_DIR="posted_links_editor"
-SHIFT_DIR="game_links_shift"
 FRAMES_DIR="temp_frames"
 
 GAME_LINKS_DIR="$BASE/$LINKS_DIR"
 POSTED_LINKS_DIR="$BASE/$POSTED_DIR"
-GAME_SHIFT_DIR="$BASE/$SHIFT_DIR"
-mkdir -p "$GAME_LINKS_DIR" "$POSTED_LINKS_DIR" "$GAME_SHIFT_DIR" "$FRAMES_DIR" "logs"
+mkdir -p "$GAME_LINKS_DIR" "$POSTED_LINKS_DIR" "$FRAMES_DIR" "logs"
 
 LOG_FILE="logs/pipeline_debug.log"
 exec > >(tee -a "$LOG_FILE") 2>&1
 
-# ══════════════════════════════════════════════════════════════
-# 🔁 SCRIPT RETRY COUNTER (3 max)
-# ══════════════════════════════════════════════════════════════
-RETRY_COUNT="${RETRY_COUNT:-0}"
-MAX_SCRIPT_RETRIES=3
-
-echo ""
-echo "════════════════════════════════════════════════════════"
-echo "🚀 Pipeline Started at: $(date '+%Y-%m-%d %H:%M:%S IST')"
-echo "🔁 Script Retry: $RETRY_COUNT / $MAX_SCRIPT_RETRIES"
-echo "════════════════════════════════════════════════════════"
-
-# Max retries check
-if [ $RETRY_COUNT -ge $MAX_SCRIPT_RETRIES ]; then
-    echo ""
-    echo "🚫 Max script retries ($MAX_SCRIPT_RETRIES) reached. Exiting."
-    echo "🏁 Finished at: $(date '+%Y-%m-%d %H:%M:%S IST')"
-    exit 0
-fi
+echo "===================================================="
+echo "🚀 Pipeline Started at: $(date)"
+echo "===================================================="
 
 GEMINI_KEYS=("$GEMINI_API_KEY_1" "$GEMINI_API_KEY_2" "$GEMINI_API_KEY_3")
 
 get_random_gemini_key() {
     local valid_keys=()
     for k in "${GEMINI_KEYS[@]}"; do
-        [ -n "$k" ] && valid_keys+=("$k")
+        if [ -n "$k" ]; then
+            valid_keys+=("$k")
+        fi
     done
     if [ ${#valid_keys[@]} -eq 0 ]; then
         echo "$GEMINI_API_KEY_1"
@@ -62,34 +40,30 @@ get_random_gemini_key() {
 DEFAULT_POST_MODE="${POST_MODE:-1}"
 MIN_CLIP_DURATION=12
 
-# ═════════════════════════════════════════════════════════════
-# 0. Cookie Health Check
-# ═════════════════════════════════════════════════════════════
+# 0. 🍪 Pre-Flight Cookie Health Check
 echo "🔍 [STEP 0] Checking Facebook Cookie Session Health..."
 python3 cookie_checker.py
 if [ $? -ne 0 ]; then
-    echo "❌ [ERROR] Pipeline halted due to invalid cookies."
+    echo "❌ [ERROR] Pipeline halted due to invalid or expired Facebook cookies."
     exit 1
 fi
 
-# ═════════════════════════════════════════════════════════════
-# 1. Insights Update
-# ═════════════════════════════════════════════════════════════
-echo "📈 [STEP 1] Pulling analytics..."
+# 1. 📊 Update Past Performance & Insights
+echo "📈 [STEP 1] Pulling real analytics and insights from past posts..."
 python3 insights_tracker.py
 
-# ═════════════════════════════════════════════════════════════
-# 2. Check 3 Hours Gap
-# ═════════════════════════════════════════════════════════════
+# 2. ⏳ Check 3 Hours Gap
 if [ "$DEFAULT_POST_MODE" != "2" ] && [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$PAGE_ID" ]; then
-    echo "🔍 [STEP 2] Checking last post time..."
+    echo "🔍 [STEP 2] Checking last post time on Facebook Page..."
     
     LAST_POST_CHECK=$(python3 -c "
 import requests
 from datetime import datetime, timezone
+
 page_id = '$PAGE_ID'
 token = '$PAGE_ACCESS_TOKEN'
 url = f'https://graph.facebook.com/v24.0/{page_id}/feed?access_token={token}&limit=1'
+
 try:
     res = requests.get(url).json()
     if 'data' in res and len(res['data']) > 0:
@@ -101,7 +75,7 @@ try:
     else:
         print('LAST_POST_HOURS:999')
 except Exception as e:
-    print(f'LAST_POST_HOURS:999')
+    print(f'LAST_POST_HOURS:999 (Error: {e})')
 ")
 
     HOURS_AGO=$(echo "$LAST_POST_CHECK" | grep "LAST_POST_HOURS" | cut -d':' -f2)
@@ -110,18 +84,16 @@ except Exception as e:
     if [ -n "$HOURS_AGO" ]; then
         IS_LESS_THAN_3=$(python3 -c "print('yes' if float('$HOURS_AGO' or '0') < 3.0 else 'no')")
         if [ "$IS_LESS_THAN_3" == "yes" ]; then
-            echo "⏳ 3 ghante gap poora nahi hua! Sirf $HOURS_AGO ghante."
+            echo "⏳ 3 ghante ka gap poora nahi hua hai! Sirf $HOURS_AGO ghante hue hain."
             exit 0
         else
-            echo "✅ 3 ghante gap poora."
+            echo "✅ 3 ghante ka gap poora ho chuka hai."
         fi
     fi
 fi
 
-# ═════════════════════════════════════════════════════════════
-# 3. AI Agent Brain
-# ═════════════════════════════════════════════════════════════
-echo "🤖 [STEP 3] Consulting AI Agent Brain..."
+# 3. 🧠 AI AGENT BRAIN
+echo "🤖 [STEP 3] Consulting AI Agent Brain (ai_agent.py)..."
 AGENT_OUTPUT=$(python3 ai_agent.py)
 echo "🧠 AI Agent Raw Output: $AGENT_OUTPUT"
 
@@ -130,26 +102,25 @@ SELECTED_GAME_NAME=$(echo "$AGENT_OUTPUT" | python3 -c "import sys, json; print(
 SELECTED_STYLE=$(echo "$AGENT_OUTPUT" | python3 -c "import sys, json; print(json.load(sys.stdin).get('chosen_style', 'curiosity'))" 2>/dev/null)
 
 if [ -z "$TARGET_FILE" ] || [ "$TARGET_FILE" == "None" ] || [ ! -f "$TARGET_FILE" ]; then
-    echo "⚠️ [WARNING] No valid game file found. Target: $TARGET_FILE"
+    echo "⚠️ [WARNING] AI Agent ko koi valid game file nahi mili! Target File: $TARGET_FILE"
     exit 0
 fi
 
 GAME_POSTED_LOG="$POSTED_LINKS_DIR/${SELECTED_GAME_NAME}_posted_links_editor.txt"
-GAME_SHIFT_LOG="$GAME_SHIFT_DIR/${SELECTED_GAME_NAME}_shift_links.txt"
-echo "🎮 Selected Game: $SELECTED_GAME_NAME | File: $TARGET_FILE | Style: $SELECTED_STYLE"
+echo "🎮 Selected Game: $SELECTED_GAME_NAME | Target File: $TARGET_FILE | Style: $SELECTED_STYLE"
 
-# ═════════════════════════════════════════════════════════════
-# 4. Parse Link
-# ═════════════════════════════════════════════════════════════
-echo "🔗 [STEP 4] Parsing link..."
+# 4. Parse and Validate Link
+echo "🔗 [STEP 4] Parsing and validating link from target file..."
 PARSED_DATA=$(TARGET_FILE="$TARGET_FILE" python3 -c "
 import sys, json, os, random
 target = os.environ.get('TARGET_FILE', '')
 if not os.path.exists(target):
     print('{}')
     sys.exit(0)
+
 with open(target, 'r', encoding='utf-8', errors='ignore') as f:
     content = f.read()
+
 lines = [l.strip() for l in content.split('\n') if l.strip()]
 valid_pairs = []
 for line in lines:
@@ -165,9 +136,11 @@ for line in lines:
             if not title:
                 title = os.path.basename(url).split('?')[0]
             valid_pairs.append({'title': title, 'url': url, 'raw': line})
+
 if not valid_pairs:
     print('{}')
     sys.exit(0)
+
 chosen = random.choice(valid_pairs)
 print(json.dumps({'title': chosen['title'], 'url': chosen['url'], 'raw': chosen['raw']}))
 ")
@@ -176,28 +149,26 @@ SELECTED_URL=$(echo "$PARSED_DATA" | python3 -c "import sys, json; print(json.lo
 SELECTED_LINE=$(echo "$PARSED_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('raw', ''))" 2>/dev/null)
 
 if [ -z "$SELECTED_URL" ]; then
-    echo "⚠️ [WARNING] No valid link found."
+    echo "⚠️ [WARNING] Is file me koi valid link nahi mila."
     exit 0
 fi
 
-echo "🔗 Validated Link: $SELECTED_URL"
+echo "🔗 Validated Link Found: $SELECTED_URL"
 
-# ═════════════════════════════════════════════════════════════
-# 5. Get Duration
-# ═════════════════════════════════════════════════════════════
-echo "✂️ [STEP 5] Checking source video duration..."
+# 5. ⏱️ Get Source Video Duration
+echo "✂️ [STEP 5] Checking source video total duration via ffprobe..."
 SOURCE_DURATION=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$SELECTED_URL" 2>/dev/null)
+echo "⏱️ Raw ffprobe duration output: '$SOURCE_DURATION'"
 SOURCE_DURATION=${SOURCE_DURATION%.*}
+
 if [ -z "$SOURCE_DURATION" ] || [ "$SOURCE_DURATION" -le 0 ] 2>/dev/null; then
+    echo "⚠️ [WARNING] ffprobe duration failed or returned 0. Defaulting source duration to 60s."
     SOURCE_DURATION=60
 fi
-echo "⏱️ Source Duration: ${SOURCE_DURATION}s"
 
-# ═════════════════════════════════════════════════════════════
-# 6. Extract Frames & Build Grid
-# ═════════════════════════════════════════════════════════════
+# 6. 📸 Frame Extraction & 6x10 Grid Generation Across Full Video
 rm -f "$FRAMES_DIR"/*.jpg
-echo "📸 [STEP 6] Extracting 60 frames..."
+echo "📸 [STEP 6] Extracting 60 dynamic frames across source video..."
 
 NUM_FRAMES=60
 interval=$((SOURCE_DURATION / NUM_FRAMES))
@@ -217,71 +188,83 @@ for i in "${!timestamps[@]}"; do
     idx=$((i+1))
     ts="${timestamps[$i]}"
     frame_path="$FRAMES_DIR/frame_$idx.jpg"
-    ffmpeg -y -ss "$ts" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel error
+    ffmpeg -y -ss "$ts" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel info
     if [ ! -f "$frame_path" ] || [ ! -s "$frame_path" ]; then
-        ffmpeg -y -ss "00:00:01" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel error
+        ffmpeg -y -ss "00:00:01" -i "$SELECTED_URL" -vframes 1 -q:v 2 "$frame_path" -loglevel info
     fi
 done
 
 GRID_PATH="$FRAMES_DIR/merged_60_grid_screenshot.jpg"
-echo "🧩 Merging frames into 6x10 grid..."
+echo "🧩 Merging frames into 6x10 vertical grid (2592x3840)..."
 
 TIMESTAMPS_STR="${timestamps[*]}" python3 - << 'EOF'
-import os, subprocess
+import os
+import subprocess
+
 frames_dir = 'temp_frames'
 grid_path = os.path.join(frames_dir, 'merged_60_grid_screenshot.jpg')
+
 try:
     from PIL import Image, ImageDraw
 except ImportError:
     subprocess.run(["pip", "install", "Pillow"], check=True)
     from PIL import Image, ImageDraw
+
 timestamps_env = os.environ.get('TIMESTAMPS_STR', '')
 timestamps = timestamps_env.split()
+
 for i in range(1, 61):
     frame_path = os.path.join(frames_dir, f'frame_{i}.jpg')
     ts = timestamps[i-1] if (i-1) < len(timestamps) else "00:00:00"
     if os.path.exists(frame_path) and os.path.getsize(frame_path) > 0:
         try:
+            # Resize each frame to 432x384
             im = Image.open(frame_path).resize((432, 384))
             draw = ImageDraw.Draw(im)
             draw.rectangle([10, 10, 120, 40], fill=(0, 0, 0))
             draw.text((13, 15), ts, fill=(255, 255, 255))
             im.save(frame_path, 'JPEG', quality=80)
-        except: pass
+        except Exception as e:
+            print(f"⚠️ Frame processing error at {i}: {e}")
+
 images = []
 for i in range(1, 61):
     img_path = os.path.join(frames_dir, f'frame_{i}.jpg')
     if os.path.exists(img_path) and os.path.getsize(img_path) > 0:
-        try: im = Image.open(img_path)
-        except: im = Image.new('RGB', (432, 384), (0, 0, 0))
+        try:
+            im = Image.open(img_path)
+        except Exception:
+            im = Image.new('RGB', (432, 384), (0, 0, 0))
     else:
         im = Image.new('RGB', (432, 384), (0, 0, 0))
     images.append(im)
+
+# Canvas size: 2592 x 3840 (6 columns, 10 rows)
 grid_img = Image.new('RGB', (2592, 3840))
 for idx, im in enumerate(images):
     col = idx % 6
     row = idx // 6
     grid_img.paste(im, (col * 432, row * 384))
+
 grid_img.save(grid_path, 'JPEG', quality=85)
-print("✅ Grid created.")
+print("✅ 60-frame grid screenshot created successfully.")
 EOF
 
-# ═════════════════════════════════════════════════════════════
-# 7. Gemini Analysis
-# ═════════════════════════════════════════════════════════════
-echo ""
-echo "🤖 [STEP 7] Asking Gemini..."
+# 7. 🤖 Gemini Smart JSON Analysis
+echo "🤖 [STEP 7] Sending grid & past insights to Gemini for Smart Action Cutting Decision..."
 
 INSIGHTS_SUMMARY=$(python3 -c "
 import os, json
-mf = 'logs/agent_memory.json'
-if os.path.exists(mf):
+memory_file = 'logs/agent_memory.json'
+if os.path.exists(memory_file):
     try:
-        with open(mf) as f:
-            d = json.load(f)
-            print(f'Memory: {d.get(\"game_scores\", {})}')
-    except: print('No memory.')
-else: print('Fresh run.')
+        with open(memory_file, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            print(f'Top Game Scores: {data.get(\"game_scores\", {})}, Styles: {data.get(\"title_styles\", {})}')
+    except:
+        print('No prior memory stats.')
+else:
+    print('Fresh run.')
 ")
 
 if [ "$SELECTED_STYLE" == "aggressive" ]; then
@@ -291,15 +274,15 @@ elif [ "$SELECTED_STYLE" == "question" ]; then
 elif [ "$SELECTED_STYLE" == "emoji_heavy" ]; then
     STYLE_PROMPT="Create a fast-paced viral gaming title with strong emojis."
 else
-    STYLE_PROMPT="Create a high-curiosity viral Reels hook title (6-10 words)."
+    STYLE_PROMPT="Create a high-curiosity viral Facebook/Instagram Reels hook title (6-10 words preferred)."
 fi
 
 GEMINI_JSON_RESULT=""
-MAX_TOTAL_RETRIES=2
+MAX_TOTAL_RETRIES=4
 
 for ((attempt=1; attempt<=MAX_TOTAL_RETRIES; attempt++)); do
     CURRENT_GEMINI_KEY=$(get_random_gemini_key)
-    echo "   🤖 Gemini Attempt $attempt/$MAX_TOTAL_RETRIES (Key: ${CURRENT_GEMINI_KEY:0:10}...)"
+    echo "🤖 Gemini Attempt $attempt/$MAX_TOTAL_RETRIES (Key used: ${CURRENT_GEMINI_KEY:0,6}...)"
     
     if [ -f "$GRID_PATH" ]; then
         file_size=$(wc -c < "$GRID_PATH")
@@ -309,7 +292,6 @@ for ((attempt=1; attempt<=MAX_TOTAL_RETRIES; attempt++)); do
           -H "X-Goog-Upload-Header-Content-Length: $file_size" \
           -H "X-Goog-Upload-Header-Content-Type: image/jpeg" \
           -H "Content-Type: application/json" \
-          --connect-timeout 10 -m 30 \
           -d '{"file": {"display_name": "GridScreenshot"}}')
 
         gemini_upload_url=$(echo "$upload_res" | grep -i "x-goog-upload-url:" | tr -d '\r' | cut -d' ' -f2)
@@ -320,44 +302,32 @@ for ((attempt=1; attempt<=MAX_TOTAL_RETRIES; attempt++)); do
               -H "X-Goog-Upload-Command: upload, finalize" \
               -H "X-Goog-Upload-Offset: 0" \
               -H "Content-Length: $file_size" \
-              --connect-timeout 10 -m 30 \
               --data-binary "@$GRID_PATH")
 
             file_uri=$(echo "$finalize_res" | jq -r '.file.uri // empty')
             
             if [ -n "$file_uri" ]; then
                 file_name_g_api=$(echo "$file_uri" | awk -F'/' '{print $NF}')
-                sc=0
-                while [ $sc -lt 10 ]; do
-                    state=$(curl -s --connect-timeout 5 -m 10 "https://generativelanguage.googleapis.com/v1beta/files/$file_name_g_api?key=$CURRENT_GEMINI_KEY" | jq -r '.state // empty')
+                
+                state_check_counter=0
+                while [ $state_check_counter -lt 10 ]; do
+                    state=$(curl -s "https://generativelanguage.googleapis.com/v1beta/files/$file_name_g_api?key=$CURRENT_GEMINI_KEY" | jq -r '.state // empty')
                     [ "$state" = "ACTIVE" ] && break
                     sleep 1
-                    sc=$((sc + 1))
+                    state_check_counter=$((state_check_counter + 1))
                 done
 
                 if [ "$state" = "ACTIVE" ]; then
-                    prompt_text="Analyze this 9:16 gaming grid. Video duration: ${SOURCE_DURATION}s.
-Style: $STYLE_PROMPT
+                    prompt_text="Analyze the provided 9:16 gaming screenshot grid. Total video source duration is $SOURCE_DURATION seconds.
+Insights Context: $INSIGHTS_SUMMARY
+Style Directive: $STYLE_PROMPT
 
-YOUR TASK: Decide APPROVE or REJECT.
-
-REJECT IF:
-- ONLY menus, login screens, or loading screens
-- No actual gameplay visible in any frame
-- All frames identical (frozen)
-- Black/crash/error frames dominate
-- No exciting moment
-
-APPROVE IF:
-- Any real gameplay visible
-- Any action or engaging moment exists
-
-STRICT JSON ONLY:
-
-If REJECT: {\"status\": \"REJECT\", \"reason\": \"<1-line>\"}
-If APPROVE: {\"status\": \"APPROVE\", \"title\": \"<6-10 words with 1-3 emojis>\", \"start_time\": \"<HH:MM:SS>\", \"clip_duration\": <integer 12-45>, \"reason\": \"<1-line>\"}
-
-NO markdown. ONLY JSON."
+Your primary job as an expert video editor is to find the most thrilling, high-action segment, skipping dull introductions.
+Return a JSON object with EXACTLY three keys:
+1. 'title' (string: viral title with 1-3 emojis)
+2. 'start_time' (string format HH:MM:SS indicating exact peak action start time based on grid timestamps)
+3. 'clip_duration' (integer: length between 12 and 45 seconds meeting monetization rules)
+Return ONLY valid JSON format, no markdown wrapping."
 
                     payload=$(jq -n \
                       --arg uri "$file_uri" \
@@ -366,12 +336,11 @@ NO markdown. ONLY JSON."
                       '{contents: [{parts: [{file_data: {file_uri: $uri, mime_type: $mime}}, {text: $ptext}]}]}')
 
                     gemini_resp=$(curl -s -X POST -H "Content-Type: application/json" \
-                      --connect-timeout 10 -m 30 \
                       "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$CURRENT_GEMINI_KEY" \
                       -d "$payload")
 
                     GEMINI_JSON_RESULT=$(echo "$gemini_resp" | jq -r '.candidates[0].content.parts[0].text // empty')
-                    echo "   📥 Gemini: ${GEMINI_JSON_RESULT:0:150}..."
+                    echo "🤖 Gemini JSON Response: '$GEMINI_JSON_RESULT'"
                 fi
             fi
         fi
@@ -380,37 +349,29 @@ NO markdown. ONLY JSON."
     if [ -n "$GEMINI_JSON_RESULT" ] && [ "$GEMINI_JSON_RESULT" != "null" ]; then
         break
     else
-        echo "   ⚠️ Attempt $attempt failed."
+        echo "⚠️ Gemini attempt $attempt failed. Retrying..."
         GEMINI_JSON_RESULT=""
-        sleep 1
+        sleep 3
     fi
 done
 
-# Parse Gemini
+# Safe Python JSON Parser using Heredoc (Fixed Syntax Error)
 PARSED_JSON_DATA=$(GEMINI_RAW="$GEMINI_JSON_RESULT" python3 - << 'EOF'
 import json, re, sys, os
 
 raw = os.environ.get('GEMINI_RAW', '')
 cleaned = re.sub(r'```json', '', raw, flags=re.IGNORECASE)
 cleaned = re.sub(r'```', '', cleaned).strip()
-cleaned = re.sub(r'<think>.*?</think>', '', cleaned, flags=re.DOTALL).strip()
 
 data = {}
 try:
-    match = re.search(r'\{.*\}', cleaned, re.DOTALL)
+    match = re.search(r'\{.*?\}', cleaned, re.DOTALL)
     if match:
         data = json.loads(match.group(0))
     else:
         data = json.loads(cleaned)
 except Exception as e:
-    print(json.dumps({'status': 'failed', 'error': str(e)}))
-    sys.exit(0)
-
-status_field = str(data.get('status', '')).strip().upper()
-reason = str(data.get('reason', '')).strip()
-
-if status_field == 'REJECT':
-    print(json.dumps({'status': 'reject', 'reason': reason or 'Gemini rejected'}))
+    print(json.dumps({'status': 'failed', 'error': str(e), 'raw': raw}))
     sys.exit(0)
 
 title = data.get('title')
@@ -418,34 +379,62 @@ start_time = data.get('start_time')
 duration = data.get('clip_duration')
 
 if not title or not start_time or not duration:
-    print(json.dumps({'status': 'failed', 'error': 'Missing keys'}))
+    print(json.dumps({'status': 'failed', 'error': 'Missing keys in JSON'}))
 else:
     try:
         dur_int = int(duration)
         if dur_int < 12: dur_int = 12
-        if dur_int > 45: dur_int = 45
-        print(json.dumps({'status': 'success', 'title': title, 'start_time': start_time, 'duration': dur_int, 'reason': reason}))
+        print(json.dumps({'status': 'success', 'title': title, 'start_time': start_time, 'duration': dur_int}))
     except:
-        print(json.dumps({'status': 'failed', 'error': 'Invalid duration'}))
+        print(json.dumps({'status': 'failed', 'error': 'Invalid duration format'}))
 EOF
 )
 
-PARSED_STATUS=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys,json;print(json.load(sys.stdin).get('status','failed'))" 2>/dev/null)
-PARSED_REASON=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys,json;print(json.load(sys.stdin).get('reason',''))" 2>/dev/null)
+PARSED_STATUS=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status', 'failed'))" 2>/dev/null)
+PARSED_REASON=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('reason', ''))" 2>/dev/null)
 
-# ═════════════════════════════════════════════════════════════
-# 🚫 GEMINI REJECT → Link SHIFT karo
-# ═════════════════════════════════════════════════════════════
+# Agar Gemini fail ho gaya, toh exit karne ke bajaye Fallback Brain ko bulao
+if [ "$PARSED_STATUS" != "success" ]; then
+    echo "⚠️ Gemini failed. Triggering Fallback Brain (OpenRouter)..."
+    
+    export GRID_PATH
+    export SOURCE_DURATION
+    export INSIGHTS_SUMMARY
+    export STYLE_PROMPT
+    
+        PARSED_JSON_DATA=$(bash fallback.sh)
+    echo "🧠 Fallback AI Final Response: $PARSED_JSON_DATA"
+    
+    # 🛡️ Safety filter: Sirf last wala valid JSON block extract karega
+    PARSED_JSON_DATA=$(echo "$PARSED_JSON_DATA" | python3 -c "
+import sys, re, json
+raw = sys.stdin.read()
+match = re.search(r'\{.*\}', raw, re.DOTALL)
+if match:
+    try:
+        data = json.loads(match.group(0))
+        print(json.dumps(data))
+    except:
+        print('{\"status\": \"failed\"}')
+else:
+    print('{\"status\": \"failed\"}')
+")
+
+    PARSED_STATUS=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status', 'failed'))" 2>/dev/null)
+    PARSED_REASON=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('reason', ''))" 2>/dev/null)
+fi
+
+# 🚫 OpenRouter REJECT → Link SHIFT + Script Retry (3x)
 if [ "$PARSED_STATUS" == "reject" ]; then
-    echo ""
-    echo "🚫 GEMINI NE REJECT KIYA"
-    echo "   💬 Reason : $PARSED_REASON"
-    echo "   🔗 Link   : $SELECTED_URL"
-    echo ""
+    echo "🚫 OPENROUTER NE REJECT KIYA: $PARSED_REASON"
     echo "📦 Link ko SHIFT kar raha hoon..."
     
-    echo "$SELECTED_LINE | REJECT (Gemini): $PARSED_REASON" >> "$GAME_SHIFT_LOG"
-    echo "   ✅ Shift file: $GAME_SHIFT_LOG"
+    SHIFT_DIR="game_links_shift"
+    mkdir -p "$SHIFT_DIR"
+    SHIFT_LOG="$SHIFT_DIR/${SELECTED_GAME_NAME}_shift_links.txt"
+    
+    echo "$SELECTED_LINE | REJECT (OpenRouter): $PARSED_REASON" >> "$SHIFT_LOG"
+    echo "   ✅ Shift file: $SHIFT_LOG"
     
     python3 -c "
 import os
@@ -459,260 +448,230 @@ if os.path.exists(tf):
         f.write(cl + '\n\n')
     print(f'   🗑️  Editor removed: {tf}')
 "
-fi
-
-# ═════════════════════════════════════════════════════════════
-# 🔄 Fallback: OpenRouter (Gemini fail ya reject)
-# ═════════════════════════════════════════════════════════════
-if [ "$PARSED_STATUS" != "success" ]; then
-    echo ""
-    echo "════════════════════════════════════════════════════════"
-    echo "🔄 Triggering OpenRouter Fallback..."
-    echo "════════════════════════════════════════════════════════"
     
-    export GRID_PATH SOURCE_DURATION INSIGHTS_SUMMARY STYLE_PROMPT
-    
-    FB_RAW=$(bash fallback.sh 2>&1 | tee /tmp/fb_debug.log)
-    echo "$FB_RAW" | grep -v '^{' >&2
-    
-    PARSED_JSON_DATA=$(echo "$FB_RAW" | python3 -c "
-import sys, re, json
-raw = sys.stdin.read()
-matches = list(re.finditer(r'\{[^{}]*\}', raw, re.DOTALL))
-if matches:
-    try:
-        print(json.dumps(json.loads(matches[-1].group(0))))
-    except:
-        print('{\"status\":\"failed\"}')
-else:
-    print('{\"status\":\"failed\"}')
-")
-    
-    PARSED_STATUS=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys,json;print(json.load(sys.stdin).get('status','failed'))" 2>/dev/null)
-    PARSED_REASON=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys,json;print(json.load(sys.stdin).get('reason',''))" 2>/dev/null)
-    
-    echo ""
-    echo "🧠 OpenRouter Status : $PARSED_STATUS"
-    echo "🧠 OpenRouter Reason : $PARSED_REASON"
-fi
-
-# ═════════════════════════════════════════════════════════════
-# 🚫 OPENROUTER REJECT → Link SHIFT + Script Retry
-# ═════════════════════════════════════════════════════════════
-if [ "$PARSED_STATUS" == "reject" ]; then
-    echo ""
-    echo "🚫 OPENROUTER NE BHI REJECT KIYA"
-    echo "   💬 Reason : $PARSED_REASON"
-    echo ""
-    echo "📦 Link ko SHIFT kar raha hoon..."
-    
-    if [ "$PARSED_REASON" != *"Gemini"* ]; then
-        echo "$SELECTED_LINE | REJECT (OpenRouter): $PARSED_REASON" >> "$GAME_SHIFT_LOG"
-        echo "   ✅ Shift file: $GAME_SHIFT_LOG"
-        
-        python3 -c "
-import os
-tf = '$TARGET_FILE'
-sl = '''$SELECTED_LINE'''
-if os.path.exists(tf):
-    with open(tf, 'r', encoding='utf-8', errors='ignore') as f:
-        c = f.read()
-    cl = c.replace(sl, '').strip()
-    with open(tf, 'w', encoding='utf-8') as f:
-        f.write(cl + '\n\n')
-    print(f'   🗑️  Editor removed: {tf}')
-"
-    fi
-    
-    # 🔁 SCRIPT RETRY
+    RETRY_COUNT="${RETRY_COUNT:-0}"
+    MAX_SCRIPT_RETRIES=3
     RETRY_COUNT=$((RETRY_COUNT + 1))
     export RETRY_COUNT
     
-    echo ""
-    echo "════════════════════════════════════════════════════════"
-    echo "🔁 SCRIPT RETRY $RETRY_COUNT / $MAX_SCRIPT_RETRIES"
-    echo "   🕐 $(date '+%Y-%m-%d %H:%M:%S IST')"
-    echo "════════════════════════════════════════════════════════"
-    echo ""
-    
     if [ $RETRY_COUNT -lt $MAX_SCRIPT_RETRIES ]; then
+        echo "🔁 SCRIPT RETRY $RETRY_COUNT / $MAX_SCRIPT_RETRIES"
         sleep 2
         exec bash "$0"
     else
         echo "🚫 Max script retries ($MAX_SCRIPT_RETRIES) reached"
-        echo "🏁 Pipeline Finished at: $(date '+%Y-%m-%d %H:%M:%S IST')"
         exit 0
     fi
 fi
 
-# ═════════════════════════════════════════════════════════════
-# ❌ FINAL CHECK
-# ═════════════════════════════════════════════════════════════
+# Agar Gemini aur Fallback dono fail ho gaye, tabhi pipeline rukegi
 if [ "$PARSED_STATUS" != "success" ]; then
-    echo ""
-    echo "❌ [ERROR] Gemini aur Fallback dono fail/reject!"
-    echo "🏁 Pipeline Finished at: $(date '+%Y-%m-%d %H:%M:%S IST')"
+    echo "❌ [ERROR] Gemini aur Fallback dono fail ho gaye! Pipeline halted."
     exit 1
 fi
 
-# ═════════════════════════════════════════════════════════════
-# ✅ APPROVED — Continue
-# ═════════════════════════════════════════════════════════════
-AI_TITLE=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys,json;print(json.load(sys.stdin).get('title',''))" 2>/dev/null)
-FINAL_START_TIME=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys,json;print(json.load(sys.stdin).get('start_time',''))" 2>/dev/null)
-FINAL_CLIP_DURATION=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys,json;print(json.load(sys.stdin).get('duration',15))" 2>/dev/null)
-AI_REASON=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys,json;print(json.load(sys.stdin).get('reason',''))" 2>/dev/null)
+AI_TITLE=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('title', ''))" 2>/dev/null)
+FINAL_START_TIME=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('start_time', ''))" 2>/dev/null)
+FINAL_CLIP_DURATION=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('duration', 15))" 2>/dev/null)
 
-echo ""
-echo "════════════════════════════════════════════════════════"
-echo "✅ AI NE APPROVE KIYA"
-echo "════════════════════════════════════════════════════════"
-echo "   - Title        : $AI_TITLE"
-echo "   - Start Time   : $FINAL_START_TIME"
+echo "🎯 Strict Gemini Decisions Loaded Successfully:"
+echo "   - Title: $AI_TITLE"
+echo "   - Start Time: $FINAL_START_TIME"
 echo "   - Clip Duration: $FINAL_CLIP_DURATION seconds"
-echo "   - Reason       : $AI_REASON"
-echo "   - Retry Count  : $RETRY_COUNT / $MAX_SCRIPT_RETRIES"
-echo ""
 
 CAPTION="$AI_TITLE
 
 #videogames #gamingcommunity #gaming #${SELECTED_GAME_NAME,,} #gamingreels #reels"
 
-# 8. Clip Cutting
+# 8. ✂️ Actual Video Cutting via FFmpeg strictly using Gemini's Decision
 FINAL_CLIP_PATH="$FRAMES_DIR/final_cut_clip.mp4"
-echo "✂️ [STEP 8] Cutting clip..."
-ffmpeg -y -ss "$FINAL_START_TIME" -i "$SELECTED_URL" -t "$FINAL_CLIP_DURATION" -c:v copy -c:a copy "$FINAL_CLIP_PATH" -loglevel error
+echo "✂️ [STEP 8] Cutting thrilling clip via FFmpeg from $FINAL_START_TIME for $FINAL_CLIP_DURATION seconds..."
+ffmpeg -y -ss "$FINAL_START_TIME" -i "$SELECTED_URL" -t "$FINAL_CLIP_DURATION" -c:v copy -c:a copy "$FINAL_CLIP_PATH" -loglevel info
 
 if [ ! -f "$FINAL_CLIP_PATH" ] || [ ! -s "$FINAL_CLIP_PATH" ]; then
-    echo "⚠️ Stream copy failed. Re-encoding..."
-    ffmpeg -y -ss "$FINAL_START_TIME" -i "$SELECTED_URL" -t "$FINAL_CLIP_DURATION" -c:v libx264 -preset veryfast -c:a aac "$FINAL_CLIP_PATH" -loglevel error
+    echo "⚠️ Stream copy cut failed. Retrying re-encoding cut..."
+    ffmpeg -y -ss "$FINAL_START_TIME" -i "$SELECTED_URL" -t "$FINAL_CLIP_DURATION" -c:v libx264 -preset veryfast -c:a aac "$FINAL_CLIP_PATH" -loglevel info
 fi
 
-if [ ! -f "$FINAL_CLIP_PATH" ] || [ ! -s "$FINAL_CLIP_PATH" ]; then
-    echo "❌ FFmpeg failed!"
+if [ -f "$FINAL_CLIP_PATH" ] && [ -s "$FINAL_CLIP_PATH" ]; then
+    echo "✅ Optimized action clip successfully saved at: $FINAL_CLIP_PATH"
+else
+    echo "❌ [ERROR] FFmpeg failed to cut the video clip based on Gemini's timing!"
     exit 1
 fi
-echo "✅ Clip saved: $FINAL_CLIP_PATH"
 
-# 9. Posting
+# ================= 5. 🚀 CRON-SAFE PLATFORM CONTROLLER =================
 POST_MODE="$DEFAULT_POST_MODE"
-echo "🚀 [STEP 9] Posting (Mode: $POST_MODE)..."
+echo "🚀 Using Posting Mode: $POST_MODE (1: Both, 2: Insta Only, 3: FB Only)"
 
 PUBLISH_ID=""
 FB_POST_ID=""
 
-# Instagram Reels
+# --- A. Instagram Reels Upload via GitHub Release Asset ---
 if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "2" ]; then
     if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$IG_ID" ]; then
-        echo "🚀 Instagram Reels upload..."
+        echo "🚀 Uploading to Instagram Reels via GitHub Release Asset..."
         
         TAG_NAME="clip-release-$(date +%s)"
         REPO="${GITHUB_REPOSITORY}"
         TOKEN="${GITHUB_TOKEN:-$GH_PAT}"
         
+        echo "🏷️ Creating temporary GitHub Release ($TAG_NAME)..."
         RELEASE_RES=$(curl -s -X POST "https://api.github.com/repos/$REPO/releases" \
           -H "Authorization: token $TOKEN" \
           -H "Content-Type: application/json" \
-          -d "{\"tag_name\":\"$TAG_NAME\",\"name\":\"Temp Clip\",\"draft\":false,\"prerelease\":true}")
+          -d "{
+            \"tag_name\": \"$TAG_NAME\",
+            \"name\": \"Temporary Clip Release\",
+            \"draft\": false,
+            \"prerelease\": true
+          }")
           
-        RELEASE_ID=$(echo "$RELEASE_RES" | python3 -c "import sys,json;print(json.load(sys.stdin).get('id',''))" 2>/dev/null)
+        RELEASE_ID=$(echo "$RELEASE_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
         
         if [ -n "$RELEASE_ID" ] && [ "$RELEASE_ID" != "None" ]; then
+            echo "📦 Release created successfully (ID: $RELEASE_ID). Uploading video asset..."
+            
             UPLOAD_URL="https://uploads.github.com/repos/$REPO/releases/$RELEASE_ID/assets?name=final_clip.mp4"
             ASSET_RES=$(curl -s -X POST "$UPLOAD_URL" \
               -H "Authorization: token $TOKEN" \
               -H "Content-Type: video/mp4" \
               --data-binary "@$FINAL_CLIP_PATH")
               
-            PUBLIC_VIDEO_URL=$(echo "$ASSET_RES" | python3 -c "import sys,json;print(json.load(sys.stdin).get('browser_download_url',''))" 2>/dev/null)
+            PUBLIC_VIDEO_URL=$(echo "$ASSET_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('browser_download_url', ''))" 2>/dev/null)
             
             if [ -n "$PUBLIC_VIDEO_URL" ] && [ "$PUBLIC_VIDEO_URL" != "None" ]; then
+                echo "🔗 Generated Release Asset Public URL: $PUBLIC_VIDEO_URL"
+                
                 CONTAINER_RES=$(curl -s -X POST "$API/$IG_ID/media" \
                   --data-urlencode "media_type=REELS" \
                   --data-urlencode "video_url=$PUBLIC_VIDEO_URL" \
                   --data-urlencode "caption=$CAPTION" \
                   --data-urlencode "access_token=$PAGE_ACCESS_TOKEN")
 
-                CREATION_ID=$(echo "$CONTAINER_RES" | python3 -c "import sys,json;print(json.load(sys.stdin).get('id',''))" 2>/dev/null)
+                echo "📦 IG Container Response: $CONTAINER_RES"
+                CREATION_ID=$(echo "$CONTAINER_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
 
                 if [ -n "$CREATION_ID" ] && [ "$CREATION_ID" != "None" ]; then
+                    echo "⏳ Container created (ID: $CREATION_ID). Checking processing status..."
+                    
                     for i in {1..45}; do
                         sleep 5
-                        STATUS_RES=$(curl -s "$API/$CREATION_ID?fields=status_code&access_token=$PAGE_ACCESS_TOKEN")
-                        STATUS_CODE=$(echo "$STATUS_RES" | python3 -c "import sys,json;print(json.load(sys.stdin).get('status_code',''))" 2>/dev/null)
-                        [ "$STATUS_CODE" == "FINISHED" ] && break
+                        STATUS_RES=$(curl -s "$API/$CREATION_ID?fields=status_code,status&access_token=$PAGE_ACCESS_TOKEN")
+                        STATUS_CODE=$(echo "$STATUS_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status_code', ''))" 2>/dev/null)
+                        
+                        if [ "$STATUS_CODE" == "FINISHED" ]; then
+                            echo "✅ Video processing finished by Instagram!"
+                            break
+                        else
+                            echo "⏳ Video still processing (Status: $STATUS_CODE)..."
+                        fi
                     done
 
                     PUBLISH_RES=$(curl -s -X POST "$API/$IG_ID/media_publish" \
                       -d "creation_id=$CREATION_ID" \
                       -d "access_token=$PAGE_ACCESS_TOKEN")
                     
-                    PUBLISH_ID=$(echo "$PUBLISH_RES" | python3 -c "import sys,json;print(json.load(sys.stdin).get('id',''))" 2>/dev/null)
-                    [ -n "$PUBLISH_ID" ] && [ "$PUBLISH_ID" != "None" ] && echo "🎉 IG Published: $PUBLISH_ID"
+                    echo "📢 IG Publish Response: $PUBLISH_RES"
+                    PUBLISH_ID=$(echo "$PUBLISH_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
+                    
+                    if [ -n "$PUBLISH_ID" ] && [ "$PUBLISH_ID" != "None" ]; then
+                        echo "🎉 Instagram Post Published Successfully! ID: $PUBLISH_ID"
+                    else
+                        echo "❌ Error: Failed to publish container to Instagram!"
+                    fi
                 fi
+            else
+                echo "❌ Error: Failed to upload video asset to GitHub release!"
+                echo "Response: $ASSET_RES"
             fi
             
-            curl -s -X DELETE "https://api.github.com/repos/$REPO/releases/$RELEASE_ID" -H "Authorization: token $TOKEN" > /dev/null
-            curl -s -X DELETE "https://api.github.com/repos/$REPO/git/refs/tags/$TAG_NAME" -H "Authorization: token $TOKEN" > /dev/null
+            echo "🗑️ Cleaning up temporary GitHub release and tag..."
+            curl -s -X DELETE "https://api.github.com/repos/$REPO/releases/$RELEASE_ID" \
+              -H "Authorization: token $TOKEN" > /dev/null
+              
+            curl -s -X DELETE "https://api.github.com/repos/$REPO/git/refs/tags/$TAG_NAME" \
+              -H "Authorization: token $TOKEN" > /dev/null
+            echo "✨ GitHub release and tag cleaned up successfully."
+            
+        else
+            echo "❌ Error: Failed to create temporary GitHub Release!"
+            echo "Response: $RELEASE_RES"
         fi
     fi
 fi
 
-# Facebook
+# --- B. Facebook Page Video Upload ---
 if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "3" ]; then
     if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$PAGE_ID" ]; then
-        echo "🚀 Facebook upload..."
+        echo "🚀 Uploading to Facebook Page..."
         FB_RES=$(curl -s -X POST "$API/$PAGE_ID/videos" \
           --data-urlencode "source=@$FINAL_CLIP_PATH" \
           --data-urlencode "description=$CAPTION" \
           --data-urlencode "access_token=$PAGE_ACCESS_TOKEN")
 
-        FB_POST_ID=$(echo "$FB_RES" | python3 -c "import sys,json;print(json.load(sys.stdin).get('id',''))" 2>/dev/null)
-        [ -n "$FB_POST_ID" ] && [ "$FB_POST_ID" != "None" ] && echo "🎉 FB Published: $FB_POST_ID"
+        echo "📦 FB Upload Response: $FB_RES"
+        FB_POST_ID=$(echo "$FB_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
+
+        if [ -n "$FB_POST_ID" ] && [ "$FB_POST_ID" != "None" ]; then
+            echo "🎉 Successfully Published to Facebook Page! Video ID: $FB_POST_ID"
+        else
+            echo "❌ Error: Failed to publish video to Facebook Page!"
+        fi
     fi
 fi
 
-# 10. Memory Update & File Sync
+# 10. 🧠 Memory & Adaptive Feedback Update & File Cleanup
 ACTIVE_ID="${PUBLISH_ID:-$FB_POST_ID}"
-echo "📝 [STEP 10] Memory update. Active ID: $ACTIVE_ID"
+echo "📝 [STEP 10] Updating memory and file sync. Active ID: $ACTIVE_ID"
 
 if [ -n "$ACTIVE_ID" ] && [ "$ACTIVE_ID" != "None" ]; then
     python3 -c "
 import os, json
-mf = 'logs/agent_memory.json'
-mem = {'game_scores': {}, 'title_styles': {'curiosity': 10, 'aggressive': 10, 'question': 10, 'emoji_heavy': 10}}
-if os.path.exists(mf):
+memory_file = 'logs/agent_memory.json'
+memory = {'game_scores': {}, 'title_styles': {'curiosity': 10, 'aggressive': 10, 'question': 10, 'emoji_heavy': 10}}
+if os.path.exists(memory_file):
     try:
-        with open(mf) as f: mem.update(json.load(f))
-    except: pass
-mem['game_scores']['$SELECTED_GAME_NAME'] = mem['game_scores'].get('$SELECTED_GAME_NAME', 10) + 5
-if '$SELECTED_STYLE' in mem['title_styles']:
-    mem['title_styles']['$SELECTED_STYLE'] += 3
+        with open(memory_file, 'r', encoding='utf-8') as f:
+            memory.update(json.load(f))
+    except:
+        pass
+
+g_name = '$SELECTED_GAME_NAME'
+memory['game_scores'][g_name] = memory['game_scores'].get(g_name, 10) + 5
+used_style = '$SELECTED_STYLE'
+if used_style in memory['title_styles']:
+    memory['title_styles'][used_style] += 3
+
 os.makedirs('logs', exist_ok=True)
-with open(mf, 'w') as f: json.dump(mem, f, indent=4)
-print('🧠 Memory updated.')
+with open(memory_file, 'w', encoding='utf-8') as f:
+    json.dump(memory, f, indent=4)
+print('🧠 Agent Memory Updated Successfully!')
 "
 
     python3 -c "
 import os
-tf = '$TARGET_FILE'
-pl = '$GAME_POSTED_LOG'
-sl = '''$SELECTED_LINE'''
-aid = '$ACTIVE_ID'
-if os.path.exists(tf):
-    with open(tf, 'r', encoding='utf-8', errors='ignore') as f:
-        c = f.read()
-    cl = c.replace(sl, '').strip()
-    with open(tf, 'w', encoding='utf-8') as f:
-        f.write(cl + '\n\n')
-os.makedirs(os.path.dirname(pl), exist_ok=True)
-with open(pl, 'a', encoding='utf-8') as f:
-    f.write(sl + f'\nVideo id : {aid}\n\n')
-print('✅ Link moved to posted folder.')
+target_file = '$TARGET_FILE'
+posted_log = '$GAME_POSTED_LOG'
+selected_line = '''$SELECTED_LINE'''
+act_id = '$ACTIVE_ID'
+
+if os.path.exists(target_file):
+    with open(target_file, 'r', encoding='utf-8', errors='ignore') as f:
+        content = f.read()
+    cleaned = content.replace(selected_line, '').strip()
+    with open(target_file, 'w', encoding='utf-8') as f:
+        f.write(cleaned + '\n\n')
+
+os.makedirs(os.path.dirname(posted_log), exist_ok=True)
+with open(posted_log, 'a', encoding='utf-8') as f:
+    f.write(selected_line + f'\nVideo id : {act_id}\n\n')
+print('✅ Link successfully removed from temp file and shifted to posted folder!')
 "
+else
+    echo "⚠️ [WARNING] Skipped file sync because no active post ID was generated."
 fi
 
-echo ""
-echo "════════════════════════════════════════════════════════"
-echo "🏁 Pipeline Finished at: $(date '+%Y-%m-%d %H:%M:%S IST')"
-echo "════════════════════════════════════════════════════════"
+echo "===================================================="
+echo "🏁 Pipeline Finished at: $(date)"
+echo "===================================================="
