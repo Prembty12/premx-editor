@@ -1,1 +1,1 @@
-{"clip_duration":15,"reason":"Intense cinematic cutscene with key dialogue","start_time":20,"status":"APPROVE","title":"May we fight true 🗡️🔴"}
+{"clip_duration": 18, "reason": "Kratos' dramatic plea for Pandora", "start_time": 20, "status": "APPROVE", "title": "Spare Her! Kratos Pleads 😭"}
