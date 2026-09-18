@@ -390,7 +390,7 @@ else:
 EOF
 )
 
-PARSED_STATUS=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status', 'failed'))" 2>/dev/null)
+PARSED_STATUS=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status', 'failed').lower())" 2>/dev/null)
 PARSED_REASON=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('reason', ''))" 2>/dev/null)
 
 # Agar Gemini fail ho gaya, toh exit karne ke bajaye Fallback Brain ko bulao
@@ -420,7 +420,7 @@ else:
     print('{\"status\": \"failed\"}')
 ")
 
-    PARSED_STATUS=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status', 'failed'))" 2>/dev/null)
+    PARSED_STATUS=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status', 'failed').lower())" 2>/dev/null)
     PARSED_REASON=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('reason', ''))" 2>/dev/null)
 fi
 
