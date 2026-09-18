@@ -1,1 +1,1 @@
-{"reason": "Tactical stealth entry, cutting chains, and tense close-quarters gameplay showing real action.", "start_time": 15, "status": "APPROVE", "title": "Stealth Raid Turns Deadly 💀🪓"}
+{"reason": "Continuous first-person shooter gameplay with aiming, shooting, and explosions in a burning environment.", "start_time": 0, "status": "APPROVE", "title": "Survive the Burning City 🔫🔥"}

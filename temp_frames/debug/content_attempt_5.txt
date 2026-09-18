@@ -1,1 +1,7 @@
-{"clip_duration":15,"reason":"Gameplay shows tense exploration, cutting a chained door, and a sudden zombie reveal.","start_time":33,"status":"APPROVE","title":"I Cut The Wrong Chain 😱"}
+{
+  "clip_duration": 20,
+  "reason": "First-person combat with movement, gunfire, and large explosions.",
+  "start_time": 20,
+  "status": "APPROVE",
+  "title": "Who Burned DC? 🔥"
+}

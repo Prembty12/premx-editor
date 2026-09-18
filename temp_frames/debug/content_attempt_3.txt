@@ -1,12 +1,5 @@
-Thinking Process:
-
-1.  **Analyze the Request:**
-    *   Input: A 9:16 gaming screenshot grid (6 columns, many rows, total 54 seconds duration).
-    *   Task: Decide APPROVE or REJECT based on the criteria.
-    *   If APPROVE: Create a high-curiosity viral Facebook/Instagram Reels hook title (6-10 words preferred, max 6 words according to the rule "short, viral title under 6 words with 1-3 emojis", NO generic boring words like Epic, Insane, Crazy, Best, Gameplay).
-    *   Output format: Strict JSON object (no markdown, no extra text).
-
-2.  **Analyze the Grid Images:**
-    *   The grid shows a tactical shooter game (looks like Call of Duty, specifically a co-op mode or spec ops mission, maybe the "Bonded" or "Hostage" mission, looks like cutting chains with bolt cutters, entering a school/police station, encountering a hostage, then some close-up of a neck with blood, then tactical movement).
-    *   Let's look at the frames:
-        *   Frames 00:00 to 00:05: Tactical gear, barrels
+{
+  "reason": "Approval is justified because the grid shows continuous first-person shooter gameplay with movement, aiming, combat, explosions, and environmental destruction throughout the sequence.",
+  "status": "APPROVE",
+  "title": "Who Burned The White House? 🔥"
+}
