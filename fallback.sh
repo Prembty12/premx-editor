@@ -72,7 +72,7 @@ TITLE RULES (only for APPROVE):
 STRICT JSON OUTPUT — ALL FIELDS MANDATORY:
 
 If REJECT:
-{\"status\": \"REJECT\", \"reason\": \"<1-line explanation why rejected>\"}
+{\"status\": \"REJECT\", \"reason\": \"<short reason max 10 words>\"}
 
 If APPROVE, ALL 5 FIELDS ARE MANDATORY:
 {
@@ -80,7 +80,7 @@ If APPROVE, ALL 5 FIELDS ARE MANDATORY:
   \"title\": \"<viral title 6 words max with 1-3 emojis>\",
   \"start_time\": <integer seconds, exact second where the engaging moment starts>,
   \"clip_duration\": <integer seconds, MINIMUM 12 seconds, exact duration of the engaging moment>,
-  \"reason\": \"<1-line explanation why approved>\"
+  \"reason\": \"<short explanation MAX 10 words>\"
 }
 
 CRITICAL - HOW TO CALCULATE START_TIME AND CLIP_DURATION:
@@ -99,6 +99,7 @@ CRITICAL - HOW TO CALCULATE START_TIME AND CLIP_DURATION:
 4. NO markdown, NO extra text, NO escaped quotes, ONLY the JSON object
 5. NO null values, NO empty values
 6. STOP GENERATING immediately after the closing curly bracket '}'. DO NOT TRUNCATE.
+7. KEEP YOUR RESPONSE AS SHORT AS POSSIBLE. Do not write long explanations.
 
 VALID EXAMPLE:
 {\"status\": \"APPROVE\", \"title\": \"Epic Clutch 1v4 💀\", \"start_time\": 5, \"clip_duration\": 20, \"reason\": \"High tension clutch moment\"}
