@@ -1,1 +1,1 @@
-{"reason":"Real FPS combat is visible with sniping, shooting, movement, and active firefights throughout the grid.","start_time":0,"status":"APPROVE","title":"This Sniper Push Changes Everything 🎯🔥" }
+{"reason": "Tactical breaching sequence showing chain cutting, room clearing, and tense hostage discovery.", "start_time": 20, "status": "APPROVE", "title": "They Cut Chains For This 💀"}

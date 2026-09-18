@@ -1,1 +1,1 @@
-{"reason":"First-person shooter gameplay shows aiming, movement, gunfire, and a tense enemy push.","start_time":21,"status":"APPROVE","title":"He Pushed Too Far 🔥\",\"clip_duration\":25}
+{"reason": "Real tactical gameplay showing soldiers cutting chains, clearing rooms, and a dramatic close-up of an injury.", "start_time": 20, "status": "APPROVE", "title": "They Cut the Chain... 💀"}

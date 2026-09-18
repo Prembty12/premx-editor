@@ -1,1 +1,1 @@
-{"reason": "Active first-person shooter gameplay showing tactical movement, scoping, and red-lit combat sequences.", "start_time": 10, "status": "APPROVE", "title": "Red Hot Kill Zone 🔥🎯"}
+{"reason": "Tactical stealth entry, cutting chains, and tense close-quarters gameplay showing real action.", "start_time": 15, "status": "APPROVE", "title": "Stealth Raid Turns Deadly 💀🪓"}

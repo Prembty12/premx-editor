@@ -1,1 +1,1 @@
-{"reason": "Active first-person shooter gameplay showing tactical movement, scoping, shooting, and a humorous repetitive holding pattern.", "start_time": 3, "status": "APPROVE", "title": "He found the perfect spot 🤫"}
+{"clip_duration":15,"reason":"Gameplay shows tense exploration, cutting a chained door, and a sudden zombie reveal.","start_time":33,"status":"APPROVE","title":"I Cut The Wrong Chain 😱"}
