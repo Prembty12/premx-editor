@@ -443,25 +443,32 @@ if [ "$PARSED_STATUS" != "success" ]; then
     export INSIGHTS_SUMMARY
     export STYLE_PROMPT
     
-        PARSED_JSON_DATA=$(bash fallback.sh)
-    echo "🧠 Fallback AI Final Response: $PARSED_JSON_DATA"
+    # 🛠️ FIX: Fallback ka sirf aakhri clean JSON line capture karenge
+    FALLBACK_RAW=$(bash fallback.sh)
+    echo "🧠 Fallback AI Raw Response Received."
     
-    # 🛡️ Safety filter: Sirf last wala valid JSON block extract karega
-    PARSED_JSON_DATA=$(echo "$PARSED_JSON_DATA" | python3 -c "
+    PARSED_JSON_DATA=$(echo "$FALLBACK_RAW" | python3 -c "
 import sys, re, json
 raw = sys.stdin.read()
-match = re.search(r'\{.*\}', raw, re.DOTALL)
-if match:
+# Saare lines me se sabse aakhri valid JSON block dhundho
+matches = re.findall(r'\{.*?\}', raw, re.DOTALL)
+valid_json = None
+for m in reversed(matches):
     try:
-        data = json.loads(match.group(0))
-        print(json.dumps(data))
+        d = json.loads(m)
+        if 'status' in d:
+            valid_json = d
+            break
     except:
-        print('{\"status\": \"failed\"}')
+        continue
+
+if valid_json:
+    print(json.dumps(valid_json))
 else:
     print('{\"status\": \"failed\"}')
 ")
 
-    PARSED_STATUS=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status', 'failed').lower())" 2>/dev/null)
+    PARSED_STATUS=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(str(json.load(sys.stdin).get('status', 'failed')).lower().strip())" 2>/dev/null)
     PARSED_REASON=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('reason', ''))" 2>/dev/null)
 fi
 
