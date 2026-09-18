@@ -1,1 +1,1 @@
-{"clip_duration": 38, "reason": "Epic boss combat and giant beast climbing sequence.", "start_time": 0, "status": "APPROVE", "title": "Kratos Giant Boss Fight 🦖⚔️"}
+{"clip_duration": 15, "reason": "Only slow character walking, no action or gameplay.", "start_time": 5, "status": "REJECT", "title": "Walking in the Magic Cage 🌿✨"}
