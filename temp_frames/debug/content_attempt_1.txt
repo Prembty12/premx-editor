@@ -1,1 +1,1 @@
-{"clip_duration": 15, "reason": "Intense combat with massive explosion.", "start_time": 24, "status": "APPROVE", "title": "Chaos level maxed out 💀"}
+{"clip_duration": 18, "reason": "Intense sniper bloodbath with explosions.", "start_time": 24, "status": "APPROVE", "title": "City Sniper Bloodbath Action 🩸🎯"}
