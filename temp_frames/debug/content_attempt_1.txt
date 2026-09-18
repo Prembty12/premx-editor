@@ -1,1 +1,1 @@
-{"clip_duration": 36, "reason": "Mostly cinematic cutscenes, no active gameplay.", "start_time": 0, "status": "REJECT", "title": "Test Mode Reject"}
+{"clip_duration": 38, "reason": "Epic boss combat and giant beast climbing sequence.", "start_time": 0, "status": "APPROVE", "title": "Kratos Giant Boss Fight 🦖⚔️"}
