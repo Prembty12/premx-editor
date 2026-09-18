@@ -312,7 +312,7 @@ else
 fi
 
 GEMINI_JSON_RESULT=""
-MAX_TOTAL_RETRIES=4
+MAX_TOTAL_RETRIES=10
 
 for ((attempt=1; attempt<=MAX_TOTAL_RETRIES; attempt++)); do
     CURRENT_GEMINI_KEY=$(get_random_gemini_key)
