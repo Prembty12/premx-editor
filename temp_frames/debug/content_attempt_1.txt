@@ -1,1 +1,1 @@
-{"clip_duration": 18, "reason": "Kratos' dramatic plea for Pandora", "start_time": 20, "status": "APPROVE", "title": "Spare Her! Kratos Pleads 😭"}
+{"clip_duration": 15, "reason": "Intense combat with massive explosion.", "start_time": 24, "status": "APPROVE", "title": "Chaos level maxed out 💀"}
