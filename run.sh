@@ -20,7 +20,14 @@ echo "===================================================="
 echo "🚀 Pipeline Started at: $(date)"
 echo "===================================================="
 
-GEMINI_KEYS=("$GEMINI_API_KEY_1" "$GEMINI_API_KEY_2" "$GEMINI_API_KEY_3")
+GEMINI_KEYS=(
+    "$GEMINI_API_KEY_1"
+    "$GEMINI_API_KEY_2"
+    "$GEMINI_API_KEY_3"
+    "$GEMINI_API_KEY_4"
+    "$GEMINI_API_KEY_5"
+    "$GEMINI_API_KEY_6"
+)
 
 get_random_gemini_key() {
     local valid_keys=()
