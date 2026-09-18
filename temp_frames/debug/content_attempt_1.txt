@@ -1,1 +1,1 @@
-{"reason": "Continuous first-person shooter gameplay with aiming, shooting, and explosions in a burning environment.", "start_time": 0, "status": "APPROVE", "title": "Survive the Burning City 🔫🔥"}
+{"clip_duration": 35, "reason": "The grid displays continuous, active gameplay with a character running, exploring, and engaging in combat with visual effects in a forest setting.", "start_time": 5, "status": "APPROVE", "title": "Deep Forest Survival Run 🌲⚔️"}
