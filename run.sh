@@ -431,10 +431,7 @@ else:
 EOF
 )
 
-PARSED_STATUS=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status', 'failed').lower())" 2>/dev/null)
-PARSED_REASON=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('reason', ''))" 2>/dev/null)
-
-# Agar Gemini fail ho gaya, toh exit karne ke bajaye Fallback Brain ko bulao
+# Agar Gemini fail ho gaya, toh Fallback Brain ko call karo
 if [ "$PARSED_STATUS" != "success" ]; then
     echo "⚠️ Gemini failed. Triggering Fallback Brain (OpenRouter)..."
     
@@ -443,30 +440,37 @@ if [ "$PARSED_STATUS" != "success" ]; then
     export INSIGHTS_SUMMARY
     export STYLE_PROMPT
     
-    # 🛠️ FIX: Fallback ka sirf aakhri clean JSON line capture karenge
+    # Raw output ko temporarily ek file ya variable me save karo
     FALLBACK_RAW=$(bash fallback.sh)
-    echo "🧠 Fallback AI Raw Response Received."
+    
+    # --- DEBUGGING: Yeh line check karne ke liye hai ki fallback kya bhej raha hai ---
+    echo "--- RAW FALLBACK OUTPUT START ---"
+    echo "$FALLBACK_RAW"
+    echo "--- RAW FALLBACK OUTPUT END ---"
     
     PARSED_JSON_DATA=$(echo "$FALLBACK_RAW" | python3 -c "
 import sys, re, json
 raw = sys.stdin.read()
-# Saare lines me se sabse aakhri valid JSON block dhundho
 matches = re.findall(r'\{.*?\}', raw, re.DOTALL)
 valid_json = None
 for m in reversed(matches):
     try:
         d = json.loads(m)
-        if 'status' in d:
+        if any(k in d for k in ['status', 'STATUS', 'State', 'state']):
             valid_json = d
             break
     except:
         continue
 
 if valid_json:
+    # Normalize keys to lowercase 'status'
+    if 'STATUS' in valid_json: valid_json['status'] = valid_json.pop('STATUS')
     print(json.dumps(valid_json))
 else:
-    print('{\"status\": \"failed\"}')
+    print(json.dumps({'status': 'failed'}))
 ")
+
+    echo "Cleaned JSON Data: $PARSED_JSON_DATA"
 
     PARSED_STATUS=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(str(json.load(sys.stdin).get('status', 'failed')).lower().strip())" 2>/dev/null)
     PARSED_REASON=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('reason', ''))" 2>/dev/null)
