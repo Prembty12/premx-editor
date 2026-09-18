@@ -50,24 +50,22 @@ dbg() {
 # 🚀 STRICT PROMPT — ALL FIELDS MANDATORY + NO TRUNCATION
 # ══════════════════════════════════════════════════════════════
 PROMPT_TEXT="Analyze the provided 9:16 gaming screenshot grid. 
-⚠️ TEST MODE NOTICE: For current script testing purposes, you MUST evaluate every grid as REJECT. Do not approve any video right now; always return status REJECT with a short reason.
 
-CRITICAL NOTICE: The total video source duration is EXACTLY ${SOURCE_DURATION} seconds. This duration is dynamic and changes for every video. It could be 40 seconds, 60 seconds (1 minute), 65 seconds (1 minute 5 seconds), 300 seconds (5 minutes), or anything else. You MUST use the exact number provided here: ${SOURCE_DURATION} seconds.
+CRITICAL NOTICE: The total video source duration is EXACTLY ${SOURCE_DURATION} seconds. This duration is dynamic and changes for every video. You MUST use the exact number provided here: ${SOURCE_DURATION} seconds.
 
 Style Directive: ${STYLE_PROMPT}
 
 YOUR TASK: Decide APPROVE or REJECT for this video.
 
-REJECT IF:
-- Grid shows ONLY menus, login screens, or loading screens
-- No actual gameplay visible in ANY frame
-- All frames look identical (frozen/paused)
-- Crash screen, error, or black frames dominate
-- Absolutely no exciting/engaging moment
-- (TEST MODE ACTIVE: Default to REJECT for all test inputs)
+REJECT IF (Strictly reject if content is boring, empty, or lacks engagement):
+- Grid shows ONLY menus, map screens, inventory checking, shopping, or loading screens
+- No actual gameplay or action visible in ANY frame
+- All frames look identical, frozen, or useless (boring walking/running without anything happening)
+- Crash screen, error, black frames, or dead/idle moments dominate
+- Absolutely NO exciting, thrilling, or engaging moment (agar video bekar ya faltu lage toh turant REJECT karo)
 
 APPROVE IF:
-- Real gameplay has a clear \"Engaging Highlight Window\" (combat, explosions, emotional cutscenes, epic fails, funny bugs, or high-stakes moments).
+- Real gameplay has a clear, powerful \"Engaging Highlight Window\" (combat, intense fights, epic boss battles, explosions, emotional cutscenes, hilarious fails, or high-stakes clutch moments).
 - The moment has a clear start and end point in the timestamps.
 
 TITLE RULES (only for APPROVE):
@@ -77,26 +75,24 @@ TITLE RULES (only for APPROVE):
 STRICT JSON OUTPUT — ALL FIELDS MANDATORY:
 
 If REJECT:
-{\"status\": \"REJECT\", \"reason\": \"<short reason max 10 words>\"}
+{\"status\": \"REJECT\", \"reason\": \"<short reason max 10 words, e.g., No action or boring walking>\"}
 
 If APPROVE, ALL 5 FIELDS ARE MANDATORY:
 {
   \"status\": \"APPROVE\",
   \"title\": \"<viral title 6 words max with 1-3 emojis>\",
   \"start_time\": <integer seconds, exact second where the engaging moment starts>,
-  \"clip_duration\": <integer seconds, MINIMUM 12 seconds, exact duration of the engaging moment>,
+  \"clip_duration\": <integer seconds, minimum 12 seconds. Capture the FULL fight or highlight completely from start to finish, do not cut it short!>,
   \"reason\": \"<short explanation MAX 10 words>\"
 }
 
 CRITICAL - HOW TO CALCULATE START_TIME AND CLIP_DURATION (Total Video Length = ${SOURCE_DURATION} seconds):
 1. The video starts at 0s and ends at EXACTLY ${SOURCE_DURATION}s.
-2. Look at the timestamps on the grid carefully. Identify the exact second the ENGAGING MOMENT STARTS and the exact second it ENDS. This could be a fight, a tense dialogue, an emotional scene, a massive explosion, or a hilarious fail. DO NOT just look for combat.
+2. Look at the timestamps on the grid carefully. Identify the exact second the ENGAGING MOMENT STARTS and the exact second it ENDS. 
 3. Set 'start_time' to when this moment begins.
-4. Calculate 'clip_duration' by subtracting start_time from end_time (e.g., 25 - 5 = 20 seconds).
-5. STRICT MATH RULE: Your 'start_time' + 'clip_duration' MUST NOT exceed the total video length of ${SOURCE_DURATION} seconds. For example, if the video is 40s long, your start_time cannot be 35 and duration cannot be 15 (35+15=50, which is more than 40).
-6. MINIMUM DURATION: The clip must be at least 12 seconds. If the actual highlight is only 5-6 seconds, find the 5 seconds of highlight and add 3-4 seconds before and after to make it 12-15 seconds.
-7. DO NOT include long non-engaging sequences before or after the highlight. Skip boring running, walking, menu checking, or exploring sequences.
-8. NEVER take a 30-40 second clip if the actual highlight is only 15-20 seconds long.
+4. Calculate 'clip_duration' by subtracting start_time from end_time to cover the **entire** action sequence. Do not leave out the middle or end of a good fight.
+5. STRICT MATH RULE: Your 'start_time' + 'clip_duration' MUST NOT exceed the total video length of ${SOURCE_DURATION} seconds.
+6. MINIMUM DURATION: The clip must be at least 12 seconds. 
 
 ⚠️ CRITICAL — MISSING ANY FIELD = INVALID RESPONSE:
 1. 'status' is MANDATORY (APPROVE or REJECT)
@@ -104,11 +100,14 @@ CRITICAL - HOW TO CALCULATE START_TIME AND CLIP_DURATION (Total Video Length = $
 3. If REJECT: only status and reason required
 4. NO markdown, NO extra text, NO escaped quotes, ONLY the JSON object
 5. NO null values, NO empty values
-6. STOP GENERATING immediately after the closing curly bracket '}'. DO NOT TRUNCATE.
+6. STOP GENERATING immediately after the closing curly bracket 'J'. DO NOT TRUNCATE.
 7. KEEP YOUR RESPONSE AS SHORT AS POSSIBLE. Do not write long explanations.
 
-VALID EXAMPLE:
-{\"status\": \"APPROVE\", \"title\": \"Epic Clutch 1v4 💀\", \"start_time\": 5, \"clip_duration\": 20, \"reason\": \"High tension clutch moment\"}
+VALID EXAMPLE (REJECT):
+{\"status\": \"REJECT\", \"reason\": \"Only menu navigation and boring running\"}
+
+VALID EXAMPLE (APPROVE):
+{\"status\": \"APPROVE\", \"title\": \"Epic Clutch 1v4 💀\", \"start_time\": 5, \"clip_duration\": 25, \"reason\": \"Full combat sequence covered\"}
 
 Return the JSON object now:"
 
