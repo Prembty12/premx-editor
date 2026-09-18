@@ -360,7 +360,7 @@ Your primary job as an expert video editor is to find the most thrilling, high-a
 Return a JSON object with EXACTLY three keys:
 1. 'title' (string: viral title with 1-3 emojis)
 2. 'start_time' (string format HH:MM:SS indicating exact peak action start time based on grid timestamps)
-3. 'clip_duration' (integer: length between 12 and 45 seconds meeting monetization rules)
+3. 'clip_duration' (integer: length between 12 and $SOURCE_DURATION seconds meeting monetization rules)
 Return ONLY valid JSON format, no markdown wrapping."
 
                     payload=$(jq -n \
