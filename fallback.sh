@@ -9,7 +9,7 @@ if ! date '+%Z' 2>/dev/null | grep -qi 'IST'; then
     export TZ='IST-5:30'
 fi
 
-GRID_PATH="${GRID_PATH:-temp_frames/merged_60_grid_screenshot.jpg}"
+GRID_PATH="${GRID_PATH:-temp_frames/merged_90_grid_portrait.jpg}"
 SOURCE_DURATION="${SOURCE_DURATION:-60}"
 STYLE_PROMPT="${STYLE_PROMPT:-}"
 
