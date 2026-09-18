@@ -506,8 +506,8 @@ if os.path.exists(tf):
 fi
 
 # Agar Gemini aur Fallback dono fail ho gaye, tabhi pipeline rukegi
-if [ "$PARSED_STATUS" != "success" ]; then
-    echo "❌ [ERROR] Gemini aur Fallback dono fail ho gaye! Pipeline halted."
+if [ "$PARSED_STATUS" != "success" ] && [ "$PARSED_STATUS" != "reject" ]; then
+    echo "❌ [ERROR] Pipeline halted."
     exit 1
 fi
 
