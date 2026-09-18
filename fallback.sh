@@ -345,7 +345,7 @@ def parse_json(raw_input):
         
         # 🚫 REJECT
         if status_val == "REJECT":
-            return {"status": "REJECT", "reason": reason_match.group(1) if reason_match else ""}
+            return {"status": "reject", "reason": reason_match.group(1) if reason_match else ""}
         
         # ✅ APPROVE — ALL FIELDS MANDATORY (no defaults!)
         if status_val == "APPROVE":
@@ -510,7 +510,7 @@ def parse_json(raw_input):
         reason_match = re.search(r'"reason"\s*:\s*"([^"]*)"', clean)
         
         if status_val == "REJECT":
-            return {"status": "REJECT", "reason": reason_match.group(1) if reason_match else ""}
+            return {"status": "reject", "reason": reason_match.group(1) if reason_match else ""}
         
         if status_val == "APPROVE":
             if not title_match or not st_match or not dur_match:
