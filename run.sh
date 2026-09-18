@@ -244,10 +244,15 @@ for i in range(1, 91):
         try:
             im = Image.open(frame_path).resize((FRAME_WIDTH, FRAME_HEIGHT), Image.Resampling.LANCZOS)
             
-            # Aapka pasandida compact timestamp box aur default font style
+            # --- 8K COMPACT TIMESTAMP BOX ---
             draw = ImageDraw.Draw(im)
-            draw.rectangle([6, 6, 85, 26], fill=(0, 0, 0))
-            draw.text((9, 9), ts_label, fill=(255, 255, 255))
+            draw.rectangle([16, 16, 230, 72], fill=(0, 0, 0))
+            
+            try:
+                font = ImageFont.load_default()
+                draw.text((24, 24), ts_label, fill=(255, 255, 255), font=font)
+            except Exception:
+                draw.text((24, 24), ts_label, fill=(255, 255, 255))
             
             im.save(frame_path, 'JPEG', quality=95)
         except Exception as e:
