@@ -1,1 +1,1 @@
-{"clip_duration": 15, "reason": "Emergency broadcast screens, no actual gameplay.", "start_time": 0, "status": "REJECT", "title": "Test Reject"}
+{"clip_duration": 15, "reason": "Test mode active: default REJECT policy.", "start_time": 10, "status": "REJECT", "title": "Test Reject Title"}
