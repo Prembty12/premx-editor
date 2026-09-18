@@ -1,1 +1,1 @@
-{"reason": "Real tactical gameplay showing soldiers cutting chains, clearing rooms, and a dramatic close-up of an injury.", "start_time": 20, "status": "APPROVE", "title": "They Cut the Chain... 💀"}
+{"reason":"Actual first-person shooter gameplay shows shooting, explosions, movement, and a tense gate escape sequence.","status":"APPROVE","title":"Gate Escape Blows Up 💥"}

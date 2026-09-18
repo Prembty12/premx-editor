@@ -1,1 +1,1 @@
-{"clip_duration": 20, "reason": "Real martial arts gameplay with active stick fighting and dynamic movement.", "start_time": 5, "status": "APPROVE", "title": "Stick Fight Fury 🥋🔥"}
+{"reason":"Intense first-person shooter action with heavy explosions, gunfire, and a dramatic gate-lifting sequence under fire.","start_time":0,"status":"APPROVE","title":"Surviving the fiery gate 💥🔥clip_duration: 40}{"}

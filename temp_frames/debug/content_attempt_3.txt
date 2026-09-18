@@ -1,5 +1,1 @@
-{
-  "reason": "Approval is justified because the grid shows continuous first-person shooter gameplay with movement, aiming, combat, explosions, and environmental destruction throughout the sequence.",
-  "status": "APPROVE",
-  "title": "Who Burned The White House? 🔥"
-}
+{"reason":"Real gameplay showing intense sci-fi combat, explosions, and cinematic action sequences.","start_time":0,"status":"APPROVE","title":"Extreme combat zone 💥 clip_duration 20"}
