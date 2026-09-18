@@ -49,7 +49,9 @@ dbg() {
 # ══════════════════════════════════════════════════════════════
 # 🚀 STRICT PROMPT — ALL FIELDS MANDATORY + NO TRUNCATION
 # ══════════════════════════════════════════════════════════════
-PROMPT_TEXT="Analyze the provided 9:16 gaming screenshot grid. Total video source duration is ${SOURCE_DURATION} seconds.
+PROMPT_TEXT="Analyze the provided 9:16 gaming screenshot grid. 
+CRITICAL NOTICE: The total video source duration is EXACTLY ${SOURCE_DURATION} seconds. This duration is dynamic and changes for every video. It could be 40 seconds, 60 seconds (1 minute), 65 seconds (1 minute 5 seconds), 300 seconds (5 minutes), or anything else. You MUST use the exact number provided here: ${SOURCE_DURATION} seconds.
+
 Style Directive: ${STYLE_PROMPT}
 
 YOUR TASK: Decide APPROVE or REJECT for this video.
@@ -62,9 +64,8 @@ REJECT IF:
 - Absolutely no exciting/engaging moment
 
 APPROVE IF:
-- Real gameplay is visible (even if not super exciting)
-- Any action, movement, or engaging moment exists
-- High-tension, emotional, or thrilling segments present
+- Real gameplay has a clear \"Engaging Highlight Window\" (combat, explosions, emotional cutscenes, epic fails, funny bugs, or high-stakes moments).
+- The moment has a clear start and end point in the timestamps.
 
 TITLE RULES (only for APPROVE):
 - Create a short, viral title under 6 words with 1-3 emojis
@@ -73,16 +74,26 @@ TITLE RULES (only for APPROVE):
 STRICT JSON OUTPUT — ALL FIELDS MANDATORY:
 
 If REJECT:
-{\"status\": \"REJECT\", \"reason\": \"<1-line explanation why rejected>\"}
+{\"status\": \"REJECT\", \"reason\": \"<short reason max 10 words>\"}
 
 If APPROVE, ALL 5 FIELDS ARE MANDATORY:
 {
   \"status\": \"APPROVE\",
   \"title\": \"<viral title 6 words max with 1-3 emojis>\",
-  \"start_time\": <integer seconds 0 to $((SOURCE_DURATION - 15))>,
-  \"clip_duration\": <integer seconds 15 to ${SOURCE_DURATION}>,
-  \"reason\": \"<1-line explanation why approved>\"
+  \"start_time\": <integer seconds, exact second where the engaging moment starts>,
+  \"clip_duration\": <integer seconds, MINIMUM 12 seconds, exact duration of the engaging moment>,
+  \"reason\": \"<short explanation MAX 10 words>\"
 }
+
+CRITICAL - HOW TO CALCULATE START_TIME AND CLIP_DURATION (Total Video Length = ${SOURCE_DURATION} seconds):
+1. The video starts at 0s and ends at EXACTLY ${SOURCE_DURATION}s.
+2. Look at the timestamps on the grid carefully. Identify the exact second the ENGAGING MOMENT STARTS and the exact second it ENDS. This could be a fight, a tense dialogue, an emotional scene, a massive explosion, or a hilarious fail. DO NOT just look for combat.
+3. Set 'start_time' to when this moment begins.
+4. Calculate 'clip_duration' by subtracting start_time from end_time (e.g., 25 - 5 = 20 seconds).
+5. STRICT MATH RULE: Your 'start_time' + 'clip_duration' MUST NOT exceed the total video length of ${SOURCE_DURATION} seconds. For example, if the video is 40s long, your start_time cannot be 35 and duration cannot be 15 (35+15=50, which is more than 40).
+6. MINIMUM DURATION: The clip must be at least 12 seconds. If the actual highlight is only 5-6 seconds, find the 5 seconds of highlight and add 3-4 seconds before and after to make it 12-15 seconds.
+7. DO NOT include long non-engaging sequences before or after the highlight. Skip boring running, walking, menu checking, or exploring sequences.
+8. NEVER take a 30-40 second clip if the actual highlight is only 15-20 seconds long.
 
 ⚠️ CRITICAL — MISSING ANY FIELD = INVALID RESPONSE:
 1. 'status' is MANDATORY (APPROVE or REJECT)
@@ -91,6 +102,7 @@ If APPROVE, ALL 5 FIELDS ARE MANDATORY:
 4. NO markdown, NO extra text, NO escaped quotes, ONLY the JSON object
 5. NO null values, NO empty values
 6. STOP GENERATING immediately after the closing curly bracket '}'. DO NOT TRUNCATE.
+7. KEEP YOUR RESPONSE AS SHORT AS POSSIBLE. Do not write long explanations.
 
 VALID EXAMPLE:
 {\"status\": \"APPROVE\", \"title\": \"Epic Clutch 1v4 💀\", \"start_time\": 5, \"clip_duration\": 20, \"reason\": \"High tension clutch moment\"}
@@ -156,11 +168,11 @@ schema = {
     "properties": {
         "status": {"type": "string", "enum": ["APPROVE", "REJECT"]},
         "title": {"type": "string"},
-        "start_time": {"type": "integer", "minimum": 0, "maximum": max(0, source_duration - 12)},
-        "clip_duration": {"type": "integer", "minimum": 12, "maximum": source_duration},
+        "start_time": {"type": "integer", "minimum": 0, "maximum": max(0, source_duration - 15)},
+        "clip_duration": {"type": "integer", "minimum": 15, "maximum": source_duration},
         "reason": {"type": "string"}
     },
-    "required": ["status", "reason"],
+    "required": ["status", "reason", "title", "start_time", "clip_duration"],
     "additionalProperties": False
 }
 
@@ -593,18 +605,11 @@ duration = data.get('clip_duration', 15)
 
 try:
     dur_int = int(duration)
-    
-    # 1. AI ki limitation ke hisaab se Minimum 12s ka check (No Defaults)
-    if dur_int < 12 or dur_int > sd:
-        raise ValueError(f"Duration out of bounds (Must be 12s to {sd}s, AI gave {dur_int}s)")
-    
-    # 2. Strict Math Check: Start time + Duration video ki total length se bahar nahi hona chahiye
-    if (start_time_val + dur_int) > sd:
-        raise ValueError(f"Time Conflict: Start ({start_time_val}s) + Duration ({dur_int}s) exceeds total video length ({sd}s)")
-        
+    if dur_int < 15 or dur_int > sd:
+        raise ValueError(f"Duration out of bounds")
 except Exception as e:
-    dbg(f"❌ Invalid duration/time: {duration} ({e})")
-    print(json.dumps({"status": "failed", "error": f"Invalid time calculation: {e}"}))
+    dbg(f"❌ Invalid duration: {duration} ({e})")
+    print(json.dumps({"status": "failed", "error": f"Invalid duration: {duration}"}))
     sys.exit(1)
 
 dbg("")
