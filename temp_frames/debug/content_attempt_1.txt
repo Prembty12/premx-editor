@@ -1,1 +1,1 @@
-{"reason":"Intense first-person shooter action with heavy explosions, gunfire, and a dramatic gate-lifting sequence under fire.","start_time":0,"status":"APPROVE","title":"Surviving the fiery gate 💥🔥clip_duration: 40}{"}
+{"clip_duration":15,"reason":"Intense cinematic cutscene with key dialogue","start_time":20,"status":"APPROVE","title":"May we fight true 🗡️🔴"}
