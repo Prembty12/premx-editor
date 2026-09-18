@@ -1,1 +1,1 @@
-{"clip_duration": 15, "reason": "Test mode active: rejecting all test inputs.", "start_time": 10, "status": "REJECT", "title": "Tank battle action unfolds 🔥"}
+{"clip_duration": 15, "reason": "Emergency broadcast screens, no actual gameplay.", "start_time": 0, "status": "REJECT", "title": "Test Reject"}
