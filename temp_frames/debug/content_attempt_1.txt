@@ -1,1 +1,1 @@
-{"clip_duration": 21, "reason": "Stealth bridge infiltration with explosive action", "start_time": 10, "status": "APPROVE", "title": "Spider-Man's Bridge Takedown 🕷️💥"}
+{"clip_duration": 40, "reason": "Continuous sniper scoping and target kills", "start_time": 5, "status": "APPROVE", "title": "Deadly Scope Precision 💀🔥"}
