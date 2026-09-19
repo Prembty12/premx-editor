@@ -1,4 +1,4 @@
-name: Testing
+name: Auto Stream Video Editor (PremxGamer HD)
 
 on:
   workflow_dispatch:
@@ -73,45 +73,42 @@ jobs:
           yt-dlp --version
           ffmpeg -version
 
-      - name: Fully Auto Fetch Video with Detailed Diagnostics
+      - name: Fully Auto Fetch Video via ScraperAPI
+        env:
+          SCRAPER_API_KEY: ${{ secrets.SCRAPER_API_KEY }}
         run: |
           URL="${{ github.event.inputs.video_url }}"
           AUDIO_URL="${{ github.event.inputs.audio_url }}"
           
-          echo "📦 Fetching video source with diagnostics..."
+          echo "📦 Downloading via ScraperAPI Proxy..."
           echo "Target URL: $URL"
           
-          if [[ "$URL" == *"videodownapi.com"* ]] || [[ "$URL" == "download" ]]; then
-            echo "🔗 Direct Downloader API link detected. Downloading via curl..."
-            curl -L -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" "$URL" -o "input_video.mp4" || \
-            wget --user-agent="Mozilla/5.0" "$URL" -O "input_video.mp4"
-          fi
+          PROXY_URL="http://scraperapi:${SCRAPER_API_KEY}@proxy-server.scraperapi.com:8001"
+          
+          # yt-dlp mein proxy pass kar rahe hain taaki IP block na ho
+          yt-dlp --verbose \
+                 --proxy "$PROXY_URL" \
+                 --geo-bypass \
+                 --no-check-certificates \
+                 -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/b[ext=mp4]/best" \
+                 --merge-output-format mp4 \
+                 "$URL" -o "input_video.mp4" || {
+             echo "⚠️ Proxy attempt failed, trying fallback..."
+             yt-dlp --verbose --geo-bypass --no-check-certificates "$URL" -o "input_video.mp4"
+          }
           
           if [ ! -f "input_video.mp4" ] || [ ! -s "input_video.mp4" ]; then
-            echo "🔄 Attempting yt-dlp extraction with verbose logs..."
-            yt-dlp --verbose \
-                   --extractor-args "youtube:player_client=android,web" \
-                   --geo-bypass \
-                   --no-check-certificates \
-                   -f "b[ext=mp4]/best" "$URL" -o "input_video.mp4" || {
-              echo "⚠️ First yt-dlp attempt failed. Trying fallback format..."
-              yt-dlp --verbose --geo-bypass --no-check-certificates "$URL" -o "input_video.mp4"
-            }
-          fi
-          
-          if [ ! -f "input_video.mp4" ] || [ ! -s "input_video.mp4" ]; then
-            echo "❌ CRITICAL ERROR: Failed to fetch video completely! Check the URL or possible IP/bot blocking."
+            echo "❌ CRITICAL ERROR: Failed to fetch video!"
             exit 1
           else
-            echo "✅ Video downloaded successfully. File size:"
+            echo "✅ Video downloaded successfully!"
             ls -lh input_video.mp4
           fi
 
           if [ -n "$AUDIO_URL" ]; then
-            echo "🎵 Fetching optional audio/video source..."
-            yt-dlp --extract-audio --audio-format mp3 --geo-bypass "$AUDIO_URL" -o "optional_audio.mp3" || true
+            echo "🎵 Fetching optional audio..."
+            yt-dlp --extract-audio --audio-format mp3 "$AUDIO_URL" -o "optional_audio.mp3" || true
             if [ -f "optional_audio.mp3" ]; then
-              echo "🔄 Merging custom MP3 audio into main video..."
               ffmpeg -y -i "input_video.mp4" -i "optional_audio.mp3" -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 "input_video_merged.mp4"
               mv "input_video_merged.mp4" "input_video.mp4"
             fi
