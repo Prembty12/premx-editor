@@ -92,7 +92,7 @@ CRITICAL - HOW TO CALCULATE START_TIME AND CLIP_DURATION (Total Video Length = $
 3. Set 'start_time' to when this moment begins.
 4. Calculate 'clip_duration' by subtracting start_time from end_time to cover the **entire** action sequence. Do not leave out the middle or end of a good fight.
 5. STRICT MATH RULE: Your 'start_time' + 'clip_duration' MUST NOT exceed the total video length of ${SOURCE_DURATION} seconds.
-6. MINIMUM DURATION: The clip must be at least 12 seconds. 
+6. MINIMUM DURATION: The clip must be at least 15 seconds. 
 
 ⚠️ CRITICAL — MISSING ANY FIELD = INVALID RESPONSE:
 1. 'status' is MANDATORY (APPROVE or REJECT)
@@ -107,7 +107,7 @@ VALID EXAMPLE (REJECT):
 {\"status\": \"REJECT\", \"reason\": \"Only menu navigation and boring running\"}
 
 VALID EXAMPLE (APPROVE):
-{\"status\": \"APPROVE\", \"title\": \"Epic Clutch 1v4 💀\", \"start_time\": 5, \"clip_duration\": 25, \"reason\": \"Full combat sequence covered\"}
+{\"status\": \"APPROVE\", \"title\": \"I Had One Chance 🚀\", \"start_time\": 5, \"clip_duration\": 25, \"reason\": \"Full combat sequence covered\"}
 
 Return the JSON object now:"
 
