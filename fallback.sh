@@ -62,7 +62,7 @@ REJECT IF (Strictly reject if content is boring, empty, or lacks engagement):
 - No actual gameplay or action visible in ANY frame
 - All frames look identical, frozen, or useless (boring walking/running without anything happening)
 - Crash screen, error, black frames, or dead/idle moments dominate
-- Absolutely NO exciting, thrilling, or engaging moment (agar video bekar ya faltu lage toh turant REJECT karo)
+- Absolutely NO exciting, thrilling, or engaging moment (If the video feels useless subpar or unengaging instantly reject it)
 
 APPROVE IF:
 - Real gameplay has a clear, powerful \"Engaging Highlight Window\" (combat, intense fights, epic boss battles, explosions, emotional cutscenes, hilarious fails, or high-stakes clutch moments).
@@ -82,7 +82,7 @@ If APPROVE, ALL 5 FIELDS ARE MANDATORY:
   \"status\": \"APPROVE\",
   \"title\": \"<viral title 6 words max with 1-3 emojis>\",
   \"start_time\": <integer seconds, exact second where the engaging moment starts>,
-  \"clip_duration\": <integer seconds, minimum 12 seconds. Capture the FULL fight or highlight completely from start to finish, do not cut it short!>,
+  \"clip_duration\": <integer seconds, minimum 15 seconds. Capture the FULL fight or highlight completely from start to finish, do not cut it short!>,
   \"reason\": \"<short explanation MAX 10 words>\"
 }
 
