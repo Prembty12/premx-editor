@@ -1,6 +1,6 @@
 {
     "game_scores": {
-        "SpiderMan2": 37,
+        "SpiderMan2": 42,
         "AfghanistanRedZone": 10,
         "Ghost_soap_escap": 11,
         "ghostwork": 5,
@@ -21,7 +21,7 @@
         "monkeyKing": 10,
         " UkraineCovertMission": 12,
         "MarvelsSpiderMan2": 39,
-        "RescueOperation": 17
+        "RescueOperation": 12
     },
     "title_styles": {
         "curiosity": 16,
@@ -32,7 +32,7 @@
         "clickbait": 28,
         "informative": 13,
         "epic_cinematic": 10,
-        "funny_roast": 28,
+        "funny_roast": 31,
         "secret_hidden": 37,
         "exposed": 13,
         "unbelievable": 13,
@@ -40,8 +40,8 @@
         "secret": 34,
         "shocking": 13
     },
-    "last_used_style": "crazy",
-    "last_played_game": "RescueOperation",
+    "last_used_style": "funny_roast",
+    "last_played_game": "SpiderMan2",
     "streak_game": "",
     "streak_count": 0,
     "winning_title_context": "SPIDER-FURY: MILES MORALES UNLEASHES MAXIMUM COMBAT POWER!\n\n#videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingreels #reels",
