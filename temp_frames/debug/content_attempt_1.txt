@@ -1,1 +1,1 @@
-{"clip_duration": 15, "reason": "Only slow character walking, no action or gameplay.", "start_time": 5, "status": "REJECT", "title": "Walking in the Magic Cage 🌿✨"}
+{"clip_duration": 21, "reason": "Stealth bridge infiltration with explosive action", "start_time": 10, "status": "APPROVE", "title": "Spider-Man's Bridge Takedown 🕷️💥"}
