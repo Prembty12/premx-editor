@@ -10,6 +10,9 @@ GEMINI_KEYS = [
     os.environ.get("GEMINI_API_KEY_1"),
     os.environ.get("GEMINI_API_KEY_2"),
     os.environ.get("GEMINI_API_KEY_3"),
+    os.environ.get("GEMINI_API_KEY_4"),
+    os.environ.get("GEMINI_API_KEY_5"),
+    os.environ.get("GEMINI_API_KEY_6"),
 ]
 
 FB_PAGE_ID = os.environ.get("PAGE_ID")
