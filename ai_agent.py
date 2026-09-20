@@ -246,18 +246,18 @@ def run_agent_brain():
             memory["streak_game"] = high_perf_game
             memory["streak_count"] = current_streak_count
             chosen_game = high_perf_game
-            log(f"🚀 STREAK START (Post 1/3): Game -> {chosen_game}")
-        elif current_streak_count < 3:
+            log(f"🚀 STREAK START (Post 1/2): Game -> {chosen_game}")
+        elif current_streak_count < 2:
             current_streak_count += 1
             memory["streak_count"] = current_streak_count
             chosen_game = high_perf_game
-            log(f"📈 STREAK RUNNING (Post {current_streak_count}/3): Game -> {chosen_game}")
+            log(f"📈 STREAK RUNNING (Post {current_streak_count}/2): Game -> {chosen_game}")
             
-            if current_streak_count >= 3:
+            if current_streak_count >= 2:
                 if current_video_id not in processed_viral_ids:
                     processed_viral_ids.append(current_video_id)
                 memory["processed_viral_ids"] = processed_viral_ids
-                log(f"🔒 STREAK COMPLETED (3/3): Video ID '{current_video_id}' ab permanently blacklist ho gayi hai.")
+                log(f"🔒 STREAK COMPLETED (2/2): Video ID '{current_video_id}' ab permanently blacklist ho gayi hai.")
         else:
             memory["streak_game"] = ""
             memory["streak_count"] = 0
