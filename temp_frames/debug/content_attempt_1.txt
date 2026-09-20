@@ -1,1 +1,1 @@
-{"clip_duration": 45, "reason": "Full cinematic combat and escape sequence", "start_time": 5, "status": "APPROVE", "title": "They Walked Into a Trap 🪤💥"}
+{"clip_duration": 16, "reason": "Full intense combat sequence", "start_time": 40, "status": "APPROVE", "title": "Chaos erupted instantly 💥🚀"}
