@@ -1,1 +1,1 @@
-{"clip_duration": 20, "reason": "Full lightsaber combat action captured", "start_time": 6, "status": "APPROVE", "title": "Can I beat this elite squad? 🤔⚔️"}
+{"clip_duration": 35, "reason": "Tense interrogation cutscene with high-stakes drama.", "start_time": 3, "status": "APPROVE", "title": "One Wrong Word... 💀"}
