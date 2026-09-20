@@ -1,1 +1,1 @@
-{"clip_duration": 35, "reason": "Tense interrogation cutscene with high-stakes drama.", "start_time": 3, "status": "APPROVE", "title": "One Wrong Word... 💀"}
+{"clip_duration":34,"reason":"Intense cinematic villain power showcase.","start_time":8,"status":"APPROVE","title":"He Has The Ultimate Power 🔥"}
