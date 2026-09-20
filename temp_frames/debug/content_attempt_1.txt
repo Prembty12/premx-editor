@@ -1,1 +1,1 @@
-{"clip_duration":34,"reason":"Intense cinematic villain power showcase.","start_time":8,"status":"APPROVE","title":"He Has The Ultimate Power 🔥"}
+{"clip_duration": 45, "reason": "Full cinematic combat and escape sequence", "start_time": 5, "status": "APPROVE", "title": "They Walked Into a Trap 🪤💥"}
