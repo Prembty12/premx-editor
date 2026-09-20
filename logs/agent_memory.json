@@ -28,7 +28,7 @@
         "curiosity": 16,
         "aggressive": 28,
         "question": 22,
-        "emoji_heavy": 19,
+        "emoji_heavy": 22,
         "gaming_hype": 22,
         "clickbait": 31,
         "informative": 16,
@@ -41,14 +41,15 @@
         "secret": 34,
         "shocking": 16
     },
-    "last_used_style": "shocking",
+    "last_used_style": "emoji_heavy",
     "last_played_game": "Callofdutyaw",
     "streak_game": "Callofdutyaw",
-    "streak_count": 2,
+    "streak_count": 3,
     "winning_title_context": "Soldiers Run and Shoot in City Chaos \ud83d\udca5\n\n#videogames #gamingcommunity #gaming #callofdutyaw #gamingreels #reels",
     "winning_video_id": "28324604270511325",
     "processed_viral_ids": [
-        "1444317791239680"
+        "1444317791239680",
+        "28324604270511325"
     ],
     "style_history": {},
     "winning_title_game": "SpiderMan2",
