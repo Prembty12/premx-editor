@@ -16,9 +16,9 @@
         "DiabloIV": 10,
         "MexicanBorderwar": 5,
         "Russian_secret_missions": 11,
-        "sifu": 10,
+        "sifu": 15,
         "mm2remastered": 38,
-        "monkeyKing": 15,
+        "monkeyKing": 10,
         " UkraineCovertMission": 12,
         "MarvelsSpiderMan2": 39,
         "RescueOperation": 12,
@@ -27,7 +27,7 @@
     "title_styles": {
         "curiosity": 16,
         "aggressive": 28,
-        "question": 22,
+        "question": 25,
         "emoji_heavy": 22,
         "gaming_hype": 25,
         "clickbait": 34,
@@ -41,8 +41,8 @@
         "secret": 34,
         "shocking": 16
     },
-    "last_used_style": "clickbait",
-    "last_played_game": "monkeyKing",
+    "last_used_style": "question",
+    "last_played_game": "sifu",
     "streak_game": "",
     "streak_count": 0,
     "winning_title_context": "Can you survive this red firestorm?\n\n#videogames #gamingcommunity #gaming #mm2remastered #gamingreels #reels",
@@ -59,6 +59,9 @@
             "uploaded_count": 1
         },
         "monkeyKing": {
+            "uploaded_count": 1
+        },
+        "sifu": {
             "uploaded_count": 1
         }
     },

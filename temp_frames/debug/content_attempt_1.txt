@@ -1,1 +1,1 @@
-{"clip_duration": 35, "reason": "Intense beast boss battle combat sequence", "start_time": 0, "status": "APPROVE", "title": "Blue Beast Boss Fight ⚡️"}
+{"clip_duration": 30, "reason": "Continuous intense martial arts combat sequence", "start_time": 0, "status": "APPROVE", "title": "Hallway Beatdown 🥋🔥"}
