@@ -1,1 +1,1 @@
-{"clip_duration": 50, "reason": "Massive fiery explosion sequence, highly cinematic", "start_time": 5, "status": "APPROVE", "title": "The Ultimate Fire Storm 🔥"}
+{"clip_duration": 44, "reason": "Intense fiery city combat action", "start_time": 12, "status": "APPROVE", "title": "Surviving The Fiery Inferno 🔥☠️"}

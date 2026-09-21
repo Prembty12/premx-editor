@@ -31,7 +31,7 @@
         "emoji_heavy": 22,
         "gaming_hype": 25,
         "clickbait": 31,
-        "informative": 16,
+        "informative": 19,
         "epic_cinematic": 10,
         "funny_roast": 34,
         "secret_hidden": 37,
@@ -41,17 +41,24 @@
         "secret": 34,
         "shocking": 16
     },
-    "last_used_style": "gaming_hype",
+    "last_used_style": "informative",
     "last_played_game": "mm2remastered",
     "streak_game": "mm2remastered",
-    "streak_count": 1,
+    "streak_count": 2,
     "winning_title_context": "Can you survive this red firestorm?\n\n#videogames #gamingcommunity #gaming #mm2remastered #gamingreels #reels",
     "winning_video_id": "1829429441565917",
+    "winning_video_views": 0,
     "processed_viral_ids": [
         "1444317791239680",
-        "28324604270511325"
+        "28324604270511325",
+        "1829429441565917"
     ],
     "style_history": {},
+    "game_stats": {
+        "mm2remastered": {
+            "uploaded_count": 1
+        }
+    },
     "winning_title_game": "SpiderMan2",
     "winning_title_uses": 3
 }
