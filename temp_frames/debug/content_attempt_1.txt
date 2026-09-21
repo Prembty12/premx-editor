@@ -1,1 +1,1 @@
-{"clip_duration": 44, "reason": "Intense fiery city combat action", "start_time": 12, "status": "APPROVE", "title": "Surviving The Fiery Inferno 🔥☠️"}
+{"clip_duration": 35, "reason": "Intense beast boss battle combat sequence", "start_time": 0, "status": "APPROVE", "title": "Blue Beast Boss Fight ⚡️"}

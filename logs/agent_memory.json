@@ -17,8 +17,8 @@
         "MexicanBorderwar": 5,
         "Russian_secret_missions": 11,
         "sifu": 10,
-        "mm2remastered": 45,
-        "monkeyKing": 10,
+        "mm2remastered": 38,
+        "monkeyKing": 15,
         " UkraineCovertMission": 12,
         "MarvelsSpiderMan2": 39,
         "RescueOperation": 12,
@@ -30,7 +30,7 @@
         "question": 22,
         "emoji_heavy": 22,
         "gaming_hype": 25,
-        "clickbait": 31,
+        "clickbait": 34,
         "informative": 19,
         "epic_cinematic": 10,
         "funny_roast": 34,
@@ -41,10 +41,10 @@
         "secret": 34,
         "shocking": 16
     },
-    "last_used_style": "informative",
-    "last_played_game": "mm2remastered",
-    "streak_game": "mm2remastered",
-    "streak_count": 2,
+    "last_used_style": "clickbait",
+    "last_played_game": "monkeyKing",
+    "streak_game": "",
+    "streak_count": 0,
     "winning_title_context": "Can you survive this red firestorm?\n\n#videogames #gamingcommunity #gaming #mm2remastered #gamingreels #reels",
     "winning_video_id": "1829429441565917",
     "winning_video_views": 0,
@@ -56,6 +56,9 @@
     "style_history": {},
     "game_stats": {
         "mm2remastered": {
+            "uploaded_count": 1
+        },
+        "monkeyKing": {
             "uploaded_count": 1
         }
     },
