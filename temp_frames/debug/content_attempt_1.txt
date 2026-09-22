@@ -1,1 +1,7 @@
-{"clip_duration": 21, "reason": "Stealth bridge infiltration with explosive action", "start_time": 10, "status": "APPROVE", "title": "Spider-Man's Bridge Takedown 🕷️💥"}
+{
+  "clip_duration": 35,
+  "reason": "Full combat sequence with explosions and flares.",
+  "start_time": 5,
+  "status": "APPROVE",
+  "title": "Firestorm Chaos Unleashed 🔥💥"
+}
