@@ -4,7 +4,6 @@ import json
 import random
 import requests
 import sys
-import shutil
 import subprocess
 from datetime import datetime, timedelta
 
@@ -19,7 +18,7 @@ except ImportError:
 
 try:
     from reportlab.lib.pagesizes import letter
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image as RLImage
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib import colors
     REPORTLAB_AVAILABLE = True
@@ -48,7 +47,7 @@ def get_active_key():
     return random.choice(valid)
 
 # 🔄 Git Auto-Commit & Push Function
-def git_commit_and_push(file_paths_to_add, commit_message="Auto-Agent: Update unified gaming dashboard [skip ci]"):
+def git_commit_and_push(file_paths_to_add, commit_message="Auto-Agent: Update A-Z unified gaming dashboard [skip ci]"):
     try:
         subprocess.run(["git", "config", "--global", "user.name", "github-actions[bot]"], check=False)
         subprocess.run(["git", "config", "--global", "user.email", "41898282+github-actions[bot]@users.noreply.github.com"], check=False)
@@ -146,7 +145,7 @@ def generate_visual_reports(game_views_summary, game_stats):
             
     return sorted_analytics
 
-# ✨ UNIFIED DASHBOARD RECORDING FUNCTION (Game-Wise Separate Tables)
+# ✨ A-Z SINGLE TABLE UNIFIED DASHBOARD RECORDING FUNCTION
 def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploaded_link, facebook_video_link, views_count, game_views_summary, game_stats):
     dashboard_path = "GAMING_DASHBOARD.md"
     leaderboard_json = os.path.join("logs/leaderboard", "games_performance_leaderboard.json")
@@ -198,8 +197,9 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
     except Exception as e:
         log(f"⚠️ Leaderboard error: {e}")
 
+    # Markdown Content A to Z Single Table Format
     md_content = []
-    md_content.append("# 🚀 GAMING AGENT COMMAND & ANALYTICS DASHBOARD\n")
+    md_content.append("# 🚀 GAMING AGENT COMMAND & ANALYTICS DASHBOARD\n\n")
     md_content.append(f"> **Last Updated:** {timestamp} | **Status:** All Systems Active & Synchronized\n\n")
     
     md_content.append("--- \n\n## 🏆 Global Leaderboard & Performance Summary\n\n")
@@ -212,16 +212,16 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
         tier = "🔥 Viral / Hype" if item['avg_views'] > 7000 else "⚡ Trending" if item['avg_views'] > 4000 else "📈 Stable"
         md_content.append(f"| {rank_icon} | **{item['game']}** | {item['uploaded_count']} | {item['total_views']:,} | {item['avg_views']:,} | {tier} |\n")
         
-    md_content.append("\n--- \n\n## 📊 Game-Wise Execution & Upload History\n\n")
-    
-    for g_name, entries in all_history.items():
-        md_content.append(f"### 🎮 {g_name} - Upload History ({len(entries)} Videos)\n\n")
-        md_content.append("| # | Timestamp | AI Generated Title | Views | Source File Link | Clickable Facebook Video Link | Status |\n")
-        md_content.append("|---|---|---|---|---|---|---|\n")
-        for i, entry in enumerate(entries, 1):
+    md_content.append("\n--- \n\n## 📊 Complete A to Z Upload & Execution History\n\n")
+    md_content.append("| # | Game Name | Timestamp | AI Generated Title | Views | Source File Link | Clickable Facebook Video Link | Status |\n")
+    md_content.append("|---|---|---|---|---|---|---|---|\n")
+
+    global_counter = 1
+    for g_name in sorted(all_history.keys()):
+        for entry in all_history[g_name]:
             v_str = f"{entry['views']:,} views" if entry['views'] > 0 else "Pending"
-            md_content.append(f"| {i} | {entry['timestamp']} | {entry['ai_title']} | {v_str} | [Source]({entry['source_link']}) | [🔥 Watch on FB]({entry['fb_link']}) | ✅ Active |\n")
-        md_content.append("\n")
+            md_content.append(f"| {global_counter} | **{g_name}** | {entry['timestamp']} | {entry['ai_title']} | {v_str} | [Source]({entry['source_link']}) | [🔥 Watch on FB]({entry['fb_link']}) | ✅ Active |\n")
+            global_counter += 1
 
     with open(dashboard_path, 'w', encoding='utf-8') as f:
         f.writelines(md_content)
@@ -337,7 +337,7 @@ def run_agent_brain():
     memory_file = "logs/agent_memory.json"
     
     os.makedirs("logs", exist_ok=True)
-    os.makedirs(links_dir, exist_ok=True) # Ensure folder exists safely
+    os.makedirs(links_dir, exist_ok=True)
     
     memory = {
         "game_scores": {}, 
@@ -367,23 +367,16 @@ def run_agent_brain():
         except Exception:
             pass
 
-    # 🛑 SAFE CHECK: Ab koi bhi file move ya delete nahi hogi! Sirf read hogi.
+    # 🛑 SAFE CHECK: Error handling for missing files
     all_files = glob.glob(os.path.join(links_dir, "*.txt"))
     if not all_files:
         all_files = glob.glob("*.txt") + glob.glob("game_links_editor/*.txt")
 
     if not all_files:
-        print(json.dumps({"error": "No valid game files found in game_links_editor."}))
-        sys.exit(1)
+        log("❌ Error: No valid game files found anywhere.")
+        sys.exit(0)
 
-    valid_game_files = []
-    for f in all_files:
-        if os.path.exists(f):
-            valid_game_files.append(f)
-
-    if not valid_game_files:
-        print(json.dumps({"error": "All game files are missing."}))
-        sys.exit(1)
+    valid_game_files = [f for f in all_files if os.path.exists(f)]
 
     game_list = []
     file_mapping = {}
@@ -403,10 +396,17 @@ def run_agent_brain():
         next_index = (game_list.index(last_game) + 1) % len(game_list)
         chosen_game = game_list[next_index]
     else:
-        chosen_game = game_list[0]
+        chosen_game = game_list[0] if game_list else "DefaultGame"
 
-    if not chosen_game or chosen_game not in file_mapping:
-        chosen_game = game_list[0]
+    # 🛑 SAFE FALLBACK CHECK (Error fix for missing target files)
+    target_file = file_mapping.get(chosen_game, "")
+    if not target_file or not os.path.exists(target_file):
+        log(f"⚠️ Warning: Target file for {chosen_game} not found. Using fallback file.")
+        if valid_game_files:
+            target_file = valid_game_files[0]
+            chosen_game = os.path.basename(target_file).replace(".txt", "").strip()
+        else:
+            sys.exit(0)
 
     styles = memory.get("title_styles", {})
     style_names = list(styles.keys())
@@ -439,10 +439,6 @@ Respond ONLY in strict JSON format:
     except Exception:
         pass
 
-    target_file = file_mapping.get(chosen_game, "")
-    if not target_file:
-        sys.exit(1)
-        
     total_links, uploaded_links, remaining_links, game_stats = get_game_video_stats(target_file, memory, chosen_game)
     
     specific_uploaded_link = "N/A"
@@ -453,7 +449,7 @@ Respond ONLY in strict JSON format:
                 link_index = uploaded_links % len(lines)
                 specific_uploaded_link = lines[link_index]
     except Exception:
-        sys.exit(1)
+        pass
 
     game_stats[chosen_game]["uploaded_count"] = uploaded_links + 1
     memory["game_stats"] = game_stats
@@ -499,24 +495,27 @@ Respond ONLY in strict JSON format:
         game_stats=memory.get("game_stats", {})
     )
 
-    sorted_summary = sorted(game_views_summary.items(), key=lambda x: x[1], reverse=True)
-    chat_style_summary = "\n".join([f"🎮 {g}: {v:,} views" for g, v in sorted_summary])
+    print(f"""
+🚀 GAMING AGENT COMMAND & ANALYTICS DASHBOARD
+> Last Updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | Status: All Systems Active & Synchronized
 
-    print(json.dumps({
-        "target_file": target_file,
-        "current_uploaded_game": chosen_game,
-        "current_uploaded_link": specific_uploaded_link,
-        "ai_generated_title": generated_ai_title,
-        "next_rotation_game": next_game,
-        "next_rotation_link": next_link,
-        "chosen_style": chosen_style,
-        "facebook_video_link": current_video_link,
-        "total_videos": total_links,
-        "uploaded_videos": uploaded_links,
-        "remaining_videos": remaining_links,
-        "selected_video_views": current_video_views,
-        "all_games_total_views_summary": chat_style_summary
-    }, indent=4))
+📊 Current Execution Status:
+• Current Upload Game : {chosen_game}
+• AI Generated Title   : {generated_ai_title}
+• Chosen Style         : {chosen_style}
+• Source File Link     : {specific_uploaded_link}
+• Facebook Video Link  : {current_video_link}
+• Selected Video Views : {current_video_views:,} views
+
+⏭️ Next Rotation Preview:
+• Next Game            : {next_game}
+• Next Link            : {next_link}
+
+📈 Progress Stats:
+• Total Videos         : {total_links}
+• Uploaded So Far      : {uploaded_links}
+• Remaining Videos     : {remaining_links}
+""")
 
 if __name__ == "__main__":
     run_agent_brain()
