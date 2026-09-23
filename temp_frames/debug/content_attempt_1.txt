@@ -1,1 +1,1 @@
-{"clip_duration": 40, "reason": "Intense fiery magic boss combat", "start_time": 5, "status": "APPROVE", "title": "Fire Magic Boss Clash 🔥⚔️"}
+{"clip_duration": 15, "reason": "Spider-Man swinging over burning bridge action.", "start_time": 16, "status": "APPROVE", "title": "Spider-Man Swings Over Burning Bridge 🕷️🔥"}
