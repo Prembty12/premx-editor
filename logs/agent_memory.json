@@ -1,30 +1,49 @@
 {
     "game_scores": {
-        "SpiderMan2": 37,
-        "AfghanistanRedZone": 10,
-        "Ghost_soap_escap": 11,
+        "SpiderMan2": 5,
+        "AfghanistanRedZone": 5,
+        "Ghost_soap_escap": 5,
         "ghostwork": 5,
-        "Ghost Destroys Mexican": 11,
-        "GodofWarLaufey ": 10,
-        "ghostandela": 11,
-        "combatopration": 10,
-        "GODOFWAR3": 10,
-        "Callofdutyaw": 38,
-        "codBlackops6": 13,
+        "Ghost Destroys Mexican": 5,
+        "GodofWarLaufey ": 5,
+        "ghostandela": 5,
+        "combatopration": 5,
+        "GODOFWAR3": 5,
+        "Callofdutyaw": 16,
+        "codBlackops6": 5,
         "Ghost_price": 5,
-        "VietnamCavePrison": 10,
-        "DiabloIV": 10,
+        "VietnamCavePrison": 5,
+        "DiabloIV": 5,
         "MexicanBorderwar": 5,
-        "Russian_secret_missions": 11,
-        "sifu": 10,
-        "mm2remastered": 39,
-        "monkeyKing": 10,
-        " UkraineCovertMission": 12,
-        "MarvelsSpiderMan2": 39,
-        "RescueOperation": 12,
+        "Russian_secret_missions": 5,
+        "sifu": 5,
+        "mm2remastered": 27,
+        "monkeyKing": 5,
+        " UkraineCovertMission": 6,
+        "MarvelsSpiderMan2": 21,
+        "RescueOperation": 5,
         "GodofWarLaufey": 10,
         "UkraineCovertMission": 11,
-        "": 15
+        "": 14,
+        "#AfghanistanRedZone": 10,
+        "#Callofdutyaw": 38,
+        "#DiabloIV": 10,
+        "#GODOFWAR3": 10,
+        "#Ghost Destroys Mexican": 11,
+        "#Ghost_soap_escap": 11,
+        "#GodofWarLaufey": 10,
+        "#MarvelsSpiderMan2": 39,
+        "#RescueOperation": 12,
+        "#Russian_secret_missions": 11,
+        "#SpiderMan2": 37,
+        "#UkraineCovertMission": 12,
+        "#VietnamCavePrison": 10,
+        "#codBlackops6": 13,
+        "#combatopration": 10,
+        "#ghostandela": 11,
+        "#mm2remastered": 39,
+        "#monkeyKing": 10,
+        "#sifu": 10
     },
     "title_styles": {
         "curiosity": 19,
@@ -32,7 +51,7 @@
         "question": 22,
         "emoji_heavy": 22,
         "gaming_hype": 25,
-        "clickbait": 28,
+        "clickbait": 31,
         "informative": 13,
         "epic_cinematic": 10,
         "funny_roast": 28,
@@ -43,15 +62,15 @@
         "secret": 37,
         "shocking": 16
     },
-    "last_used_style": "curiosity",
-    "last_played_game": "Russian_secret_missions",
-    "streak_game": "",
-    "streak_count": 0,
-    "winning_title_context": "Soldiers Run and Shoot in City Chaos \ud83d\udca5\n\n#videogames #gamingcommunity #gaming #callofdutyaw #gamingreels #reels",
-    "winning_video_id": "28324604270511325",
-    "winning_video_link": "",
-    "winning_ig_link": "",
-    "winning_video_views": 0,
+    "last_used_style": "clickbait",
+    "last_played_game": "#mm2remastered",
+    "streak_game": "#mm2remastered",
+    "streak_count": 1,
+    "winning_title_context": "Can you survive this red firestorm?\n\n#videogames #gamingcommunity #gaming #mm2remastered #gamingreels #reels",
+    "winning_video_id": "1829429441565917",
+    "winning_video_link": "/reel/1829429441565917/",
+    "winning_ig_link": "N/A",
+    "winning_video_views": 10258,
     "processed_viral_ids": [
         "1444317791239680",
         "1829429441565917",
@@ -129,6 +148,82 @@
             "last_screenshot": "N/A"
         },
         "Callofdutyaw": {
+            "uploaded_count": 0,
+            "last_screenshot": "N/A"
+        },
+        "#VietnamCavePrison": {
+            "uploaded_count": 0,
+            "last_screenshot": "N/A"
+        },
+        "#RescueOperation": {
+            "uploaded_count": 0,
+            "last_screenshot": "N/A"
+        },
+        "#UkraineCovertMission": {
+            "uploaded_count": 0,
+            "last_screenshot": "N/A"
+        },
+        "#combatopration": {
+            "uploaded_count": 0,
+            "last_screenshot": "N/A"
+        },
+        "#AfghanistanRedZone": {
+            "uploaded_count": 0,
+            "last_screenshot": "N/A"
+        },
+        "#codBlackops6": {
+            "uploaded_count": 0,
+            "last_screenshot": "N/A"
+        },
+        "#GodofWarLaufey": {
+            "uploaded_count": 0,
+            "last_screenshot": "N/A"
+        },
+        "#SpiderMan2": {
+            "uploaded_count": 0,
+            "last_screenshot": "N/A"
+        },
+        "#Ghost_soap_escap": {
+            "uploaded_count": 0,
+            "last_screenshot": "N/A"
+        },
+        "#ghostandela": {
+            "uploaded_count": 0,
+            "last_screenshot": "N/A"
+        },
+        "#sifu": {
+            "uploaded_count": 0,
+            "last_screenshot": "N/A"
+        },
+        "#DiabloIV": {
+            "uploaded_count": 0,
+            "last_screenshot": "N/A"
+        },
+        "#mm2remastered": {
+            "uploaded_count": 1,
+            "last_screenshot": "N/A"
+        },
+        "#GODOFWAR3": {
+            "uploaded_count": 0,
+            "last_screenshot": "N/A"
+        },
+        "#Ghost Destroys Mexican": {
+            "uploaded_count": 0,
+            "last_screenshot": "N/A"
+        },
+        "#Russian_secret_missions": {
+            "uploaded_count": 0,
+            "last_screenshot": "N/A"
+        },
+        "#MarvelsSpiderMan2": {
+            "uploaded_count": 0,
+            "last_screenshot": "N/A"
+        },
+        "#monkeyKing": {
+            "uploaded_count": 0,
+            "last_screenshot": "N/A"
+        },
+        "#Callofdutyaw": {
             "uploaded_count": 0,
             "last_screenshot": "N/A"
         }
