@@ -5,23 +5,25 @@
         "Ghost_soap_escap": 11,
         "ghostwork": 5,
         "Ghost Destroys Mexican": 11,
-        "GodofWarLaufey ": 10,
+        "GodofWarLaufey ": 5,
         "ghostandela": 11,
         "combatopration": 10,
         "GODOFWAR3": 10,
-        "Callofdutyaw": 38,
+        "Callofdutyaw": 37,
         "codBlackops6": 13,
         "Ghost_price": 5,
         "VietnamCavePrison": 10,
-        "DiabloIV": 15,
+        "DiabloIV": 10,
         "MexicanBorderwar": 5,
         "Russian_secret_missions": 11,
         "sifu": 10,
         "mm2remastered": 39,
         "monkeyKing": 10,
-        " UkraineCovertMission": 12,
+        " UkraineCovertMission": 6,
         "MarvelsSpiderMan2": 39,
-        "RescueOperation": 12
+        "RescueOperation": 12,
+        "GodofWarLaufey": 10,
+        "UkraineCovertMission": 12
     },
     "title_styles": {
         "curiosity": 16,
@@ -40,18 +42,25 @@
         "secret": 34,
         "shocking": 16
     },
-    "last_used_style": "secret_hidden",
-    "last_played_game": "DiabloIV",
-    "streak_game": "",
-    "streak_count": 0,
+    "last_used_style": "clickbait",
+    "last_played_game": "GODOFWAR3",
     "winning_title_context": "Soldiers Run and Shoot in City Chaos \ud83d\udca5\n\n#videogames #gamingcommunity #gaming #callofdutyaw #gamingreels #reels",
     "winning_video_id": "28324604270511325",
+    "winning_video_link": "",
+    "winning_video_views": 0,
     "processed_viral_ids": [
         "1444317791239680",
         "1829429441565917",
         "28324604270511325"
     ],
     "style_history": {},
+    "game_stats": {
+        "GODOFWAR3": {
+            "uploaded_count": 1
+        }
+    },
+    "streak_game": "",
+    "streak_count": 0,
     "winning_title_game": "SpiderMan2",
     "winning_title_uses": 3
 }
