@@ -1,1 +1,1 @@
-{"clip_duration": 36, "reason": "Epic cinematic warrior pull of faith.", "start_time": 0, "status": "APPROVE", "title": "Pull of Faith & Destiny ⛓️🔥"}
+{"clip_duration": 40, "reason": "Intense fiery magic boss combat", "start_time": 5, "status": "APPROVE", "title": "Fire Magic Boss Clash 🔥⚔️"}
