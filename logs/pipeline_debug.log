@@ -1,0 +1,33 @@
+====================================================
+🚀 Pipeline Started at: Wed Sep 23 19:00:44 UTC 2026
+====================================================
+🔍 [STEP 0] Checking Facebook Cookie Session Health...
+⚠️ Checking Facebook Cookie Session Health...
+✅ Status: Cookies present and verified for pipeline execution.
+📈 [STEP 1] Pulling real analytics and insights from past posts...
+📊 Real Facebook Insights fetched & AI memory updated successfully!
+🤖 [STEP 3] Consulting AI Agent Brain (ai_agent.py)...
+🔄 Git Push Result:  To https://github.com/Prembty12/premx-editor
+   e67c354..1a7a7d4  main -> main
+
+🧠 AI Agent Raw Output: [main 1a7a7d4] Auto-Agent: Update unified gaming dashboard [skip ci]
+ 4 files changed, 223 insertions(+), 9 deletions(-)
+ create mode 100644 GAMING_DASHBOARD.md
+ create mode 100644 logs/dashboard_history.json
+ create mode 100644 logs/leaderboard/games_performance_leaderboard.json
+{
+    "target_file": "game_links_editor/GODOFWAR3.txt",
+    "current_uploaded_game": "GODOFWAR3",
+    "current_uploaded_link": "N/A",
+    "ai_generated_title": "\ud83d\udd25 Insane GODOFWAR3 Gameplay Highlights!",
+    "next_rotation_game": "Ghost Destroys Mexican",
+    "next_rotation_link": "N/A",
+    "chosen_style": "clickbait",
+    "facebook_video_link": "",
+    "total_videos": 0,
+    "uploaded_videos": 1,
+    "remaining_videos": 0,
+    "selected_video_views": 0,
+    "all_games_total_views_summary": "\ud83c\udfae codBlackops6: 28,647 views\n\ud83c\udfae SpiderMan2: 20,651 views\n\ud83c\udfae Callofdutyaw: 13,468 views\n\ud83c\udfae mm2remastered: 11,765 views\n\ud83c\udfae MarvelsSpiderMan2: 11,486 views\n\ud83c\udfae RescueOperation: 6,530 views\n\ud83c\udfae Ghost Destroys Mexican: 3,530 views\n\ud83c\udfae combatopration: 2,810 views\n\ud83c\udfae UkraineCovertMission: 2,027 views\n\ud83c\udfae Russian_secret_missions: 1,696 views\n\ud83c\udfae ghostandela: 1,438 views\n\ud83c\udfae AfghanistanRedZone: 1,281 views\n\ud83c\udfae Ghost_soap_escap: 1,209 views\n\ud83c\udfae VietnamCavePrison: 595 views\n\ud83c\udfae sifu: 564 views\n\ud83c\udfae monkeyKing: 224 views\n\ud83c\udfae DiabloIV: 148 views\n\ud83c\udfae GodofWarLaufey: 80 views\n\ud83c\udfae GODOFWAR3: 0 views"
+}
+⚠️ [WARNING] AI Agent ko koi valid game file nahi mili! Target File: 
