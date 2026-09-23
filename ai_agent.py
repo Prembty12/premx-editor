@@ -114,7 +114,7 @@ def generate_visual_reports(game_views_summary, game_stats, game_name):
             elements.append(Paragraph("🏆 Performance & Efficiency Leaderboard", heading_style))
             table_data = [["Rank", "Game Name", "Total Views", "Videos", "Avg/Video", "View Share"]]
             for idx, item in enumerate(sorted_analytics, 1):
-                table_data.append([str(idx), item["game"], f"{item['total_views']:,}", str(item["uploaded_count"]), f"{item['avg_views']:,}", f"{item['share_pct']}%"])
+                table_data.append([str(idx), item["game"], f"{item['total_views']:,}", str(item['uploaded_count']), f"{item['avg_views']:,}", f"{item['share_pct']}%"])
                 
             t = Table(table_data, colWidths=[40, 150, 90, 60, 90, 70])
             t.setStyle(TableStyle([
@@ -140,7 +140,7 @@ def generate_visual_reports(game_views_summary, game_stats, game_name):
     return sorted_analytics
 
 
-# 📊 PROFESSIONAL HISTORY RECORDING FUNCTION (WITH TITLE & LINKS)
+# 📊 PROFESSIONAL HISTORY RECORDING FUNCTION (STRICT HASHTAG ENFORCEMENT)
 def save_professional_history(game_name, target_file, chosen_style, streak_count, total_views, specific_uploaded_link, facebook_video_link, instagram_video_link, winning_title, generated_caption, total_links, uploaded_links_count, remaining_links_count, next_game, next_link, game_views_summary, game_stats, reasoning=""):
     master_history_dir = "logs/professional_records"
     game_history_dir = "logs/game_specific_history"
@@ -149,7 +149,10 @@ def save_professional_history(game_name, target_file, chosen_style, streak_count
     os.makedirs(game_history_dir, exist_ok=True)
     os.makedirs(leaderboard_dir, exist_ok=True)
     
-    clean_g_name = game_name.replace('#', '')
+    # Ensure game name always starts with '#' for records/outputs
+    formatted_game_name = f"#{game_name.replace('#', '').strip()}"
+    clean_g_name = formatted_game_name.replace('#', '').replace(' ', '')
+    
     master_csv = os.path.join(master_history_dir, "all_games_execution_history.csv")
     game_specific_csv = os.path.join(game_history_dir, f"{clean_g_name}_video_history.csv")
     leaderboard_json = os.path.join(leaderboard_dir, "games_performance_leaderboard.json")
@@ -178,10 +181,10 @@ def save_professional_history(game_name, target_file, chosen_style, streak_count
             pass
 
     all_games_views_str = json.dumps(game_views_summary)
-    current_game_total_views = game_views_summary.get(clean_g_name, game_views_summary.get(game_name, 0))
+    current_game_total_views = game_views_summary.get(clean_g_name, game_views_summary.get(formatted_game_name, 0))
 
     row_data = [
-        timestamp, game_name, target_file, chosen_style, streak_count, 
+        timestamp, formatted_game_name, target_file, chosen_style, streak_count, 
         total_links, uploaded_links_count, remaining_links_count, facebook_video_link, 
         instagram_video_link, specific_uploaded_link, winning_title, generated_caption, next_game, next_link, total_views, current_game_total_views, all_games_views_str, reasoning, saved_screenshot_path
     ]
@@ -210,7 +213,7 @@ def save_professional_history(game_name, target_file, chosen_style, streak_count
             json.dump([
                 {
                     "rank": i+1, 
-                    "game_name": f"#{item['game'].replace('#', '')}", 
+                    "game_name": f"#{item['game'].replace('#', '').strip()}", 
                     "total_views": item["total_views"], 
                     "uploaded_videos": item["uploaded_count"],
                     "avg_views_per_video": item["avg_views"],
@@ -224,7 +227,7 @@ def save_professional_history(game_name, target_file, chosen_style, streak_count
             writer.writerow(["Rank", "Game Name", "Total Accumulated Views", "Uploaded Videos", "Avg Views / Video", "View Share (%)", "Last Screenshot"])
             for i, item in enumerate(sorted_analytics):
                 l_shot = game_stats.get(item["game"], {}).get("last_screenshot", "N/A")
-                writer.writerow([i+1, f"#{item['game'].replace('#', '')}", item["total_views"], item["uploaded_count"], item["avg_views"], f"{item['share_pct']}%", l_shot])
+                writer.writerow([i+1, f"#{item['game'].replace('#', '').strip()}", item["total_views"], item["uploaded_count"], item["avg_views"], f"{item['share_pct']}%", l_shot])
     except Exception as e:
         log(f"⚠️ Leaderboard error: {e}")
 
@@ -263,13 +266,9 @@ def fetch_and_calculate_scores(game_list, memory):
     winning_fb_link = "N/A"
     winning_ig_link = "N/A"
     winning_video_views = 0
-    best_views = 7000
+    best_views = -1
     
-    processed_viral_ids = memory.get("processed_viral_ids", [])
     game_scores = memory.get("game_scores", {})
-    title_styles = memory.get("title_styles", {})
-    style_history = memory.get("style_history", {})
-
     twenty_eight_days_ago = datetime.now() - timedelta(days=28)
     since_timestamp = int(twenty_eight_days_ago.timestamp())
 
@@ -294,19 +293,20 @@ def fetch_and_calculate_scores(game_list, memory):
                     views = video.get("views", 0)
                     
                     for game in game_list:
-                        if game.lower() in text:
+                        clean_g = game.replace('#', '').strip().lower()
+                        if clean_g in text:
                             temp_game_views[game] += views
                             temp_game_counts[game] += 1
                             if views >= 7000:
                                 temp_viral_counts[game] += 1
-                            if views >= 7000 and video_id not in processed_viral_ids:
-                                if views > best_views or winning_game is None:
-                                    best_views = views
-                                    winning_game = game
-                                    winning_title = title if title else description
-                                    winning_video_id = video_id
-                                    winning_fb_link = permalink
-                                    winning_video_views = views
+                            
+                            if views > best_views or winning_game is None:
+                                best_views = views
+                                winning_game = game
+                                winning_title = title if title else description
+                                winning_video_id = video_id
+                                winning_fb_link = permalink
+                                winning_video_views = views
         except Exception as e:
             log(f"⚠️ FB error: {e}")
 
@@ -331,19 +331,20 @@ def fetch_and_calculate_scores(game_list, memory):
                         views = (post.get("like_count", 0) * 10) + (post.get("comments_count", 0) * 20)
 
                     for game in game_list:
-                        if game.lower() in text:
+                        clean_g = game.replace('#', '').strip().lower()
+                        if clean_g in text:
                             temp_game_views[game] += views
                             temp_game_counts[game] += 1
                             if views >= 7000:
                                 temp_viral_counts[game] += 1
-                            if views >= 7000 and post_id not in processed_viral_ids:
-                                if views > best_views or winning_game is None:
-                                    best_views = views
-                                    winning_game = game
-                                    winning_title = caption
-                                    winning_video_id = post_id
-                                    winning_ig_link = permalink
-                                    winning_video_views = views
+                            
+                            if views > best_views or winning_game is None:
+                                best_views = views
+                                winning_game = game
+                                winning_title = caption
+                                winning_video_id = post_id
+                                winning_ig_link = permalink
+                                winning_video_views = views
         except Exception as e:
             log(f"⚠️ IG error: {e}")
 
@@ -424,7 +425,9 @@ def run_agent_brain():
     game_list = []
     file_mapping = {}
     for f in valid_game_files:
-        g_name = os.path.basename(f).replace("_uploaded_links.txt", "").replace(".txt", "")
+        raw_g_name = os.path.basename(f).replace("_uploaded_links.txt", "").replace(".txt", "")
+        # Force strict hashtag format for game name
+        g_name = f"#{raw_g_name.replace('#', '').strip()}"
         file_mapping[g_name] = f
         _, _, rem_links, _ = get_game_video_stats(f, memory, g_name)
         if rem_links > 0:
@@ -432,23 +435,14 @@ def run_agent_brain():
 
     if not game_list:
         for f in valid_game_files:
-            g_name = os.path.basename(f).replace("_uploaded_links.txt", "").replace(".txt", "")
+            raw_g_name = os.path.basename(f).replace("_uploaded_links.txt", "").replace(".txt", "")
+            g_name = f"#{raw_g_name.replace('#', '').strip()}"
             game_list.append(g_name)
 
     game_list.sort()
 
     high_perf_game, winning_title, current_video_id, current_fb_link, current_ig_link, current_video_views, game_views_summary, memory = fetch_and_calculate_scores(game_list, memory)
     
-    processed_viral_ids = memory.get("processed_viral_ids", [])
-    
-    if current_video_id and current_video_id in processed_viral_ids:
-        high_perf_game = None
-        winning_title = "N/A"
-        current_video_id = ""
-        current_fb_link = "N/A"
-        current_ig_link = "N/A"
-        current_video_views = 0
-
     stored_video_id = memory.get("winning_video_id", "")
     current_streak_count = memory.get("streak_count", 0)
     chosen_game = ""
@@ -468,10 +462,6 @@ def run_agent_brain():
             current_streak_count += 1
             memory["streak_count"] = current_streak_count
             chosen_game = high_perf_game
-            if current_streak_count >= 2:
-                if current_video_id not in processed_viral_ids:
-                    processed_viral_ids.append(current_video_id)
-                memory["processed_viral_ids"] = processed_viral_ids
         else:
             memory["streak_game"] = ""
             memory["streak_count"] = 0
@@ -486,12 +476,12 @@ def run_agent_brain():
         else:
             chosen_game = game_list[0]
 
-    winning_context = memory.get("winning_title_context", "N/A")
-    recorded_views = memory.get("winning_video_views", 0)
-    tracked_fb_link = memory.get("winning_video_link", "N/A")
-    tracked_ig_link = memory.get("winning_ig_link", "N/A")
-    styles = memory.get("title_styles", {})
+    winning_context = winning_title if winning_title != "N/A" else memory.get("winning_title_context", "N/A")
+    recorded_views = current_video_views if current_video_views > 0 else memory.get("winning_video_views", 0)
+    tracked_fb_link = current_fb_link if current_fb_link != "N/A" else memory.get("winning_video_link", "N/A")
+    tracked_ig_link = current_ig_link if current_ig_link != "N/A" else memory.get("winning_ig_link", "N/A")
     
+    styles = memory.get("title_styles", {})
     style_names = list(styles.keys())
     style_weights = list(styles.values())
     chosen_style = random.choices(style_names, weights=style_weights, k=1)[0]
@@ -544,16 +534,20 @@ def run_agent_brain():
 
     total_links, uploaded_links, remaining_links, _ = get_game_video_stats(target_file, memory, chosen_game)
 
-    # 💎 Formatting with Hashtag (#)
-    formatted_game_name = f"#{chosen_game.replace(' ', '')}"
-    formatted_next_game = f"#{next_game.replace(' ', '')}" if next_game else "N/A"
-    formatted_views_summary = {f"#{k.replace(' ', '')}": v for k, v in game_views_summary.items()}
+    # 💎 Strict Hashtag Formatting for Game and Summary
+    formatted_game_name = f"#{chosen_game.replace('#', '').strip()}"
+    formatted_next_game = f"#{next_game.replace('#', '').strip()}" if next_game else "N/A"
+    
+    formatted_views_summary = {}
+    for k, v in game_views_summary.items():
+        clean_k = f"#{k.replace('#', '').strip()}"
+        formatted_views_summary[clean_k] = v
 
     # 🏷️ Auto Generated Description / Caption with Hashtags
-    clean_tag = chosen_game.replace(' ', '')
+    clean_tag = chosen_game.replace('#', '').replace(' ', '')
     generated_caption = f"🔥 {chosen_style.upper()} Gaming Moment! 🎮 Catch this epic action live. Check out more details and gameplay. #{clean_tag} #gaming #videogames #gamingcommunity #reels #gamingreels"
 
-    # Save history with Facebook link, Instagram link, Winning Title, and generated caption
+    # Save history with guaranteed '#' prefix in game name
     save_professional_history(
         game_name=formatted_game_name,
         target_file=target_file,
@@ -575,7 +569,7 @@ def run_agent_brain():
         reasoning=ai_reasoning
     )
 
-    current_game_total_views = game_views_summary.get(chosen_game, 0)
+    current_game_total_views = formatted_views_summary.get(formatted_game_name, 0)
     saved_screenshot_logged = game_stats.get(chosen_game, {}).get("last_screenshot", "N/A")
 
     print(json.dumps({
