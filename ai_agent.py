@@ -139,7 +139,7 @@ def generate_visual_reports(game_views_summary, game_stats, game_name):
     return sorted_analytics
 
 
-# 📊 PROFESSIONAL & ADVANCED ANALYTICS RECORDING FUNCTION
+# 📊 PROFESSIONAL & ADVANCED ANALYTICS RECORDING FUNCTION (WITH ALL GAMES VIEWS SUMMARY)
 def save_professional_history(game_name, target_file, chosen_style, streak_count, total_views, specific_uploaded_link, facebook_video_link, total_links, uploaded_links_count, remaining_links_count, next_game, next_link, game_views_summary, game_stats, reasoning=""):
     master_history_dir = "logs/professional_records"
     game_history_dir = "logs/game_specific_history"
@@ -166,15 +166,17 @@ def save_professional_history(game_name, target_file, chosen_style, streak_count
     if found_ss:
         ss_folder = "logs/history_screenshots"
         os.makedirs(ss_folder, exist_ok=True)
-        file_name = f"{game_name}{datetime.now().strftime('%Y%m%d%H%M%S')}.jpg"
+        file_name = f"{game_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg"
         saved_screenshot_path = os.path.join(ss_folder, file_name)
         try:
             shutil.copy(found_ss, saved_screenshot_path)
+            # Game specific stats ma pan screenshot path save rakhva mate
             if game_name in game_stats:
                 game_stats[game_name]["last_screenshot"] = saved_screenshot_path
         except Exception:
             pass
 
+    # Convert all games views summary to formatted string for CSV logging
     all_games_views_str = json.dumps(game_views_summary)
     current_game_total_views = game_views_summary.get(game_name, 0)
 
@@ -513,7 +515,7 @@ Respond ONLY in strict JSON format:
         if candidates and "content" in candidates[0]:
             parts = candidates[0]["content"].get("parts", [])
             if parts:
-                text_res = parts[0].get("text", "").replace("json", "").replace("", "").strip()
+                text_res = parts[0].get("text", "").replace("```json", "").replace("```", "").strip()
                 parsed = json.loads(text_res)
                 if parsed.get("chosen_style") in styles:
                     chosen_style = parsed.get("chosen_style")
@@ -568,6 +570,7 @@ Respond ONLY in strict JSON format:
 
     total_links, uploaded_links, remaining_links, _ = get_game_video_stats(target_file, memory, chosen_game)
 
+    # Save history including all games total views summary and screenshot path
     save_professional_history(
         game_name=chosen_game,
         target_file=target_file,
