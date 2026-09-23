@@ -1,1 +1,1 @@
-{"clip_duration": 15, "reason": "Spider-Man swinging over burning bridge action.", "start_time": 16, "status": "APPROVE", "title": "Spider-Man Swings Over Burning Bridge 🕷️🔥"}
+{"clip_duration": 17, "reason": "Cinematic dark castle climb with giant beast climax", "start_time": 40, "status": "APPROVE", "title": "Dark Castle Giant Beast Reveal 🌩️"}

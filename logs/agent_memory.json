@@ -24,10 +24,10 @@
         "RescueOperation": 12,
         "GodofWarLaufey": 10,
         "UkraineCovertMission": 11,
-        "": 18
+        "": 15
     },
     "title_styles": {
-        "curiosity": 16,
+        "curiosity": 19,
         "aggressive": 28,
         "question": 22,
         "emoji_heavy": 22,
@@ -43,8 +43,8 @@
         "secret": 37,
         "shocking": 16
     },
-    "last_used_style": "secret",
-    "last_played_game": "MarvelsSpiderMan2",
+    "last_used_style": "curiosity",
+    "last_played_game": "Russian_secret_missions",
     "streak_game": "",
     "streak_count": 0,
     "winning_title_context": "Soldiers Run and Shoot in City Chaos \ud83d\udca5\n\n#videogames #gamingcommunity #gaming #callofdutyaw #gamingreels #reels",
@@ -73,7 +73,7 @@
             "last_screenshot": "N/A"
         },
         "RescueOperation": {
-            "uploaded_count": 0,
+            "uploaded_count": 1,
             "last_screenshot": "N/A"
         },
         " UkraineCovertMission": {
@@ -117,7 +117,7 @@
             "last_screenshot": "N/A"
         },
         "Russian_secret_missions": {
-            "uploaded_count": 0,
+            "uploaded_count": 1,
             "last_screenshot": "N/A"
         },
         "MarvelsSpiderMan2": {
