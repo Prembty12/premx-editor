@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Downloader API Client</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #0f172a; color: #f8fafc; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .container { background: #1e293b; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); width: 100%; max-width: 600px; }
+        h2 { margin-bottom: 20px; font-size: 24px; color: #38bdf8; text-align: center; }
+        .input-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        input[type="text"] { flex: 1; padding: 12px 15px; border: 1px solid #475569; background: #0f172a; color: #fff; border-radius: 8px; font-size: 14px; outline: none; }
+        input[type="text"]:focus { border-color: #38bdf8; }
+        button { background: #38bdf8; color: #0f172a; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        button:hover { background: #0ea5e9; }
+        #loading { display: none; text-align: center; margin: 15px 0; color: #94a3b8; }
+        .video-info { display: flex; gap: 15px; margin-bottom: 20px; align-items: center; background: #0f172a; padding: 15px; border-radius: 8px; }
+        .video-info img { width: 120px; border-radius: 6px; object-fit: cover; }
+        .video-details h3 { font-size: 16px; margin-bottom: 5px; color: #f1f5f9; }
+        .video-details p { font-size: 13px; color: #94a3b8; }
+        .formats-list { max-height: 350px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+        .format-card { background: #0f172a; padding: 12px 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #334155; }
+        .format-meta { font-size: 14px; color: #cbd5e1; }
+        .format-meta span { display: block; font-size: 11px; color: #64748b; margin-top: 2px; }
+        .download-btn { background: #22c55e; color: #fff; padding: 6px 14px; font-size: 13px; border-radius: 6px; text-decoration: none; font-weight: bold; }
+        .download-btn:hover { background: #16a34a; }
+        .error { color: #ef4444; background: #fee2e2; padding: 10px; border-radius: 6px; font-size: 14px; text-align: center; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>YouTube Downloader</h2>
+    
+    <div class="input-group">
+        <input type="text" id="urlInput" placeholder="Paste YouTube video link here...">
+        <button onclick="fetchVideoInfo()">Fetch</button>
+    </div>
+
+    <div id="errorBox" style="display: none;" class="error"></div>
+    <div id="loading">Fetching video streams... Please wait.</div>
+
+    <div id="resultContainer" style="display: none;">
+        <div class="video-info">
+            <img id="thumbnail" src="" alt="Thumbnail">
+            <div class="video-details">
+                <h3 id="videoTitle"></h3>
+                <p id="videoDuration"></p>
+            </div>
+        </div>
+        <div class="formats-list" id="formatsList"></div>
+    </div>
+</div>
+
+<script>
+    const API_BASE_URL = "https://premx-editor.onrender.com/download?url=";
+
+    async function fetchVideoInfo() {
+        const urlInput = document.getElementById('urlInput').value.trim();
+        const errorBox = document.getElementById('errorBox');
+        const loading = document.getElementById('loading');
+        const resultContainer = document.getElementById('resultContainer');
+        const formatsList = document.getElementById('formatsList');
+
+        errorBox.style.display = 'none';
+        resultContainer.style.display = 'none';
+
+        if (!urlInput) {
+            errorBox.innerText = "Please enter a valid YouTube URL.";
+            errorBox.style.display = 'block';
+            return;
+        }
+
+        loading.style.display = 'block';
+
+        try {
+            const response = await fetch(API_BASE_URL + encodeURIComponent(urlInput));
+            const data = await response.json();
+
+            loading.style.display = 'none';
+
+            if (data.error) {
+                errorBox.innerText = data.error;
+                errorBox.style.display = 'block';
+                return;
+            }
+
+            document.getElementById('thumbnail').src = data.thumbnail;
+            document.getElementById('videoTitle').innerText = data.title;
+            document.getElementById('videoDuration').innerText = "Duration: " + Math.floor(data.duration / 60) + " mins";
+
+            formatsList.innerHTML = '';
+            
+            if (data.formats && data.formats.length > 0) {
+                data.formats.forEach(f => {
+                    const card = document.createElement('div');
+                    card.className = 'format-card';
+                    
+                    card.innerHTML = `
+                        <div class="format-meta">
+                            Resolution: <strong>${f.resolution || 'Unknown'}</strong>
+                            <span>Format ID: ${f.format_id}</span>
+                        </div>
+                        <a href="${f.url}" class="download-btn" target="_blank" download>Download</a>
+                    `;
+                    formatsList.appendChild(card);
+                });
+            } else {
+                formatsList.innerHTML = '<p style="text-align:center; color:#94a3b8;">No direct download formats found.</p>';
+            }
+
+            resultContainer.style.display = 'block';
+
+        } catch (err) {
+            loading.style.display = 'none';
+            errorBox.innerText = "Failed to connect to backend API: " + err.message;
+            errorBox.style.display = 'block';
+        }
+    }
+</script>
+
+</body>
+</html>

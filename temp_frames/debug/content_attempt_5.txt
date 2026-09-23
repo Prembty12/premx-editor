@@ -1,0 +1,7 @@
+{
+  "clip_duration": 20,
+  "reason": "First-person combat with movement, gunfire, and large explosions.",
+  "start_time": 20,
+  "status": "APPROVE",
+  "title": "Who Burned DC? 🔥"
+}

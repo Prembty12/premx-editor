@@ -1,0 +1,51 @@
+name: gaming_reels_schedule
+
+on:
+  workflow_dispatch:
+ # schedule:
+    # - cron: '0 */5000 * * *' # Har 5 ghante mein automatic run hoga
+     
+    #- cron: '*/59 * * * *' # Har 5 minutes mein background mein check karega
+
+jobs:
+  auto-run:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python & Cache
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip' # Ab yeh requirements.txt ko dhoondh lega aur cache perfectly kaam karega!
+          
+      - name: Install Dependencies & FFmpeg
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg
+          pip install -r requirements.txt
+
+      - name: Run Fully Automated Grid Script
+        env:
+          GEMINI_API_KEY_1: ${{ secrets.GEMINI_API_KEY_1 }}
+          GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}
+          GEMINI_API_KEY_3: ${{ secrets.GEMINI_API_KEY_3 }}
+          PAGE_ACCESS_TOKEN: ${{ secrets.PAGE_ACCESS_TOKEN }}
+          PAGE_ID: ${{ secrets.PAGE_ID }}
+          IG_ID: ${{ secrets.IG_ID }}
+          POST_MODE: '2'   # POST_MODE: ${{ vars.POST_MODE }}        
+          COOLDOWN_MINUTES: '180' # 300 minutes (5 hours) cooldown gap
+        run: |
+          bash auto_gemini_grid_pipeline_schedule.sh
+
+      - name: Commit & Push Changes Back to Repository
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "🤖 Fully automated grid analysis, posting & local cooldown sync"
+          branch: main
+          file_pattern: game_links_editor/ posted_links_editor/ temp_frames/* logs/
+          skip_fetch: false
+          push_options: '--force'

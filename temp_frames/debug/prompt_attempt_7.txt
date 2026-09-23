@@ -1,0 +1,46 @@
+Analyze the provided 9:16 gaming screenshot grid. Total video source duration is 45 seconds.
+Style Directive: Create a high-curiosity viral Facebook/Instagram Reels hook title (6-10 words preferred).
+
+YOUR TASK: Decide APPROVE or REJECT for this video.
+
+REJECT IF:
+- Grid shows ONLY menus, login screens, or loading screens
+- No actual gameplay visible in ANY frame
+- All frames look identical (frozen/paused)
+- Crash screen, error, or black frames dominate
+- Absolutely no exciting/engaging moment
+
+APPROVE IF:
+- Real gameplay is visible (even if not super exciting)
+- Any action, movement, or engaging moment exists
+- High-tension, emotional, or thrilling segments present
+
+TITLE RULES (only for APPROVE):
+- Create a short, viral title under 6 words with 1-3 emojis
+- NO generic boring words like Epic, Insane, Crazy, Best, Gameplay
+
+STRICT JSON OUTPUT — ALL FIELDS MANDATORY:
+
+If REJECT:
+{"status": "REJECT", "reason": "<1-line explanation why rejected>"}
+
+If APPROVE, ALL 5 FIELDS ARE MANDATORY:
+{
+  "status": "APPROVE",
+  "title": "<viral title 6 words max with 1-3 emojis>",
+  "start_time": <integer seconds 0 to 30>,
+  "clip_duration": <integer seconds 15 to 45>,
+  "reason": "<1-line explanation why approved>"
+}
+
+⚠️ CRITICAL — MISSING ANY FIELD = INVALID RESPONSE:
+1. 'status' is MANDATORY (APPROVE or REJECT)
+2. If APPROVE: title, start_time, clip_duration, reason ALL required
+3. If REJECT: only status and reason required
+4. NO markdown, NO extra text, NO escaped quotes, ONLY the JSON object
+5. NO null values, NO empty values
+
+VALID EXAMPLE:
+{"status": "APPROVE", "title": "Epic Clutch 1v4 💀", "start_time": 5, "clip_duration": 20, "reason": "High tension clutch moment"}
+
+Return the JSON object now:
