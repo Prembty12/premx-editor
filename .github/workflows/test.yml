@@ -1,4 +1,4 @@
-Name:  testing
+name: Video Editor
 
 on:
   workflow_dispatch:
@@ -73,38 +73,31 @@ jobs:
           yt-dlp --version
           ffmpeg -version
 
-      - name: Fully Auto Fetch Video with Detailed Diagnostics
+      - name: Fully Auto Fetch Video from API Link or YouTube
         run: |
           URL="${{ github.event.inputs.video_url }}"
           AUDIO_URL="${{ github.event.inputs.audio_url }}"
           
-          echo "📦 Fetching video source with diagnostics..."
-          echo "Target URL: $URL"
+          echo "📦 Fetching video source..."
           
-          if [[ "$URL" == *"videodownapi.com"* ]] || [[ "$URL" == "download" ]]; then
+          if [[ "$URL" == "videodownapi.com" ]] || [[ "$URL" == "download" ]]; then
             echo "🔗 Direct Downloader API link detected. Downloading via curl..."
             curl -L -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" "$URL" -o "input_video.mp4" || \
             wget --user-agent="Mozilla/5.0" "$URL" -O "input_video.mp4"
           fi
           
           if [ ! -f "input_video.mp4" ] || [ ! -s "input_video.mp4" ]; then
-            echo "🔄 Attempting yt-dlp extraction with verbose logs..."
-            yt-dlp --verbose \
-                   --extractor-args "youtube:player_client=android,web" \
+            echo "🔄 Fallback to yt-dlp extraction..."
+            yt-dlp --extractor-args "youtube:player_client=android,web" \
                    --geo-bypass \
                    --no-check-certificates \
-                   -f "b[ext=mp4]/best" "$URL" -o "input_video.mp4" || {
-              echo "⚠️ First yt-dlp attempt failed. Trying fallback format..."
-              yt-dlp --verbose --geo-bypass --no-check-certificates "$URL" -o "input_video.mp4"
-            }
+                   -f "b[ext=mp4]/best" "$URL" -o "input_video.mp4" || \
+            yt-dlp --geo-bypass --no-check-certificates "$URL" -o "input_video.mp4"
           fi
           
           if [ ! -f "input_video.mp4" ] || [ ! -s "input_video.mp4" ]; then
-            echo "❌ CRITICAL ERROR: Failed to fetch video completely! Check the URL or possible IP/bot blocking."
+            echo "Error: Failed to fetch video completely!"
             exit 1
-          else
-            echo "✅ Video downloaded successfully. File size:"
-            ls -lh input_video.mp4
           fi
 
           if [ -n "$AUDIO_URL" ]; then
@@ -117,7 +110,7 @@ jobs:
             fi
           fi
 
-      - name: Process Clips, Single Release, and Real-time Links Push
+      - name: Process Clips, Smart Release Management, and Real-time Links Push
         run: |
           RAW_TITLE="${{ github.event.inputs.video_title }}"
           TITLE_INPUT=$(echo "$RAW_TITLE" | tr ' ' '_')
@@ -130,9 +123,9 @@ jobs:
           FPS_OPT="${{ github.event.inputs.fps }}"
           GAME_NAME="${{ github.event.inputs.game_name }}"
           
-          SINGLE_TAG="v1.0.${{ github.run_number }}"
-          echo "📦 Creating single release: $SINGLE_TAG"
-          gh release create "$SINGLE_TAG" --title "Batch Clips: $RAW_TITLE" --notes "All generated clips for run ${{ github.run_number }}" || true
+          # Game name ke basis par tag define karenge (e.g. release-newcod)
+          TARGET_TAG="release-${GAME_NAME}"
+          echo "📦 Checking release status for tag: $TARGET_TAG"
 
           # Setup Git configuration once
           git config --global user.name "github-actions[bot]"
@@ -140,7 +133,28 @@ jobs:
 
           mkdir -p game_links_editor
           FILE_PATH="game_links_editor/${GAME_NAME}.txt"
-          > "$FILE_PATH"
+
+          # Pull latest changes first to avoid git conflict
+          git pull origin main || git pull origin master || true
+
+          # Check if release already exists on GitHub
+          if gh release view "$TARGET_TAG" &>/dev/null; then
+            echo "✅ Existing release found ($TARGET_TAG). Reusing it for new clips."
+          else
+            echo "🚀 New game name detected! Creating new release: $TARGET_TAG"
+            gh release create "$TARGET_TAG" --title "Game Clips: $GAME_NAME" --notes "All generated clips for $GAME_NAME" || true
+          fi
+
+          # Auto-detect starting index if file already exists so numbering continues (e.g. 1, 2, 3 -> next will be 4, 5...)
+          START_INDEX=1
+          if [ -f "$FILE_PATH" ]; then
+            echo "📂 Existing game file found: $FILE_PATH. Appending new links..."
+            EXISTING_LINES=$(grep -cve '^\s*$' "$FILE_PATH" || echo "0")
+            START_INDEX=$((EXISTING_LINES + 1))
+          else
+            echo "📄 Creating new game file: $FILE_PATH"
+            touch "$FILE_PATH"
+          fi
 
           # Crop Ratios
           CROP=""
@@ -154,7 +168,7 @@ jobs:
           GAME=""
           if [ "$FILTER" = "1" ]; then GAME="eq=brightness=0.02:contrast=1.18:saturation=1.25,hqdn3d=1.5:1.5:6:6,unsharp=3:3:0.75:3:3:0.0,"; fi
           if [ "$FILTER" = "2" ]; then GAME="eq=brightness=0.02:contrast=1.20:saturation=1.22:gamma=1.11,vibrance=intensity=0.20,hqdn3d=1.5:1.5:6:6,cas=0.3,noise=alls=3:allf=t+u,unsharp=3:3:0.75:3:3:0.0,"; fi 
-          if [ "$FILTER" = "3" ]; then GAME="scale=flags=lanczos+accurate_rnd:param0=3.0,eq=brightness=0.01:contrast=1.10:saturation=1.10:gamma=1.05,vibrance=intensity=0.10,hqdn3d=1.0:1.0:3:3,cas=0.15,noise=alls=2:allf=t+u,unsharp=3:3:0.2:3:3:0.0,"; fi
+          if [ "$FILTER" = "3" ]; then GAME="scale=flags=lanczos+accurate_rnd:param0=3.0,eq=brightness=0.02:contrast=1.10:saturation=1.10:gamma=1.10,vibrance=intensity=0.10,hqdn3d=1.0:1.0:3:3,cas=0.15,noise=alls=2:allf=t+u,unsharp=3:3:0.2:3:3:0.0,"; fi
           if [ "$FILTER" = "4" ]; then GAME="eq=brightness=0.15:contrast=1.20:gamma=1.25,unsharp=5:5:1.0:5:5:0.0,"; fi
           if [ "$FILTER" = "5" ]; then GAME="eq=contrast=1.25:saturation=1.20,colorbalance=rs=0.08:gs=0.02:bs=-0.08,unsharp=5:5:1.2:5:5:0.0,"; fi
           if [ "$FILTER" = "6" ]; then GAME="eq=contrast=1.35:saturation=1.55:gamma=1.05,unsharp=7:7:2.5:7:7:0.0,"; fi
@@ -176,10 +190,12 @@ jobs:
           VF_CHAIN="${V_SPEED}${CROP}${GAME}scale=trunc(iw/2)*2:trunc(ih/2)*2"
           AF_CHAIN="${A_SPEED}aresample=48000"
 
-          for ((i=1; i<=CLIP_COUNT; i++)); do
-            SS=$(( (i-1) * CLIP_LEN ))
+          END_INDEX=$((START_INDEX + CLIP_COUNT - 1))
+          
+          for ((i=START_INDEX, c=1; i<=END_INDEX; i++, c++)); do
+            SS=$(( (c-1) * CLIP_LEN ))
             CLIP_FILE="${TITLE_INPUT}${i}.mp4"
-            echo "🎬 Rendering $CLIP_FILE..."
+            echo "🎬 Rendering $CLIP_FILE (Auto-indexed)..."
 
             if [ -f "logo.png" ]; then
               ffmpeg -y -ss $SS -t $CLIP_LEN -i "input_video.mp4" -i "logo.png" \
@@ -229,15 +245,17 @@ jobs:
                 "$CLIP_FILE"
             fi
 
-            echo "🚀 Uploading $CLIP_FILE to single release ($SINGLE_TAG)..."
-            gh release upload "$SINGLE_TAG" "$CLIP_FILE" --clobber
+            echo "🚀 Uploading $CLIP_FILE to release ($TARGET_TAG)..."
+            gh release upload "$TARGET_TAG" "$CLIP_FILE" --clobber
 
-            CLIP_URL=$(gh release view "$SINGLE_TAG" --json assets --jq ".assets[] | select(.name == \"$CLIP_FILE\") | .url")
+            # Extract the asset download URL instantly from the release for this clip
+            CLIP_URL=$(gh release view "$TARGET_TAG" --json assets --jq ".assets[] | select(.name == \"$CLIP_FILE\") | .url")
 
             if [ -n "$CLIP_URL" ]; then
               echo "📝 Appending link for ${TITLE_INPUT}${i} to $FILE_PATH..."
               echo "${TITLE_INPUT}${i} | Link: ${CLIP_URL}" >> "$FILE_PATH"
 
+              # Instant git commit and push for the text file update
               git add "$FILE_PATH"
               git commit -m "Real-time add link for clip ${TITLE_INPUT}${i}" || echo "No changes to commit"
               
@@ -245,6 +263,7 @@ jobs:
               git push origin HEAD:main || git push origin HEAD:master || git push || true
             fi
 
+            # Clean up local video file
             rm -f "$CLIP_FILE"
           done
         env:
