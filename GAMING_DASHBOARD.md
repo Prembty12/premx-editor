@@ -1,6 +1,6 @@
 # 🚀 GAMING AGENT COMMAND & ANALYTICS DASHBOARD
 
-> **Last Updated:** 2026-09-23 19:08:47 | **Status:** All Systems Active & Synchronized
+> **Last Updated:** 2026-09-23 19:17:11 | **Status:** All Systems Active & Synchronized
 
 --- 
 
@@ -8,31 +8,32 @@
 
 | Rank | Game Name | Total Videos | Total Views | Avg Views / Video | Performance Tier |
 | :---: | :--- | :---: | :---: | :---: | :---: |
-| 🥇 | **codBlackops6** | 0 | 28,647 | 0 | 📈 Stable |
-| 🥈 | **SpiderMan2** | 0 | 20,651 | 0 | 📈 Stable |
-| 🥉 | **Callofdutyaw** | 0 | 13,478 | 0 | 📈 Stable |
-| 4️⃣ | **mm2remastered** | 0 | 11,787 | 0 | 📈 Stable |
-| 5️⃣ | **MarvelsSpiderMan2** | 0 | 11,486 | 0 | 📈 Stable |
-| 6 | **RescueOperation** | 0 | 6,530 | 0 | 📈 Stable |
-| 7 | **Ghost Destroys Mexican** | 1 | 3,530 | 3,530 | 📈 Stable |
-| 8 | **combatopration** | 0 | 2,810 | 0 | 📈 Stable |
-| 9 | **UkraineCovertMission** | 0 | 2,027 | 0 | 📈 Stable |
-| 10 | **Russian_secret_missions** | 0 | 1,698 | 0 | 📈 Stable |
-| 11 | **ghostandela** | 0 | 1,438 | 0 | 📈 Stable |
-| 12 | **AfghanistanRedZone** | 0 | 1,281 | 0 | 📈 Stable |
-| 13 | **Ghost_soap_escap** | 0 | 1,209 | 0 | 📈 Stable |
-| 14 | **VietnamCavePrison** | 0 | 595 | 0 | 📈 Stable |
-| 15 | **sifu** | 0 | 564 | 0 | 📈 Stable |
-| 16 | **monkeyKing** | 0 | 224 | 0 | 📈 Stable |
-| 17 | **DiabloIV** | 0 | 148 | 0 | 📈 Stable |
-| 18 | **GodofWarLaufey** | 0 | 80 | 0 | 📈 Stable |
-| 19 | **GODOFWAR3** | 1 | 0 | 0 | 📈 Stable |
+| 🥇 | **SpiderMan2** | 0 | 14,260 | 0 | 📈 Stable |
+| 🥈 | **mm2remastered** | 0 | 14,001 | 0 | 📈 Stable |
+| 🥉 | **Callofdutyaw** | 0 | 12,670 | 0 | 📈 Stable |
+| 4️⃣ | **MarvelsSpiderMan2** | 0 | 12,266 | 0 | 📈 Stable |
+| 5️⃣ | **RescueOperation** | 0 | 6,941 | 0 | 📈 Stable |
+| 6 | **ghostandela** | 0 | 4,248 | 0 | 📈 Stable |
+| 7 | **codBlackops6** | 0 | 2,749 | 0 | 📈 Stable |
+| 8 | **Ghost Destroys Mexican** | 1 | 2,677 | 2,677 | 📈 Stable |
+| 9 | **UkraineCovertMission** | 0 | 2,397 | 0 | 📈 Stable |
+| 10 | **AfghanistanRedZone** | 0 | 1,721 | 0 | 📈 Stable |
+| 11 | **Russian_secret_missions** | 0 | 1,651 | 0 | 📈 Stable |
+| 12 | **Ghost_soap_escap** | 1 | 1,088 | 1,088 | 📈 Stable |
+| 13 | **VietnamCavePrison** | 0 | 895 | 0 | 📈 Stable |
+| 14 | **GODOFWAR3** | 1 | 790 | 790 | 📈 Stable |
+| 15 | **sifu** | 0 | 655 | 0 | 📈 Stable |
+| 16 | **combatopration** | 0 | 502 | 0 | 📈 Stable |
+| 17 | **monkeyKing** | 0 | 434 | 0 | 📈 Stable |
+| 18 | **GodofWarLaufey** | 0 | 380 | 0 | 📈 Stable |
+| 19 | **DiabloIV** | 0 | 288 | 0 | 📈 Stable |
 
 --- 
 
 ## 📊 Complete A to Z Upload & Execution History
 
-| # | Game Name | Timestamp | AI Generated Title | Views | Source File Link | Clickable Facebook Video Link | Status |
-|---|---|---|---|---|---|---|---|
-| 1 | **GODOFWAR3** | 2026-09-23 19:01:11 | 🔥 Insane GODOFWAR3 Gameplay Highlights! | Pending | [Source](N/A) | [🔥 Watch on FB]() | ✅ Active |
-| 2 | **Ghost Destroys Mexican** | 2026-09-23 19:08:47 | 🔥 Insane Ghost Destroys Mexican Gameplay Highlights! | Pending | [Source](N/A) | [🔥 Watch on FB]() | ✅ Active |
+| # | Game Name | Timestamp | AI Generated Title | Views | Source File Link | Live Post Link | Platform | Status |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **GODOFWAR3** | 2026-09-23 19:01:11 | 🔥 Insane GODOFWAR3 Gameplay Highlights! | Pending | [Source](N/A) | Pending / Local | Facebook / Auto | ✅ Active |
+| 2 | **Ghost Destroys Mexican** | 2026-09-23 19:08:47 | 🔥 Insane Ghost Destroys Mexican Gameplay Highlights! | Pending | [Source](N/A) | Pending / Local | Facebook / Auto | ✅ Active |
+| 3 | **Ghost_soap_escap** | 2026-09-23 19:17:11 | 🔥 Epic Ghost_soap_escap Gameplay Moments! | 2,550 views | [Source](N/A) | [🔗 View Post](https://www.instagram.com/reel/DdVoBPWkUDh/) | Instagram | ✅ Active |
