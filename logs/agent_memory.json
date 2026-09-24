@@ -1,6 +1,6 @@
 {
     "game_scores": {
-        "AfghanistanRedZone": 15,
+        "AfghanistanRedZone": 10,
         "Callofdutyaw": 11,
         "DiabloIV": 10,
         "GODOFWAR3": 10,
@@ -20,6 +20,37 @@
         "monkeyKing": 10,
         "sifu": 10
     },
+    "last_played_game": "Callofdutyaw",
+    "processed_viral_ids": [],
+    "game_stats": {
+        "AfghanistanRedZone": {
+            "uploaded_count": 0
+        },
+        "Callofdutyaw": {
+            "uploaded_count": 0
+        }
+    },
+    "actual_posted_titles": {
+        "AfghanistanRedZone": "Street Gunfight Mayhem \ud83d\udd2b\ud83d\udc80",
+        "Callofdutyaw": "Prison Break Riot \ud83d\ude94\ud83d\udc80\n\n#videogames #gamingcommunity #gaming #callofdutyaw #gamingreels #reels",
+        "DiabloIV": "Pull of Faith & Destiny \u26d3\ufe0f\ud83d\udd25",
+        "GODOFWAR3": "",
+        "Ghost Destroys Mexican": "",
+        "Ghost_soap_escap": "Ghost's Secret Stealth Method Is Unbelievable! \ud83e\udd2b\ud83d\udd25\n\n#videogames #gamingcommunity #gaming #ghost_soap_escap #gamingreels #reels",
+        "GodofWarLaufey": "She unlocked a forbidden god-tier ability! \ud83d\ude31\ud83d\udd25\n\n#videogames #gamingcommunity #gaming #godofwarlaufey  #gamingreels #reels",
+        "MarvelsSpiderMan2": "Spider-Man's Bridge Takedown \ud83d\udd77\ufe0f\ud83d\udca5\n\n#videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingreels #reels",
+        "RescueOperation": "",
+        "Russian_secret_missions": "City Sniper Bloodbath Action \ud83e\ude78\ud83c\udfaf\n\n#videogames #gamingcommunity #gaming #russian_secret_missions #gamingreels #reels",
+        "SpiderMan2": "Desert Bloodbath Slash \u2694\ufe0f\ud83d\udc80",
+        "UkraineCovertMission": "Sniper Fire & Big Booms \ud83d\udca5\ud83c\udfaf\n\n#videogames #gamingcommunity #gaming #ukrainecovertmission #gamingreels #reels",
+        "VietnamCavePrison": "Would You Pull the Trigger? \ud83d\ude31",
+        "codBlackops6": "Sniper Shot Sparks Firefight \ud83d\udd25\n\n#videogames #gamingcommunity #gaming #codblackops6 #gamingreels #reels",
+        "combatopration": "",
+        "ghostandela": "I Cut The Wrong Chain \ud83d\ude31\n\n#videogames #gamingcommunity #gaming #ghostandela #gamingreels #reels",
+        "mm2remastered": "City Burns in Massive Firestorm \ud83d\udd25\ud83c\udfd9\ufe0f",
+        "monkeyKing": "",
+        "sifu": "Hallway Beatdown \ud83e\udd4b\ud83d\udd25\n\n#videogames #gamingcommunity #gaming #sifu #gamingreels #reels"
+    },
     "title_styles": {
         "curiosity": 13,
         "aggressive": 10,
@@ -37,33 +68,5 @@
         "secret": 10,
         "shocking": 10
     },
-    "last_used_style": "curiosity",
-    "last_played_game": "AfghanistanRedZone",
-    "processed_viral_ids": [],
-    "game_stats": {
-        "AfghanistanRedZone": {
-            "uploaded_count": 0
-        }
-    },
-    "actual_posted_titles": {
-        "AfghanistanRedZone": "Shield Combat Gets Wild \ud83d\udd25\n\n#videogames #gamingcommunity #gaming #afghanistanredzone #gamingreels #reels",
-        "Callofdutyaw": "Prison Break Riot \ud83d\ude94\ud83d\udc80\n\n#videogames #gamingcommunity #gaming #callofdutyaw #gamingreels #reels",
-        "DiabloIV": "Pull of Faith & Destiny \u26d3\ufe0f\ud83d\udd25\n\n#videogames #gamingcommunity #gaming #diabloiv #gamingreels #reels",
-        "GODOFWAR3": "",
-        "Ghost Destroys Mexican": "",
-        "Ghost_soap_escap": "Ghost's Secret Stealth Method Is Unbelievable! \ud83e\udd2b\ud83d\udd25\n\n#videogames #gamingcommunity #gaming #ghost_soap_escap #gamingreels #reels",
-        "GodofWarLaufey": "She unlocked a forbidden god-tier ability! \ud83d\ude31\ud83d\udd25\n\n#videogames #gamingcommunity #gaming #godofwarlaufey  #gamingreels #reels",
-        "MarvelsSpiderMan2": "Spider-Man's Bridge Takedown \ud83d\udd77\ufe0f\ud83d\udca5\n\n#videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingreels #reels",
-        "RescueOperation": "",
-        "Russian_secret_missions": "City Sniper Bloodbath Action \ud83e\ude78\ud83c\udfaf\n\n#videogames #gamingcommunity #gaming #russian_secret_missions #gamingreels #reels",
-        "SpiderMan2": "Desert Bloodbath Slash \u2694\ufe0f\ud83d\udc80\n\n#videogames #gamingcommunity #gaming #spiderman2 #gamingreels #reels",
-        "UkraineCovertMission": "Sniper Fire & Big Booms \ud83d\udca5\ud83c\udfaf\n\n#videogames #gamingcommunity #gaming #ukrainecovertmission #gamingreels #reels",
-        "VietnamCavePrison": "Would You Pull the Trigger? \ud83d\ude31\n\n#videogames #gamingcommunity #gaming #vietnamcaveprison #gamingreels #reels",
-        "codBlackops6": "Sniper Shot Sparks Firefight \ud83d\udd25\n\n#videogames #gamingcommunity #gaming #codblackops6 #gamingreels #reels",
-        "combatopration": "",
-        "ghostandela": "I Cut The Wrong Chain \ud83d\ude31\n\n#videogames #gamingcommunity #gaming #ghostandela #gamingreels #reels",
-        "mm2remastered": "City Burns in Massive Firestorm \ud83d\udd25\ud83c\udfd9\ufe0f\n\n#videogames #gamingcommunity #gaming #mm2remastered #gamingreels #reels",
-        "monkeyKing": "",
-        "sifu": "Hallway Beatdown \ud83e\udd4b\ud83d\udd25\n\n#videogames #gamingcommunity #gaming #sifu #gamingreels #reels"
-    }
+    "last_used_style": "curiosity"
 }
