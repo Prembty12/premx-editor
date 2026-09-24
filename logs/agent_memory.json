@@ -64,8 +64,8 @@
         "secret": 37,
         "shocking": 19
     },
-    "last_used_style": "secret",
-    "last_played_game": "Russian_secret_missions",
+    "last_used_style": "aggressive",
+    "last_played_game": "SpiderMan2",
     "processed_viral_ids": [
         "1444317791239680",
         "1829429441565917",
@@ -110,7 +110,7 @@
             "last_screenshot": "N/A"
         },
         "SpiderMan2": {
-            "uploaded_count": 0,
+            "uploaded_count": 1,
             "last_screenshot": "N/A"
         },
         "ghostandela": {
