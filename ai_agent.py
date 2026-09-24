@@ -37,6 +37,7 @@ GEMINI_KEYS = [
 
 FB_PAGE_ID = os.environ.get("PAGE_ID")
 FB_ACCESS_TOKEN = os.environ.get("PAGE_ACCESS_TOKEN")
+IG_BUSINESS_ID = os.environ.get("IG_BUSINESS_ID") # Optional: Instagram Business Account ID
 
 def log(msg):
     sys.stderr.write(f"{msg}\n")
@@ -46,6 +47,16 @@ def get_active_key():
     if not valid:
         raise ValueError("No valid Gemini API keys found.")
     return random.choice(valid)
+
+# 🎮 GAME NAME PARSING: File name se `#` tak ka use karke clean game name nikalna
+def extract_game_name(file_path_or_string):
+    base_name = os.path.basename(str(file_path_or_string))
+    clean_name = base_name.split('.')[0]
+    
+    if '#' in clean_name:
+        clean_name = clean_name.split('#')[0]
+        
+    return clean_name.replace('_', ' ').strip()
 
 # 📊 ADVANCED ANALYTICS: VISUAL CHART & PROFESSIONAL PDF REPORT
 def generate_visual_reports(game_views_summary, game_stats, game_name):
@@ -80,7 +91,7 @@ def generate_visual_reports(game_views_summary, game_stats, game_name):
             
             fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
             ax1.bar(games, total_v, color='#4A90E2')
-            ax1.set_title("Total Views Leaderboard", fontsize=12, fontweight='bold')
+            ax1.set_title("Total Views Leaderboard (FB + IG)", fontsize=12, fontweight='bold')
             ax1.set_ylabel("Views", fontsize=10, fontweight='bold')
             ax1.tick_params(axis='x', rotation=30)
             
@@ -89,7 +100,7 @@ def generate_visual_reports(game_views_summary, game_stats, game_name):
             ax2.set_ylabel("Avg Views / Video", fontsize=10, fontweight='bold')
             ax2.tick_params(axis='x', rotation=30)
             
-            plt.suptitle("Advanced Gaming Performance & Efficiency Analytics", fontsize=14, fontweight='bold')
+            plt.suptitle("Advanced Gaming Performance & Multi-Platform Efficiency Analytics", fontsize=14, fontweight='bold')
             plt.tight_layout()
             plt.savefig(chart_path, dpi=300)
             plt.close()
@@ -106,11 +117,11 @@ def generate_visual_reports(game_views_summary, game_stats, game_name):
             heading_style = ParagraphStyle('HeadingStyle', parent=styles['Heading2'], fontSize=13, textColor=colors.HexColor('#3F51B5'), spaceBefore=10, spaceAfter=5)
             normal_style = styles['Normal']
             
-            elements.append(Paragraph("🎮 Facebook Gaming Agent - Advanced Analytics Report", title_style))
+            elements.append(Paragraph("🎮 Multi-Platform Gaming Agent - Advanced Analytics Report", title_style))
             elements.append(Paragraph(f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", normal_style))
             elements.append(Spacer(1, 15))
             
-            elements.append(Paragraph("🏆 Advanced Performance & Efficiency Leaderboard", heading_style))
+            elements.append(Paragraph("🏆 Performance & Efficiency Leaderboard (Facebook & Instagram)", heading_style))
             table_data = [["Rank", "Game Name", "Total Views", "Videos", "Avg/Video", "View Share"]]
             for idx, item in enumerate(sorted_analytics, 1):
                 table_data.append([str(idx), item["game"], f"{item['total_views']:,}", str(item["uploaded_count"]), f"{item['avg_views']:,}", f"{item['share_pct']}%"])
@@ -129,7 +140,7 @@ def generate_visual_reports(game_views_summary, game_stats, game_name):
             elements.append(Spacer(1, 15))
             
             if os.path.exists(chart_path):
-                elements.append(Paragraph("📈 Advanced Performance & Efficiency Visuals", heading_style))
+                elements.append(Paragraph("📈 Performance Visuals", heading_style))
                 elements.append(RLImage(chart_path, width=480, height=240))
                 
             doc.build(elements)
@@ -139,8 +150,8 @@ def generate_visual_reports(game_views_summary, game_stats, game_name):
     return sorted_analytics
 
 
-# 📊 PROFESSIONAL & ADVANCED ANALYTICS RECORDING FUNCTION
-def save_professional_history(game_name, target_file, chosen_style, streak_count, total_views, specific_uploaded_link, facebook_video_link, total_links, uploaded_links_count, remaining_links_count, next_game, next_link, game_views_summary, game_stats, reasoning=""):
+# 📊 PROFESSIONAL & MARKDOWN DASHBOARD RECORDING FUNCTION
+def save_professional_history(game_name, target_file, chosen_style, streak_count, total_views, specific_uploaded_link, live_video_link, platform_name, total_links, uploaded_links_count, remaining_links_count, next_game, next_link, game_views_summary, game_stats, ai_title="", reasoning=""):
     master_history_dir = "logs/professional_records"
     game_history_dir = "logs/game_specific_history"
     leaderboard_dir = "logs/leaderboard"
@@ -180,13 +191,13 @@ def save_professional_history(game_name, target_file, chosen_style, streak_count
 
     row_data = [
         timestamp, game_name, target_file, chosen_style, streak_count, 
-        total_links, uploaded_links_count, remaining_links_count, facebook_video_link, 
+        total_links, uploaded_links_count, remaining_links_count, live_video_link, platform_name,
         specific_uploaded_link, next_game, next_link, total_views, current_game_total_views, all_games_views_str, reasoning, saved_screenshot_path
     ]
     
     headers = [
         "Timestamp", "Game Name", "Target File", "Chosen Style", "Streak", 
-        "Total Videos", "Uploaded Videos", "Remaining Videos", "Facebook Video Link", 
+        "Total Videos", "Uploaded Videos", "Remaining Videos", "Live Video Link", "Platform",
         "Uploaded Game Link", "Next Rotation Game", "Next Rotation Link", "Video Views", "Game Total Views", "All Games Total Views Summary", "AI Reasoning / Approve Reason", "Screenshot Path"
     ]
 
@@ -200,6 +211,33 @@ def save_professional_history(game_name, target_file, chosen_style, streak_count
                 writer.writerow(row_data)
         except Exception as e:
             log(f"⚠️ History save error on {path}: {e}")
+
+    # GitHub Markdown Dashboard Update (`GAMING_DASHBOARD.md`)
+    dashboard_path = "GAMING_DASHBOARD.md"
+    if not os.path.exists(dashboard_path):
+        with open(dashboard_path, "w", encoding="utf-8") as f:
+            f.write("# 📊 Autonomous Gaming Agent Dashboard\n\n")
+            f.write("## 📈 Complete A to Z Upload & Execution History\n\n")
+            f.write("| # | Game Name | Timestamp | AI Generated Title | Views | Source File Link | Live Post Link | Platform | Status |\n")
+            f.write("|---|---|---|---|---|---|---|---|---|\n")
+
+    md_rows_count = 0
+    if os.path.exists(dashboard_path):
+        with open(dashboard_path, "r", encoding="utf-8") as f:
+            for line in f:
+                if line.strip().startswith("|") and not "---" in line and not "#" in line:
+                    md_rows_count += 1
+
+    next_md_index = md_rows_count + 1
+    views_str = f"{total_views:,} views" if total_views > 0 else "Pending"
+    live_post_str = f"[🔗 View Post]({live_video_link})" if live_video_link != "N/A" and live_video_link else "Pending / Local"
+    source_str = f"[Source]({specific_uploaded_link})" if specific_uploaded_link != "N/A" else "Source"
+    status_str = "✅ Active"
+    final_ai_title = ai_title if ai_title else f"🔥 Insane {game_name} Gameplay Highlights!"
+
+    new_md_row = f"| {next_md_index} | {game_name} | {timestamp} | {final_ai_title} | {views_str} | {source_str} | {live_post_str} | {platform_name} | {status_str} |\n"
+    with open(dashboard_path, "a", encoding="utf-8") as f:
+        f.write(new_md_row)
 
     sorted_analytics = generate_visual_reports(game_views_summary, game_stats, game_name)
     
@@ -224,7 +262,7 @@ def save_professional_history(game_name, target_file, chosen_style, streak_count
                 l_shot = game_stats.get(item["game"], {}).get("last_screenshot", "N/A")
                 writer.writerow([i+1, item["game"], item["total_views"], item["uploaded_count"], item["avg_views"], f"{item['share_pct']}%", l_shot])
     except Exception as e:
-        log(f"⚠️ Leaderboard save error: {e}")
+            log(f"⚠️ Leaderboard save error: {e}")
 
 
 def get_game_video_stats(target_file, memory, game_name):
@@ -250,103 +288,121 @@ def get_game_video_stats(target_file, memory, game_name):
 
 
 def fetch_and_calculate_scores(game_list, memory):
-    if not FB_PAGE_ID or not FB_ACCESS_TOKEN:
-        return None, "", "", "", 0, {}, memory
-    
-    try:
-        twenty_eight_days_ago = datetime.now() - timedelta(days=28)
-        since_timestamp = int(twenty_eight_days_ago.timestamp())
+    temp_game_views = {g: 0 for g in game_list}
+    temp_game_counts = {g: 0 for g in game_list}
+    temp_viral_counts = {g: 0 for g in game_list}
 
-        url = f"https://graph.facebook.com/v19.0/{FB_PAGE_ID}/videos"
-        params = {
-            "fields": "id,title,description,views,permalink_url,created_time",
-            "since": since_timestamp,
-            "access_token": FB_ACCESS_TOKEN,
-            "limit": 100
-        }
-        response = requests.get(url, params=params, timeout=15)
-        
-        if response.status_code != 200:
-            return None, "", "", "", 0, {}, memory
-            
-        data = response.json().get("data", [])
-        
-        processed_viral_ids = memory.get("processed_viral_ids", [])
-        game_scores = memory.get("game_scores", {})
-        title_styles = memory.get("title_styles", {})
-        style_history = memory.get("style_history", {})
-        
-        best_views = 7000
-        winning_game = None
-        winning_title = ""
-        winning_video_id = ""
-        winning_video_link = ""
-        winning_video_views = 0
-        highest_found = 0
+    processed_viral_ids = memory.get("processed_viral_ids", [])
+    game_scores = memory.get("game_scores", {})
+    title_styles = memory.get("title_styles", {})
+    style_history = memory.get("style_history", {})
 
-        temp_game_views = {g: 0 for g in game_list}
-        temp_game_counts = {g: 0 for g in game_list}
-        temp_viral_counts = {g: 0 for g in game_list}
+    best_views = 7000
+    winning_game = None
+    winning_title = ""
+    winning_video_id = ""
+    winning_video_link = ""
+    winning_video_views = 0
+    winning_platform = "Facebook"
 
-        style_total_views = {s: 0 for s in title_styles}
-        style_counts = {s: 0 for s in title_styles}
-        style_viral_hits = {s: 0 for s in title_styles}
-        
-        for video in data:
-            video_id = video.get("id", "")
-            title = video.get("title", "")
-            description = video.get("description", "")
-            permalink = video.get("permalink_url", f"https://www.facebook.com/{video_id}")
-            text = (title + " " + description).lower()
-            views = video.get("views", 0)
-            
-            if views > highest_found:
-                highest_found = views
-            
-            used_style = style_history.get(video_id)
-            if used_style in title_styles:
-                style_total_views[used_style] += views
-                style_counts[used_style] += 1
-                if views >= 7000:
-                    style_viral_hits[used_style] += 1
+    # 1. 📘 Fetch Facebook Videos & Views
+    if FB_PAGE_ID and FB_ACCESS_TOKEN:
+        try:
+            twenty_eight_days_ago = datetime.now() - timedelta(days=28)
+            since_timestamp = int(twenty_eight_days_ago.timestamp())
 
-            for game in game_list:
-                if game.lower() in text:
-                    temp_game_views[game] += views
-                    temp_game_counts[game] += 1
-                    
-                    if views >= 7000:
-                        temp_viral_counts[game] += 1
-                    
-                    if views >= 7000 and video_id not in processed_viral_ids:
-                        if views > best_views or winning_game is None:
-                            best_views = views
-                            winning_game = game
-                            winning_title = title if title else description
-                            winning_video_id = video_id
-                            winning_video_link = permalink
-                            winning_video_views = views
+            url = f"https://graph.facebook.com/v19.0/{FB_PAGE_ID}/videos"
+            params = {
+                "fields": "id,title,description,views,permalink_url,created_time",
+                "since": since_timestamp,
+                "access_token": FB_ACCESS_TOKEN,
+                "limit": 100
+            }
+            response = requests.get(url, params=params, timeout=15)
+            if response.status_code == 200:
+                fb_data = response.json().get("data", [])
+                for video in fb_data:
+                    video_id = video.get("id", "")
+                    title = video.get("title", "")
+                    description = video.get("description", "")
+                    permalink = video.get("permalink_url", f"https://www.facebook.com/{video_id}")
+                    text = (title + " " + description).lower()
+                    views = video.get("views", 0)
 
-        for game in game_list:
-            total_v = temp_game_views[game]
-            count_v = temp_game_counts[game]
-            viral_c = temp_viral_counts[game]
-            if count_v > 0:
-                avg_v = total_v / count_v
-                calculated_score = int(10 + (avg_v / 500) + (viral_c * 25))
-            else:
-                calculated_score = 10
-            game_scores[game] = max(10, calculated_score)
+                    for game in game_list:
+                        if game.lower() in text:
+                            temp_game_views[game] += views
+                            temp_game_counts[game] += 1
+                            if views >= 7000:
+                                temp_viral_counts[game] += 1
+                            
+                            if views >= 7000 and video_id not in processed_viral_ids:
+                                if views > best_views or winning_game is None:
+                                    best_views = views
+                                    winning_game = game
+                                    winning_title = title if title else description
+                                    winning_video_id = video_id
+                                    winning_video_link = permalink
+                                    winning_video_views = views
+                                    winning_platform = "Facebook"
+        except Exception as e:
+            log(f"⚠️ Facebook API Error: {e}")
 
-        memory["game_scores"] = game_scores
-        memory["title_styles"] = title_styles
+    # 2. 📸 Fetch Instagram Media & Views/Insights
+    if IG_BUSINESS_ID and FB_ACCESS_TOKEN:
+        try:
+            ig_url = f"https://graph.facebook.com/v19.0/{IG_BUSINESS_ID}/media"
+            ig_params = {
+                "fields": "id,caption,media_type,permalink,timestamp,video_views,like_count",
+                "access_token": FB_ACCESS_TOKEN,
+                "limit": 50
+            }
+            ig_response = requests.get(ig_url, params=ig_params, timeout=15)
+            if ig_response.status_code == 200:
+                ig_data = ig_response.json().get("data", [])
+                for post in ig_data:
+                    post_id = post.get("id", "")
+                    caption = post.get("caption", "")
+                    permalink = post.get("permalink", f"https://www.instagram.com/p/{post_id}/")
+                    # Reels ya videos ke views (agar available ho) ya like count fallback
+                    views = post.get("video_views", post.get("like_count", 0) * 15)
+                    text = caption.lower()
 
-        return winning_game, winning_title, winning_video_id, winning_video_link, winning_video_views, temp_game_views, memory
-        
-    except Exception as e:
-        log(f"❌ ERROR: {e}")
-        
-    return None, "", "", "", 0, {}, memory
+                    for game in game_list:
+                        if game.lower() in text:
+                            temp_game_views[game] += views
+                            temp_game_counts[game] += 1
+                            if views >= 7000:
+                                temp_viral_counts[game] += 1
+                            
+                            if views >= 7000 and post_id not in processed_viral_ids:
+                                if views > best_views or winning_game is None:
+                                    best_views = views
+                                    winning_game = game
+                                    winning_title = caption
+                                    winning_video_id = post_id
+                                    winning_video_link = permalink
+                                    winning_video_views = views
+                                    winning_platform = "Instagram"
+        except Exception as e:
+            log(f"⚠️ Instagram API Error: {e}")
+
+    for game in game_list:
+        total_v = temp_game_views[game]
+        count_v = temp_game_counts[game]
+        viral_c = temp_viral_counts[game]
+        if count_v > 0:
+            avg_v = total_v / count_v
+            calculated_score = int(10 + (avg_v / 500) + (viral_c * 25))
+        else:
+            calculated_score = 10
+        game_scores[game] = max(10, calculated_score)
+
+    memory["game_scores"] = game_scores
+    memory["title_styles"] = title_styles
+
+    return winning_game, winning_title, winning_video_id, winning_video_link, winning_video_views, winning_platform, temp_game_views, memory
+
 
 def run_agent_brain():
     links_dir = "game_links_editor"
@@ -372,6 +428,7 @@ def run_agent_brain():
         "winning_video_id": "",
         "winning_video_link": "",
         "winning_video_views": 0,
+        "winning_platform": "Facebook",
         "processed_viral_ids": [],
         "style_history": {},
         "game_stats": {}
@@ -411,7 +468,7 @@ def run_agent_brain():
     game_list = []
     file_mapping = {}
     for f in valid_game_files:
-        g_name = os.path.basename(f).replace("_uploaded_links.txt", "").replace(".txt", "")
+        g_name = extract_game_name(f)
         file_mapping[g_name] = f
         
         _, _, rem_links, _ = get_game_video_stats(f, memory, g_name)
@@ -420,12 +477,12 @@ def run_agent_brain():
 
     if not game_list:
         for f in valid_game_files:
-            g_name = os.path.basename(f).replace("_uploaded_links.txt", "").replace(".txt", "")
+            g_name = extract_game_name(f)
             game_list.append(g_name)
 
     game_list.sort()
 
-    high_perf_game, winning_title, current_video_id, current_video_link, current_video_views, game_views_summary, memory = fetch_and_calculate_scores(game_list, memory)
+    high_perf_game, winning_title, current_video_id, current_video_link, current_video_views, current_platform, game_views_summary, memory = fetch_and_calculate_scores(game_list, memory)
     
     processed_viral_ids = memory.get("processed_viral_ids", [])
     
@@ -447,6 +504,7 @@ def run_agent_brain():
             memory["winning_video_link"] = current_video_link
             memory["winning_title_context"] = winning_title
             memory["winning_video_views"] = current_video_views
+            memory["winning_platform"] = current_platform
             memory["streak_game"] = high_perf_game
             memory["streak_count"] = current_streak_count
             chosen_game = high_perf_game
@@ -485,12 +543,14 @@ def run_agent_brain():
     winning_context = memory.get("winning_title_context", "None")
     recorded_views = memory.get("winning_video_views", 0)
     tracked_vid_link = memory.get("winning_video_link", "N/A")
+    tracked_platform = memory.get("winning_platform", "Facebook")
     styles = memory.get("title_styles", {})
     
     style_names = list(styles.keys())
     style_weights = list(styles.values())
     chosen_style = random.choices(style_names, weights=style_weights, k=1)[0]
     ai_reasoning = "Default style selection approved."
+    ai_generated_title = f"🔥 Insane {chosen_game} Gameplay Highlights!"
 
     try:
         api_key = get_active_key()
@@ -502,7 +562,7 @@ Selected Style: {chosen_style}
 Reference Winning Title: "{winning_context}"
 
 Respond ONLY in strict JSON format:
-{{"chosen_game": "{chosen_game}", "chosen_style": "{chosen_style}", "reasoning": "Approved for high engagement"}}"""
+{{"chosen_game": "{chosen_game}", "chosen_style": "{chosen_style}", "ai_title": "Generated viral hook title here", "reasoning": "Approved for high engagement"}}"""
 
         payload = {"contents": [{"parts": [{"text": prompt}]}]}
         response = requests.post(url, json=payload, timeout=15)
@@ -513,10 +573,12 @@ Respond ONLY in strict JSON format:
         if candidates and "content" in candidates[0]:
             parts = candidates[0]["content"].get("parts", [])
             if parts:
-                text_res = parts[0].get("text", "").replace("json", "").replace("", "").strip()
+                text_res = parts[0].get("text", "").replace("```json", "").replace("```", "").strip()
                 parsed = json.loads(text_res)
                 if parsed.get("chosen_style") in styles:
                     chosen_style = parsed.get("chosen_style")
+                if parsed.get("ai_title"):
+                    ai_generated_title = parsed.get("ai_title")
                 ai_reasoning = parsed.get("reasoning", "AI approved successfully")
     except Exception:
         pass
@@ -575,7 +637,8 @@ Respond ONLY in strict JSON format:
         streak_count=memory.get("streak_count", 0),
         total_views=recorded_views,
         specific_uploaded_link=specific_uploaded_link,
-        facebook_video_link=tracked_vid_link,
+        live_video_link=tracked_vid_link,
+        platform_name=tracked_platform,
         total_links=total_links,
         uploaded_links_count=uploaded_links,
         remaining_links_count=remaining_links,
@@ -583,6 +646,7 @@ Respond ONLY in strict JSON format:
         next_link=next_link,
         game_views_summary=game_views_summary,
         game_stats=memory.get("game_stats", {}),
+        ai_title=ai_generated_title,
         reasoning=ai_reasoning
     )
 
@@ -596,7 +660,9 @@ Respond ONLY in strict JSON format:
         "next_rotation_game": next_game,
         "next_rotation_link": next_link,
         "chosen_style": chosen_style,
-        "facebook_video_link": tracked_vid_link,
+        "ai_generated_title": ai_generated_title,
+        "platform": tracked_platform,
+        "live_video_link": tracked_vid_link,
         "total_videos": total_links,
         "uploaded_videos": uploaded_links,
         "remaining_videos": remaining_links,
