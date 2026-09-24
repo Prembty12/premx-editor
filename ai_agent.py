@@ -7,7 +7,7 @@ import sys
 import subprocess
 from datetime import datetime, timedelta
 
-# 📦 PDF aur Graph ke liye imports
+# 📦 Optional imports
 try:
     import matplotlib
     matplotlib.use('Agg')
@@ -39,31 +39,41 @@ FB_ACCESS_TOKEN = os.environ.get("PAGE_ACCESS_TOKEN")
 
 
 def log(msg):
-    """Human-readable logs -> stderr (bash ke log file me jayenge, stdout ko pollute nahi karenge)"""
+    """Human-readable logs -> stderr (stdout only for JSON)"""
     sys.stderr.write(f"{msg}\n")
     sys.stderr.flush()
 
 
 def get_active_key():
     valid = [k for k in GEMINI_KEYS if k]
-    if not valid:
-        return None
-    return random.choice(valid)
+    return random.choice(valid) if valid else None
 
 
-# 🔄 Git Auto-Commit & Push Function — FIXED: no stdout leak
-def git_commit_and_push(file_paths_to_add, commit_message="Auto-Agent: Sync dashboard + live titles [skip ci]"):
+# ---------------------------------------------------------------------------
+# GIT SYNC
+# ---------------------------------------------------------------------------
+def git_commit_and_push(file_paths_to_add,
+                        commit_message="Auto-Agent: Sync dashboard + live titles [skip ci]"):
     try:
-        # 🔇 Saare git commands ka output DEVNULL ya captured — stdout pe leak NA ho
         subprocess.run(["git", "config", "--global", "user.name", "github-actions[bot]"],
                        check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        subprocess.run(["git", "config", "--global", "user.email", "41898282+github-actions[bot]@users.noreply.github.com"],
+        subprocess.run(["git", "config", "--global", "user.email",
+                        "41898282+github-actions[bot]@users.noreply.github.com"],
                        check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
+        subprocess.run(["git", "pull", "--rebase", "--autostash"],
+                       check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+        added_any = False
         for path in file_paths_to_add:
             if os.path.exists(path):
                 subprocess.run(["git", "add", path],
                                check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                added_any = True
+
+        if not added_any:
+            log("🔄 Git: nothing to stage — skipping")
+            return
 
         commit_res = subprocess.run(["git", "commit", "-m", commit_message],
                                     capture_output=True, text=True, check=False)
@@ -76,6 +86,167 @@ def git_commit_and_push(file_paths_to_add, commit_message="Auto-Agent: Sync dash
         log(f"⚠️ Git auto-push error: {e}")
 
 
+# ---------------------------------------------------------------------------
+# 🔑 NEW: ENRICH HISTORY WITH FB + IG PERMALINKS
+# ---------------------------------------------------------------------------
+def enrich_history_with_platform_links():
+    """
+    Fetch recent FB videos + IG media from Graph API and fill in
+    fb_post_link / ig_post_link for each entry in dashboard_history.json.
+
+    Matching criteria: FB video title/description OR IG caption contains
+    the game name. Newest entries get newest posts (position-wise).
+    """
+    if not FB_PAGE_ID or not FB_ACCESS_TOKEN:
+        log("⚠️ FB credentials missing — skipping link enrichment")
+        return
+
+    history_file = "logs/dashboard_history.json"
+    if not os.path.exists(history_file):
+        log("📭 No history file yet — skipping enrichment")
+        return
+
+    try:
+        with open(history_file, 'r', encoding='utf-8') as f:
+            all_history = json.load(f)
+    except Exception as e:
+        log(f"⚠️ History load error: {e}")
+        return
+
+    # ---------- Fetch FB videos (last 100) ----------
+    fb_videos = []
+    try:
+        r = requests.get(
+            f"https://graph.facebook.com/v19.0/{FB_PAGE_ID}/videos",
+            params={
+                "fields": "id,title,description,permalink_url,created_time",
+                "access_token": FB_ACCESS_TOKEN,
+                "limit": 100
+            },
+            timeout=15
+        )
+        if r.status_code == 200:
+            fb_videos = r.json().get("data", [])
+            log(f"📘 Fetched {len(fb_videos)} FB videos")
+        else:
+            log(f"⚠️ FB API status {r.status_code}: {r.text[:200]}")
+    except Exception as e:
+        log(f"⚠️ FB fetch error: {e}")
+
+    # ---------- Fetch IG media (last 100) ----------
+    ig_media = []
+    try:
+        r = requests.get(
+            f"https://graph.facebook.com/v19.0/{FB_PAGE_ID}",
+            params={"fields": "instagram_business_account",
+                    "access_token": FB_ACCESS_TOKEN},
+            timeout=10
+        )
+        if r.status_code == 200:
+            ig_id = r.json().get("instagram_business_account", {}).get("id")
+            if ig_id:
+                r2 = requests.get(
+                    f"https://graph.facebook.com/v19.0/{ig_id}/media",
+                    params={"fields": "id,caption,permalink,timestamp",
+                            "access_token": FB_ACCESS_TOKEN,
+                            "limit": 100},
+                    timeout=15
+                )
+                if r2.status_code == 200:
+                    ig_media = r2.json().get("data", [])
+                    log(f"📷 Fetched {len(ig_media)} IG media")
+                else:
+                    log(f"⚠️ IG media API status {r2.status_code}: {r2.text[:200]}")
+    except Exception as e:
+        log(f"⚠️ IG fetch error: {e}")
+
+    # ---------- Match & update ----------
+    updated_count = 0
+
+    for game_name, entries in all_history.items():
+        game_key_nospace = game_name.lower().replace(" ", "")
+        game_key_lower = game_name.lower()
+
+        # Collect matching FB posts
+        game_fb_posts = []
+        for vid in fb_videos:
+            text = ((vid.get("title") or "") + " " +
+                    (vid.get("description") or "")).lower()
+            text_nospace = text.replace(" ", "")
+            if game_key_nospace in text_nospace or game_key_lower in text:
+                game_fb_posts.append({
+                    "permalink": vid.get("permalink_url", ""),
+                    "created_time": vid.get("created_time", "")
+                })
+
+        # Collect matching IG posts
+        game_ig_posts = []
+        for m in ig_media:
+            cap = (m.get("caption") or "").lower()
+            cap_nospace = cap.replace(" ", "")
+            if game_key_nospace in cap_nospace or game_key_lower in cap:
+                game_ig_posts.append({
+                    "permalink": m.get("permalink", ""),
+                    "timestamp": m.get("timestamp", "")
+                })
+
+        # Sort newest first
+        game_fb_posts.sort(key=lambda x: x.get("created_time", ""), reverse=True)
+        game_ig_posts.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
+
+        # Sort entries newest first for alignment
+        entries_sorted = sorted(entries,
+                                key=lambda x: x.get("timestamp", ""),
+                                reverse=True)
+
+        # Position-wise assignment
+        for i, entry in enumerate(entries_sorted):
+            # FB
+            if not entry.get("fb_post_link") and i < len(game_fb_posts):
+                perma = game_fb_posts[i]["permalink"]
+                if perma:
+                    entry["fb_post_link"] = perma
+                    updated_count += 1
+
+            # IG
+            if not entry.get("ig_post_link") and i < len(game_ig_posts):
+                perma = game_ig_posts[i]["permalink"]
+                if perma:
+                    entry["ig_post_link"] = perma
+                    updated_count += 1
+
+            # Backward compat: old single post_link
+            if not entry.get("fb_post_link") and not entry.get("ig_post_link"):
+                old_link = entry.get("post_link", "")
+                old_plat = (entry.get("platform", "") or "").lower()
+                if "facebook" in old_plat and old_link:
+                    entry["fb_post_link"] = old_link
+                    updated_count += 1
+                elif "instagram" in old_plat and old_link:
+                    entry["ig_post_link"] = old_link
+                    updated_count += 1
+
+            # Refresh platform label
+            fb_l = entry.get("fb_post_link", "")
+            ig_l = entry.get("ig_post_link", "")
+            if fb_l and ig_l:
+                entry["platform"] = "Both"
+            elif fb_l:
+                entry["platform"] = "Facebook"
+            elif ig_l:
+                entry["platform"] = "Instagram"
+
+    try:
+        with open(history_file, 'w', encoding='utf-8') as f:
+            json.dump(all_history, f, indent=4)
+        log(f"✅ Enriched {updated_count} link(s) from FB + IG")
+    except Exception as e:
+        log(f"⚠️ Save error: {e}")
+
+
+# ---------------------------------------------------------------------------
+# VISUAL REPORTS
+# ---------------------------------------------------------------------------
 def generate_visual_reports(game_views_summary, game_stats):
     reports_dir = "logs/reports"
     os.makedirs(reports_dir, exist_ok=True)
@@ -129,18 +300,23 @@ def generate_visual_reports(game_views_summary, game_stats):
             doc = SimpleDocTemplate(pdf_path, pagesize=letter)
             elements = []
             styles = getSampleStyleSheet()
-            title_style = ParagraphStyle('TitleStyle', parent=styles['Heading1'], fontSize=18, textColor=colors.HexColor('#1A237E'), spaceAfter=15, alignment=1)
-            heading_style = ParagraphStyle('HeadingStyle', parent=styles['Heading2'], fontSize=13, textColor=colors.HexColor('#3F51B5'), spaceBefore=10, spaceAfter=5)
+            title_style = ParagraphStyle('TitleStyle', parent=styles['Heading1'], fontSize=18,
+                                         textColor=colors.HexColor('#1A237E'), spaceAfter=15, alignment=1)
+            heading_style = ParagraphStyle('HeadingStyle', parent=styles['Heading2'], fontSize=13,
+                                           textColor=colors.HexColor('#3F51B5'), spaceBefore=10, spaceAfter=5)
             normal_style = styles['Normal']
 
-            elements.append(Paragraph("🎮 Multi-Platform Gaming Agent - Clean Analytics Report", title_style))
-            elements.append(Paragraph(f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", normal_style))
+            elements.append(Paragraph("🎮 Multi-Platform Gaming Agent - Analytics Report", title_style))
+            elements.append(Paragraph(
+                f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", normal_style))
             elements.append(Spacer(1, 15))
 
-            elements.append(Paragraph("🏆 Performance & Efficiency Leaderboard", heading_style))
-            table_data = [["Rank", "Game Name", "Total Views", "Videos", "Avg/Video", "View Share"]]
+            elements.append(Paragraph("🏆 Performance Leaderboard", heading_style))
+            table_data = [["Rank", "Game Name", "Total Views", "Videos", "Avg/Video", "Share"]]
             for idx, item in enumerate(sorted_analytics, 1):
-                table_data.append([str(idx), item["game"], f"{item['total_views']:,}", str(item['uploaded_count']), f"{item['avg_views']:,}", f"{item['share_pct']}%"])
+                table_data.append([str(idx), item["game"], f"{item['total_views']:,}",
+                                   str(item['uploaded_count']), f"{item['avg_views']:,}",
+                                   f"{item['share_pct']}%"])
 
             t = Table(table_data, colWidths=[40, 150, 90, 60, 90, 70])
             t.setStyle(TableStyle([
@@ -160,6 +336,9 @@ def generate_visual_reports(game_views_summary, game_stats):
     return sorted_analytics
 
 
+# ---------------------------------------------------------------------------
+# DASHBOARD
+# ---------------------------------------------------------------------------
 def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploaded_link,
                              post_link, platform_name, views_count,
                              game_views_summary, game_stats, actual_posted_titles=None):
@@ -187,16 +366,16 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
     new_entry = {
         "timestamp": timestamp,
         "style": chosen_style,
-        "ai_title": ai_title,
-        "actual_posted_title": actual_posted_titles.get(game_name, ""),
+        "actual_posted_title": actual_posted_titles.get(game_name, "") or ai_title,
         "views": views_count,
         "source_link": specific_uploaded_link,
-        "post_link": post_link,
-        "platform": platform_name,
+        "fb_post_link": "",
+        "ig_post_link": "",
+        "platform": platform_name or "Pending",
     }
     all_history[game_name].append(new_entry)
 
-    # Backfill live titles on all older entries
+    # Backfill live titles
     for g_name, entries in all_history.items():
         live_title = actual_posted_titles.get(g_name, "")
         if live_title:
@@ -204,12 +383,24 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
                 if not entry.get("actual_posted_title"):
                     entry["actual_posted_title"] = live_title
 
+    # Save
     try:
         with open(history_json, 'w', encoding='utf-8') as f:
             json.dump(all_history, f, indent=4)
     except Exception:
         pass
 
+    # ---------- 🔑 ENRICH WITH FB + IG LINKS ----------
+    enrich_history_with_platform_links()
+
+    # Reload
+    try:
+        with open(history_json, 'r', encoding='utf-8') as f:
+            all_history = json.load(f)
+    except Exception:
+        pass
+
+    # Reports
     sorted_analytics = generate_visual_reports(game_views_summary, game_stats)
 
     try:
@@ -227,56 +418,76 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
     except Exception as e:
         log(f"⚠️ Leaderboard error: {e}")
 
+    # ---------- Build markdown ----------
     md_content = []
     md_content.append("# 🚀 GAMING AGENT COMMAND & ANALYTICS DASHBOARD\n\n")
     md_content.append(f"> **Last Updated:** {timestamp} | **Status:** All Systems Active & Synchronized\n\n")
 
-    md_content.append("--- \n\n## 🏆 Global Leaderboard & Performance Summary\n\n")
-    md_content.append("| Rank | Game Name | Total Videos | Total Views | Avg Views / Video | Performance Tier |\n")
-    md_content.append("| :---: | :--- | :---: | :---: | :---: | :---: |\n")
+    grand_total_posts = 0
+    grand_total_views = 0
 
-    medals = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣"]
-    for idx, item in enumerate(sorted_analytics):
-        rank_icon = medals[idx] if idx < len(medals) else f"{idx + 1}"
-        tier = "🔥 Viral / Hype" if item['avg_views'] > 7000 else "⚡ Trending" if item['avg_views'] > 4000 else "📈 Stable"
-        md_content.append(f"| {rank_icon} | **{item['game']}** | {item['uploaded_count']} | {item['total_views']:,} | {item['avg_views']:,} | {tier} |\n")
+    # Loop over games in rank order
+    for game_item in sorted_analytics:
+        g_name = game_item['game']
+        game_entries = all_history.get(g_name, [])
+        if not game_entries:
+            continue
 
-    md_content.append("\n--- \n\n## 📺 Live Post Titles (Fetched from Facebook / Instagram)\n\n")
-    md_content.append("> These are the **actual titles/captions** currently live on your FB / IG posts.\n\n")
-    md_content.append("| Game Name | 📺 Actual Live Title (FB / IG) | Platform |\n")
-    md_content.append("|---|---|---|\n")
-    for g_name in sorted(actual_posted_titles.keys()):
-        live_title = actual_posted_titles.get(g_name, "").strip() or "_No live post detected yet_"
-        live_title = live_title.replace("\n", " ").replace("|", "\\|")[:200]
-        md_content.append(f"| **{g_name}** | {live_title} | FB / IG |\n")
+        # Newest first within game
+        game_entries_sorted = sorted(game_entries,
+                                     key=lambda x: x.get('timestamp', ''),
+                                     reverse=True)
 
-    md_content.append("\n--- \n\n## 📊 Complete A to Z Upload & Execution History\n\n")
-    md_content.append("| # | Game Name | Timestamp | 🤖 AI Planned Title | 📺 Actual Live Title (FB/IG) | Views | Source File Link | Live Post Link | Platform | Status |\n")
-    md_content.append("|---|---|---|---|---|---|---|---|---|---|\n")
+        total_v = sum(e.get('views', 0) for e in game_entries_sorted)
+        avg_v = total_v // len(game_entries_sorted) if game_entries_sorted else 0
+        tier = ("🔥 Viral" if avg_v > 7000
+                else "⚡ Trending" if avg_v > 4000
+                else "📈 Stable")
 
-    global_counter = 1
-    for g_name in sorted(all_history.keys()):
-        for entry in all_history[g_name]:
-            v_str = f"{entry['views']:,} views" if entry['views'] > 0 else "Pending"
-            p_name = entry.get('platform', 'Facebook / Auto')
-            p_link = entry.get('post_link', '#')
+        grand_total_posts += len(game_entries_sorted)
+        grand_total_views += total_v
 
-            if p_link != "N/A" and p_link != "#":
-                link_markdown = f"[🔗 View Post]({p_link})"
-            else:
-                link_markdown = "Pending / Local"
+        # Section header
+        md_content.append(f"\n--- \n\n## 🎮 {g_name} — Upload History ({len(game_entries_sorted)} posts)\n\n")
+        md_content.append(f"**📊 Total Views:** {total_v:,} · **Avg:** {avg_v:,} · **Tier:** {tier}\n\n")
 
-            ai_planned = (entry.get('ai_title', '') or '').replace("\n", " ").replace("|", "\\|")[:120]
-            actual_live = (entry.get('actual_posted_title', '') or '').replace("\n", " ").replace("|", "\\|")[:120]
-            if not actual_live:
-                actual_live = "_Pending fetch_"
+        # Table header
+        md_content.append("| # | 🕐 Timestamp | 📺 Live Title | 👁️ Views | 🔗 Source | 🌐 Live Post | Platform | Status |\n")
+        md_content.append("| :---: | :--- | :--- | :---: | :---: | :--- | :---: | :---: |\n")
+
+        for idx, entry in enumerate(game_entries_sorted, 1):
+            title = (entry.get('actual_posted_title') or '').replace("\n", " ").replace("|", "\\|")[:100]
+            if not title:
+                title = "_Pending fetch_"
+
+            views = entry.get('views', 0)
+            v_str = f"{views:,}" if views > 0 else "Pending"
+
+            fb_link = (entry.get('fb_post_link') or '').strip()
+            ig_link = (entry.get('ig_post_link') or '').strip()
+
+            parts = []
+            if fb_link and fb_link not in ('#', 'N/A'):
+                parts.append(f"[🔗 FB]({fb_link})")
+            if ig_link and ig_link not in ('#', 'N/A'):
+                parts.append(f"[🔗 IG]({ig_link})")
+            live_post_md = " · ".join(parts) if parts else "Pending"
+
+            plat = ("📘+📷 Both" if fb_link and ig_link
+                    else "📘 Facebook" if fb_link
+                    else "📷 Instagram" if ig_link
+                    else "⏳ Pending")
+
+            src = entry.get('source_link', '#')
+            src_md = f"[🔗]({src})" if src and src not in ('#', 'N/A') else "N/A"
 
             md_content.append(
-                f"| {global_counter} | **{g_name}** | {entry['timestamp']} | "
-                f"{ai_planned} | {actual_live} | {v_str} | "
-                f"[Source]({entry['source_link']}) | {link_markdown} | {p_name} | ✅ Active |\n"
+                f"| **{idx}** | {entry.get('timestamp', '')} | "
+                f"{title} | {v_str} | {src_md} | "
+                f"{live_post_md} | {plat} | ✅ |\n"
             )
-            global_counter += 1
+
+    md_content.append(f"\n---\n\n**📊 Grand Total:** {grand_total_posts} posts · {grand_total_views:,} views\n")
 
     with open(dashboard_path, 'w', encoding='utf-8') as f:
         f.writelines(md_content)
@@ -284,12 +495,16 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
     git_commit_and_push([dashboard_path, leaderboard_json, history_json, "logs/agent_memory.json"])
 
 
+# ---------------------------------------------------------------------------
+# LINK STATS
+# ---------------------------------------------------------------------------
 def get_game_video_stats(target_file, memory, game_name):
     total_links = 0
     if target_file and os.path.exists(target_file):
         try:
             with open(target_file, 'r', encoding='utf-8', errors='ignore') as f:
-                lines = [line.strip() for line in f if line.strip() and ('http://' in line or 'https://' in line)]
+                lines = [line.strip() for line in f
+                         if line.strip() and ('http://' in line or 'https://' in line)]
                 total_links = len(lines)
         except Exception:
             pass
@@ -300,10 +515,12 @@ def get_game_video_stats(target_file, memory, game_name):
 
     uploaded_links = game_stats[game_name]["uploaded_count"]
     remaining_links = max(0, total_links - uploaded_links)
-
     return total_links, uploaded_links, remaining_links, game_stats
 
 
+# ---------------------------------------------------------------------------
+# FB + IG ANALYTICS
+# ---------------------------------------------------------------------------
 def fetch_and_calculate_scores_multiplatform(game_list, memory):
     if not FB_PAGE_ID or not FB_ACCESS_TOKEN:
         return None, "", "", "Facebook", 0, {}, {}, memory
@@ -330,7 +547,10 @@ def fetch_and_calculate_scores_multiplatform(game_list, memory):
             ig_id = res_ig_acc.json().get("instagram_business_account", {}).get("id")
             if ig_id:
                 media_url = f"https://graph.facebook.com/v19.0/{ig_id}/media"
-                media_params = {"fields": "id,caption,media_url,permalink,timestamp,like_count,comments_count", "access_token": FB_ACCESS_TOKEN, "limit": 50}
+                media_params = {
+                    "fields": "id,caption,media_url,permalink,timestamp,like_count,comments_count",
+                    "access_token": FB_ACCESS_TOKEN, "limit": 50
+                }
                 res_ig_media = requests.get(media_url, params=media_params, timeout=15)
                 if res_ig_media.status_code == 200:
                     ig_data_list = res_ig_media.json().get("data", [])
@@ -353,7 +573,7 @@ def fetch_and_calculate_scores_multiplatform(game_list, memory):
         actual_posted_titles = {g: "" for g in game_list}
         actual_title_timestamps = {g: "" for g in game_list}
 
-        # ---------- FACEBOOK ----------
+        # FACEBOOK
         if res_fb.status_code == 200:
             for video in res_fb.json().get("data", []):
                 vid_id = video.get("id", "")
@@ -382,7 +602,7 @@ def fetch_and_calculate_scores_multiplatform(game_list, memory):
                             platform_type = "Facebook"
                             winning_views = views
 
-        # ---------- INSTAGRAM ----------
+        # INSTAGRAM
         for ig in ig_data_list:
             ig_id = ig.get("id", "")
             caption = (ig.get("caption", "") or "").strip()
@@ -432,6 +652,20 @@ def fetch_and_calculate_scores_multiplatform(game_list, memory):
     return None, "", "", "Facebook", 0, {}, {}, memory
 
 
+# ---------------------------------------------------------------------------
+# GAME SELECTION
+# ---------------------------------------------------------------------------
+def choose_next_game(game_list, memory):
+    last_game = memory.get("last_played_game", "")
+    if last_game in game_list:
+        next_index = (game_list.index(last_game) + 1) % len(game_list)
+        return game_list[next_index]
+    return game_list[0] if game_list else "DefaultGame"
+
+
+# ---------------------------------------------------------------------------
+# MAIN
+# ---------------------------------------------------------------------------
 def run_agent_brain():
     links_dir = "game_links_editor"
     memory_file = "logs/agent_memory.json"
@@ -439,7 +673,7 @@ def run_agent_brain():
     os.makedirs("logs", exist_ok=True)
     os.makedirs(links_dir, exist_ok=True)
 
-    memory = {
+    default_memory = {
         "game_scores": {},
         "title_styles": {
             "curiosity": 10, "aggressive": 10, "question": 10, "emoji_heavy": 10,
@@ -454,6 +688,7 @@ def run_agent_brain():
         "actual_posted_titles": {}
     }
 
+    memory = dict(default_memory)
     if os.path.exists(memory_file):
         try:
             with open(memory_file, 'r', encoding='utf-8') as f:
@@ -463,7 +698,7 @@ def run_agent_brain():
         except Exception:
             pass
 
-    # ✅ Robust file finder with proper filter
+    # Discover game files
     all_files = glob.glob(os.path.join(links_dir, "*.txt"))
     if not all_files:
         all_files = glob.glob("game_links_editor/*.txt")
@@ -476,13 +711,14 @@ def run_agent_brain():
     ]
 
     if not all_files:
-        log("❌ Error: No valid game text files found anywhere in the repository.")
+        log("❌ Error: No valid game text files found.")
         sys.exit(1)
 
-    valid_game_files = [f for f in all_files if os.path.exists(f) and os.path.getsize(f) > 0]
+    valid_game_files = [f for f in all_files
+                        if os.path.exists(f) and os.path.getsize(f) > 0]
 
     if not valid_game_files:
-        log("❌ Error: All game files are empty. Add links to at least one file.")
+        log("❌ Error: All game files are empty.")
         sys.exit(1)
 
     game_list = []
@@ -498,10 +734,10 @@ def run_agent_brain():
         file_mapping[g_name] = f
         game_list.append(g_name)
 
-    game_list = sorted(list(set(game_list)))
-
+    game_list = sorted(set(game_list))
     log(f"📁 Found {len(game_list)} game file(s): {game_list}")
 
+    # Analytics
     (winning_game, winning_title, winning_link, platform_type,
      winning_views, game_views_summary, actual_posted_titles, memory) = \
         fetch_and_calculate_scores_multiplatform(game_list, memory)
@@ -509,55 +745,59 @@ def run_agent_brain():
     if not actual_posted_titles:
         actual_posted_titles = memory.get("actual_posted_titles", {}) or {}
 
-    # 🔄 Game Rotation logic across runs
-    last_game = memory.get("last_played_game", "")
-    if last_game in game_list:
-        next_index = (game_list.index(last_game) + 1) % len(game_list)
-        chosen_game = game_list[next_index]
-    else:
-        chosen_game = game_list[0] if game_list else "DefaultGame"
+    # Choose game
+    chosen_game = choose_next_game(game_list, memory)
 
-    # 🛡️ STRICT TARGET FILE RESOLUTION
     target_file = file_mapping.get(chosen_game, "")
     if not target_file or not os.path.exists(target_file):
-        log(f"❌ Critical Error: Target file for chosen game '{chosen_game}' not found. Halting pipeline execution.")
+        log(f"❌ Target file for '{chosen_game}' not found. Halting.")
         sys.exit(1)
 
-    styles = memory.get("title_styles", {})
-    chosen_style = random.choices(list(styles.keys()), weights=list(styles.values()), k=1)[0]
+    # Choose style
+    styles = memory.get("title_styles", {}) or default_memory["title_styles"]
+    style_names = list(styles.keys())
+    style_weights = [max(1, int(w)) for w in styles.values()]
+    chosen_style = random.choices(style_names, weights=style_weights, k=1)[0]
 
-    # 🎯 Title banane ka kaam MAIN BASH SCRIPT (Step 7, Gemini) karegi.
-    #    Yahan sirf placeholder rakha hai dashboard/history ke liye.
-    game_hashtag = f"#{chosen_game.replace(' ', '')}"
-    generated_ai_title = f"🎮 {chosen_game} Gameplay | {game_hashtag}"
+    # Placeholder title (real one from run.sh)
+    safe_hashtag = "#" + chosen_game.replace(" ", "").replace("-", "")
+    generated_ai_title = f"🎮 {chosen_game} Gameplay | {safe_hashtag}"
 
-    total_links, uploaded_links, remaining_links, game_stats = get_game_video_stats(target_file, memory, chosen_game)
+    # Link stats
+    total_links, uploaded_links, remaining_links, game_stats = \
+        get_game_video_stats(target_file, memory, chosen_game)
 
+    # Pick source URL
     specific_uploaded_link = "N/A"
     try:
         with open(target_file, 'r', encoding='utf-8', errors='ignore') as f:
-            lines = [line.strip() for line in f if line.strip() and ('http://' in line or 'https://' in line)]
+            lines = [line.strip() for line in f
+                     if line.strip() and ('http://' in line or 'https://' in line)]
             if lines:
                 link_index = uploaded_links % len(lines)
-                specific_uploaded_link = lines[link_index]
-                for token in specific_uploaded_link.split():
+                candidate = lines[link_index]
+                for token in candidate.split():
                     if token.startswith("http://") or token.startswith("https://"):
                         specific_uploaded_link = token
                         break
-    except Exception:
-        pass
+                else:
+                    specific_uploaded_link = candidate
+    except Exception as e:
+        log(f"⚠️ Link extraction error: {e}")
 
-    game_stats[chosen_game]["uploaded_count"] = uploaded_links + 1
-    memory["game_stats"] = game_stats
+    # Persist rotation state
     memory["last_used_style"] = chosen_style
     memory["last_played_game"] = chosen_game
+    memory["game_stats"] = game_stats
+    memory["actual_posted_titles"] = actual_posted_titles
 
     try:
         with open(memory_file, 'w', encoding='utf-8') as f:
             json.dump(memory, f, indent=4)
-    except Exception:
-        pass
+    except Exception as e:
+        log(f"⚠️ Memory save error: {e}")
 
+    # Update dashboard
     update_unified_dashboard(
         game_name=chosen_game,
         chosen_style=chosen_style,
@@ -571,27 +811,26 @@ def run_agent_brain():
         actual_posted_titles=actual_posted_titles,
     )
 
-    # Human-readable → stderr
     log(f"""
-🚀 GAMING AGENT COMMAND & ANALYTICS DASHBOARD (MULTI-PLATFORM)
-> Last Updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | Status: Smart Sync Active
+🚀 GAMING AGENT — EXECUTION SUMMARY
+> Last Updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 
-📊 Current Execution Status:
-• Current Upload Game : {chosen_game}
-• Dashboard Placeholder Title : {generated_ai_title}
-• Detected Platform   : {platform_type if winning_link else "Pending"}
-• Live Post Link      : {winning_link if winning_link else "N/A"}
-• Source File Link    : {specific_uploaded_link}
-• Engagement Views    : {winning_views:,} views
+📊 Current Upload:
+• Game          : {chosen_game}
+• Title         : {generated_ai_title}
+• Style         : {chosen_style}
+• Source File   : {specific_uploaded_link}
+• Views         : {winning_views:,}
 
-📈 Progress Stats:
-• Total Videos         : {total_links}
-• Uploaded So Far      : {uploaded_links + 1}
-• Remaining Videos     : {remaining_links}
+📈 Progress:
+• Total Videos  : {total_links}
+• Uploaded      : {uploaded_links}
+• Remaining     : {remaining_links}
 """)
 
-    # ✅ ONLY JSON to stdout — bash isi ko parse karegi
+    # ✅ Clean JSON to stdout for run.sh
     print(json.dumps({
+        "status": "success",
         "target_file": target_file,
         "game_name": chosen_game,
         "chosen_style": chosen_style,
@@ -599,7 +838,7 @@ def run_agent_brain():
         "actual_posted_title": actual_posted_titles.get(chosen_game, ""),
         "source_url": specific_uploaded_link,
         "total_links": total_links,
-        "uploaded_count": uploaded_links + 1,
+        "uploaded_count": uploaded_links,
         "remaining_links": remaining_links,
     }))
 
