@@ -1,1 +1,1 @@
-{"clip_duration": 42, "reason": "Intense combat action with explosions", "start_time": 0, "status": "APPROVE", "title": "Intense Firefight Survival Mode 💥🎯"}
+{"clip_duration": 18, "reason": "Intense magic combat and colorful explosions", "start_time": 16, "status": "APPROVE", "title": "Kratos Destroys Giants 💀⚡"}
