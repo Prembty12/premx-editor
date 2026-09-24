@@ -1,1 +1,1 @@
-{"clip_duration": 18, "reason": "Intense magic combat and colorful explosions", "start_time": 16, "status": "APPROVE", "title": "Kratos Destroys Giants 💀⚡"}
+{"clip_duration": 30, "reason": "Intense turret combat with blood splatters and explosions", "start_time": 5, "status": "APPROVE", "title": "Turret Carnage Unleashed 💀🔥"}

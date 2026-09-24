@@ -1,1 +1,1 @@
-{"status":"APPROVE","title":"He Lifted The Gate?! 🤯","start_time":0,"clip_duration":40,"reason":"Intense FPS firefight with explosions plus a unique gate-lift mechanic"}
+{"clip_duration": 15, "reason": "Boring sniper scoping with no action", "start_time": 5, "status": "REJECT", "title": "No Action"}

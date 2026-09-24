@@ -5,39 +5,44 @@
         "total_views": 28654,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 26.11
+        "view_share_percentage": 26.97,
+        "last_screenshot": "N/A"
     },
     {
         "rank": 2,
         "game_name": "SpiderMan2",
-        "total_views": 20670,
+        "total_views": 20671,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 18.83
+        "view_share_percentage": 19.46,
+        "last_screenshot": "N/A"
     },
     {
         "rank": 3,
         "game_name": "Callofdutyaw",
-        "total_views": 13945,
+        "total_views": 13947,
         "uploaded_videos": 1,
-        "avg_views_per_video": 13945,
-        "view_share_percentage": 12.71
+        "avg_views_per_video": 13947,
+        "view_share_percentage": 13.13,
+        "last_screenshot": "N/A"
     },
     {
         "rank": 4,
         "game_name": "mm2remastered",
-        "total_views": 12799,
+        "total_views": 12805,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 11.66
+        "view_share_percentage": 12.05,
+        "last_screenshot": "N/A"
     },
     {
         "rank": 5,
         "game_name": "MarvelsSpiderMan2",
-        "total_views": 11502,
+        "total_views": 11503,
         "uploaded_videos": 1,
-        "avg_views_per_video": 11502,
-        "view_share_percentage": 10.48
+        "avg_views_per_video": 11503,
+        "view_share_percentage": 10.83,
+        "last_screenshot": "N/A"
     },
     {
         "rank": 6,
@@ -45,110 +50,115 @@
         "total_views": 6536,
         "uploaded_videos": 1,
         "avg_views_per_video": 6536,
-        "view_share_percentage": 5.96
+        "view_share_percentage": 6.15,
+        "last_screenshot": "N/A"
     },
     {
         "rank": 7,
-        "game_name": "Ghost Destroys Mexican",
-        "total_views": 3530,
-        "uploaded_videos": 2,
-        "avg_views_per_video": 1765,
-        "view_share_percentage": 3.22
-    },
-    {
-        "rank": 8,
         "game_name": "combatopration",
         "total_views": 2810,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 2.56
+        "view_share_percentage": 2.65,
+        "last_screenshot": "N/A"
+    },
+    {
+        "rank": 8,
+        "game_name": " UkraineCovertMission",
+        "total_views": 2027,
+        "uploaded_videos": 1,
+        "avg_views_per_video": 2027,
+        "view_share_percentage": 1.91,
+        "last_screenshot": "N/A"
     },
     {
         "rank": 9,
-        "game_name": "UkraineCovertMission",
-        "total_views": 2027,
-        "uploaded_videos": 0,
-        "avg_views_per_video": 0,
-        "view_share_percentage": 1.85
-    },
-    {
-        "rank": 10,
         "game_name": "Russian_secret_missions",
         "total_views": 1703,
         "uploaded_videos": 1,
         "avg_views_per_video": 1703,
-        "view_share_percentage": 1.55
+        "view_share_percentage": 1.6,
+        "last_screenshot": "N/A"
     },
     {
-        "rank": 11,
+        "rank": 10,
         "game_name": "ghostandela",
         "total_views": 1438,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 1.31
+        "view_share_percentage": 1.35,
+        "last_screenshot": "N/A"
+    },
+    {
+        "rank": 11,
+        "game_name": "AfghanistanRedZone",
+        "total_views": 1295,
+        "uploaded_videos": 2,
+        "avg_views_per_video": 647,
+        "view_share_percentage": 1.22,
+        "last_screenshot": "N/A"
     },
     {
         "rank": 12,
-        "game_name": "AfghanistanRedZone",
-        "total_views": 1295,
-        "uploaded_videos": 1,
-        "avg_views_per_video": 1295,
-        "view_share_percentage": 1.18
+        "game_name": "Ghost_soap_escap",
+        "total_views": 1222,
+        "uploaded_videos": 2,
+        "avg_views_per_video": 611,
+        "view_share_percentage": 1.15,
+        "last_screenshot": "N/A"
     },
     {
         "rank": 13,
-        "game_name": "Ghost_soap_escap",
-        "total_views": 1220,
-        "uploaded_videos": 2,
-        "avg_views_per_video": 610,
-        "view_share_percentage": 1.11
-    },
-    {
-        "rank": 14,
         "game_name": "VietnamCavePrison",
         "total_views": 595,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 0.54
+        "view_share_percentage": 0.56,
+        "last_screenshot": "N/A"
     },
     {
-        "rank": 15,
+        "rank": 14,
         "game_name": "sifu",
         "total_views": 571,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 0.52
+        "view_share_percentage": 0.54,
+        "last_screenshot": "N/A"
     },
     {
-        "rank": 16,
+        "rank": 15,
         "game_name": "monkeyKing",
         "total_views": 224,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 0.2
+        "view_share_percentage": 0.21,
+        "last_screenshot": "N/A"
     },
     {
-        "rank": 17,
+        "rank": 16,
         "game_name": "DiabloIV",
         "total_views": 148,
         "uploaded_videos": 1,
         "avg_views_per_video": 148,
-        "view_share_percentage": 0.13
+        "view_share_percentage": 0.14,
+        "last_screenshot": "N/A"
+    },
+    {
+        "rank": 17,
+        "game_name": "GodofWarLaufey ",
+        "total_views": 83,
+        "uploaded_videos": 1,
+        "avg_views_per_video": 83,
+        "view_share_percentage": 0.08,
+        "last_screenshot": "N/A"
     },
     {
         "rank": 18,
-        "game_name": "GodofWarLaufey",
-        "total_views": 82,
-        "uploaded_videos": 1,
-        "avg_views_per_video": 82,
-        "view_share_percentage": 0.07
-    },
-    {
-        "rank": 19,
         "game_name": "GODOFWAR3",
         "total_views": 0,
         "uploaded_videos": 2,
         "avg_views_per_video": 0,
-        "view_share_percentage": 0.0
+        "view_share_percentage": 0.0,
+        "last_screenshot": "N/A"
     }
 ]

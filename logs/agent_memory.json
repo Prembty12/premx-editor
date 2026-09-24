@@ -4,8 +4,8 @@
         "AfghanistanRedZone": 10,
         "Ghost_soap_escap": 11,
         "ghostwork": 5,
-        "Ghost Destroys Mexican": 11,
-        "GodofWarLaufey ": 5,
+        "Ghost Destroys Mexican": 5,
+        "GodofWarLaufey ": 10,
         "ghostandela": 11,
         "combatopration": 10,
         "GODOFWAR3": 10,
@@ -19,12 +19,12 @@
         "sifu": 10,
         "mm2remastered": 40,
         "monkeyKing": 10,
-        " UkraineCovertMission": 5,
+        " UkraineCovertMission": 12,
         "MarvelsSpiderMan2": 39,
         "RescueOperation": 12,
         "GodofWarLaufey": 10,
         "UkraineCovertMission": 12,
-        "": 5,
+        "": 10,
         "#AfghanistanRedZone": 10,
         "#Callofdutyaw": 38,
         "#DiabloIV": 10,
@@ -60,10 +60,12 @@
         "unbelievable": 13,
         "crazy": 22,
         "secret": 37,
-        "shocking": 16
+        "shocking": 19
     },
-    "last_used_style": "secret_hidden",
-    "last_played_game": "GodofWarLaufey",
+    "last_used_style": "shocking",
+    "last_played_game": "AfghanistanRedZone",
+    "streak_game": "",
+    "streak_count": 0,
     "winning_title_context": "Can you survive this red firestorm?\n\n#videogames #gamingcommunity #gaming #mm2remastered #gamingreels #reels",
     "winning_video_id": "1829429441565917",
     "winning_video_link": "/reel/1829429441565917/",
@@ -93,7 +95,7 @@
             "last_screenshot": "N/A"
         },
         " UkraineCovertMission": {
-            "uploaded_count": 0,
+            "uploaded_count": 1,
             "last_screenshot": "N/A"
         },
         "combatopration": {
@@ -101,7 +103,7 @@
             "last_screenshot": "N/A"
         },
         "AfghanistanRedZone": {
-            "uploaded_count": 1,
+            "uploaded_count": 2,
             "last_screenshot": "N/A"
         },
         "codBlackops6": {
@@ -228,8 +230,6 @@
             "uploaded_count": 1
         }
     },
-    "streak_game": "",
-    "streak_count": 0,
     "winning_ig_link": "N/A",
     "winning_title_game": "SpiderMan2",
     "winning_title_uses": 3
