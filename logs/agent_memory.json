@@ -64,8 +64,8 @@
         "secret": 37,
         "shocking": 19
     },
-    "last_used_style": "curiosity",
-    "last_played_game": "MarvelsSpiderMan2",
+    "last_used_style": "secret_hidden",
+    "last_played_game": "RescueOperation",
     "processed_viral_ids": [
         "1444317791239680",
         "1829429441565917",
@@ -86,7 +86,7 @@
             "last_screenshot": "N/A"
         },
         "RescueOperation": {
-            "uploaded_count": 1,
+            "uploaded_count": 2,
             "last_screenshot": "N/A"
         },
         " UkraineCovertMission": {
