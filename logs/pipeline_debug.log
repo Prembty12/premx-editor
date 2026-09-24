@@ -55426,3 +55426,38 @@ KeyError: 'fb_link'
  4 files changed, 23 insertions(+), 10 deletions(-)
 {"target_file": "game_links_editor/MarvelsSpiderMan2.txt", "game_name": "MarvelsSpiderMan2", "chosen_style": "curiosity", "ai_title": "\ud83d\udd25 MarvelsSpiderMan2 Best Moments! #MarvelsSpiderMan2", "actual_posted_title": "Spider-Man's Bridge Takedown \ud83d\udd77\ufe0f\ud83d\udca5\n\n#videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingreels #reels", "source_url": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan22.mp4", "total_links": 35, "uploaded_count": 2, "remaining_links": 34}
 ⚠️ [WARNING] AI Agent ko koi valid game file nahi mili! Target File: 
+====================================================
+🚀 Pipeline Started at: Thu Sep 24 16:30:00 UTC 2026
+====================================================
+🔍 [STEP 0] Checking Facebook Cookie Session Health...
+⚠️ Checking Facebook Cookie Session Health...
+✅ Status: Cookies present and verified for pipeline execution.
+📈 [STEP 1] Pulling real analytics and insights from past posts...
+📊 Real Facebook Insights fetched & AI memory updated successfully!
+🤖 [STEP 3] Consulting AI Agent Brain (ai_agent.py)...
+📁 Found 19 game file(s): ['AfghanistanRedZone', 'Callofdutyaw', 'DiabloIV', 'GODOFWAR3', 'Ghost Destroys Mexican', 'Ghost_soap_escap', 'GodofWarLaufey', 'MarvelsSpiderMan2', 'RescueOperation', 'Russian_secret_missions', 'SpiderMan2', 'UkraineCovertMission', 'VietnamCavePrison', 'codBlackops6', 'combatopration', 'ghostandela', 'mm2remastered', 'monkeyKing', 'sifu']
+⚠️ AI Title generation warning: 401 Client Error: Unauthorized for url: https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AQ.Ab8RN6J5_QVQBUvFTVI_NgeSbuK39Bch1Zf2akLrKLLi7XO1AA
+🔄 Git Push Result:  To https://github.com/Prembty12/premx-editor
+   4c7971e..2998072  main -> main
+
+
+🚀 GAMING AGENT COMMAND & ANALYTICS DASHBOARD (MULTI-PLATFORM)
+> Last Updated: 2026-09-24 16:30:59 | Status: Smart Sync Active
+
+📊 Current Execution Status:
+• Current Upload Game : RescueOperation
+• AI Generated Title   : 🔥 RescueOperation Best Moments! #RescueOperation
+• Detected Platform    : Facebook
+• Live Post Link       : /reel/1541099677784572/
+• Source File Link     : https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation12.mp4
+• Engagement Views     : 2,377 views
+
+📈 Progress Stats:
+• Total Videos         : 3
+• Uploaded So Far      : 2
+• Remaining Videos     : 2
+
+🧠 AI Agent Raw Output: [main 2998072] Auto-Agent: Fix file target warning & update A-Z dashboard [skip ci]
+ 4 files changed, 42 insertions(+), 58 deletions(-)
+{"target_file": "game_links_editor/RescueOperation.txt", "game_name": "RescueOperation", "chosen_style": "secret_hidden", "ai_title": "\ud83d\udd25 RescueOperation Best Moments! #RescueOperation", "source_url": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation12.mp4", "total_links": 3, "uploaded_count": 2, "remaining_links": 2}
+⚠️ [WARNING] AI Agent ko koi valid game file nahi mili! Target File: 
