@@ -55349,3 +55349,42 @@ Traceback (most recent call last):
 KeyError: 'fb_link'
 🧠 AI Agent Raw Output: 
 ⚠️ [WARNING] AI Agent ko koi valid game file nahi mili! Target File: 
+====================================================
+🚀 Pipeline Started at: Thu Sep 24 16:19:56 UTC 2026
+====================================================
+🔍 [STEP 0] Checking Facebook Cookie Session Health...
+⚠️ Checking Facebook Cookie Session Health...
+✅ Status: Cookies present and verified for pipeline execution.
+📈 [STEP 1] Pulling real analytics and insights from past posts...
+📊 Real Facebook Insights fetched & AI memory updated successfully!
+🤖 [STEP 3] Consulting AI Agent Brain (ai_agent.py)...
+📁 Found 19 game file(s): ['AfghanistanRedZone', 'Callofdutyaw', 'DiabloIV', 'GODOFWAR3', 'Ghost Destroys Mexican', 'Ghost_soap_escap', 'GodofWarLaufey', 'MarvelsSpiderMan2', 'RescueOperation', 'Russian_secret_missions', 'SpiderMan2', 'UkraineCovertMission', 'VietnamCavePrison', 'codBlackops6', 'combatopration', 'ghostandela', 'mm2remastered', 'monkeyKing', 'sifu']
+⚠️ AI Title generation warning: 401 Client Error: Unauthorized for url: https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AQ.Ab8RN6KDOLImk6MiGABwjkH5_mMiwblg070C52CMsw_EfjMX9g
+🔄 Git Push Result:  To https://github.com/Prembty12/premx-editor
+   a54c861..d3f4994  main -> main
+
+
+🚀 GAMING AGENT COMMAND & ANALYTICS DASHBOARD (MULTI-PLATFORM)
+> Last Updated: 2026-09-24 16:20:20 | Status: Smart Sync Active
+
+📊 Current Execution Status:
+• Current Upload Game : GodofWarLaufey
+• AI Planned Title    : 🔥 GodofWarLaufey Best Moments! #GodofWarLaufey
+• Live Title on Facebook : She unlocked a forbidden god-tier ability! 😱🔥
+
+#videogames #gamingcommunity #gaming #godofwarlaufey  #gamingreels #reels
+• Detected Platform   : Facebook
+• Live Post Link      : /reel/1541099677784572/
+• Source File Link    : https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_5.mp4
+• Engagement Views    : 2,377 views
+
+📈 Progress Stats:
+• Total Videos         : 13
+• Uploaded So Far      : 2
+• Remaining Videos     : 12
+
+🧠 AI Agent Raw Output: [main d3f4994] Auto-Agent: Sync dashboard + live titles [skip ci]
+ 4 files changed, 222 insertions(+), 100 deletions(-)
+ create mode 100644 GAMING_DASHBOARD.md
+{"target_file": "game_links_editor/GodofWarLaufey .txt", "game_name": "GodofWarLaufey", "chosen_style": "question", "ai_title": "\ud83d\udd25 GodofWarLaufey Best Moments! #GodofWarLaufey", "actual_posted_title": "She unlocked a forbidden god-tier ability! \ud83d\ude31\ud83d\udd25\n\n#videogames #gamingcommunity #gaming #godofwarlaufey  #gamingreels #reels", "source_url": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_5.mp4", "total_links": 13, "uploaded_count": 2, "remaining_links": 12}
+⚠️ [WARNING] AI Agent ko koi valid game file nahi mili! Target File: 
