@@ -1,1 +1,7 @@
-{"reason":"Actual first-person shooter gameplay shows shooting, explosions, movement, and a tense gate escape sequence.","status":"APPROVE","title":"Gate Escape Blows Up 💥"}
+{
+  "clip_duration": 38,
+  "reason": "High-stakes armed interrogation with tense cinematic payoff",
+  "start_time": 0,
+  "status": "APPROVE",
+  "title": "Would You Pull the Trigger? 😱"
+}

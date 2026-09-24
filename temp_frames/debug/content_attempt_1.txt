@@ -1,1 +1,25 @@
-{"clip_duration": 33, "reason": "Intense sniper action and fiery urban explosions.", "start_time": 60, "status": "APPROVE", "title": "Sniper Fire & Big Booms 💥🎯"}
+Thinking Process:
+
+1.  **Analyze the Request:**
+    *   Input: A 9x16 grid of screenshots from a video (total 144 frames, but represents a timeline of 38 seconds).
+    *   Total video duration: EXACTLY 38 seconds.
+    *   Task: Decide APPROVE or REJECT.
+    *   REJECT criteria: Only menus, map screens, inventory, shopping, loading screens, no actual gameplay/action, all frames identical/frozen, crash screen, dead/idle moments, absolutely no exciting/engaging moment.
+    *   APPROVE criteria: Real gameplay has a clear, powerful "Engaging Highlight Window" (combat, intense fights, epic boss battles, explosions, emotional cutscenes, hilarious fails, high-stakes clutch). Capture the full sequence from start to end. Minimum clip duration is 12 seconds, start_time + clip_duration <= 38.
+    *   Title rules (for APPROVE): Short viral title under 6 words with 1-3 emojis, NO generic boring words like Epic, Insane, Crazy, Best, Gameplay.
+    *   Output format: STRICT JSON (no markdown, no extra text).
+
+2.  **Analyze the Image Grid:**
+    *   The image shows a sequence of frames from a video game (looks like *Counter-Strike: Condition Zero* or similar, specifically the "Russian campaign" or some interrogation/torture scene, maybe *Call of Duty* or *CS:CZ* deleted scene, looks like the hostage/torture scene from CS:CZ or some similar game, actually looks like the interrogation scene from *Call of Duty: Modern Warfare* or maybe *CS:CZ* / *CS:GO* mod, specifically a guy sitting at a table with a knife/gun, being interrogated, or doing the knife game "Russian roulette" style or just sitting there while soldiers are behind him).
+    *   Let's look closer: A man in a green shirt and beanie sitting at a table with a bloody knife/pistol. Soldiers standing behind him. Red subtitles like "Boris...", "Don't look at me...", "I'm going to kill you...".
+    *   It looks like a tense cutscene/interrogation sequence.
+    *   Is there action? It's a dramatic cutscene, dialogue-heavy, tense atmosphere ("I'm going to kill you all", knife on the table, pointing guns).
+    *   Let's check if it qualifies as "engaging highlight window" (emotional cutscenes, tense drama, high-stakes moments).
+    *   Let's map the timeline:
+        *   Row 1: soldiers standing, some dialogue ("I'm going to kill you all").
+        *   Row 2: walking/standing, chairs, dialogue ("Don't look at me", etc.).
+        *   Row 3: sitting down, leaning over the table.
+        *   Row 4: sitting, soldiers behind him.
+        *   Row 5: pointing gun, knife, some action/tension.
+        *   Row 6-9: sitting at the table, playing some game or putting gun on table (looks like the classic "Russian roulette" or knife spinning / gun placing scene from CS:CZ / Condition Zero, specifically the "Restoring Hope" or "Tour of Duty" mission, or maybe a custom map/scene).
+    *   Is it engaging? It's a dramatic cutscene, but is it "boring walking/running without anything happening"? It has dialogue, tense gestures, a
