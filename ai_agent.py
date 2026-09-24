@@ -231,31 +231,7 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
     with open(dashboard_path, 'w', encoding='utf-8') as f:
         f.writelines(md_content)
         
-    git_commit_and_push([dashboard_path, leaderboard_json, history_json, "logs/agent_memory.json", "current_game.txt"])
-
-
-def get_game_video_stats(target_file, memory, game_name):
-    total_links = 0
-    if target_file and os.path.exists(target_file):
-        try:
-            with open(target_file, 'r', encoding='utf-8', errors='ignore') as f:
-                lines = []
-                for line in f:
-                    line_str = line.strip()
-                    if line_str and "http" in line_str:
-                        lines.append(line_str)
-                total_links = len(lines)
-        except Exception:
-            pass
-            
-    game_stats = memory.get("game_stats", {})
-    if game_name not in game_stats:
-        game_stats[game_name] = {"uploaded_count": 0}
-    
-    uploaded_links = game_stats[game_name]["uploaded_count"]
-    remaining_links = max(0, total_links - uploaded_links)
-    
-    return total_links, uploaded_links, remaining_links, game_stats
+    git_commit_and_push([dashboard_path, leaderboard_json, history_json, "logs/agent_memory.json"])
 
 
 def fetch_and_calculate_scores_multiplatform(game_list, memory):
@@ -438,69 +414,22 @@ def run_agent_brain():
     else:
         chosen_game = game_list[0] if game_list else "DefaultGame"
 
-    # Game name ko simple text file mein save karna (bina env variable ke)
-    with open("current_game.txt", "w", encoding="utf-8") as f:
-        f.write(chosen_game)
-
     target_file = file_mapping.get(chosen_game, "")
     if not target_file or not os.path.exists(target_file):
-        log(f"Critical Error: Target file for chosen game '{chosen_game}' not found. Halting pipeline execution.")
+        log(f"Critical Error: Target file for chosen game '{chosen_game}' not found.")
         sys.exit(1)
 
     styles = memory.get("title_styles", {})
     chosen_style = random.choices(list(styles.keys()), weights=list(styles.values()), k=1)[0]
     
-    game_hashtag = f"#{chosen_game.replace(' ', '')}"
-    generated_ai_title = f"Epic {chosen_game} Gameplay Moments! {game_hashtag}"
+    # Bash script ke liye JSON output print karo jo run.sh expect kar raha hai
+    output_data = {
+        "target_file": target_file,
+        "game_name": chosen_game,
+        "chosen_style": chosen_style
+    }
+    print(json.dumps(output_data))
 
-    try:
-        api_key = get_active_key()
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
-        prompt = f"""You are an advanced AI Social Media Manager.
-Target Game: {chosen_game}
-Selected Style: {chosen_style}
-Hashtag to include: {game_hashtag}
-Generate a catchy, viral social media video title for this game, and make sure to include the exact game name '{chosen_game}' and its hashtag '{game_hashtag}' in the title.
-Respond ONLY in strict JSON format:
-{{"chosen_game": "{chosen_game}", "chosen_style": "{chosen_style}", "ai_title": "Your generated catchy title here with {game_hashtag}", "reasoning": "Approved"}}"""
-        payload = {"contents": [{"parts": [{"text": prompt}]}]}
-        response = requests.post(url, json=payload, timeout=15)
-        response.raise_for_status()
-        res_data = response.json()
-        candidates = res_data.get("candidates", [])
-        if candidates and "content" in candidates[0]:
-            parts = candidates[0]["content"].get("parts", [])
-            if parts:
-                text_res = parts[0].get("text", "").replace("```json", "").replace("```", "").strip()
-                parsed = json.loads(text_res)
-                if parsed.get("ai_title"):
-                    generated_ai_title = parsed.get("ai_title")
-                    if game_hashtag.lower() not in generated_ai_title.lower():
-                        generated_ai_title = f"{generated_ai_title} {game_hashtag}"
-    except Exception as e:
-        log(f"AI Title generation warning: {e}")
-        generated_ai_title = f"{chosen_game} Best Moments! {game_hashtag}"
-
-    total_links, uploaded_links, remaining_links, game_stats = get_game_video_stats(target_file, memory, chosen_game)
-    
-    specific_uploaded_link = "N/A"
-    try:
-        with open(target_file, 'r', encoding='utf-8', errors='ignore') as f:
-            valid_links = []
-            for line in f:
-                line_str = line.strip()
-                if line_str and "http" in line_str:
-                    parts = line_str.split("http")
-                    url = "http" + parts[1].split()[0]
-                    valid_links.append(url)
-            if valid_links:
-                link_index = uploaded_links % len(valid_links)
-                specific_uploaded_link = valid_links[link_index]
-    except Exception:
-        pass
-
-    game_stats[chosen_game]["uploaded_count"] = uploaded_links + 1
-    memory["game_stats"] = game_stats
     memory["last_used_style"] = chosen_style
     memory["last_played_game"] = chosen_game
 
@@ -513,32 +442,14 @@ Respond ONLY in strict JSON format:
     update_unified_dashboard(
         game_name=chosen_game,
         chosen_style=chosen_style,
-        ai_title=generated_ai_title,
-        specific_uploaded_link=specific_uploaded_link,
+        ai_title=f"{chosen_game} Gameplay",
+        specific_uploaded_link="N/A",
         post_link=winning_link if winning_link else "N/A",
         platform_name=platform_type if winning_link else "Local / Pending",
         views_count=winning_views,
         game_views_summary=game_views_summary,
         game_stats=memory.get("game_stats", {})
     )
-
-    print(f"""
-GAMING AGENT COMMAND & ANALYTICS DASHBOARD (MULTI-PLATFORM)
-> Last Updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | Status: Smart Sync Active
-
-Current Execution Status:
-• Current Upload Game : {chosen_game}
-• AI Generated Title   : {generated_ai_title}
-• Detected Platform    : {platform_type if winning_link else "Pending"}
-• Live Post Link       : {winning_link if winning_link else "N/A"}
-• Source File Link     : {specific_uploaded_link}
-• Engagement Views     : {winning_views:,} views
-
-Progress Stats:
-• Total Videos         : {total_links}
-• Uploaded So Far      : {uploaded_links + 1}
-• Remaining Videos     : {remaining_links}
-""")
 
 if __name__ == "__main__":
     run_agent_brain()
