@@ -5,7 +5,8 @@ import requests
 from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-DAYS_LIMIT = 14  # 🔥 28 se 14 din
+# 🔥 SIRF 14 DIN KA DATA
+DAYS_LIMIT = 14
 CUTOFF_DATE = datetime.now() - timedelta(days=DAYS_LIMIT)
 
 
