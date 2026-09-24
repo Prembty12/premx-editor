@@ -35226,3 +35226,22 @@ size=   40941kB time=00:00:17.98 bitrate=18649.4kbits/s speed=43.1x
 • Uploaded So Far      : 2
 • Remaining Videos     : 0
 ⚠️ [WARNING] AI Agent ko koi valid game file nahi mili! Target File: 
+====================================================
+🚀 Pipeline Started at: Thu Sep 24 09:36:44 UTC 2026
+====================================================
+🔍 [STEP 0] Checking Facebook Cookie Session Health...
+⚠️ Checking Facebook Cookie Session Health...
+✅ Status: Cookies present and verified for pipeline execution.
+📈 [STEP 1] Pulling real analytics and insights from past posts...
+📊 Real Facebook Insights fetched & AI memory updated successfully!
+🤖 [STEP 3] Consulting AI Agent Brain (ai_agent.py)...
+Traceback (most recent call last):
+  File "/home/runner/work/premx-editor/premx-editor/ai_agent.py", line 521, in <module>
+    run_agent_brain()
+  File "/home/runner/work/premx-editor/premx-editor/ai_agent.py", line 487, in run_agent_brain
+    update_unified_dashboard(
+  File "/home/runner/work/premx-editor/premx-editor/ai_agent.py", line 223, in update_unified_dashboard
+    md_content.append(f"| {global_counter} | **{g_name}** | {entry['timestamp']} | {entry['ai_title']} | {v_str} | [Source]({entry['source_link']}) | [🔥 Watch on FB]({entry['fb_link']}) | ✅ Active |\n")
+KeyError: 'fb_link'
+🧠 AI Agent Raw Output: 
+⚠️ [WARNING] AI Agent ko koi valid game file nahi mili! Target File: 
