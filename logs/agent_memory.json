@@ -64,8 +64,8 @@
         "secret": 37,
         "shocking": 19
     },
-    "last_used_style": "secret_hidden",
-    "last_played_game": "RescueOperation",
+    "last_used_style": "secret",
+    "last_played_game": "Russian_secret_missions",
     "processed_viral_ids": [
         "1444317791239680",
         "1829429441565917",
@@ -130,7 +130,7 @@
             "last_screenshot": "N/A"
         },
         "Russian_secret_missions": {
-            "uploaded_count": 1,
+            "uploaded_count": 2,
             "last_screenshot": "N/A"
         },
         "MarvelsSpiderMan2": {
