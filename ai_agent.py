@@ -145,7 +145,6 @@ def generate_visual_reports(game_views_summary, game_stats):
             
     return sorted_analytics
 
-# ✨ MULTI-PLATFORM A-Z SINGLE TABLE DASHBOARD RECORDING
 def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploaded_link, post_link, platform_name, views_count, game_views_summary, game_stats):
     dashboard_path = "GAMING_DASHBOARD.md"
     leaderboard_json = os.path.join("logs/leaderboard", "games_performance_leaderboard.json")
@@ -198,7 +197,6 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
     except Exception as e:
         log(f"⚠️ Leaderboard error: {e}")
 
-    # Markdown Content A to Z Single Table Format (Multi-Platform & Combined Support)
     md_content = []
     md_content.append("# 🚀 GAMING AGENT COMMAND & ANALYTICS DASHBOARD\n\n")
     md_content.append(f"> **Last Updated:** {timestamp} | **Status:** All Systems Active & Synchronized\n\n")
@@ -396,14 +394,14 @@ def run_agent_brain():
         except Exception:
             pass
 
-    # 🛑 ROBUST FILE FINDER (Fixes missing file warnings and errors)
+    # 🛑 ROBUST FILE FINDER (Halts if no game files exist anywhere)
     all_files = glob.glob(os.path.join(links_dir, "*.txt"))
     if not all_files:
         all_files = glob.glob("*.txt") + glob.glob("game_links_editor/*.txt")
 
     if not all_files:
         log("❌ Error: No valid game text files found anywhere in the repository.")
-        sys.exit(0)
+        sys.exit(1)
 
     valid_game_files = [f for f in all_files if os.path.exists(f)]
 
@@ -420,6 +418,7 @@ def run_agent_brain():
 
     winning_game, winning_title, winning_link, platform_type, winning_views, game_views_summary, memory = fetch_and_calculate_scores_multiplatform(game_list, memory)
     
+    # 🔄 Game Rotation logic across runs
     last_game = memory.get("last_played_game", "")
     if last_game in game_list:
         next_index = (game_list.index(last_game) + 1) % len(game_list)
@@ -427,21 +426,18 @@ def run_agent_brain():
     else:
         chosen_game = game_list[0] if game_list else "DefaultGame"
 
-    # 🛡️ SAFE TARGET FILE RESOLUTION (Never fails even if exact match is missing)
+    # 🛡️ STRICT TARGET FILE RESOLUTION (Halts if specific game file is missing, NO dummy files)
     target_file = file_mapping.get(chosen_game, "")
     if not target_file or not os.path.exists(target_file):
-        log(f"⚠️ Warning: Target file for '{chosen_game}' not found directly. Picking the first available text file safely.")
-        if valid_game_files:
-            target_file = valid_game_files[0]
-            chosen_game = os.path.basename(target_file).replace("_uploaded_links.txt", "").replace(".txt", "").strip()
-        else:
-            log("❌ Critical Error: No valid files available to process.")
-            sys.exit(0)
+        log(f"❌ Critical Error: Target file for chosen game '{chosen_game}' not found. Halting pipeline execution.")
+        sys.exit(1)
 
     styles = memory.get("title_styles", {})
     chosen_style = random.choices(list(styles.keys()), weights=list(styles.values()), k=1)[0]
     
-    generated_ai_title = f"🔥 Epic {chosen_game} Gameplay Moments!"
+    # 🏷️ Clean Hashtag Integration
+    game_hashtag = f"#{chosen_game.replace(' ', '')}"
+    generated_ai_title = f"🔥 Epic {chosen_game} Gameplay Moments! {game_hashtag}"
 
     try:
         api_key = get_active_key()
@@ -449,9 +445,10 @@ def run_agent_brain():
         prompt = f"""You are an advanced AI Social Media Manager.
 Target Game: {chosen_game}
 Selected Style: {chosen_style}
-Generate a catchy, viral social media video title for this game.
+Hashtag to include: {game_hashtag}
+Generate a catchy, viral social media video title for this game, and make sure to include the exact game name '{chosen_game}' and its hashtag '{game_hashtag}' in the title.
 Respond ONLY in strict JSON format:
-{{"chosen_game": "{chosen_game}", "chosen_style": "{chosen_style}", "ai_title": "Your generated catchy title here", "reasoning": "Approved"}}"""
+{{"chosen_game": "{chosen_game}", "chosen_style": "{chosen_style}", "ai_title": "Your generated catchy title here with {game_hashtag}", "reasoning": "Approved"}}"""
         payload = {"contents": [{"parts": [{"text": prompt}]}]}
         response = requests.post(url, json=payload, timeout=15)
         response.raise_for_status()
@@ -464,8 +461,11 @@ Respond ONLY in strict JSON format:
                 parsed = json.loads(text_res)
                 if parsed.get("ai_title"):
                     generated_ai_title = parsed.get("ai_title")
-    except Exception:
-        pass
+                    if game_hashtag.lower() not in generated_ai_title.lower():
+                        generated_ai_title = f"{generated_ai_title} {game_hashtag}"
+    except Exception as e:
+        log(f"⚠️ AI Title generation warning: {e}")
+        generated_ai_title = f"🔥 {chosen_game} Best Moments! {game_hashtag}"
 
     total_links, uploaded_links, remaining_links, game_stats = get_game_video_stats(target_file, memory, chosen_game)
     
