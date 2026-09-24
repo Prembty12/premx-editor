@@ -422,14 +422,6 @@ def run_agent_brain():
     styles = memory.get("title_styles", {})
     chosen_style = random.choices(list(styles.keys()), weights=list(styles.values()), k=1)[0]
     
-    # Bash script ke liye JSON output print karo jo run.sh expect kar raha hai
-    output_data = {
-        "target_file": target_file,
-        "game_name": chosen_game,
-        "chosen_style": chosen_style
-    }
-    print(json.dumps(output_data))
-
     memory["last_used_style"] = chosen_style
     memory["last_played_game"] = chosen_game
 
@@ -450,6 +442,14 @@ def run_agent_brain():
         game_views_summary=game_views_summary,
         game_stats=memory.get("game_stats", {})
     )
+
+    # STRICTLY ONLY JSON OUTPUT TO STDOUT (Baki sab logs sys.stderr par hain)
+    output_data = {
+        "target_file": target_file,
+        "game_name": chosen_game,
+        "chosen_style": chosen_style
+    }
+    print(json.dumps(output_data))
 
 if __name__ == "__main__":
     run_agent_brain()
