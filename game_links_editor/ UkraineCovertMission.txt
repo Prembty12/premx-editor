@@ -1,7 +1,7 @@
 <<<<<<< HEAD
 =======
 
-_Ukraine_Covert_Sniper_Mission2 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.99/_Ukraine_Covert_Sniper_Mission2.mp4
+
 >>>>>>> 73a0ab8 (Real-time add link for clip _Ukraine_Covert_Sniper_Mission2)
 
 
