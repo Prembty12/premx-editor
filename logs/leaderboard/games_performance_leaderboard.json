@@ -1,173 +1,154 @@
 [
     {
         "rank": 1,
-        "game_name": "codBlackops6",
-        "total_views": 28654,
+        "game_name": "mm2remastered",
+        "total_views": 14241,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 26.2,
-        "last_screenshot": "N/A"
+        "view_share_percentage": 18.21
     },
     {
         "rank": 2,
         "game_name": "SpiderMan2",
-        "total_views": 20664,
+        "total_views": 14141,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 18.9,
-        "last_screenshot": "N/A"
+        "view_share_percentage": 18.08
     },
     {
         "rank": 3,
         "game_name": "Callofdutyaw",
-        "total_views": 13818,
+        "total_views": 13049,
         "uploaded_videos": 1,
-        "avg_views_per_video": 13818,
-        "view_share_percentage": 12.64,
-        "last_screenshot": "N/A"
+        "avg_views_per_video": 13049,
+        "view_share_percentage": 16.69
     },
     {
         "rank": 4,
-        "game_name": "mm2remastered",
-        "total_views": 12558,
-        "uploaded_videos": 0,
-        "avg_views_per_video": 0,
-        "view_share_percentage": 11.48,
-        "last_screenshot": "N/A"
+        "game_name": "MarvelsSpiderMan2",
+        "total_views": 12280,
+        "uploaded_videos": 1,
+        "avg_views_per_video": 12280,
+        "view_share_percentage": 15.7
     },
     {
         "rank": 5,
-        "game_name": "MarvelsSpiderMan2",
-        "total_views": 11498,
+        "game_name": "RescueOperation",
+        "total_views": 6956,
         "uploaded_videos": 1,
-        "avg_views_per_video": 11498,
-        "view_share_percentage": 10.51,
-        "last_screenshot": "N/A"
+        "avg_views_per_video": 6956,
+        "view_share_percentage": 8.89
     },
     {
         "rank": 6,
-        "game_name": "RescueOperation",
-        "total_views": 6533,
-        "uploaded_videos": 1,
-        "avg_views_per_video": 6533,
-        "view_share_percentage": 5.97,
-        "last_screenshot": "N/A"
+        "game_name": "Ghost Destroys Mexican",
+        "total_views": 2677,
+        "uploaded_videos": 2,
+        "avg_views_per_video": 1338,
+        "view_share_percentage": 3.42
     },
     {
         "rank": 7,
-        "game_name": "Ghost Destroys Mexican",
-        "total_views": 3530,
-        "uploaded_videos": 1,
-        "avg_views_per_video": 3530,
-        "view_share_percentage": 3.23,
-        "last_screenshot": "N/A"
+        "game_name": "codBlackops6",
+        "total_views": 2509,
+        "uploaded_videos": 0,
+        "avg_views_per_video": 0,
+        "view_share_percentage": 3.21
     },
     {
         "rank": 8,
-        "game_name": "combatopration",
-        "total_views": 2810,
+        "game_name": "UkraineCovertMission",
+        "total_views": 2397,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 2.57,
-        "last_screenshot": "N/A"
+        "view_share_percentage": 3.07
     },
     {
         "rank": 9,
-        "game_name": " UkraineCovertMission",
-        "total_views": 2027,
-        "uploaded_videos": 0,
-        "avg_views_per_video": 0,
-        "view_share_percentage": 1.85,
-        "last_screenshot": "N/A"
+        "game_name": "AfghanistanRedZone",
+        "total_views": 1732,
+        "uploaded_videos": 1,
+        "avg_views_per_video": 1732,
+        "view_share_percentage": 2.21
     },
     {
         "rank": 10,
-        "game_name": "Russian_secret_missions",
-        "total_views": 1701,
-        "uploaded_videos": 1,
-        "avg_views_per_video": 1701,
-        "view_share_percentage": 1.56,
-        "last_screenshot": "N/A"
+        "game_name": "ghostandela",
+        "total_views": 1698,
+        "uploaded_videos": 0,
+        "avg_views_per_video": 0,
+        "view_share_percentage": 2.17
     },
     {
         "rank": 11,
-        "game_name": "ghostandela",
-        "total_views": 1438,
-        "uploaded_videos": 0,
-        "avg_views_per_video": 0,
-        "view_share_percentage": 1.31,
-        "last_screenshot": "N/A"
+        "game_name": "Russian_secret_missions",
+        "total_views": 1655,
+        "uploaded_videos": 1,
+        "avg_views_per_video": 1655,
+        "view_share_percentage": 2.12
     },
     {
         "rank": 12,
-        "game_name": "AfghanistanRedZone",
-        "total_views": 1290,
+        "game_name": "Ghost_soap_escap",
+        "total_views": 1097,
         "uploaded_videos": 1,
-        "avg_views_per_video": 1290,
-        "view_share_percentage": 1.18,
-        "last_screenshot": "N/A"
+        "avg_views_per_video": 1097,
+        "view_share_percentage": 1.4
     },
     {
         "rank": 13,
-        "game_name": "Ghost_soap_escap",
-        "total_views": 1217,
-        "uploaded_videos": 1,
-        "avg_views_per_video": 1217,
-        "view_share_percentage": 1.11,
-        "last_screenshot": "N/A"
+        "game_name": "VietnamCavePrison",
+        "total_views": 815,
+        "uploaded_videos": 0,
+        "avg_views_per_video": 0,
+        "view_share_percentage": 1.04
     },
     {
         "rank": 14,
-        "game_name": "VietnamCavePrison",
-        "total_views": 595,
-        "uploaded_videos": 0,
-        "avg_views_per_video": 0,
-        "view_share_percentage": 0.54,
-        "last_screenshot": "N/A"
+        "game_name": "GODOFWAR3",
+        "total_views": 790,
+        "uploaded_videos": 2,
+        "avg_views_per_video": 395,
+        "view_share_percentage": 1.01
     },
     {
         "rank": 15,
         "game_name": "sifu",
-        "total_views": 568,
+        "total_views": 659,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 0.52,
-        "last_screenshot": "N/A"
+        "view_share_percentage": 0.84
     },
     {
         "rank": 16,
-        "game_name": "monkeyKing",
-        "total_views": 224,
+        "game_name": "combatopration",
+        "total_views": 452,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 0.2,
-        "last_screenshot": "N/A"
+        "view_share_percentage": 0.58
     },
     {
         "rank": 17,
-        "game_name": "DiabloIV",
-        "total_views": 148,
-        "uploaded_videos": 1,
-        "avg_views_per_video": 148,
-        "view_share_percentage": 0.14,
-        "last_screenshot": "N/A"
+        "game_name": "monkeyKing",
+        "total_views": 384,
+        "uploaded_videos": 0,
+        "avg_views_per_video": 0,
+        "view_share_percentage": 0.49
     },
     {
         "rank": 18,
-        "game_name": "GodofWarLaufey ",
-        "total_views": 81,
-        "uploaded_videos": 1,
-        "avg_views_per_video": 81,
-        "view_share_percentage": 0.07,
-        "last_screenshot": "N/A"
+        "game_name": "GodofWarLaufey",
+        "total_views": 382,
+        "uploaded_videos": 0,
+        "avg_views_per_video": 0,
+        "view_share_percentage": 0.49
     },
     {
         "rank": 19,
-        "game_name": "GODOFWAR3",
-        "total_views": 0,
-        "uploaded_videos": 2,
-        "avg_views_per_video": 0,
-        "view_share_percentage": 0.0,
-        "last_screenshot": "N/A"
+        "game_name": "DiabloIV",
+        "total_views": 288,
+        "uploaded_videos": 1,
+        "avg_views_per_video": 288,
+        "view_share_percentage": 0.37
     }
 ]
