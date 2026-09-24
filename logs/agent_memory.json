@@ -64,8 +64,8 @@
         "secret": 37,
         "shocking": 19
     },
-    "last_used_style": "question",
-    "last_played_game": "GodofWarLaufey",
+    "last_used_style": "curiosity",
+    "last_played_game": "MarvelsSpiderMan2",
     "processed_viral_ids": [
         "1444317791239680",
         "1829429441565917",
@@ -134,7 +134,7 @@
             "last_screenshot": "N/A"
         },
         "MarvelsSpiderMan2": {
-            "uploaded_count": 1,
+            "uploaded_count": 2,
             "last_screenshot": "N/A"
         },
         "monkeyKing": {
