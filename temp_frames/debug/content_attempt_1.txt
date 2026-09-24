@@ -1,1 +1,1 @@
-{"clip_duration": 15, "reason": "High-action desert combat with flashy visual effects.", "start_time": 6, "status": "APPROVE", "title": "Desert Bloodbath Slash ⚔️💀"}
+{"clip_duration": 33, "reason": "Intense sniper action and fiery urban explosions.", "start_time": 60, "status": "APPROVE", "title": "Sniper Fire & Big Booms 💥🎯"}
