@@ -1,1 +1,1 @@
-{"clip_duration":28,"reason":"Cinematic city explosion and face close-up.","start_time":0,"status":"APPROVE","title":"City Burning Explosion 💥"}
+{"clip_duration": 15, "reason": "High-action desert combat with flashy visual effects.", "start_time": 6, "status": "APPROVE", "title": "Desert Bloodbath Slash ⚔️💀"}
