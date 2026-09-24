@@ -1,1 +1,1 @@
-{"clip_duration": 30, "reason": "Intense turret combat with blood splatters and explosions", "start_time": 5, "status": "APPROVE", "title": "Turret Carnage Unleashed 💀🔥"}
+{"clip_duration":28,"reason":"Cinematic city explosion and face close-up.","start_time":0,"status":"APPROVE","title":"City Burning Explosion 💥"}
