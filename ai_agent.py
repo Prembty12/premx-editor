@@ -47,23 +47,31 @@ def log(msg):
 def get_active_key():
     valid = [k for k in GEMINI_KEYS if k]
     if not valid:
-        raise ValueError("No valid Gemini API keys found.")
+        return None
     return random.choice(valid)
 
 
-# 🔄 Git Auto-Commit & Push Function
-def git_commit_and_push(file_paths_to_add, commit_message="Auto-Agent: Fix file target warning & update A-Z dashboard [skip ci]"):
+# 🔄 Git Auto-Commit & Push Function — FIXED: no stdout leak
+def git_commit_and_push(file_paths_to_add, commit_message="Auto-Agent: Sync dashboard + live titles [skip ci]"):
     try:
-        subprocess.run(["git", "config", "--global", "user.name", "github-actions[bot]"], check=False)
-        subprocess.run(["git", "config", "--global", "user.email", "41898282+github-actions[bot]@users.noreply.github.com"], check=False)
+        # 🔇 Saare git commands ka output DEVNULL ya captured — stdout pe leak NA ho
+        subprocess.run(["git", "config", "--global", "user.name", "github-actions[bot]"],
+                       check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(["git", "config", "--global", "user.email", "41898282+github-actions[bot]@users.noreply.github.com"],
+                       check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
         for path in file_paths_to_add:
             if os.path.exists(path):
-                subprocess.run(["git", "add", path], check=False)
+                subprocess.run(["git", "add", path],
+                               check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-        subprocess.run(["git", "commit", "-m", commit_message], check=False)
-        push_res = subprocess.run(["git", "push"], capture_output=True, text=True, check=False)
-        log(f"🔄 Git Push Result: {push_res.stdout} {push_res.stderr}")
+        commit_res = subprocess.run(["git", "commit", "-m", commit_message],
+                                    capture_output=True, text=True, check=False)
+        log(f"🔄 Git Commit: {commit_res.stdout.strip()} {commit_res.stderr.strip()}")
+
+        push_res = subprocess.run(["git", "push"],
+                                  capture_output=True, text=True, check=False)
+        log(f"🔄 Git Push: {push_res.stdout.strip()} {push_res.stderr.strip()}")
     except Exception as e:
         log(f"⚠️ Git auto-push error: {e}")
 
@@ -152,7 +160,12 @@ def generate_visual_reports(game_views_summary, game_stats):
     return sorted_analytics
 
 
-def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploaded_link, post_link, platform_name, views_count, game_views_summary, game_stats):
+def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploaded_link,
+                             post_link, platform_name, views_count,
+                             game_views_summary, game_stats, actual_posted_titles=None):
+    if actual_posted_titles is None:
+        actual_posted_titles = {}
+
     dashboard_path = "GAMING_DASHBOARD.md"
     leaderboard_json = os.path.join("logs/leaderboard", "games_performance_leaderboard.json")
     os.makedirs("logs/leaderboard", exist_ok=True)
@@ -171,15 +184,25 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
     if game_name not in all_history:
         all_history[game_name] = []
 
-    all_history[game_name].append({
+    new_entry = {
         "timestamp": timestamp,
         "style": chosen_style,
         "ai_title": ai_title,
+        "actual_posted_title": actual_posted_titles.get(game_name, ""),
         "views": views_count,
         "source_link": specific_uploaded_link,
         "post_link": post_link,
-        "platform": platform_name
-    })
+        "platform": platform_name,
+    }
+    all_history[game_name].append(new_entry)
+
+    # Backfill live titles on all older entries
+    for g_name, entries in all_history.items():
+        live_title = actual_posted_titles.get(g_name, "")
+        if live_title:
+            for entry in entries:
+                if not entry.get("actual_posted_title"):
+                    entry["actual_posted_title"] = live_title
 
     try:
         with open(history_json, 'w', encoding='utf-8') as f:
@@ -218,9 +241,18 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
         tier = "🔥 Viral / Hype" if item['avg_views'] > 7000 else "⚡ Trending" if item['avg_views'] > 4000 else "📈 Stable"
         md_content.append(f"| {rank_icon} | **{item['game']}** | {item['uploaded_count']} | {item['total_views']:,} | {item['avg_views']:,} | {tier} |\n")
 
+    md_content.append("\n--- \n\n## 📺 Live Post Titles (Fetched from Facebook / Instagram)\n\n")
+    md_content.append("> These are the **actual titles/captions** currently live on your FB / IG posts.\n\n")
+    md_content.append("| Game Name | 📺 Actual Live Title (FB / IG) | Platform |\n")
+    md_content.append("|---|---|---|\n")
+    for g_name in sorted(actual_posted_titles.keys()):
+        live_title = actual_posted_titles.get(g_name, "").strip() or "_No live post detected yet_"
+        live_title = live_title.replace("\n", " ").replace("|", "\\|")[:200]
+        md_content.append(f"| **{g_name}** | {live_title} | FB / IG |\n")
+
     md_content.append("\n--- \n\n## 📊 Complete A to Z Upload & Execution History\n\n")
-    md_content.append("| # | Game Name | Timestamp | AI Generated Title | Views | Source File Link | Live Post Link | Platform | Status |\n")
-    md_content.append("|---|---|---|---|---|---|---|---|---|\n")
+    md_content.append("| # | Game Name | Timestamp | 🤖 AI Planned Title | 📺 Actual Live Title (FB/IG) | Views | Source File Link | Live Post Link | Platform | Status |\n")
+    md_content.append("|---|---|---|---|---|---|---|---|---|---|\n")
 
     global_counter = 1
     for g_name in sorted(all_history.keys()):
@@ -234,7 +266,16 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
             else:
                 link_markdown = "Pending / Local"
 
-            md_content.append(f"| {global_counter} | **{g_name}** | {entry['timestamp']} | {entry['ai_title']} | {v_str} | [Source]({entry['source_link']}) | {link_markdown} | {p_name} | ✅ Active |\n")
+            ai_planned = (entry.get('ai_title', '') or '').replace("\n", " ").replace("|", "\\|")[:120]
+            actual_live = (entry.get('actual_posted_title', '') or '').replace("\n", " ").replace("|", "\\|")[:120]
+            if not actual_live:
+                actual_live = "_Pending fetch_"
+
+            md_content.append(
+                f"| {global_counter} | **{g_name}** | {entry['timestamp']} | "
+                f"{ai_planned} | {actual_live} | {v_str} | "
+                f"[Source]({entry['source_link']}) | {link_markdown} | {p_name} | ✅ Active |\n"
+            )
             global_counter += 1
 
     with open(dashboard_path, 'w', encoding='utf-8') as f:
@@ -264,9 +305,8 @@ def get_game_video_stats(target_file, memory, game_name):
 
 
 def fetch_and_calculate_scores_multiplatform(game_list, memory):
-    # ✅ FIX #2: 7 values return kar raha hai, not 8
     if not FB_PAGE_ID or not FB_ACCESS_TOKEN:
-        return None, "", "", "Facebook", 0, {}, memory
+        return None, "", "", "Facebook", 0, {}, {}, memory
 
     try:
         twenty_eight_days_ago = datetime.now() - timedelta(days=28)
@@ -310,12 +350,17 @@ def fetch_and_calculate_scores_multiplatform(game_list, memory):
         temp_game_counts = {g: 0 for g in game_list}
         temp_viral_counts = {g: 0 for g in game_list}
 
+        actual_posted_titles = {g: "" for g in game_list}
+        actual_title_timestamps = {g: "" for g in game_list}
+
+        # ---------- FACEBOOK ----------
         if res_fb.status_code == 200:
             for video in res_fb.json().get("data", []):
                 vid_id = video.get("id", "")
-                title = video.get("title", "") or video.get("description", "")
+                title = (video.get("title", "") or video.get("description", "") or "").strip()
                 permalink = video.get("permalink_url", f"https://facebook.com/{vid_id}")
                 views = video.get("views", 0)
+                created = video.get("created_time", "")
                 text = title.lower()
 
                 for game in game_list:
@@ -324,6 +369,11 @@ def fetch_and_calculate_scores_multiplatform(game_list, memory):
                         temp_game_counts[game] += 1
                         if views >= 5000:
                             temp_viral_counts[game] += 1
+
+                        if title and created > actual_title_timestamps[game]:
+                            actual_posted_titles[game] = title
+                            actual_title_timestamps[game] = created
+
                         if views > best_views and vid_id not in processed_viral_ids:
                             best_views = views
                             winning_game = game
@@ -332,21 +382,28 @@ def fetch_and_calculate_scores_multiplatform(game_list, memory):
                             platform_type = "Facebook"
                             winning_views = views
 
+        # ---------- INSTAGRAM ----------
         for ig in ig_data_list:
             ig_id = ig.get("id", "")
-            caption = ig.get("caption", "")
-            permalink = ig.get("permalink", f"https://instagram.com")
+            caption = (ig.get("caption", "") or "").strip()
+            permalink = ig.get("permalink", "https://instagram.com")
             approx_views = (ig.get("like_count", 0) * 10) + (ig.get("comments_count", 0) * 20)
+            created = ig.get("timestamp", "")
             text = caption.lower()
 
             for game in game_list:
                 if game.lower() in text:
                     temp_game_views[game] += approx_views
                     temp_game_counts[game] += 1
+
+                    if caption and created > actual_title_timestamps[game]:
+                        actual_posted_titles[game] = caption
+                        actual_title_timestamps[game] = created
+
                     if approx_views > best_views and ig_id not in processed_viral_ids:
                         best_views = approx_views
                         winning_game = game
-                        winning_title = caption[:50]
+                        winning_title = caption[:80]
                         winning_link = permalink
                         platform_type = "Instagram"
                         winning_views = approx_views
@@ -364,13 +421,15 @@ def fetch_and_calculate_scores_multiplatform(game_list, memory):
 
         memory["game_scores"] = game_scores
         memory["title_styles"] = title_styles
+        memory["actual_posted_titles"] = actual_posted_titles
 
-        return winning_game, winning_title, winning_link, platform_type, winning_views, temp_game_views, memory
+        return (winning_game, winning_title, winning_link, platform_type,
+                winning_views, temp_game_views, actual_posted_titles, memory)
 
     except Exception as e:
         log(f"❌ Multi-platform Fetch Error: {e}")
 
-    return None, "", "", "Facebook", 0, {}, memory
+    return None, "", "", "Facebook", 0, {}, {}, memory
 
 
 def run_agent_brain():
@@ -391,7 +450,8 @@ def run_agent_brain():
         "last_used_style": "curiosity",
         "last_played_game": "",
         "processed_viral_ids": [],
-        "game_stats": {}
+        "game_stats": {},
+        "actual_posted_titles": {}
     }
 
     if os.path.exists(memory_file):
@@ -403,12 +463,11 @@ def run_agent_brain():
         except Exception:
             pass
 
-    # ✅ FIX #3: Robust file finder with proper filter
+    # ✅ Robust file finder with proper filter
     all_files = glob.glob(os.path.join(links_dir, "*.txt"))
     if not all_files:
         all_files = glob.glob("game_links_editor/*.txt")
 
-    # Filter out unwanted files (e.g. requirements.txt, notes.txt)
     all_files = [
         f for f in all_files
         if ("_uploaded_links" in f
@@ -429,7 +488,11 @@ def run_agent_brain():
     game_list = []
     file_mapping = {}
     for f in valid_game_files:
-        g_name = os.path.basename(f).replace("_uploaded_links.txt", "").replace("_links_editor.txt", "").replace(".txt", "").strip()
+        g_name = (os.path.basename(f)
+                  .replace("_uploaded_links.txt", "")
+                  .replace("_links_editor.txt", "")
+                  .replace("_posted_links_editor.txt", "")
+                  .replace(".txt", "").strip())
         if not g_name:
             continue
         file_mapping[g_name] = f
@@ -439,7 +502,12 @@ def run_agent_brain():
 
     log(f"📁 Found {len(game_list)} game file(s): {game_list}")
 
-    winning_game, winning_title, winning_link, platform_type, winning_views, game_views_summary, memory = fetch_and_calculate_scores_multiplatform(game_list, memory)
+    (winning_game, winning_title, winning_link, platform_type,
+     winning_views, game_views_summary, actual_posted_titles, memory) = \
+        fetch_and_calculate_scores_multiplatform(game_list, memory)
+
+    if not actual_posted_titles:
+        actual_posted_titles = memory.get("actual_posted_titles", {}) or {}
 
     # 🔄 Game Rotation logic across runs
     last_game = memory.get("last_played_game", "")
@@ -458,37 +526,10 @@ def run_agent_brain():
     styles = memory.get("title_styles", {})
     chosen_style = random.choices(list(styles.keys()), weights=list(styles.values()), k=1)[0]
 
-    # 🏷️ Clean Hashtag Integration
+    # 🎯 Title banane ka kaam MAIN BASH SCRIPT (Step 7, Gemini) karegi.
+    #    Yahan sirf placeholder rakha hai dashboard/history ke liye.
     game_hashtag = f"#{chosen_game.replace(' ', '')}"
-    generated_ai_title = f"🔥 Epic {chosen_game} Gameplay Moments! {game_hashtag}"
-
-    try:
-        api_key = get_active_key()
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
-        prompt = f"""You are an advanced AI Social Media Manager.
-Target Game: {chosen_game}
-Selected Style: {chosen_style}
-Hashtag to include: {game_hashtag}
-Generate a catchy, viral social media video title for this game, and make sure to include the exact game name '{chosen_game}' and its hashtag '{game_hashtag}' in the title.
-Respond ONLY in strict JSON format:
-{{"chosen_game": "{chosen_game}", "chosen_style": "{chosen_style}", "ai_title": "Your generated catchy title here with {game_hashtag}", "reasoning": "Approved"}}"""
-        payload = {"contents": [{"parts": [{"text": prompt}]}]}
-        response = requests.post(url, json=payload, timeout=15)
-        response.raise_for_status()
-        res_data = response.json()
-        candidates = res_data.get("candidates", [])
-        if candidates and "content" in candidates[0]:
-            parts = candidates[0]["content"].get("parts", [])
-            if parts:
-                text_res = parts[0].get("text", "").replace("```json", "").replace("```", "").strip()
-                parsed = json.loads(text_res)
-                if parsed.get("ai_title"):
-                    generated_ai_title = parsed.get("ai_title")
-                    if game_hashtag.lower() not in generated_ai_title.lower():
-                        generated_ai_title = f"{generated_ai_title} {game_hashtag}"
-    except Exception as e:
-        log(f"⚠️ AI Title generation warning: {e}")
-        generated_ai_title = f"🔥 {chosen_game} Best Moments! {game_hashtag}"
+    generated_ai_title = f"🎮 {chosen_game} Gameplay | {game_hashtag}"
 
     total_links, uploaded_links, remaining_links, game_stats = get_game_video_stats(target_file, memory, chosen_game)
 
@@ -499,7 +540,6 @@ Respond ONLY in strict JSON format:
             if lines:
                 link_index = uploaded_links % len(lines)
                 specific_uploaded_link = lines[link_index]
-                # Extract URL only from the line
                 for token in specific_uploaded_link.split():
                     if token.startswith("http://") or token.startswith("https://"):
                         specific_uploaded_link = token
@@ -527,21 +567,22 @@ Respond ONLY in strict JSON format:
         platform_name=platform_type if winning_link else "Local / Pending",
         views_count=winning_views,
         game_views_summary=game_views_summary,
-        game_stats=memory.get("game_stats", {})
+        game_stats=memory.get("game_stats", {}),
+        actual_posted_titles=actual_posted_titles,
     )
 
-    # ✅ FIX #1: Human-readable output -> stderr
+    # Human-readable → stderr
     log(f"""
 🚀 GAMING AGENT COMMAND & ANALYTICS DASHBOARD (MULTI-PLATFORM)
 > Last Updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | Status: Smart Sync Active
 
 📊 Current Execution Status:
 • Current Upload Game : {chosen_game}
-• AI Generated Title   : {generated_ai_title}
-• Detected Platform    : {platform_type if winning_link else "Pending"}
-• Live Post Link       : {winning_link if winning_link else "N/A"}
-• Source File Link     : {specific_uploaded_link}
-• Engagement Views     : {winning_views:,} views
+• Dashboard Placeholder Title : {generated_ai_title}
+• Detected Platform   : {platform_type if winning_link else "Pending"}
+• Live Post Link      : {winning_link if winning_link else "N/A"}
+• Source File Link    : {specific_uploaded_link}
+• Engagement Views    : {winning_views:,} views
 
 📈 Progress Stats:
 • Total Videos         : {total_links}
@@ -549,12 +590,13 @@ Respond ONLY in strict JSON format:
 • Remaining Videos     : {remaining_links}
 """)
 
-    # ✅ FIX #1 (CRITICAL): Only JSON goes to stdout — bash yahi parse karega
+    # ✅ ONLY JSON to stdout — bash isi ko parse karegi
     print(json.dumps({
         "target_file": target_file,
         "game_name": chosen_game,
         "chosen_style": chosen_style,
         "ai_title": generated_ai_title,
+        "actual_posted_title": actual_posted_titles.get(chosen_game, ""),
         "source_url": specific_uploaded_link,
         "total_links": total_links,
         "uploaded_count": uploaded_links + 1,
