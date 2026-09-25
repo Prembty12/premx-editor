@@ -60,9 +60,8 @@ def normalize(s):
 
 
 def extract_urls(text):
-    """🔥 Robust URL extraction — kisi bhi format se"""
+    """🔥 Robust URL extraction"""
     urls = re.findall(r'https?://[^\s\)\]\'"<>,;]+', text)
-    # Clean trailing chars
     cleaned = []
     seen = set()
     for u in urls:
@@ -71,6 +70,43 @@ def extract_urls(text):
             seen.add(u)
             cleaned.append(u)
     return cleaned
+
+
+# 🔥🔥🔥 FIX: FB URL HELPER — relative URL ko full URL banao
+def fix_fb_url(url, vid_id=""):
+    """FB API kabhi relative URL deta hai (/reel/xxx) — full URL banao"""
+    if not url:
+        return f"https://www.facebook.com/{vid_id}" if vid_id else ""
+    
+    url = str(url).strip()
+    
+    # Already full URL
+    if url.startswith("http://") or url.startswith("https://"):
+        return url
+    
+    # Relative URL (jaise "/reel/123456/")
+    if url.startswith("/"):
+        return f"https://www.facebook.com{url}"
+    
+    # Koi aur format
+    return f"https://www.facebook.com/{url}"
+
+
+# 🔥🔥🔥 FIX: IG URL HELPER
+def fix_ig_url(url):
+    """IG URL ko full URL banao"""
+    if not url:
+        return ""
+    
+    url = str(url).strip()
+    
+    if url.startswith("http://") or url.startswith("https://"):
+        return url
+    
+    if url.startswith("/"):
+        return f"https://www.instagram.com{url}"
+    
+    return f"https://www.instagram.com/{url}"
 
 
 def git_commit_and_push(file_paths_to_add, commit_message="Auto-Agent: Sync dashboard [skip ci]"):
@@ -182,7 +218,6 @@ def generate_visual_reports(game_views_summary, game_stats):
 
 
 def save_rotation_history(game_list, chosen_game, memory, memory_file="logs/rotation_history.json"):
-    """Game rotation history — sab games included, number wise"""
     os.makedirs("logs", exist_ok=True)
 
     rotation_data = {
@@ -254,7 +289,6 @@ def save_rotation_history(game_list, chosen_game, memory, memory_file="logs/rota
 
 
 def load_source_data():
-    """Source files se: URLs + videos count fetch karo — robust"""
     source_links_map = {}
     source_videos_count = {}
     source_titles_map = {}
@@ -270,18 +304,15 @@ def load_source_data():
                 with open(os.path.join(posted_dir, fname), 'r', encoding='utf-8', errors='ignore') as f:
                     content = f.read()
 
-                # 🔥 Robust URL extraction
                 urls = extract_urls(content)
                 if urls:
                     source_links_map[gname] = urls
 
-                # Video count
                 vid_count = content.count("Video id :")
                 if vid_count == 0:
                     vid_count = len(urls)
                 source_videos_count[gname] = vid_count
 
-                # Titles
                 titles = re.findall(r'Title\s*:\s*(.+)', content)
                 source_titles_map[gname] = [t.strip() for t in titles]
             except Exception:
@@ -290,9 +321,8 @@ def load_source_data():
     return source_links_map, source_videos_count, source_titles_map
 
 
-# ============ 🔥 PARSE FILE (purani insights_tracker jaisa) ============
 def parse_posted_file(filepath, game_name):
-    """Purani script ka exact parse logic — block by block"""
+    """Purani script ka exact parse logic"""
     with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
         content = f.read()
 
@@ -313,12 +343,8 @@ def parse_posted_file(filepath, game_name):
             video_name = line.split('| Link:')[0].strip()
 
             current_video = {
-                'vid_id': None,
-                'title': None,
-                'link': link_part,
-                'video_name': video_name,
-                'platform': 'FB + IG',
-                'game': game_name
+                'vid_id': None, 'title': None, 'link': link_part,
+                'video_name': video_name, 'platform': 'FB + IG', 'game': game_name
             }
         elif 'Video id :' in line:
             vid_id = line.split('Video id :')[-1].strip()
@@ -333,7 +359,6 @@ def parse_posted_file(filepath, game_name):
 
 
 def fetch_fb_caption(vid_id, page_token):
-    """FB API se caption fetch karo (purani logic)"""
     url = f"https://graph.facebook.com/v24.0/{vid_id}?fields=description&access_token={page_token}"
     try:
         res = requests.get(url, timeout=5).json()
@@ -346,7 +371,6 @@ def fetch_fb_caption(vid_id, page_token):
 
 
 def fetch_fb_views_by_id(vid_id, page_token):
-    """FB API se views fetch karo (purani logic)"""
     url = f"https://graph.facebook.com/v24.0/{vid_id}/video_insights?access_token={page_token}"
     try:
         res = requests.get(url, timeout=5).json()
@@ -360,14 +384,6 @@ def fetch_fb_views_by_id(vid_id, page_token):
 
 
 def fetch_fb_ig_data(game_list):
-    """
-    🔥 PURANI LOGIC + NAYI LOGIC combined:
-    1. posted_links_editor/ folder se files padho
-    2. Block-by-block parse karo
-    3. Parallel FB fetch (per video ID)
-    4. IG media se title match
-    5. Page videos API fallback (agar posted_links_editor empty ho)
-    """
     from concurrent.futures import ThreadPoolExecutor, as_completed
 
     posted_dir = 'posted_links_editor'
@@ -378,7 +394,7 @@ def fetch_fb_ig_data(game_list):
         log("⚠️ FB_ACCESS_TOKEN missing")
         return result, game_views_summary
 
-    # ---------- STEP 1: posted_links_editor se parse ----------
+    # STEP 1: posted_links_editor se parse
     if os.path.exists(posted_dir):
         cutoff_date = now_ist() - timedelta(days=DAYS_LIMIT)
         all_tasks = []
@@ -393,7 +409,6 @@ def fetch_fb_ig_data(game_list):
 
             filepath = os.path.join(posted_dir, filename)
 
-            # 28 din mtime check
             try:
                 file_mtime = datetime.fromtimestamp(os.path.getmtime(filepath), tz=IST)
                 if file_mtime < cutoff_date:
@@ -433,7 +448,8 @@ def fetch_fb_ig_data(game_list):
                 post['title'] = title
                 post['fb_views'] = fb_views
                 post['fb_posted'] = fb_views > 0
-                post['fb_link'] = f"https://facebook.com/{vid_id}" if fb_views > 0 else ""
+                # 🔥 FIX: vid_id se full URL banao
+                post['fb_link'] = f"https://www.facebook.com/{vid_id}" if fb_views > 0 else ""
                 post['status'] = "✅ Live" if fb_views > 0 else "⏳ Pending"
                 return post
 
@@ -446,7 +462,7 @@ def fetch_fb_ig_data(game_list):
                         if game in result:
                             result[game].append({
                                 "title": r.get('title', 'Untitled'),
-                                "fb_link": r.get('fb_link', ''),
+                                "fb_link": fix_fb_url(r.get('fb_link', ''), r.get('vid_id', '')),
                                 "fb_views": r.get('fb_views', 0),
                                 "fb_posted": r.get('fb_posted', False),
                                 "ig_link": "",
@@ -460,14 +476,13 @@ def fetch_fb_ig_data(game_list):
                     except Exception as e:
                         log(f"⚠️ Process error: {e}")
 
-    # ---------- STEP 2: Page videos API fallback ----------
+    # STEP 2: Page videos API fallback
     twenty_eight_days_ago = now_ist() - timedelta(days=DAYS_LIMIT)
     since_timestamp = int(twenty_eight_days_ago.timestamp())
 
     fb_videos = []
     ig_medias = []
 
-    # FB Page videos (fallback / additional)
     try:
         fb_url = f"https://graph.facebook.com/v19.0/{FB_PAGE_ID}/videos"
         params = {
@@ -483,7 +498,6 @@ def fetch_fb_ig_data(game_list):
     except Exception as e:
         log(f"❌ FB page fetch error: {e}")
 
-    # IG media
     try:
         ig_url = f"https://graph.facebook.com/v19.0/{FB_PAGE_ID}"
         ig_params = {"fields": "instagram_business_account", "access_token": FB_ACCESS_TOKEN}
@@ -505,14 +519,13 @@ def fetch_fb_ig_data(game_list):
     except Exception as e:
         log(f"❌ IG fetch error: {e}")
 
-    # 🔥 Merge page videos into result (agar pehle se nahi hai)
+    # Merge page videos
     for game in game_list:
         game_norm = normalize(game)
         existing_titles = set()
         for v in result[game]:
             existing_titles.add(normalize(v.get("title", ""))[:40])
 
-        # FB page videos match
         for v in fb_videos:
             title = (v.get("title") or v.get("description") or "").strip()
             if not title:
@@ -521,9 +534,11 @@ def fetch_fb_ig_data(game_list):
                 key = normalize(title)[:40]
                 if key in existing_titles:
                     continue
+                # 🔥 FIX: permalink_url ko full URL banao
+                fb_link = fix_fb_url(v.get("permalink_url", ""), v.get("id", ""))
                 entry = {
                     "title": title,
-                    "fb_link": v.get("permalink_url", f"https://facebook.com/{v.get('id','')}"),
+                    "fb_link": fb_link,
                     "fb_views": int(v.get("views", 0) or 0),
                     "fb_posted": True,
                     "ig_link": "",
@@ -544,13 +559,13 @@ def fetch_fb_ig_data(game_list):
                 continue
             if game_norm and game_norm in normalize(caption):
                 caption_norm = normalize(caption)[:40]
-                # Try to match existing FB video
                 matched = False
                 for v in result[game]:
                     v_norm = normalize(v.get("title", ""))[:40]
                     if v_norm and (v_norm[:20] in caption_norm or caption_norm[:20] in v_norm):
                         ig_views = (m.get("like_count", 0) * 10) + (m.get("comments_count", 0) * 20)
-                        v["ig_link"] = m.get("permalink", "")
+                        # 🔥 FIX: IG link full URL banao
+                        v["ig_link"] = fix_ig_url(m.get("permalink", ""))
                         v["ig_views"] = ig_views
                         v["ig_posted"] = True
                         game_views_summary[game] += ig_views
@@ -564,7 +579,7 @@ def fetch_fb_ig_data(game_list):
                         "fb_link": "",
                         "fb_views": 0,
                         "fb_posted": False,
-                        "ig_link": m.get("permalink", ""),
+                        "ig_link": fix_ig_url(m.get("permalink", "")),
                         "ig_views": ig_views,
                         "ig_posted": True,
                         "timestamp": m.get("timestamp", ""),
@@ -786,7 +801,6 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
 
 
 def get_game_video_stats(target_file, memory, game_name):
-    """🔥 Robust video count — kisi bhi format se"""
     total_links = 0
     if target_file and os.path.exists(target_file):
         try:
@@ -839,6 +853,20 @@ def run_agent_brain():
                     memory.update(loaded)
         except Exception:
             pass
+
+    # 🔥 FIX: Memory ke purane broken links ko bhi fix karo
+    for g_name, videos in memory.get("actual_posted_titles", {}).items():
+        if not isinstance(videos, list):
+            continue
+        for v in videos:
+            if not isinstance(v, dict):
+                continue
+            fb = v.get("fb_link", "")
+            if fb and not str(fb).startswith("http"):
+                v["fb_link"] = fix_fb_url(fb, v.get("vid_id", ""))
+            ig = v.get("ig_link", "")
+            if ig and not str(ig).startswith("http"):
+                v["ig_link"] = fix_ig_url(ig)
 
     # Find game files
     all_files = glob.glob(os.path.join(links_dir, "*.txt"))
@@ -901,7 +929,7 @@ def run_agent_brain():
         target_file, memory, chosen_game
     )
 
-    # 🔥 Robust source link extraction
+    # Source link extraction
     specific_uploaded_link = "N/A"
     try:
         with open(target_file, 'r', encoding='utf-8', errors='ignore') as f:
