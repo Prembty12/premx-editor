@@ -21,17 +21,22 @@
         "monkeyKing",
         "sifu"
     ],
-    "current_index": 0,
-    "current_game": "AfghanistanRedZone",
-    "next_game": "Callofdutyaw",
-    "next_game_position": 2,
-    "last_updated": "2026-09-26 00:59:04",
-    "total_runs": 1,
+    "current_index": 1,
+    "current_game": "Callofdutyaw",
+    "next_game": "DiabloIV",
+    "next_game_position": 3,
+    "last_updated": "2026-09-26 01:09:19",
+    "total_runs": 2,
     "rotation_log": [
         {
             "run": 1,
             "game": "AfghanistanRedZone",
             "timestamp": "2026-09-26 00:59:04"
+        },
+        {
+            "run": 2,
+            "game": "Callofdutyaw",
+            "timestamp": "2026-09-26 01:09:19"
         }
     ],
     "all_games": [
@@ -40,31 +45,31 @@
             "game": "AfghanistanRedZone",
             "uploaded": 1,
             "last_run": 1,
-            "next_turn_in": 0,
-            "status": "current"
+            "next_turn_in": 18,
+            "status": "waiting"
         },
         {
             "position": 2,
             "game": "Callofdutyaw",
-            "uploaded": 0,
-            "last_run": 0,
-            "next_turn_in": 1,
-            "status": "next_up"
+            "uploaded": 1,
+            "last_run": 2,
+            "next_turn_in": 0,
+            "status": "current"
         },
         {
             "position": 3,
             "game": "DiabloIV",
             "uploaded": 0,
             "last_run": 0,
-            "next_turn_in": 2,
-            "status": "waiting"
+            "next_turn_in": 1,
+            "status": "next_up"
         },
         {
             "position": 4,
             "game": "GODOFWAR3",
             "uploaded": 0,
             "last_run": 0,
-            "next_turn_in": 3,
+            "next_turn_in": 2,
             "status": "waiting"
         },
         {
@@ -72,7 +77,7 @@
             "game": "Ghost Destroys Mexican",
             "uploaded": 0,
             "last_run": 0,
-            "next_turn_in": 4,
+            "next_turn_in": 3,
             "status": "waiting"
         },
         {
@@ -80,7 +85,7 @@
             "game": "Ghost_soap_escap",
             "uploaded": 0,
             "last_run": 0,
-            "next_turn_in": 5,
+            "next_turn_in": 4,
             "status": "waiting"
         },
         {
@@ -88,7 +93,7 @@
             "game": "GodofWarLaufey",
             "uploaded": 0,
             "last_run": 0,
-            "next_turn_in": 6,
+            "next_turn_in": 5,
             "status": "waiting"
         },
         {
@@ -96,7 +101,7 @@
             "game": "MarvelsSpiderMan2",
             "uploaded": 0,
             "last_run": 0,
-            "next_turn_in": 7,
+            "next_turn_in": 6,
             "status": "waiting"
         },
         {
@@ -104,7 +109,7 @@
             "game": "RescueOperation",
             "uploaded": 0,
             "last_run": 0,
-            "next_turn_in": 8,
+            "next_turn_in": 7,
             "status": "waiting"
         },
         {
@@ -112,7 +117,7 @@
             "game": "Russian_secret_missions",
             "uploaded": 0,
             "last_run": 0,
-            "next_turn_in": 9,
+            "next_turn_in": 8,
             "status": "waiting"
         },
         {
@@ -120,7 +125,7 @@
             "game": "SpiderMan2",
             "uploaded": 0,
             "last_run": 0,
-            "next_turn_in": 10,
+            "next_turn_in": 9,
             "status": "waiting"
         },
         {
@@ -128,7 +133,7 @@
             "game": "UkraineCovertMission",
             "uploaded": 0,
             "last_run": 0,
-            "next_turn_in": 11,
+            "next_turn_in": 10,
             "status": "waiting"
         },
         {
@@ -136,7 +141,7 @@
             "game": "VietnamCavePrison",
             "uploaded": 0,
             "last_run": 0,
-            "next_turn_in": 12,
+            "next_turn_in": 11,
             "status": "waiting"
         },
         {
@@ -144,7 +149,7 @@
             "game": "codBlackops6",
             "uploaded": 0,
             "last_run": 0,
-            "next_turn_in": 13,
+            "next_turn_in": 12,
             "status": "waiting"
         },
         {
@@ -152,7 +157,7 @@
             "game": "combatopration",
             "uploaded": 0,
             "last_run": 0,
-            "next_turn_in": 14,
+            "next_turn_in": 13,
             "status": "waiting"
         },
         {
@@ -160,7 +165,7 @@
             "game": "ghostandela",
             "uploaded": 0,
             "last_run": 0,
-            "next_turn_in": 15,
+            "next_turn_in": 14,
             "status": "waiting"
         },
         {
@@ -168,7 +173,7 @@
             "game": "mm2remastered",
             "uploaded": 0,
             "last_run": 0,
-            "next_turn_in": 16,
+            "next_turn_in": 15,
             "status": "waiting"
         },
         {
@@ -176,7 +181,7 @@
             "game": "monkeyKing",
             "uploaded": 0,
             "last_run": 0,
-            "next_turn_in": 17,
+            "next_turn_in": 16,
             "status": "waiting"
         },
         {
@@ -184,7 +189,7 @@
             "game": "sifu",
             "uploaded": 0,
             "last_run": 0,
-            "next_turn_in": 18,
+            "next_turn_in": 17,
             "status": "waiting"
         }
     ]
