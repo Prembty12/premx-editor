@@ -57,7 +57,7 @@ fi
 
 # 1. 📊 Update Past Performance & Insights
 echo "📈 [STEP 1] Pulling real analytics and insights from past posts..."
-python3 insights_tracker.py
+python3 agent_brain.py
 
 # 2. ⏳ Check 3 Hours Gap
 if [ "$DEFAULT_POST_MODE" != "2" ] && [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$PAGE_ID" ]; then
