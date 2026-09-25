@@ -60,7 +60,7 @@ def normalize(s):
 
 
 def extract_urls(text):
-    """🔥 Robust URL extraction"""
+    """Robust URL extraction"""
     urls = re.findall(r'https?://[^\s\)\]\'"<>,;]+', text)
     cleaned = []
     seen = set()
@@ -72,40 +72,28 @@ def extract_urls(text):
     return cleaned
 
 
-# 🔥🔥🔥 FIX: FB URL HELPER — relative URL ko full URL banao
+# 🔥 FB/IG URL FIX HELPERS
 def fix_fb_url(url, vid_id=""):
-    """FB API kabhi relative URL deta hai (/reel/xxx) — full URL banao"""
+    """FB relative URL → full URL"""
     if not url:
         return f"https://www.facebook.com/{vid_id}" if vid_id else ""
-    
     url = str(url).strip()
-    
-    # Already full URL
     if url.startswith("http://") or url.startswith("https://"):
         return url
-    
-    # Relative URL (jaise "/reel/123456/")
     if url.startswith("/"):
         return f"https://www.facebook.com{url}"
-    
-    # Koi aur format
     return f"https://www.facebook.com/{url}"
 
 
-# 🔥🔥🔥 FIX: IG URL HELPER
 def fix_ig_url(url):
-    """IG URL ko full URL banao"""
+    """IG relative URL → full URL"""
     if not url:
         return ""
-    
     url = str(url).strip()
-    
     if url.startswith("http://") or url.startswith("https://"):
         return url
-    
     if url.startswith("/"):
         return f"https://www.instagram.com{url}"
-    
     return f"https://www.instagram.com/{url}"
 
 
@@ -188,7 +176,7 @@ def generate_visual_reports(game_views_summary, game_stats):
                                            textColor=colors.HexColor('#3F51B5'), spaceBefore=10, spaceAfter=5)
             normal_style = styles['Normal']
 
-            elements.append(Paragraph("🎮 Multi-Platform Gaming Agent - Clean Analytics Report", title_style))
+            elements.append(Paragraph("🎮 Multi-Platform Gaming Agent - Analytics Report", title_style))
             elements.append(Paragraph(f"Generated on: {now_ist_str()} IST", normal_style))
             elements.append(Spacer(1, 15))
 
@@ -322,7 +310,7 @@ def load_source_data():
 
 
 def parse_posted_file(filepath, game_name):
-    """Purani script ka exact parse logic"""
+    """Purani insights_tracker ka parse logic"""
     with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
         content = f.read()
 
@@ -412,14 +400,12 @@ def fetch_fb_ig_data(game_list):
             try:
                 file_mtime = datetime.fromtimestamp(os.path.getmtime(filepath), tz=IST)
                 if file_mtime < cutoff_date:
-                    log(f"⏭️ Skip {game_name} (purani file)")
                     continue
             except Exception:
                 pass
 
             try:
                 posts = parse_posted_file(filepath, game_name)
-                log(f"📂 {game_name}: {len(posts)} videos parsed")
                 for p in posts:
                     all_tasks.append(p)
             except Exception as e:
@@ -448,7 +434,6 @@ def fetch_fb_ig_data(game_list):
                 post['title'] = title
                 post['fb_views'] = fb_views
                 post['fb_posted'] = fb_views > 0
-                # 🔥 FIX: vid_id se full URL banao
                 post['fb_link'] = f"https://www.facebook.com/{vid_id}" if fb_views > 0 else ""
                 post['status'] = "✅ Live" if fb_views > 0 else "⏳ Pending"
                 return post
@@ -476,7 +461,7 @@ def fetch_fb_ig_data(game_list):
                     except Exception as e:
                         log(f"⚠️ Process error: {e}")
 
-    # STEP 2: Page videos API fallback
+    # STEP 2: Page videos API
     twenty_eight_days_ago = now_ist() - timedelta(days=DAYS_LIMIT)
     since_timestamp = int(twenty_eight_days_ago.timestamp())
 
@@ -534,7 +519,6 @@ def fetch_fb_ig_data(game_list):
                 key = normalize(title)[:40]
                 if key in existing_titles:
                     continue
-                # 🔥 FIX: permalink_url ko full URL banao
                 fb_link = fix_fb_url(v.get("permalink_url", ""), v.get("id", ""))
                 entry = {
                     "title": title,
@@ -552,7 +536,6 @@ def fetch_fb_ig_data(game_list):
                 game_views_summary[game] += entry["fb_views"]
                 existing_titles.add(key)
 
-        # IG match
         for m in ig_medias:
             caption = (m.get("caption") or "").strip()
             if not caption:
@@ -564,7 +547,6 @@ def fetch_fb_ig_data(game_list):
                     v_norm = normalize(v.get("title", ""))[:40]
                     if v_norm and (v_norm[:20] in caption_norm or caption_norm[:20] in v_norm):
                         ig_views = (m.get("like_count", 0) * 10) + (m.get("comments_count", 0) * 20)
-                        # 🔥 FIX: IG link full URL banao
                         v["ig_link"] = fix_ig_url(m.get("permalink", ""))
                         v["ig_views"] = ig_views
                         v["ig_posted"] = True
@@ -589,7 +571,6 @@ def fetch_fb_ig_data(game_list):
                     game_views_summary[game] += ig_views
                     existing_titles.add(caption_norm)
 
-    # Sort newest first
     for game in game_list:
         result[game] = sorted(result[game], key=lambda x: x.get("timestamp", ""), reverse=True)
 
@@ -717,7 +698,7 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
             f"| **{g_name}** | {title} | {fb_md} | {fb_v_md} | {ig_md} | {ig_v_md} | {src_md} | {all_md} |\n"
         )
 
-    # Collapsible lists
+    # 🔥 FIX: Collapsible lists — ANCHOR BAHAR
     md_content.append("\n--- \n\n## 📜 Full Video History (Click to Expand)\n\n")
 
     for g_name in sorted(actual_posted_titles.keys()):
@@ -726,10 +707,11 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
             continue
 
         anchor = g_name.lower().replace(' ', '-')
+        # Anchor OUTSIDE details
+        md_content.append(f'<a id="{anchor}-all"></a>\n')
         md_content.append(
             f'<details>\n<summary><b>🎮 {g_name} — All {len(videos)} Videos (Newest First)</b></summary>\n\n'
         )
-        md_content.append(f'<a id="{anchor}-all"></a>\n\n')
         md_content.append("| # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |\n")
         md_content.append("|---|---|---|---|---|---|---|\n")
 
@@ -854,7 +836,7 @@ def run_agent_brain():
         except Exception:
             pass
 
-    # 🔥 FIX: Memory ke purane broken links ko bhi fix karo
+    # Auto-fix purane broken links
     for g_name, videos in memory.get("actual_posted_titles", {}).items():
         if not isinstance(videos, list):
             continue
@@ -879,11 +861,8 @@ def run_agent_brain():
         log("❌ No valid game files found.")
         sys.exit(1)
 
-    valid_game_files = [f for f in all_files if os.path.exists(f) and os.path.getsize(f) > 0]
-
-    if not valid_game_files:
-        log("❌ All game files empty.")
-        sys.exit(1)
+    # 🔥 Sirf files jisme content hai
+    valid_game_files = [f for f in all_files if os.path.exists(f)]
 
     game_list = []
     file_mapping = {}
@@ -914,10 +893,40 @@ def run_agent_brain():
     else:
         chosen_game = game_list[0] if game_list else "DefaultGame"
 
+    # 🔥 FIX: Agar file khali hai to next game try karo
     target_file = file_mapping.get(chosen_game, "")
-    if not target_file or not os.path.exists(target_file):
-        log(f"❌ Target file not found for '{chosen_game}'")
+    original_chosen = chosen_game
+    attempts = 0
+    max_attempts = len(game_list)
+
+    while attempts < max_attempts:
+        if target_file and os.path.exists(target_file):
+            try:
+                with open(target_file, 'r', encoding='utf-8', errors='ignore') as f:
+                    content = f.read()
+                urls = extract_urls(content)
+                if urls:
+                    log(f"✅ {chosen_game}: {len(urls)} URLs found — proceeding")
+                    break
+                else:
+                    log(f"⚠️ {chosen_game}: File has no URLs — trying next game")
+            except Exception as e:
+                log(f"⚠️ {chosen_game}: Read error — {e}")
+        else:
+            log(f"⚠️ {chosen_game}: File not found — trying next game")
+
+        current_idx = game_list.index(chosen_game)
+        next_idx = (current_idx + 1) % len(game_list)
+        chosen_game = game_list[next_idx]
+        target_file = file_mapping.get(chosen_game, "")
+        attempts += 1
+
+    if attempts >= max_attempts:
+        log(f"❌ All game files empty. Cannot proceed.")
         sys.exit(1)
+
+    if chosen_game != original_chosen:
+        log(f"🔄 Switched from {original_chosen} to {chosen_game}")
 
     styles = memory.get("title_styles", {})
     chosen_style = random.choices(list(styles.keys()), weights=list(styles.values()), k=1)[0]
@@ -929,7 +938,7 @@ def run_agent_brain():
         target_file, memory, chosen_game
     )
 
-    # Source link extraction
+    # Source link
     specific_uploaded_link = "N/A"
     try:
         with open(target_file, 'r', encoding='utf-8', errors='ignore') as f:
@@ -942,8 +951,6 @@ def run_agent_brain():
             link_index = uploaded_links % len(all_urls)
             specific_uploaded_link = all_urls[link_index]
             log(f"✅ Source link: {specific_uploaded_link}")
-        else:
-            log(f"⚠️ No URLs in {target_file}")
     except Exception as e:
         log(f"⚠️ Link extraction error: {e}")
 
