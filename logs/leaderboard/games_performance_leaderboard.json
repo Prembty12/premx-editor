@@ -2,10 +2,10 @@
     {
         "rank": 1,
         "game_name": "mm2remastered",
-        "total_views": 17428,
+        "total_views": 17430,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 23.3
+        "view_share_percentage": 23.28
     },
     {
         "rank": 2,
@@ -13,7 +13,7 @@
         "total_views": 13715,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 18.34
+        "view_share_percentage": 18.32
     },
     {
         "rank": 3,
@@ -21,28 +21,28 @@
         "total_views": 12235,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 16.36
+        "view_share_percentage": 16.34
     },
     {
         "rank": 4,
         "game_name": "AfghanistanRedZone",
-        "total_views": 7127,
+        "total_views": 7171,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 9.53
+        "view_share_percentage": 9.58
     },
     {
         "rank": 5,
         "game_name": "RescueOperation",
-        "total_views": 6171,
+        "total_views": 6172,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 8.25
+        "view_share_percentage": 8.24
     },
     {
         "rank": 6,
         "game_name": "Callofdutyaw",
-        "total_views": 5307,
+        "total_views": 5318,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
         "view_share_percentage": 7.1
@@ -61,7 +61,7 @@
         "total_views": 2384,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 3.19
+        "view_share_percentage": 3.18
     },
     {
         "rank": 9,
@@ -75,8 +75,8 @@
         "rank": 10,
         "game_name": "Ghost_soap_escap",
         "total_views": 1112,
-        "uploaded_videos": 0,
-        "avg_views_per_video": 0,
+        "uploaded_videos": 1,
+        "avg_views_per_video": 1112,
         "view_share_percentage": 1.49
     },
     {
@@ -89,19 +89,19 @@
     },
     {
         "rank": 12,
+        "game_name": "GODOFWAR3",
+        "total_views": 872,
+        "uploaded_videos": 1,
+        "avg_views_per_video": 872,
+        "view_share_percentage": 1.16
+    },
+    {
+        "rank": 13,
         "game_name": "Russian_secret_missions",
         "total_views": 869,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
         "view_share_percentage": 1.16
-    },
-    {
-        "rank": 13,
-        "game_name": "GODOFWAR3",
-        "total_views": 862,
-        "uploaded_videos": 1,
-        "avg_views_per_video": 862,
-        "view_share_percentage": 1.15
     },
     {
         "rank": 14,

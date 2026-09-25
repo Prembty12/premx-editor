@@ -37,8 +37,8 @@
         "secret": 10,
         "shocking": 10
     },
-    "last_used_style": "funny_roast",
-    "last_played_game": "Ghost Destroys Mexican",
+    "last_used_style": "shocking",
+    "last_played_game": "Ghost_soap_escap",
     "processed_viral_ids": [],
     "game_stats": {
         "AfghanistanRedZone": {
@@ -54,6 +54,9 @@
             "uploaded_count": 1
         },
         "Ghost Destroys Mexican": {
+            "uploaded_count": 1
+        },
+        "Ghost_soap_escap": {
             "uploaded_count": 1
         }
     },
