@@ -72,7 +72,6 @@ def extract_urls(text):
     return cleaned
 
 
-# 🔥 FB/IG URL FIX HELPERS
 def fix_fb_url(url, vid_id=""):
     """FB relative URL → full URL"""
     if not url:
@@ -647,6 +646,68 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
 
     source_links_map, source_videos_count, _ = load_source_data()
 
+    # 🔥 NAYA: Har game ki alag file banao
+    games_dir = "logs/games"
+    os.makedirs(games_dir, exist_ok=True)
+    game_file_links = {}
+
+    for g_name in sorted(actual_posted_titles.keys()):
+        videos = actual_posted_titles.get(g_name, [])
+        if not videos:
+            continue
+
+        # Safe filename
+        safe_name = re.sub(r'[^a-zA-Z0-9_-]', '_', g_name)
+        game_filename = f"{safe_name}.md"
+        game_filepath = os.path.join(games_dir, game_filename)
+        game_file_links[g_name] = f"logs/games/{game_filename}"
+
+        # File content
+        gf_lines = []
+        gf_lines.append(f"# 🎮 {g_name} — Full Video History\n\n")
+        gf_lines.append(f"[⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)\n\n")
+        gf_lines.append(f"**Total Videos:** {len(videos)} | ")
+        gf_lines.append(f"**Last Updated:** {now_ist_str()} IST\n\n")
+        gf_lines.append("---\n\n")
+
+        # Stats
+        total_fb_views = sum(v.get('fb_views', 0) for v in videos)
+        total_ig_views = sum(v.get('ig_views', 0) for v in videos)
+        fb_count = sum(1 for v in videos if v.get('fb_posted'))
+        ig_count = sum(1 for v in videos if v.get('ig_posted'))
+
+        gf_lines.append("## 📊 Summary\n\n")
+        gf_lines.append("| Metric | Value |\n|---|---|\n")
+        gf_lines.append(f"| Total Videos | **{len(videos)}** |\n")
+        gf_lines.append(f"| FB Posted | {fb_count} / {len(videos)} |\n")
+        gf_lines.append(f"| IG Posted | {ig_count} / {len(videos)} |\n")
+        gf_lines.append(f"| Total FB Views | **{total_fb_views:,}** |\n")
+        gf_lines.append(f"| Total IG Views | **{total_ig_views:,}** |\n\n")
+
+        gf_lines.append("---\n\n## 📜 All Videos (Newest First)\n\n")
+        gf_lines.append("| # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |\n")
+        gf_lines.append("|---|---|---|---|---|---|---|\n")
+
+        src_urls = source_links_map.get(g_name, [])
+        src_urls_newest = list(reversed(src_urls))
+
+        for idx, v in enumerate(videos, 1):
+            title = (v.get("title") or "").replace("\n", " ").replace("|", "\\|")[:120] or "_Untitled_"
+            fb_md = f"[🔵 FB]({v['fb_link']})" if v.get("fb_posted") and v.get("fb_link") else "⏳ Pending"
+            fb_v_md = f"{v.get('fb_views', 0):,}" if v.get("fb_posted") else "_0_"
+            ig_md = f"[🟣 IG]({v['ig_link']})" if v.get("ig_posted") and v.get("ig_link") else "⏳ Pending"
+            ig_v_md = f"{v.get('ig_views', 0):,}" if v.get("ig_posted") else "_0_"
+            src_link = src_urls_newest[idx - 1] if idx - 1 < len(src_urls_newest) else ""
+            src_md = f"[📂]({src_link})" if src_link else "_N/A_"
+
+            gf_lines.append(f"| {idx} | {title} | {fb_md} | {fb_v_md} | {ig_md} | {ig_v_md} | {src_md} |\n")
+
+        try:
+            with open(game_filepath, 'w', encoding='utf-8') as f:
+                f.writelines(gf_lines)
+        except Exception as e:
+            log(f"⚠️ Failed to write {game_filepath}: {e}")
+
     md_content = []
     md_content.append("# 🚀 GAMING AGENT COMMAND & ANALYTICS DASHBOARD\n\n")
     md_content.append(f"> **Last Updated:** {timestamp} IST | **Status:** All Systems Active & Synchronized\n\n")
@@ -676,7 +737,7 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
     for g_name in sorted(actual_posted_titles.keys()):
         videos = actual_posted_titles.get(g_name, [])
 
-        # 🔥 Remaining/Total calculate karo
+        # Remaining/Total calculate
         src_file = file_mapping.get(g_name, "")
         total_vids = 0
         if src_file and os.path.exists(src_file):
@@ -714,45 +775,27 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
         src_link = src_urls[-1] if src_urls else ""
         src_md = f"[📂]({src_link})" if src_link else "_N/A_"
 
-        all_md = (f"**[📜 View {len(videos)}](#{g_name.lower().replace(' ', '-')}-all)**"
-                  if len(videos) > 1 else "_1_")
+        # 🔥 NAYA: Alag file ka link
+        if g_name in game_file_links:
+            all_md = f"**[📜 View {len(videos)}]({game_file_links[g_name]})**"
+        else:
+            all_md = f"_{len(videos)}_"
 
         md_content.append(
             f"| **{g_name}** | {title} | {fb_md} | {fb_v_md} | {ig_md} | {ig_v_md} | {progress_md} | {src_md} | {all_md} |\n"
         )
 
-    # 🔥 FIX: Collapsible lists — id attribute directly on <details>
-    md_content.append("\n--- \n\n## 📜 Full Video History (Click to Expand)\n\n")
+    # Full history links section
+    md_content.append("\n--- \n\n## 📜 Full Video History\n\n")
+    md_content.append("> Click any game below to view its complete video list with all FB/IG links:\n\n")
 
     for g_name in sorted(actual_posted_titles.keys()):
         videos = actual_posted_titles.get(g_name, [])
         if not videos:
             continue
-
-        anchor = g_name.lower().replace(' ', '-')
-        # 🔥 FIX: id attribute directly <details> tag pe
-        md_content.append(
-            f'<details id="{anchor}-all">\n'
-            f'<summary><b>🎮 {g_name} — All {len(videos)} Videos (Newest First)</b></summary>\n\n'
-        )
-        md_content.append("| # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |\n")
-        md_content.append("|---|---|---|---|---|---|---|\n")
-
-        src_urls = source_links_map.get(g_name, [])
-        src_urls_newest = list(reversed(src_urls))
-
-        for idx, v in enumerate(videos, 1):
-            title = (v.get("title") or "").replace("\n", " ").replace("|", "\\|")[:100] or "_Untitled_"
-            fb_md = f"[🔵 FB]({v['fb_link']})" if v.get("fb_posted") and v.get("fb_link") else "⏳ Pending"
-            fb_v_md = f"{v.get('fb_views', 0):,}" if v.get("fb_posted") else "_0_"
-            ig_md = f"[🟣 IG]({v['ig_link']})" if v.get("ig_posted") and v.get("ig_link") else "⏳ Pending"
-            ig_v_md = f"{v.get('ig_views', 0):,}" if v.get("ig_posted") else "_0_"
-            src_link = src_urls_newest[idx - 1] if idx - 1 < len(src_urls_newest) else ""
-            src_md = f"[📂]({src_link})" if src_link else "_N/A_"
-
-            md_content.append(f"| {idx} | {title} | {fb_md} | {fb_v_md} | {ig_md} | {ig_v_md} | {src_md} |\n")
-
-        md_content.append("\n</details>\n\n")
+        file_link = game_file_links.get(g_name, "")
+        if file_link:
+            md_content.append(f"- **🎮 {g_name}** — [📜 View All {len(videos)} Videos]({file_link})\n")
 
     # Rotation
     rotation_file = "logs/rotation_history.json"
@@ -801,7 +844,8 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
 
     git_commit_and_push([
         dashboard_path, leaderboard_json, history_json,
-        "logs/agent_memory.json", "logs/rotation_history.json"
+        "logs/agent_memory.json", "logs/rotation_history.json",
+        "logs/games/"
     ])
 
 
@@ -859,7 +903,7 @@ def run_agent_brain():
         except Exception:
             pass
 
-    # Auto-fix purane broken links
+    # Auto-fix broken links
     for g_name, videos in memory.get("actual_posted_titles", {}).items():
         if not isinstance(videos, list):
             continue
@@ -873,7 +917,6 @@ def run_agent_brain():
             if ig and not str(ig).startswith("http"):
                 v["ig_link"] = fix_ig_url(ig)
 
-    # Find game files
     all_files = glob.glob(os.path.join(links_dir, "*.txt"))
     if not all_files:
         all_files = glob.glob("game_links_editor/*.txt")
@@ -902,12 +945,10 @@ def run_agent_brain():
     game_list = sorted(list(set(game_list)))
     log(f"📁 Found {len(game_list)} games: {game_list}")
 
-    # Fetch FB + IG
     actual_posted_titles, game_views_summary = fetch_fb_ig_data(game_list)
     if not game_views_summary:
         game_views_summary = {g: 0 for g in game_list}
 
-    # Rotation
     last_game = memory.get("last_played_game", "")
     if last_game in game_list:
         next_index = (game_list.index(last_game) + 1) % len(game_list)
@@ -915,7 +956,7 @@ def run_agent_brain():
     else:
         chosen_game = game_list[0] if game_list else "DefaultGame"
 
-    # 🔥 FIX: Empty file skip
+    # Empty file skip
     target_file = file_mapping.get(chosen_game, "")
     original_chosen = chosen_game
     attempts = 0
@@ -960,7 +1001,6 @@ def run_agent_brain():
         target_file, memory, chosen_game
     )
 
-    # Source link
     specific_uploaded_link = "N/A"
     try:
         with open(target_file, 'r', encoding='utf-8', errors='ignore') as f:
