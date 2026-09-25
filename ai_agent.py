@@ -579,9 +579,12 @@ def fetch_fb_ig_data(game_list):
 
 def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploaded_link,
                              post_link, platform_name, views_count,
-                             game_views_summary, game_stats, actual_posted_titles=None):
+                             game_views_summary, game_stats, actual_posted_titles=None,
+                             file_mapping=None):
     if actual_posted_titles is None:
         actual_posted_titles = {}
+    if file_mapping is None:
+        file_mapping = {}
 
     dashboard_path = "GAMING_DASHBOARD.md"
     leaderboard_json = os.path.join("logs/leaderboard", "games_performance_leaderboard.json")
@@ -667,15 +670,35 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
     # Live table
     md_content.append("\n--- \n\n## 📺 Live Post Titles + Views (Latest per Game)\n\n")
     md_content.append("> 🔵 FB = Facebook post live | 🟣 IG = Instagram post live | ⏳ = Pending\n\n")
-    md_content.append("| Game Name | 📺 Latest Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source | 📜 All |\n")
-    md_content.append("|---|---|---|---|---|---|---|---|\n")
+    md_content.append("| Game Name | 📺 Latest Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📊 Remaining / Total | 📂 Source | 📜 All |\n")
+    md_content.append("|---|---|---|---|---|---|---|---|---|\n")
 
     for g_name in sorted(actual_posted_titles.keys()):
         videos = actual_posted_titles.get(g_name, [])
 
+        # 🔥 Remaining/Total calculate karo
+        src_file = file_mapping.get(g_name, "")
+        total_vids = 0
+        if src_file and os.path.exists(src_file):
+            try:
+                with open(src_file, 'r', encoding='utf-8', errors='ignore') as f:
+                    c = f.read()
+                total_vids = max(len(extract_urls(c)), c.count("Video id :"), c.count("| Link:"))
+            except Exception:
+                pass
+        uploaded_vids = game_stats.get(g_name, {}).get("uploaded_count", 0)
+        remaining_vids = max(0, total_vids - uploaded_vids)
+
+        if total_vids > 0:
+            progress_md = f"**{remaining_vids}** / {total_vids}"
+            if remaining_vids == 0:
+                progress_md = f"✅ {total_vids} / {total_vids}"
+        else:
+            progress_md = "_N/A_"
+
         if not videos:
             md_content.append(
-                f"| **{g_name}** | _Not Posted Yet_ | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ | — |\n"
+                f"| **{g_name}** | _Not Posted Yet_ | ⏳ Pending | _0_ | ⏳ Pending | _0_ | {progress_md} | _N/A_ | — |\n"
             )
             continue
 
@@ -695,10 +718,10 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
                   if len(videos) > 1 else "_1_")
 
         md_content.append(
-            f"| **{g_name}** | {title} | {fb_md} | {fb_v_md} | {ig_md} | {ig_v_md} | {src_md} | {all_md} |\n"
+            f"| **{g_name}** | {title} | {fb_md} | {fb_v_md} | {ig_md} | {ig_v_md} | {progress_md} | {src_md} | {all_md} |\n"
         )
 
-    # 🔥 FIX: Collapsible lists — ANCHOR BAHAR
+    # 🔥 FIX: Collapsible lists — id attribute directly on <details>
     md_content.append("\n--- \n\n## 📜 Full Video History (Click to Expand)\n\n")
 
     for g_name in sorted(actual_posted_titles.keys()):
@@ -707,10 +730,10 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
             continue
 
         anchor = g_name.lower().replace(' ', '-')
-        # Anchor OUTSIDE details
-        md_content.append(f'<a id="{anchor}-all"></a>\n')
+        # 🔥 FIX: id attribute directly <details> tag pe
         md_content.append(
-            f'<details>\n<summary><b>🎮 {g_name} — All {len(videos)} Videos (Newest First)</b></summary>\n\n'
+            f'<details id="{anchor}-all">\n'
+            f'<summary><b>🎮 {g_name} — All {len(videos)} Videos (Newest First)</b></summary>\n\n'
         )
         md_content.append("| # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |\n")
         md_content.append("|---|---|---|---|---|---|---|\n")
@@ -861,7 +884,6 @@ def run_agent_brain():
         log("❌ No valid game files found.")
         sys.exit(1)
 
-    # 🔥 Sirf files jisme content hai
     valid_game_files = [f for f in all_files if os.path.exists(f)]
 
     game_list = []
@@ -893,7 +915,7 @@ def run_agent_brain():
     else:
         chosen_game = game_list[0] if game_list else "DefaultGame"
 
-    # 🔥 FIX: Agar file khali hai to next game try karo
+    # 🔥 FIX: Empty file skip
     target_file = file_mapping.get(chosen_game, "")
     original_chosen = chosen_game
     attempts = 0
@@ -985,6 +1007,7 @@ def run_agent_brain():
         platform_name="Facebook" if latest_fb_link else ("Instagram" if latest_ig_link else "Local / Pending"),
         views_count=latest_views, game_views_summary=game_views_summary,
         game_stats=memory.get("game_stats", {}), actual_posted_titles=actual_posted_titles,
+        file_mapping=file_mapping,
     )
 
     log(f"""
