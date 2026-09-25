@@ -1,6 +1,7 @@
 {
     "game_scores": {
-        "Callofdutyaw": 15
+        "Callofdutyaw": 15,
+        "DiabloIV": 15
     },
     "title_styles": {
         "curiosity": 10,
@@ -17,7 +18,7 @@
         "unbelievable": 10,
         "crazy": 10,
         "secret": 10,
-        "shocking": 10
+        "shocking": 13
     },
     "last_used_style": "shocking",
     "last_played_game": "DiabloIV",

@@ -1,1 +1,1 @@
-{"clip_duration": 25, "reason": "Dramatic execution cutscene with high tension.", "start_time": 25, "status": "APPROVE", "title": "The Execution Order 🪦"}
+{"clip_duration": 36, "reason": "Full cinematic monster fight sequence", "start_time": 0, "status": "APPROVE", "title": "Bloody Demon Combat Unleashed 🩸⚔️"}
