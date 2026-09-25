@@ -5,7 +5,7 @@
         "total_views": 27417,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 19.39
+        "view_share_percentage": 19.38
     },
     {
         "rank": 2,
@@ -13,12 +13,12 @@
         "total_views": 22913,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 16.21
+        "view_share_percentage": 16.2
     },
     {
         "rank": 3,
         "game_name": "mm2remastered",
-        "total_views": 18809,
+        "total_views": 18815,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
         "view_share_percentage": 13.3
@@ -26,9 +26,9 @@
     {
         "rank": 4,
         "game_name": "Callofdutyaw",
-        "total_views": 16275,
+        "total_views": 16276,
         "uploaded_videos": 1,
-        "avg_views_per_video": 16275,
+        "avg_views_per_video": 16276,
         "view_share_percentage": 11.51
     },
     {
@@ -37,7 +37,7 @@
         "total_views": 12905,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 9.13
+        "view_share_percentage": 9.12
     },
     {
         "rank": 6,
@@ -45,15 +45,15 @@
         "total_views": 10017,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 7.09
+        "view_share_percentage": 7.08
     },
     {
         "rank": 7,
         "game_name": "AfghanistanRedZone",
-        "total_views": 9498,
+        "total_views": 9557,
         "uploaded_videos": 1,
-        "avg_views_per_video": 9498,
-        "view_share_percentage": 6.72
+        "avg_views_per_video": 9557,
+        "view_share_percentage": 6.76
     },
     {
         "rank": 8,
@@ -69,7 +69,7 @@
         "total_views": 4349,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 3.08
+        "view_share_percentage": 3.07
     },
     {
         "rank": 10,
@@ -114,10 +114,10 @@
     {
         "rank": 15,
         "game_name": "GODOFWAR3",
-        "total_views": 1156,
+        "total_views": 1176,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 0.82
+        "view_share_percentage": 0.83
     },
     {
         "rank": 16,
@@ -147,8 +147,8 @@
         "rank": 19,
         "game_name": "DiabloIV",
         "total_views": 340,
-        "uploaded_videos": 0,
-        "avg_views_per_video": 0,
+        "uploaded_videos": 1,
+        "avg_views_per_video": 340,
         "view_share_percentage": 0.24
     }
 ]
