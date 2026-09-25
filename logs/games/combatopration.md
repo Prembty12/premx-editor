@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 14 | **Last Updated:** 2026-09-26 02:03:49 IST
+**Total Videos:** 14 | **Last Updated:** 2026-09-26 02:06:21 IST
 
 ---
 
@@ -29,10 +29,10 @@
 | 5 | He was too focused on the big gun to notice me 😂🤷‍♂️  #videogames #gamingcommunity #gaming #combatopration #gamingreels  | [🔵 FB](https://www.facebook.com/reel/1745487260034532/) | 508 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_1.mp4) |
 | 6 | combatopration 15 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_9.mp4) |
 | 7 | combatopration 3 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_5.mp4) |
-| 8 | combatopration 5 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_15.mp4) |
-| 9 | combatopration 14 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_3.mp4) |
+| 8 | combatopration 14 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_15.mp4) |
+| 9 | combatopration 5 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_3.mp4) |
 | 10 | combatopration 1 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
 | 11 | combatopration 9 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
 | 12 | combatopration 2 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
-| 13 | combatopration 7 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
-| 14 | combatopration 10 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 13 | combatopration 10 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 14 | combatopration 7 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |

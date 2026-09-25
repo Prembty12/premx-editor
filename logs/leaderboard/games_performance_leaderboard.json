@@ -5,7 +5,7 @@
         "total_views": 27419,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 19.18
+        "view_share_percentage": 19.17
     },
     {
         "rank": 2,
@@ -13,7 +13,7 @@
         "total_views": 22655,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 15.85
+        "view_share_percentage": 15.84
     },
     {
         "rank": 3,
@@ -21,15 +21,15 @@
         "total_views": 18879,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 13.21
+        "view_share_percentage": 13.2
     },
     {
         "rank": 4,
         "game_name": "Callofdutyaw",
-        "total_views": 16620,
+        "total_views": 16645,
         "uploaded_videos": 1,
-        "avg_views_per_video": 16620,
-        "view_share_percentage": 11.63
+        "avg_views_per_video": 16645,
+        "view_share_percentage": 11.64
     },
     {
         "rank": 5,
@@ -42,10 +42,10 @@
     {
         "rank": 6,
         "game_name": "AfghanistanRedZone",
-        "total_views": 12024,
+        "total_views": 12087,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 8.41
+        "view_share_percentage": 8.45
     },
     {
         "rank": 7,
@@ -61,7 +61,7 @@
         "total_views": 5214,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 3.65
+        "view_share_percentage": 3.64
     },
     {
         "rank": 9,
@@ -93,7 +93,7 @@
         "total_views": 1680,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 1.18
+        "view_share_percentage": 1.17
     },
     {
         "rank": 13,
@@ -105,16 +105,16 @@
     },
     {
         "rank": 14,
-        "game_name": "VietnamCavePrison",
-        "total_views": 1401,
+        "game_name": "GODOFWAR3",
+        "total_views": 1405,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
         "view_share_percentage": 0.98
     },
     {
         "rank": 15,
-        "game_name": "GODOFWAR3",
-        "total_views": 1395,
+        "game_name": "VietnamCavePrison",
+        "total_views": 1401,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
         "view_share_percentage": 0.98
@@ -147,8 +147,8 @@
         "rank": 19,
         "game_name": "DiabloIV",
         "total_views": 360,
-        "uploaded_videos": 0,
-        "avg_views_per_video": 0,
+        "uploaded_videos": 1,
+        "avg_views_per_video": 360,
         "view_share_percentage": 0.25
     }
 ]

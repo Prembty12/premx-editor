@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 15 | **Last Updated:** 2026-09-26 02:03:49 IST
+**Total Videos:** 15 | **Last Updated:** 2026-09-26 02:06:21 IST
 
 ---
 
@@ -29,10 +29,10 @@
 | 5 | Pull of Faith & Destiny ⛓️🔥  #videogames #gamingcommunity #gaming #diabloiv #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdnME8Xj0om/) | 140 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.102/DiabloIV9.mp4) |
 | 6 | Epic Battle! 🔥💥  #videogames #gamingcommunity #gaming #diabloiv #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2338989986911230/) | 150 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.102/DiabloIV2.mp4) |
 | 7 | DiabloIV3 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.102/DiabloIV7.mp4) |
-| 8 | DiabloIV7 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.102/DiabloIV10.mp4) |
-| 9 | DiabloIV10 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.102/DiabloIV3.mp4) |
-| 10 | DiabloIV9 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
-| 11 | DiabloIV2 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 8 | DiabloIV10 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.102/DiabloIV10.mp4) |
+| 9 | DiabloIV7 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.102/DiabloIV3.mp4) |
+| 10 | DiabloIV2 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 11 | DiabloIV9 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
 | 12 | DiabloIV4 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
 | 13 | DiabloIV11 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
 | 14 | DiabloIV8 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |

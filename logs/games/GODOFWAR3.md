@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 9 | **Last Updated:** 2026-09-26 02:03:49 IST
+**Total Videos:** 9 | **Last Updated:** 2026-09-26 02:06:21 IST
 
 ---
 
@@ -14,7 +14,7 @@
 | FB Posted | 1 / 9 |
 | IG Posted | 3 / 9 |
 | Total FB Views | **25** |
-| Total IG Views | **1,370** |
+| Total IG Views | **1,380** |
 
 ---
 
@@ -22,12 +22,12 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | Trapped Inside Giant Beast 👹  #videogames #gamingcommunity #gaming #godofwar3 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1121298093949579/) | 25 | [🟣 IG](https://www.instagram.com/reel/Ddt5-4KlVj_/) | 570 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR314.mp4) |
+| 1 | Trapped Inside Giant Beast 👹  #videogames #gamingcommunity #gaming #godofwar3 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1121298093949579/) | 25 | [🟣 IG](https://www.instagram.com/reel/Ddt5-4KlVj_/) | 580 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR314.mp4) |
 | 2 | Kratos Giant Boss Fight 🦖⚔️  #videogames #gamingcommunity #gaming #godofwar3 #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdcJxg-jUVD/) | 540 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR36.mp4) |
 | 3 | Spare Her! Kratos Pleads 😭  #videogames #gamingcommunity #gaming #godofwar3 #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdbP6F8jD2a/) | 260 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR321.mp4) |
 | 4 | GODOFWAR320 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR320.mp4) |
 | 5 | GODOFWAR319 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR319.mp4) |
 | 6 | GODOFWAR321 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR37.mp4) |
 | 7 | GODOFWAR36 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
-| 8 | GODOFWAR37 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
-| 9 | GODOFWAR314 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 8 | GODOFWAR314 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 9 | GODOFWAR37 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |

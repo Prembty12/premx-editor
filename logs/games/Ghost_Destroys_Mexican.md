@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 18 | **Last Updated:** 2026-09-26 02:03:49 IST
+**Total Videos:** 18 | **Last Updated:** 2026-09-26 02:06:21 IST
 
 ---
 
@@ -32,11 +32,11 @@
 | 8 | Ghost Destroys Mexican Oil Ring14 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.82/Ghost_Destroys_Mexican_Oil_Ring12.mp4) |
 | 9 | Ghost Destroys Mexican Oil Ring6 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.82/Ghost_Destroys_Mexican_Oil_Ring18.mp4) |
 | 10 | Ghost Destroys Mexican Oil Ring18 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.82/Ghost_Destroys_Mexican_Oil_Ring6.mp4) |
-| 11 | Ghost Destroys Mexican Oil Ring12 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.82/Ghost_Destroys_Mexican_Oil_Ring14.mp4) |
-| 12 | Ghost Destroys Mexican Oil Ring7 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.82/Ghost_Destroys_Mexican_Oil_Ring4.mp4) |
-| 13 | Ghost Destroys Mexican Oil Ring8 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
-| 14 | Ghost Destroys Mexican Oil Ring15 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
-| 15 | Ghost Destroys Mexican Oil Ring3 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
-| 16 | Ghost Destroys Mexican Oil Ring11 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
-| 17 | Ghost Destroys Mexican Oil Ring2 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
-| 18 | Ghost Destroys Mexican Oil Ring13 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 11 | Ghost Destroys Mexican Oil Ring7 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.82/Ghost_Destroys_Mexican_Oil_Ring14.mp4) |
+| 12 | Ghost Destroys Mexican Oil Ring12 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.82/Ghost_Destroys_Mexican_Oil_Ring4.mp4) |
+| 13 | Ghost Destroys Mexican Oil Ring2 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 14 | Ghost Destroys Mexican Oil Ring3 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 15 | Ghost Destroys Mexican Oil Ring8 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 16 | Ghost Destroys Mexican Oil Ring15 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 17 | Ghost Destroys Mexican Oil Ring13 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 18 | Ghost Destroys Mexican Oil Ring11 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
