@@ -1,0 +1,43 @@
+====================================================
+🚀 Pipeline Started at: Fri Sep 25 18:51:26 UTC 2026
+====================================================
+🔍 [STEP 0] Checking Facebook Cookie Session Health...
+⚠️ Checking Facebook Cookie Session Health...
+✅ Status: Cookies present and verified for pipeline execution.
+📈 [STEP 1] Pulling real analytics and insights from past posts...
+python3: can't open file '/home/runner/work/premx-editor/premx-editor/agent_brain.py': [Errno 2] No such file or directory
+🤖 [STEP 3] Consulting AI Agent Brain (ai_agent.py)...
+📁 Found 19 game file(s): ['AfghanistanRedZone', 'Callofdutyaw', 'DiabloIV', 'GODOFWAR3', 'Ghost Destroys Mexican', 'Ghost_soap_escap', 'GodofWarLaufey', 'MarvelsSpiderMan2', 'RescueOperation', 'Russian_secret_missions', 'SpiderMan2', 'UkraineCovertMission', 'VietnamCavePrison', 'codBlackops6', 'combatopration', 'ghostandela', 'mm2remastered', 'monkeyKing', 'sifu']
+✅ FB: 100 videos fetched
+✅ IG: 100 media fetched
+🔄 Rotation saved. Next game: Callofdutyaw
+🔄 Git Commit: [main 3a35869] Auto-Agent: Sync dashboard + rotation history [skip ci]
+ 5 files changed, 2443 insertions(+)
+ create mode 100644 GAMING_DASHBOARD.md
+ create mode 100644 logs/agent_memory.json
+ create mode 100644 logs/dashboard_history.json
+ create mode 100644 logs/leaderboard/games_performance_leaderboard.json
+ create mode 100644 logs/rotation_history.json 
+🔄 Git Push:  To https://github.com/Prembty12/premx-editor
+   f54c419..3a35869  main -> main
+
+🚀 GAMING AGENT COMMAND & ANALYTICS DASHBOARD
+> Last Updated: 2026-09-26 00:21:31 IST
+
+📊 Current Execution Status:
+• Current Upload Game : AfghanistanRedZone
+• AI Placeholder Title : 🎮 AfghanistanRedZone Gameplay | #AfghanistanRedZone
+• Detected Platform   : Facebook
+• Live Post Link      : /reel/1440490007980933/
+• Source File Link    : N/A
+• Engagement Views    : 6,752 views
+
+📈 Progress Stats:
+• Total Videos         : 0
+• Uploaded So Far      : 1
+• Remaining Videos     : 0
+
+🧠 AI Agent Raw Output: {"target_file": "game_links_editor/AfghanistanRedZone.txt", "game_name": "AfghanistanRedZone", "chosen_style": "informative", "ai_title": "\ud83c\udfae AfghanistanRedZone Gameplay | #AfghanistanRedZone", "actual_posted_title": "Street Gunfight Mayhem \ud83d\udd2b\ud83d\udc80\n\n#videogames #gamingcommunity #gaming #afghanistanredzone #gamingreels #reels", "source_url": "N/A", "total_links": 0, "uploaded_count": 1, "remaining_links": 0, "next_game": "Callofdutyaw"}
+🎮 Selected Game: AfghanistanRedZone | Target File: game_links_editor/AfghanistanRedZone.txt | Style: informative
+🔗 [STEP 4] Parsing and validating link from target file...
+⚠️ [WARNING] Is file me koi valid link nahi mila.
