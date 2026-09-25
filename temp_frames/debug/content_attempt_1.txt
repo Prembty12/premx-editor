@@ -1,1 +1,1 @@
-{"clip_duration": 16, "reason": "Intense explosive combat with red enemies.", "start_time": 40, "status": "APPROVE", "title": "Red Siege Incoming! 🔥💥"}
+{"clip_duration": 36, "reason": "Full cinematic drama and intense dialogue.", "start_time": 0, "status": "APPROVE", "title": "He Returned To Destroy You 🔥"}
