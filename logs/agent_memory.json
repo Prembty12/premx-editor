@@ -37,11 +37,14 @@
         "secret": 10,
         "shocking": 10
     },
-    "last_used_style": "crazy",
-    "last_played_game": "AfghanistanRedZone",
+    "last_used_style": "informative",
+    "last_played_game": "Callofdutyaw",
     "processed_viral_ids": [],
     "game_stats": {
         "AfghanistanRedZone": {
+            "uploaded_count": 0
+        },
+        "Callofdutyaw": {
             "uploaded_count": 0
         }
     },
