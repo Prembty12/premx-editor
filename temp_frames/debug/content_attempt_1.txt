@@ -1,1 +1,1 @@
-{"clip_duration": 40, "reason": "Combat countdown and cinematic city explosions", "start_time": 12, "status": "APPROVE", "title": "Countdown to absolute chaos 💥"}
+{"clip_duration": 26, "reason": "Epic cinematic god light sequence", "start_time": 10, "status": "APPROVE", "title": "Gods clash in pure light ⚡🔥"}
