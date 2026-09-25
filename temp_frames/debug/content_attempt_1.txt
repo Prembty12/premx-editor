@@ -1,1 +1,1 @@
-{"clip_duration": 38, "reason": "Dramatic giant monster cinematic and action", "start_time": 0, "status": "APPROVE", "title": "Trapped Inside Giant Beast 👹"}
+{"clip_duration": 25, "reason": "Intense red-light underwater combat with blood bursts.", "start_time": 8, "status": "APPROVE", "title": "Underwater Bloodbath 🩸🔥"}
