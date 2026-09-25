@@ -2,7 +2,7 @@
     "game_scores": {
         "AfghanistanRedZone": 10,
         "Callofdutyaw": 11,
-        "DiabloIV": 10,
+        "DiabloIV": 15,
         "GODOFWAR3": 10,
         "Ghost Destroys Mexican": 10,
         "Ghost_soap_escap": 11,
@@ -19,6 +19,23 @@
         "mm2remastered": 10,
         "monkeyKing": 10,
         "sifu": 10
+    },
+    "title_styles": {
+        "curiosity": 19,
+        "aggressive": 10,
+        "question": 10,
+        "emoji_heavy": 10,
+        "gaming_hype": 10,
+        "clickbait": 10,
+        "informative": 10,
+        "epic_cinematic": 10,
+        "funny_roast": 10,
+        "secret_hidden": 10,
+        "exposed": 10,
+        "unbelievable": 10,
+        "crazy": 10,
+        "secret": 10,
+        "shocking": 10
     },
     "last_played_game": "DiabloIV",
     "processed_viral_ids": [],
@@ -53,23 +70,6 @@
         "mm2remastered": "City Burns in Massive Firestorm \ud83d\udd25\ud83c\udfd9\ufe0f",
         "monkeyKing": "",
         "sifu": "Hallway Beatdown \ud83e\udd4b\ud83d\udd25\n\n#videogames #gamingcommunity #gaming #sifu #gamingreels #reels"
-    },
-    "title_styles": {
-        "curiosity": 16,
-        "aggressive": 10,
-        "question": 10,
-        "emoji_heavy": 10,
-        "gaming_hype": 10,
-        "clickbait": 10,
-        "informative": 10,
-        "epic_cinematic": 10,
-        "funny_roast": 10,
-        "secret_hidden": 10,
-        "exposed": 10,
-        "unbelievable": 10,
-        "crazy": 10,
-        "secret": 10,
-        "shocking": 10
     },
     "last_used_style": "curiosity"
 }

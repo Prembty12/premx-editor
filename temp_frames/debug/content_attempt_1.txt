@@ -1,1 +1,1 @@
-{"clip_duration": 46, "reason": "Dramatic cinematic drop and fiery explosion sequence", "start_time": 10, "status": "APPROVE", "title": "Spartan's Fiery Descent 🔥💀"}
+{"clip_duration": 24, "reason": "Cinematic angel descent with giant steps and bright light", "start_time": 12, "status": "APPROVE", "title": "Divine Wrath Meets demonic hordes 🪽😈"}
