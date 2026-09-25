@@ -1,0 +1,63 @@
+====================================================
+🚀 Pipeline Started at: Fri Sep 25 19:28:54 UTC 2026
+====================================================
+🔍 [STEP 0] Checking Facebook Cookie Session Health...
+⚠️ Checking Facebook Cookie Session Health...
+✅ Status: Cookies present and verified for pipeline execution.
+📈 [STEP 1] Pulling real analytics and insights from past posts...
+python3: can't open file '/home/runner/work/premx-editor/premx-editor/agent_brain.py': [Errno 2] No such file or directory
+🤖 [STEP 3] Consulting AI Agent Brain (ai_agent.py)...
+📁 Found 19 games: ['AfghanistanRedZone', 'Callofdutyaw', 'DiabloIV', 'GODOFWAR3', 'Ghost Destroys Mexican', 'Ghost_soap_escap', 'GodofWarLaufey', 'MarvelsSpiderMan2', 'RescueOperation', 'Russian_secret_missions', 'SpiderMan2', 'UkraineCovertMission', 'VietnamCavePrison', 'codBlackops6', 'combatopration', 'ghostandela', 'mm2remastered', 'monkeyKing', 'sifu']
+📂 sifu: 3 videos parsed
+📂 GODOFWAR3: 6 videos parsed
+📂 Callofdutyaw: 13 videos parsed
+📂 Russian_secret_missions: 8 videos parsed
+📂 SpiderMan2: 26 videos parsed
+📂 Ghost Destroys Mexican: 12 videos parsed
+📂 UkraineCovertMission: 1 videos parsed
+📂 ghostandela: 3 videos parsed
+📂 monkeyKing: 3 videos parsed
+📂 codBlackops6: 17 videos parsed
+📂 DiabloIV: 8 videos parsed
+📂 AfghanistanRedZone: 5 videos parsed
+📂 MarvelsSpiderMan2: 9 videos parsed
+📂 combatopration: 9 videos parsed
+📂 mm2remastered: 6 videos parsed
+📂 VietnamCavePrison: 7 videos parsed
+📂 Ghost_soap_escap: 12 videos parsed
+📂 RescueOperation: 9 videos parsed
+📊 Total 157 videos processing (parallel)...
+✅ FB page: 100 videos fetched
+✅ IG: 100 media fetched
+📊 AfghanistanRedZone: total_links=0 (urls=0, vid_ids=0, pipe_links=0)
+🔍 AfghanistanRedZone: 0 URLs found in game_links_editor/AfghanistanRedZone.txt
+⚠️ No URLs in game_links_editor/AfghanistanRedZone.txt
+🔄 Rotation saved. Next: Callofdutyaw
+🔄 Git Commit: [main f3c6e94] Auto-Agent: Sync dashboard [skip ci]
+ 5 files changed, 4589 insertions(+)
+ create mode 100644 GAMING_DASHBOARD.md
+ create mode 100644 logs/agent_memory.json
+ create mode 100644 logs/dashboard_history.json
+ create mode 100644 logs/leaderboard/games_performance_leaderboard.json
+ create mode 100644 logs/rotation_history.json 
+🔄 Git Push:  To https://github.com/Prembty12/premx-editor
+   d5f10b0..f3c6e94  main -> main
+
+🚀 GAMING AGENT DASHBOARD
+> Last Updated: 2026-09-26 00:59:06 IST
+
+📊 Status:
+• Game: AfghanistanRedZone
+• Platform: Facebook
+• Source Link: N/A
+• Views: 7,661
+
+📈 Progress:
+• Total Videos: 0
+• Uploaded: 1
+• Remaining: 0
+
+🧠 AI Agent Raw Output: {"target_file": "game_links_editor/AfghanistanRedZone.txt", "game_name": "AfghanistanRedZone", "chosen_style": "curiosity", "ai_title": "\ud83c\udfae AfghanistanRedZone Gameplay | #AfghanistanRedZone", "actual_posted_title": "Street Gunfight Mayhem \ud83d\udd2b\ud83d\udc80\n\n#videogames #gamingcommunity #gaming #afghanistanredzone #gamingreels #reels", "source_url": "N/A", "total_links": 0, "uploaded_count": 1, "remaining_links": 0, "next_game": "Callofdutyaw"}
+🎮 Selected Game: AfghanistanRedZone | Target File: game_links_editor/AfghanistanRedZone.txt | Style: curiosity
+🔗 [STEP 4] Parsing and validating link from target file...
+⚠️ [WARNING] Is file me koi valid link nahi mila.
