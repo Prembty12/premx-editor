@@ -1,9 +1,9 @@
 {
     "game_scores": {
         "AfghanistanRedZone": 12,
-        "Callofdutyaw": 11,
+        "Callofdutyaw": 10,
         "DiabloIV": 10,
-        "GODOFWAR3": 15,
+        "GODOFWAR3": 10,
         "Ghost Destroys Mexican": 10,
         "Ghost_soap_escap": 11,
         "GodofWarLaufey": 10,
@@ -38,7 +38,7 @@
         "shocking": 10
     },
     "last_used_style": "funny_roast",
-    "last_played_game": "GODOFWAR3",
+    "last_played_game": "Ghost Destroys Mexican",
     "processed_viral_ids": [],
     "game_stats": {
         "AfghanistanRedZone": {
@@ -52,13 +52,16 @@
         },
         "GODOFWAR3": {
             "uploaded_count": 1
+        },
+        "Ghost Destroys Mexican": {
+            "uploaded_count": 1
         }
     },
     "actual_posted_titles": {
         "AfghanistanRedZone": "Street Gunfight Mayhem \ud83d\udd2b\ud83d\udc80\n\n#videogames #gamingcommunity #gaming #afghanistanredzone #gamingreels #reels",
         "Callofdutyaw": "Countdown to absolute chaos \ud83d\udca5\n\n#videogames #gamingcommunity #gaming #callofdutyaw #gamingreels #reels",
         "DiabloIV": "Gods clash in pure light \u26a1\ud83d\udd25\n\n#videogames #gamingcommunity #gaming #diabloiv #gamingreels #reels",
-        "GODOFWAR3": "Kratos Giant Boss Fight \ud83e\udd96\u2694\ufe0f\n\n#videogames #gamingcommunity #gaming #godofwar3 #gamingreels #reels",
+        "GODOFWAR3": "Trapped Inside Giant Beast \ud83d\udc79\n\n#videogames #gamingcommunity #gaming #godofwar3 #gamingreels #reels",
         "Ghost Destroys Mexican": "Only 1% can survive this sliding container trap! \ud83d\udc80\n\n#videogames #gamingcommunity #gaming #ghost destroys mexican #gamingreels #reels",
         "Ghost_soap_escap": "Ghost's Secret Stealth Method Is Unbelievable! \ud83e\udd2b\ud83d\udd25\n\n#videogames #gamingcommunity #gaming #ghost_soap_escap #gamingreels #reels",
         "GodofWarLaufey": "She unlocked a forbidden god-tier ability! \ud83d\ude31\ud83d\udd25\n\n#videogames #gamingcommunity #gaming #godofwarlaufey  #gamingreels #reels",
@@ -71,7 +74,7 @@
         "codBlackops6": "Sniper Shot Sparks Firefight \ud83d\udd25\n\n#videogames #gamingcommunity #gaming #codblackops6 #gamingreels #reels",
         "combatopration": "Can you survive the sniper countdown?\n\n#videogames #gamingcommunity #gaming #combatopration #gamingreels #reels",
         "ghostandela": "I Cut The Wrong Chain \ud83d\ude31\n\n#videogames #gamingcommunity #gaming #ghostandela #gamingreels #reels",
-        "mm2remastered": "City Burns in Massive Firestorm \ud83d\udd25\ud83c\udfd9\ufe0f\n\n#videogames #gamingcommunity #gaming #mm2remastered #gamingreels #reels",
+        "mm2remastered": "Red Sky Combat Zone \ud83d\udc80\ud83d\udd25\n\n#videogames #gamingcommunity #gaming #mm2remastered #gamingreels #reels",
         "monkeyKing": "Blue Beast Boss Fight \u26a1\ufe0f\n\n#videogames #gamingcommunity #gaming #monkeyking #gamingreels #reels",
         "sifu": "Hallway Beatdown \ud83e\udd4b\ud83d\udd25\n\n#videogames #gamingcommunity #gaming #sifu #gamingreels #reels"
     }
