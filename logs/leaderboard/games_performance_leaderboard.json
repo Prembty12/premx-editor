@@ -5,55 +5,55 @@
         "total_views": 27419,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 19.31
+        "view_share_percentage": 19.37
     },
     {
         "rank": 2,
         "game_name": "SpiderMan2",
-        "total_views": 22693,
+        "total_views": 22694,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 15.98
+        "view_share_percentage": 16.04
     },
     {
         "rank": 3,
         "game_name": "mm2remastered",
-        "total_views": 18842,
+        "total_views": 18858,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 13.27
+        "view_share_percentage": 13.32
     },
     {
         "rank": 4,
         "game_name": "Callofdutyaw",
-        "total_views": 16306,
+        "total_views": 16378,
         "uploaded_videos": 1,
-        "avg_views_per_video": 16306,
-        "view_share_percentage": 11.48
+        "avg_views_per_video": 16378,
+        "view_share_percentage": 11.57
     },
     {
         "rank": 5,
         "game_name": "MarvelsSpiderMan2",
-        "total_views": 12685,
+        "total_views": 12686,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 8.93
+        "view_share_percentage": 8.96
     },
     {
         "rank": 6,
         "game_name": "AfghanistanRedZone",
-        "total_views": 10354,
+        "total_views": 10947,
         "uploaded_videos": 1,
-        "avg_views_per_video": 10354,
-        "view_share_percentage": 7.29
+        "avg_views_per_video": 10947,
+        "view_share_percentage": 7.74
     },
     {
         "rank": 7,
         "game_name": "RescueOperation",
-        "total_views": 10017,
+        "total_views": 9717,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 7.05
+        "view_share_percentage": 6.87
     },
     {
         "rank": 8,
@@ -61,7 +61,7 @@
         "total_views": 5214,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 3.67
+        "view_share_percentage": 3.68
     },
     {
         "rank": 9,
@@ -69,7 +69,7 @@
         "total_views": 4349,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 3.06
+        "view_share_percentage": 3.07
     },
     {
         "rank": 10,
@@ -85,15 +85,15 @@
         "total_views": 2599,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 1.83
+        "view_share_percentage": 1.84
     },
     {
         "rank": 12,
         "game_name": "combatopration",
-        "total_views": 2550,
+        "total_views": 1680,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 1.8
+        "view_share_percentage": 1.19
     },
     {
         "rank": 13,
@@ -114,10 +114,10 @@
     {
         "rank": 15,
         "game_name": "GODOFWAR3",
-        "total_views": 1278,
+        "total_views": 1300,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 0.9
+        "view_share_percentage": 0.92
     },
     {
         "rank": 16,
@@ -147,8 +147,8 @@
         "rank": 19,
         "game_name": "DiabloIV",
         "total_views": 340,
-        "uploaded_videos": 0,
-        "avg_views_per_video": 0,
+        "uploaded_videos": 1,
+        "avg_views_per_video": 340,
         "view_share_percentage": 0.24
     }
 ]
