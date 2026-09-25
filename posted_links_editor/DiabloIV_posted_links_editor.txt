@@ -19,3 +19,6 @@ Video id : 18104777081578629
 DiabloIV11 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.102/DiabloIV11.mp4
 Video id : 18140489395611348
 
+DiabloIV8 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.102/DiabloIV8.mp4
+Video id : 18123083870319116
+

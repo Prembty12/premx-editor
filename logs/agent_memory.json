@@ -1,5 +1,7 @@
 {
-    "game_scores": {},
+    "game_scores": {
+        "DiabloIV": 15
+    },
     "title_styles": {
         "curiosity": 10,
         "aggressive": 10,
@@ -12,7 +14,7 @@
         "funny_roast": 10,
         "secret_hidden": 10,
         "exposed": 10,
-        "unbelievable": 10,
+        "unbelievable": 13,
         "crazy": 10,
         "secret": 10,
         "shocking": 10
