@@ -1,1 +1,1 @@
-{"clip_duration":56,"reason":"Intense fiery combat and ruined city run","start_time":0,"status":"APPROVE","title":"Red Sky Combat Zone 💀🔥"}
+{"clip_duration": 40, "reason": "Combat countdown and cinematic city explosions", "start_time": 12, "status": "APPROVE", "title": "Countdown to absolute chaos 💥"}
