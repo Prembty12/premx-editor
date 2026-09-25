@@ -1,7 +1,7 @@
 {
     "game_scores": {
         "AfghanistanRedZone": 10,
-        "Callofdutyaw": 16,
+        "Callofdutyaw": 11,
         "DiabloIV": 10,
         "GODOFWAR3": 10,
         "Ghost Destroys Mexican": 10,
@@ -20,24 +20,7 @@
         "monkeyKing": 10,
         "sifu": 10
     },
-    "title_styles": {
-        "curiosity": 16,
-        "aggressive": 10,
-        "question": 10,
-        "emoji_heavy": 10,
-        "gaming_hype": 10,
-        "clickbait": 10,
-        "informative": 10,
-        "epic_cinematic": 10,
-        "funny_roast": 10,
-        "secret_hidden": 10,
-        "exposed": 10,
-        "unbelievable": 10,
-        "crazy": 10,
-        "secret": 10,
-        "shocking": 10
-    },
-    "last_played_game": "Callofdutyaw",
+    "last_played_game": "DiabloIV",
     "processed_viral_ids": [],
     "game_stats": {
         "AfghanistanRedZone": {
@@ -45,11 +28,14 @@
         },
         "Callofdutyaw": {
             "uploaded_count": 0
+        },
+        "DiabloIV": {
+            "uploaded_count": 0
         }
     },
     "actual_posted_titles": {
-        "AfghanistanRedZone": "Street Gunfight Mayhem \ud83d\udd2b\ud83d\udc80",
-        "Callofdutyaw": "Prison Break Riot \ud83d\ude94\ud83d\udc80\n\n#videogames #gamingcommunity #gaming #callofdutyaw #gamingreels #reels",
+        "AfghanistanRedZone": "Street Gunfight Mayhem \ud83d\udd2b\ud83d\udc80\n\n#videogames #gamingcommunity #gaming #afghanistanredzone #gamingreels #reels",
+        "Callofdutyaw": "Spartan's Fiery Descent \ud83d\udd25\ud83d\udc80",
         "DiabloIV": "Pull of Faith & Destiny \u26d3\ufe0f\ud83d\udd25",
         "GODOFWAR3": "",
         "Ghost Destroys Mexican": "",
@@ -67,6 +53,23 @@
         "mm2remastered": "City Burns in Massive Firestorm \ud83d\udd25\ud83c\udfd9\ufe0f",
         "monkeyKing": "",
         "sifu": "Hallway Beatdown \ud83e\udd4b\ud83d\udd25\n\n#videogames #gamingcommunity #gaming #sifu #gamingreels #reels"
+    },
+    "title_styles": {
+        "curiosity": 16,
+        "aggressive": 10,
+        "question": 10,
+        "emoji_heavy": 10,
+        "gaming_hype": 10,
+        "clickbait": 10,
+        "informative": 10,
+        "epic_cinematic": 10,
+        "funny_roast": 10,
+        "secret_hidden": 10,
+        "exposed": 10,
+        "unbelievable": 10,
+        "crazy": 10,
+        "secret": 10,
+        "shocking": 10
     },
     "last_used_style": "curiosity"
 }
