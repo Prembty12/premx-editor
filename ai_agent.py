@@ -24,13 +24,12 @@ def now_ist_str():
 def now_ist_ampm():
     return datetime.now(IST).strftime("%Y-%m-%d %I:%M:%S %p")
 
-
 def utc_to_ist(iso_time_str):
     if not iso_time_str:
         return None
     try:
-        time_str = str(iso_time_str).strip().replace("Z", "+00:00").replace("+0000", "+00:00")
-        dt = datetime.fromisoformat(time_str)
+        s = str(iso_time_str).strip().replace("Z", "+00:00").replace("+0000", "+00:00")
+        dt = datetime.fromisoformat(s)
         if dt.tzinfo is None:
             dt = dt.replace(tzinfo=timezone.utc)
         return dt.astimezone(IST)
@@ -38,7 +37,6 @@ def utc_to_ist(iso_time_str):
         return None
 
 
-# 📦 PDF + Graph
 try:
     import matplotlib
     matplotlib.use('Agg')
@@ -47,25 +45,8 @@ try:
 except ImportError:
     MATPLOTLIB_AVAILABLE = False
 
-try:
-    from reportlab.lib.pagesizes import letter
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-    from reportlab.lib import colors
-    REPORTLAB_AVAILABLE = True
-except ImportError:
-    REPORTLAB_AVAILABLE = False
 
-
-GEMINI_KEYS = [
-    os.environ.get("GEMINI_API_KEY_1"),
-    os.environ.get("GEMINI_API_KEY_2"),
-    os.environ.get("GEMINI_API_KEY_3"),
-    os.environ.get("GEMINI_API_KEY_4"),
-    os.environ.get("GEMINI_API_KEY_5"),
-    os.environ.get("GEMINI_API_KEY_6"),
-]
-
+GEMINI_KEYS = [os.environ.get(f"GEMINI_API_KEY_{i}") for i in range(1, 7)]
 FB_PAGE_ID = os.environ.get("PAGE_ID")
 FB_ACCESS_TOKEN = os.environ.get("PAGE_ACCESS_TOKEN")
 
@@ -90,8 +71,8 @@ def normalize(s):
 
 def extract_urls(text):
     urls = re.findall(r'https?://[^\s\)\]\'"<>,;]+', text)
-    cleaned = []
     seen = set()
+    cleaned = []
     for u in urls:
         u = u.rstrip('.,;)\']"')
         if u and u not in seen:
@@ -123,7 +104,7 @@ def fix_ig_url(url):
 
 
 def parse_game_links_file(filepath):
-    """Parse game_links_editor file"""
+    """Parse game_links_editor file — multiple formats"""
     videos = []
     if not filepath or not os.path.exists(filepath):
         return videos
@@ -157,14 +138,12 @@ def parse_game_links_file(filepath):
 
 
 # ============================================================
-# 🤖 GEMINI
+# GEMINI
 # ============================================================
 def call_gemini_api(api_key, prompt, max_tokens=150):
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
-    payload = {
-        "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {"temperature": 0.9, "maxOutputTokens": max_tokens, "topP": 0.95}
-    }
+    payload = {"contents": [{"parts": [{"text": prompt}]}],
+               "generationConfig": {"temperature": 0.9, "maxOutputTokens": max_tokens, "topP": 0.95}}
     try:
         res = requests.post(url, json=payload, timeout=15)
         if res.status_code == 200:
@@ -175,41 +154,37 @@ def call_gemini_api(api_key, prompt, max_tokens=150):
 
 
 # ============================================================
-# 🚫 ABUSE DETECTION
+# ABUSE
 # ============================================================
 ABUSE_PATTERNS = [
     r'\b(madarchod|madrchod|bhosd|bhosdi|bhosdike|chutiya|chutya|chutiye|gaand|gandu|gaandu|harami|haramkhor|haramzada|kutta|kutte|kutiya|suar|saala|sala|bkl|mc|bc|bkc|lund|lauda|lavda|randi|rand)\b',
     r'\b(fuck|f\*ck|fuk|shit|sh\*t|bitch|bastard|asshole|dick|pussy|cunt|whore|slut)\b',
     r'(मादरचोद|भोसड़ी|भोसड़ीके|चूतिया|चूतिये|गांड|गांडू|हरामी|हरामखोर|कुत्ता|कुत्ते|कुतिया|सुअर|साला|भड़वे|लंड|लौड़ा|रंडी)',
 ]
-
 FAMILY_ABUSE_PATTERNS = [
     r'\b(teri maa|teri behen|tere baap|teri ma|teri behan|teri biwi|teri beti)\b',
     r'(तेरी मां|तेरी माँ|तेरी बहन|तेरे बाप|तेरी बीवी|तेरी बेटी)',
 ]
-
-FORBIDDEN_REPLY_WORDS = [
-    "maa", "ma", "mata", "behen", "behan", "baap", "beti", "biwi",
-    "caste", "religion", "hindu", "muslim", "christian", "sikh",
-    "kill", "die", "death", "murder", "rape", "suicide",
-]
+FORBIDDEN_REPLY_WORDS = ["maa", "ma", "mata", "behen", "behan", "baap", "beti", "biwi",
+                          "caste", "religion", "hindu", "muslim", "christian", "sikh",
+                          "kill", "die", "death", "murder", "rape", "suicide"]
 
 
 def detect_abuse(text):
-    text_lower = text.lower()
-    for pattern in FAMILY_ABUSE_PATTERNS:
-        if re.search(pattern, text_lower, re.IGNORECASE):
+    tl = text.lower()
+    for p in FAMILY_ABUSE_PATTERNS:
+        if re.search(p, tl, re.IGNORECASE):
             return "family_abuse"
-    for pattern in ABUSE_PATTERNS:
-        if re.search(pattern, text_lower, re.IGNORECASE):
+    for p in ABUSE_PATTERNS:
+        if re.search(p, tl, re.IGNORECASE):
             return "general_abuse"
     return "none"
 
 
 def is_spam(text):
-    text_lower = text.lower()
-    for indicator in ["http://", "https://", ".com", ".xyz", "click here", "follow me", "dm me", "join my", "subscribe my"]:
-        if indicator in text_lower:
+    tl = text.lower()
+    for i in ["http://", "https://", ".com", ".xyz", "click here", "follow me", "dm me", "join my", "subscribe my"]:
+        if i in tl:
             return True
     return False
 
@@ -251,17 +226,17 @@ def is_reply_safe(reply_text, is_abuse=False):
     rl = reply_text.lower()
     if "http" in rl or ".com" in rl:
         return False, "contains_link"
-    for word in FORBIDDEN_REPLY_WORDS:
-        if word in rl:
-            return False, f"forbidden_{word}"
-    for pattern in ABUSE_PATTERNS:
-        if re.search(pattern, rl, re.IGNORECASE):
+    for w in FORBIDDEN_REPLY_WORDS:
+        if w in rl:
+            return False, f"forbidden_{w}"
+    for p in ABUSE_PATTERNS:
+        if re.search(p, rl, re.IGNORECASE):
             return False, "contains_abuse"
     return True, "safe"
 
 
 # ============================================================
-# 🤖 AUTO-REPLY
+# AUTO-REPLY
 # ============================================================
 def fetch_fb_comments(post_id, since_timestamp=None):
     url = f"https://graph.facebook.com/v19.0/{post_id}/comments"
@@ -330,11 +305,9 @@ def process_fb_comments(actual_posted_titles):
                 reply_log = json.load(f)
         except Exception:
             pass
-    
     replies_count = 0
     cutoff_time = (now_ist() - timedelta(hours=MAX_COMMENT_AGE_HOURS)).timestamp()
     min_age_time = (now_ist() - timedelta(minutes=MIN_COMMENT_AGE_MIN)).timestamp()
-    
     for game_name, videos in actual_posted_titles.items():
         if replies_count >= MAX_REPLIES_PER_RUN:
             break
@@ -402,7 +375,6 @@ def process_fb_comments(actual_posted_titles):
                     reply_log["total_replies"] = reply_log.get("total_replies", 0) + 1
                     replied_ids.add(comment_id)
                     log(f"✅ Reply: {reply_text[:60]}")
-    
     os.makedirs("logs", exist_ok=True)
     replied_data["replied"] = list(replied_ids)[-5000:]
     replied_data["last_updated"] = now_ist_ampm()
@@ -418,7 +390,7 @@ def process_fb_comments(actual_posted_titles):
 
 
 # ============================================================
-# 📈 TRENDING
+# TRENDING + BEST TIME
 # ============================================================
 def detect_trending_games(actual_posted_titles, game_views_summary, days=7):
     game_stats = {}
@@ -449,17 +421,14 @@ def detect_trending_games(actual_posted_titles, game_views_summary, days=7):
                                    "avg_views": total_views // video_count,
                                    "latest_post": latest_post, "fb_link": latest_fb_link,
                                    "source_link": latest_source}
-    
     if not game_stats:
         result = {"last_updated": now_ist_ampm(), "period_days": days, "trending": [], "below_avg": [], "recommendation": None}
         os.makedirs("logs", exist_ok=True)
         with open("logs/trending_cache.json", 'w', encoding='utf-8') as f:
             json.dump(result, f, indent=2)
         return result
-    
     all_avgs = [s["avg_views"] for s in game_stats.values()]
     overall_avg = sum(all_avgs) / len(all_avgs) if all_avgs else 1
-    
     trending_list = []
     for g, s in game_stats.items():
         ratio = s["avg_views"] / overall_avg if overall_avg > 0 else 0
@@ -471,12 +440,10 @@ def detect_trending_games(actual_posted_titles, game_views_summary, days=7):
         trending_list.append({"game": g, "views_7d": s["total_views"],
                                "avg_per_video": s["avg_views"], "trend": trend,
                                "fb_link": s["fb_link"], "source_link": s["source_link"]})
-    
     trending_list.sort(key=lambda x: x["avg_per_video"], reverse=True)
     top = [t for t in trending_list if t["trend"] in ("viral", "trending", "steady")][:5]
     below = [t for t in trending_list if t["trend"] in ("slow", "below_avg")][:5]
     best = trending_list[0] if trending_list else None
-    
     result = {"last_updated": now_ist_ampm(), "period_days": days,
               "trending": top, "below_avg": below, "recommendation": best}
     os.makedirs("logs", exist_ok=True)
@@ -485,9 +452,6 @@ def detect_trending_games(actual_posted_titles, game_views_summary, days=7):
     return result
 
 
-# ============================================================
-# 🎯 BEST TIME
-# ============================================================
 def analyze_best_time(all_history):
     if not all_history:
         try:
@@ -547,7 +511,7 @@ def analyze_best_time(all_history):
 
 
 # ============================================================
-# 🎨 DASHBOARD SECTIONS
+# DASHBOARD SECTIONS
 # ============================================================
 def generate_trending_section():
     try:
@@ -621,11 +585,11 @@ def generate_auto_reply_section():
     lines.append(f"Total Replies: {data.get('total_replies', 0)} | Skipped: {data.get('total_skipped', 0)}\n\n")
     replies = data.get("replies", [])
     if replies:
-        friendly_count = sum(1 for r in replies if r.get("type") == "friendly")
-        savage_count = sum(1 for r in replies if r.get("type") == "savage")
+        fc = sum(1 for r in replies if r.get("type") == "friendly")
+        sc = sum(1 for r in replies if r.get("type") == "savage")
         lines.append("### 📊 Stats\n\n| Type | Count |\n|---|---|\n")
-        lines.append(f"| Friendly | {friendly_count} |\n")
-        lines.append(f"| Savage | {savage_count} |\n")
+        lines.append(f"| Friendly | {fc} |\n")
+        lines.append(f"| Savage | {sc} |\n")
         lines.append(f"| Total | {len(replies)} |\n\n")
         lines.append("### 💬 Recent Replies (Last 20)\n\n")
         lines.append("| # | Time | User Comment | Gemini Reply | Type | FB Post | Source |\n")
@@ -653,7 +617,7 @@ def generate_auto_reply_section():
 
 
 # ============================================================
-# 📦 CORE FUNCTIONS
+# CORE FUNCTIONS
 # ============================================================
 def git_commit_and_push(file_paths_to_add, commit_message="Auto-Agent: Sync dashboard [skip ci]"):
     try:
@@ -785,16 +749,16 @@ def load_source_data():
 
 
 # ============================================================
-# 🔥 FINAL: Simple Merge Logic
+# 🔥 MAIN DATA FETCH — SAARE VIDEOS WITH TITLE + SOURCE
 # ============================================================
 def fetch_fb_ig_data(game_list):
     """
-    Simple merge:
-    1. game_links_editor/ se SAARE videos uthao (title + source_link)
-    2. FB/IG API se posted videos fetch karo
-    3. posted_links_editor/ se ID → source map banao
-    4. Merge: FB/IG videos (ID match se source) + Unposted (game_links_editor se direct)
-    5. Sort: Posted newest first, phir pending
+    Complete data fetch:
+    1. game_links_editor/ se SAARE videos (title + source) uthao
+    2. posted_links_editor/ se ID → Source map banao
+    3. FB/IG API se posted videos fetch karo — real title + views
+    4. Merge: posted videos (real title + ID match source) + unposted (file title + source)
+    5. Sort: Posted newest first, then pending
     """
     from concurrent.futures import ThreadPoolExecutor, as_completed
     
@@ -804,9 +768,37 @@ def fetch_fb_ig_data(game_list):
     
     if not FB_ACCESS_TOKEN:
         log("⚠️ FB_ACCESS_TOKEN missing")
+        # Fallback: sirf game_links_editor se
+        games_links_dir = "game_links_editor"
+        for game in game_list:
+            src_file = None
+            for f in os.listdir(games_links_dir):
+                if not f.endswith(".txt"):
+                    continue
+                base = f.replace(".txt", "").replace("_links_editor", "").replace("_uploaded_links", "")
+                if base == game:
+                    src_file = os.path.join(games_links_dir, f)
+                    break
+            if not src_file:
+                for f in os.listdir(games_links_dir):
+                    if f.endswith(".txt") and f.startswith(game):
+                        src_file = os.path.join(games_links_dir, f)
+                        break
+            if src_file and os.path.exists(src_file):
+                src_videos = parse_game_links_file(src_file)
+                for sv in src_videos:
+                    result[game].append({
+                        "title": sv.get("title") or sv.get("video_name") or "Untitled",
+                        "fb_link": "", "fb_views": 0, "fb_posted": False,
+                        "ig_link": "", "ig_views": 0, "ig_posted": False,
+                        "timestamp": "", "vid_id": sv.get("video_name", ""),
+                        "video_name": sv.get("video_name", ""),
+                        "source_link": sv.get("source_link", ""),
+                        "is_source_only": True,
+                    })
         return result, game_views_summary
     
-    # ============ STEP 1: ID → Source map (posted_links_editor se) ============
+    # ============ STEP 1: ID → Source map ============
     id_to_source_map = {}
     if os.path.exists(posted_dir):
         for filename in os.listdir(posted_dir):
@@ -826,16 +818,16 @@ def fetch_fb_ig_data(game_list):
                             block_id = bl.split('Video id :')[-1].strip()
                         elif '| Link:' in bl:
                             link_part = bl.split('| Link:')[-1].strip()
-                            url_match = re.search(r'(https?://[^\s\n\r\)\]\'"<>,;]+)', link_part)
-                            if url_match:
-                                block_link = url_match.group(1).rstrip('.,;)\']"')
+                            m = re.search(r'(https?://[^\s\n\r\)\]\'"<>,;]+)', link_part)
+                            if m:
+                                block_link = m.group(1).rstrip('.,;)\']"')
                     if block_id and block_link:
                         id_to_source_map[block_id] = block_link
             except Exception as e:
                 log(f"⚠️ Parse error {filename}: {e}")
     log(f"📋 ID→Source map: {len(id_to_source_map)} entries")
     
-    # ============ STEP 2: game_links_editor/ se SAARE videos ============
+    # ============ STEP 2: game_links_editor se SAARE videos ============
     games_links_dir = "game_links_editor"
     game_source_videos = {}
     for game in game_list:
@@ -843,7 +835,7 @@ def fetch_fb_ig_data(game_list):
         for f in os.listdir(games_links_dir):
             if not f.endswith(".txt"):
                 continue
-            base = (f.replace(".txt", "").replace("_links_editor", "").replace("_uploaded_links", ""))
+            base = f.replace(".txt", "").replace("_links_editor", "").replace("_uploaded_links", "")
             if base == game:
                 src_file = os.path.join(games_links_dir, f)
                 break
@@ -859,7 +851,7 @@ def fetch_fb_ig_data(game_list):
         game_source_videos[game] = src_videos
         log(f"📂 {game}: {len(src_videos)} source videos")
     
-    # ============ STEP 3: FB/IG se posted videos fetch ============
+    # ============ STEP 3: FB + IG fetch ============
     twenty_eight_days_ago = now_ist() - timedelta(days=DAYS_LIMIT)
     since_timestamp = int(twenty_eight_days_ago.timestamp())
     fb_videos = []
@@ -879,16 +871,16 @@ def fetch_fb_ig_data(game_list):
     try:
         ig_url = f"https://graph.facebook.com/v19.0/{FB_PAGE_ID}"
         ig_params = {"fields": "instagram_business_account", "access_token": FB_ACCESS_TOKEN}
-        res_ig_acc = requests.get(ig_url, params=ig_params, timeout=10)
-        if res_ig_acc.status_code == 200:
-            ig_id = res_ig_acc.json().get("instagram_business_account", {}).get("id")
+        res_ig = requests.get(ig_url, params=ig_params, timeout=10)
+        if res_ig.status_code == 200:
+            ig_id = res_ig.json().get("instagram_business_account", {}).get("id")
             if ig_id:
                 media_url = f"https://graph.facebook.com/v19.0/{ig_id}/media"
-                media_params = {"fields": "id,caption,permalink,timestamp,like_count,comments_count",
-                                "access_token": FB_ACCESS_TOKEN, "limit": 100}
-                res_ig = requests.get(media_url, params=media_params, timeout=20)
-                if res_ig.status_code == 200:
-                    ig_medias = res_ig.json().get("data", [])
+                mp = {"fields": "id,caption,permalink,timestamp,like_count,comments_count",
+                      "access_token": FB_ACCESS_TOKEN, "limit": 100}
+                res_m = requests.get(media_url, params=mp, timeout=20)
+                if res_m.status_code == 200:
+                    ig_medias = res_m.json().get("data", [])
                     log(f"✅ IG: {len(ig_medias)} media")
     except Exception as e:
         log(f"❌ IG error: {e}")
@@ -898,10 +890,10 @@ def fetch_fb_ig_data(game_list):
         game_norm = normalize(game)
         src_videos = game_source_videos.get(game, [])
         
-        # Collect posted videos (FB + IG) for this game
-        posted_videos = []  # list of dicts
+        # Collect posted videos for this game
+        posted_videos = []
         
-        # FB videos
+        # FB videos match
         for v in fb_videos:
             title = (v.get("title") or v.get("description") or "").strip()
             if not title:
@@ -921,7 +913,7 @@ def fetch_fb_ig_data(game_list):
                 "video_name": "",
             })
         
-        # IG medias
+        # IG medias match
         for m in ig_medias:
             caption = (m.get("caption") or "").strip()
             if not caption:
@@ -942,7 +934,7 @@ def fetch_fb_ig_data(game_list):
                 "video_name": "",
             })
         
-        # 🔥 Match source link from game_links_editor (agar ID se nahi mila)
+        # Match source link from game_links_editor
         for pv in posted_videos:
             if pv["source_link"]:
                 continue
@@ -976,11 +968,11 @@ def fetch_fb_ig_data(game_list):
                 })
             game_views_summary[game] += pv["views"]
         
-        # 🔥 Unposted videos: src_videos mein se jo posted nahi hue
-        posted_names = set()
+        # 🔥 Unposted videos: game_links_editor se jo posted nahi hue
+        posted_ids = set()
         posted_titles_short = set()
         for pv in posted_videos:
-            posted_names.add(pv["vid_id"].lower())
+            posted_ids.add(pv["vid_id"].lower())
             posted_titles_short.add(pv["title"].lower()[:40])
         
         for sv in src_videos:
@@ -988,22 +980,20 @@ def fetch_fb_ig_data(game_list):
             sv_title = (sv.get("title") or "").lower()
             sv_title_short = sv_title[:40]
             
-            # Check if already posted
             is_posted = False
-            if sv_name and sv_name in posted_names:
+            if sv_name and sv_name in posted_ids:
                 is_posted = True
             elif sv_title_short and sv_title_short in posted_titles_short:
                 is_posted = True
             else:
-                for pname in posted_names:
-                    if sv_name and sv_name in pname:
+                for pid in posted_ids:
+                    if sv_name and sv_name in pid:
                         is_posted = True
                         break
-                    if sv_name and len(sv_name) > 5 and sv_name[-5:] in pname:
+                    if sv_name and len(sv_name) > 5 and sv_name[-5:] in pid:
                         is_posted = True
                         break
             
-            # Add unposted video (with direct source link)
             if not is_posted:
                 result[game].append({
                     "title": sv.get("title") or sv.get("video_name") or "Untitled",
@@ -1016,7 +1006,7 @@ def fetch_fb_ig_data(game_list):
                     "is_source_only": True,
                 })
     
-    # ============ STEP 5: Sort — Posted newest first, then pending ============
+    # ============ STEP 5: Sort ============
     for game in game_list:
         posted_v = [x for x in result[game] if x.get("fb_posted") or x.get("ig_posted")]
         pending_v = [x for x in result[game] if not (x.get("fb_posted") or x.get("ig_posted"))]
@@ -1037,6 +1027,9 @@ def fetch_fb_ig_data(game_list):
     return result, game_views_summary
 
 
+# ============================================================
+# UPDATE DASHBOARD
+# ============================================================
 def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploaded_link,
                              post_link, platform_name, views_count,
                              game_views_summary, game_stats, actual_posted_titles=None,
@@ -1092,14 +1085,15 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
     
     def get_latest_post_time(g_name):
         videos = actual_posted_titles.get(g_name, [])
-        latest_time = ""
+        lt = ""
         for v in videos:
             if v.get("fb_posted") or v.get("ig_posted"):
                 ts = v.get("timestamp", "")
-                if ts and ts > latest_time:
-                    latest_time = ts
-        return latest_time
+                if ts and ts > lt:
+                    lt = ts
+        return lt
     
+    # 🔥 Games files generate
     games_dir = "logs/games"
     os.makedirs(games_dir, exist_ok=True)
     game_file_links = {}
@@ -1127,15 +1121,14 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
         videos = posted_v_sorted + pending_v_sorted
         
         safe_name = re.sub(r'[^a-zA-Z0-9_-]', '_', g_name)
-        game_filename = f"{safe_name}.md"
-        game_filepath = os.path.join(games_dir, game_filename)
-        game_file_links[g_name] = f"logs/games/{game_filename}"
+        game_filepath = os.path.join(games_dir, f"{safe_name}.md")
+        game_file_links[g_name] = f"logs/games/{safe_name}.md"
         
-        gf_lines = []
-        gf_lines.append(f"# 🎮 {g_name} — Full Video History\n\n")
-        gf_lines.append(f"[⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)\n\n")
-        gf_lines.append(f"**Total Videos:** {len(videos)} | **Last Updated:** {now_ist_ampm()} IST\n\n")
-        gf_lines.append("---\n\n")
+        gf = []
+        gf.append(f"# 🎮 {g_name} — Full Video History\n\n")
+        gf.append(f"[⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)\n\n")
+        gf.append(f"**Total Videos:** {len(videos)} | **Last Updated:** {now_ist_ampm()} IST\n\n")
+        gf.append("---\n\n")
         
         total_fb_views = sum(v.get('fb_views', 0) for v in videos)
         total_ig_views = sum(v.get('ig_views', 0) for v in videos)
@@ -1143,16 +1136,16 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
         ig_count = sum(1 for v in videos if v.get('ig_posted'))
         total_posted = sum(1 for v in videos if v.get('fb_posted') or v.get('ig_posted'))
         
-        gf_lines.append("## 📊 Summary\n\n| Metric | Value |\n|---|---|\n")
-        gf_lines.append(f"| Total Videos | **{len(videos)}** |\n")
-        gf_lines.append(f"| Posted (FB or IG) | {total_posted} / {len(videos)} |\n")
-        gf_lines.append(f"| FB Posted | {fb_count} / {len(videos)} |\n")
-        gf_lines.append(f"| IG Posted | {ig_count} / {len(videos)} |\n")
-        gf_lines.append(f"| Total FB Views | **{total_fb_views:,}** |\n")
-        gf_lines.append(f"| Total IG Views | **{total_ig_views:,}** |\n\n")
-        gf_lines.append("---\n\n## 📜 All Videos (Newest First)\n\n")
-        gf_lines.append("| # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |\n")
-        gf_lines.append("|---|---|---|---|---|---|---|\n")
+        gf.append("## 📊 Summary\n\n| Metric | Value |\n|---|---|\n")
+        gf.append(f"| Total Videos | **{len(videos)}** |\n")
+        gf.append(f"| Posted (FB or IG) | {total_posted} / {len(videos)} |\n")
+        gf.append(f"| FB Posted | {fb_count} / {len(videos)} |\n")
+        gf.append(f"| IG Posted | {ig_count} / {len(videos)} |\n")
+        gf.append(f"| Total FB Views | **{total_fb_views:,}** |\n")
+        gf.append(f"| Total IG Views | **{total_ig_views:,}** |\n\n")
+        gf.append("---\n\n## 📜 All Videos (Newest First)\n\n")
+        gf.append("| # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |\n")
+        gf.append("|---|---|---|---|---|---|---|\n")
         
         for idx, v in enumerate(videos, 1):
             title = (v.get("title") or "").replace("\n", " ").replace("|", "\\|")[:120] or "_Untitled_"
@@ -1161,37 +1154,36 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
             ig_md = f"[🟣 IG]({v['ig_link']})" if v.get("ig_posted") and v.get("ig_link") else "⏳ Pending"
             ig_v_md = f"{v.get('ig_views', 0):,}" if v.get("ig_posted") else "_0_"
             
-            # Source link (already set during merge)
             src_link = v.get("source_link", "")
             src_md = f"[📂]({src_link})" if src_link else "_N/A_"
-            
-            gf_lines.append(f"| {idx} | {title} | {fb_md} | {fb_v_md} | {ig_md} | {ig_v_md} | {src_md} |\n")
+            gf.append(f"| {idx} | {title} | {fb_md} | {fb_v_md} | {ig_md} | {ig_v_md} | {src_md} |\n")
         
         try:
             with open(game_filepath, 'w', encoding='utf-8') as f:
-                f.writelines(gf_lines)
+                f.writelines(gf)
         except Exception as e:
             log(f"⚠️ Write error {game_filepath}: {e}")
     
-    md_content = []
-    md_content.append("# 🚀 GAMING AGENT COMMAND & ANALYTICS DASHBOARD\n\n")
-    md_content.append(f"> **Last Updated:** {now_ist_ampm()} IST | **Status:** All Systems Active & Synchronized\n\n")
-    md_content.append("--- \n\n## 🏆 Global Leaderboard & Performance Summary\n\n")
-    md_content.append("| Rank | Game Name | Total Videos | Total Views | Avg Views / Video | Performance Tier |\n")
-    md_content.append("| :---: | :--- | :---: | :---: | :---: | :---: |\n")
+    # Main dashboard
+    md = []
+    md.append("# 🚀 GAMING AGENT COMMAND & ANALYTICS DASHBOARD\n\n")
+    md.append(f"> **Last Updated:** {now_ist_ampm()} IST | **Status:** All Systems Active & Synchronized\n\n")
+    md.append("--- \n\n## 🏆 Global Leaderboard & Performance Summary\n\n")
+    md.append("| Rank | Game Name | Total Videos | Total Views | Avg Views / Video | Performance Tier |\n")
+    md.append("| :---: | :--- | :---: | :---: | :---: | :---: |\n")
     medals = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣"]
     for idx, item in enumerate(sorted_analytics):
         rank_icon = medals[idx] if idx < len(medals) else f"{idx + 1}"
         tier = ("🔥 Viral / Hype" if item['avg_views'] > 7000
                 else "⚡ Trending" if item['avg_views'] > 4000
                 else "📈 Stable")
-        md_content.append(f"| {rank_icon} | **{item['game']}** | {item['uploaded_count']} | "
-                          f"{item['total_views']:,} | {item['avg_views']:,} | {tier} |\n")
+        md.append(f"| {rank_icon} | **{item['game']}** | {item['uploaded_count']} | "
+                  f"{item['total_views']:,} | {item['avg_views']:,} | {tier} |\n")
     
-    md_content.append("\n--- \n\n## 📺 Live Post Titles + Views (Latest per Game)\n\n")
-    md_content.append("> 🔵 FB = Facebook post live | 🟣 IG = Instagram post live | ⏳ = Pending\n\n")
-    md_content.append("| Game Name | 📅 Last Posted | 📺 Latest Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📊 Remaining / Total | 📂 Source | 📜 All |\n")
-    md_content.append("|---|---|---|---|---|---|---|---|---|---|\n")
+    md.append("\n--- \n\n## 📺 Live Post Titles + Views (Latest per Game)\n\n")
+    md.append("> 🔵 FB = Facebook post live | 🟣 IG = Instagram post live | ⏳ = Pending\n\n")
+    md.append("| Game Name | 📅 Last Posted | 📺 Latest Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📊 Remaining / Total | 📂 Source | 📜 All |\n")
+    md.append("|---|---|---|---|---|---|---|---|---|---|\n")
     
     sorted_games = sorted(actual_posted_titles.keys(),
                           key=lambda g: get_latest_post_time(g) or "0000", reverse=True)
@@ -1204,8 +1196,8 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
             try:
                 with open(src_file, 'r', encoding='utf-8', errors='ignore') as f:
                     c = f.read()
-                pipe_count = len(re.findall(r'\|\s*Link:', c))
-                total_vids = max(pipe_count, total_vids, len(extract_urls(c)))
+                pc = len(re.findall(r'\|\s*Link:', c))
+                total_vids = max(pc, total_vids, len(extract_urls(c)))
             except Exception:
                 pass
         
@@ -1218,18 +1210,17 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
         else:
             progress_md = "_N/A_"
         
-        latest_post_time = get_latest_post_time(g_name)
-        if latest_post_time:
-            dt_ist = utc_to_ist(latest_post_time)
-            date_str = dt_ist.strftime("%Y-%m-%d %I:%M %p") if dt_ist else latest_post_time[:16]
+        lpt = get_latest_post_time(g_name)
+        if lpt:
+            dt_ist = utc_to_ist(lpt)
+            date_str = dt_ist.strftime("%Y-%m-%d %I:%M %p") if dt_ist else lpt[:16]
         else:
             date_str = "—"
         
         if not videos:
-            md_content.append(f"| **{g_name}** | {date_str} | _Not Posted Yet_ | ⏳ Pending | _0_ | ⏳ Pending | _0_ | {progress_md} | _N/A_ | — |\n")
+            md.append(f"| **{g_name}** | {date_str} | _Not Posted Yet_ | ⏳ Pending | _0_ | ⏳ Pending | _0_ | {progress_md} | _N/A_ | — |\n")
             continue
         
-        # Latest posted by timestamp
         latest_posted = None
         latest_ts = ""
         for v in videos:
@@ -1246,7 +1237,6 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
         ig_md = f"[🟣 IG]({latest['ig_link']})" if latest.get("ig_posted") and latest.get("ig_link") else "⏳ Pending"
         ig_v_md = f"{latest.get('ig_views', 0):,}" if latest.get("ig_posted") else "_0_"
         
-        # Source link
         src_link = latest.get("source_link", "") if latest else ""
         if not src_link and videos:
             src_link = videos[0].get("source_link", "")
@@ -1256,59 +1246,56 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
         src_md = f"[📂]({src_link})" if src_link else "_N/A_"
         
         all_md = f"**[📜 View {len(videos)}]({game_file_links[g_name]})**" if g_name in game_file_links else f"_{len(videos)}_"
-        md_content.append(f"| **{g_name}** | {date_str} | {title} | {fb_md} | {fb_v_md} | {ig_md} | {ig_v_md} | {progress_md} | {src_md} | {all_md} |\n")
+        md.append(f"| **{g_name}** | {date_str} | {title} | {fb_md} | {fb_v_md} | {ig_md} | {ig_v_md} | {progress_md} | {src_md} | {all_md} |\n")
     
-    for section_func in [generate_trending_section, generate_best_time_section, generate_auto_reply_section]:
-        section = section_func()
-        if section:
-            md_content.append(section)
+    for sf in [generate_trending_section, generate_best_time_section, generate_auto_reply_section]:
+        s = sf()
+        if s:
+            md.append(s)
     
-    md_content.append("\n--- \n\n## 📜 Full Video History\n\n")
-    md_content.append("> Click any game below to view its complete video list:\n\n")
+    md.append("\n--- \n\n## 📜 Full Video History\n\n")
+    md.append("> Click any game below to view its complete video list:\n\n")
     for g_name in sorted_games:
         videos = actual_posted_titles.get(g_name, [])
         if not videos:
             continue
-        file_link = game_file_links.get(g_name, "")
-        if file_link:
-            md_content.append(f"- **🎮 {g_name}** — [📜 View All {len(videos)} Videos]({file_link})\n")
+        fl = game_file_links.get(g_name, "")
+        if fl:
+            md.append(f"- **🎮 {g_name}** — [📜 View All {len(videos)} Videos]({fl})\n")
     
     rotation_file = "logs/rotation_history.json"
     if os.path.exists(rotation_file):
         try:
             with open(rotation_file, 'r', encoding='utf-8') as f:
                 rot = json.load(f)
-            md_content.append("\n--- \n\n## 🔄 Game Rotation Queue\n\n")
-            md_content.append(f"**📊 Total Games:** {rot.get('total_games', 0)} | **🎯 Current:** `{rot.get('current_game', 'N/A')}` | "
-                              f"**⏭️ Next Game:** `{rot.get('next_game', 'N/A')}` (Position #{rot.get('next_game_position', 0)}) | "
-                              f"**🔢 Total Runs:** {rot.get('total_runs', 0)}\n\n")
-            md_content.append(f"**Last Updated:** {rot.get('last_updated', 'N/A')} IST\n\n")
-            md_content.append("| # | Game Name | Uploaded | Last Run # | Next Turn In | Status |\n")
-            md_content.append("|:---:|---|:---:|:---:|:---:|:---:|\n")
-            for ginfo in rot.get("all_games", []):
-                pos = ginfo.get("position", 0)
-                gname = ginfo.get("game", "")
-                uploaded = ginfo.get("uploaded", 0)
-                last_run = ginfo.get("last_run", 0) or "—"
-                next_in = ginfo.get("next_turn_in", 0)
-                status = ginfo.get("status", "waiting")
-                if status == "current":
-                    status_md = "🎯 **CURRENT**"
-                elif status == "next_up":
-                    status_md = "⏭️ **NEXT UP**"
-                else:
-                    status_md = f"⏳ Wait {next_in}"
-                md_content.append(f"| {pos} | **{gname}** | {uploaded} | {last_run} | {next_in} | {status_md} |\n")
-            recent_logs = rot.get("rotation_log", [])[-5:]
-            if recent_logs:
-                md_content.append("\n### 📜 Recent Runs (Last 5)\n\n| Run # | Game | Timestamp (IST) |\n|:---:|---|---|\n")
-                for log_entry in reversed(recent_logs):
-                    md_content.append(f"| {log_entry['run']} | {log_entry['game']} | {log_entry['timestamp']} |\n")
+            md.append("\n--- \n\n## 🔄 Game Rotation Queue\n\n")
+            md.append(f"**📊 Total Games:** {rot.get('total_games', 0)} | **🎯 Current:** `{rot.get('current_game', 'N/A')}` | "
+                      f"**⏭️ Next Game:** `{rot.get('next_game', 'N/A')}` (Position #{rot.get('next_game_position', 0)}) | "
+                      f"**🔢 Total Runs:** {rot.get('total_runs', 0)}\n\n")
+            md.append(f"**Last Updated:** {rot.get('last_updated', 'N/A')} IST\n\n")
+            md.append("| # | Game Name | Uploaded | Last Run # | Next Turn In | Status |\n")
+            md.append("|:---:|---|:---:|:---:|:---:|:---:|\n")
+            for gi in rot.get("all_games", []):
+                pos = gi.get("position", 0)
+                gn = gi.get("game", "")
+                up = gi.get("uploaded", 0)
+                lr = gi.get("last_run", 0) or "—"
+                ni = gi.get("next_turn_in", 0)
+                st = gi.get("status", "waiting")
+                if st == "current": sm = "🎯 **CURRENT**"
+                elif st == "next_up": sm = "⏭️ **NEXT UP**"
+                else: sm = f"⏳ Wait {ni}"
+                md.append(f"| {pos} | **{gn}** | {up} | {lr} | {ni} | {sm} |\n")
+            rl = rot.get("rotation_log", [])[-5:]
+            if rl:
+                md.append("\n### 📜 Recent Runs (Last 5)\n\n| Run # | Game | Timestamp (IST) |\n|:---:|---|---|\n")
+                for le in reversed(rl):
+                    md.append(f"| {le['run']} | {le['game']} | {le['timestamp']} |\n")
         except Exception as e:
             log(f"⚠️ Rotation error: {e}")
     
     with open(dashboard_path, 'w', encoding='utf-8') as f:
-        f.writelines(md_content)
+        f.writelines(md)
     
     git_commit_and_push([
         dashboard_path, leaderboard_json, history_json,
@@ -1325,10 +1312,10 @@ def get_game_video_stats(target_file, memory, game_name):
         try:
             with open(target_file, 'r', encoding='utf-8', errors='ignore') as f:
                 content = f.read()
-            pipe_count = len(re.findall(r'\|\s*Link:', content))
-            url_count = len(extract_urls(content))
-            vid_count = content.count("Video id :")
-            total_links = max(pipe_count, url_count, vid_count)
+            pc = len(re.findall(r'\|\s*Link:', content))
+            uc = len(extract_urls(content))
+            vc = content.count("Video id :")
+            total_links = max(pc, uc, vc)
             log(f"📊 {game_name}: total={total_links}")
         except Exception as e:
             log(f"⚠️ Stats error: {e}")
@@ -1351,12 +1338,10 @@ def run_agent_brain():
     
     memory = {
         "game_scores": {},
-        "title_styles": {
-            "curiosity": 10, "aggressive": 10, "question": 10, "emoji_heavy": 10,
-            "gaming_hype": 10, "clickbait": 10, "informative": 10, "epic_cinematic": 10,
-            "funny_roast": 10, "secret_hidden": 10, "exposed": 10, "unbelievable": 10,
-            "crazy": 10, "secret": 10, "shocking": 10
-        },
+        "title_styles": {"curiosity": 10, "aggressive": 10, "question": 10, "emoji_heavy": 10,
+                         "gaming_hype": 10, "clickbait": 10, "informative": 10, "epic_cinematic": 10,
+                         "funny_roast": 10, "secret_hidden": 10, "exposed": 10, "unbelievable": 10,
+                         "crazy": 10, "secret": 10, "shocking": 10},
         "last_used_style": "curiosity", "last_played_game": "",
         "processed_viral_ids": [], "game_stats": {}, "actual_posted_titles": {}
     }
@@ -1470,9 +1455,9 @@ def run_agent_brain():
     try:
         with open(target_file, 'r', encoding='utf-8', errors='ignore') as f:
             content = f.read()
-        pipe_links = re.findall(r'\|\s*Link:\s*(https?://[^\s\n\r\)\]\'"<>,;]+)', content)
-        pipe_links = [u.rstrip('.,;)\']"') for u in pipe_links]
-        all_urls = pipe_links if pipe_links else extract_urls(content)
+        pl = re.findall(r'\|\s*Link:\s*(https?://[^\s\n\r\)\]\'"<>,;]+)', content)
+        pl = [u.rstrip('.,;)\']"') for u in pl]
+        all_urls = pl if pl else extract_urls(content)
         if all_urls:
             specific_uploaded_link = all_urls[uploaded_links % len(all_urls)]
             log(f"✅ Source: {specific_uploaded_link}")
