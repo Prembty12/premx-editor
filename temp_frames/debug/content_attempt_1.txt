@@ -1,1 +1,1 @@
-{"clip_duration": 61, "reason": "Full cinematic military standoff sequence.", "start_time": 0, "status": "APPROVE", "title": "Tense Confrontation Between Soldiers 💀"}
+{"clip_duration": 32, "reason": "Intense cinematic magic combat and explosions", "start_time": 15, "status": "APPROVE", "title": "Purple Fire Destroys Everything 🔥💜"}
