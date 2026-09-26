@@ -10,15 +10,15 @@
     {
         "rank": 2,
         "game_name": "SpiderMan2",
-        "total_views": 22396,
-        "uploaded_videos": 0,
-        "avg_views_per_video": 0,
-        "view_share_percentage": 14.44
+        "total_views": 22386,
+        "uploaded_videos": 1,
+        "avg_views_per_video": 22386,
+        "view_share_percentage": 14.43
     },
     {
         "rank": 3,
         "game_name": "mm2remastered",
-        "total_views": 19641,
+        "total_views": 19644,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
         "view_share_percentage": 12.67
@@ -26,18 +26,18 @@
     {
         "rank": 4,
         "game_name": "Callofdutyaw",
-        "total_views": 19567,
+        "total_views": 19570,
         "uploaded_videos": 1,
-        "avg_views_per_video": 19567,
+        "avg_views_per_video": 19570,
         "view_share_percentage": 12.62
     },
     {
         "rank": 5,
         "game_name": "AfghanistanRedZone",
-        "total_views": 19041,
+        "total_views": 19056,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 12.28
+        "view_share_percentage": 12.29
     },
     {
         "rank": 6,
@@ -74,7 +74,7 @@
     {
         "rank": 10,
         "game_name": "UkraineCovertMission",
-        "total_views": 3038,
+        "total_views": 3039,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
         "view_share_percentage": 1.96
