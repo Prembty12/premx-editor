@@ -21,8 +21,8 @@
         "secret": 10,
         "shocking": 10
     },
-    "last_used_style": "exposed",
-    "last_played_game": "GodofWarLaufey",
+    "last_used_style": "gaming_hype",
+    "last_played_game": "MarvelsSpiderMan2",
     "processed_viral_ids": [],
     "game_stats": {
         "Callofdutyaw": {
@@ -36,6 +36,9 @@
         },
         "GodofWarLaufey": {
             "uploaded_count": 1
+        },
+        "MarvelsSpiderMan2": {
+            "uploaded_count": 1
         }
     },
     "actual_posted_titles": {
@@ -43,7 +46,7 @@
             {
                 "title": "Street Gunfight Mayhem \ud83d\udd2b\ud83d\udc80\n\n#videogames #gamingcommunity #gaming #afghanistanredzone #gamingreels #reels",
                 "fb_link": "https://www.facebook.com/reel/1440490007980933/",
-                "fb_views": 16225,
+                "fb_views": 16246,
                 "fb_posted": true,
                 "ig_link": "https://www.instagram.com/reel/DdrsNGqivic/",
                 "ig_views": 900,
@@ -56,7 +59,7 @@
             {
                 "title": "Shield Combat Gets Wild \ud83d\udd25\n\n#videogames #gamingcommunity #gaming #afghanistanredzone #gamingreels #reels",
                 "fb_link": "https://www.facebook.com/reel/1423985949876220/",
-                "fb_views": 498,
+                "fb_views": 499,
                 "fb_posted": true,
                 "ig_link": "https://www.instagram.com/reel/DdjuENtmJwV/",
                 "ig_views": 280,
@@ -201,7 +204,7 @@
             {
                 "title": "The Execution Order \ud83e\udea6\n\n#videogames #gamingcommunity #gaming #callofdutyaw #gamingreels #reels",
                 "fb_link": "https://www.facebook.com/reel/2362917614514491/",
-                "fb_views": 1824,
+                "fb_views": 1825,
                 "fb_posted": true,
                 "ig_link": "https://www.instagram.com/reel/DduPIENlfsZ/",
                 "ig_views": 100,
@@ -240,7 +243,7 @@
             {
                 "title": "Prison Break Riot \ud83d\ude94\ud83d\udc80\n\n#videogames #gamingcommunity #gaming #callofdutyaw #gamingreels #reels",
                 "fb_link": "https://www.facebook.com/reel/2127237434533442/",
-                "fb_views": 2105,
+                "fb_views": 2106,
                 "fb_posted": true,
                 "ig_link": "https://www.instagram.com/reel/DdmZ3RhCo-Z/",
                 "ig_views": 900,
@@ -253,7 +256,7 @@
             {
                 "title": "Hangar Havoc \ud83d\udd25\u2694\ufe0f\n\n#videogames #gamingcommunity #gaming #callofdutyaw #gamingreels #reels",
                 "fb_link": "https://www.facebook.com/reel/1425203349552652/",
-                "fb_views": 578,
+                "fb_views": 579,
                 "fb_posted": true,
                 "ig_link": "https://www.instagram.com/reel/Ddg4fx6llu5/",
                 "ig_views": 120,
@@ -806,7 +809,7 @@
                 "fb_views": 0,
                 "fb_posted": false,
                 "ig_link": "https://www.instagram.com/reel/Ddw4xG3ieOp/",
-                "ig_views": 0,
+                "ig_views": 10,
                 "ig_posted": true,
                 "timestamp": "2026-09-26T20:25:11+0000",
                 "vid_id": "17886522225618617",
@@ -816,7 +819,7 @@
             {
                 "title": "Slayer Rips Monster Heart \ud83d\udc80\n\n#videogames #gamingcommunity #gaming #godofwar3 #gamingreels #reels",
                 "fb_link": "https://www.facebook.com/reel/29055320854074025/",
-                "fb_views": 83,
+                "fb_views": 94,
                 "fb_posted": true,
                 "ig_link": "https://www.instagram.com/reel/Ddw1Ty0FYpO/",
                 "ig_views": 30,
@@ -1610,6 +1613,19 @@
         ],
         "GodofWarLaufey": [
             {
+                "title": "Fire Giant Boss Fight \ud83d\udd25\u2694\ufe0f\n\n#videogames #gamingcommunity #gaming #godofwarlaufey #gamingreels #reels",
+                "fb_link": "",
+                "fb_views": 0,
+                "fb_posted": false,
+                "ig_link": "https://www.instagram.com/reel/Ddw7t8Djnt_/",
+                "ig_views": 0,
+                "ig_posted": true,
+                "timestamp": "2026-09-26T20:50:57+0000",
+                "vid_id": "18132622645709069",
+                "video_name": "",
+                "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_23.mp4"
+            },
+            {
                 "title": "Purple Fire Destroys Everything \ud83d\udd25\ud83d\udc9c\n\n#videogames #gamingcommunity #gaming #godofwarlaufey #gamingreel",
                 "fb_link": "",
                 "fb_views": 0,
@@ -1636,18 +1652,17 @@
                 "source_link": ""
             },
             {
-                "title": "GodofWarLaufey_23",
-                "fb_link": "",
+                "title": "GodofWarLaufey 23",
+                "fb_link": "https://www.facebook.com/18132622645709069",
                 "fb_views": 0,
                 "fb_posted": false,
                 "ig_link": "",
                 "ig_views": 0,
                 "ig_posted": false,
                 "timestamp": "",
-                "vid_id": "GodofWarLaufey_23",
+                "vid_id": "18132622645709069",
                 "video_name": "GodofWarLaufey_23",
-                "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_23.mp4",
-                "is_source_only": true
+                "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_23.mp4"
             },
             {
                 "title": "GodofWarLaufey_19",
@@ -2506,7 +2521,7 @@
                 "fb_views": 0,
                 "fb_posted": false,
                 "ig_link": "https://www.instagram.com/reel/DdwZqBbjcOq/",
-                "ig_views": 120,
+                "ig_views": 140,
                 "ig_posted": true,
                 "timestamp": "2026-09-26T15:53:17+0000",
                 "vid_id": "18208015735317143",
@@ -2780,7 +2795,7 @@
             {
                 "title": "Sniper k\ud83d\udcaflls lead to mom meme!\n\n#videogames #gamingcommunity #gaming #russian_secret_missions #gamingreels #reels",
                 "fb_link": "https://www.facebook.com/reel/1861373075302275/",
-                "fb_views": 261,
+                "fb_views": 267,
                 "fb_posted": true,
                 "ig_link": "https://www.instagram.com/reel/DdwmXObDLk8/",
                 "ig_views": 10,
@@ -4019,7 +4034,7 @@
             {
                 "title": "Sniper Fire & Big Booms \ud83d\udca5\ud83c\udfaf\n\n#videogames #gamingcommunity #gaming #ukrainecovertmission #gamingreels #reels",
                 "fb_link": "https://www.facebook.com/reel/1433881315316238/",
-                "fb_views": 460,
+                "fb_views": 461,
                 "fb_posted": true,
                 "ig_link": "https://www.instagram.com/reel/DdrhIHCFEtY/",
                 "ig_views": 180,
@@ -4073,7 +4088,7 @@
             {
                 "title": "Valley Helicopter War \ud83d\ude81\ud83d\udca5\n\n#videogames #gamingcommunity #gaming #vietnamcaveprison #gamingreels #reels",
                 "fb_link": "https://www.facebook.com/reel/1780695949719463/",
-                "fb_views": 274,
+                "fb_views": 283,
                 "fb_posted": true,
                 "ig_link": "https://www.instagram.com/reel/Ddwn1FmgvlH/",
                 "ig_views": 40,
@@ -4121,19 +4136,6 @@
                 "vid_id": "1364205288788033",
                 "video_name": "",
                 "source_link": ""
-            },
-            {
-                "title": "The ultimate cave trap survival guide!\n\n#videogames #gamingcommunity #gaming #vietnamcaveprison #gam",
-                "fb_link": "",
-                "fb_views": 0,
-                "fb_posted": false,
-                "ig_link": "https://www.instagram.com/reel/DdSrVmJDK0c/",
-                "ig_views": 440,
-                "ig_posted": true,
-                "timestamp": "2026-09-15T02:50:34+0000",
-                "vid_id": "17907822729539500",
-                "video_name": "",
-                "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison4.mp4"
             },
             {
                 "title": "VietnamCavePrison25",
@@ -4470,7 +4472,7 @@
                 "fb_views": 0,
                 "fb_posted": false,
                 "ig_link": "https://www.instagram.com/reel/DdwsMe0CQ_C/",
-                "ig_views": 10,
+                "ig_views": 20,
                 "ig_posted": true,
                 "timestamp": "2026-09-26T18:35:16+0000",
                 "vid_id": "18042902879821385",
@@ -4506,7 +4508,7 @@
             {
                 "title": "Can he survive this insane ambush? \ud83d\ude31\ud83d\udd25\n\n#videogames #gamingcommunity #gaming #codblackops6 #gamingreels #reels",
                 "fb_link": "https://www.facebook.com/reel/1087694207200854/",
-                "fb_views": 1986,
+                "fb_views": 1987,
                 "fb_posted": true,
                 "ig_link": "",
                 "ig_views": 0,
@@ -5969,7 +5971,7 @@
             {
                 "title": "Red Sky Combat Zone \ud83d\udc80\ud83d\udd25\n\n#videogames #gamingcommunity #gaming #mm2remastered #gamingreels #reels",
                 "fb_link": "https://www.facebook.com/reel/3584878615007660/",
-                "fb_views": 749,
+                "fb_views": 750,
                 "fb_posted": true,
                 "ig_link": "",
                 "ig_views": 0,
@@ -5982,7 +5984,7 @@
             {
                 "title": "Intense Firefight Survival Mode \ud83d\udca5\ud83c\udfaf\n\n#videogames #gamingcommunity #gaming #mm2remastered #gamingreels #reels",
                 "fb_link": "https://www.facebook.com/reel/2293098418120844/",
-                "fb_views": 865,
+                "fb_views": 866,
                 "fb_posted": true,
                 "ig_link": "",
                 "ig_views": 0,
@@ -6021,7 +6023,7 @@
             {
                 "title": "Surviving The Fiery Inferno \ud83d\udd25\u2620\ufe0f\n\n#videogames #gamingcommunity #gaming #mm2remastered #gamingreels #reels",
                 "fb_link": "https://www.facebook.com/reel/1648582690157110/",
-                "fb_views": 523,
+                "fb_views": 524,
                 "fb_posted": true,
                 "ig_link": "https://www.instagram.com/reel/DdiJ64yEqV5/",
                 "ig_views": 810,
@@ -6034,7 +6036,7 @@
             {
                 "title": "The Ultimate Fire Storm \ud83d\udd25\n\n#videogames #gamingcommunity #gaming #mm2remastered #gamingreels #reels",
                 "fb_link": "https://www.facebook.com/reel/1772677524053524/",
-                "fb_views": 706,
+                "fb_views": 707,
                 "fb_posted": true,
                 "ig_link": "https://www.instagram.com/reel/DdiHCCOlP4Q/",
                 "ig_views": 160,
@@ -6060,7 +6062,7 @@
             {
                 "title": "Can you survive this red firestorm?\n\n#videogames #gamingcommunity #gaming #mm2remastered #gamingreels #reels",
                 "fb_link": "https://www.facebook.com/reel/1829429441565917/",
-                "fb_views": 13904,
+                "fb_views": 13906,
                 "fb_posted": true,
                 "ig_link": "https://www.instagram.com/reel/DdV9CvpDMvp/",
                 "ig_views": 570,
@@ -6889,7 +6891,7 @@
             {
                 "title": "Hallway Beatdown \ud83e\udd4b\ud83d\udd25\n\n#videogames #gamingcommunity #gaming #sifu #gamingreels #reels",
                 "fb_link": "https://www.facebook.com/reel/2361453797997528/",
-                "fb_views": 306,
+                "fb_views": 307,
                 "fb_posted": true,
                 "ig_link": "https://www.instagram.com/reel/DdjNjBFCvUn/",
                 "ig_views": 30,

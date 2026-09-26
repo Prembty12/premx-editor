@@ -1,22 +1,22 @@
 {
-  "last_updated": "2026-09-27 02:18:23 AM",
+  "last_updated": "2026-09-27 02:25:27 AM",
   "period_days": 7,
   "trending": [
     {
       "game": "AfghanistanRedZone",
-      "views_7d": 17903,
-      "avg_per_video": 8951,
+      "views_7d": 17925,
+      "avg_per_video": 8962,
       "trend": "viral",
-      "ratio": 11.379193445864821,
+      "ratio": 11.446533740154686,
       "fb_link": "https://www.facebook.com/reel/1440490007980933/",
       "source_link": ""
     },
     {
       "game": "Callofdutyaw",
-      "views_7d": 8734,
+      "views_7d": 8737,
       "avg_per_video": 873,
       "trend": "steady",
-      "ratio": 1.10982414012289,
+      "ratio": 1.1150216419499042,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison14.mp4"
     }
@@ -24,19 +24,19 @@
   "below_avg": [
     {
       "game": "mm2remastered",
-      "views_7d": 4443,
-      "avg_per_video": 740,
+      "views_7d": 4447,
+      "avg_per_video": 741,
       "trend": "slow",
-      "ratio": 0.9407444028533088,
+      "ratio": 0.9464273043354857,
       "fb_link": "https://www.facebook.com/reel/3584878615007660/",
       "source_link": ""
     },
     {
       "game": "UkraineCovertMission",
-      "views_7d": 640,
-      "avg_per_video": 640,
+      "views_7d": 641,
+      "avg_per_video": 641,
       "trend": "slow",
-      "ratio": 0.813616780846105,
+      "ratio": 0.8187043212942595,
       "fb_link": "https://www.facebook.com/reel/1433881315316238/",
       "source_link": ""
     },
@@ -45,7 +45,7 @@
       "views_7d": 1104,
       "avg_per_video": 552,
       "trend": "slow",
-      "ratio": 0.7017444734797655,
+      "ratio": 0.7050308663875683,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan233.mp4"
     },
@@ -54,26 +54,26 @@
       "views_7d": 1797,
       "avg_per_video": 449,
       "trend": "slow",
-      "ratio": 0.5708030228123455,
+      "ratio": 0.5734761938551054,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan233.mp4"
     },
     {
       "game": "GODOFWAR3",
-      "views_7d": 1662,
-      "avg_per_video": 415,
+      "views_7d": 1683,
+      "avg_per_video": 420,
       "trend": "slow",
-      "ratio": 0.5275796313298962,
+      "ratio": 0.5364365287731497,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR32.mp4"
     }
   ],
   "recommendation": {
     "game": "AfghanistanRedZone",
-    "views_7d": 17903,
-    "avg_per_video": 8951,
+    "views_7d": 17925,
+    "avg_per_video": 8962,
     "trend": "viral",
-    "ratio": 11.379193445864821,
+    "ratio": 11.446533740154686,
     "fb_link": "https://www.facebook.com/reel/1440490007980933/",
     "source_link": ""
   }
