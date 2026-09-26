@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 21 | **Last Updated:** 2026-09-27 02:29:52 AM IST
+**Total Videos:** 21 | **Last Updated:** 2026-09-27 02:31:47 AM IST
 
 ---
 
@@ -15,7 +15,7 @@
 | FB Posted | 5 / 21 |
 | IG Posted | 6 / 21 |
 | Total FB Views | **6,582** |
-| Total IG Views | **3,340** |
+| Total IG Views | **3,350** |
 
 ---
 
@@ -23,7 +23,7 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | Frozen Sniper Ops 🎯❄️  #videogames #gamingcommunity #gaming #rescueoperation #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdwZqBbjcOq/) | 150 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation14.mp4) |
+| 1 | Frozen Sniper Ops 🎯❄️  #videogames #gamingcommunity #gaming #rescueoperation #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdwZqBbjcOq/) | 160 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation14.mp4) |
 | 2 | Deadly Scope Precision 💀🔥  #videogames #gamingcommunity #gaming #rescueoperation #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdeTVXtjkS8/) | 300 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation12.mp4) |
 | 3 | Chaos level maxed out 💀  #videogames #gamingcommunity #gaming #rescueoperation #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdbnzPcgXFK/) | 1,070 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation6.mp4) |
 | 4 | Can you survive the fiery corridor ambush that melts the entire enemy squad?  #videogames #gamingcommunity #gaming #resc | [🔵 FB](https://www.facebook.com/reel/1541099677784572/) | 2,392 | [🟣 IG](https://www.instagram.com/reel/DdT0YOrCNCj/) | 230 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation8.mp4) |
