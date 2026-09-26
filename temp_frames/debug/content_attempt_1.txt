@@ -1,1 +1,1 @@
-{"clip_duration": 15, "reason": "Intense titan climb and powerful combat action", "start_time": 23, "status": "APPROVE", "title": "Kratos Titan Clash 💀🔥"}
+{"clip_duration": 35, "reason": "Intense fire giant boss battle combat sequence", "start_time": 12, "status": "APPROVE", "title": "Fire Giant Boss Fight 🔥⚔️"}
