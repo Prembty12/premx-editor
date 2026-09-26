@@ -1,1 +1,1 @@
-{"clip_duration": 22, "reason": "Cinematic storm ship boarding action sequence.", "start_time": 35, "status": "APPROVE", "title": "Storm Ship Boarding Climb 🌊⚓"}
+{"clip_duration": 61, "reason": "Full cinematic military standoff sequence.", "start_time": 0, "status": "APPROVE", "title": "Tense Confrontation Between Soldiers 💀"}

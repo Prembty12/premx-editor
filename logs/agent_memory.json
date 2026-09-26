@@ -2,7 +2,8 @@
     "game_scores": {
         "DiabloIV": 15,
         "GODOFWAR3": 15,
-        "Ghost Destroys Mexican": 15
+        "Ghost Destroys Mexican": 15,
+        "Ghost_soap_escap": 15
     },
     "title_styles": {
         "curiosity": 13,
@@ -15,7 +16,7 @@
         "epic_cinematic": 10,
         "funny_roast": 13,
         "secret_hidden": 10,
-        "exposed": 10,
+        "exposed": 13,
         "unbelievable": 13,
         "crazy": 10,
         "secret": 10,
