@@ -1,7 +1,12 @@
 {
-  "last_updated": "2026-09-27 01:25:14 AM",
-  "total_posts_analyzed": 0,
+  "last_updated": "2026-09-27 01:51:49 AM",
+  "total_posts_analyzed": 1,
   "top_slots": [],
-  "daily": {},
+  "daily": {
+    "Sunday": {
+      "avg_views": 10,
+      "posts": 1
+    }
+  },
   "today_suggestion": null
 }

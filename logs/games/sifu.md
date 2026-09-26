@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 19 | **Last Updated:** 2026-09-27 01:25:14 AM IST
+**Total Videos:** 19 | **Last Updated:** 2026-09-27 01:51:49 AM IST
 
 ---
 
@@ -24,7 +24,7 @@
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
 | 1 | Hallway Beatdown 🥋🔥  #videogames #gamingcommunity #gaming #sifu #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2361453797997528/) | 306 | [🟣 IG](https://www.instagram.com/reel/DdjNjBFCvUn/) | 30 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu1.mp4) |
-| 2 | Stick Fight Fury 🥋🔥  #videogames #gamingcommunity #gaming #sifu #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Dda0qBkja1S/) | 60 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu2.mp4) |
+| 2 | Stick Fight Fury 🥋🔥  #videogames #gamingcommunity #gaming #sifu #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Dda0qBkja1S/) | 60 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu17.mp4) |
 | 3 | Tiny fighter vs giant boss! 👊💥  #videogames #gamingcommunity #gaming #sifu #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1101493405643422/) | 288 | [🟣 IG](https://www.instagram.com/reel/DdWYXL_DCHM/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu3.mp4) |
 | 4 | sifu18 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu18.mp4) |
 | 5 | sifu17 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu17.mp4) |

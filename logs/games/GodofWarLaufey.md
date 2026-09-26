@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 15 | **Last Updated:** 2026-09-27 01:25:14 AM IST
+**Total Videos:** 15 | **Last Updated:** 2026-09-27 01:51:49 AM IST
 
 ---
 
@@ -23,7 +23,7 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | Purple Fire Destroys Everything 🔥💜  #videogames #gamingcommunity #gaming #godofwarlaufey #gamingreel | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdvtUA_IJ6A/) | 220 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_4.mp4) |
+| 1 | Purple Fire Destroys Everything 🔥💜  #videogames #gamingcommunity #gaming #godofwarlaufey #gamingreel | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdvtUA_IJ6A/) | 220 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_10.mp4) |
 | 2 | She unlocked a forbidden god-tier ability! 😱🔥  #videogames #gamingcommunity #gaming #godofwarlaufey  #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1087626214135364/) | 88 | [🟣 IG](https://www.instagram.com/reel/Ddbfe5kCMH4/) | 300 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_5.mp4) |
 | 3 | GodofWarLaufey_23 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_23.mp4) |
 | 4 | GodofWarLaufey_19 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_19.mp4) |
