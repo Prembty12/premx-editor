@@ -24,7 +24,7 @@ def now_ist_str():
 def now_ist_ampm():
     return datetime.now(IST).strftime("%Y-%m-%d %I:%M:%S %p")
 
-# 🔥 NEW: UTC → IST converter
+# 🔥 FIX 3: UTC → IST converter
 def utc_to_ist(iso_time_str):
     if not iso_time_str:
         return None
@@ -155,16 +155,27 @@ def parse_game_links_file(filepath):
 # ============================================================
 # 🤖 GEMINI INTEGRATION
 # ============================================================
+def get_gemini_key():
+    valid = [k for k in GEMINI_KEYS if k]
+    return random.choice(valid) if valid else None
+
+
 def call_gemini_api(api_key, prompt, max_tokens=150):
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
     payload = {
         "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {"temperature": 0.9, "maxOutputTokens": max_tokens, "topP": 0.95}
+        "generationConfig": {
+            "temperature": 0.9,
+            "maxOutputTokens": max_tokens,
+            "topP": 0.95,
+        }
     }
     try:
         res = requests.post(url, json=payload, timeout=15)
         if res.status_code == 200:
-            return res.json()['candidates'][0]['content']['parts'][0]['text'].strip()
+            data = res.json()
+            text = data['candidates'][0]['content']['parts'][0]['text']
+            return text.strip()
     except Exception as e:
         log(f"⚠️ Gemini API error: {e}")
     return None
@@ -177,31 +188,40 @@ ABUSE_PATTERNS = [
     r'\b(madarchod|madrchod|bhosd|bhosdi|bhosdike|chutiya|chutya|chutiye|gaand|gandu|gaandu|harami|haramkhor|haramzada|kutta|kutte|kutiya|suar|saala|sala|bkl|mc|bc|bkc|lund|lauda|lavda|randi|rand)\b',
     r'\b(fuck|f\*ck|fuk|shit|sh\*t|bitch|bastard|asshole|dick|pussy|cunt|whore|slut)\b',
     r'(मादरचोद|भोसड़ी|भोसड़ीके|चूतिया|चूतिये|गांड|गांडू|हरामी|हरामखोर|कुत्ता|कुत्ते|कुतिया|सुअर|साला|भड़वे|लंड|लौड़ा|रंडी)',
+    r'\b(thevdiya|punda|otha|sunni|lanja|pooka|baadu|koothi)\b',
 ]
+
 FAMILY_ABUSE_PATTERNS = [
     r'\b(teri maa|teri behen|tere baap|teri ma|teri behan|teri biwi|teri beti)\b',
     r'(तेरी मां|तेरी माँ|तेरी बहन|तेरे बाप|तेरी बीवी|तेरी बेटी)',
 ]
-FORBIDDEN_REPLY_WORDS = ["maa", "ma", "mata", "behen", "behan", "baap", "beti", "biwi",
-                          "caste", "religion", "hindu", "muslim", "christian", "sikh",
-                          "kill", "die", "death", "murder", "rape", "suicide"]
+
+FORBIDDEN_REPLY_WORDS = [
+    "maa", "ma", "mata", "behen", "behan", "baap", "beti", "biwi",
+    "caste", "religion", "hindu", "muslim", "christian", "sikh",
+    "kill", "die", "death", "murder", "rape", "suicide",
+]
 
 
 def detect_abuse(text):
-    tl = text.lower()
-    for p in FAMILY_ABUSE_PATTERNS:
-        if re.search(p, tl, re.IGNORECASE):
+    text_lower = text.lower()
+    for pattern in FAMILY_ABUSE_PATTERNS:
+        if re.search(pattern, text_lower, re.IGNORECASE):
             return "family_abuse"
-    for p in ABUSE_PATTERNS:
-        if re.search(p, tl, re.IGNORECASE):
+    for pattern in ABUSE_PATTERNS:
+        if re.search(pattern, text_lower, re.IGNORECASE):
             return "general_abuse"
     return "none"
 
 
 def is_spam(text):
-    tl = text.lower()
-    for i in ["http://", "https://", ".com", ".xyz", "click here", "follow me", "dm me", "join my", "subscribe my"]:
-        if i in tl:
+    text_lower = text.lower()
+    spam_indicators = [
+        "http://", "https://", ".com", ".xyz", "click here",
+        "follow me", "dm me", "join my", "subscribe my",
+    ]
+    for indicator in spam_indicators:
+        if indicator in text_lower:
             return True
     return False
 
@@ -210,21 +230,55 @@ def generate_smart_reply(comment_text, game_name, post_title, is_abuse=False):
     keys = [k for k in GEMINI_KEYS if k]
     if not keys:
         return None
+
     if is_abuse:
-        prompt = f"""Savage but respectful gaming creator replying to hater.
-Game: {game_name}
-Post: {post_title}
-Hater: "{comment_text}"
-RULES: Same language, witty/sarcastic, max 25 words, 1-2 emojis, NEVER abuse back, NEVER insult family.
-Reply ONLY text."""
+        prompt = f"""You are a SAVAGE but RESPECTFUL gaming content creator replying to a hater.
+
+CONTEXT:
+- Game: {game_name}
+- Post: {post_title}
+
+HATER'S COMMENT: "{comment_text}"
+
+RULES:
+1. Reply in SAME language as the hater
+2. Be WITTY, SARCASTIC, FUNNY
+3. Match energy but stay CHILL and RESPECTFUL
+4. NEVER abuse back
+5. NEVER insult family/religion/caste
+6. NEVER threaten
+7. MAX 25 words
+8. Include 1-2 emojis (😂😎🔥)
+9. Style: Savage Hinglish / Gen-Z comeback
+
+GOOD EXAMPLES:
+- "bakwas video" → "Bhai 3 ghante dekh ke comment kiya? 😂"
+- "chutiya" → "Bhai tu bhi bana, competition badhega 😎"
+- "ghatiya" → "Bhai platinum kiya hai kya? Tips de 😂"
+- "f***ing trash" → "Yet here you are watching 😂🔥"
+
+Reply ONLY with the reply text, no quotes, no prefix."""
     else:
-        prompt = f"""Friendly gaming creator.
-Game: {game_name}
-Post: {post_title}
-Comment: "{comment_text}"
-RULES: Same language, friendly, max 20 words, 1-2 emojis.
-Reply ONLY text."""
-    for _ in range(min(3, len(keys))):
+        prompt = f"""You are a friendly gaming content creator replying to a fan.
+
+CONTEXT:
+- Game: {game_name}
+- Post: {post_title}
+
+FAN'S COMMENT: "{comment_text}"
+
+RULES:
+1. Reply in SAME language as the comment
+2. Friendly, casual, gaming-community tone
+3. MAX 20 words
+4. Include 1-2 emojis
+5. NEVER share download links
+6. NEVER promise specific dates
+7. Match energy of comment
+
+Reply ONLY with the reply text, no quotes, no prefix."""
+
+    for attempt in range(min(3, len(keys))):
         key = random.choice(keys)
         response = call_gemini_api(key, prompt, max_tokens=100)
         if response:
@@ -240,33 +294,38 @@ def is_reply_safe(reply_text, is_abuse=False):
         return False, "too_short"
     if len(reply_text) > 300:
         return False, "too_long"
-    rl = reply_text.lower()
-    if "http" in rl or ".com" in rl:
+    reply_lower = reply_text.lower()
+    if "http" in reply_lower or ".com" in reply_lower:
         return False, "contains_link"
-    for w in FORBIDDEN_REPLY_WORDS:
-        if w in rl:
-            return False, f"forbidden_{w}"
-    for p in ABUSE_PATTERNS:
-        if re.search(p, rl, re.IGNORECASE):
-            return False, "contains_abuse"
+    for word in FORBIDDEN_REPLY_WORDS:
+        if word in reply_lower:
+            return False, f"forbidden_word_{word}"
+    for pattern in ABUSE_PATTERNS:
+        if re.search(pattern, reply_lower, re.IGNORECASE):
+            return False, "reply_contains_abuse"
     return True, "safe"
 
 
 # ============================================================
-# 🤖 AUTO-REPLY
+# 🤖 AUTO-REPLY FUNCTIONS (FB ONLY)
 # ============================================================
 def fetch_fb_comments(post_id, since_timestamp=None):
     url = f"https://graph.facebook.com/v19.0/{post_id}/comments"
-    params = {"fields": "id,message,from,created_time,can_reply",
-              "access_token": FB_ACCESS_TOKEN, "limit": 50}
+    params = {
+        "fields": "id,message,from,created_time,can_reply",
+        "access_token": FB_ACCESS_TOKEN,
+        "limit": 50,
+    }
     if since_timestamp:
         params["since"] = since_timestamp
     try:
         res = requests.get(url, params=params, timeout=15)
         if res.status_code == 200:
             return res.json().get("data", [])
+        else:
+            log(f"⚠️ FB comments fetch error: {res.status_code} {res.text[:200]}")
     except Exception as e:
-        log(f"⚠️ Comments error: {e}")
+        log(f"⚠️ FB comments fetch exception: {e}")
     return []
 
 
@@ -276,7 +335,8 @@ def check_if_already_replied(comment_id):
     try:
         res = requests.get(url, params=params, timeout=10)
         if res.status_code == 200:
-            for reply in res.json().get("data", []):
+            replies = res.json().get("data", [])
+            for reply in replies:
                 if reply.get("from", {}).get("id") == FB_PAGE_ID:
                     return True
     except Exception:
@@ -286,25 +346,28 @@ def check_if_already_replied(comment_id):
 
 def post_fb_reply(comment_id, reply_text):
     if not AUTO_COMMENT_ENABLED:
-        log(f"🚫 [DRY] Would post: {reply_text[:80]}")
+        log(f"🚫 [AUTO_COMMENT OFF] Would post: {reply_text[:80]}")
         return f"disabled_{comment_id}"
+
     url = f"https://graph.facebook.com/v19.0/{comment_id}/comments"
+    payload = {"message": reply_text, "access_token": FB_ACCESS_TOKEN}
     try:
-        res = requests.post(url, data={"message": reply_text, "access_token": FB_ACCESS_TOKEN}, timeout=15)
+        res = requests.post(url, data=payload, timeout=15)
         if res.status_code == 200:
             return res.json().get("id")
         else:
-            log(f"⚠️ Reply error: {res.status_code}")
+            log(f"⚠️ Reply post error: {res.status_code} {res.text[:200]}")
     except Exception as e:
-        log(f"⚠️ Reply error: {e}")
+        log(f"⚠️ Reply post exception: {e}")
     return None
 
 
 def process_fb_comments(actual_posted_titles):
     if not AUTO_COMMENT_ENABLED:
-        log("🚫 Auto-comment disabled")
+        log("🚫 Auto-comment disabled — skipping reply processing")
         return None
-    log("🤖 Auto-reply started...")
+
+    log("🤖 Auto-reply processing started...")
     replied_file = "logs/replied_comment_ids.json"
     replied_data = {"replied": [], "last_updated": ""}
     if os.path.exists(replied_file):
@@ -325,6 +388,7 @@ def process_fb_comments(actual_posted_titles):
     replies_count = 0
     cutoff_time = (now_ist() - timedelta(hours=MAX_COMMENT_AGE_HOURS)).timestamp()
     min_age_time = (now_ist() - timedelta(minutes=MIN_COMMENT_AGE_MIN)).timestamp()
+
     for game_name, videos in actual_posted_titles.items():
         if replies_count >= MAX_REPLIES_PER_RUN:
             break
@@ -347,51 +411,88 @@ def process_fb_comments(actual_posted_titles):
                 comment_id = comment.get("id", "")
                 comment_text = comment.get("message", "").strip()
                 comment_time = comment.get("created_time", "")
+                can_reply = comment.get("can_reply", True)
                 if not comment_id or not comment_text:
                     continue
                 if comment_id in replied_ids:
                     continue
-                if not comment.get("can_reply", True):
+                if not can_reply:
                     continue
-                if comment.get("from", {}).get("id") == FB_PAGE_ID:
+                from_data = comment.get("from", {})
+                if from_data.get("id") == FB_PAGE_ID:
                     continue
                 try:
                     dt = datetime.fromisoformat(comment_time.replace("+0000", "+00:00"))
-                    cts = dt.timestamp()
-                    if cts < cutoff_time or cts > min_age_time:
+                    comment_ts = dt.timestamp()
+                    if comment_ts < cutoff_time:
+                        continue
+                    if comment_ts > min_age_time:
                         continue
                 except Exception:
                     pass
                 abuse_type = detect_abuse(comment_text)
-                if abuse_type == "family_abuse" or is_spam(comment_text):
-                    replied_ids.add(comment_id)
+                if abuse_type == "family_abuse":
+                    reply_log["skipped"].append({
+                        "comment_id": comment_id,
+                        "comment_text": comment_text[:100],
+                        "reason": "family_abuse",
+                        "timestamp": now_ist_ampm(),
+                    })
                     reply_log["total_skipped"] = reply_log.get("total_skipped", 0) + 1
+                    replied_ids.add(comment_id)
+                    continue
+                if is_spam(comment_text):
+                    reply_log["skipped"].append({
+                        "comment_id": comment_id,
+                        "comment_text": comment_text[:100],
+                        "reason": "spam",
+                        "timestamp": now_ist_ampm(),
+                    })
+                    reply_log["total_skipped"] = reply_log.get("total_skipped", 0) + 1
+                    replied_ids.add(comment_id)
                     continue
                 if check_if_already_replied(comment_id):
+                    log(f"⏭️ Already replied (FB verify) — {comment_id}")
                     replied_ids.add(comment_id)
                     continue
                 is_abuse = (abuse_type == "general_abuse")
-                reply_text = generate_smart_reply(comment_text, game_name, video.get("title", ""), is_abuse=is_abuse)
+                reply_text = generate_smart_reply(
+                    comment_text, game_name, video.get("title", ""), is_abuse=is_abuse
+                )
                 if not reply_text:
                     continue
                 safe, reason = is_reply_safe(reply_text, is_abuse=is_abuse)
                 if not safe:
+                    log(f"⚠️ Reply unsafe: {reason}")
+                    reply_log["skipped"].append({
+                        "comment_id": comment_id,
+                        "comment_text": comment_text[:100],
+                        "reason": f"unsafe_{reason}",
+                        "timestamp": now_ist_ampm(),
+                    })
                     replied_ids.add(comment_id)
                     continue
                 reply_id = post_fb_reply(comment_id, reply_text)
                 if reply_id:
                     replies_count += 1
                     reply_log["replies"].append({
-                        "reply_id": reply_id, "comment_id": comment_id, "post_id": post_id,
-                        "user_comment": comment_text[:200], "gemini_reply": reply_text,
+                        "reply_id": reply_id,
+                        "comment_id": comment_id,
+                        "post_id": post_id,
+                        "user_comment": comment_text[:200],
+                        "gemini_reply": reply_text,
                         "type": "savage" if is_abuse else "friendly",
-                        "game": game_name, "post_title": video.get("title", "")[:100],
-                        "fb_post_link": fb_link, "source_link": video.get("source_link", ""),
-                        "timestamp": now_ist_ampm(), "status": "posted",
+                        "game": game_name,
+                        "post_title": video.get("title", "")[:100],
+                        "fb_post_link": fb_link,
+                        "source_link": video.get("source_link", ""),
+                        "timestamp": now_ist_ampm(),
+                        "status": "posted",
                     })
                     reply_log["total_replies"] = reply_log.get("total_replies", 0) + 1
                     replied_ids.add(comment_id)
-                    log(f"✅ Reply: {reply_text[:60]}")
+                    log(f"✅ Reply posted: {reply_text[:60]}")
+
     os.makedirs("logs", exist_ok=True)
     replied_data["replied"] = list(replied_ids)[-5000:]
     replied_data["last_updated"] = now_ist_ampm()
@@ -402,12 +503,12 @@ def process_fb_comments(actual_posted_titles):
     reply_log["last_updated"] = now_ist_ampm()
     with open(reply_log_file, 'w', encoding='utf-8') as f:
         json.dump(reply_log, f, indent=2)
-    log(f"🤖 Done. {replies_count} replies.")
+    log(f"🤖 Auto-reply done. {replies_count} replies posted.")
     return reply_log
 
 
 # ============================================================
-# 📈 TRENDING
+# 📈 TRENDING GAMES
 # ============================================================
 def detect_trending_games(actual_posted_titles, game_views_summary, days=7):
     game_stats = {}
@@ -434,18 +535,23 @@ def detect_trending_games(actual_posted_titles, game_views_summary, days=7):
                 latest_fb_link = v.get("fb_link", "")
                 latest_source = v.get("source_link", "")
         if video_count > 0:
-            game_stats[g_name] = {"total_views": total_views, "video_count": video_count,
-                                   "avg_views": total_views // video_count,
-                                   "latest_post": latest_post, "fb_link": latest_fb_link,
-                                   "source_link": latest_source}
+            game_stats[g_name] = {
+                "total_views": total_views, "video_count": video_count,
+                "avg_views": total_views // video_count,
+                "latest_post": latest_post, "fb_link": latest_fb_link,
+                "source_link": latest_source,
+            }
+
     if not game_stats:
         result = {"last_updated": now_ist_ampm(), "period_days": days, "trending": [], "below_avg": [], "recommendation": None}
         os.makedirs("logs", exist_ok=True)
         with open("logs/trending_cache.json", 'w', encoding='utf-8') as f:
             json.dump(result, f, indent=2)
         return result
+
     all_avgs = [s["avg_views"] for s in game_stats.values()]
     overall_avg = sum(all_avgs) / len(all_avgs) if all_avgs else 1
+
     trending_list = []
     for g, s in game_stats.items():
         ratio = s["avg_views"] / overall_avg if overall_avg > 0 else 0
@@ -454,15 +560,21 @@ def detect_trending_games(actual_posted_titles, game_views_summary, days=7):
         elif ratio >= 1.0: trend = "steady"
         elif ratio >= 0.5: trend = "slow"
         else: trend = "below_avg"
-        trending_list.append({"game": g, "views_7d": s["total_views"],
-                               "avg_per_video": s["avg_views"], "trend": trend,
-                               "fb_link": s["fb_link"], "source_link": s["source_link"]})
+        trending_list.append({
+            "game": g, "views_7d": s["total_views"],
+            "avg_per_video": s["avg_views"], "trend": trend, "ratio": ratio,
+            "fb_link": s["fb_link"], "source_link": s["source_link"],
+        })
+
     trending_list.sort(key=lambda x: x["avg_per_video"], reverse=True)
     top = [t for t in trending_list if t["trend"] in ("viral", "trending", "steady")][:5]
     below = [t for t in trending_list if t["trend"] in ("slow", "below_avg")][:5]
     best = trending_list[0] if trending_list else None
-    result = {"last_updated": now_ist_ampm(), "period_days": days,
-              "trending": top, "below_avg": below, "recommendation": best}
+
+    result = {
+        "last_updated": now_ist_ampm(), "period_days": days,
+        "trending": top, "below_avg": below, "recommendation": best,
+    }
     os.makedirs("logs", exist_ok=True)
     with open("logs/trending_cache.json", 'w', encoding='utf-8') as f:
         json.dump(result, f, indent=2)
@@ -470,7 +582,7 @@ def detect_trending_games(actual_posted_titles, game_views_summary, days=7):
 
 
 # ============================================================
-# 🎯 BEST TIME
+# 🎯 BEST TIME TO POST
 # ============================================================
 def analyze_best_time(all_history):
     if not all_history:
@@ -479,8 +591,10 @@ def analyze_best_time(all_history):
                 all_history = json.load(f)
         except Exception:
             all_history = {}
+
     hourly = {}
     daily = {}
+
     for game, entries in all_history.items():
         for entry in entries:
             ts = entry.get("timestamp", "")
@@ -496,34 +610,45 @@ def analyze_best_time(all_history):
                         dt = datetime.strptime(ts, "%Y-%m-%d %I:%M:%S %p")
                     except Exception:
                         continue
-            hourly.setdefault(dt.hour, []).append(views)
-            daily.setdefault(dt.strftime("%A"), []).append(views)
+            hour = dt.hour
+            day_name = dt.strftime("%A")
+            hourly.setdefault(hour, []).append(views)
+            daily.setdefault(day_name, []).append(views)
+
     hourly_stats = []
     for hour, views_list in hourly.items():
         if len(views_list) < 2:
             continue
-        hourly_stats.append({"hour": hour, "posts": len(views_list),
-                             "avg_views": sum(views_list) // len(views_list)})
+        avg = sum(views_list) // len(views_list)
+        hourly_stats.append({"hour": hour, "posts": len(views_list), "avg_views": avg})
+
     hourly_stats.sort(key=lambda x: x["avg_views"], reverse=True)
+
     top_slots = []
     medals = ["🥇", "🥈", "🥉", "4", "5"]
     recs = ["BEST", "Great", "Good", "Average", "Below avg"]
     for idx, h in enumerate(hourly_stats[:5]):
         start = h["hour"]
         end = (start + 1) % 24
-        top_slots.append({"rank": idx + 1,
-                          "icon": medals[idx] if idx < len(medals) else str(idx + 1),
-                          "time_slot": f"{start:02d}:00 - {end:02d}:00",
-                          "posts": h["posts"], "avg_views": h["avg_views"],
-                          "recommendation": recs[idx] if idx < len(recs) else "—"})
+        top_slots.append({
+            "rank": idx + 1,
+            "icon": medals[idx] if idx < len(medals) else str(idx + 1),
+            "time_slot": f"{start:02d}:00 - {end:02d}:00",
+            "posts": h["posts"], "avg_views": h["avg_views"],
+            "recommendation": recs[idx] if idx < len(recs) else "—",
+        })
+
     daily_stats = {}
     for day, views_list in daily.items():
         if views_list:
             daily_stats[day] = {"avg_views": sum(views_list) // len(views_list), "posts": len(views_list)}
-    result = {"last_updated": now_ist_ampm(),
-              "total_posts_analyzed": sum(len(v) for v in hourly.values()),
-              "top_slots": top_slots, "daily": daily_stats,
-              "today_suggestion": top_slots[0] if top_slots else None}
+
+    result = {
+        "last_updated": now_ist_ampm(),
+        "total_posts_analyzed": sum(len(v) for v in hourly.values()),
+        "top_slots": top_slots, "daily": daily_stats,
+        "today_suggestion": top_slots[0] if top_slots else None,
+    }
     os.makedirs("logs", exist_ok=True)
     with open("logs/best_time_analysis.json", 'w', encoding='utf-8') as f:
         json.dump(result, f, indent=2)
@@ -539,8 +664,9 @@ def generate_trending_section():
             data = json.load(f)
     except Exception:
         return ""
-    lines = ["\n--- \n\n## 📈 Trending Games (Last 7 Days)\n\n"]
-    lines.append(f"> Auto-detected | Last Updated: {data.get('last_updated', 'N/A')}\n\n")
+    lines = []
+    lines.append("\n--- \n\n## 📈 Trending Games (Last 7 Days)\n\n")
+    lines.append(f"> Auto-detected based on views performance | Last Updated: {data.get('last_updated', 'N/A')}\n\n")
     trending = data.get("trending", [])
     if trending:
         lines.append("| Rank | Game Name | Views (7d) | Avg / Video | Trend | FB Post | Source |\n")
@@ -556,12 +682,14 @@ def generate_trending_section():
             lines.append(f"| {rank_icon} | **{t['game']}** | {t['views_7d']:,} | {t['avg_per_video']:,} | {trend_icon} | {fb_md} | {src_md} |\n")
     below = data.get("below_avg", [])
     if below:
-        lines.append("\n### 📉 Below Average\n\n| Game | Views (7d) | Avg |\n|---|---|---|\n")
+        lines.append("\n### 📉 Below Average This Week\n\n")
+        lines.append("| Game | Views (7d) | Avg |\n|---|---|---|\n")
         for b in below:
             lines.append(f"| {b['game']} | {b['views_7d']:,} | {b['avg_per_video']:,} |\n")
     rec = data.get("recommendation")
     if rec:
-        lines.append(f"\n### 💡 Recommendation\n\n**Best game:** 🚀 **{rec['game']}** (Avg {rec['avg_per_video']:,} views)\n")
+        lines.append("\n### 💡 Recommendation\n\n")
+        lines.append(f"**Best game to post next:** 🚀 **{rec['game']}** (Avg {rec['avg_per_video']:,} views/video)\n")
     return "".join(lines)
 
 
@@ -571,22 +699,22 @@ def generate_best_time_section():
             data = json.load(f)
     except Exception:
         return ""
-    lines = ["\n--- \n\n## 🎯 Best Time to Post (IST)\n\n"]
+    lines = []
+    lines.append("\n--- \n\n## 🎯 Best Time to Post (IST)\n\n")
     lines.append(f"> Analysis from {data.get('total_posts_analyzed', 0)} posts | Last Updated: {data.get('last_updated', 'N/A')}\n\n")
     slots = data.get("top_slots", [])
     if slots:
         lines.append("| Rank | Time (IST) | Posts | Avg Views | Recommendation |\n")
         lines.append("|:---:|---|:---:|:---:|---|\n")
         for s in slots:
-            rec_icon = {"BEST": "🔥 **BEST**", "Great": "⚡ **Great**", "Good": "✅ **Good**",
-                        "Average": "📊 Average", "Below avg": "📉 Below avg"}.get(s["recommendation"], s["recommendation"])
+            rec_icon = {"BEST": "🔥 **BEST**", "Great": "⚡ **Great**", "Good": "✅ **Good**", "Average": "📊 Average", "Below avg": "📉 Below avg"}.get(s["recommendation"], s["recommendation"])
             lines.append(f"| {s['icon']} | **{s['time_slot']}** | {s['posts']} | **{s['avg_views']:,}** | {rec_icon} |\n")
     today = data.get("today_suggestion")
     if today:
-        lines.append(f"\n### 💡 Aaj post karo: ⏰ **{today['time_slot']} IST**\n")
+        lines.append(f"\n### 💡 Today's Suggestion\n\n**Aaj post karo:** ⏰ **{today['time_slot']} IST**\n")
     daily = data.get("daily", {})
     if daily:
-        lines.append("\n### 📅 Weekly\n\n| Day | Posts | Avg Views |\n|---|---|---|\n")
+        lines.append("\n### 📅 Weekly Pattern\n\n| Day | Posts | Avg Views |\n|---|---|---|\n")
         for day in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]:
             if day in daily:
                 lines.append(f"| {day} | {daily[day]['posts']} | {daily[day]['avg_views']:,} |\n")
@@ -599,17 +727,18 @@ def generate_auto_reply_section():
             data = json.load(f)
     except Exception:
         return ""
-    lines = ["\n--- \n\n## 🤖 Auto-Reply Log (Facebook Only)\n\n"]
+    lines = []
+    lines.append("\n--- \n\n## 🤖 Auto-Reply Log (Facebook Only)\n\n")
     status = "🚫 **DISABLED**" if not AUTO_COMMENT_ENABLED else "✅ **ACTIVE**"
-    lines.append(f"> Status: {status} | Last Updated: {data.get('last_updated', 'N/A')} | ")
+    lines.append(f"> Auto-Comment Status: {status} | Last Updated: {data.get('last_updated', 'N/A')} | ")
     lines.append(f"Total Replies: {data.get('total_replies', 0)} | Skipped: {data.get('total_skipped', 0)}\n\n")
     replies = data.get("replies", [])
     if replies:
-        fc = sum(1 for r in replies if r.get("type") == "friendly")
-        sc = sum(1 for r in replies if r.get("type") == "savage")
-        lines.append("### 📊 Stats\n\n| Type | Count |\n|---|---|\n")
-        lines.append(f"| Friendly | {fc} |\n")
-        lines.append(f"| Savage | {sc} |\n")
+        friendly_count = sum(1 for r in replies if r.get("type") == "friendly")
+        savage_count = sum(1 for r in replies if r.get("type") == "savage")
+        lines.append("### 📊 Stats\n\n| Metric | Value |\n|---|---|\n")
+        lines.append(f"| Friendly Replies | {friendly_count} |\n")
+        lines.append(f"| Savage Replies | {savage_count} |\n")
         lines.append(f"| Total | {len(replies)} |\n\n")
         lines.append("### 💬 Recent Replies (Last 20)\n\n")
         lines.append("| # | Time | User Comment | Gemini Reply | Type | FB Post | Source |\n")
@@ -633,11 +762,18 @@ def generate_auto_reply_section():
                 fb_link = s.get("fb_post_link", "")
                 fb_md = f"[🔵]({fb_link})" if fb_link else "_N/A_"
                 lines.append(f"| {comment} | {reply} | {fb_md} |\n")
+    skipped = data.get("skipped", [])[-5:]
+    if skipped:
+        lines.append("\n### ⏭️ Skipped Comments (Last 5)\n\n| Comment | Reason |\n|---|---|\n")
+        for s in reversed(skipped):
+            comment = (s.get("comment_text", "") or "").replace("\n", " ").replace("|", "\\|")[:80]
+            reason = s.get("reason", "").replace("_", " ")
+            lines.append(f"| {comment} | {reason} |\n")
     return "".join(lines)
 
 
 # ============================================================
-# 📦 CORE FUNCTIONS
+# 📦 EXISTING FUNCTIONS
 # ============================================================
 def git_commit_and_push(file_paths_to_add, commit_message="Auto-Agent: Sync dashboard [skip ci]"):
     try:
@@ -647,29 +783,33 @@ def git_commit_and_push(file_paths_to_add, commit_message="Auto-Agent: Sync dash
                        check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         for path in file_paths_to_add:
             if os.path.exists(path):
-                subprocess.run(["git", "add", path], check=False,
-                               stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                subprocess.run(["git", "add", path],
+                               check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         commit_res = subprocess.run(["git", "commit", "-m", commit_message],
                                     capture_output=True, text=True, check=False)
-        log(f"🔄 Commit: {commit_res.stdout.strip()}")
-        push_res = subprocess.run(["git", "push"], capture_output=True, text=True, check=False)
-        log(f"🔄 Push: {push_res.stdout.strip()}")
+        log(f"🔄 Git Commit: {commit_res.stdout.strip()} {commit_res.stderr.strip()}")
+        push_res = subprocess.run(["git", "push"],
+                                  capture_output=True, text=True, check=False)
+        log(f"🔄 Git Push: {push_res.stdout.strip()} {push_res.stderr.strip()}")
     except Exception as e:
-        log(f"⚠️ Git error: {e}")
+        log(f"⚠️ Git auto-push error: {e}")
 
 
 def generate_visual_reports(game_views_summary, game_stats):
     reports_dir = "logs/reports"
     os.makedirs(reports_dir, exist_ok=True)
     chart_path = os.path.join(reports_dir, "views_chart.png")
+    pdf_path = os.path.join(reports_dir, "gaming_agent_report.pdf")
     total_platform_views = sum(game_views_summary.values()) or 1
     analytics_data = []
     for g_n, g_v in game_views_summary.items():
         uploaded_count = game_stats.get(g_n, {}).get("uploaded_count", 0)
         avg_views = int(g_v / uploaded_count) if uploaded_count > 0 else 0
         share_pct = round((g_v / total_platform_views) * 100, 2)
-        analytics_data.append({"game": g_n, "total_views": g_v, "uploaded_count": uploaded_count,
-                                "avg_views": avg_views, "share_pct": share_pct})
+        analytics_data.append({
+            "game": g_n, "total_views": g_v, "uploaded_count": uploaded_count,
+            "avg_views": avg_views, "share_pct": share_pct
+        })
     sorted_analytics = sorted(analytics_data, key=lambda x: x["total_views"], reverse=True)
     if MATPLOTLIB_AVAILABLE and sorted_analytics:
         try:
@@ -678,12 +818,14 @@ def generate_visual_reports(game_views_summary, game_stats):
             avg_v = [item["avg_views"] for item in sorted_analytics]
             fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
             ax1.bar(games, total_v, color='#4A90E2')
-            ax1.set_title("Total Views", fontsize=12, fontweight='bold')
+            ax1.set_title("Total Views Leaderboard", fontsize=12, fontweight='bold')
+            ax1.set_ylabel("Views", fontsize=10, fontweight='bold')
             ax1.tick_params(axis='x', rotation=30)
             ax2.bar(games, avg_v, color='#50E3C2')
-            ax2.set_title("Avg Views per Video", fontsize=12, fontweight='bold')
+            ax2.set_title("Efficiency: Avg Views per Video", fontsize=12, fontweight='bold')
+            ax2.set_ylabel("Avg Views / Video", fontsize=10, fontweight='bold')
             ax2.tick_params(axis='x', rotation=30)
-            plt.suptitle("Gaming Performance Analytics", fontsize=14, fontweight='bold')
+            plt.suptitle("Advanced Gaming Performance Analytics", fontsize=14, fontweight='bold')
             plt.tight_layout()
             plt.savefig(chart_path, dpi=300)
             plt.close()
@@ -694,9 +836,11 @@ def generate_visual_reports(game_views_summary, game_stats):
 
 def save_rotation_history(game_list, chosen_game, memory, memory_file="logs/rotation_history.json"):
     os.makedirs("logs", exist_ok=True)
-    rotation_data = {"total_games": 0, "rotation_order": [], "current_index": 0,
-                     "current_game": "", "next_game": "", "next_game_position": 0,
-                     "last_updated": "", "total_runs": 0, "rotation_log": [], "all_games": []}
+    rotation_data = {
+        "total_games": 0, "rotation_order": [], "current_index": 0,
+        "current_game": "", "next_game": "", "next_game_position": 0,
+        "last_updated": "", "total_runs": 0, "rotation_log": [], "all_games": []
+    }
     if os.path.exists(memory_file):
         try:
             with open(memory_file, 'r', encoding='utf-8') as f:
@@ -717,7 +861,10 @@ def save_rotation_history(game_list, chosen_game, memory, memory_file="logs/rota
     rotation_data["last_updated"] = now_ist_ampm()
     rotation_data["total_runs"] = len(rotation_data.get("rotation_log", [])) + 1
     rotation_data.setdefault("rotation_log", []).append({
-        "run": rotation_data["total_runs"], "game": chosen_game, "timestamp": now_ist_ampm()})
+        "run": rotation_data["total_runs"],
+        "game": chosen_game,
+        "timestamp": now_ist_ampm(),
+    })
     all_games_list = []
     current_idx = rotation_data["current_index"]
     for i, g in enumerate(game_list):
@@ -735,8 +882,10 @@ def save_rotation_history(game_list, chosen_game, memory, memory_file="logs/rota
         else:
             next_turn_in = len(game_list) - current_idx + i
             status = "next_up" if next_turn_in == 1 else "waiting"
-        all_games_list.append({"position": i + 1, "game": g, "uploaded": uploaded,
-                                "last_run": last_run, "next_turn_in": next_turn_in, "status": status})
+        all_games_list.append({
+            "position": i + 1, "game": g, "uploaded": uploaded,
+            "last_run": last_run, "next_turn_in": next_turn_in, "status": status
+        })
     rotation_data["all_games"] = all_games_list
     with open(memory_file, 'w', encoding='utf-8') as f:
         json.dump(rotation_data, f, indent=4)
@@ -1100,7 +1249,7 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
         for v in videos:
             if v.get("fb_posted") or v.get("ig_posted"):
                 ts = v.get("timestamp", "")
-                if ts and ts > latest_time: latest_time = ts
+                if ts > latest_time: latest_time = ts
         return latest_time
     games_dir = "logs/games"
     os.makedirs(games_dir, exist_ok=True)
@@ -1360,7 +1509,7 @@ def get_game_video_stats(target_file, memory, game_name):
             url_count = len(extract_urls(content))
             vid_count = content.count("Video id :")
             total_links = max(pipe_count, url_count, vid_count)
-            log(f"📊 {game_name}: total={total_links}")
+            log(f"📊 {game_name}: total={total_links} (pipe={pipe_count}, urls={url_count}, vid_ids={vid_count})")
         except Exception as e:
             log(f"⚠️ Stats error: {e}")
     game_stats = memory.get("game_stats", {})
@@ -1376,8 +1525,10 @@ def run_agent_brain():
     memory_file = "logs/agent_memory.json"
     os.makedirs("logs", exist_ok=True)
     os.makedirs(links_dir, exist_ok=True)
+
     if not AUTO_COMMENT_ENABLED:
-        log("🚫 AUTO_COMMENT=false — Auto-reply will be SKIPPED")
+        log("🚫 AUTO_COMMENT=false — Auto-reply will be SKIPPED (analytics only)")
+
     memory = {
         "game_scores": {},
         "title_styles": {
@@ -1431,6 +1582,7 @@ def run_agent_brain():
     actual_posted_titles, game_views_summary = fetch_fb_ig_data(game_list)
     if not game_views_summary:
         game_views_summary = {g: 0 for g in game_list}
+
     if AUTO_COMMENT_ENABLED:
         try:
             process_fb_comments(actual_posted_titles)
@@ -1438,6 +1590,7 @@ def run_agent_brain():
             log(f"⚠️ Auto-reply error: {e}")
     else:
         log("🚫 Auto-comment disabled — skipping")
+
     try:
         detect_trending_games(actual_posted_titles, game_views_summary, days=7)
     except Exception as e:
@@ -1446,6 +1599,7 @@ def run_agent_brain():
         analyze_best_time({})
     except Exception as e:
         log(f"⚠️ Best time error: {e}")
+
     last_game = memory.get("last_played_game", "")
     if last_game in game_list:
         next_index = (game_list.index(last_game) + 1) % len(game_list)
