@@ -1,1 +1,1 @@
-{"clip_duration": 30, "reason": "Helicopter combat flight with big explosions over valley", "start_time": 0, "status": "APPROVE", "title": "Valley Helicopter War 🚁💥"}
+{"clip_duration": 15, "reason": "Intense battlefield action with explosions and gunfire.", "start_time": 30, "status": "APPROVE", "title": "Battlefield Chaos Unleashed 💥🔫"}
