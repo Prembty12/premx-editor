@@ -1,1 +1,1 @@
-{"clip_duration": 15, "reason": "Intense battlefield action with explosions and gunfire.", "start_time": 30, "status": "APPROVE", "title": "Battlefield Chaos Unleashed 💥🔫"}
+{"clip_duration": 24, "reason": "Cinematic fire explosion and tense walk", "start_time": 0, "status": "APPROVE", "title": "Walking Through Pure Fire 🔥💀"}
