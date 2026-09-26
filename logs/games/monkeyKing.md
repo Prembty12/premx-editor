@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 40 | **Last Updated:** 2026-09-26 11:48:48 IST
+**Total Videos:** 40 | **Last Updated:** 2026-09-26 14:46:57 IST
 
 ---
 
@@ -23,10 +23,10 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | This Fire Boss Fight Goes Totally Insane 🔥😱  #videogames #gamingcommunity #gaming #monkeyking #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1407808034823324/) | 226 | ⏳ Pending | _0_ | _N/A_ |
-| 2 | This Monkey King Combat Will Shock You!  #videogames #gamingcommunity #gaming #monkeyking #gamingree | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdV9wLCj6ZV/) | 50 | _N/A_ |
-| 3 | Deep Forest Survival Run 🌲⚔️  #videogames #gamingcommunity #gaming #monkeyking #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Ddak_htilfE/) | 40 | _N/A_ |
-| 4 | Blue Beast Boss Fight ⚡️  #videogames #gamingcommunity #gaming #monkeyking #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Ddi4IfDAkrS/) | 120 | _N/A_ |
+| 1 | This Fire Boss Fight Goes Totally Insane 🔥😱  #videogames #gamingcommunity #gaming #monkeyking #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1407808034823324/) | 226 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing6.mp4) |
+| 2 | This Monkey King Combat Will Shock You!  #videogames #gamingcommunity #gaming #monkeyking #gamingree | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdV9wLCj6ZV/) | 50 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing7.mp4) |
+| 3 | Deep Forest Survival Run 🌲⚔️  #videogames #gamingcommunity #gaming #monkeyking #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Ddak_htilfE/) | 40 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing8.mp4) |
+| 4 | Blue Beast Boss Fight ⚡️  #videogames #gamingcommunity #gaming #monkeyking #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Ddi4IfDAkrS/) | 120 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing9.mp4) |
 | 5 | monkeyKing16 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing16.mp4) |
 | 6 | monkeyKing30 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing30.mp4) |
 | 7 | monkeyKing35 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing35.mp4) |

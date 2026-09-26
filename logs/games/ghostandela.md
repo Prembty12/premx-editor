@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 47 | **Last Updated:** 2026-09-26 11:48:48 IST
+**Total Videos:** 47 | **Last Updated:** 2026-09-26 14:46:57 IST
 
 ---
 
@@ -23,8 +23,8 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | Ghost's ultimate prison escape secret exposed!  #videogames #gamingcommunity #gaming #ghostandela #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/4490994824477364/) | 924 | [🟣 IG](https://www.instagram.com/reel/DdVoBPWkUDh/) | 2,660 | _N/A_ |
-| 2 | I Cut The Wrong Chain 😱  #videogames #gamingcommunity #gaming #ghostandela #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1581162263212204/) | 525 | [🟣 IG](https://www.instagram.com/reel/DdaXvNeDhq2/) | 260 | _N/A_ |
+| 1 | Ghost's ultimate prison escape secret exposed!  #videogames #gamingcommunity #gaming #ghostandela #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/4490994824477364/) | 924 | [🟣 IG](https://www.instagram.com/reel/DdVoBPWkUDh/) | 2,660 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela2.mp4) |
+| 2 | I Cut The Wrong Chain 😱  #videogames #gamingcommunity #gaming #ghostandela #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1581162263212204/) | 525 | [🟣 IG](https://www.instagram.com/reel/DdaXvNeDhq2/) | 260 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela3.mp4) |
 | 3 | ghostandela24 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela24.mp4) |
 | 4 | ghostandela15 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela15.mp4) |
 | 5 | ghostandela13 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela13.mp4) |

@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 14 | **Last Updated:** 2026-09-26 11:48:48 IST
+**Total Videos:** 14 | **Last Updated:** 2026-09-26 14:46:57 IST
 
 ---
 
@@ -23,7 +23,7 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | She unlocked a forbidden god-tier ability! 😱🔥  #videogames #gamingcommunity #gaming #godofwarlaufey  #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1087626214135364/) | 87 | [🟣 IG](https://www.instagram.com/reel/Ddbfe5kCMH4/) | 300 | _N/A_ |
+| 1 | She unlocked a forbidden god-tier ability! 😱🔥  #videogames #gamingcommunity #gaming #godofwarlaufey  #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1087626214135364/) | 87 | [🟣 IG](https://www.instagram.com/reel/Ddbfe5kCMH4/) | 300 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_4.mp4) |
 | 2 | GodofWarLaufey_10 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_10.mp4) |
 | 3 | GodofWarLaufey_12 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_12.mp4) |
 | 4 | GodofWarLaufey_13 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_13.mp4) |

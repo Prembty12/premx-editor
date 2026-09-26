@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 39 | **Last Updated:** 2026-09-26 11:48:48 IST
+**Total Videos:** 39 | **Last Updated:** 2026-09-26 14:46:57 IST
 
 ---
 
@@ -14,7 +14,7 @@
 | Posted (FB or IG) | 5 / 39 |
 | FB Posted | 3 / 39 |
 | IG Posted | 3 / 39 |
-| Total FB Views | **1,714** |
+| Total FB Views | **1,715** |
 | Total IG Views | **890** |
 
 ---
@@ -23,11 +23,11 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | When the minimap turns yellow, you have to react 👁️🏃‍♂️  #videogames #gamingcommunity #gaming #russian_secret_missions # | [🔵 FB](https://www.facebook.com/reel/1046407214799805/) | 758 | ⏳ Pending | _0_ | _N/A_ |
-| 2 | 💥🔫 Intense Combat!  #videogames #gamingcommunity #gaming #russian_secret_missions #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1353285143546456/) | 332 | ⏳ Pending | _0_ | _N/A_ |
-| 3 | What is the mind-blowing secret behind this impossible sniper streak under heavy fire?  #videogames  | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdUF7wUkt74/) | 180 | _N/A_ |
-| 4 | Can you survive this sniper rush? 🔫🎯  #videogames #gamingcommunity #gaming #russian_secret_missions  | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdZYu5bCRSd/) | 460 | _N/A_ |
-| 5 | City Sniper Bloodbath Action 🩸🎯  #videogames #gamingcommunity #gaming #russian_secret_missions #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1795873828500766/) | 624 | [🟣 IG](https://www.instagram.com/reel/DdbxSIFCN1X/) | 250 | _N/A_ |
+| 1 | When the minimap turns yellow, you have to react 👁️🏃‍♂️  #videogames #gamingcommunity #gaming #russian_secret_missions # | [🔵 FB](https://www.facebook.com/reel/1046407214799805/) | 758 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions1.mp4) |
+| 2 | 💥🔫 Intense Combat!  #videogames #gamingcommunity #gaming #russian_secret_missions #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1353285143546456/) | 332 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions3.mp4) |
+| 3 | What is the mind-blowing secret behind this impossible sniper streak under heavy fire?  #videogames  | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdUF7wUkt74/) | 180 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions4.mp4) |
+| 4 | Can you survive this sniper rush? 🔫🎯  #videogames #gamingcommunity #gaming #russian_secret_missions  | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdZYu5bCRSd/) | 460 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions5.mp4) |
+| 5 | City Sniper Bloodbath Action 🩸🎯  #videogames #gamingcommunity #gaming #russian_secret_missions #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1795873828500766/) | 625 | [🟣 IG](https://www.instagram.com/reel/DdbxSIFCN1X/) | 250 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions6.mp4) |
 | 6 | Russian secret missions19 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions19.mp4) |
 | 7 | Russian secret missions9 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions9.mp4) |
 | 8 | Russian secret missions32 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions32.mp4) |
