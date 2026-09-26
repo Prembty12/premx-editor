@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 20 | **Last Updated:** 2026-09-27 01:51:49 AM IST
+**Total Videos:** 20 | **Last Updated:** 2026-09-27 02:16:01 AM IST
 
 ---
 
@@ -14,7 +14,7 @@
 | Posted (FB or IG) | 4 / 20 |
 | FB Posted | 2 / 20 |
 | IG Posted | 3 / 20 |
-| Total FB Views | **1,237** |
+| Total FB Views | **1,238** |
 | Total IG Views | **390** |
 
 ---
@@ -25,7 +25,7 @@
 |---|---|---|---|---|---|---|
 | 1 | Tense Confrontation Between Soldiers 💀  #videogames #gamingcommunity #gaming #ghost_soap_escap #gami | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdvsqOUkm2U/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps1.mp4) |
 | 2 | Underwater Bloodbath 🩸🔥  #videogames #gamingcommunity #gaming #ghost_soap_escap #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DduCTJaj3Av/) | 150 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps17.mp4) |
-| 3 | Ghost's Secret Stealth Method Is Unbelievable! 🤫🔥  #videogames #gamingcommunity #gaming #ghost_soap_escap #gamingreels # | [🔵 FB](https://www.facebook.com/reel/1555204199626941/) | 872 | [🟣 IG](https://www.instagram.com/reel/Ddbc0pNlOJX/) | 240 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps12.mp4) |
+| 3 | Ghost's Secret Stealth Method Is Unbelievable! 🤫🔥  #videogames #gamingcommunity #gaming #ghost_soap_escap #gamingreels # | [🔵 FB](https://www.facebook.com/reel/1555204199626941/) | 873 | [🟣 IG](https://www.instagram.com/reel/Ddbc0pNlOJX/) | 240 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps12.mp4) |
 | 4 | Surviving an entire army just to find your duo 😭🙏  #videogames #gamingcommunity #gaming #ghost_soap_escap #gamingreels # | [🔵 FB](https://www.facebook.com/reel/1603374561571140/) | 365 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps3.mp4) |
 | 5 | Ghost soap escaps23 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps23.mp4) |
 | 6 | Ghost soap escaps20 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps20.mp4) |
