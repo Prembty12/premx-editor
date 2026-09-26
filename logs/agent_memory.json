@@ -7,7 +7,8 @@
         "GodofWarLaufey": 15,
         "MarvelsSpiderMan2": 15,
         "RescueOperation": 15,
-        "Russian_secret_missions": 15
+        "Russian_secret_missions": 15,
+        "VietnamCavePrison": 15
     },
     "title_styles": {
         "curiosity": 13,
@@ -23,7 +24,7 @@
         "exposed": 13,
         "unbelievable": 16,
         "crazy": 13,
-        "secret": 10,
+        "secret": 13,
         "shocking": 10
     },
     "last_used_style": "secret",
