@@ -36,6 +36,7 @@ jobs:
           PAGE_ID: ${{ secrets.PAGE_ID }}
           IG_ID: ${{ secrets.IG_ID }}
           POST_MODE: 'ig_only'
+          AUTO_COMMENT: "true"
         run: |
           bash auto_gemini_grid_pipeline.sh
 
