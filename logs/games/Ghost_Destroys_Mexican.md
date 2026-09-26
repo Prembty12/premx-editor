@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 20 | **Last Updated:** 2026-09-27 02:16:01 AM IST
+**Total Videos:** 20 | **Last Updated:** 2026-09-27 02:18:23 AM IST
 
 ---
 
@@ -14,7 +14,7 @@
 | Posted (FB or IG) | 7 / 20 |
 | FB Posted | 5 / 20 |
 | IG Posted | 3 / 20 |
-| Total FB Views | **4,006** |
+| Total FB Views | **4,007** |
 | Total IG Views | **1,240** |
 
 ---
@@ -26,7 +26,7 @@
 | 1 | Storm Ship Boarding Climb 🌊⚓  #videogames #gamingcommunity #gaming #ghost destroys mexican #gamingre | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdvYTdVDxHO/) | 30 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.82/Ghost_Destroys_Mexican_Oil_Ring5.mp4) |
 | 2 | Only 1% can survive this sliding container trap! 💀  #videogames #gamingcommunity #gaming #ghost dest | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdbXJKUDxOr/) | 360 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.82/Ghost_Destroys_Mexican_Oil_Ring11.mp4) |
 | 3 | Silent Raid, Heavy Firepower 🔫💥  #videogames #gamingcommunity #gaming #ghost destroys mexican #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/949999774829726/) | 549 | [🟣 IG](https://www.instagram.com/reel/DdX7aGqABGH/) | 850 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.82/Ghost_Destroys_Mexican_Oil_Ring6.mp4) |
-| 4 | Alexandra wasn’t joking this time 😳🔥  #videogames #gamingcommunity #gaming #ghost destroys mexican #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1834075574415718/) | 146 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.82/Ghost_Destroys_Mexican_Oil_Ring18.mp4) |
+| 4 | Alexandra wasn’t joking this time 😳🔥  #videogames #gamingcommunity #gaming #ghost destroys mexican #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1834075574415718/) | 147 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.82/Ghost_Destroys_Mexican_Oil_Ring18.mp4) |
 | 5 | The missile is coming... we can't stop it 😱🔥  #videogames #gamingcommunity #gaming #ghost destroys mexican #gamingreels  | [🔵 FB](https://www.facebook.com/reel/1965423384100872/) | 787 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.82/Ghost_Destroys_Mexican_Oil_Ring12.mp4) |
 | 6 | Will they survive this chaotic offshore raid? 💥👀  #videogames #gamingcommunity #gaming #ghost destroys mexican #gamingre | [🔵 FB](https://www.facebook.com/reel/1791367398728313/) | 2,067 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.82/Ghost_Destroys_Mexican_Oil_Ring7.mp4) |
 | 7 | Clearing a cargo ship in a raging storm hits different! 🚢⛈️  #videogames #gamingcommunity #gaming #ghostdestroysmexican  | [🔵 FB](https://www.facebook.com/reel/1055119590712547/) | 457 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.82/Ghost_Destroys_Mexican_Oil_Ring2.mp4) |
