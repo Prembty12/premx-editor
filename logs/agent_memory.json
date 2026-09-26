@@ -28,8 +28,8 @@
         "secret": 13,
         "shocking": 10
     },
-    "last_used_style": "gaming_hype",
-    "last_played_game": "combatopration",
+    "last_used_style": "clickbait",
+    "last_played_game": "ghostandela",
     "processed_viral_ids": [],
     "game_stats": {
         "Callofdutyaw": {
@@ -72,6 +72,9 @@
             "uploaded_count": 1
         },
         "combatopration": {
+            "uploaded_count": 1
+        },
+        "ghostandela": {
             "uploaded_count": 1
         }
     },
@@ -1959,20 +1962,6 @@
             }
         ],
         "combatopration": [
-            {
-                "title": "combatopration_16",
-                "fb_link": "",
-                "fb_views": 0,
-                "fb_posted": false,
-                "ig_link": "",
-                "ig_views": 0,
-                "ig_posted": false,
-                "timestamp": "",
-                "vid_id": "combatopration_16",
-                "video_name": "combatopration_16",
-                "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_16.mp4",
-                "is_source_only": true
-            },
             {
                 "title": "combatopration_13",
                 "fb_link": "",

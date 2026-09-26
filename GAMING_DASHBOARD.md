@@ -1,6 +1,6 @@
 # 🚀 GAMING AGENT COMMAND & ANALYTICS DASHBOARD
 
-> **Last Updated:** 2026-09-27 12:40:30 AM IST | **Status:** All Systems Active & Synchronized
+> **Last Updated:** 2026-09-27 12:42:15 AM IST | **Status:** All Systems Active & Synchronized
 
 --- 
 
@@ -24,7 +24,7 @@
 | 14 | **UkraineCovertMission** | 1 | 0 | 0 | 📈 Stable |
 | 15 | **VietnamCavePrison** | 1 | 0 | 0 | 📈 Stable |
 | 16 | **combatopration** | 1 | 0 | 0 | 📈 Stable |
-| 17 | **ghostandela** | 0 | 0 | 0 | 📈 Stable |
+| 17 | **ghostandela** | 1 | 0 | 0 | 📈 Stable |
 | 18 | **mm2remastered** | 0 | 0 | 0 | 📈 Stable |
 | 19 | **sifu** | 0 | 0 | 0 | 📈 Stable |
 
@@ -51,8 +51,8 @@
 | **Russian_secret_missions** | — | Russian_secret_missions38 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | **26** / 27 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions38.mp4) | **[📜 View 27](logs/games/Russian_secret_missions.md)** |
 | **UkraineCovertMission** | — | _Not Posted Yet_ | ⏳ Pending | _0_ | ⏳ Pending | _0_ | **1** / 2 | _N/A_ | — |
 | **VietnamCavePrison** | — | VietnamCavePrison25 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | **15** / 16 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison25.mp4) | **[📜 View 16](logs/games/VietnamCavePrison.md)** |
-| **combatopration** | — | combatopration_16 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | **5** / 6 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_16.mp4) | **[📜 View 6](logs/games/combatopration.md)** |
-| **ghostandela** | — | ghostandela51 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | **43** / 43 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela51.mp4) | **[📜 View 43](logs/games/ghostandela.md)** |
+| **combatopration** | — | combatopration_13 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | **4** / 5 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_13.mp4) | **[📜 View 5](logs/games/combatopration.md)** |
+| **ghostandela** | — | ghostandela51 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | **42** / 43 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela51.mp4) | **[📜 View 43](logs/games/ghostandela.md)** |
 | **mm2remastered** | — | mm2remastered_22 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | **12** / 12 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_22.mp4) | **[📜 View 12](logs/games/mm2remastered.md)** |
 | **sifu** | — | sifu16 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | **14** / 14 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu16.mp4) | **[📜 View 14](logs/games/sifu.md)** |
 
@@ -60,18 +60,18 @@
 
 ## 📈 Trending Games (Last 7 Days)
 
-> Auto-detected | Last Updated: 2026-09-27 12:40:30 AM
+> Auto-detected | Last Updated: 2026-09-27 12:42:15 AM
 
 
 --- 
 
 ## 🎯 Best Time to Post (IST)
 
-> Analysis from 13 posts | Last Updated: 2026-09-27 12:40:30 AM
+> Analysis from 14 posts | Last Updated: 2026-09-27 12:42:15 AM
 
 | Rank | Time (IST) | Posts | Avg Views | Recommendation |
 |:---:|---|:---:|:---:|---|
-| 🥇 | **00:00 - 01:00** | 2 | **4,784** | 🔥 **BEST** |
+| 🥇 | **00:00 - 01:00** | 3 | **3,189** | 🔥 **BEST** |
 | 🥈 | **23:00 - 00:00** | 4 | **1,840** | ⚡ **Great** |
 | 🥉 | **20:00 - 21:00** | 2 | **375** | ✅ **Good** |
 | 4 | **07:00 - 08:00** | 2 | **5** | 📊 Average |
@@ -83,13 +83,13 @@
 | Day | Posts | Avg Views |
 |---|---|---|
 | Saturday | 10 | 950 |
-| Sunday | 3 | 3,527 |
+| Sunday | 4 | 2,645 |
 
 --- 
 
 ## 🤖 Auto-Reply Log (Facebook Only)
 
-> Status: ✅ **ACTIVE** | Last Updated: 2026-09-27 12:40:30 AM | Total Replies: 0 | Skipped: 0
+> Status: ✅ **ACTIVE** | Last Updated: 2026-09-27 12:42:15 AM | Total Replies: 0 | Skipped: 0
 
 
 --- 
@@ -109,7 +109,7 @@
 - **🎮 RescueOperation** — [📜 View All 2 Videos](logs/games/RescueOperation.md)
 - **🎮 Russian_secret_missions** — [📜 View All 27 Videos](logs/games/Russian_secret_missions.md)
 - **🎮 VietnamCavePrison** — [📜 View All 16 Videos](logs/games/VietnamCavePrison.md)
-- **🎮 combatopration** — [📜 View All 6 Videos](logs/games/combatopration.md)
+- **🎮 combatopration** — [📜 View All 5 Videos](logs/games/combatopration.md)
 - **🎮 ghostandela** — [📜 View All 43 Videos](logs/games/ghostandela.md)
 - **🎮 mm2remastered** — [📜 View All 12 Videos](logs/games/mm2remastered.md)
 - **🎮 sifu** — [📜 View All 14 Videos](logs/games/sifu.md)
@@ -118,38 +118,38 @@
 
 ## 🔄 Game Rotation Queue
 
-**📊 Total Games:** 19 | **🎯 Current:** `combatopration` | **⏭️ Next Game:** `ghostandela` (Position #16) | **🔢 Total Runs:** 14
+**📊 Total Games:** 19 | **🎯 Current:** `ghostandela` | **⏭️ Next Game:** `mm2remastered` (Position #17) | **🔢 Total Runs:** 15
 
-**Last Updated:** 2026-09-27 12:40:30 AM IST
+**Last Updated:** 2026-09-27 12:42:15 AM IST
 
 | # | Game Name | Uploaded | Last Run # | Next Turn In | Status |
 |:---:|---|:---:|:---:|:---:|:---:|
-| 1 | **AfghanistanRedZone** | 0 | — | 5 | ⏳ Wait 5 |
-| 2 | **Callofdutyaw** | 1 | 1 | 6 | ⏳ Wait 6 |
-| 3 | **DiabloIV** | 1 | 2 | 7 | ⏳ Wait 7 |
-| 4 | **GODOFWAR3** | 1 | 3 | 8 | ⏳ Wait 8 |
-| 5 | **Ghost Destroys Mexican** | 1 | 4 | 9 | ⏳ Wait 9 |
-| 6 | **Ghost_soap_escap** | 1 | 5 | 10 | ⏳ Wait 10 |
-| 7 | **GodofWarLaufey** | 1 | 6 | 11 | ⏳ Wait 11 |
-| 8 | **MarvelsSpiderMan2** | 1 | 7 | 12 | ⏳ Wait 12 |
-| 9 | **RescueOperation** | 1 | 8 | 13 | ⏳ Wait 13 |
-| 10 | **Russian_secret_missions** | 1 | 9 | 14 | ⏳ Wait 14 |
-| 11 | **SpiderMan2** | 1 | 10 | 15 | ⏳ Wait 15 |
-| 12 | **UkraineCovertMission** | 1 | 11 | 16 | ⏳ Wait 16 |
-| 13 | **VietnamCavePrison** | 1 | 12 | 17 | ⏳ Wait 17 |
-| 14 | **codBlackops6** | 1 | 13 | 18 | ⏳ Wait 18 |
-| 15 | **combatopration** | 1 | 14 | 0 | 🎯 **CURRENT** |
-| 16 | **ghostandela** | 0 | — | 1 | ⏭️ **NEXT UP** |
-| 17 | **mm2remastered** | 0 | — | 2 | ⏳ Wait 2 |
-| 18 | **monkeyKing** | 0 | — | 3 | ⏳ Wait 3 |
-| 19 | **sifu** | 0 | — | 4 | ⏳ Wait 4 |
+| 1 | **AfghanistanRedZone** | 0 | — | 4 | ⏳ Wait 4 |
+| 2 | **Callofdutyaw** | 1 | 1 | 5 | ⏳ Wait 5 |
+| 3 | **DiabloIV** | 1 | 2 | 6 | ⏳ Wait 6 |
+| 4 | **GODOFWAR3** | 1 | 3 | 7 | ⏳ Wait 7 |
+| 5 | **Ghost Destroys Mexican** | 1 | 4 | 8 | ⏳ Wait 8 |
+| 6 | **Ghost_soap_escap** | 1 | 5 | 9 | ⏳ Wait 9 |
+| 7 | **GodofWarLaufey** | 1 | 6 | 10 | ⏳ Wait 10 |
+| 8 | **MarvelsSpiderMan2** | 1 | 7 | 11 | ⏳ Wait 11 |
+| 9 | **RescueOperation** | 1 | 8 | 12 | ⏳ Wait 12 |
+| 10 | **Russian_secret_missions** | 1 | 9 | 13 | ⏳ Wait 13 |
+| 11 | **SpiderMan2** | 1 | 10 | 14 | ⏳ Wait 14 |
+| 12 | **UkraineCovertMission** | 1 | 11 | 15 | ⏳ Wait 15 |
+| 13 | **VietnamCavePrison** | 1 | 12 | 16 | ⏳ Wait 16 |
+| 14 | **codBlackops6** | 1 | 13 | 17 | ⏳ Wait 17 |
+| 15 | **combatopration** | 1 | 14 | 18 | ⏳ Wait 18 |
+| 16 | **ghostandela** | 1 | 15 | 0 | 🎯 **CURRENT** |
+| 17 | **mm2remastered** | 0 | — | 1 | ⏭️ **NEXT UP** |
+| 18 | **monkeyKing** | 0 | — | 2 | ⏳ Wait 2 |
+| 19 | **sifu** | 0 | — | 3 | ⏳ Wait 3 |
 
 ### 📜 Recent Runs (Last 5)
 
 | Run # | Game | Timestamp (IST) |
 |:---:|---|---|
+| 15 | ghostandela | 2026-09-27 12:42:15 AM |
 | 14 | combatopration | 2026-09-27 12:40:30 AM |
 | 13 | codBlackops6 | 2026-09-27 12:02:12 AM |
 | 12 | VietnamCavePrison | 2026-09-26 11:24:05 PM |
 | 11 | UkraineCovertMission | 2026-09-26 11:21:39 PM |
-| 10 | SpiderMan2 | 2026-09-26 11:19:03 PM |
