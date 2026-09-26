@@ -1,22 +1,22 @@
 {
-  "last_updated": "2026-09-26 11:21:39 PM",
+  "last_updated": "2026-09-26 11:24:05 PM",
   "period_days": 7,
   "trending": [
     {
       "game": "AfghanistanRedZone",
-      "views_7d": 17353,
-      "avg_per_video": 8676,
+      "views_7d": 17357,
+      "avg_per_video": 8678,
       "trend": "viral",
-      "ratio": 9.714885576317448,
+      "ratio": 9.704221414593235,
       "fb_link": "https://www.facebook.com/reel/1440490007980933/",
       "source_link": ""
     },
     {
       "game": "Callofdutyaw",
-      "views_7d": 8663,
-      "avg_per_video": 1082,
+      "views_7d": 8666,
+      "avg_per_video": 1083,
       "trend": "steady",
-      "ratio": 1.2115613408915948,
+      "ratio": 1.2110707296617278,
       "fb_link": "",
       "source_link": ""
     }
@@ -27,16 +27,16 @@
       "views_7d": 4428,
       "avg_per_video": 738,
       "trend": "slow",
-      "ratio": 0.8263699349149696,
+      "ratio": 0.825272574783338,
       "fb_link": "https://www.facebook.com/reel/3584878615007660/",
       "source_link": ""
     },
     {
       "game": "GODOFWAR3",
-      "views_7d": 2037,
-      "avg_per_video": 679,
+      "views_7d": 2047,
+      "avg_per_video": 682,
       "trend": "slow",
-      "ratio": 0.7603051298201413,
+      "ratio": 0.7626502655856864,
       "fb_link": "",
       "source_link": ""
     },
@@ -45,7 +45,7 @@
       "views_7d": 626,
       "avg_per_video": 626,
       "trend": "slow",
-      "ratio": 0.7009587794807194,
+      "ratio": 0.7000279563880346,
       "fb_link": "https://www.facebook.com/reel/1433881315316238/",
       "source_link": ""
     },
@@ -54,26 +54,26 @@
       "views_7d": 1084,
       "avg_per_video": 542,
       "trend": "slow",
-      "ratio": 0.6069004129050318,
+      "ratio": 0.6060944925915571,
       "fb_link": "",
       "source_link": ""
     },
     {
-      "game": "SpiderMan2",
-      "views_7d": 1776,
-      "avg_per_video": 444,
-      "trend": "below_avg",
-      "ratio": 0.497165651900063,
-      "fb_link": "",
+      "game": "Russian_secret_missions",
+      "views_7d": 907,
+      "avg_per_video": 453,
+      "trend": "slow",
+      "ratio": 0.5065697511881465,
+      "fb_link": "https://www.facebook.com/reel/1861373075302275/",
       "source_link": ""
     }
   ],
   "recommendation": {
     "game": "AfghanistanRedZone",
-    "views_7d": 17353,
-    "avg_per_video": 8676,
+    "views_7d": 17357,
+    "avg_per_video": 8678,
     "trend": "viral",
-    "ratio": 9.714885576317448,
+    "ratio": 9.704221414593235,
     "fb_link": "https://www.facebook.com/reel/1440490007980933/",
     "source_link": ""
   }
