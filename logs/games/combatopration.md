@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 20 | **Last Updated:** 2026-09-27 12:02:12 AM IST
+**Total Videos:** 6 | **Last Updated:** 2026-09-27 12:40:30 AM IST
 
 ---
 
@@ -10,12 +10,12 @@
 
 | Metric | Value |
 |---|---|
-| Total Videos | **20** |
-| Posted (FB or IG) | 5 / 20 |
-| FB Posted | 4 / 20 |
-| IG Posted | 2 / 20 |
-| Total FB Views | **1,403** |
-| Total IG Views | **280** |
+| Total Videos | **6** |
+| Posted (FB or IG) | 0 / 6 |
+| FB Posted | 0 / 6 |
+| IG Posted | 0 / 6 |
+| Total FB Views | **0** |
+| Total IG Views | **0** |
 
 ---
 
@@ -23,23 +23,9 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | He Pushed Too Far 🔥  #videogames #gamingcommunity #gaming #combatopration #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdZ7WiCgfFX/) | 220 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_4.mp4) |
-| 2 | Can you survive the sniper countdown?  #videogames #gamingcommunity #gaming #combatopration #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/977955188681433/) | 235 | [🟣 IG](https://www.instagram.com/reel/DdVPFUljUMW/) | 60 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_6.mp4) |
-| 3 | This sunset carrier takeoff is pure cinema 🌅🚁  #videogames #gamingcommunity #gaming #combatopration #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1732692267819087/) | 402 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_8.mp4) |
-| 4 | They Had No Idea  #videogames #gamingcommunity #gaming #combatopration #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1963626794324115/) | 257 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_12.mp4) |
-| 5 | He was too focused on the big gun to notice me 😂🤷‍♂️  #videogames #gamingcommunity #gaming #combatopration #gamingreels  | [🔵 FB](https://www.facebook.com/reel/1745487260034532/) | 509 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_13.mp4) |
-| 6 | combatopration_16 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_16.mp4) |
-| 7 | combatopration_15 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_15.mp4) |
-| 8 | combatopration_14 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_14.mp4) |
-| 9 | combatopration_13 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_13.mp4) |
-| 10 | combatopration_12 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_12.mp4) |
-| 11 | combatopration_10 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_10.mp4) |
-| 12 | combatopration_9 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_9.mp4) |
-| 13 | combatopration_8 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_8.mp4) |
-| 14 | combatopration_7 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_7.mp4) |
-| 15 | combatopration_6 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_6.mp4) |
-| 16 | combatopration_5 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_5.mp4) |
-| 17 | combatopration_4 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_4.mp4) |
-| 18 | combatopration_3 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_3.mp4) |
-| 19 | combatopration_2 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_2.mp4) |
-| 20 | combatopration_1 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_1.mp4) |
+| 1 | combatopration_16 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_16.mp4) |
+| 2 | combatopration_13 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_13.mp4) |
+| 3 | combatopration_12 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_12.mp4) |
+| 4 | combatopration_8 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_8.mp4) |
+| 5 | combatopration_6 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_6.mp4) |
+| 6 | combatopration_4 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_4.mp4) |
