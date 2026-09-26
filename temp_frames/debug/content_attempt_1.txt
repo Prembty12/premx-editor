@@ -1,1 +1,1 @@
-{"clip_duration": 32, "reason": "Intense cinematic magic combat and explosions", "start_time": 15, "status": "APPROVE", "title": "Purple Fire Destroys Everything 🔥💜"}
+{"clip_duration": 15, "reason": "Full monster combat sequence with energy blast", "start_time": 11, "status": "APPROVE", "title": "Lightning Strike Melts Monsters ⚡💀"}
