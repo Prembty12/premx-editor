@@ -1,1 +1,1 @@
-{"clip_duration": 44, "reason": "Cinematic sniper mission on icy platform.", "start_time": 5, "status": "APPROVE", "title": "Frozen Sniper Ops 🎯❄️"}
+{"clip_duration":18,"reason":"Funny red meme screen and sniper action","start_time":33,"status":"APPROVE","title":"Sniper kills lead to mom meme! 🔴💀"}
