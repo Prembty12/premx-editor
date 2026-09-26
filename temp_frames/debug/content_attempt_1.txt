@@ -1,1 +1,1 @@
-{"clip_duration": 32, "reason": "Full combat and cinematic sequence covered", "start_time": 24, "status": "APPROVE", "title": "Betrayal Under Fire 🔫🔥"}
+{"clip_duration": 15, "reason": "Intense titan climb and powerful combat action", "start_time": 23, "status": "APPROVE", "title": "Kratos Titan Clash 💀🔥"}

@@ -1,12 +1,13 @@
 {
     "game_scores": {
-        "Callofdutyaw": 15
+        "Callofdutyaw": 15,
+        "GODOFWAR3": 15
     },
     "title_styles": {
         "curiosity": 10,
         "aggressive": 10,
         "question": 10,
-        "emoji_heavy": 10,
+        "emoji_heavy": 13,
         "gaming_hype": 10,
         "clickbait": 10,
         "informative": 10,
