@@ -980,6 +980,36 @@ def fetch_fb_ig_data(game_list):
     if not FB_ACCESS_TOKEN:
         log("⚠️ FB_ACCESS_TOKEN missing")
         return result, game_views_summary
+
+    # 🔥 FIX: ID → Source map banao (posted_links_editor se)
+    id_to_source_map = {}
+    if os.path.exists(posted_dir):
+        for fname in os.listdir(posted_dir):
+            if not fname.endswith('_posted_links_editor.txt'):
+                continue
+            fpath = os.path.join(posted_dir, fname)
+            try:
+                with open(fpath, 'r', encoding='utf-8', errors='ignore') as f:
+                    content = f.read()
+                blocks = re.split(r'\n\s*\n', content)
+                for block in blocks:
+                    block_id = ""
+                    block_link = ""
+                    for bl in block.split('\n'):
+                        bl = bl.strip()
+                        if 'Video id :' in bl:
+                            block_id = bl.split('Video id :')[-1].strip()
+                        elif '| Link:' in bl:
+                            lp = bl.split('| Link:')[-1].strip()
+                            um = re.search(r'(https?://[^\s\n\r\)\]\'"<>,;]+)', lp)
+                            if um:
+                                block_link = um.group(1).rstrip('.,;)\']"')
+                    if block_id and block_link:
+                        id_to_source_map[block_id] = block_link
+            except Exception as e:
+                log(f"⚠️ ID map error {fname}: {e}")
+    log(f"📋 ID→Source map: {len(id_to_source_map)} entries")
+
     if os.path.exists(posted_dir):
         cutoff_date = now_ist() - timedelta(days=DAYS_LIMIT)
         all_tasks = []
@@ -1028,15 +1058,20 @@ def fetch_fb_ig_data(game_list):
                         r = future.result()
                         game = r.get('game')
                         if game in result:
+                            vid_id = str(r.get('vid_id', '')).strip()
+                            # 🔥 ID se source link match
+                            matched_source = id_to_source_map.get(vid_id, "")
+                            if not matched_source:
+                                matched_source = r.get('link', '')
                             result[game].append({
                                 "title": r.get('title', 'Untitled'),
-                                "fb_link": fix_fb_url(r.get('fb_link', ''), r.get('vid_id', '')),
+                                "fb_link": fix_fb_url(r.get('fb_link', ''), vid_id),
                                 "fb_views": r.get('fb_views', 0),
                                 "fb_posted": r.get('fb_posted', False),
                                 "ig_link": "", "ig_views": 0, "ig_posted": False,
-                                "timestamp": "", "vid_id": r.get('vid_id', ''),
+                                "timestamp": "", "vid_id": vid_id,
                                 "video_name": r.get('video_name', ''),
-                                "source_link": r.get('link', ''),
+                                "source_link": matched_source,
                             })
                             game_views_summary[game] += r.get('fb_views', 0)
                     except Exception as e:
@@ -1082,13 +1117,17 @@ def fetch_fb_ig_data(game_list):
             if game_norm and game_norm in normalize(title):
                 key = normalize(title)[:40]
                 if key in existing_titles: continue
-                fb_link = fix_fb_url(v.get("permalink_url", ""), v.get("id", ""))
+                fb_vid_id = str(v.get("id", "")).strip()
+                fb_link = fix_fb_url(v.get("permalink_url", ""), fb_vid_id)
+                # 🔥 ID se source link
+                matched_source = id_to_source_map.get(fb_vid_id, "")
                 entry = {
                     "title": title, "fb_link": fb_link,
                     "fb_views": int(v.get("views", 0) or 0),
                     "fb_posted": True, "ig_link": "", "ig_views": 0, "ig_posted": False,
                     "timestamp": v.get("created_time", ""),
-                    "vid_id": v.get("id", ""), "video_name": "", "source_link": "",
+                    "vid_id": fb_vid_id, "video_name": "",
+                    "source_link": matched_source,
                 }
                 result[game].append(entry)
                 game_views_summary[game] += entry["fb_views"]
@@ -1111,12 +1150,15 @@ def fetch_fb_ig_data(game_list):
                         break
                 if not matched and caption_norm not in existing_titles:
                     ig_views = (m.get("like_count", 0) * 10) + (m.get("comments_count", 0) * 20)
+                    ig_media_id = str(m.get("id", "")).strip()
+                    matched_source = id_to_source_map.get(ig_media_id, "")
                     result[game].append({
                         "title": caption[:100], "fb_link": "", "fb_views": 0, "fb_posted": False,
                         "ig_link": fix_ig_url(m.get("permalink", "")),
                         "ig_views": ig_views, "ig_posted": True,
                         "timestamp": m.get("timestamp", ""),
-                        "vid_id": m.get("id", ""), "video_name": "", "source_link": "",
+                        "vid_id": ig_media_id, "video_name": "",
+                        "source_link": matched_source,
                     })
                     game_views_summary[game] += ig_views
                     existing_titles.add(caption_norm)
@@ -1169,13 +1211,13 @@ def fetch_fb_ig_data(game_list):
                     "timestamp": "", "vid_id": vname, "video_name": vname,
                     "source_link": src_link, "is_source_only": True,
                 })
-    
-    # 🔥 FIX 1: Sort — Posted newest first, phir pending
+
+    # 🔥 FIX: Sort — Posted newest first, phir pending
     for game in game_list:
         posted_v = [x for x in result[game] if x.get("fb_posted") or x.get("ig_posted")]
         pending_v = [x for x in result[game] if not (x.get("fb_posted") or x.get("ig_posted"))]
         posted_v_sorted = sorted(posted_v, key=lambda x: x.get("timestamp", "") or "0000", reverse=True)
-        
+
         def pending_key(x):
             vname = x.get("video_name") or x.get("vid_id") or ""
             digits = re.findall(r'\d+', vname)
@@ -1187,7 +1229,7 @@ def fetch_fb_ig_data(game_list):
             return (1, vname)
         pending_v_sorted = sorted(pending_v, key=pending_key)
         result[game] = posted_v_sorted + pending_v_sorted
-    
+
     return result, game_views_summary
 
 
@@ -1257,12 +1299,12 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
     for g_name in sorted(actual_posted_titles.keys()):
         videos = actual_posted_titles.get(g_name, [])
         if not videos: continue
-        
-        # 🔥 FIX 1: Sort — Posted newest first, phir pending
+
+        # 🔥 Sort — Posted newest first, phir pending
         posted_v = [x for x in videos if x.get("fb_posted") or x.get("ig_posted")]
         pending_v = [x for x in videos if not (x.get("fb_posted") or x.get("ig_posted"))]
         posted_v_sorted = sorted(posted_v, key=lambda x: x.get("timestamp", "") or "0000", reverse=True)
-        
+
         def pending_key(x):
             vname = x.get("video_name") or x.get("vid_id") or ""
             digits = re.findall(r'\d+', vname)
@@ -1274,7 +1316,7 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
             return (1, vname)
         pending_v_sorted = sorted(pending_v, key=pending_key)
         videos = posted_v_sorted + pending_v_sorted
-        
+
         src_file_for_game = file_mapping.get(g_name, "")
         if not src_file_for_game:
             for f in os.listdir("game_links_editor"):
@@ -1300,7 +1342,7 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
                 posted_links_inner = [u.rstrip('.,;)\']"') for u in posted_links_inner]
             except Exception:
                 pass
-        
+
         safe_name = re.sub(r'[^a-zA-Z0-9_-]', '_', g_name)
         game_filename = f"{safe_name}.md"
         game_filepath = os.path.join(games_dir, game_filename)
@@ -1331,15 +1373,15 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
             fb_v_md = f"{v.get('fb_views', 0):,}" if v.get("fb_posted") else "_0_"
             ig_md = f"[🟣 IG]({v['ig_link']})" if v.get("ig_posted") and v.get("ig_link") else "⏳ Pending"
             ig_v_md = f"{v.get('ig_views', 0):,}" if v.get("ig_posted") else "_0_"
-            
-            # 🔥 FIX 2: Source link — digits match + index fallback
+
+            # 🔥 Source link — digits match + index fallback
             src_link = v.get("source_link", "")
             if not src_link:
                 v_name = (v.get("video_name") or v.get("vid_id") or "").lower().strip()
                 v_digits = re.findall(r'\d+', v_name)
                 v_num = v_digits[-1] if v_digits else ""
                 game_clean = re.sub(r'[^a-z0-9]', '', g_name.lower())
-                
+
                 if v_num and file_links:
                     for fl in file_links:
                         fl_clean = re.sub(r'[^a-z0-9]', '', fl.lower())
@@ -1362,7 +1404,7 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
                         src_link = src_urls[idx - 1]
                     elif src_urls:
                         src_link = src_urls[-1]
-            
+
             src_md = f"[📂]({src_link})" if src_link else "_N/A_"
             gf_lines.append(f"| {idx} | {title} | {fb_md} | {fb_v_md} | {ig_md} | {ig_v_md} | {src_md} |\n")
         try:
@@ -1408,8 +1450,8 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
             if remaining_vids == 0: progress_md = f"✅ {total_vids} / {total_vids}"
         else:
             progress_md = "_N/A_"
-        
-        # 🔥 FIX 3: Time AM/PM in IST
+
+        # 🔥 Time AM/PM in IST
         latest_post_time = get_latest_post_time(g_name)
         if latest_post_time:
             dt_ist = utc_to_ist(latest_post_time)
@@ -1419,11 +1461,11 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
                 date_str = str(latest_post_time)[:16]
         else:
             date_str = "—"
-        
+
         if not videos:
             md_content.append(f"| **{g_name}** | {date_str} | _Not Posted Yet_ | ⏳ Pending | _0_ | ⏳ Pending | _0_ | {progress_md} | _N/A_ | — |\n")
             continue
-        
+
         latest_posted = None
         latest_ts = ""
         for v in videos:
@@ -1432,7 +1474,7 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
                 if ts > latest_ts:
                     latest_ts = ts
                     latest_posted = v
-        
+
         latest = latest_posted if latest_posted else videos[0]
         title = (latest.get("title") or "").replace("\n", " ").replace("|", "\\|")[:80] or "_Untitled_"
         fb_md = f"[🔵 FB]({latest['fb_link']})" if latest.get("fb_posted") and latest.get("fb_link") else "⏳ Pending"
