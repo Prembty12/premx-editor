@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 11 | **Last Updated:** 2026-09-26 19:15:27 IST
+**Total Videos:** 11 | **Last Updated:** 2026-09-26 21:19:00 IST
 
 ---
 
@@ -14,8 +14,8 @@
 | Posted (FB or IG) | 6 / 11 |
 | FB Posted | 4 / 11 |
 | IG Posted | 5 / 11 |
-| Total FB Views | **16,605** |
-| Total IG Views | **2,030** |
+| Total FB Views | **16,786** |
+| Total IG Views | **2,050** |
 
 ---
 
@@ -28,7 +28,7 @@
 | 3 | 🔥💥 URBAN COMBAT SHOWDOWN! 🎮🚀  #videogames #gamingcommunity #gaming #afghanistanredzone #gamingreels  | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdR9yu1FLdY/) | 400 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.101/AfghanistanRedZone9.mp4) |
 | 4 | Every shadow hides a threat 💀🔍  #videogames #gamingcommunity #gaming #afghanistanredzone #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2968419923556642/) | 415 | [🟣 IG](https://www.instagram.com/reel/DdWp4qYgoT-/) | 180 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.101/AfghanistanRedZone5.mp4) |
 | 5 | Shield Combat Gets Wild 🔥  #videogames #gamingcommunity #gaming #afghanistanredzone #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1423985949876220/) | 495 | [🟣 IG](https://www.instagram.com/reel/DdjuENtmJwV/) | 280 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.101/AfghanistanRedZone6.mp4) |
-| 6 | Street Gunfight Mayhem 🔫💀  #videogames #gamingcommunity #gaming #afghanistanredzone #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1440490007980933/) | 15,280 | [🟣 IG](https://www.instagram.com/reel/DdrsNGqivic/) | 870 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.101/AfghanistanRedZone6.mp4) |
+| 6 | Street Gunfight Mayhem 🔫💀  #videogames #gamingcommunity #gaming #afghanistanredzone #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1440490007980933/) | 15,461 | [🟣 IG](https://www.instagram.com/reel/DdrsNGqivic/) | 890 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.101/AfghanistanRedZone6.mp4) |
 | 7 | AfghanistanRedZone8 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.101/AfghanistanRedZone8.mp4) |
 | 8 | AfghanistanRedZone6 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.101/AfghanistanRedZone6.mp4) |
 | 9 | AfghanistanRedZone5 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.101/AfghanistanRedZone5.mp4) |
