@@ -1,1 +1,1 @@
-{"clip_duration": 35, "reason": "Intense giant beast boss battle combat", "start_time": 2, "status": "APPROVE", "title": "Giant Beast Clash 💀⚔️"}
+{"clip_duration": 22, "reason": "Cinematic storm ship boarding action sequence.", "start_time": 35, "status": "APPROVE", "title": "Storm Ship Boarding Climb 🌊⚓"}
