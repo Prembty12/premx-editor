@@ -1,1 +1,1 @@
-{"clip_duration": 15, "reason": "Full monster combat sequence with energy blast", "start_time": 11, "status": "APPROVE", "title": "Lightning Strike Melts Monsters ⚡💀"}
+{"clip_duration": 44, "reason": "Cinematic sniper mission on icy platform.", "start_time": 5, "status": "APPROVE", "title": "Frozen Sniper Ops 🎯❄️"}
