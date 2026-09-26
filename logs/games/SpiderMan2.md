@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 57 | **Last Updated:** 2026-09-26 14:46:57 IST
+**Total Videos:** 57 | **Last Updated:** 2026-09-26 14:53:02 IST
 
 ---
 
@@ -13,9 +13,9 @@
 | Total Videos | **57** |
 | Posted (FB or IG) | 30 / 57 |
 | FB Posted | 19 / 57 |
-| IG Posted | 19 / 57 |
-| Total FB Views | **20,747** |
-| Total IG Views | **1,700** |
+| IG Posted | 18 / 57 |
+| Total FB Views | **20,750** |
+| Total IG Views | **1,660** |
 
 ---
 
@@ -31,10 +31,10 @@
 | 6 | Miles Morales goes ABSOLUTELY BEAST MODE! ⚡️🕷️  #videogames #gamingcommunity #gaming #spiderman2 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2520416678426501/) | 761 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan216.mp4) |
 | 7 | Thought the fight was over until this happened 😭  #videogames #gamingcommunity #gaming #spiderman2 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1424333832929625/) | 137 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan216.mp4) |
 | 8 | SPIDER-MAN AGGRESSIVE SPRINT! 🕷️💥  #videogames #gamingcommunity #gaming #spiderman2 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1076964548273048/) | 410 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan216.mp4) |
-| 9 | SPIDER-FURY: MILES MORALES UNLEASHES MAXIMUM COMBAT POWER!  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gam | [🔵 FB](https://www.facebook.com/reel/1444317791239680/) | 9,032 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan216.mp4) |
+| 9 | SPIDER-FURY: MILES MORALES UNLEASHES MAXIMUM COMBAT POWER!  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gam | [🔵 FB](https://www.facebook.com/reel/1444317791239680/) | 9,035 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan216.mp4) |
 | 10 | SPIDER-FURY: SANDMAN UNLEASHES FULL POWER! 🕷️🔥  #videogames #gamingcommunity #gaming #spiderman2 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1413264610906135/) | 85 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan216.mp4) |
 | 11 | SANDBLOOD RAGE: SPIDER-MAN VS THE COLOSSAL SAND TITAN!  #videogames #gamingcommunity #gaming #spiderman2 #gamingreels #r | [🔵 FB](https://www.facebook.com/reel/1392931593021744/) | 214 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan216.mp4) |
-| 12 | Can Spider-Man survive the ultimate showdown in the crumbling ruins of this epic battle?  #videogames #gamingcommunity # | [🔵 FB](https://www.facebook.com/reel/1591562232667306/) | 277 | [🟣 IG](https://www.instagram.com/reel/DdRxPaLnBde/) | 40 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan216.mp4) |
+| 12 | Can Spider-Man survive the ultimate showdown in the crumbling ruins of this epic battle?  #videogames #gamingcommunity # | [🔵 FB](https://www.facebook.com/reel/1591562232667306/) | 277 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan216.mp4) |
 | 13 | Explosive Spider-Man Battle Unleashed in 30 Seconds!  #videogames #gamingcommunity #gaming #spiderma | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdR0NkxoJAU/) | 60 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan216.mp4) |
 | 14 | Spider-Man 2 Unleashes Epic Lightning Attack  #videogames #gamingcommunity #gaming #spiderman2 #gami | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdR3Az2kuie/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan216.mp4) |
 | 15 | Spider-Man vs giant sand monster battle!  #videogames #gamingcommunity #gaming #spiderman2 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/934804913037610/) | 106 | [🟣 IG](https://www.instagram.com/reel/DdRx6mym1K3/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan216.mp4) |

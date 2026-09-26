@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 30 | **Last Updated:** 2026-09-26 14:46:57 IST
+**Total Videos:** 30 | **Last Updated:** 2026-09-26 14:53:02 IST
 
 ---
 
@@ -14,7 +14,7 @@
 | Posted (FB or IG) | 15 / 30 |
 | FB Posted | 10 / 30 |
 | IG Posted | 10 / 30 |
-| Total FB Views | **16,777** |
+| Total FB Views | **16,779** |
 | Total IG Views | **2,420** |
 
 ---
@@ -35,7 +35,7 @@
 | 10 | Hangar Havoc 🔥⚔️  #videogames #gamingcommunity #gaming #callofdutyaw #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1425203349552652/) | 576 | [🟣 IG](https://www.instagram.com/reel/Ddg4fx6llu5/) | 120 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison27.mp4) |
 | 11 | Prison Break Riot 🚔💀  #videogames #gamingcommunity #gaming #callofdutyaw #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2127237434533442/) | 2,088 | [🟣 IG](https://www.instagram.com/reel/DdmZ3RhCo-Z/) | 900 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison28.mp4) |
 | 12 | Spartan's Fiery Descent 🔥💀  #videogames #gamingcommunity #gaming #callofdutyaw #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdruKqeDFzf/) | 30 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison29.mp4) |
-| 13 | Countdown to absolute chaos 💥  #videogames #gamingcommunity #gaming #callofdutyaw #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1092246033169273/) | 1,204 | [🟣 IG](https://www.instagram.com/reel/DdtIoijj3UC/) | 230 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison32.mp4) |
+| 13 | Countdown to absolute chaos 💥  #videogames #gamingcommunity #gaming #callofdutyaw #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1092246033169273/) | 1,206 | [🟣 IG](https://www.instagram.com/reel/DdtIoijj3UC/) | 230 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison32.mp4) |
 | 14 | The Execution Order 🪦  #videogames #gamingcommunity #gaming #callofdutyaw #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2362917614514491/) | 1,720 | [🟣 IG](https://www.instagram.com/reel/DduPIENlfsZ/) | 100 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison34.mp4) |
 | 15 | Red Siege Incoming! 🔥💥  #videogames #gamingcommunity #gaming #callofdutyaw #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DduTpZqFpGk/) | 80 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison35.mp4) |
 | 16 | Escape.from.Atlas.High.Security.Prison8 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison8.mp4) |

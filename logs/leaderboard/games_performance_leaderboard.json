@@ -2,7 +2,7 @@
     {
         "rank": 1,
         "game_name": "codBlackops6",
-        "total_views": 27422,
+        "total_views": 27424,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
         "view_share_percentage": 17.96
@@ -10,15 +10,15 @@
     {
         "rank": 2,
         "game_name": "SpiderMan2",
-        "total_views": 22517,
+        "total_views": 22480,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 14.75
+        "view_share_percentage": 14.72
     },
     {
         "rank": 3,
         "game_name": "mm2remastered",
-        "total_views": 19350,
+        "total_views": 19354,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
         "view_share_percentage": 12.67
@@ -26,23 +26,23 @@
     {
         "rank": 4,
         "game_name": "Callofdutyaw",
-        "total_views": 19197,
+        "total_views": 19199,
         "uploaded_videos": 1,
-        "avg_views_per_video": 19197,
+        "avg_views_per_video": 19199,
         "view_share_percentage": 12.57
     },
     {
         "rank": 5,
         "game_name": "AfghanistanRedZone",
-        "total_views": 18009,
+        "total_views": 18040,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 11.79
+        "view_share_percentage": 11.81
     },
     {
         "rank": 6,
         "game_name": "MarvelsSpiderMan2",
-        "total_views": 12689,
+        "total_views": 12692,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
         "view_share_percentage": 8.31
@@ -90,10 +90,10 @@
     {
         "rank": 12,
         "game_name": "GODOFWAR3",
-        "total_views": 1973,
+        "total_views": 1983,
         "uploaded_videos": 1,
-        "avg_views_per_video": 1973,
-        "view_share_percentage": 1.29
+        "avg_views_per_video": 1983,
+        "view_share_percentage": 1.3
     },
     {
         "rank": 13,
@@ -147,8 +147,8 @@
         "rank": 19,
         "game_name": "GodofWarLaufey",
         "total_views": 387,
-        "uploaded_videos": 0,
-        "avg_views_per_video": 0,
+        "uploaded_videos": 1,
+        "avg_views_per_video": 387,
         "view_share_percentage": 0.25
     }
 ]
