@@ -1,1 +1,1 @@
-{"clip_duration":56,"reason":"Intense cinematic sci-fi character dialogue sequence.","start_time":0,"status":"APPROVE","title":"Spacey's dark secret 🤫"}
+{"clip_duration": 32, "reason": "Full combat and cinematic sequence covered", "start_time": 24, "status": "APPROVE", "title": "Betrayal Under Fire 🔫🔥"}

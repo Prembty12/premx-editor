@@ -1,5 +1,7 @@
 {
-    "game_scores": {},
+    "game_scores": {
+        "Callofdutyaw": 15
+    },
     "title_styles": {
         "curiosity": 10,
         "aggressive": 10,
@@ -8,7 +10,7 @@
         "gaming_hype": 10,
         "clickbait": 10,
         "informative": 10,
-        "epic_cinematic": 10,
+        "epic_cinematic": 13,
         "funny_roast": 10,
         "secret_hidden": 10,
         "exposed": 10,
