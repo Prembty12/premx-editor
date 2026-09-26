@@ -1,9 +1,10 @@
 {
     "game_scores": {
-        "DiabloIV": 15
+        "DiabloIV": 15,
+        "GODOFWAR3": 15
     },
     "title_styles": {
-        "curiosity": 10,
+        "curiosity": 13,
         "aggressive": 10,
         "question": 10,
         "emoji_heavy": 10,

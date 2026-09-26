@@ -16,3 +16,6 @@ Video id : 17863699062675472
 GODOFWAR314 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR314.mp4
 Video id : 18161925847495136
 
+GODOFWAR35 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR35.mp4
+Video id : 18195013837390836
+

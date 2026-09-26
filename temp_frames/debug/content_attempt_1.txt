@@ -1,1 +1,1 @@
-{"clip_duration": 36, "reason": "Full cinematic drama and intense dialogue.", "start_time": 0, "status": "APPROVE", "title": "He Returned To Destroy You 🔥"}
+{"clip_duration": 35, "reason": "Intense giant beast boss battle combat", "start_time": 2, "status": "APPROVE", "title": "Giant Beast Clash 💀⚔️"}
