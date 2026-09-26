@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 19 | **Last Updated:** 2026-09-26 14:53:02 IST
+**Total Videos:** 19 | **Last Updated:** 2026-09-26 19:15:27 IST
 
 ---
 
@@ -14,8 +14,8 @@
 | Posted (FB or IG) | 4 / 19 |
 | FB Posted | 1 / 19 |
 | IG Posted | 4 / 19 |
-| Total FB Views | **193** |
-| Total IG Views | **1,790** |
+| Total FB Views | **201** |
+| Total IG Views | **1,940** |
 
 ---
 
@@ -25,8 +25,8 @@
 |---|---|---|---|---|---|---|
 | 1 | Spare Her! Kratos Pleads 😭  #videogames #gamingcommunity #gaming #godofwar3 #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdbP6F8jD2a/) | 260 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR32.mp4) |
 | 2 | Kratos Giant Boss Fight 🦖⚔️  #videogames #gamingcommunity #gaming #godofwar3 #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdcJxg-jUVD/) | 540 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR33.mp4) |
-| 3 | Trapped Inside Giant Beast 👹  #videogames #gamingcommunity #gaming #godofwar3 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1121298093949579/) | 193 | [🟣 IG](https://www.instagram.com/reel/Ddt5-4KlVj_/) | 800 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR34.mp4) |
-| 4 | Giant Beast Clash 💀⚔️  #videogames #gamingcommunity #gaming #godofwar3 #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdvFrL0Agnu/) | 190 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR38.mp4) |
+| 3 | Trapped Inside Giant Beast 👹  #videogames #gamingcommunity #gaming #godofwar3 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1121298093949579/) | 201 | [🟣 IG](https://www.instagram.com/reel/Ddt5-4KlVj_/) | 880 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR34.mp4) |
+| 4 | Giant Beast Clash 💀⚔️  #videogames #gamingcommunity #gaming #godofwar3 #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdvFrL0Agnu/) | 260 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR38.mp4) |
 | 5 | GODOFWAR36 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR36.mp4) |
 | 6 | GODOFWAR321 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR321.mp4) |
 | 7 | GODOFWAR37 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR37.mp4) |

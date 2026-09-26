@@ -1,0 +1,36 @@
+{
+  "last_updated": "2026-09-26 19:15:27",
+  "total_posts_analyzed": 6,
+  "top_slots": [
+    {
+      "rank": 1,
+      "icon": "\ud83e\udd47",
+      "time_slot": "14:00 - 15:00",
+      "posts": 2,
+      "avg_views": 375,
+      "recommendation": "BEST"
+    },
+    {
+      "rank": 2,
+      "icon": "\ud83e\udd48",
+      "time_slot": "02:00 - 03:00",
+      "posts": 2,
+      "avg_views": 5,
+      "recommendation": "Great"
+    }
+  ],
+  "daily": {
+    "Saturday": {
+      "avg_views": 356,
+      "posts": 6
+    }
+  },
+  "today_suggestion": {
+    "rank": 1,
+    "icon": "\ud83e\udd47",
+    "time_slot": "14:00 - 15:00",
+    "posts": 2,
+    "avg_views": 375,
+    "recommendation": "BEST"
+  }
+}

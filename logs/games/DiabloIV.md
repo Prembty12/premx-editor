@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 17 | **Last Updated:** 2026-09-26 14:53:02 IST
+**Total Videos:** 17 | **Last Updated:** 2026-09-26 19:15:27 IST
 
 ---
 
@@ -15,7 +15,7 @@
 | FB Posted | 1 / 17 |
 | IG Posted | 6 / 17 |
 | Total FB Views | **150** |
-| Total IG Views | **300** |
+| Total IG Views | **320** |
 
 ---
 
@@ -29,7 +29,7 @@
 | 4 | Gods clash in pure light ⚡🔥  #videogames #gamingcommunity #gaming #diabloiv #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdtbNLwCrsT/) | 50 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.102/DiabloIV2.mp4) |
 | 5 | They Don't Want You 😈🔥  #videogames #gamingcommunity #gaming #diabloiv #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DduLgUEArPg/) | 30 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.102/DiabloIV9.mp4) |
 | 6 | Bloody Demon Combat Unleashed 🩸⚔️  #videogames #gamingcommunity #gaming #diabloiv #gamingreels #reel | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DduRbqribyu/) | 60 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.102/DiabloIV4.mp4) |
-| 7 | He Returned To Destroy You 🔥  #videogames #gamingcommunity #gaming #diabloiv #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DduVnyLid_N/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.102/DiabloIV11.mp4) |
+| 7 | He Returned To Destroy You 🔥  #videogames #gamingcommunity #gaming #diabloiv #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DduVnyLid_N/) | 40 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.102/DiabloIV11.mp4) |
 | 8 | DiabloIV2 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.102/DiabloIV2.mp4) |
 | 9 | DiabloIV5 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.102/DiabloIV5.mp4) |
 | 10 | DiabloIV10 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.102/DiabloIV10.mp4) |

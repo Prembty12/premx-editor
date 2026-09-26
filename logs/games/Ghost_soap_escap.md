@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 20 | **Last Updated:** 2026-09-26 14:53:02 IST
+**Total Videos:** 20 | **Last Updated:** 2026-09-26 19:15:27 IST
 
 ---
 
@@ -14,7 +14,7 @@
 | Posted (FB or IG) | 4 / 20 |
 | FB Posted | 2 / 20 |
 | IG Posted | 3 / 20 |
-| Total FB Views | **1,235** |
+| Total FB Views | **1,236** |
 | Total IG Views | **380** |
 
 ---
@@ -23,7 +23,7 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | Surviving an entire army just to find your duo 😭🙏  #videogames #gamingcommunity #gaming #ghost_soap_escap #gamingreels # | [🔵 FB](https://www.facebook.com/reel/1603374561571140/) | 363 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps8.mp4) |
+| 1 | Surviving an entire army just to find your duo 😭🙏  #videogames #gamingcommunity #gaming #ghost_soap_escap #gamingreels # | [🔵 FB](https://www.facebook.com/reel/1603374561571140/) | 364 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps8.mp4) |
 | 2 | Ghost's Secret Stealth Method Is Unbelievable! 🤫🔥  #videogames #gamingcommunity #gaming #ghost_soap_escap #gamingreels # | [🔵 FB](https://www.facebook.com/reel/1555204199626941/) | 872 | [🟣 IG](https://www.instagram.com/reel/Ddbc0pNlOJX/) | 240 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps9.mp4) |
 | 3 | Underwater Bloodbath 🩸🔥  #videogames #gamingcommunity #gaming #ghost_soap_escap #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DduCTJaj3Av/) | 140 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps12.mp4) |
 | 4 | Tense Confrontation Between Soldiers 💀  #videogames #gamingcommunity #gaming #ghost_soap_escap #gami | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdvsqOUkm2U/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps12.mp4) |
