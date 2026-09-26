@@ -22,6 +22,9 @@ def now_ist():
 def now_ist_str():
     return datetime.now(IST).strftime("%Y-%m-%d %H:%M:%S")
 
+def now_ist_ampm():
+    return datetime.now(IST).strftime("%Y-%m-%d %I:%M:%S %p")
+
 
 # 📦 PDF aur Graph
 try:
@@ -56,11 +59,10 @@ FB_PAGE_ID = os.environ.get("PAGE_ID")
 FB_ACCESS_TOKEN = os.environ.get("PAGE_ACCESS_TOKEN")
 
 DAYS_LIMIT = 28
-MAX_REPLIES_PER_RUN = 5           # Rate limit
-MIN_COMMENT_AGE_MIN = 2           # Comment 2 min purana ho
-MAX_COMMENT_AGE_HOURS = 24        # 24 ghante se purana skip
+MAX_REPLIES_PER_RUN = 5
+MIN_COMMENT_AGE_MIN = 2
+MAX_COMMENT_AGE_HOURS = 24
 
-# 🚫 DRY RUN — Auto-comment band
 AUTO_COMMENT_ENABLED = os.environ.get("AUTO_COMMENT", "true").lower() == "true"
 
 
@@ -147,7 +149,7 @@ def get_gemini_key():
 
 
 def call_gemini_api(api_key, prompt, max_tokens=150):
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={api_key}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
     payload = {
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {
@@ -216,7 +218,7 @@ def generate_smart_reply(comment_text, game_name, post_title, is_abuse=False):
     keys = [k for k in GEMINI_KEYS if k]
     if not keys:
         return None
-    
+
     if is_abuse:
         prompt = f"""You are a SAVAGE but RESPECTFUL gaming content creator replying to a hater.
 
@@ -263,7 +265,7 @@ RULES:
 7. Match energy of comment
 
 Reply ONLY with the reply text, no quotes, no prefix."""
-    
+
     for attempt in range(min(3, len(keys))):
         key = random.choice(keys)
         response = call_gemini_api(key, prompt, max_tokens=100)
@@ -316,7 +318,6 @@ def fetch_fb_comments(post_id, since_timestamp=None):
 
 
 def check_if_already_replied(comment_id):
-    """FB API se verify karo ki reply already hai ya nahi (Layer 4)"""
     url = f"https://graph.facebook.com/v19.0/{comment_id}/comments"
     params = {
         "fields": "id,from",
@@ -339,7 +340,7 @@ def post_fb_reply(comment_id, reply_text):
     if not AUTO_COMMENT_ENABLED:
         log(f"🚫 [AUTO_COMMENT OFF] Would post: {reply_text[:80]}")
         return f"disabled_{comment_id}"
-    
+
     url = f"https://graph.facebook.com/v19.0/{comment_id}/comments"
     payload = {
         "message": reply_text,
@@ -357,88 +358,82 @@ def post_fb_reply(comment_id, reply_text):
 
 
 def process_fb_comments(actual_posted_titles):
-    """FB comments pe auto-reply karo (AUTO_COMMENT_ENABLED check)"""
-    
     if not AUTO_COMMENT_ENABLED:
         log("🚫 Auto-comment disabled — skipping reply processing")
         return None
-    
+
     log("🤖 Auto-reply processing started...")
-    
+
     replied_file = "logs/replied_comment_ids.json"
     replied_data = {"replied": [], "last_updated": ""}
-    
+
     if os.path.exists(replied_file):
         try:
             with open(replied_file, 'r', encoding='utf-8') as f:
                 replied_data = json.load(f)
         except Exception:
             pass
-    
+
     replied_ids = set(replied_data.get("replied", []))
-    
+
     reply_log_file = "logs/auto_reply_log.json"
     reply_log = {"total_replies": 0, "total_skipped": 0, "replies": [], "skipped": []}
-    
+
     if os.path.exists(reply_log_file):
         try:
             with open(reply_log_file, 'r', encoding='utf-8') as f:
                 reply_log = json.load(f)
         except Exception:
             pass
-    
+
     replies_count = 0
     cutoff_time = (now_ist() - timedelta(hours=MAX_COMMENT_AGE_HOURS)).timestamp()
     min_age_time = (now_ist() - timedelta(minutes=MIN_COMMENT_AGE_MIN)).timestamp()
-    
+
     for game_name, videos in actual_posted_titles.items():
         if replies_count >= MAX_REPLIES_PER_RUN:
             break
-        
+
         for video in videos:
             if replies_count >= MAX_REPLIES_PER_RUN:
                 break
-            
+
             if not video.get("fb_posted"):
                 continue
-            
+
             fb_link = video.get("fb_link", "")
             if not fb_link:
                 continue
-            
+
             post_id_match = re.search(r'/(\d+)/?$', fb_link)
             if not post_id_match:
                 continue
             post_id = post_id_match.group(1)
-            
+
             comments = fetch_fb_comments(post_id)
-            
+
             for comment in comments:
                 if replies_count >= MAX_REPLIES_PER_RUN:
                     break
-                
+
                 comment_id = comment.get("id", "")
                 comment_text = comment.get("message", "").strip()
                 comment_time = comment.get("created_time", "")
                 can_reply = comment.get("can_reply", True)
-                
+
                 if not comment_id or not comment_text:
                     continue
-                
-                # Layer 1: Local file check
+
                 if comment_id in replied_ids:
                     continue
-                
-                # Layer 2: FB API can_reply
+
                 if not can_reply:
                     continue
-                
-                # Layer 3: Own comment check
+
                 from_data = comment.get("from", {})
                 if from_data.get("id") == FB_PAGE_ID:
                     continue
-                
-                # Time checks
+
                 try:
                     dt = datetime.fromisoformat(comment_time.replace("+0000", "+00:00"))
                     comment_ts = dt.timestamp()
@@ -448,47 +443,44 @@ def process_fb_comments(actual_posted_titles):
                         continue
                 except Exception:
                     pass
-                
-                # Abuse check
+
                 abuse_type = detect_abuse(comment_text)
-                
+
                 if abuse_type == "family_abuse":
                     reply_log["skipped"].append({
                         "comment_id": comment_id,
                         "comment_text": comment_text[:100],
                         "reason": "family_abuse",
-                        "timestamp": now_ist_str(),
+                        "timestamp": now_ist_ampm(),
                     })
                     reply_log["total_skipped"] = reply_log.get("total_skipped", 0) + 1
                     replied_ids.add(comment_id)
                     continue
-                
+
                 if is_spam(comment_text):
                     reply_log["skipped"].append({
                         "comment_id": comment_id,
                         "comment_text": comment_text[:100],
                         "reason": "spam",
-                        "timestamp": now_ist_str(),
+                        "timestamp": now_ist_ampm(),
                     })
                     reply_log["total_skipped"] = reply_log.get("total_skipped", 0) + 1
                     replied_ids.add(comment_id)
                     continue
-                
-                # Layer 4: FB API verify (extra safety)
+
                 if check_if_already_replied(comment_id):
                     log(f"⏭️ Already replied (FB verify) — {comment_id}")
                     replied_ids.add(comment_id)
                     continue
-                
-                # Gemini reply
+
                 is_abuse = (abuse_type == "general_abuse")
                 reply_text = generate_smart_reply(
                     comment_text, game_name, video.get("title", ""), is_abuse=is_abuse
                 )
-                
+
                 if not reply_text:
                     continue
-                
+
                 safe, reason = is_reply_safe(reply_text, is_abuse=is_abuse)
                 if not safe:
                     log(f"⚠️ Reply unsafe: {reason}")
@@ -496,14 +488,13 @@ def process_fb_comments(actual_posted_titles):
                         "comment_id": comment_id,
                         "comment_text": comment_text[:100],
                         "reason": f"unsafe_{reason}",
-                        "timestamp": now_ist_str(),
+                        "timestamp": now_ist_ampm(),
                     })
                     replied_ids.add(comment_id)
                     continue
-                
-                # Post reply
+
                 reply_id = post_fb_reply(comment_id, reply_text)
-                
+
                 if reply_id:
                     replies_count += 1
                     reply_log["replies"].append({
@@ -517,26 +508,25 @@ def process_fb_comments(actual_posted_titles):
                         "post_title": video.get("title", "")[:100],
                         "fb_post_link": fb_link,
                         "source_link": video.get("source_link", ""),
-                        "timestamp": now_ist_str(),
+                        "timestamp": now_ist_ampm(),
                         "status": "posted",
                     })
                     reply_log["total_replies"] = reply_log.get("total_replies", 0) + 1
                     replied_ids.add(comment_id)
                     log(f"✅ Reply posted: {reply_text[:60]}")
-    
-    # Save
+
     os.makedirs("logs", exist_ok=True)
     replied_data["replied"] = list(replied_ids)[-5000:]
-    replied_data["last_updated"] = now_ist_str()
+    replied_data["last_updated"] = now_ist_ampm()
     with open(replied_file, 'w', encoding='utf-8') as f:
         json.dump(replied_data, f, indent=2)
-    
+
     reply_log["replies"] = reply_log.get("replies", [])[-200:]
     reply_log["skipped"] = reply_log.get("skipped", [])[-100:]
-    reply_log["last_updated"] = now_ist_str()
+    reply_log["last_updated"] = now_ist_ampm()
     with open(reply_log_file, 'w', encoding='utf-8') as f:
         json.dump(reply_log, f, indent=2)
-    
+
     log(f"🤖 Auto-reply done. {replies_count} replies posted.")
     return reply_log
 
@@ -578,17 +568,17 @@ def detect_trending_games(actual_posted_titles, game_views_summary, days=7):
                 "latest_post": latest_post, "fb_link": latest_fb_link,
                 "source_link": latest_source,
             }
-    
+
     if not game_stats:
-        result = {"last_updated": now_ist_str(), "period_days": days, "trending": [], "below_avg": [], "recommendation": None}
+        result = {"last_updated": now_ist_ampm(), "period_days": days, "trending": [], "below_avg": [], "recommendation": None}
         os.makedirs("logs", exist_ok=True)
         with open("logs/trending_cache.json", 'w', encoding='utf-8') as f:
             json.dump(result, f, indent=2)
         return result
-    
+
     all_avgs = [s["avg_views"] for s in game_stats.values()]
     overall_avg = sum(all_avgs) / len(all_avgs) if all_avgs else 1
-    
+
     trending_list = []
     for g, s in game_stats.items():
         ratio = s["avg_views"] / overall_avg if overall_avg > 0 else 0
@@ -602,14 +592,14 @@ def detect_trending_games(actual_posted_titles, game_views_summary, days=7):
             "avg_per_video": s["avg_views"], "trend": trend, "ratio": ratio,
             "fb_link": s["fb_link"], "source_link": s["source_link"],
         })
-    
+
     trending_list.sort(key=lambda x: x["avg_per_video"], reverse=True)
     top = [t for t in trending_list if t["trend"] in ("viral", "trending", "steady")][:5]
     below = [t for t in trending_list if t["trend"] in ("slow", "below_avg")][:5]
     best = trending_list[0] if trending_list else None
-    
+
     result = {
-        "last_updated": now_ist_str(), "period_days": days,
+        "last_updated": now_ist_ampm(), "period_days": days,
         "trending": top, "below_avg": below, "recommendation": best,
     }
     os.makedirs("logs", exist_ok=True)
@@ -628,10 +618,10 @@ def analyze_best_time(all_history):
                 all_history = json.load(f)
         except Exception:
             all_history = {}
-    
+
     hourly = {}
     daily = {}
-    
+
     for game, entries in all_history.items():
         for entry in entries:
             ts = entry.get("timestamp", "")
@@ -641,21 +631,24 @@ def analyze_best_time(all_history):
             try:
                 dt = datetime.strptime(ts, "%Y-%m-%d %H:%M:%S")
             except Exception:
-                continue
+                try:
+                    dt = datetime.strptime(ts, "%Y-%m-%d %I:%M:%S %p")
+                except Exception:
+                    continue
             hour = dt.hour
             day_name = dt.strftime("%A")
             hourly.setdefault(hour, []).append(views)
             daily.setdefault(day_name, []).append(views)
-    
+
     hourly_stats = []
     for hour, views_list in hourly.items():
         if len(views_list) < 2:
             continue
         avg = sum(views_list) // len(views_list)
         hourly_stats.append({"hour": hour, "posts": len(views_list), "avg_views": avg})
-    
+
     hourly_stats.sort(key=lambda x: x["avg_views"], reverse=True)
-    
+
     top_slots = []
     medals = ["🥇", "🥈", "🥉", "4", "5"]
     recs = ["BEST", "Great", "Good", "Average", "Below avg"]
@@ -669,14 +662,14 @@ def analyze_best_time(all_history):
             "posts": h["posts"], "avg_views": h["avg_views"],
             "recommendation": recs[idx] if idx < len(recs) else "—",
         })
-    
+
     daily_stats = {}
     for day, views_list in daily.items():
         if views_list:
             daily_stats[day] = {"avg_views": sum(views_list) // len(views_list), "posts": len(views_list)}
-    
+
     result = {
-        "last_updated": now_ist_str(),
+        "last_updated": now_ist_ampm(),
         "total_posts_analyzed": sum(len(v) for v in hourly.values()),
         "top_slots": top_slots, "daily": daily_stats,
         "today_suggestion": top_slots[0] if top_slots else None,
@@ -778,7 +771,7 @@ def generate_auto_reply_section():
         for idx, r in enumerate(list(reversed(replies[-20:])), 1):
             comment = (r.get("user_comment", "") or "").replace("\n", " ").replace("|", "\\|")[:60]
             reply = (r.get("gemini_reply", "") or "").replace("\n", " ").replace("|", "\\|")[:80]
-            ts = r.get("timestamp", "")[:16]
+            ts = r.get("timestamp", "")[:20]
             rtype = "😎 Savage" if r.get("type") == "savage" else "✅ Friendly"
             fb_link = r.get("fb_post_link", "")
             fb_md = f"[🔵]({fb_link})" if fb_link else "_N/A_"
@@ -805,7 +798,7 @@ def generate_auto_reply_section():
 
 
 # ============================================================
-# 📦 EXISTING FUNCTIONS (Dashboard, Rotation, etc.)
+# 📦 EXISTING FUNCTIONS
 # ============================================================
 def git_commit_and_push(file_paths_to_add, commit_message="Auto-Agent: Sync dashboard [skip ci]"):
     try:
@@ -890,12 +883,12 @@ def save_rotation_history(game_list, chosen_game, memory, memory_file="logs/rota
         rotation_data["current_game"] = chosen_game
         rotation_data["next_game"] = game_list[next_idx]
         rotation_data["next_game_position"] = next_idx + 1
-    rotation_data["last_updated"] = now_ist_str()
+    rotation_data["last_updated"] = now_ist_ampm()
     rotation_data["total_runs"] = len(rotation_data.get("rotation_log", [])) + 1
     rotation_data.setdefault("rotation_log", []).append({
         "run": rotation_data["total_runs"],
         "game": chosen_game,
-        "timestamp": now_ist_str(),
+        "timestamp": now_ist_ampm(),
     })
     all_games_list = []
     current_idx = rotation_data["current_index"]
@@ -1218,7 +1211,7 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
     dashboard_path = "GAMING_DASHBOARD.md"
     leaderboard_json = os.path.join("logs/leaderboard", "games_performance_leaderboard.json")
     os.makedirs("logs/leaderboard", exist_ok=True)
-    timestamp = now_ist_str()
+    timestamp = now_ist_ampm()
     history_json = "logs/dashboard_history.json"
     all_history = {}
     if os.path.exists(history_json):
@@ -1273,6 +1266,13 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
     for g_name in sorted(actual_posted_titles.keys()):
         videos = actual_posted_titles.get(g_name, [])
         if not videos: continue
+        # 🔥 FIX 3: Sort videos newest first
+        def sort_video_key(x):
+            ts = x.get("timestamp", "") or ""
+            is_posted = x.get("fb_posted") or x.get("ig_posted")
+            return (0 if is_posted else 1, ts if ts else "0000")
+        videos = sorted(videos, key=sort_video_key, reverse=False)
+        
         src_file_for_game = file_mapping.get(g_name, "")
         if not src_file_for_game:
             for f in os.listdir("game_links_editor"):
@@ -1288,6 +1288,18 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
                 file_links = [u.rstrip('.,;)\']"') for u in file_links]
             except Exception:
                 pass
+        # 🔥 FIX 4: posted_links_editor se bhi links uthao
+        posted_file_inner = os.path.join("posted_links_editor", f"{g_name}_posted_links_editor.txt")
+        posted_links_inner = []
+        if os.path.exists(posted_file_inner):
+            try:
+                with open(posted_file_inner, 'r', encoding='utf-8', errors='ignore') as pf:
+                    pcontent = pf.read()
+                posted_links_inner = re.findall(r'\|\s*Link:\s*(https?://[^\s\n\r\)\]\'"<>,;]+)', pcontent)
+                posted_links_inner = [u.rstrip('.,;)\']"') for u in posted_links_inner]
+            except Exception:
+                pass
+        
         safe_name = re.sub(r'[^a-zA-Z0-9_-]', '_', g_name)
         game_filename = f"{safe_name}.md"
         game_filepath = os.path.join(games_dir, game_filename)
@@ -1295,7 +1307,7 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
         gf_lines = []
         gf_lines.append(f"# 🎮 {g_name} — Full Video History\n\n")
         gf_lines.append(f"[⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)\n\n")
-        gf_lines.append(f"**Total Videos:** {len(videos)} | **Last Updated:** {now_ist_str()} IST\n\n")
+        gf_lines.append(f"**Total Videos:** {len(videos)} | **Last Updated:** {now_ist_ampm()} IST\n\n")
         gf_lines.append("---\n\n")
         total_fb_views = sum(v.get('fb_views', 0) for v in videos)
         total_ig_views = sum(v.get('ig_views', 0) for v in videos)
@@ -1318,12 +1330,21 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
             fb_v_md = f"{v.get('fb_views', 0):,}" if v.get("fb_posted") else "_0_"
             ig_md = f"[🟣 IG]({v['ig_link']})" if v.get("ig_posted") and v.get("ig_link") else "⏳ Pending"
             ig_v_md = f"{v.get('ig_views', 0):,}" if v.get("ig_posted") else "_0_"
+            
+            # 🔥 FIX 4: Source link 4-level fallback
             src_link = v.get("source_link", "")
             if not src_link and file_links:
-                src_link = file_links[idx - 1] if idx - 1 < len(file_links) else (file_links[-1] if file_links else "")
+                if idx - 1 < len(file_links):
+                    src_link = file_links[idx - 1]
+            if not src_link and posted_links_inner:
+                if idx - 1 < len(posted_links_inner):
+                    src_link = posted_links_inner[idx - 1]
             if not src_link:
                 src_urls = source_links_map.get(g_name, [])
-                src_link = src_urls[idx - 1] if idx - 1 < len(src_urls) else (src_urls[-1] if src_urls else "")
+                if idx - 1 < len(src_urls):
+                    src_link = src_urls[idx - 1]
+                elif src_urls:
+                    src_link = src_urls[-1]
             src_md = f"[📂]({src_link})" if src_link else "_N/A_"
             gf_lines.append(f"| {idx} | {title} | {fb_md} | {fb_v_md} | {ig_md} | {ig_v_md} | {src_md} |\n")
         try:
@@ -1333,7 +1354,7 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
             log(f"⚠️ Failed to write {game_filepath}: {e}")
     md_content = []
     md_content.append("# 🚀 GAMING AGENT COMMAND & ANALYTICS DASHBOARD\n\n")
-    md_content.append(f"> **Last Updated:** {timestamp} IST | **Status:** All Systems Active & Synchronized\n\n")
+    md_content.append(f"> **Last Updated:** {now_ist_ampm()} IST | **Status:** All Systems Active & Synchronized\n\n")
     md_content.append("--- \n\n## 🏆 Global Leaderboard & Performance Summary\n\n")
     md_content.append("| Rank | Game Name | Total Videos | Total Views | Avg Views / Video | Performance Tier |\n")
     md_content.append("| :---: | :--- | :---: | :---: | :---: | :---: |\n")
@@ -1373,7 +1394,7 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
         if latest_post_time:
             try:
                 dt = datetime.fromisoformat(latest_post_time.replace("+0000", "+00:00"))
-                date_str = dt.strftime("%Y-%m-%d %H:%M")
+                date_str = dt.strftime("%Y-%m-%d %I:%M %p")
             except Exception:
                 date_str = latest_post_time[:16]
         else:
@@ -1381,30 +1402,51 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
         if not videos:
             md_content.append(f"| **{g_name}** | {date_str} | _Not Posted Yet_ | ⏳ Pending | _0_ | ⏳ Pending | _0_ | {progress_md} | _N/A_ | — |\n")
             continue
+        
+        # 🔥 FIX 1: Latest posted video by timestamp
         latest_posted = None
+        latest_ts = ""
         for v in videos:
             if v.get("fb_posted") or v.get("ig_posted"):
-                latest_posted = v
-                break
+                ts = v.get("timestamp", "")
+                if ts > latest_ts:
+                    latest_ts = ts
+                    latest_posted = v
+        
         latest = latest_posted if latest_posted else videos[0]
         title = (latest.get("title") or "").replace("\n", " ").replace("|", "\\|")[:80] or "_Untitled_"
         fb_md = f"[🔵 FB]({latest['fb_link']})" if latest.get("fb_posted") and latest.get("fb_link") else "⏳ Pending"
         fb_v_md = f"{latest.get('fb_views', 0):,}" if latest.get("fb_posted") else "_0_"
         ig_md = f"[🟣 IG]({latest['ig_link']})" if latest.get("ig_posted") and latest.get("ig_link") else "⏳ Pending"
         ig_v_md = f"{latest.get('ig_views', 0):,}" if latest.get("ig_posted") else "_0_"
-        src_link = latest_posted.get("source_link", "") if latest_posted else ""
-        if not src_link and videos: src_link = videos[0].get("source_link", "")
+        
+        # 🔥 FIX 2: Source link 4-level fallback
+        src_link = ""
+        if latest_posted:
+            src_link = latest_posted.get("source_link", "")
+        if not src_link and videos:
+            src_link = videos[0].get("source_link", "")
+        if not src_link:
+            posted_file = os.path.join("posted_links_editor", f"{g_name}_posted_links_editor.txt")
+            if os.path.exists(posted_file):
+                try:
+                    with open(posted_file, 'r', encoding='utf-8', errors='ignore') as f:
+                        pc = f.read()
+                    pl = re.findall(r'\|\s*Link:\s*(https?://[^\s\n\r\)\]\'"<>,;]+)', pc)
+                    pl = [u.rstrip('.,;)\']"') for u in pl]
+                    if pl:
+                        src_link = pl[0]
+                except Exception:
+                    pass
         if not src_link:
             src_urls = source_links_map.get(g_name, [])
             src_link = src_urls[0] if src_urls else ""
         src_md = f"[📂]({src_link})" if src_link else "_N/A_"
         all_md = f"**[📜 View {len(videos)}]({game_file_links[g_name]})**" if g_name in game_file_links else f"_{len(videos)}_"
         md_content.append(f"| **{g_name}** | {date_str} | {title} | {fb_md} | {fb_v_md} | {ig_md} | {ig_v_md} | {progress_md} | {src_md} | {all_md} |\n")
-    # 🔥 NEW SECTIONS
     for section_func in [generate_trending_section, generate_best_time_section, generate_auto_reply_section]:
         section = section_func()
         if section: md_content.append(section)
-    # Full history links
     md_content.append("\n--- \n\n## 📜 Full Video History\n\n")
     md_content.append("> Click any game below to view its complete video list with all FB/IG links:\n\n")
     for g_name in sorted_games:
@@ -1480,10 +1522,10 @@ def run_agent_brain():
     memory_file = "logs/agent_memory.json"
     os.makedirs("logs", exist_ok=True)
     os.makedirs(links_dir, exist_ok=True)
-    
+
     if not AUTO_COMMENT_ENABLED:
         log("🚫 AUTO_COMMENT=false — Auto-reply will be SKIPPED (analytics only)")
-    
+
     memory = {
         "game_scores": {},
         "title_styles": {
@@ -1537,8 +1579,7 @@ def run_agent_brain():
     actual_posted_titles, game_views_summary = fetch_fb_ig_data(game_list)
     if not game_views_summary:
         game_views_summary = {g: 0 for g in game_list}
-    
-    # 🔥 Auto-reply (only if enabled)
+
     if AUTO_COMMENT_ENABLED:
         try:
             process_fb_comments(actual_posted_titles)
@@ -1546,8 +1587,7 @@ def run_agent_brain():
             log(f"⚠️ Auto-reply error: {e}")
     else:
         log("🚫 Auto-comment disabled — skipping")
-    
-    # 🔥 Trending + Best Time
+
     try:
         detect_trending_games(actual_posted_titles, game_views_summary, days=7)
     except Exception as e:
@@ -1556,7 +1596,7 @@ def run_agent_brain():
         analyze_best_time({})
     except Exception as e:
         log(f"⚠️ Best time error: {e}")
-    
+
     last_game = memory.get("last_played_game", "")
     if last_game in game_list:
         next_index = (game_list.index(last_game) + 1) % len(game_list)
@@ -1648,7 +1688,7 @@ def run_agent_brain():
     )
     log(f"""
 🚀 GAMING AGENT DASHBOARD
-> Last Updated: {now_ist_str()} IST
+> Last Updated: {now_ist_ampm()} IST
 > Auto-Comment: {"✅ ENABLED" if AUTO_COMMENT_ENABLED else "🚫 DISABLED"}
 
 📊 Status:
