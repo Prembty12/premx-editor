@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 58 | **Last Updated:** 2026-09-26 02:06:21 IST
+**Total Videos:** 58 | **Last Updated:** 2026-09-26 09:06:00 IST
 
 ---
 
@@ -13,7 +13,7 @@
 | Total Videos | **58** |
 | FB Posted | 19 / 58 |
 | IG Posted | 21 / 58 |
-| Total FB Views | **20,745** |
+| Total FB Views | **20,746** |
 | Total IG Views | **1,800** |
 
 ---
@@ -42,10 +42,10 @@
 | 18 | Explosive Spider-Man Battle Unleashed in 30 Seconds!  #videogames #gamingcommunity #gaming #spiderma | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdR0NkxoJAU/) | 60 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan222.mp4) |
 | 19 | SPIDER-MAN'S EPIC SKYDIVE CRASH! 🕷️💨💥 Ultimate Slow-Mo Action! SpiderMan2 ✨  #videogames #gamingcomm | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdRuZm9Do_3/) | 90 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan21.mp4) |
 | 20 | Aggressive Swing Over City Highway!  #videogames #gamingcommunity #gaming #spiderman2 #gamingreels # | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdRqYfIgmAH/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan28.mp4) |
-| 21 | Can Spider-Man survive the ultimate showdown in the crumbling ruins of this epic battle?  #videogames #gamingcommunity # | [🔵 FB](https://www.facebook.com/reel/1591562232667306/) | 277 | [🟣 IG](https://www.instagram.com/reel/DdRLcpJD5-O/) | 40 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan221.mp4) |
+| 21 | Can Spider-Man survive the ultimate showdown in the crumbling ruins of this epic battle?  #videogames #gamingcommunity # | [🔵 FB](https://www.facebook.com/reel/1591562232667306/) | 277 | [🟣 IG](https://www.instagram.com/reel/DdRxPaLnBde/) | 40 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan221.mp4) |
 | 22 | SANDBLOOD RAGE: SPIDER-MAN VS THE COLOSSAL SAND TITAN!  #videogames #gamingcommunity #gaming #spiderman2 #gamingreels #r | [🔵 FB](https://www.facebook.com/reel/1392931593021744/) | 214 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan228.mp4) |
 | 23 | SPIDER-FURY: SANDMAN UNLEASHES FULL POWER! 🕷️🔥  #videogames #gamingcommunity #gaming #spiderman2 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1413264610906135/) | 85 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan227.mp4) |
-| 24 | SPIDER-FURY: MILES MORALES UNLEASHES MAXIMUM COMBAT POWER!  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gam | [🔵 FB](https://www.facebook.com/reel/1444317791239680/) | 9,030 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan217.mp4) |
+| 24 | SPIDER-FURY: MILES MORALES UNLEASHES MAXIMUM COMBAT POWER!  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gam | [🔵 FB](https://www.facebook.com/reel/1444317791239680/) | 9,031 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan217.mp4) |
 | 25 | SPIDER-MAN AGGRESSIVE SPRINT! 🕷️💥  #videogames #gamingcommunity #gaming #spiderman2 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1076964548273048/) | 410 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan23.mp4) |
 | 26 | Thought the fight was over until this happened 😭  #videogames #gamingcommunity #gaming #spiderman2 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1424333832929625/) | 137 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan212.mp4) |
 | 27 | Miles Morales goes ABSOLUTELY BEAST MODE! ⚡️🕷️  #videogames #gamingcommunity #gaming #spiderman2 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2520416678426501/) | 761 | ⏳ Pending | _0_ | _N/A_ |
@@ -54,29 +54,29 @@
 | 30 | They really thought they had me surrounded 🤫⚡  #videogames #gamingcommunity #gaming #spiderman2 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1791192378719718/) | 247 | ⏳ Pending | _0_ | _N/A_ |
 | 31 | Swinging straight into a massive city-wide disaster 🌪️🕸️  #videogames #gamingcommunity #gaming #spiderman2 #gamingreels  | [🔵 FB](https://www.facebook.com/reel/4793440470942089/) | 1,498 | ⏳ Pending | _0_ | _N/A_ |
 | 32 | He really thought he could swat a spider ⚡️👊  #videogames #gamingcommunity #gaming #spiderman2 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2574650296310653/) | 4,546 | ⏳ Pending | _0_ | _N/A_ |
-| 33 | SpiderMan217 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
-| 34 | SpiderMan212 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
-| 35 | SpiderMan23 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
-| 36 | SpiderMan228 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
-| 37 | SpiderMan227 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
-| 38 | SpiderMan221 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
-| 39 | SpiderMan28 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
-| 40 | SpiderMan21 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
-| 41 | SpiderMan222 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
-| 42 | SpiderMan27 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 33 | SpiderMan212 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 34 | SpiderMan23 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 35 | SpiderMan228 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 36 | SpiderMan221 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 37 | SpiderMan28 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 38 | SpiderMan21 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 39 | SpiderMan227 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 40 | SpiderMan217 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 41 | SpiderMan27 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 42 | SpiderMan222 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
 | 43 | SpiderMan26 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
-| 44 | SpiderMan211 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 44 | SpiderMan218 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
 | 45 | SpiderMan229 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
-| 46 | SpiderMan218 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
-| 47 | SpiderMan224 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
-| 48 | SpiderMan226 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
-| 49 | SpiderMan210 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
-| 50 | SpiderMan25 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
-| 51 | SpiderMan214 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 46 | SpiderMan224 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 47 | SpiderMan226 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 48 | SpiderMan210 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 49 | SpiderMan211 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 50 | SpiderMan214 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 51 | SpiderMan25 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
 | 52 | SpiderMan220 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
 | 53 | SpiderMan213 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
 | 54 | SpiderMan215 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
 | 55 | SpiderMan225 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
-| 56 | SpiderMan223 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
-| 57 | SpiderMan219 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 56 | SpiderMan219 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 57 | SpiderMan223 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
 | 58 | SpiderMan29 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |

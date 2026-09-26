@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 18 | **Last Updated:** 2026-09-26 02:06:21 IST
+**Total Videos:** 18 | **Last Updated:** 2026-09-26 09:06:00 IST
 
 ---
 
@@ -13,7 +13,7 @@
 | Total Videos | **18** |
 | FB Posted | 5 / 18 |
 | IG Posted | 8 / 18 |
-| Total FB Views | **11,547** |
+| Total FB Views | **11,548** |
 | Total IG Views | **1,140** |
 
 ---
@@ -30,13 +30,13 @@
 | 6 | SPIDER-MAN'S ULTIMATE VILLAIN SHOWDOWN: THE EPIC SLOW-MO COMBAT THAT WILL BLOW YOUR MIND!  #videogam | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdTylaPkf4p/) | 50 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan221.mp4) |
 | 7 | How does Spider-Man survive this epic military ambush?  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingr | [🔵 FB](https://www.facebook.com/reel/1639395280878916/) | 1,330 | [🟣 IG](https://www.instagram.com/reel/DdTYhE2AdR6/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan245.mp4) |
 | 8 | The secret behind Miles' red spider hoodie!  #videogames #gamingcommunity #gaming #marvelsspiderman2 | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdTXTBqFUVK/) | 40 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan243.mp4) |
-| 9 | SPIDER-FURY: MILES MORALES UNLEASHES MAXIMUM COMBAT POWER!  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gam | [🔵 FB](https://www.facebook.com/reel/1444317791239680/) | 9,030 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan230.mp4) |
+| 9 | SPIDER-FURY: MILES MORALES UNLEASHES MAXIMUM COMBAT POWER!  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gam | [🔵 FB](https://www.facebook.com/reel/1444317791239680/) | 9,031 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan230.mp4) |
 | 10 | MarvelsSpiderMan230 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
 | 11 | MarvelsSpiderMan243 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
 | 12 | MarvelsSpiderMan221 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
-| 13 | MarvelsSpiderMan245 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 13 | MarvelsSpiderMan227 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
 | 14 | MarvelsSpiderMan211 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
-| 15 | MarvelsSpiderMan227 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
-| 16 | MarvelsSpiderMan214 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 15 | MarvelsSpiderMan214 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
+| 16 | MarvelsSpiderMan245 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
 | 17 | MarvelsSpiderMan228 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
 | 18 | MarvelsSpiderMan213 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ |
