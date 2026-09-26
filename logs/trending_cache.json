@@ -1,22 +1,22 @@
 {
-  "last_updated": "2026-09-26 11:19:03 PM",
+  "last_updated": "2026-09-26 11:21:39 PM",
   "period_days": 7,
   "trending": [
     {
       "game": "AfghanistanRedZone",
-      "views_7d": 17346,
-      "avg_per_video": 8673,
+      "views_7d": 17353,
+      "avg_per_video": 8676,
       "trend": "viral",
-      "ratio": 9.716286234420949,
+      "ratio": 9.714885576317448,
       "fb_link": "https://www.facebook.com/reel/1440490007980933/",
       "source_link": ""
     },
     {
       "game": "Callofdutyaw",
-      "views_7d": 8661,
+      "views_7d": 8663,
       "avg_per_video": 1082,
       "trend": "steady",
-      "ratio": 1.212155160341689,
+      "ratio": 1.2115613408915948,
       "fb_link": "",
       "source_link": ""
     }
@@ -27,7 +27,7 @@
       "views_7d": 4428,
       "avg_per_video": 738,
       "trend": "slow",
-      "ratio": 0.8267749614899874,
+      "ratio": 0.8263699349149696,
       "fb_link": "https://www.facebook.com/reel/3584878615007660/",
       "source_link": ""
     },
@@ -36,16 +36,16 @@
       "views_7d": 2037,
       "avg_per_video": 679,
       "trend": "slow",
-      "ratio": 0.7606777762218176,
+      "ratio": 0.7603051298201413,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "UkraineCovertMission",
-      "views_7d": 625,
-      "avg_per_video": 625,
+      "views_7d": 626,
+      "avg_per_video": 626,
       "trend": "slow",
-      "ratio": 0.7001820473323064,
+      "ratio": 0.7009587794807194,
       "fb_link": "https://www.facebook.com/reel/1433881315316238/",
       "source_link": ""
     },
@@ -54,7 +54,7 @@
       "views_7d": 1084,
       "avg_per_video": 542,
       "trend": "slow",
-      "ratio": 0.6071978714465761,
+      "ratio": 0.6069004129050318,
       "fb_link": "",
       "source_link": ""
     },
@@ -63,17 +63,17 @@
       "views_7d": 1776,
       "avg_per_video": 444,
       "trend": "below_avg",
-      "ratio": 0.49740932642487046,
+      "ratio": 0.497165651900063,
       "fb_link": "",
       "source_link": ""
     }
   ],
   "recommendation": {
     "game": "AfghanistanRedZone",
-    "views_7d": 17346,
-    "avg_per_video": 8673,
+    "views_7d": 17353,
+    "avg_per_video": 8676,
     "trend": "viral",
-    "ratio": 9.716286234420949,
+    "ratio": 9.714885576317448,
     "fb_link": "https://www.facebook.com/reel/1440490007980933/",
     "source_link": ""
   }
