@@ -1,1 +1,1 @@
-{"clip_duration": 35, "reason": "Intense fire giant boss battle combat sequence", "start_time": 12, "status": "APPROVE", "title": "Fire Giant Boss Fight 🔥⚔️"}
+{"clip_duration": 31, "reason": "Giant statue climb and dramatic cinematic action.", "start_time": 0, "status": "APPROVE", "title": "Spider-Man Climbs Giant Colossus 🔥"}
