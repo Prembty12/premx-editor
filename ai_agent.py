@@ -6,9 +6,7 @@ import requests
 import sys
 import subprocess
 import re
-import time
 from datetime import datetime, timedelta, timezone
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # 🇮🇳 Indian Standard Time
 try:
@@ -26,6 +24,7 @@ def now_ist_str():
 def now_ist_ampm():
     return datetime.now(IST).strftime("%Y-%m-%d %I:%M:%S %p")
 
+# 🔥 FIX 3: UTC → IST converter
 def utc_to_ist(iso_time_str):
     if not iso_time_str:
         return None
@@ -39,6 +38,7 @@ def utc_to_ist(iso_time_str):
         return None
 
 
+# 📦 PDF aur Graph
 try:
     import matplotlib
     matplotlib.use('Agg')
@@ -57,53 +57,25 @@ except ImportError:
     REPORTLAB_AVAILABLE = False
 
 
-# ============================================================
-# 🔑 OPENROUTER API KEYS (replaced Gemini)
-# ============================================================
-OPENROUTER_KEYS = [
-    os.environ.get("OPENROUTER_API_KEY"),
-    os.environ.get("OPENROUTER_API_KEY_2"),
-    os.environ.get("OPENROUTER_API_KEY_3"),
-    os.environ.get("OPENROUTER_API_KEY_4"),
-    os.environ.get("OPENROUTER_API_KEY_5"),
+# 🔑 Gemini Keys
+GEMINI_KEYS = [
+    os.environ.get("GEMINI_API_KEY_1"),
+    os.environ.get("GEMINI_API_KEY_2"),
+    os.environ.get("GEMINI_API_KEY_3"),
+    os.environ.get("GEMINI_API_KEY_4"),
+    os.environ.get("GEMINI_API_KEY_5"),
+    os.environ.get("GEMINI_API_KEY_6"),
 ]
-
-FIXED_MODEL = "dots-studio/dots-3-note-preview:free"
-FALLBACK_MODEL = "openrouter/free"
-OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-MAX_JSON_RETRIES = 12
 
 FB_PAGE_ID = os.environ.get("PAGE_ID")
 FB_ACCESS_TOKEN = os.environ.get("PAGE_ACCESS_TOKEN")
 
-FB_API_VERSION = "v24.0"
-FB_GRAPH_URL = f"https://graph.facebook.com/{FB_API_VERSION}"
-
 DAYS_LIMIT = 28
 MAX_REPLIES_PER_RUN = 5
-MIN_COMMENT_AGE_MIN = 0
+MIN_COMMENT_AGE_MIN = 2
 MAX_COMMENT_AGE_HOURS = 24
-POSTS_TO_SCAN = 25
-COMMENT_FETCH_WORKERS = 10
 
 AUTO_COMMENT_ENABLED = os.environ.get("AUTO_COMMENT", "true").lower() == "true"
-
-KNOWN_GAMES = [
-    "BGMI", "Free Fire", "GTA 5", "GTA San Andreas", "GTA", "CODM",
-    "Call of Duty", "God of War", "Spider-Man", "Minecraft", "PUBG",
-    "Fortnite", "Valorant", "Clash of Clans", "Clash Royale", "Roblox",
-    "Among Us", "Apex Legends", "FIFA", "PES", "WWE", "Naruto",
-    "Dragon Ball", "Tekken", "Mortal Kombat", "Resident Evil",
-    "Black Ops 6", "Black Ops", "Modern Warfare", "Warzone", "MW3",
-    "God of War Ragnarok", "Spider-Man 2", "Ghost of Tsushima",
-    "Red Dead Redemption", "Elden Ring", "Dark Souls", "Sekiro",
-    "Cyberpunk 2077", "Assassin's Creed", "Far Cry", "Battlefield",
-    "Need for Speed", "Forza", "Gran Turismo", "Halo", "Gears of War",
-    "Subway Surfers", "Candy Crush", "Temple Run", "Clash",
-    "VietnamCavePrison", "combatoperation", "ghostandela", "mm2remastered",
-    "monkeyKing", "sifu", "codBlackops6", "SpiderMan2", "godofwar3",
-    "afghanistanredz", "spider",
-]
 
 
 def log(msg):
@@ -181,72 +153,31 @@ def parse_game_links_file(filepath):
 
 
 # ============================================================
-# 🤖 OPENROUTER INTEGRATION (replaced Gemini)
+# 🤖 GEMINI INTEGRATION
 # ============================================================
-def _call_openrouter_single(model_name, api_key, prompt, max_tokens=150):
-    if not api_key:
-        return None
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json",
-        "HTTP-Referer": "https://github.com/",
-        "X-Title": "Gaming Auto-Agent",
-    }
+def get_gemini_key():
+    valid = [k for k in GEMINI_KEYS if k]
+    return random.choice(valid) if valid else None
+
+
+def call_gemini_api(api_key, prompt, max_tokens=150):
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={api_key}"
     payload = {
-        "model": model_name,
-        "messages": [{"role": "user", "content": prompt}],
-        "temperature": 0.9,
-        "max_tokens": max_tokens,
-        "top_p": 0.95,
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {
+            "temperature": 0.9,
+            "maxOutputTokens": max_tokens,
+            "topP": 0.95,
+        }
     }
     try:
-        res = requests.post(OPENROUTER_URL, headers=headers, json=payload, timeout=30)
+        res = requests.post(url, json=payload, timeout=15)
         if res.status_code == 200:
             data = res.json()
-            choices = data.get("choices", [])
-            if choices:
-                content = choices[0].get("message", {}).get("content", "")
-                if content:
-                    return content.strip()
-        else:
-            log(f"   ⚠️ HTTP {res.status_code}: {res.text[:120]}")
+            text = data['candidates'][0]['content']['parts'][0]['text']
+            return text.strip()
     except Exception as e:
-        log(f"   ⚠️ Exception: {e}")
-    return None
-
-
-def _extract_json(response):
-    """Robust JSON extraction — 3 fallbacks."""
-    if not response:
-        return None
-    cleaned = response.strip()
-    if "```" in cleaned:
-        cleaned = re.sub(r'^```(?:json)?\s*', '', cleaned)
-        cleaned = re.sub(r'\s*```$', '', cleaned)
-        cleaned = cleaned.strip()
-    try:
-        result = json.loads(cleaned)
-        if isinstance(result, dict):
-            return result
-    except Exception:
-        pass
-    start = cleaned.find("{")
-    end = cleaned.rfind("}")
-    if start != -1 and end != -1 and end > start:
-        try:
-            result = json.loads(cleaned[start:end+1])
-            if isinstance(result, dict):
-                return result
-        except Exception:
-            pass
-    json_match = re.search(r'\{[\s\S]*\}', cleaned)
-    if json_match:
-        try:
-            result = json.loads(json_match.group())
-            if isinstance(result, dict):
-                return result
-        except Exception:
-            pass
+        log(f"⚠️ Gemini API error: {e}")
     return None
 
 
@@ -265,9 +196,8 @@ FAMILY_ABUSE_PATTERNS = [
     r'(तेरी मां|तेरी माँ|तेरी बहन|तेरे बाप|तेरी बीवी|तेरी बेटी)',
 ]
 
-# ✅ "ma" hata diya (false positive fix)
 FORBIDDEN_REPLY_WORDS = [
-    "maa", "mata", "behen", "behan", "baap", "beti", "biwi",
+    "maa", "ma", "mata", "behen", "behan", "baap", "beti", "biwi",
     "caste", "religion", "hindu", "muslim", "christian", "sikh",
     "kill", "die", "death", "murder", "rape", "suicide",
 ]
@@ -296,138 +226,80 @@ def is_spam(text):
     return False
 
 
-# ============================================================
-# 🎯 BATCH REPLY GENERATOR — 12 RETRY + HASHTAG + HUMOR PROMPT
-# ============================================================
-def generate_batch_replies(comments_batch, max_retries=MAX_JSON_RETRIES):
-    """12 attempts with rotating keys + robust JSON parse."""
-    if not comments_batch:
-        return {}
+def generate_smart_reply(comment_text, game_name, post_title, is_abuse=False):
+    keys = [k for k in GEMINI_KEYS if k]
+    if not keys:
+        return None
 
-    formatted = ""
-    for c in comments_batch:
-        tone = "SAVAGE-HATER" if c["is_abuse"] else "FRIENDLY-FAN"
-        safe_text = c["comment_text"].replace('"', "'").replace("\n", " ")[:300]
-        caption_safe = c.get("post_title", "").replace('"', "'").replace("\n", " ")[:150]
-        hashtags_safe = ", ".join(c.get("post_hashtags", []))[:100]
-        formatted += (
-            f'[{tone}] ID: "{c["comment_id"]}" | '
-            f'Game: "{c["game_name"]}" | '
-            f'Hashtags: [{hashtags_safe}] | '
-            f'Caption: "{caption_safe}" | '
-            f'Comment: "{safe_text}"\n'
-        )
+    if is_abuse:
+        prompt = f"""You are a SAVAGE but RESPECTFUL gaming content creator replying to a hater.
 
-    prompt = f"""You are a SAVAGE, WITTY, and CONFIDENT gaming content creator replying to comments on your gaming channel.
+CONTEXT:
+- Game: {game_name}
+- Post: {post_title}
 
-For EACH comment below, write a SHORT reply (maximum 25 words).
+HATER'S COMMENT: "{comment_text}"
 
-REPLY STYLE GUIDE:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-FRIENDLY-FAN comments -> Friendly, warm, FUNNY, gaming-community tone.
-   - Make them laugh, feel welcomed, and want to comment again.
-   - Sometimes end with a playful question to boost engagement.
-   - Hype them up like a close friend.
+RULES:
+1. Reply in SAME language as the hater
+2. Be WITTY, SARCASTIC, FUNNY
+3. Match energy but stay CHILL and RESPECTFUL
+4. NEVER abuse back
+5. NEVER insult family/religion/caste
+6. NEVER threaten
+7. MAX 25 words
+8. Include 1-2 emojis (😂😎🔥)
+9. Style: Savage Hinglish / Gen-Z comeback
 
-SAVAGE-HATER comments (abuse/insult) -> SAVAGE, WITTY, SARCASTIC comeback.
-   - Match their energy but STAY CHILL and CONFIDENT.
-   - Roast them with HUMOR, never with abuse.
-   - Make it FUNNY, not angry.
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+GOOD EXAMPLES:
+- "bakwas video" → "Bhai 3 ghante dekh ke comment kiya? 😂"
+- "chutiya" → "Bhai tu bhi bana, competition badhega 😎"
+- "ghatiya" → "Bhai platinum kiya hai kya? Tips de 😂"
+- "f***ing trash" → "Yet here you are watching 😂🔥"
 
-STRICT RULES:
-1. DETECT language of each comment and REPLY IN THE SAME LANGUAGE.
-2. DO NOT use regional Indian languages (Tamil, Telugu, Bengali, etc.). Reply in ENGLISH or HINGLISH only.
-3. GAME NAME RULE:
-   - IF the comment ASKS about the game name ("Which game?", "Game name?", "What game is this?"), THEN mention the game name.
-   - IF NOT asked, DO NOT mention the game name.
-   - Use Caption and Hashtags as context.
-4. Include 1-2 emojis per reply.
-5. NEVER share links.
-6. NEVER insult family, religion, or caste.
-7. NEVER use abusive words back.
-8. MAX 25 words per reply.
-9. HOOK THEM BACK: Sometimes end with a playful question.
+Reply ONLY with the reply text, no quotes, no prefix."""
+    else:
+        prompt = f"""You are a friendly gaming content creator replying to a fan.
 
-CRITICAL OUTPUT REQUIREMENT:
-- Return ONLY valid JSON.
-- Keys = EXACT comment IDs.
-- Values = reply text.
-- NO extra text, NO markdown, NO "User Safety", ONLY JSON.
+CONTEXT:
+- Game: {game_name}
+- Post: {post_title}
 
-Example format:
-{{
-  "COMMENT_ID_1": "reply text 1",
-  "COMMENT_ID_2": "reply text 2"
-}}
+FAN'S COMMENT: "{comment_text}"
 
-COMMENTS TO REPLY:
-{formatted}
+RULES:
+1. Reply in SAME language as the comment
+2. Friendly, casual, gaming-community tone
+3. MAX 20 words
+4. Include 1-2 emojis
+5. NEVER share download links
+6. NEVER promise specific dates
+7. Match energy of comment
 
-YOUR JSON RESPONSE:"""
+Reply ONLY with the reply text, no quotes, no prefix."""
 
-    valid_keys = [k for k in OPENROUTER_KEYS if k]
-    if not valid_keys:
-        log("❌ No OpenRouter API keys found.")
-        return {}
-
-    for attempt in range(1, max_retries + 1):
-        key_index = (attempt - 1) % len(valid_keys)
-        current_key = valid_keys[key_index]
-
-        if attempt == 1:
-            model_to_use = FIXED_MODEL
-            log(f"🔄 Attempt {attempt}/{max_retries} | FIXED | Key {key_index + 1}")
-        else:
-            model_to_use = FALLBACK_MODEL
-            log(f"🔄 Attempt {attempt}/{max_retries} | FALLBACK | Key {key_index + 1}")
-
-        response = _call_openrouter_single(model_to_use, current_key, prompt, max_tokens=800)
-
-        if not response:
-            log(f"   ⚠️ Empty — retry")
-            time.sleep(1)
-            continue
-
-        resp_stripped = response.strip().lower()
-        if resp_stripped in ["user safety: safe", "safe", "unsafe", "none"]:
-            log(f"   ⚠️ Safety model — retry")
-            time.sleep(1)
-            continue
-
-        parsed = _extract_json(response)
-        if parsed is None:
-            log(f"   ⚠️ Invalid JSON — retry. Preview: {response[:100]}")
-            time.sleep(1)
-            continue
-
-        result = {}
-        for c in comments_batch:
-            cid = c["comment_id"]
-            if cid in parsed:
-                reply = str(parsed[cid]).strip().strip('"').strip("'")
-                if reply and reply.lower() not in ["user safety: safe", "safe", "unsafe", "none"]:
-                    result[cid] = reply
-
-        if result:
-            log(f"   ✅ Valid JSON on attempt {attempt}: {len(result)}/{len(comments_batch)}")
-            return result
-        else:
-            log(f"   ⚠️ No valid replies — retry")
-            time.sleep(1)
-
-    log(f"❌ Failed after {max_retries} attempts.")
-    return {}
+    for attempt in range(min(3, len(keys))):
+        key = random.choice(keys)
+        response = call_gemini_api(key, prompt, max_tokens=100)
+        if response:
+            response = response.strip().strip('"').strip("'")
+            if response.lower().startswith("reply:"):
+                response = response[6:].strip()
+            return response
+    return None
 
 
 def is_reply_safe(reply_text, is_abuse=False):
     if not reply_text or len(reply_text.strip()) < 3:
         return False, "too_short"
-    if len(reply_text) > 400:
+    if len(reply_text) > 300:
         return False, "too_long"
     reply_lower = reply_text.lower()
     if "http" in reply_lower or ".com" in reply_lower:
         return False, "contains_link"
+    for word in FORBIDDEN_REPLY_WORDS:
+        if word in reply_lower:
+            return False, f"forbidden_word_{word}"
     for pattern in ABUSE_PATTERNS:
         if re.search(pattern, reply_lower, re.IGNORECASE):
             return False, "reply_contains_abuse"
@@ -435,10 +307,10 @@ def is_reply_safe(reply_text, is_abuse=False):
 
 
 # ============================================================
-# 🤖 AUTO-REPLY FUNCTIONS (DIRECT FB MODE + BATCH + HASHTAG)
+# 🤖 AUTO-REPLY FUNCTIONS (FB ONLY)
 # ============================================================
 def fetch_fb_comments(post_id, since_timestamp=None):
-    url = f"{FB_GRAPH_URL}/{post_id}/comments"
+    url = f"https://graph.facebook.com/v19.0/{post_id}/comments"
     params = {
         "fields": "id,message,from,created_time,can_reply",
         "access_token": FB_ACCESS_TOKEN,
@@ -451,14 +323,14 @@ def fetch_fb_comments(post_id, since_timestamp=None):
         if res.status_code == 200:
             return res.json().get("data", [])
         else:
-            log(f"      ⚠️ comments error ({res.status_code}): {res.text[:150]}")
+            log(f"⚠️ FB comments fetch error: {res.status_code} {res.text[:200]}")
     except Exception as e:
-        log(f"      ⚠️ comments exception: {e}")
+        log(f"⚠️ FB comments fetch exception: {e}")
     return []
 
 
 def check_if_already_replied(comment_id):
-    url = f"{FB_GRAPH_URL}/{comment_id}/comments"
+    url = f"https://graph.facebook.com/v19.0/{comment_id}/comments"
     params = {"fields": "id,from", "access_token": FB_ACCESS_TOKEN, "limit": 10}
     try:
         res = requests.get(url, params=params, timeout=10)
@@ -477,27 +349,25 @@ def post_fb_reply(comment_id, reply_text):
         log(f"🚫 [AUTO_COMMENT OFF] Would post: {reply_text[:80]}")
         return f"disabled_{comment_id}"
 
-    url = f"{FB_GRAPH_URL}/{comment_id}/comments"
+    url = f"https://graph.facebook.com/v19.0/{comment_id}/comments"
     payload = {"message": reply_text, "access_token": FB_ACCESS_TOKEN}
     try:
         res = requests.post(url, data=payload, timeout=15)
         if res.status_code == 200:
             return res.json().get("id")
         else:
-            log(f"⚠️ Reply post error ({res.status_code}): {res.text[:200]}")
+            log(f"⚠️ Reply post error: {res.status_code} {res.text[:200]}")
     except Exception as e:
         log(f"⚠️ Reply post exception: {e}")
     return None
 
 
-def process_fb_comments(actual_posted_titles=None):
-    """DIRECT FB MODE — parallel fetch + hashtag detection + batch + 12 retry."""
+def process_fb_comments(actual_posted_titles):
     if not AUTO_COMMENT_ENABLED:
-        log("🚫 Auto-comment disabled — skipping")
+        log("🚫 Auto-comment disabled — skipping reply processing")
         return None
 
-    log("🤖 Auto-reply processing started (DIRECT FB MODE)...")
-
+    log("🤖 Auto-reply processing started...")
     replied_file = "logs/replied_comment_ids.json"
     replied_data = {"replied": [], "last_updated": ""}
     if os.path.exists(replied_file):
@@ -507,7 +377,6 @@ def process_fb_comments(actual_posted_titles=None):
         except Exception:
             pass
     replied_ids = set(replied_data.get("replied", []))
-
     reply_log_file = "logs/auto_reply_log.json"
     reply_log = {"total_replies": 0, "total_skipped": 0, "replies": [], "skipped": []}
     if os.path.exists(reply_log_file):
@@ -516,230 +385,124 @@ def process_fb_comments(actual_posted_titles=None):
                 reply_log = json.load(f)
         except Exception:
             pass
-
+    replies_count = 0
     cutoff_time = (now_ist() - timedelta(hours=MAX_COMMENT_AGE_HOURS)).timestamp()
     min_age_time = (now_ist() - timedelta(minutes=MIN_COMMENT_AGE_MIN)).timestamp()
 
-    log(f"📥 Fetching latest {POSTS_TO_SCAN} posts from FB Page: {FB_PAGE_ID}")
-    posts_url = f"{FB_GRAPH_URL}/{FB_PAGE_ID}/posts"
-    posts_params = {
-        "fields": "id,message,created_time,permalink_url",
-        "access_token": FB_ACCESS_TOKEN,
-        "limit": POSTS_TO_SCAN,
-    }
-    try:
-        res = requests.get(posts_url, params=posts_params, timeout=20)
-        if res.status_code != 200:
-            log(f"❌ FB posts error ({res.status_code}): {res.text[:300]}")
-            return None
-        posts = res.json().get("data", [])
-        log(f"✅ Got {len(posts)} posts")
-    except Exception as e:
-        log(f"❌ FB posts exception: {e}")
-        return None
-
-    if not posts:
-        log("ℹ️ No posts found.")
-        return None
-
-    log(f"⚡ Parallel fetching comments ({COMMENT_FETCH_WORKERS} workers)...")
-    post_comments_map = {}
-
-    def fetch_post_comments(post):
-        post_id = post.get("id", "")
-        if not post_id:
-            return (post_id, [])
-        try:
-            return (post_id, fetch_fb_comments(post_id))
-        except Exception as e:
-            log(f"      ⚠️ Error {post_id}: {e}")
-            return (post_id, [])
-
-    with ThreadPoolExecutor(max_workers=COMMENT_FETCH_WORKERS) as executor:
-        futures = {executor.submit(fetch_post_comments, p): p for p in posts}
-        for future in as_completed(futures):
-            try:
-                pid, comments = future.result()
-                post_comments_map[pid] = comments
-            except Exception as e:
-                log(f"⚠️ Parallel error: {e}")
-
-    total_comments = sum(len(c) for c in post_comments_map.values())
-    log(f"✅ Total {total_comments} comments fetched")
-
-    valid_comments = []
-    skipped_logs = []
-
-    for post in posts:
-        if len(valid_comments) >= MAX_REPLIES_PER_RUN:
+    for game_name, videos in actual_posted_titles.items():
+        if replies_count >= MAX_REPLIES_PER_RUN:
             break
-        post_id = post.get("id", "")
-        post_message_full = (post.get("message", "") or "")
-        post_message = post_message_full[:80]
-        comments = post_comments_map.get(post_id, [])
-        if not comments:
-            continue
-
-        hashtags = re.findall(r'#(\w+)', post_message_full)
-        log(f"      📌 Hashtags: {hashtags}")
-
-        game_name = "Video Game"
-        for tag in hashtags:
-            tag_clean = tag.lower().replace("_", "").replace("-", "")
-            for g in KNOWN_GAMES:
-                g_clean = g.lower().replace(" ", "").replace("_", "").replace("-", "")
-                if g_clean == tag_clean or g_clean in tag_clean or tag_clean in g_clean:
-                    game_name = g
-                    break
-            if game_name != "Video Game":
+        for video in videos:
+            if replies_count >= MAX_REPLIES_PER_RUN:
                 break
-
-        if game_name == "Video Game":
-            for g in KNOWN_GAMES:
-                if g.lower() in post_message_full.lower():
-                    game_name = g
+            if not video.get("fb_posted"):
+                continue
+            fb_link = video.get("fb_link", "")
+            if not fb_link:
+                continue
+            post_id_match = re.search(r'/(\d+)/?$', fb_link)
+            if not post_id_match:
+                continue
+            post_id = post_id_match.group(1)
+            comments = fetch_fb_comments(post_id)
+            for comment in comments:
+                if replies_count >= MAX_REPLIES_PER_RUN:
                     break
-
-        log(f"🔍 Post: {post_id} | {post_message} | {len(comments)} comments")
-        log(f"      🎮 Detected: {game_name}")
-
-        for comment in comments:
-            if len(valid_comments) >= MAX_REPLIES_PER_RUN:
-                break
-            comment_id = comment.get("id", "")
-            comment_text = comment.get("message", "").strip()
-            comment_time = comment.get("created_time", "")
-            can_reply = comment.get("can_reply", True)
-
-            if not comment_id or not comment_text:
-                continue
-            if comment_id in replied_ids:
-                continue
-            if not can_reply:
-                continue
-            from_data = comment.get("from", {})
-            if from_data.get("id") == FB_PAGE_ID:
-                continue
-
-            try:
-                dt = datetime.fromisoformat(comment_time.replace("+0000", "+00:00"))
-                comment_ts = dt.timestamp()
-                if comment_ts < cutoff_time:
+                comment_id = comment.get("id", "")
+                comment_text = comment.get("message", "").strip()
+                comment_time = comment.get("created_time", "")
+                can_reply = comment.get("can_reply", True)
+                if not comment_id or not comment_text:
                     continue
-                if comment_ts > min_age_time:
+                if comment_id in replied_ids:
                     continue
-            except Exception:
-                pass
-
-            abuse_type = detect_abuse(comment_text)
-            if abuse_type == "family_abuse":
-                skipped_logs.append({
-                    "comment_id": comment_id,
-                    "comment_text": comment_text[:100],
-                    "reason": "family_abuse",
-                    "timestamp": now_ist_ampm(),
-                })
-                replied_ids.add(comment_id)
-                continue
-
-            if is_spam(comment_text):
-                skipped_logs.append({
-                    "comment_id": comment_id,
-                    "comment_text": comment_text[:100],
-                    "reason": "spam",
-                    "timestamp": now_ist_ampm(),
-                })
-                replied_ids.add(comment_id)
-                continue
-
-            if check_if_already_replied(comment_id):
-                log(f"      ⏭️ Already replied — {comment_id[:20]}")
-                replied_ids.add(comment_id)
-                continue
-
-            log(f"      ✅ VALID: '{comment_text[:50]}' | user={from_data.get('name','?')}")
-            valid_comments.append({
-                "comment_id": comment_id,
-                "comment_text": comment_text,
-                "game_name": game_name,
-                "post_title": post_message,
-                "post_hashtags": hashtags,
-                "is_abuse": (abuse_type == "general_abuse"),
-                "post_id": post_id,
-                "fb_link": post.get("permalink_url", f"https://www.facebook.com/{post_id}"),
-                "source_link": "",
-                "user_name": from_data.get("name", "Unknown User"),
-            })
-
-    if not valid_comments:
-        log("ℹ️ No valid comments. Skipping.")
-        replies_map = {}
-    else:
-        log(f"📦 Batch: {len(valid_comments)} comments → retry loop (max {MAX_JSON_RETRIES})")
-        replies_map = generate_batch_replies(valid_comments)
-
-    replies_count = 0
-    for c in valid_comments:
-        comment_id = c["comment_id"]
-        reply_text = replies_map.get(comment_id)
-        if not reply_text:
-            log(f"⚠️ No reply for {comment_id}")
-            continue
-
-        safe, reason = is_reply_safe(reply_text, is_abuse=c["is_abuse"])
-        if not safe:
-            log(f"⚠️ Unsafe ({reason}) for {comment_id}")
-            skipped_logs.append({
-                "comment_id": comment_id,
-                "comment_text": c["comment_text"][:100],
-                "reason": f"unsafe_{reason}",
-                "timestamp": now_ist_ampm(),
-            })
-            replied_ids.add(comment_id)
-            continue
-
-        reply_id = post_fb_reply(comment_id, reply_text)
-        if reply_id:
-            replies_count += 1
-            reply_log["replies"].append({
-                "reply_id": reply_id,
-                "comment_id": comment_id,
-                "post_id": c["post_id"],
-                "user_name": c["user_name"],
-                "user_comment": c["comment_text"][:200],
-                "openrouter_reply": reply_text,
-                "type": "savage" if c["is_abuse"] else "friendly",
-                "game": c["game_name"],
-                "post_title": c["post_title"][:100],
-                "fb_post_link": c["fb_link"],
-                "source_link": c["source_link"],
-                "timestamp": now_ist_ampm(),
-                "status": "posted",
-            })
-            reply_log["total_replies"] = reply_log.get("total_replies", 0) + 1
-            replied_ids.add(comment_id)
-            log(f"✅ Reply posted [{comment_id[:20]}]")
-            log(f"   👤 User: {c['user_name']}")
-            log(f"   💬 Comment: {c['comment_text'][:80]}")
-            log(f"   🤖 AI Reply: {reply_text[:80]}")
-        else:
-            log(f"❌ Failed to post {comment_id[:20]}")
-
-    reply_log["skipped"].extend(skipped_logs)
-    reply_log["total_skipped"] = reply_log.get("total_skipped", 0) + len(skipped_logs)
+                if not can_reply:
+                    continue
+                from_data = comment.get("from", {})
+                if from_data.get("id") == FB_PAGE_ID:
+                    continue
+                try:
+                    dt = datetime.fromisoformat(comment_time.replace("+0000", "+00:00"))
+                    comment_ts = dt.timestamp()
+                    if comment_ts < cutoff_time:
+                        continue
+                    if comment_ts > min_age_time:
+                        continue
+                except Exception:
+                    pass
+                abuse_type = detect_abuse(comment_text)
+                if abuse_type == "family_abuse":
+                    reply_log["skipped"].append({
+                        "comment_id": comment_id,
+                        "comment_text": comment_text[:100],
+                        "reason": "family_abuse",
+                        "timestamp": now_ist_ampm(),
+                    })
+                    reply_log["total_skipped"] = reply_log.get("total_skipped", 0) + 1
+                    replied_ids.add(comment_id)
+                    continue
+                if is_spam(comment_text):
+                    reply_log["skipped"].append({
+                        "comment_id": comment_id,
+                        "comment_text": comment_text[:100],
+                        "reason": "spam",
+                        "timestamp": now_ist_ampm(),
+                    })
+                    reply_log["total_skipped"] = reply_log.get("total_skipped", 0) + 1
+                    replied_ids.add(comment_id)
+                    continue
+                if check_if_already_replied(comment_id):
+                    log(f"⏭️ Already replied (FB verify) — {comment_id}")
+                    replied_ids.add(comment_id)
+                    continue
+                is_abuse = (abuse_type == "general_abuse")
+                reply_text = generate_smart_reply(
+                    comment_text, game_name, video.get("title", ""), is_abuse=is_abuse
+                )
+                if not reply_text:
+                    continue
+                safe, reason = is_reply_safe(reply_text, is_abuse=is_abuse)
+                if not safe:
+                    log(f"⚠️ Reply unsafe: {reason}")
+                    reply_log["skipped"].append({
+                        "comment_id": comment_id,
+                        "comment_text": comment_text[:100],
+                        "reason": f"unsafe_{reason}",
+                        "timestamp": now_ist_ampm(),
+                    })
+                    replied_ids.add(comment_id)
+                    continue
+                reply_id = post_fb_reply(comment_id, reply_text)
+                if reply_id:
+                    replies_count += 1
+                    reply_log["replies"].append({
+                        "reply_id": reply_id,
+                        "comment_id": comment_id,
+                        "post_id": post_id,
+                        "user_comment": comment_text[:200],
+                        "gemini_reply": reply_text,
+                        "type": "savage" if is_abuse else "friendly",
+                        "game": game_name,
+                        "post_title": video.get("title", "")[:100],
+                        "fb_post_link": fb_link,
+                        "source_link": video.get("source_link", ""),
+                        "timestamp": now_ist_ampm(),
+                        "status": "posted",
+                    })
+                    reply_log["total_replies"] = reply_log.get("total_replies", 0) + 1
+                    replied_ids.add(comment_id)
+                    log(f"✅ Reply posted: {reply_text[:60]}")
 
     os.makedirs("logs", exist_ok=True)
     replied_data["replied"] = list(replied_ids)[-5000:]
     replied_data["last_updated"] = now_ist_ampm()
     with open(replied_file, 'w', encoding='utf-8') as f:
         json.dump(replied_data, f, indent=2)
-
     reply_log["replies"] = reply_log.get("replies", [])[-200:]
     reply_log["skipped"] = reply_log.get("skipped", [])[-100:]
     reply_log["last_updated"] = now_ist_ampm()
     with open(reply_log_file, 'w', encoding='utf-8') as f:
         json.dump(reply_log, f, indent=2)
-
     log(f"🤖 Auto-reply done. {replies_count} replies posted.")
     return reply_log
 
@@ -965,7 +728,7 @@ def generate_auto_reply_section():
     except Exception:
         return ""
     lines = []
-    lines.append("\n--- \n\n## 🤖 Auto-Reply Log (Direct FB Mode)\n\n")
+    lines.append("\n--- \n\n## 🤖 Auto-Reply Log (Facebook Only)\n\n")
     status = "🚫 **DISABLED**" if not AUTO_COMMENT_ENABLED else "✅ **ACTIVE**"
     lines.append(f"> Auto-Comment Status: {status} | Last Updated: {data.get('last_updated', 'N/A')} | ")
     lines.append(f"Total Replies: {data.get('total_replies', 0)} | Skipped: {data.get('total_skipped', 0)}\n\n")
@@ -978,29 +741,27 @@ def generate_auto_reply_section():
         lines.append(f"| Savage Replies | {savage_count} |\n")
         lines.append(f"| Total | {len(replies)} |\n\n")
         lines.append("### 💬 Recent Replies (Last 20)\n\n")
-        lines.append("| # | Time | 👤 User | 💬 User Comment | 🤖 AI Reply | Type | Game | FB Post |\n")
-        lines.append("|---|---|---|---|---|---|---|---|\n")
+        lines.append("| # | Time | User Comment | Gemini Reply | Type | FB Post | Source |\n")
+        lines.append("|---|---|---|---|---|---|---|\n")
         for idx, r in enumerate(list(reversed(replies[-20:])), 1):
-            user_name = (r.get("user_name", "Unknown") or "Unknown").replace("|", "\\|")[:20]
             comment = (r.get("user_comment", "") or "").replace("\n", " ").replace("|", "\\|")[:60]
-            reply = (r.get("openrouter_reply", "") or "").replace("\n", " ").replace("|", "\\|")[:80]
+            reply = (r.get("gemini_reply", "") or "").replace("\n", " ").replace("|", "\\|")[:80]
             ts = r.get("timestamp", "")[:20]
             rtype = "😎 Savage" if r.get("type") == "savage" else "✅ Friendly"
-            game = (r.get("game", "") or "").replace("|", "\\|")[:15]
             fb_link = r.get("fb_post_link", "")
             fb_md = f"[🔵]({fb_link})" if fb_link else "_N/A_"
-            lines.append(f"| {idx} | {ts} | **{user_name}** | {comment} | {reply} | {rtype} | {game} | {fb_md} |\n")
+            src_link = r.get("source_link", "")
+            src_md = f"[📂]({src_link})" if src_link else "_N/A_"
+            lines.append(f"| {idx} | {ts} | {comment} | {reply} | {rtype} | {fb_md} | {src_md} |\n")
         savages = [r for r in replies if r.get("type") == "savage"][-5:]
         if savages:
-            lines.append("\n### 😎 Savage Replies (Last 5)\n\n| 👤 User | 💬 Abuse | 🤖 AI Reply | Game | FB Link |\n|---|---|---|---|---|\n")
+            lines.append("\n### 😎 Savage Replies (Last 5)\n\n| User Abuse | Gemini Reply | FB Link |\n|---|---|---|\n")
             for s in reversed(savages):
-                user_name = (s.get("user_name", "Unknown") or "Unknown").replace("|", "\\|")[:20]
                 comment = (s.get("user_comment", "") or "").replace("\n", " ").replace("|", "\\|")[:80]
-                reply = (s.get("openrouter_reply", "") or "").replace("\n", " ").replace("|", "\\|")[:100]
-                game = (s.get("game", "") or "").replace("|", "\\|")[:15]
+                reply = (s.get("gemini_reply", "") or "").replace("\n", " ").replace("|", "\\|")[:100]
                 fb_link = s.get("fb_post_link", "")
                 fb_md = f"[🔵]({fb_link})" if fb_link else "_N/A_"
-                lines.append(f"| **{user_name}** | {comment} | {reply} | {game} | {fb_md} |\n")
+                lines.append(f"| {comment} | {reply} | {fb_md} |\n")
     skipped = data.get("skipped", [])[-5:]
     if skipped:
         lines.append("\n### ⏭️ Skipped Comments (Last 5)\n\n| Comment | Reason |\n|---|---|\n")
@@ -1012,7 +773,7 @@ def generate_auto_reply_section():
 
 
 # ============================================================
-# 📦 EXISTING FUNCTIONS (UNCHANGED — source link matching untouched)
+# 📦 EXISTING FUNCTIONS
 # ============================================================
 def git_commit_and_push(file_paths_to_add, commit_message="Auto-Agent: Sync dashboard [skip ci]"):
     try:
@@ -1187,7 +948,7 @@ def parse_posted_file(filepath, game_name):
 
 
 def fetch_fb_caption(vid_id, page_token):
-    url = f"{FB_GRAPH_URL}/{vid_id}?fields=description&access_token={page_token}"
+    url = f"https://graph.facebook.com/v24.0/{vid_id}?fields=description&access_token={page_token}"
     try:
         res = requests.get(url, timeout=5).json()
         caption = res.get('description', '').strip()
@@ -1199,7 +960,7 @@ def fetch_fb_caption(vid_id, page_token):
 
 
 def fetch_fb_views_by_id(vid_id, page_token):
-    url = f"{FB_GRAPH_URL}/{vid_id}/video_insights?access_token={page_token}"
+    url = f"https://graph.facebook.com/v24.0/{vid_id}/video_insights?access_token={page_token}"
     try:
         res = requests.get(url, timeout=5).json()
         for metric in res.get('data', []):
@@ -1212,6 +973,7 @@ def fetch_fb_views_by_id(vid_id, page_token):
 
 
 def fetch_fb_ig_data(game_list):
+    from concurrent.futures import ThreadPoolExecutor, as_completed
     posted_dir = 'posted_links_editor'
     result = {g: [] for g in game_list}
     game_views_summary = {g: 0 for g in game_list}
@@ -1219,6 +981,7 @@ def fetch_fb_ig_data(game_list):
         log("⚠️ FB_ACCESS_TOKEN missing")
         return result, game_views_summary
 
+    # 🔥 FIX: ID → Source map banao (posted_links_editor se)
     id_to_source_map = {}
     if os.path.exists(posted_dir):
         for fname in os.listdir(posted_dir):
@@ -1284,8 +1047,8 @@ def fetch_fb_ig_data(game_list):
                     if not title: title = f"Video {vid_id[:8]}"
                 post['title'] = title
                 post['fb_views'] = fb_views
-                post['fb_posted'] = bool(vid_id)
-                post['fb_link'] = f"https://www.facebook.com/{vid_id}" if vid_id else ""
+                post['fb_posted'] = fb_views > 0
+                post['fb_link'] = f"https://www.facebook.com/{vid_id}" if fb_views > 0 else ""
                 post['status'] = "✅ Live" if fb_views > 0 else "⏳ Pending"
                 return post
             with ThreadPoolExecutor(max_workers=10) as executor:
@@ -1296,6 +1059,7 @@ def fetch_fb_ig_data(game_list):
                         game = r.get('game')
                         if game in result:
                             vid_id = str(r.get('vid_id', '')).strip()
+                            # 🔥 ID se source link match
                             matched_source = id_to_source_map.get(vid_id, "")
                             if not matched_source:
                                 matched_source = r.get('link', '')
@@ -1317,7 +1081,7 @@ def fetch_fb_ig_data(game_list):
     fb_videos = []
     ig_medias = []
     try:
-        fb_url = f"{FB_GRAPH_URL}/{FB_PAGE_ID}/videos"
+        fb_url = f"https://graph.facebook.com/v19.0/{FB_PAGE_ID}/videos"
         params = {"fields": "id,title,description,views,permalink_url,created_time",
                   "since": since_timestamp, "access_token": FB_ACCESS_TOKEN, "limit": 100}
         res = requests.get(fb_url, params=params, timeout=20)
@@ -1327,13 +1091,13 @@ def fetch_fb_ig_data(game_list):
     except Exception as e:
         log(f"❌ FB page fetch error: {e}")
     try:
-        ig_url = f"{FB_GRAPH_URL}/{FB_PAGE_ID}"
+        ig_url = f"https://graph.facebook.com/v19.0/{FB_PAGE_ID}"
         ig_params = {"fields": "instagram_business_account", "access_token": FB_ACCESS_TOKEN}
         res_ig_acc = requests.get(ig_url, params=ig_params, timeout=10)
         if res_ig_acc.status_code == 200:
             ig_id = res_ig_acc.json().get("instagram_business_account", {}).get("id")
             if ig_id:
-                media_url = f"{FB_GRAPH_URL}/{ig_id}/media"
+                media_url = f"https://graph.facebook.com/v19.0/{ig_id}/media"
                 media_params = {"fields": "id,caption,permalink,timestamp,like_count,comments_count",
                                 "access_token": FB_ACCESS_TOKEN, "limit": 100}
                 res_ig = requests.get(media_url, params=media_params, timeout=20)
@@ -1355,6 +1119,7 @@ def fetch_fb_ig_data(game_list):
                 if key in existing_titles: continue
                 fb_vid_id = str(v.get("id", "")).strip()
                 fb_link = fix_fb_url(v.get("permalink_url", ""), fb_vid_id)
+                # 🔥 ID se source link
                 matched_source = id_to_source_map.get(fb_vid_id, "")
                 entry = {
                     "title": title, "fb_link": fb_link,
@@ -1447,6 +1212,7 @@ def fetch_fb_ig_data(game_list):
                     "source_link": src_link, "is_source_only": True,
                 })
 
+    # 🔥 FIX: Sort — Posted newest first, phir pending
     for game in game_list:
         posted_v = [x for x in result[game] if x.get("fb_posted") or x.get("ig_posted")]
         pending_v = [x for x in result[game] if not (x.get("fb_posted") or x.get("ig_posted"))]
@@ -1534,6 +1300,7 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
         videos = actual_posted_titles.get(g_name, [])
         if not videos: continue
 
+        # 🔥 Sort — Posted newest first, phir pending
         posted_v = [x for x in videos if x.get("fb_posted") or x.get("ig_posted")]
         pending_v = [x for x in videos if not (x.get("fb_posted") or x.get("ig_posted"))]
         posted_v_sorted = sorted(posted_v, key=lambda x: x.get("timestamp", "") or "0000", reverse=True)
@@ -1607,6 +1374,7 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
             ig_md = f"[🟣 IG]({v['ig_link']})" if v.get("ig_posted") and v.get("ig_link") else "⏳ Pending"
             ig_v_md = f"{v.get('ig_views', 0):,}" if v.get("ig_posted") else "_0_"
 
+            # 🔥 Source link — digits match + index fallback
             src_link = v.get("source_link", "")
             if not src_link:
                 v_name = (v.get("video_name") or v.get("vid_id") or "").lower().strip()
@@ -1683,6 +1451,7 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
         else:
             progress_md = "_N/A_"
 
+        # 🔥 Time AM/PM in IST
         latest_post_time = get_latest_post_time(g_name)
         if latest_post_time:
             dt_ist = utc_to_ist(latest_post_time)
