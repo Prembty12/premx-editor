@@ -123,3 +123,12 @@
 [2026-09-27 01:05:12 PM] ❌ Saari 3 keys try ho chuki hain
 [2026-09-27 01:05:12 PM] ❌ Saari 3 keys fail — koi reply nahi
 [2026-09-27 01:05:12 PM] 🤖 Auto-reply done. 0 replies posted.
+[2026-09-27 01:21:59 PM] 🌐 Gemini call | Key: AQ.Ab8RN6J5_... | Prompt: 513 chars
+[2026-09-27 01:21:59 PM] 📡 HTTP 401 (key AQ.Ab8RN6J5_...)
+[2026-09-27 01:21:59 PM] ❌ Gemini FAIL | HTTP 401 | code=401 | Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-
+[2026-09-27 01:21:59 PM] 🌐 Gemini call | Key: AQ.Ab8RN6LW9... | Prompt: 513 chars
+[2026-09-27 01:21:59 PM] 📡 HTTP 401 (key AQ.Ab8RN6LW9...)
+[2026-09-27 01:21:59 PM] ❌ Gemini FAIL | HTTP 401 | code=401 | Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-
+[2026-09-27 01:21:59 PM] 🌐 Gemini call | Key: AQ.Ab8RN6KDO... | Prompt: 513 chars
+[2026-09-27 01:21:59 PM] 📡 HTTP 401 (key AQ.Ab8RN6KDO...)
+[2026-09-27 01:21:59 PM] ❌ Gemini FAIL | HTTP 401 | code=401 | Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-

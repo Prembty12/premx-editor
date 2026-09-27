@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 27 | **Last Updated:** 2026-09-27 01:05:12 PM IST
+**Total Videos:** 27 | **Last Updated:** 2026-09-27 01:22:08 PM IST
 
 ---
 
@@ -14,7 +14,7 @@
 | Posted (FB or IG) | 9 / 27 |
 | FB Posted | 7 / 27 |
 | IG Posted | 6 / 27 |
-| Total FB Views | **17,473** |
+| Total FB Views | **17,481** |
 | Total IG Views | **2,570** |
 
 ---
@@ -30,7 +30,7 @@
 | 5 | Surviving The Fiery Inferno 🔥☠️  #videogames #gamingcommunity #gaming #mm2remastered #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1648582690157110/) | 525 | [🟣 IG](https://www.instagram.com/reel/DdiJ64yEqV5/) | 810 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_11.mp4) |
 | 6 | The Ultimate Fire Storm 🔥  #videogames #gamingcommunity #gaming #mm2remastered #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1772677524053524/) | 708 | [🟣 IG](https://www.instagram.com/reel/DdiHCCOlP4Q/) | 160 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_13.mp4) |
 | 7 | Who Burned DC? 🔥  #videogames #gamingcommunity #gaming #mm2remastered #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1742828950095379/) | 148 | [🟣 IG](https://www.instagram.com/reel/Ddaiq6ygnUK/) | 400 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_16.mp4) |
-| 8 | Can you survive this red firestorm?  #videogames #gamingcommunity #gaming #mm2remastered #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1829429441565917/) | 14,135 | [🟣 IG](https://www.instagram.com/reel/DdV9CvpDMvp/) | 570 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_17.mp4) |
+| 8 | Can you survive this red firestorm?  #videogames #gamingcommunity #gaming #mm2remastered #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1829429441565917/) | 14,143 | [🟣 IG](https://www.instagram.com/reel/DdV9CvpDMvp/) | 570 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_17.mp4) |
 | 9 | Going from space to a literal warzone in seconds 😱🔥  #videogames #gamingcommunity #gaming #mm2remastered #gamingreels #r | [🔵 FB](https://www.facebook.com/reel/1053479597579547/) | 324 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_18.mp4) |
 | 10 | mm2remastered_22 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_22.mp4) |
 | 11 | mm2remastered_21 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_21.mp4) |
