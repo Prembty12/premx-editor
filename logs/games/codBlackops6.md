@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 45 | **Last Updated:** 2026-09-27 08:36:28 PM IST
+**Total Videos:** 45 | **Last Updated:** 2026-09-27 09:02:32 PM IST
 
 ---
 
@@ -14,8 +14,8 @@
 | Posted (FB or IG) | 20 / 45 |
 | FB Posted | 17 / 45 |
 | IG Posted | 4 / 45 |
-| Total FB Views | **26,573** |
-| Total IG Views | **790** |
+| Total FB Views | **26,574** |
+| Total IG Views | **810** |
 
 ---
 
@@ -23,11 +23,11 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | Battlefield Chaos Unleashed 💥🔫  #videogames #gamingcommunity #gaming #codblackops6 #gamingreels #ree | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdwsNiDjmY3/) | 150 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops623.mp4) |
-| 2 | Arc Combat Clutch 🟠🎯  #videogames #gamingcommunity #gaming #codblackops6 #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdwsMe0CQ_C/) | 270 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops63.mp4) |
+| 1 | Battlefield Chaos Unleashed 💥🔫  #videogames #gamingcommunity #gaming #codblackops6 #gamingreels #ree | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdwsNiDjmY3/) | 160 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops623.mp4) |
+| 2 | Arc Combat Clutch 🟠🎯  #videogames #gamingcommunity #gaming #codblackops6 #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdwsMe0CQ_C/) | 280 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops63.mp4) |
 | 3 | Sniper Shot Sparks Firefight 🔥  #videogames #gamingcommunity #gaming #codblackops6 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2383468275793506/) | 403 | [🟣 IG](https://www.instagram.com/reel/DdZ5zKMCLcY/) | 130 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops64.mp4) |
 | 4 | The secret trick to dominate every single gunfight!  #videogames #gamingcommunity #gaming #codblacko | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdUVDkTCfdl/) | 240 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops613.mp4) |
-| 5 | Can he survive this insane ambush? 😱🔥  #videogames #gamingcommunity #gaming #codblackops6 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1087694207200854/) | 1,988 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops611.mp4) |
+| 5 | Can he survive this insane ambush? 😱🔥  #videogames #gamingcommunity #gaming #codblackops6 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1087694207200854/) | 1,989 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops611.mp4) |
 | 6 | STEALING A TANK IN COD! 💥😱  #videogames #gamingcommunity #gaming #codblackops6 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2356827681835663/) | 468 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops614.mp4) |
 | 7 | INSANE REFLEXES IN BLACK OPS 6! 🤯🔥  #videogames #gamingcommunity #gaming #codblackops6 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1060926839894357/) | 1,398 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops616.mp4) |
 | 8 | Hold focus Boom! 🎯 Tag a pro sniper #codblackops6 #reels #shorts | [🔵 FB](https://www.facebook.com/reel/1470917381541582/) | 1,769 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops618.mp4) |
