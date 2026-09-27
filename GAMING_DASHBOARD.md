@@ -1,6 +1,6 @@
 # 🚀 GAMING AGENT COMMAND & ANALYTICS DASHBOARD
 
-> **Last Updated:** 2026-09-27 12:32:44 PM IST | **Status:** All Systems Active & Synchronized
+> **Last Updated:** 2026-09-27 12:36:34 PM IST | **Status:** All Systems Active & Synchronized
 
 --- 
 
@@ -10,7 +10,7 @@
 | :---: | :--- | :---: | :---: | :---: | :---: |
 | 🥇 | **codBlackops6** | 1 | 27,203 | 27,203 | 🔥 Viral / Hype |
 | 🥈 | **SpiderMan2** | 1 | 22,162 | 22,162 | 🔥 Viral / Hype |
-| 🥉 | **mm2remastered** | 0 | 20,021 | 0 | 📈 Stable |
+| 🥉 | **mm2remastered** | 1 | 20,023 | 20,023 | 🔥 Viral / Hype |
 | 4️⃣ | **AfghanistanRedZone** | 0 | 19,516 | 0 | 📈 Stable |
 | 5️⃣ | **Callofdutyaw** | 1 | 19,361 | 19,361 | 🔥 Viral / Hype |
 | 6 | **MarvelsSpiderMan2** | 1 | 12,736 | 12,736 | 🔥 Viral / Hype |
@@ -20,7 +20,7 @@
 | 10 | **GODOFWAR3** | 1 | 3,403 | 3,403 | 📈 Stable |
 | 11 | **Russian_secret_missions** | 1 | 3,067 | 3,067 | 📈 Stable |
 | 12 | **UkraineCovertMission** | 1 | 3,065 | 3,065 | 📈 Stable |
-| 13 | **VietnamCavePrison** | 1 | 1,970 | 1,970 | 📈 Stable |
+| 13 | **VietnamCavePrison** | 1 | 1,976 | 1,976 | 📈 Stable |
 | 14 | **combatopration** | 1 | 1,684 | 1,684 | 📈 Stable |
 | 15 | **Ghost_soap_escap** | 1 | 1,628 | 1,628 | 📈 Stable |
 | 16 | **sifu** | 0 | 687 | 0 | 📈 Stable |
@@ -49,7 +49,7 @@
 | **Ghost_soap_escap** | 2026-09-26 02:50 PM | Tense Confrontation Between Soldiers 💀  #videogames #gamingcommunity #gaming #gh | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdvsqOUkm2U/) | 0 | **18** / 19 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps1.mp4) | **[📜 View 19](logs/games/Ghost_soap_escap.md)** |
 | **Ghost Destroys Mexican** | 2026-09-26 11:52 AM | Storm Ship Boarding Climb 🌊⚓  #videogames #gamingcommunity #gaming #ghost destro | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdvYTdVDxHO/) | 50 | **19** / 19 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.82/Ghost_Destroys_Mexican_Oil_Ring5.mp4) | **[📜 View 19](logs/games/Ghost_Destroys_Mexican.md)** |
 | **DiabloIV** | 2026-09-26 02:09 AM | He Returned To Destroy You 🔥  #videogames #gamingcommunity #gaming #diabloiv #ga | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DduVnyLid_N/) | 80 | **17** / 17 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.102/DiabloIV6.mp4) | **[📜 View 17](logs/games/DiabloIV.md)** |
-| **mm2remastered** | 2026-09-25 03:20 PM | Red Sky Combat Zone 💀🔥  #videogames #gamingcommunity #gaming #mm2remastered #gam | [🔵 FB](https://www.facebook.com/reel/3584878615007660/) | 764 | ⏳ Pending | _0_ | **27** / 27 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_19.mp4) | **[📜 View 27](logs/games/mm2remastered.md)** |
+| **mm2remastered** | 2026-09-25 03:20 PM | Red Sky Combat Zone 💀🔥  #videogames #gamingcommunity #gaming #mm2remastered #gam | [🔵 FB](https://www.facebook.com/reel/3584878615007660/) | 764 | ⏳ Pending | _0_ | **26** / 27 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_19.mp4) | **[📜 View 27](logs/games/mm2remastered.md)** |
 | **AfghanistanRedZone** | 2026-09-25 01:50 AM | Street Gunfight Mayhem 🔫💀  #videogames #gamingcommunity #gaming #afghanistanredz | [🔵 FB](https://www.facebook.com/reel/1440490007980933/) | 16,822 | [🟣 IG](https://www.instagram.com/reel/DdrsNGqivic/) | 900 | **9** / 9 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.101/AfghanistanRedZone1.mp4) | **[📜 View 9](logs/games/AfghanistanRedZone.md)** |
 | **UkraineCovertMission** | 2026-09-24 11:54 PM | Sniper Fire & Big Booms 💥🎯  #videogames #gamingcommunity #gaming #ukrainecovertm | [🔵 FB](https://www.facebook.com/reel/1433881315316238/) | 470 | [🟣 IG](https://www.instagram.com/reel/DdrhIHCFEtY/) | 180 | **3** / 4 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.99/_Ukraine_Covert_Sniper_Mission5.mp4) | **[📜 View 4](logs/games/UkraineCovertMission.md)** |
 | **sifu** | 2026-09-21 06:28 PM | Hallway Beatdown 🥋🔥  #videogames #gamingcommunity #gaming #sifu #gamingreels #re | [🔵 FB](https://www.facebook.com/reel/2361453797997528/) | 308 | [🟣 IG](https://www.instagram.com/reel/DdjNjBFCvUn/) | 30 | **19** / 19 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu18.mp4) | **[📜 View 19](logs/games/sifu.md)** |
@@ -60,7 +60,7 @@
 
 ## 📈 Trending Games (Last 7 Days)
 
-> Auto-detected based on views performance | Last Updated: 2026-09-27 12:32:44 PM
+> Auto-detected based on views performance | Last Updated: 2026-09-27 12:36:34 PM
 
 | Rank | Game Name | Views (7d) | Avg / Video | Trend | FB Post | Source |
 |:---:|---|---|---|---|---|---|
@@ -85,7 +85,7 @@
 
 ## 🎯 Best Time to Post (IST)
 
-> Analysis from 12 posts | Last Updated: 2026-09-27 12:32:44 PM
+> Analysis from 13 posts | Last Updated: 2026-09-27 12:36:34 PM
 
 | Rank | Time (IST) | Posts | Avg Views | Recommendation |
 |:---:|---|:---:|:---:|---|
@@ -101,13 +101,13 @@
 
 | Day | Posts | Avg Views |
 |---|---|---|
-| Sunday | 12 | 213 |
+| Sunday | 13 | 198 |
 
 --- 
 
 ## 🤖 Auto-Reply Log (Facebook Only)
 
-> Auto-Comment Status: ✅ **ACTIVE** | Last Updated: 2026-09-27 12:32:44 PM | Total Replies: 0 | Skipped: 0
+> Auto-Comment Status: ✅ **ACTIVE** | Last Updated: 2026-09-27 12:36:34 PM | Total Replies: 0 | Skipped: 0
 
 
 --- 
@@ -140,38 +140,38 @@
 
 ## 🔄 Game Rotation Queue
 
-**📊 Total Games:** 19 | **🎯 Current:** `ghostandela` | **⏭️ Next Game:** `mm2remastered` (Position #17) | **🔢 Total Runs:** 13
+**📊 Total Games:** 19 | **🎯 Current:** `mm2remastered` | **⏭️ Next Game:** `monkeyKing` (Position #18) | **🔢 Total Runs:** 14
 
-**Last Updated:** 2026-09-27 12:32:44 PM IST
+**Last Updated:** 2026-09-27 12:36:34 PM IST
 
 | # | Game Name | Uploaded | Last Run # | Next Turn In | Status |
 |:---:|---|:---:|:---:|:---:|:---:|
-| 1 | **AfghanistanRedZone** | 0 | — | 4 | ⏳ Wait 4 |
-| 2 | **Callofdutyaw** | 1 | 1 | 5 | ⏳ Wait 5 |
-| 3 | **DiabloIV** | 0 | — | 6 | ⏳ Wait 6 |
-| 4 | **GODOFWAR3** | 1 | 2 | 7 | ⏳ Wait 7 |
-| 5 | **Ghost Destroys Mexican** | 0 | — | 8 | ⏳ Wait 8 |
-| 6 | **Ghost_soap_escap** | 1 | 3 | 9 | ⏳ Wait 9 |
-| 7 | **GodofWarLaufey** | 1 | 4 | 10 | ⏳ Wait 10 |
-| 8 | **MarvelsSpiderMan2** | 1 | 5 | 11 | ⏳ Wait 11 |
-| 9 | **RescueOperation** | 1 | 6 | 12 | ⏳ Wait 12 |
-| 10 | **Russian_secret_missions** | 1 | 7 | 13 | ⏳ Wait 13 |
-| 11 | **SpiderMan2** | 1 | 8 | 14 | ⏳ Wait 14 |
-| 12 | **UkraineCovertMission** | 1 | 9 | 15 | ⏳ Wait 15 |
-| 13 | **VietnamCavePrison** | 1 | 10 | 16 | ⏳ Wait 16 |
-| 14 | **codBlackops6** | 1 | 11 | 17 | ⏳ Wait 17 |
-| 15 | **combatopration** | 1 | 12 | 18 | ⏳ Wait 18 |
-| 16 | **ghostandela** | 1 | 13 | 0 | 🎯 **CURRENT** |
-| 17 | **mm2remastered** | 0 | — | 1 | ⏭️ **NEXT UP** |
-| 18 | **monkeyKing** | 0 | — | 2 | ⏳ Wait 2 |
-| 19 | **sifu** | 0 | — | 3 | ⏳ Wait 3 |
+| 1 | **AfghanistanRedZone** | 0 | — | 3 | ⏳ Wait 3 |
+| 2 | **Callofdutyaw** | 1 | 1 | 4 | ⏳ Wait 4 |
+| 3 | **DiabloIV** | 0 | — | 5 | ⏳ Wait 5 |
+| 4 | **GODOFWAR3** | 1 | 2 | 6 | ⏳ Wait 6 |
+| 5 | **Ghost Destroys Mexican** | 0 | — | 7 | ⏳ Wait 7 |
+| 6 | **Ghost_soap_escap** | 1 | 3 | 8 | ⏳ Wait 8 |
+| 7 | **GodofWarLaufey** | 1 | 4 | 9 | ⏳ Wait 9 |
+| 8 | **MarvelsSpiderMan2** | 1 | 5 | 10 | ⏳ Wait 10 |
+| 9 | **RescueOperation** | 1 | 6 | 11 | ⏳ Wait 11 |
+| 10 | **Russian_secret_missions** | 1 | 7 | 12 | ⏳ Wait 12 |
+| 11 | **SpiderMan2** | 1 | 8 | 13 | ⏳ Wait 13 |
+| 12 | **UkraineCovertMission** | 1 | 9 | 14 | ⏳ Wait 14 |
+| 13 | **VietnamCavePrison** | 1 | 10 | 15 | ⏳ Wait 15 |
+| 14 | **codBlackops6** | 1 | 11 | 16 | ⏳ Wait 16 |
+| 15 | **combatopration** | 1 | 12 | 17 | ⏳ Wait 17 |
+| 16 | **ghostandela** | 1 | 13 | 18 | ⏳ Wait 18 |
+| 17 | **mm2remastered** | 1 | 14 | 0 | 🎯 **CURRENT** |
+| 18 | **monkeyKing** | 0 | — | 1 | ⏭️ **NEXT UP** |
+| 19 | **sifu** | 0 | — | 2 | ⏳ Wait 2 |
 
 ### 📜 Recent Runs (Last 5)
 
 | Run # | Game | Timestamp (IST) |
 |:---:|---|---|
+| 14 | mm2remastered | 2026-09-27 12:36:34 PM |
 | 13 | ghostandela | 2026-09-27 12:32:44 PM |
 | 12 | combatopration | 2026-09-27 10:18:15 AM |
 | 11 | codBlackops6 | 2026-09-27 09:56:03 AM |
 | 10 | VietnamCavePrison | 2026-09-27 09:36:30 AM |
-| 9 | UkraineCovertMission | 2026-09-27 09:32:10 AM |

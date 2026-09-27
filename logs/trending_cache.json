@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-27 12:32:44 PM",
+  "last_updated": "2026-09-27 12:36:34 PM",
   "period_days": 7,
   "trending": [
     {
@@ -7,7 +7,7 @@
       "views_7d": 18503,
       "avg_per_video": 9251,
       "trend": "viral",
-      "ratio": 11.462655744475803,
+      "ratio": 11.461077844311378,
       "fb_link": "https://www.facebook.com/reel/1440490007980933/",
       "source_link": ""
     },
@@ -16,7 +16,7 @@
       "views_7d": 8896,
       "avg_per_video": 889,
       "trend": "steady",
-      "ratio": 1.101535072623391,
+      "ratio": 1.1013834400165188,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison14.mp4"
     }
@@ -27,7 +27,7 @@
       "views_7d": 4466,
       "avg_per_video": 744,
       "trend": "slow",
-      "ratio": 0.9218696220830178,
+      "ratio": 0.9217427214536444,
       "fb_link": "https://www.facebook.com/reel/3584878615007660/",
       "source_link": ""
     },
@@ -36,7 +36,7 @@
       "views_7d": 650,
       "avg_per_video": 650,
       "trend": "slow",
-      "ratio": 0.8053968472499484,
+      "ratio": 0.8052859797646088,
       "fb_link": "https://www.facebook.com/reel/1433881315316238/",
       "source_link": ""
     },
@@ -45,7 +45,7 @@
       "views_7d": 2593,
       "avg_per_video": 648,
       "trend": "slow",
-      "ratio": 0.8029187031045639,
+      "ratio": 0.8028081767499484,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR32.mp4"
     },
@@ -54,7 +54,7 @@
       "views_7d": 459,
       "avg_per_video": 459,
       "trend": "slow",
-      "ratio": 0.5687340813657328,
+      "ratio": 0.5686557918645468,
       "fb_link": "https://www.facebook.com/reel/1861373075302275/",
       "source_link": ""
     },
@@ -63,7 +63,7 @@
       "views_7d": 730,
       "avg_per_video": 365,
       "trend": "below_avg",
-      "ratio": 0.45226130653266333,
+      "ratio": 0.45219905017551104,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation14.mp4"
     }
@@ -73,7 +73,7 @@
     "views_7d": 18503,
     "avg_per_video": 9251,
     "trend": "viral",
-    "ratio": 11.462655744475803,
+    "ratio": 11.461077844311378,
     "fb_link": "https://www.facebook.com/reel/1440490007980933/",
     "source_link": ""
   }
