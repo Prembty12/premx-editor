@@ -156,7 +156,7 @@ def parse_game_links_file(filepath):
 # 🤖 GEMINI INTEGRATION
 # ============================================================
 def call_gemini_api(api_key, prompt, max_tokens=150):
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={api_key}"
     payload = {
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {
@@ -308,7 +308,7 @@ def is_reply_safe(reply_text, is_abuse=False):
 # 🤖 AUTO-REPLY FUNCTIONS (FB ONLY)
 # ============================================================
 def fetch_fb_comments(post_id, since_timestamp=None):
-    url = f"https://graph.facebook.com/v19.0/{post_id}/comments"
+    url = f"https://graph.facebook.com/v24.0/{post_id}/comments"
     params = {
         "fields": "id,message,from,created_time,can_reply",
         "access_token": FB_ACCESS_TOKEN,
