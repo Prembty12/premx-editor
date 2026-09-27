@@ -1,1 +1,1 @@
-{"clip_duration": 35, "reason": "Continuous tactical combat and shooting action", "start_time": 2, "status": "APPROVE", "title": "Tactical Ruins Combat 🎯💥"}
+{"clip_duration": 15, "reason": "Glowing red staff forest combat", "start_time": 25, "status": "APPROVE", "title": "Red Staff Combat Slash ⚡⚔️"}
