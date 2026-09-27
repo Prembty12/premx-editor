@@ -1,1 +1,1 @@
-{"clip_duration": 25, "reason": "Helicopter combat and fiery crash action.", "start_time": 10, "status": "APPROVE", "title": "Helicopter Crash Chaos 💥"}
+{"clip_duration": 35, "reason": "Continuous tactical combat and shooting action", "start_time": 2, "status": "APPROVE", "title": "Tactical Ruins Combat 🎯💥"}
