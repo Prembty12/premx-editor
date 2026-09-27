@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 49 | **Last Updated:** 2026-09-27 10:18:15 AM IST
+**Total Videos:** 49 | **Last Updated:** 2026-09-27 12:32:44 PM IST
 
 ---
 
@@ -15,7 +15,7 @@
 | FB Posted | 5 / 49 |
 | IG Posted | 8 / 49 |
 | Total FB Views | **11,566** |
-| Total IG Views | **1,160** |
+| Total IG Views | **1,170** |
 
 ---
 
@@ -23,7 +23,7 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | Lightning Strike Melts Monsters ⚡💀  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingr | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdwLc5lCQmn/) | 60 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan233.mp4) |
+| 1 | Lightning Strike Melts Monsters ⚡💀  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingr | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdwLc5lCQmn/) | 70 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan233.mp4) |
 | 2 | Spider-Man's Bridge Takedown 🕷️💥  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2008442809860960/) | 615 | [🟣 IG](https://www.instagram.com/reel/Ddc8azaESE5/) | 450 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan22.mp4) |
 | 3 | You won’t believe how Miles survived this attack! 😱  #videogames #gamingcommunity #gaming #marvelssp | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdbjSlEgsT7/) | 240 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan228.mp4) |
 | 4 | Spider-Man's wild boat hijack ends in flames! 🕷️🔥  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingreels  | [🔵 FB](https://www.facebook.com/reel/2610569156066695/) | 91 | [🟣 IG](https://www.instagram.com/reel/DdYEdVsku_9/) | 90 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan24.mp4) |

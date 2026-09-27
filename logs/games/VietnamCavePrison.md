@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 28 | **Last Updated:** 2026-09-27 10:18:15 AM IST
+**Total Videos:** 28 | **Last Updated:** 2026-09-27 12:32:44 PM IST
 
 ---
 
@@ -14,8 +14,8 @@
 | Posted (FB or IG) | 5 / 28 |
 | FB Posted | 3 / 28 |
 | IG Posted | 5 / 28 |
-| Total FB Views | **1,430** |
-| Total IG Views | **440** |
+| Total FB Views | **1,510** |
+| Total IG Views | **460** |
 
 ---
 
@@ -23,8 +23,8 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | Rocket Rain on Enemy Base 💣🔥  #videogames #gamingcommunity #gaming #vietnamcaveprison #gamingreels # | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Ddxt8_plP93/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison13.mp4) |
-| 2 | Valley Helicopter War 🚁💥  #videogames #gamingcommunity #gaming #vietnamcaveprison #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1780695949719463/) | 827 | [🟣 IG](https://www.instagram.com/reel/Ddwn1FmgvlH/) | 70 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison3.mp4) |
+| 1 | Rocket Rain on Enemy Base 💣🔥  #videogames #gamingcommunity #gaming #vietnamcaveprison #gamingreels # | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Ddxt8_plP93/) | 30 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison13.mp4) |
+| 2 | Valley Helicopter War 🚁💥  #videogames #gamingcommunity #gaming #vietnamcaveprison #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1780695949719463/) | 907 | [🟣 IG](https://www.instagram.com/reel/Ddwn1FmgvlH/) | 70 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison3.mp4) |
 | 3 | Would You Pull the Trigger? 😱  #videogames #gamingcommunity #gaming #vietnamcaveprison #gamingreels  | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Ddrp4-XiGwR/) | 60 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison2.mp4) |
 | 4 | Warehouse ambush Run 🔫  #videogames #gamingcommunity #gaming #vietnamcaveprison #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2642558112868316/) | 193 | [🟣 IG](https://www.instagram.com/reel/DdZ4mLwjkuo/) | 220 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison7.mp4) |
 | 5 | You won't believe how intense this dogfight gets!  #videogames #gamingcommunity #gaming #vietnamcaveprison #gamingreels  | [🔵 FB](https://www.facebook.com/reel/1364205288788033/) | 410 | [🟣 IG](https://www.instagram.com/reel/DdUSbpbAm0w/) | 80 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison8.mp4) |

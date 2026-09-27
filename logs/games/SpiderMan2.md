@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 52 | **Last Updated:** 2026-09-27 10:18:15 AM IST
+**Total Videos:** 52 | **Last Updated:** 2026-09-27 12:32:44 PM IST
 
 ---
 
@@ -15,7 +15,7 @@
 | FB Posted | 19 / 52 |
 | IG Posted | 12 / 52 |
 | Total FB Views | **20,772** |
-| Total IG Views | **1,370** |
+| Total IG Views | **1,390** |
 
 ---
 
@@ -23,8 +23,8 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | Spider-Man Climbs Giant Colossus 🔥  #videogames #gamingcommunity #gaming #spiderman2 #gamingreels #r | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdxrbGlAcgA/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan216.mp4) |
-| 2 | Lightning Strike Melts Monsters ⚡💀  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingr | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdwLc5lCQmn/) | 60 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan233.mp4) |
+| 1 | Spider-Man Climbs Giant Colossus 🔥  #videogames #gamingcommunity #gaming #spiderman2 #gamingreels #r | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdxrbGlAcgA/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan216.mp4) |
+| 2 | Lightning Strike Melts Monsters ⚡💀  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingr | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdwLc5lCQmn/) | 70 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan233.mp4) |
 | 3 | Desert Bloodbath Slash ⚔️💀  #videogames #gamingcommunity #gaming #spiderman2 #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdrV8MyEadM/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan29.mp4) |
 | 4 | Can I beat this elite squad? 🤔⚔️  #videogames #gamingcommunity #gaming #spiderman2 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1776708160307603/) | 494 | [🟣 IG](https://www.instagram.com/reel/DdegZzvjmc_/) | 190 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan227.mp4) |
 | 5 | Spider-Man's Bridge Takedown 🕷️💥  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2008442809860960/) | 615 | [🟣 IG](https://www.instagram.com/reel/Ddc8azaESE5/) | 450 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan228.mp4) |
