@@ -2,9 +2,9 @@
     {
         "rank": 1,
         "game_name": "codBlackops6",
-        "total_views": 27203,
+        "total_views": 27213,
         "uploaded_videos": 1,
-        "avg_views_per_video": 27203,
+        "avg_views_per_video": 27213,
         "view_share_percentage": 17.27
     },
     {
@@ -13,20 +13,20 @@
         "total_views": 22162,
         "uploaded_videos": 1,
         "avg_views_per_video": 22162,
-        "view_share_percentage": 14.07
+        "view_share_percentage": 14.06
     },
     {
         "rank": 3,
         "game_name": "mm2remastered",
-        "total_views": 20023,
+        "total_views": 20043,
         "uploaded_videos": 1,
-        "avg_views_per_video": 20023,
-        "view_share_percentage": 12.71
+        "avg_views_per_video": 20043,
+        "view_share_percentage": 12.72
     },
     {
         "rank": 4,
         "game_name": "AfghanistanRedZone",
-        "total_views": 19516,
+        "total_views": 19528,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
         "view_share_percentage": 12.39
@@ -34,9 +34,9 @@
     {
         "rank": 5,
         "game_name": "Callofdutyaw",
-        "total_views": 19361,
+        "total_views": 19364,
         "uploaded_videos": 1,
-        "avg_views_per_video": 19361,
+        "avg_views_per_video": 19364,
         "view_share_percentage": 12.29
     },
     {
@@ -45,7 +45,7 @@
         "total_views": 12736,
         "uploaded_videos": 1,
         "avg_views_per_video": 12736,
-        "view_share_percentage": 8.09
+        "view_share_percentage": 8.08
     },
     {
         "rank": 7,
@@ -53,7 +53,7 @@
         "total_views": 10216,
         "uploaded_videos": 1,
         "avg_views_per_video": 10216,
-        "view_share_percentage": 6.49
+        "view_share_percentage": 6.48
     },
     {
         "rank": 8,
@@ -74,17 +74,17 @@
     {
         "rank": 10,
         "game_name": "GODOFWAR3",
-        "total_views": 3403,
+        "total_views": 3411,
         "uploaded_videos": 1,
-        "avg_views_per_video": 3403,
+        "avg_views_per_video": 3411,
         "view_share_percentage": 2.16
     },
     {
         "rank": 11,
         "game_name": "Russian_secret_missions",
-        "total_views": 3067,
+        "total_views": 3069,
         "uploaded_videos": 1,
-        "avg_views_per_video": 3067,
+        "avg_views_per_video": 3069,
         "view_share_percentage": 1.95
     },
     {
@@ -98,10 +98,10 @@
     {
         "rank": 13,
         "game_name": "VietnamCavePrison",
-        "total_views": 1976,
+        "total_views": 1996,
         "uploaded_videos": 1,
-        "avg_views_per_video": 1976,
-        "view_share_percentage": 1.25
+        "avg_views_per_video": 1996,
+        "view_share_percentage": 1.27
     },
     {
         "rank": 14,
@@ -147,8 +147,8 @@
         "rank": 19,
         "game_name": "monkeyKing",
         "total_views": 436,
-        "uploaded_videos": 0,
-        "avg_views_per_video": 0,
+        "uploaded_videos": 1,
+        "avg_views_per_video": 436,
         "view_share_percentage": 0.28
     }
 ]
