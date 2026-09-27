@@ -24,7 +24,7 @@ def now_ist_str():
 def now_ist_ampm():
     return datetime.now(IST).strftime("%Y-%m-%d %I:%M:%S %p")
 
-# 🔥 FIX 3: UTC → IST converter
+# 🔥 UTC → IST converter
 def utc_to_ist(iso_time_str):
     if not iso_time_str:
         return None
@@ -57,21 +57,20 @@ except ImportError:
     REPORTLAB_AVAILABLE = False
 
 
-# 🔑 Gemini Keys
-GEMINI_KEYS = [
-    os.environ.get("GEMINI_API_KEY_1"),
-    os.environ.get("GEMINI_API_KEY_2"),
-    os.environ.get("GEMINI_API_KEY_3"),
-    os.environ.get("GEMINI_API_KEY_4"),
-    os.environ.get("GEMINI_API_KEY_5"),
-    os.environ.get("GEMINI_API_KEY_6"),
+# ============================================================
+# 🔑 OPENROUTER API KEYS (Gemini ki jagah)
+# ============================================================
+OPENROUTER_KEYS = [
+    os.environ.get("OPENROUTER_API_KEY"),
+    os.environ.get("OPENROUTER_API_KEY_2"),
+    os.environ.get("OPENROUTER_API_KEY_3"),
+    os.environ.get("OPENROUTER_API_KEY_4"),
+    os.environ.get("OPENROUTER_API_KEY_5"),
 ]
 
-# 🔧 FIX: gemini-3.5-flash doesn't exist — that was causing every single Gemini
-# call to fail with a 404, no matter which key rotated in. Using a real,
-# currently-available model now. (gemini-2.5-flash is being shut down by
-# Google on 16 Oct 2026, so don't fall back to that.)
-GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash")
+FIXED_MODEL = "google/gemma-4-26b-a4b-it:free"   # Tumhara fixed model
+FALLBACK_MODEL = "openrouter/free"               # Emergency fallback
+OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 FB_PAGE_ID = os.environ.get("PAGE_ID")
 FB_ACCESS_TOKEN = os.environ.get("PAGE_ACCESS_TOKEN")
@@ -159,41 +158,72 @@ def parse_game_links_file(filepath):
 
 
 # ============================================================
-# 🤖 GEMINI INTEGRATION
+# 🤖 OPENROUTER INTEGRATION (Gemini replace)
 # ============================================================
-def get_gemini_key():
-    valid = [k for k in GEMINI_KEYS if k]
-    return random.choice(valid) if valid else None
-
-
-def call_gemini_api(api_key, prompt, max_tokens=150):
-    # 🔧 FIX: was hardcoded to the nonexistent "gemini-3.5-flash" model.
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={api_key}"
+def _call_openrouter_single(model_name, api_key, prompt, max_tokens=150):
+    """Ek single OpenRouter API call."""
+    if not api_key:
+        return None
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://github.com/",   # OpenRouter recommends
+        "X-Title": "Gaming Auto-Agent",
+    }
     payload = {
-        "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {
-            "temperature": 0.9,
-            "maxOutputTokens": max_tokens,
-            "topP": 0.95,
-        }
+        "model": model_name,
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0.9,
+        "max_tokens": max_tokens,
+        "top_p": 0.95,
     }
     try:
-        res = requests.post(url, json=payload, timeout=15)
+        res = requests.post(OPENROUTER_URL, headers=headers, json=payload, timeout=25)
         if res.status_code == 200:
             data = res.json()
-            try:
-                text = data['candidates'][0]['content']['parts'][0]['text']
-                return text.strip()
-            except (KeyError, IndexError) as e:
-                log(f"⚠️ Gemini response missing expected fields: {e} | body={json.dumps(data)[:300]}")
-                return None
+            choices = data.get("choices", [])
+            if choices:
+                content = choices[0].get("message", {}).get("content", "")
+                if content:
+                    return content.strip()
         else:
-            # 🔧 FIX: previously silent on non-200 — this is what was hiding
-            # the bad model name / key issues. Now every failure is visible.
-            key_tail = api_key[-6:] if api_key else "none"
-            log(f"⚠️ Gemini API HTTP {res.status_code} (key ...{key_tail}, model={GEMINI_MODEL}): {res.text[:300]}")
+            log(f"⚠️ OpenRouter {model_name} HTTP {res.status_code}: {res.text[:150]}")
     except Exception as e:
-        log(f"⚠️ Gemini API error: {e}")
+        log(f"⚠️ OpenRouter {model_name} exception: {e}")
+    return None
+
+
+def call_openrouter(prompt, max_tokens=150):
+    """
+    Logic:
+    1. FIXED_MODEL ko sirf 1 baar try karo (pehli key se).
+    2. Fail hone par FALLBACK_MODEL (openrouter/free) ko saari keys se try karo.
+       Ek key fail = turant agli key.
+    """
+    valid_keys = [k for k in OPENROUTER_KEYS if k]
+    if not valid_keys:
+        log("❌ No OpenRouter API keys found.")
+        return None
+
+    # ---------- STEP 1: FIXED MODEL (Sirf 1 try, pehli key se) ----------
+    primary_key = valid_keys[0]
+    log(f"🚀 Trying FIXED model: {FIXED_MODEL} (1 attempt)")
+    result = _call_openrouter_single(FIXED_MODEL, primary_key, prompt, max_tokens)
+    if result:
+        log(f"✅ FIXED model success")
+        return result
+
+    # ---------- STEP 2: FALLBACK MODEL (Saari keys, ek-ek baar) ----------
+    log(f"🔄 Fixed failed. Switching to FALLBACK: {FALLBACK_MODEL} with all keys...")
+    for idx, key in enumerate(valid_keys):
+        log(f"🔑 Trying Key {idx + 1} with {FALLBACK_MODEL}...")
+        result = _call_openrouter_single(FALLBACK_MODEL, key, prompt, max_tokens)
+        if result:
+            log(f"✅ Fallback success with Key {idx + 1}")
+            return result
+        log(f"❌ Key {idx + 1} failed. Next...")
+
+    log("❌ All keys and models failed.")
     return None
 
 
@@ -243,11 +273,9 @@ def is_spam(text):
 
 
 def generate_smart_reply(comment_text, game_name, post_title, is_abuse=False):
-    keys = [k for k in GEMINI_KEYS if k]
-    if not keys:
-        log("⚠️ No Gemini API keys configured (GEMINI_API_KEY_1..6 all empty)")
-        return None
-
+    """
+    OpenRouter se reply generate karta hai.
+    """
     if is_abuse:
         prompt = f"""You are a SAVAGE but RESPECTFUL gaming content creator replying to a hater.
 
@@ -295,19 +323,12 @@ RULES:
 
 Reply ONLY with the reply text, no quotes, no prefix."""
 
-    # 🔧 FIX: rotate through DIFFERENT keys per attempt instead of re-picking
-    # randomly (which could retry the same dead key more than once).
-    shuffled_keys = keys[:]
-    random.shuffle(shuffled_keys)
-    for attempt, key in enumerate(shuffled_keys[:3], 1):
-        response = call_gemini_api(key, prompt, max_tokens=100)
-        if response:
-            response = response.strip().strip('"').strip("'")
-            if response.lower().startswith("reply:"):
-                response = response[6:].strip()
-            return response
-        log(f"⚠️ Gemini attempt {attempt}/{min(3, len(shuffled_keys))} failed, trying next key...")
-    log("❌ All Gemini key attempts failed for this comment")
+    response = call_openrouter(prompt, max_tokens=100)
+    if response:
+        response = response.strip().strip('"').strip("'")
+        if response.lower().startswith("reply:"):
+            response = response[6:].strip()
+        return response
     return None
 
 
@@ -332,7 +353,7 @@ def is_reply_safe(reply_text, is_abuse=False):
 # 🤖 AUTO-REPLY FUNCTIONS (FB ONLY)
 # ============================================================
 def fetch_fb_comments(post_id, since_timestamp=None):
-    url = f"https://graph.facebook.com/v24.0/{post_id}/comments"
+    url = f"https://graph.facebook.com/v19.0/{post_id}/comments"
     params = {
         "fields": "id,message,from,created_time,can_reply",
         "access_token": FB_ACCESS_TOKEN,
@@ -352,7 +373,7 @@ def fetch_fb_comments(post_id, since_timestamp=None):
 
 
 def check_if_already_replied(comment_id):
-    url = f"https://graph.facebook.com/v24.0/{comment_id}/comments"
+    url = f"https://graph.facebook.com/v19.0/{comment_id}/comments"
     params = {"fields": "id,from", "access_token": FB_ACCESS_TOKEN, "limit": 10}
     try:
         res = requests.get(url, params=params, timeout=10)
@@ -371,7 +392,7 @@ def post_fb_reply(comment_id, reply_text):
         log(f"🚫 [AUTO_COMMENT OFF] Would post: {reply_text[:80]}")
         return f"disabled_{comment_id}"
 
-    url = f"https://graph.facebook.com/v24.0/{comment_id}/comments"
+    url = f"https://graph.facebook.com/v19.0/{comment_id}/comments"
     payload = {"message": reply_text, "access_token": FB_ACCESS_TOKEN}
     try:
         res = requests.post(url, data=payload, timeout=15)
@@ -502,7 +523,7 @@ def process_fb_comments(actual_posted_titles):
                         "comment_id": comment_id,
                         "post_id": post_id,
                         "user_comment": comment_text[:200],
-                        "gemini_reply": reply_text,
+                        "openrouter_reply": reply_text,   # renamed field
                         "type": "savage" if is_abuse else "friendly",
                         "game": game_name,
                         "post_title": video.get("title", "")[:100],
@@ -763,11 +784,11 @@ def generate_auto_reply_section():
         lines.append(f"| Savage Replies | {savage_count} |\n")
         lines.append(f"| Total | {len(replies)} |\n\n")
         lines.append("### 💬 Recent Replies (Last 20)\n\n")
-        lines.append("| # | Time | User Comment | Gemini Reply | Type | FB Post | Source |\n")
+        lines.append("| # | Time | User Comment | AI Reply | Type | FB Post | Source |\n")
         lines.append("|---|---|---|---|---|---|---|\n")
         for idx, r in enumerate(list(reversed(replies[-20:])), 1):
             comment = (r.get("user_comment", "") or "").replace("\n", " ").replace("|", "\\|")[:60]
-            reply = (r.get("gemini_reply", "") or "").replace("\n", " ").replace("|", "\\|")[:80]
+            reply = (r.get("openrouter_reply", "") or "").replace("\n", " ").replace("|", "\\|")[:80]
             ts = r.get("timestamp", "")[:20]
             rtype = "😎 Savage" if r.get("type") == "savage" else "✅ Friendly"
             fb_link = r.get("fb_post_link", "")
@@ -777,10 +798,10 @@ def generate_auto_reply_section():
             lines.append(f"| {idx} | {ts} | {comment} | {reply} | {rtype} | {fb_md} | {src_md} |\n")
         savages = [r for r in replies if r.get("type") == "savage"][-5:]
         if savages:
-            lines.append("\n### 😎 Savage Replies (Last 5)\n\n| User Abuse | Gemini Reply | FB Link |\n|---|---|---|\n")
+            lines.append("\n### 😎 Savage Replies (Last 5)\n\n| User Abuse | AI Reply | FB Link |\n|---|---|---|\n")
             for s in reversed(savages):
                 comment = (s.get("user_comment", "") or "").replace("\n", " ").replace("|", "\\|")[:80]
-                reply = (s.get("gemini_reply", "") or "").replace("\n", " ").replace("|", "\\|")[:100]
+                reply = (s.get("openrouter_reply", "") or "").replace("\n", " ").replace("|", "\\|")[:100]
                 fb_link = s.get("fb_post_link", "")
                 fb_md = f"[🔵]({fb_link})" if fb_link else "_N/A_"
                 lines.append(f"| {comment} | {reply} | {fb_md} |\n")
@@ -1003,7 +1024,6 @@ def fetch_fb_ig_data(game_list):
         log("⚠️ FB_ACCESS_TOKEN missing")
         return result, game_views_summary
 
-    # 🔥 FIX: ID → Source map banao (posted_links_editor se)
     id_to_source_map = {}
     if os.path.exists(posted_dir):
         for fname in os.listdir(posted_dir):
@@ -1081,7 +1101,6 @@ def fetch_fb_ig_data(game_list):
                         game = r.get('game')
                         if game in result:
                             vid_id = str(r.get('vid_id', '')).strip()
-                            # 🔥 ID se source link match
                             matched_source = id_to_source_map.get(vid_id, "")
                             if not matched_source:
                                 matched_source = r.get('link', '')
@@ -1103,7 +1122,7 @@ def fetch_fb_ig_data(game_list):
     fb_videos = []
     ig_medias = []
     try:
-        fb_url = f"https://graph.facebook.com/v24.0/{FB_PAGE_ID}/videos"
+        fb_url = f"https://graph.facebook.com/v19.0/{FB_PAGE_ID}/videos"
         params = {"fields": "id,title,description,views,permalink_url,created_time",
                   "since": since_timestamp, "access_token": FB_ACCESS_TOKEN, "limit": 100}
         res = requests.get(fb_url, params=params, timeout=20)
@@ -1113,13 +1132,13 @@ def fetch_fb_ig_data(game_list):
     except Exception as e:
         log(f"❌ FB page fetch error: {e}")
     try:
-        ig_url = f"https://graph.facebook.com/v24.0/{FB_PAGE_ID}"
+        ig_url = f"https://graph.facebook.com/v19.0/{FB_PAGE_ID}"
         ig_params = {"fields": "instagram_business_account", "access_token": FB_ACCESS_TOKEN}
         res_ig_acc = requests.get(ig_url, params=ig_params, timeout=10)
         if res_ig_acc.status_code == 200:
             ig_id = res_ig_acc.json().get("instagram_business_account", {}).get("id")
             if ig_id:
-                media_url = f"https://graph.facebook.com/v24.0/{ig_id}/media"
+                media_url = f"https://graph.facebook.com/v19.0/{ig_id}/media"
                 media_params = {"fields": "id,caption,permalink,timestamp,like_count,comments_count",
                                 "access_token": FB_ACCESS_TOKEN, "limit": 100}
                 res_ig = requests.get(media_url, params=media_params, timeout=20)
@@ -1141,7 +1160,6 @@ def fetch_fb_ig_data(game_list):
                 if key in existing_titles: continue
                 fb_vid_id = str(v.get("id", "")).strip()
                 fb_link = fix_fb_url(v.get("permalink_url", ""), fb_vid_id)
-                # 🔥 ID se source link
                 matched_source = id_to_source_map.get(fb_vid_id, "")
                 entry = {
                     "title": title, "fb_link": fb_link,
@@ -1234,7 +1252,6 @@ def fetch_fb_ig_data(game_list):
                     "source_link": src_link, "is_source_only": True,
                 })
 
-    # 🔥 FIX: Sort — Posted newest first, phir pending
     for game in game_list:
         posted_v = [x for x in result[game] if x.get("fb_posted") or x.get("ig_posted")]
         pending_v = [x for x in result[game] if not (x.get("fb_posted") or x.get("ig_posted"))]
@@ -1322,7 +1339,6 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
         videos = actual_posted_titles.get(g_name, [])
         if not videos: continue
 
-        # 🔥 Sort — Posted newest first, phir pending
         posted_v = [x for x in videos if x.get("fb_posted") or x.get("ig_posted")]
         pending_v = [x for x in videos if not (x.get("fb_posted") or x.get("ig_posted"))]
         posted_v_sorted = sorted(posted_v, key=lambda x: x.get("timestamp", "") or "0000", reverse=True)
@@ -1396,7 +1412,6 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
             ig_md = f"[🟣 IG]({v['ig_link']})" if v.get("ig_posted") and v.get("ig_link") else "⏳ Pending"
             ig_v_md = f"{v.get('ig_views', 0):,}" if v.get("ig_posted") else "_0_"
 
-            # 🔥 Source link — digits match + index fallback
             src_link = v.get("source_link", "")
             if not src_link:
                 v_name = (v.get("video_name") or v.get("vid_id") or "").lower().strip()
@@ -1473,7 +1488,6 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
         else:
             progress_md = "_N/A_"
 
-        # 🔥 Time AM/PM in IST
         latest_post_time = get_latest_post_time(g_name)
         if latest_post_time:
             dt_ist = utc_to_ist(latest_post_time)
@@ -1592,15 +1606,6 @@ def run_agent_brain():
 
     if not AUTO_COMMENT_ENABLED:
         log("🚫 AUTO_COMMENT=false — Auto-reply will be SKIPPED (analytics only)")
-
-    # 🔧 FIX: sanity-check Gemini keys at startup so a missing/empty key set
-    # shows up immediately in the run logs instead of failing silently
-    # inside every single generate_smart_reply call later.
-    valid_gemini_keys = [k for k in GEMINI_KEYS if k]
-    if valid_gemini_keys:
-        log(f"🔑 Gemini keys loaded: {len(valid_gemini_keys)} valid | model={GEMINI_MODEL}")
-    else:
-        log("⚠️ No Gemini API keys found in environment (GEMINI_API_KEY_1..6) — auto-reply text generation will fail")
 
     memory = {
         "game_scores": {},
@@ -1801,4 +1806,3 @@ def run_agent_brain():
 
 if __name__ == "__main__":
     run_agent_brain()
-    exit()
