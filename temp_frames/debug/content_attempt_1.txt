@@ -1,1 +1,1 @@
-{"clip_duration": 35, "reason": "Intense helicopter missile barrage with massive fiery explosions.", "start_time": 2, "status": "APPROVE", "title": "Rocket Rain on Enemy Base 💣🔥"}
+{"clip_duration": 25, "reason": "Helicopter combat and fiery crash action.", "start_time": 10, "status": "APPROVE", "title": "Helicopter Crash Chaos 💥"}
