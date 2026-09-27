@@ -1,7 +1,38 @@
 {
-  "total_replies": 0,
+  "total_replies": 2,
   "total_skipped": 0,
-  "replies": [],
+  "replies": [
+    {
+      "reply_id": "1085624367658192_2259316575466970",
+      "comment_id": "1085624367658192_2968002780210454",
+      "post_id": "100463226188818_1085624367658192",
+      "user_name": "Unknown User",
+      "user_comment": "It would be great to know which game it is...",
+      "openrouter_reply": "It's the Facebook Post game! \ud83c\udfae\ud83d\udd25 Check it out, the hype is real!",
+      "type": "friendly",
+      "game": "Facebook Post",
+      "post_title": "Street Gunfight Mayhem \ud83d\udd2b\ud83d\udc80\n\n#videogames #gamingcommunity #gaming #afghanistanredz",
+      "fb_post_link": "https://www.facebook.com/reel/1440490007980933/",
+      "source_link": "",
+      "timestamp": "2026-09-27 11:24:44 PM",
+      "status": "posted"
+    },
+    {
+      "reply_id": "1085624367658192_1784639486008744",
+      "comment_id": "1085624367658192_1411369557092735",
+      "post_id": "100463226188818_1085624367658192",
+      "user_name": "Unknown User",
+      "user_comment": "Como se llama",
+      "openrouter_reply": "Se llama Facebook Post, el juego m\u00e1s \u00e9pico! \ud83c\udfae\ud83d\udd25",
+      "type": "friendly",
+      "game": "Facebook Post",
+      "post_title": "Street Gunfight Mayhem \ud83d\udd2b\ud83d\udc80\n\n#videogames #gamingcommunity #gaming #afghanistanredz",
+      "fb_post_link": "https://www.facebook.com/reel/1440490007980933/",
+      "source_link": "",
+      "timestamp": "2026-09-27 11:24:52 PM",
+      "status": "posted"
+    }
+  ],
   "skipped": [],
-  "last_updated": "2026-09-27 10:58:55 PM"
+  "last_updated": "2026-09-27 11:24:52 PM"
 }
