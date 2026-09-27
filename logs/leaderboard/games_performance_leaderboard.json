@@ -18,15 +18,15 @@
     {
         "rank": 3,
         "game_name": "mm2remastered",
-        "total_views": 20575,
+        "total_views": 20577,
         "uploaded_videos": 2,
-        "avg_views_per_video": 10287,
+        "avg_views_per_video": 10288,
         "view_share_percentage": 12.99
     },
     {
         "rank": 4,
         "game_name": "AfghanistanRedZone",
-        "total_views": 19922,
+        "total_views": 19924,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
         "view_share_percentage": 12.58
@@ -82,9 +82,9 @@
     {
         "rank": 11,
         "game_name": "VietnamCavePrison",
-        "total_views": 3208,
+        "total_views": 3212,
         "uploaded_videos": 2,
-        "avg_views_per_video": 1604,
+        "avg_views_per_video": 1606,
         "view_share_percentage": 2.03
     },
     {
@@ -98,9 +98,9 @@
     {
         "rank": 13,
         "game_name": "Russian_secret_missions",
-        "total_views": 2495,
+        "total_views": 2496,
         "uploaded_videos": 2,
-        "avg_views_per_video": 1247,
+        "avg_views_per_video": 1248,
         "view_share_percentage": 1.58
     },
     {
@@ -147,8 +147,8 @@
         "rank": 19,
         "game_name": "monkeyKing",
         "total_views": 436,
-        "uploaded_videos": 1,
-        "avg_views_per_video": 436,
+        "uploaded_videos": 2,
+        "avg_views_per_video": 218,
         "view_share_percentage": 0.28
     }
 ]
