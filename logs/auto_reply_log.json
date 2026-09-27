@@ -1,5 +1,5 @@
 {
-  "total_replies": 3,
+  "total_replies": 4,
   "total_skipped": 0,
   "replies": [
     {
@@ -46,8 +46,23 @@
       "source_link": "",
       "timestamp": "2026-09-28 01:19:29 AM",
       "status": "posted"
+    },
+    {
+      "reply_id": "1087502314137064_1000046819776971",
+      "comment_id": "1087502314137064_1060607750126356",
+      "post_id": "100463226188818_1087502314137064",
+      "user_name": "Unknown User",
+      "user_comment": "Nice gameplay",
+      "openrouter_reply": "Thanks! \ud83d\ude0e Keep those snipes coming\u2014what\u2019s your favorite clutch moment?\ud83c\udfaf",
+      "type": "friendly",
+      "game": "Video Game",
+      "post_title": "Sniper k\ud83d\udcaflls lead to mom meme!\n\n#videogames #gamingcommunity #gaming #russian_se",
+      "fb_post_link": "https://www.facebook.com/reel/1861373075302275/",
+      "source_link": "",
+      "timestamp": "2026-09-28 02:20:35 AM",
+      "status": "posted"
     }
   ],
   "skipped": [],
-  "last_updated": "2026-09-28 01:21:36 AM"
+  "last_updated": "2026-09-28 02:20:35 AM"
 }
