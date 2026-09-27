@@ -24,6 +24,7 @@ def now_ist_str():
 def now_ist_ampm():
     return datetime.now(IST).strftime("%Y-%m-%d %I:%M:%S %p")
 
+# 🔥 FIX 3: UTC → IST converter
 def utc_to_ist(iso_time_str):
     if not iso_time_str:
         return None
@@ -56,14 +57,21 @@ except ImportError:
     REPORTLAB_AVAILABLE = False
 
 
-# ============================================================
-# 🔑 GEMINI KEYS — force load + .strip() safety
-# ============================================================
-GEMINI_KEYS = []
-for i in range(1, 7):
-    k = os.environ.get(f"GEMINI_API_KEY_{i}")
-    if k and k.strip():
-        GEMINI_KEYS.append(k.strip())
+# 🔑 Gemini Keys
+GEMINI_KEYS = [
+    os.environ.get("GEMINI_API_KEY_1"),
+    os.environ.get("GEMINI_API_KEY_2"),
+    os.environ.get("GEMINI_API_KEY_3"),
+    os.environ.get("GEMINI_API_KEY_4"),
+    os.environ.get("GEMINI_API_KEY_5"),
+    os.environ.get("GEMINI_API_KEY_6"),
+]
+
+# 🔧 FIX: gemini-3.5-flash doesn't exist — that was causing every single Gemini
+# call to fail with a 404, no matter which key rotated in. Using a real,
+# currently-available model now. (gemini-2.5-flash is being shut down by
+# Google on 16 Oct 2026, so don't fall back to that.)
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash")
 
 FB_PAGE_ID = os.environ.get("PAGE_ID")
 FB_ACCESS_TOKEN = os.environ.get("PAGE_ACCESS_TOKEN")
@@ -75,30 +83,10 @@ MAX_COMMENT_AGE_HOURS = 24
 
 AUTO_COMMENT_ENABLED = os.environ.get("AUTO_COMMENT", "true").lower() == "true"
 
-LIVE_LOG_FILE = "logs/auto_reply_live.log"
-os.makedirs("logs", exist_ok=True)
-
 
 def log(msg):
     sys.stderr.write(f"{msg}\n")
     sys.stderr.flush()
-
-
-def log_live(msg, also_file=True):
-    ts = now_ist_ampm()
-    line = f"[{ts}] {msg}"
-    sys.stderr.write(f"{line}\n")
-    sys.stderr.flush()
-    if also_file:
-        try:
-            with open(LIVE_LOG_FILE, 'a', encoding='utf-8') as f:
-                f.write(line + "\n")
-        except Exception:
-            pass
-
-
-# ✅ Log loaded keys count (safety)
-log(f"🔑 Loaded {len(GEMINI_KEYS)} Gemini keys from environment")
 
 
 def normalize(s):
@@ -171,67 +159,41 @@ def parse_game_links_file(filepath):
 
 
 # ============================================================
-# 🤖 GEMINI API CALL — gemini-3.5-flash
-# ✅ FIX: temperature/topP/topK hata diye (Gemini 3.x unsupported)
-# ✅ FIX: key URL param mein bhej rahe hain (header ke saath backup)
+# 🤖 GEMINI INTEGRATION
 # ============================================================
-def call_gemini_api(api_key, prompt, max_tokens=800):
-    MODEL = "gemini-3.5-flash"
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent"
+def get_gemini_key():
+    valid = [k for k in GEMINI_KEYS if k]
+    return random.choice(valid) if valid else None
 
-    # ⚠️ Gemini 3.x family: temperature, top_p, top_k recommended NAHI hain
-    # Inhe bhejne se empty response aa sakta hai.
-    # Sirf maxOutputTokens rakh rahe hain (safe hai).
+
+def call_gemini_api(api_key, prompt, max_tokens=150):
+    # 🔧 FIX: was hardcoded to the nonexistent "gemini-3.5-flash" model.
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={api_key}"
     payload = {
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {
+            "temperature": 0.9,
             "maxOutputTokens": max_tokens,
+            "topP": 0.95,
         }
     }
-
-    headers = {
-        "Content-Type": "application/json",
-        "x-goog-api-key": api_key,
-    }
-
-    key_short = (api_key[:10] + "...") if api_key else "NONE"
-    log_live(f"🌐 Gemini call | Model: {MODEL} | Key: {key_short} | Prompt: {len(prompt)} chars")
-
     try:
-        res = requests.post(url, json=payload, headers=headers, timeout=30)
-        log_live(f"📡 HTTP {res.status_code} (key {key_short})")
-
+        res = requests.post(url, json=payload, timeout=15)
         if res.status_code == 200:
             data = res.json()
             try:
-                candidates = data.get('candidates', [])
-                if not candidates:
-                    log_live(f"⚠️ No candidates in response | {str(data)[:200]}")
-                    return None
-                parts = candidates[0].get('content', {}).get('parts', [])
-                if not parts:
-                    finish = candidates[0].get('finishReason', '?')
-                    log_live(f"⚠️ No parts | finishReason={finish} | {str(data)[:200]}")
-                    return None
-                text = parts[0].get('text', '')
-                if not text:
-                    log_live(f"⚠️ Empty text | {str(data)[:200]}")
-                    return None
-                log_live(f"✅ Gemini OK | Reply len: {len(text)}")
+                text = data['candidates'][0]['content']['parts'][0]['text']
                 return text.strip()
-            except Exception as e:
-                log_live(f"⚠️ Response parse error: {e} | {str(data)[:200]}")
+            except (KeyError, IndexError) as e:
+                log(f"⚠️ Gemini response missing expected fields: {e} | body={json.dumps(data)[:300]}")
                 return None
         else:
-            try:
-                err_data = res.json()
-                err_code = err_data.get("error", {}).get("code", "?")
-                err_msg = err_data.get("error", {}).get("message", "")[:150]
-                log_live(f"❌ Gemini FAIL | HTTP {res.status_code} | code={err_code} | {err_msg}")
-            except Exception:
-                log_live(f"❌ Gemini FAIL | HTTP {res.status_code} | {res.text[:150]}")
+            # 🔧 FIX: previously silent on non-200 — this is what was hiding
+            # the bad model name / key issues. Now every failure is visible.
+            key_tail = api_key[-6:] if api_key else "none"
+            log(f"⚠️ Gemini API HTTP {res.status_code} (key ...{key_tail}, model={GEMINI_MODEL}): {res.text[:300]}")
     except Exception as e:
-        log_live(f"💥 Gemini EXCEPTION | Key: {key_short} | {e}")
+        log(f"⚠️ Gemini API error: {e}")
     return None
 
 
@@ -280,95 +242,72 @@ def is_spam(text):
     return False
 
 
-# ============================================================
-# 🤖 BATCH GEMINI REPLY
-# ✅ FIX: Sequential key rotation — har key ek baar, phir dobara
-# ============================================================
-def generate_batch_replies(comments_batch, game_name, post_title):
-    if not comments_batch:
+def generate_smart_reply(comment_text, game_name, post_title, is_abuse=False):
+    keys = [k for k in GEMINI_KEYS if k]
+    if not keys:
+        log("⚠️ No Gemini API keys configured (GEMINI_API_KEY_1..6 all empty)")
         return None
 
-    if not GEMINI_KEYS:
-        log_live("🚫 Koi Gemini key nahi mili")
-        return None
-
-    batch_size = len(comments_batch)
-
-    log_live("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    log_live(f"📦 BATCH: {batch_size} comments | Game: {game_name}")
-    log_live(f"📝 Post: {post_title[:60]}")
-
-    comments_lines = []
-    for idx, c in enumerate(comments_batch, 1):
-        abuse_tag = " [HATER/ABUSE]" if c.get("is_abuse") else ""
-        comments_lines.append(f'{idx}. id="{c["id"]}"{abuse_tag} | comment: "{c["text"]}"')
-    comments_block = "\n".join(comments_lines)
-
-    prompt = f"""You are a witty gaming content creator replying to comments on Facebook/Instagram Reels.
+    if is_abuse:
+        prompt = f"""You are a SAVAGE but RESPECTFUL gaming content creator replying to a hater.
 
 CONTEXT:
 - Game: {game_name}
 - Post: {post_title}
 
-COMMENTS TO REPLY ({batch_size} total):
-{comments_block}
+HATER'S COMMENT: "{comment_text}"
 
 RULES:
-- For EACH comment, write a short, engaging, human-like reply (1-2 lines max).
-- Match the tone of each comment (funny, hype, question, hater, etc.).
-- If marked [HATER/ABUSE]: be SAVAGE but RESPECTFUL. Never abuse back. Never insult family/religion/caste.
-- Use 0-2 emojis max per reply.
-- Never repeat the same reply for different comments.
-- Reply in the SAME language as the comment (Hinglish/English/Hindi).
-- Keep it natural, like a real gamer.
+1. Reply in SAME language as the hater
+2. Be WITTY, SARCASTIC, FUNNY
+3. Match energy but stay CHILL and RESPECTFUL
+4. NEVER abuse back
+5. NEVER insult family/religion/caste
+6. NEVER threaten
+7. MAX 25 words
+8. Include 1-2 emojis (😂😎🔥)
+9. Style: Savage Hinglish / Gen-Z comeback
 
-⚠️ CRITICAL:
-- Return EXACTLY {batch_size} replies — no more, no less.
-- Each reply MUST use the EXACT 'id' string from the input above.
-- Do NOT invent new ids.
-- Return ONLY a valid JSON array, no markdown, no extra text:
+GOOD EXAMPLES:
+- "bakwas video" → "Bhai 3 ghante dekh ke comment kiya? 😂"
+- "chutiya" → "Bhai tu bhi bana, competition badhega 😎"
+- "ghatiya" → "Bhai platinum kiya hai kya? Tips de 😂"
+- "f***ing trash" → "Yet here you are watching 😂🔥"
 
-[
-  {{"id": "<exact_id_1>", "reply": "<reply_1>"}},
-  {{"id": "<exact_id_2>", "reply": "<reply_2>"}}
-]
-"""
+Reply ONLY with the reply text, no quotes, no prefix."""
+    else:
+        prompt = f"""You are a friendly gaming content creator replying to a fan.
 
-    log_live(f"📝 Prompt length: {len(prompt)} chars")
+CONTEXT:
+- Game: {game_name}
+- Post: {post_title}
 
-    # ✅ FIX: Sequential rotation — shuffle once, phir ek-ek karke try
-    # Har key ko 2 chances (transient errors ke liye)
-    keys_shuffled = GEMINI_KEYS.copy()
-    random.shuffle(keys_shuffled)
-    attempts_list = keys_shuffled + keys_shuffled  # 2 rounds
+FAN'S COMMENT: "{comment_text}"
 
-    for attempt, key in enumerate(attempts_list, 1):
-        key_short = key[:10] + "..."
-        log_live(f"🎯 Attempt {attempt}/{len(attempts_list)} | Key: {key_short}")
+RULES:
+1. Reply in SAME language as the comment
+2. Friendly, casual, gaming-community tone
+3. MAX 20 words
+4. Include 1-2 emojis
+5. NEVER share download links
+6. NEVER promise specific dates
+7. Match energy of comment
 
-        response = call_gemini_api(key, prompt, max_tokens=800)
+Reply ONLY with the reply text, no quotes, no prefix."""
 
+    # 🔧 FIX: rotate through DIFFERENT keys per attempt instead of re-picking
+    # randomly (which could retry the same dead key more than once).
+    shuffled_keys = keys[:]
+    random.shuffle(shuffled_keys)
+    for attempt, key in enumerate(shuffled_keys[:3], 1):
+        response = call_gemini_api(key, prompt, max_tokens=100)
         if response:
-            cleaned = re.sub(r'^```json\s*', '', response.strip())
-            cleaned = re.sub(r'^```\s*', '', cleaned)
-            cleaned = re.sub(r'\s*```$', '', cleaned).strip()
-
-            try:
-                replies = json.loads(cleaned)
-                if isinstance(replies, list) and len(replies) > 0:
-                    log_live(f"✅ Batch JSON parsed | {len(replies)} replies")
-                    for r in replies:
-                        log_live(f"   💬 {r.get('id', '?')[:30]} → {r.get('reply', '')[:80]}")
-                    return replies
-                else:
-                    log_live(f"⚠️ JSON list nahi mila ya khali hai")
-            except json.JSONDecodeError as e:
-                log_live(f"⚠️ JSON parse fail: {e}")
-                log_live(f"   Raw (first 200): {cleaned[:200]}")
-        else:
-            log_live(f"⚠️ Key {key_short} fail — agli key try")
-
-    log_live(f"❌ Saari {len(attempts_list)} attempts fail — koi reply nahi")
+            response = response.strip().strip('"').strip("'")
+            if response.lower().startswith("reply:"):
+                response = response[6:].strip()
+            return response
+        log(f"⚠️ Gemini attempt {attempt}/{min(3, len(shuffled_keys))} failed, trying next key...")
+    log("❌ All Gemini key attempts failed for this comment")
     return None
 
 
@@ -439,9 +378,9 @@ def post_fb_reply(comment_id, reply_text):
         if res.status_code == 200:
             return res.json().get("id")
         else:
-            log_live(f"❌ Reply post fail: HTTP {res.status_code} | {res.text[:150]}")
+            log(f"⚠️ Reply post error: {res.status_code} {res.text[:200]}")
     except Exception as e:
-        log_live(f"💥 Reply post exception: {e}")
+        log(f"⚠️ Reply post exception: {e}")
     return None
 
 
@@ -450,16 +389,7 @@ def process_fb_comments(actual_posted_titles):
         log("🚫 Auto-comment disabled — skipping reply processing")
         return None
 
-    # ✅ Live log reset
-    try:
-        with open(LIVE_LOG_FILE, 'w', encoding='utf-8') as f:
-            f.write(f"=== Auto-Reply Live Log: {now_ist_ampm()} IST ===\n\n")
-    except Exception:
-        pass
-
-    log_live("🤖 Auto-reply processing started...")
-    log_live(f"🔑 Total keys available: {len(GEMINI_KEYS)}")
-
+    log("🤖 Auto-reply processing started...")
     replied_file = "logs/replied_comment_ids.json"
     replied_data = {"replied": [], "last_updated": ""}
     if os.path.exists(replied_file):
@@ -469,7 +399,6 @@ def process_fb_comments(actual_posted_titles):
         except Exception:
             pass
     replied_ids = set(replied_data.get("replied", []))
-
     reply_log_file = "logs/auto_reply_log.json"
     reply_log = {"total_replies": 0, "total_skipped": 0, "replies": [], "skipped": []}
     if os.path.exists(reply_log_file):
@@ -478,19 +407,15 @@ def process_fb_comments(actual_posted_titles):
                 reply_log = json.load(f)
         except Exception:
             pass
-
     replies_count = 0
     cutoff_time = (now_ist() - timedelta(hours=MAX_COMMENT_AGE_HOURS)).timestamp()
     min_age_time = (now_ist() - timedelta(minutes=MIN_COMMENT_AGE_MIN)).timestamp()
 
-    # ✅ Batch collection
-    batch = []
-
     for game_name, videos in actual_posted_titles.items():
-        if replies_count + len(batch) >= MAX_REPLIES_PER_RUN:
+        if replies_count >= MAX_REPLIES_PER_RUN:
             break
         for video in videos:
-            if replies_count + len(batch) >= MAX_REPLIES_PER_RUN:
+            if replies_count >= MAX_REPLIES_PER_RUN:
                 break
             if not video.get("fb_posted"):
                 continue
@@ -502,16 +427,13 @@ def process_fb_comments(actual_posted_titles):
                 continue
             post_id = post_id_match.group(1)
             comments = fetch_fb_comments(post_id)
-            log_live(f"📥 Post {post_id}: {len(comments)} comments fetched")
-
             for comment in comments:
-                if replies_count + len(batch) >= MAX_REPLIES_PER_RUN:
+                if replies_count >= MAX_REPLIES_PER_RUN:
                     break
                 comment_id = comment.get("id", "")
                 comment_text = comment.get("message", "").strip()
                 comment_time = comment.get("created_time", "")
                 can_reply = comment.get("can_reply", True)
-
                 if not comment_id or not comment_text:
                     continue
                 if comment_id in replied_ids:
@@ -530,132 +452,80 @@ def process_fb_comments(actual_posted_titles):
                         continue
                 except Exception:
                     pass
-
                 abuse_type = detect_abuse(comment_text)
                 if abuse_type == "family_abuse":
-                    log_live(f"🚫 FAMILY ABUSE — skip {comment_id}")
                     reply_log["skipped"].append({
-                        "comment_id": comment_id, "comment_text": comment_text[:100],
-                        "reason": "family_abuse", "timestamp": now_ist_ampm(),
-                    })
-                    reply_log["total_skipped"] = reply_log.get("total_skipped", 0) + 1
-                    replied_ids.add(comment_id)
-                    continue
-
-                if is_spam(comment_text):
-                    log_live(f"🚫 SPAM — skip {comment_id}")
-                    reply_log["skipped"].append({
-                        "comment_id": comment_id, "comment_text": comment_text[:100],
-                        "reason": "spam", "timestamp": now_ist_ampm(),
-                    })
-                    reply_log["total_skipped"] = reply_log.get("total_skipped", 0) + 1
-                    replied_ids.add(comment_id)
-                    continue
-
-                if check_if_already_replied(comment_id):
-                    log_live(f"⏭️ Already replied (FB verify) — {comment_id}")
-                    replied_ids.add(comment_id)
-                    continue
-
-                batch.append({
-                    "id": comment_id,
-                    "text": comment_text,
-                    "is_abuse": (abuse_type == "general_abuse"),
-                    "game": game_name,
-                    "post_id": post_id,
-                    "video": video,
-                })
-                log_live(f"➕ Added to batch: {comment_id} | \"{comment_text[:60]}\"")
-
-    # ✅ Ek saath Gemini call
-    if not batch:
-        log_live("⚠️ Batch khali — koi fresh comment nahi mila")
-    else:
-        log_live(f"📦 Sending {len(batch)} comments to Gemini in ONE call...")
-
-        batch_game = batch[0]["game"] if len(set(b["game"] for b in batch)) == 1 else "Mixed Games"
-        batch_title = batch[0]["video"].get("title", "")
-
-        replies = generate_batch_replies(batch, batch_game, batch_title)
-
-        if replies:
-            reply_map = {}
-            for r in replies:
-                rid = str(r.get("id", "")).strip()
-                rtext = str(r.get("reply", "")).strip()
-                if rid and rtext:
-                    reply_map[rid] = rtext
-
-            log_live(f"📨 {len(reply_map)} replies mapped | Batch size: {len(batch)}")
-
-            for c in batch:
-                cid = c["id"]
-                ctext = c["text"]
-                cgame = c["game"]
-                cpost = c["post_id"]
-                cvideo = c["video"]
-                cis_abuse = c["is_abuse"]
-
-                reply_text = reply_map.get(cid)
-
-                if not reply_text:
-                    log_live(f"❌ Gemini ne is comment ka reply nahi diya: {cid}")
-                    reply_log["skipped"].append({
-                        "comment_id": cid, "comment_text": ctext[:100],
-                        "reason": "no_reply_from_gemini",
+                        "comment_id": comment_id,
+                        "comment_text": comment_text[:100],
+                        "reason": "family_abuse",
                         "timestamp": now_ist_ampm(),
                     })
+                    reply_log["total_skipped"] = reply_log.get("total_skipped", 0) + 1
+                    replied_ids.add(comment_id)
                     continue
-
-                safe, reason = is_reply_safe(reply_text, is_abuse=cis_abuse)
-                if not safe:
-                    log_live(f"⚠️ Reply UNSAFE ({reason}) for {cid} — skip")
+                if is_spam(comment_text):
                     reply_log["skipped"].append({
-                        "comment_id": cid, "comment_text": ctext[:100],
+                        "comment_id": comment_id,
+                        "comment_text": comment_text[:100],
+                        "reason": "spam",
+                        "timestamp": now_ist_ampm(),
+                    })
+                    reply_log["total_skipped"] = reply_log.get("total_skipped", 0) + 1
+                    replied_ids.add(comment_id)
+                    continue
+                if check_if_already_replied(comment_id):
+                    log(f"⏭️ Already replied (FB verify) — {comment_id}")
+                    replied_ids.add(comment_id)
+                    continue
+                is_abuse = (abuse_type == "general_abuse")
+                reply_text = generate_smart_reply(
+                    comment_text, game_name, video.get("title", ""), is_abuse=is_abuse
+                )
+                if not reply_text:
+                    continue
+                safe, reason = is_reply_safe(reply_text, is_abuse=is_abuse)
+                if not safe:
+                    log(f"⚠️ Reply unsafe: {reason}")
+                    reply_log["skipped"].append({
+                        "comment_id": comment_id,
+                        "comment_text": comment_text[:100],
                         "reason": f"unsafe_{reason}",
                         "timestamp": now_ist_ampm(),
                     })
-                    replied_ids.add(cid)
+                    replied_ids.add(comment_id)
                     continue
-
-                log_live(f"📤 Posting reply → {cid} | \"{reply_text[:70]}\"")
-                reply_id = post_fb_reply(cid, reply_text)
-
+                reply_id = post_fb_reply(comment_id, reply_text)
                 if reply_id:
                     replies_count += 1
-                    log_live(f"✅ POSTED | {cid} | reply_id={reply_id}")
                     reply_log["replies"].append({
                         "reply_id": reply_id,
-                        "comment_id": cid,
-                        "post_id": cpost,
-                        "user_comment": ctext[:200],
+                        "comment_id": comment_id,
+                        "post_id": post_id,
+                        "user_comment": comment_text[:200],
                         "gemini_reply": reply_text,
-                        "type": "savage" if cis_abuse else "friendly",
-                        "game": cgame,
-                        "post_title": cvideo.get("title", "")[:100],
-                        "fb_post_link": cvideo.get("fb_link", ""),
-                        "source_link": cvideo.get("source_link", ""),
+                        "type": "savage" if is_abuse else "friendly",
+                        "game": game_name,
+                        "post_title": video.get("title", "")[:100],
+                        "fb_post_link": fb_link,
+                        "source_link": video.get("source_link", ""),
                         "timestamp": now_ist_ampm(),
                         "status": "posted",
                     })
                     reply_log["total_replies"] = reply_log.get("total_replies", 0) + 1
-                    replied_ids.add(cid)
-                else:
-                    log_live(f"❌ Reply post FAIL for {cid}")
+                    replied_ids.add(comment_id)
+                    log(f"✅ Reply posted: {reply_text[:60]}")
 
     os.makedirs("logs", exist_ok=True)
     replied_data["replied"] = list(replied_ids)[-5000:]
     replied_data["last_updated"] = now_ist_ampm()
     with open(replied_file, 'w', encoding='utf-8') as f:
         json.dump(replied_data, f, indent=2)
-
     reply_log["replies"] = reply_log.get("replies", [])[-200:]
     reply_log["skipped"] = reply_log.get("skipped", [])[-100:]
     reply_log["last_updated"] = now_ist_ampm()
     with open(reply_log_file, 'w', encoding='utf-8') as f:
         json.dump(reply_log, f, indent=2)
-
-    log_live(f"🤖 Auto-reply done. {replies_count} replies posted.")
+    log(f"🤖 Auto-reply done. {replies_count} replies posted.")
     return reply_log
 
 
@@ -951,6 +821,7 @@ def generate_visual_reports(game_views_summary, game_stats):
     reports_dir = "logs/reports"
     os.makedirs(reports_dir, exist_ok=True)
     chart_path = os.path.join(reports_dir, "views_chart.png")
+    pdf_path = os.path.join(reports_dir, "gaming_agent_report.pdf")
     total_platform_views = sum(game_views_summary.values()) or 1
     analytics_data = []
     for g_n, g_v in game_views_summary.items():
@@ -1132,6 +1003,7 @@ def fetch_fb_ig_data(game_list):
         log("⚠️ FB_ACCESS_TOKEN missing")
         return result, game_views_summary
 
+    # 🔥 FIX: ID → Source map banao (posted_links_editor se)
     id_to_source_map = {}
     if os.path.exists(posted_dir):
         for fname in os.listdir(posted_dir):
@@ -1209,6 +1081,7 @@ def fetch_fb_ig_data(game_list):
                         game = r.get('game')
                         if game in result:
                             vid_id = str(r.get('vid_id', '')).strip()
+                            # 🔥 ID se source link match
                             matched_source = id_to_source_map.get(vid_id, "")
                             if not matched_source:
                                 matched_source = r.get('link', '')
@@ -1268,6 +1141,7 @@ def fetch_fb_ig_data(game_list):
                 if key in existing_titles: continue
                 fb_vid_id = str(v.get("id", "")).strip()
                 fb_link = fix_fb_url(v.get("permalink_url", ""), fb_vid_id)
+                # 🔥 ID se source link
                 matched_source = id_to_source_map.get(fb_vid_id, "")
                 entry = {
                     "title": title, "fb_link": fb_link,
@@ -1360,6 +1234,7 @@ def fetch_fb_ig_data(game_list):
                     "source_link": src_link, "is_source_only": True,
                 })
 
+    # 🔥 FIX: Sort — Posted newest first, phir pending
     for game in game_list:
         posted_v = [x for x in result[game] if x.get("fb_posted") or x.get("ig_posted")]
         pending_v = [x for x in result[game] if not (x.get("fb_posted") or x.get("ig_posted"))]
@@ -1447,6 +1322,7 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
         videos = actual_posted_titles.get(g_name, [])
         if not videos: continue
 
+        # 🔥 Sort — Posted newest first, phir pending
         posted_v = [x for x in videos if x.get("fb_posted") or x.get("ig_posted")]
         pending_v = [x for x in videos if not (x.get("fb_posted") or x.get("ig_posted"))]
         posted_v_sorted = sorted(posted_v, key=lambda x: x.get("timestamp", "") or "0000", reverse=True)
@@ -1520,6 +1396,7 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
             ig_md = f"[🟣 IG]({v['ig_link']})" if v.get("ig_posted") and v.get("ig_link") else "⏳ Pending"
             ig_v_md = f"{v.get('ig_views', 0):,}" if v.get("ig_posted") else "_0_"
 
+            # 🔥 Source link — digits match + index fallback
             src_link = v.get("source_link", "")
             if not src_link:
                 v_name = (v.get("video_name") or v.get("vid_id") or "").lower().strip()
@@ -1596,6 +1473,7 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
         else:
             progress_md = "_N/A_"
 
+        # 🔥 Time AM/PM in IST
         latest_post_time = get_latest_post_time(g_name)
         if latest_post_time:
             dt_ist = utc_to_ist(latest_post_time)
@@ -1681,7 +1559,7 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
         "logs/agent_memory.json", "logs/rotation_history.json",
         "logs/games/", "logs/auto_reply_log.json",
         "logs/replied_comment_ids.json", "logs/trending_cache.json",
-        "logs/best_time_analysis.json", "logs/auto_reply_live.log"
+        "logs/best_time_analysis.json"
     ])
 
 
@@ -1712,10 +1590,17 @@ def run_agent_brain():
     os.makedirs("logs", exist_ok=True)
     os.makedirs(links_dir, exist_ok=True)
 
-    log(f"🔑 Keys loaded at startup: {len(GEMINI_KEYS)}")
-
     if not AUTO_COMMENT_ENABLED:
         log("🚫 AUTO_COMMENT=false — Auto-reply will be SKIPPED (analytics only)")
+
+    # 🔧 FIX: sanity-check Gemini keys at startup so a missing/empty key set
+    # shows up immediately in the run logs instead of failing silently
+    # inside every single generate_smart_reply call later.
+    valid_gemini_keys = [k for k in GEMINI_KEYS if k]
+    if valid_gemini_keys:
+        log(f"🔑 Gemini keys loaded: {len(valid_gemini_keys)} valid | model={GEMINI_MODEL}")
+    else:
+        log("⚠️ No Gemini API keys found in environment (GEMINI_API_KEY_1..6) — auto-reply text generation will fail")
 
     memory = {
         "game_scores": {},
@@ -1916,3 +1801,4 @@ def run_agent_brain():
 
 if __name__ == "__main__":
     run_agent_brain()
+    exit()
