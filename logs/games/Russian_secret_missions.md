@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 39 | **Last Updated:** 2026-09-27 09:56:09 PM IST
+**Total Videos:** 39 | **Last Updated:** 2026-09-27 10:05:20 PM IST
 
 ---
 
@@ -14,7 +14,7 @@
 | Posted (FB or IG) | 5 / 39 |
 | FB Posted | 3 / 39 |
 | IG Posted | 4 / 39 |
-| Total FB Views | **1,537** |
+| Total FB Views | **1,539** |
 | Total IG Views | **910** |
 
 ---
@@ -23,7 +23,7 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | Sniper k💯lls lead to mom meme!  #videogames #gamingcommunity #gaming #russian_secret_missions #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1861373075302275/) | 577 | [🟣 IG](https://www.instagram.com/reel/DdwmXObDLk8/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions1.mp4) |
+| 1 | Sniper k💯lls lead to mom meme!  #videogames #gamingcommunity #gaming #russian_secret_missions #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1861373075302275/) | 579 | [🟣 IG](https://www.instagram.com/reel/DdwmXObDLk8/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions1.mp4) |
 | 2 | City Sniper Bloodbath Action 🩸🎯  #videogames #gamingcommunity #gaming #russian_secret_missions #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1795873828500766/) | 626 | [🟣 IG](https://www.instagram.com/reel/DdbxSIFCN1X/) | 250 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions3.mp4) |
 | 3 | Can you survive this sniper rush? 🔫🎯  #videogames #gamingcommunity #gaming #russian_secret_missions  | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdZYu5bCRSd/) | 460 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions32.mp4) |
 | 4 | What is the mind-blowing secret behind this impossible sniper streak under heavy fire?  #videogames  | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdUF7wUkt74/) | 180 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions21.mp4) |
