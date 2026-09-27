@@ -1653,11 +1653,12 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
                 elif status == "next_up": status_md = "⏭️ **NEXT UP**"
                 else: status_md = f"⏳ Wait {next_in}"
                 md_content.append(f"| {pos} | **{gname}** | {uploaded} | {last_run} | {next_in} | {status_md} |\n")
-            recent_logs = rot.get("rotation_log", [])[-5:]
-            if recent_logs:
-                md_content.append("\n### 📜 Recent Runs (Last 5)\n\n| Run # | Game | Timestamp (IST) |\n|:---:|---|---|\n")
-                for log_entry in reversed(recent_logs):
-                    md_content.append(f"| {log_entry['run']} | {log_entry['game']} | {log_entry['timestamp']} |\n")
+            all_recent = rot.get("rotation_log", [])
+recent_logs = sorted(all_recent, key=lambda x: x.get("run", 0), reverse=True)[:5]
+if recent_logs:
+    md_content.append("\n### 📜 Recent Runs (Last 5)\n\n| Run # | Game | Timestamp (IST) |\n|:---:|---|---|\n")
+    for log_entry in recent_logs:
+        md_content.append(f"| {log_entry['run']} | {log_entry['game']} | {log_entry['timestamp']} |\n")
         except Exception as e:
             log(f"⚠️ Rotation section error: {e}")
     with open(dashboard_path, 'w', encoding='utf-8') as f:
