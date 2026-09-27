@@ -1,6 +1,6 @@
 {
-  "last_updated": "2026-09-28 03:06:03 AM",
-  "total_posts_analyzed": 32,
+  "last_updated": "2026-09-28 03:19:51 AM",
+  "total_posts_analyzed": 33,
   "top_slots": [
     {
       "rank": 1,
@@ -49,8 +49,8 @@
       "posts": 26
     },
     "Monday": {
-      "avg_views": 269,
-      "posts": 6
+      "avg_views": 373,
+      "posts": 7
     }
   },
   "today_suggestion": {
