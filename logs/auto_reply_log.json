@@ -1,5 +1,5 @@
 {
-  "total_replies": 2,
+  "total_replies": 3,
   "total_skipped": 0,
   "replies": [
     {
@@ -31,8 +31,23 @@
       "source_link": "",
       "timestamp": "2026-09-27 11:24:52 PM",
       "status": "posted"
+    },
+    {
+      "reply_id": "1088456540708308_2298048724351025",
+      "comment_id": "1088456540708308_1111090298535699",
+      "post_id": "100463226188818_1088456540708308",
+      "user_name": "Unknown User",
+      "user_comment": "Please tell me game name",
+      "openrouter_reply": "It's Spider-Man! \ud83d\udd78\ufe0f\ud83d\udca5 Want to swing by the next boss? Ready to web\u2011sling?",
+      "type": "friendly",
+      "game": "Spider-Man",
+      "post_title": "Spider-Man Climbs Giant Colossus \ud83d\udd25\n\n#videogames #gamingcommunity #gaming #spider",
+      "fb_post_link": "https://www.facebook.com/reel/1657819332435539/",
+      "source_link": "",
+      "timestamp": "2026-09-28 01:19:29 AM",
+      "status": "posted"
     }
   ],
   "skipped": [],
-  "last_updated": "2026-09-28 01:06:02 AM"
+  "last_updated": "2026-09-28 01:19:29 AM"
 }

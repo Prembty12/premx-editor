@@ -5,28 +5,28 @@
         "total_views": 27484,
         "uploaded_videos": 2,
         "avg_views_per_video": 13742,
-        "view_share_percentage": 17.36
+        "view_share_percentage": 17.35
     },
     {
         "rank": 2,
         "game_name": "SpiderMan2",
-        "total_views": 22204,
+        "total_views": 22206,
         "uploaded_videos": 1,
-        "avg_views_per_video": 22204,
+        "avg_views_per_video": 22206,
         "view_share_percentage": 14.02
     },
     {
         "rank": 3,
         "game_name": "mm2remastered",
-        "total_views": 20561,
-        "uploaded_videos": 1,
-        "avg_views_per_video": 20561,
-        "view_share_percentage": 12.98
+        "total_views": 20575,
+        "uploaded_videos": 2,
+        "avg_views_per_video": 10287,
+        "view_share_percentage": 12.99
     },
     {
         "rank": 4,
         "game_name": "AfghanistanRedZone",
-        "total_views": 19916,
+        "total_views": 19922,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
         "view_share_percentage": 12.58
@@ -34,9 +34,9 @@
     {
         "rank": 5,
         "game_name": "Callofdutyaw",
-        "total_views": 19577,
+        "total_views": 19578,
         "uploaded_videos": 2,
-        "avg_views_per_video": 9788,
+        "avg_views_per_video": 9789,
         "view_share_percentage": 12.36
     },
     {
@@ -53,7 +53,7 @@
         "total_views": 8543,
         "uploaded_videos": 2,
         "avg_views_per_video": 4271,
-        "view_share_percentage": 5.4
+        "view_share_percentage": 5.39
     },
     {
         "rank": 8,
@@ -82,10 +82,10 @@
     {
         "rank": 11,
         "game_name": "VietnamCavePrison",
-        "total_views": 3195,
+        "total_views": 3208,
         "uploaded_videos": 2,
-        "avg_views_per_video": 1597,
-        "view_share_percentage": 2.02
+        "avg_views_per_video": 1604,
+        "view_share_percentage": 2.03
     },
     {
         "rank": 12,
@@ -98,7 +98,7 @@
     {
         "rank": 13,
         "game_name": "Russian_secret_missions",
-        "total_views": 2494,
+        "total_views": 2495,
         "uploaded_videos": 2,
         "avg_views_per_video": 1247,
         "view_share_percentage": 1.58
