@@ -67,8 +67,8 @@ OPENROUTER_KEYS = [
     os.environ.get("OPENROUTER_API_KEY_5"),
 ]
 
-FIXED_MODEL = "google/gemma-4-26b-a4b-it:free"
-FALLBACK_MODEL = "meta-llama/llama-3.3-70b-instruct:free"
+FIXED_MODEL = "dots-studio/dots-3-note-preview:free"
+FALLBACK_MODEL = "openrouter/free"
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 FB_PAGE_ID = os.environ.get("PAGE_ID")
