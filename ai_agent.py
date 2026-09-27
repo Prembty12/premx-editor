@@ -56,15 +56,14 @@ except ImportError:
     REPORTLAB_AVAILABLE = False
 
 
-# 🔑 Gemini Keys (6 keys)
-GEMINI_KEYS = [
-    os.environ.get("GEMINI_API_KEY_1"),
-    os.environ.get("GEMINI_API_KEY_2"),
-    os.environ.get("GEMINI_API_KEY_3"),
-    os.environ.get("GEMINI_API_KEY_4"),
-    os.environ.get("GEMINI_API_KEY_5"),
-    os.environ.get("GEMINI_API_KEY_6"),
-]
+# ============================================================
+# 🔑 GEMINI KEYS — force load + .strip() safety
+# ============================================================
+GEMINI_KEYS = []
+for i in range(1, 7):
+    k = os.environ.get(f"GEMINI_API_KEY_{i}")
+    if k and k.strip():
+        GEMINI_KEYS.append(k.strip())
 
 FB_PAGE_ID = os.environ.get("PAGE_ID")
 FB_ACCESS_TOKEN = os.environ.get("PAGE_ACCESS_TOKEN")
@@ -72,11 +71,10 @@ FB_ACCESS_TOKEN = os.environ.get("PAGE_ACCESS_TOKEN")
 DAYS_LIMIT = 28
 MAX_REPLIES_PER_RUN = 5
 MIN_COMMENT_AGE_MIN = 2
-MAX_COMMENT_AGE_HOURS = 48
+MAX_COMMENT_AGE_HOURS = 24
 
 AUTO_COMMENT_ENABLED = os.environ.get("AUTO_COMMENT", "true").lower() == "true"
 
-# ✅ Live log file
 LIVE_LOG_FILE = "logs/auto_reply_live.log"
 os.makedirs("logs", exist_ok=True)
 
@@ -87,7 +85,6 @@ def log(msg):
 
 
 def log_live(msg, also_file=True):
-    """Console + file dono pe likhta hai"""
     ts = now_ist_ampm()
     line = f"[{ts}] {msg}"
     sys.stderr.write(f"{line}\n")
@@ -98,6 +95,10 @@ def log_live(msg, also_file=True):
                 f.write(line + "\n")
         except Exception:
             pass
+
+
+# ✅ Log loaded keys count (safety)
+log(f"🔑 Loaded {len(GEMINI_KEYS)} Gemini keys from environment")
 
 
 def normalize(s):
@@ -170,11 +171,10 @@ def parse_game_links_file(filepath):
 
 
 # ============================================================
-# 🤖 GEMINI INTEGRATION
+# 🤖 GEMINI API CALL — x-goog-api-key header
 # ============================================================
-def call_gemini_api(api_key, prompt, max_tokens=600):
-    """Gemini API call — detailed logging with key info"""
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={api_key}"
+def call_gemini_api(api_key, prompt, max_tokens=800):
+    url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent"
     payload = {
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {
@@ -183,11 +183,15 @@ def call_gemini_api(api_key, prompt, max_tokens=600):
             "topP": 0.95,
         }
     }
+    headers = {
+        "Content-Type": "application/json",
+        "x-goog-api-key": api_key,
+    }
     key_short = (api_key[:10] + "...") if api_key else "NONE"
     log_live(f"🌐 Gemini call | Key: {key_short} | Prompt: {len(prompt)} chars")
 
     try:
-        res = requests.post(url, json=payload, timeout=30)
+        res = requests.post(url, json=payload, headers=headers, timeout=30)
         log_live(f"📡 HTTP {res.status_code} (key {key_short})")
 
         if res.status_code == 200:
@@ -254,18 +258,13 @@ def is_spam(text):
 
 
 # ============================================================
-# 🤖 BATCH GEMINI REPLY (Ek call mein 5, 4, 3...)
+# 🤖 BATCH GEMINI REPLY — 5, 4, 3 jo bhi ho, ek call mein
 # ============================================================
 def generate_batch_replies(comments_batch, game_name, post_title):
-    """
-    comments_batch: list of dicts [{id, text, is_abuse}, ...]
-    Returns: list of dicts [{id, reply}, ...] or None
-    """
     if not comments_batch:
         return None
 
-    keys = [k for k in GEMINI_KEYS if k]
-    if not keys:
+    if not GEMINI_KEYS:
         log_live("🚫 Koi Gemini key nahi mili")
         return None
 
@@ -275,7 +274,6 @@ def generate_batch_replies(comments_batch, game_name, post_title):
     log_live(f"📦 BATCH: {batch_size} comments | Game: {game_name}")
     log_live(f"📝 Post: {post_title[:60]}")
 
-    # ✅ Har comment ko prompt mein daalo
     comments_lines = []
     for idx, c in enumerate(comments_batch, 1):
         abuse_tag = " [HATER/ABUSE]" if c.get("is_abuse") else ""
@@ -314,14 +312,13 @@ RULES:
 
     log_live(f"📝 Prompt length: {len(prompt)} chars")
 
-    # ✅ Key rotation with retry
     tried_keys = set()
-    max_attempts = len(keys) * 2
+    max_attempts = len(GEMINI_KEYS) * 2
 
     for attempt in range(1, max_attempts + 1):
-        available = [k for k in keys if k not in tried_keys]
+        available = [k for k in GEMINI_KEYS if k not in tried_keys]
         if not available:
-            log_live(f"❌ Saari {len(keys)} keys try ho chuki hain")
+            log_live(f"❌ Saari {len(GEMINI_KEYS)} keys try ho chuki hain")
             break
         key = random.choice(available)
         tried_keys.add(key)
@@ -332,7 +329,6 @@ RULES:
         response = call_gemini_api(key, prompt, max_tokens=800)
 
         if response:
-            # ✅ Markdown wrapper hatao
             cleaned = re.sub(r'^```json\s*', '', response.strip())
             cleaned = re.sub(r'^```\s*', '', cleaned)
             cleaned = re.sub(r'\s*```$', '', cleaned).strip()
@@ -434,16 +430,16 @@ def process_fb_comments(actual_posted_titles):
         log("🚫 Auto-comment disabled — skipping reply processing")
         return None
 
-    log_live("🤖 Auto-reply processing started...")
-
-    # ✅ Live log reset (har run fresh)
+    # ✅ Live log reset
     try:
         with open(LIVE_LOG_FILE, 'w', encoding='utf-8') as f:
             f.write(f"=== Auto-Reply Live Log: {now_ist_ampm()} IST ===\n\n")
     except Exception:
         pass
 
-    # ✅ Replied IDs load
+    log_live("🤖 Auto-reply processing started...")
+    log_live(f"🔑 Total keys available: {len(GEMINI_KEYS)}")
+
     replied_file = "logs/replied_comment_ids.json"
     replied_data = {"replied": [], "last_updated": ""}
     if os.path.exists(replied_file):
@@ -467,11 +463,11 @@ def process_fb_comments(actual_posted_titles):
     cutoff_time = (now_ist() - timedelta(hours=MAX_COMMENT_AGE_HOURS)).timestamp()
     min_age_time = (now_ist() - timedelta(minutes=MIN_COMMENT_AGE_MIN)).timestamp()
 
-    # ✅ Ek batch mein jitne comment mil sakte hain (max 5)
-    batch = []   # [{id, text, is_abuse, video, post_id}, ...]
+    # ✅ Batch collection
+    batch = []
 
     for game_name, videos in actual_posted_titles.items():
-        if replies_count >= MAX_REPLIES_PER_RUN:
+        if replies_count + len(batch) >= MAX_REPLIES_PER_RUN:
             break
         for video in videos:
             if replies_count + len(batch) >= MAX_REPLIES_PER_RUN:
@@ -541,7 +537,6 @@ def process_fb_comments(actual_posted_titles):
                     replied_ids.add(comment_id)
                     continue
 
-                # ✅ Batch mein add karo
                 batch.append({
                     "id": comment_id,
                     "text": comment_text,
@@ -552,20 +547,18 @@ def process_fb_comments(actual_posted_titles):
                 })
                 log_live(f"➕ Added to batch: {comment_id} | \"{comment_text[:60]}\"")
 
-    # ✅ Ab ek saath Gemini ko bhejo
+    # ✅ Ek saath Gemini call
     if not batch:
         log_live("⚠️ Batch khali — koi fresh comment nahi mila")
     else:
         log_live(f"📦 Sending {len(batch)} comments to Gemini in ONE call...")
 
-        # Game name pehle comment se lo (ya "Mixed")
         batch_game = batch[0]["game"] if len(set(b["game"] for b in batch)) == 1 else "Mixed Games"
         batch_title = batch[0]["video"].get("title", "")
 
         replies = generate_batch_replies(batch, batch_game, batch_title)
 
         if replies:
-            # ✅ Replies ko map karo id → reply
             reply_map = {}
             for r in replies:
                 rid = str(r.get("id", "")).strip()
@@ -575,7 +568,6 @@ def process_fb_comments(actual_posted_titles):
 
             log_live(f"📨 {len(reply_map)} replies mapped | Batch size: {len(batch)}")
 
-            # ✅ Ab har comment pe post karo
             for c in batch:
                 cid = c["id"]
                 ctext = c["text"]
@@ -631,7 +623,6 @@ def process_fb_comments(actual_posted_titles):
                 else:
                     log_live(f"❌ Reply post FAIL for {cid}")
 
-    # ✅ Save files
     os.makedirs("logs", exist_ok=True)
     replied_data["replied"] = list(replied_ids)[-5000:]
     replied_data["last_updated"] = now_ist_ampm()
@@ -940,7 +931,6 @@ def generate_visual_reports(game_views_summary, game_stats):
     reports_dir = "logs/reports"
     os.makedirs(reports_dir, exist_ok=True)
     chart_path = os.path.join(reports_dir, "views_chart.png")
-    pdf_path = os.path.join(reports_dir, "gaming_agent_report.pdf")
     total_platform_views = sum(game_views_summary.values()) or 1
     analytics_data = []
     for g_n, g_v in game_views_summary.items():
@@ -1701,6 +1691,8 @@ def run_agent_brain():
     memory_file = "logs/agent_memory.json"
     os.makedirs("logs", exist_ok=True)
     os.makedirs(links_dir, exist_ok=True)
+
+    log(f"🔑 Keys loaded at startup: {len(GEMINI_KEYS)}")
 
     if not AUTO_COMMENT_ENABLED:
         log("🚫 AUTO_COMMENT=false — Auto-reply will be SKIPPED (analytics only)")
