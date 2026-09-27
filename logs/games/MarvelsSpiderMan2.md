@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 49 | **Last Updated:** 2026-09-27 07:03:15 PM IST
+**Total Videos:** 49 | **Last Updated:** 2026-09-27 08:36:28 PM IST
 
 ---
 
@@ -14,8 +14,8 @@
 | Posted (FB or IG) | 9 / 49 |
 | FB Posted | 5 / 49 |
 | IG Posted | 8 / 49 |
-| Total FB Views | **11,568** |
-| Total IG Views | **1,170** |
+| Total FB Views | **11,578** |
+| Total IG Views | **1,180** |
 
 ---
 
@@ -24,14 +24,14 @@
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
 | 1 | Lightning Strike Melts Monsters ⚡💀  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingr | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdwLc5lCQmn/) | 70 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan233.mp4) |
-| 2 | Spider-Man's Bridge Takedown 🕷️💥  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2008442809860960/) | 615 | [🟣 IG](https://www.instagram.com/reel/Ddc8azaESE5/) | 450 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan22.mp4) |
+| 2 | Spider-Man's Bridge Takedown 🕷️💥  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2008442809860960/) | 615 | [🟣 IG](https://www.instagram.com/reel/Ddc8azaESE5/) | 460 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan22.mp4) |
 | 3 | You won’t believe how Miles survived this attack! 😱  #videogames #gamingcommunity #gaming #marvelssp | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdbjSlEgsT7/) | 240 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan228.mp4) |
 | 4 | Spider-Man's wild boat hijack ends in flames! 🕷️🔥  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingreels  | [🔵 FB](https://www.facebook.com/reel/2610569156066695/) | 91 | [🟣 IG](https://www.instagram.com/reel/DdYEdVsku_9/) | 90 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan24.mp4) |
 | 5 | Spider-Man's wildest stunt will shock you! 🕷️  #videogames #gamingcommunity #gaming #marvelsspiderma | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdTztbFFBF9/) | 60 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan25.mp4) |
 | 6 | The green beast's dark secret will shock you!  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingreels #ree | [🔵 FB](https://www.facebook.com/reel/1788534072456957/) | 485 | [🟣 IG](https://www.instagram.com/reel/DdTzfy_Cojh/) | 190 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan26.mp4) |
 | 7 | SPIDER-MAN'S ULTIMATE VILLAIN SHOWDOWN: THE EPIC SLOW-MO COMBAT THAT WILL BLOW YOUR MIND!  #videogam | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdTylaPkf4p/) | 50 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan211.mp4) |
 | 8 | How does Spider-Man survive this epic military ambush?  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingr | [🔵 FB](https://www.facebook.com/reel/1639395280878916/) | 1,331 | [🟣 IG](https://www.instagram.com/reel/DdTYhE2AdR6/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan28.mp4) |
-| 9 | SPIDER-FURY: MILES MORALES UNLEASHES MAXIMUM COMBAT POWER!  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gam | [🔵 FB](https://www.facebook.com/reel/1444317791239680/) | 9,046 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan29.mp4) |
+| 9 | SPIDER-FURY: MILES MORALES UNLEASHES MAXIMUM COMBAT POWER!  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gam | [🔵 FB](https://www.facebook.com/reel/1444317791239680/) | 9,056 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan29.mp4) |
 | 10 | MarvelsSpiderMan245 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan245.mp4) |
 | 11 | MarvelsSpiderMan243 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan243.mp4) |
 | 12 | MarvelsSpiderMan242 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan242.mp4) |
