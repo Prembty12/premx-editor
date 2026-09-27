@@ -1,1 +1,1 @@
-{"clip_duration": 31, "reason": "Giant statue climb and dramatic cinematic action.", "start_time": 0, "status": "APPROVE", "title": "Spider-Man Climbs Giant Colossus 🔥"}
+{"clip_duration": 35, "reason": "Intense helicopter missile barrage with massive fiery explosions.", "start_time": 2, "status": "APPROVE", "title": "Rocket Rain on Enemy Base 💣🔥"}
