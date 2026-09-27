@@ -24,7 +24,6 @@ def now_ist_str():
 def now_ist_ampm():
     return datetime.now(IST).strftime("%Y-%m-%d %I:%M:%S %p")
 
-# 🔥 UTC → IST converter
 def utc_to_ist(iso_time_str):
     if not iso_time_str:
         return None
@@ -166,14 +165,101 @@ def call_gemini_api(api_key, prompt, max_tokens=150):
         }
     }
     try:
-        res = requests.post(url, json=payload, timeout=15)
+        res = requests.post(url, json=payload, timeout=25)
+        log(f"    📡 Gemini HTTP Status: {res.status_code}")
         if res.status_code == 200:
             data = res.json()
-            text = data['candidates'][0]['content']['parts'][0]['text']
-            return text.strip()
+            try:
+                text = data['candidates'][0]['content']['parts'][0]['text']
+                return text.strip()
+            except (KeyError, IndexError) as e:
+                log(f"    ⚠️ Gemini parse error: {e}")
+                log(f"    📄 Response: {str(data)[:200]}")
+                return None
+        else:
+            log(f"    ❌ Gemini error {res.status_code}: {res.text[:200]}")
     except Exception as e:
-        log(f"⚠️ Gemini API error: {e}")
+        log(f"    ⚠️ Gemini exception: {e}")
     return None
+
+
+# ============================================================
+# 🔥 BATCH GEMINI — 5 comments ek saath
+# ============================================================
+def generate_batch_replies(comments_data):
+    """
+    🔥 Batch: Ek saath multiple comments ke replies generate karo
+    comments_data = [
+        {"comment_id": "123", "comment_text": "Which game bro", "post_title": "...", "is_abuse": False},
+        ...
+    ]
+    Returns: {"123": "reply1", "124": "reply2", ...}
+    """
+    keys = [k for k in GEMINI_KEYS if k]
+    if not keys:
+        log("  ⚠️ No Gemini keys available")
+        return {}
+    
+    # Build batch prompt
+    prompt_parts = ["You are a gaming content creator. Reply to EACH comment below.\n\n"]
+    prompt_parts.append("RULES:\n")
+    prompt_parts.append("- Reply in SAME language as the comment\n")
+    prompt_parts.append("- Friendly comments → friendly reply (MAX 20 words, 1-2 emojis)\n")
+    prompt_parts.append("- Abusive comments → witty savage comeback (MAX 25 words, 1-2 emojis)\n")
+    prompt_parts.append("- NEVER abuse back\n")
+    prompt_parts.append("- NEVER insult family/religion\n")
+    prompt_parts.append("- If fan asks game name, mention from POST\n\n")
+    prompt_parts.append("Reply in this EXACT format:\n")
+    prompt_parts.append("===REPLY_1===\n<reply text>\n===REPLY_2===\n<reply text>\n===REPLY_3===\n<reply text>\n\n")
+    
+    for idx, c in enumerate(comments_data, 1):
+        prompt_parts.append(f"===COMMENT_{idx}===\n")
+        prompt_parts.append(f"POST: {c['post_title'][:100]}\n")
+        prompt_parts.append(f"COMMENT: \"{c['comment_text']}\"\n")
+        prompt_parts.append(f"ABUSE: {c['is_abuse']}\n\n")
+    
+    prompt_parts.append("Now generate replies. Reply ONLY with the formatted output (===REPLY_1=== etc).\n")
+    full_prompt = "".join(prompt_parts)
+    
+    log(f"  📤 Sending {len(comments_data)} comments to Gemini...")
+    log(f"  📝 Prompt length: {len(full_prompt)} chars")
+    
+    for attempt in range(min(3, len(keys))):
+        key = random.choice(keys)
+        log(f"  🎯 Attempt {attempt + 1}: calling Gemini...")
+        
+        response = call_gemini_api(key, full_prompt, max_tokens=1500)
+        
+        if not response:
+            log(f"  ❌ Gemini attempt {attempt + 1} returned None")
+            continue
+        
+        log(f"  ✅ Gemini responded ({len(response)} chars)")
+        log(f"  📄 Response preview: {response[:300]}")
+        
+        # Parse replies
+        replies = {}
+        parts = re.split(r'===REPLY_(\d+)===', response)
+        
+        for i in range(1, len(parts), 2):
+            try:
+                idx = int(parts[i]) - 1
+                reply_text = parts[i + 1].strip()
+                reply_text = reply_text.strip().strip('"').strip("'")
+                if reply_text and idx < len(comments_data):
+                    replies[comments_data[idx]["comment_id"]] = reply_text
+            except (ValueError, IndexError):
+                continue
+        
+        log(f"  ✅ Parsed {len(replies)} replies from Gemini")
+        
+        if replies:
+            return replies
+        else:
+            log(f"  ⚠️ No replies parsed — trying next key")
+    
+    log(f"  ❌ All Gemini attempts failed")
+    return {}
 
 
 # ============================================================
@@ -221,72 +307,6 @@ def is_spam(text):
     return False
 
 
-def generate_smart_reply(comment_text, game_name, post_title, is_abuse=False):
-    """
-    🔥 NEW: Game name optional — post title se context milta hai
-    """
-    keys = [k for k in GEMINI_KEYS if k]
-    if not keys:
-        return None
-
-    if is_abuse:
-        prompt = f"""You are a SAVAGE but RESPECTFUL gaming content creator replying to a hater.
-
-POST: {post_title}
-HATER'S COMMENT: "{comment_text}"
-
-RULES:
-1. Reply in SAME language as the hater
-2. Be WITTY, SARCASTIC, FUNNY
-3. Match energy but stay CHILL and RESPECTFUL
-4. NEVER abuse back
-5. NEVER insult family/religion/caste
-6. NEVER threaten
-7. MAX 25 words
-8. Include 1-2 emojis (😂😎🔥)
-9. Style: Savage Hinglish / Gen-Z comeback
-
-GOOD EXAMPLES:
-- "bakwas video" → "Bhai 3 ghante dekh ke comment kiya? 😂"
-- "chutiya" → "Bhai tu bhi bana, competition badhega 😎"
-- "ghatiya" → "Bhai platinum kiya hai kya? Tips de 😂"
-- "f***ing trash" → "Yet here you are watching 😂🔥"
-
-Reply ONLY with the reply text, no quotes, no prefix."""
-    else:
-        prompt = f"""You are a friendly gaming content creator replying to a fan.
-
-POST CONTEXT: {post_title}
-FAN'S COMMENT: "{comment_text}"
-
-RULES:
-1. Reply in SAME language as the comment
-2. Friendly, casual, gaming-community tone
-3. MAX 20 words
-4. Include 1-2 emojis
-5. If the fan asks about the game name, mention it from POST CONTEXT
-6. NEVER share download links
-7. NEVER promise specific dates
-8. Match energy of comment
-
-GOOD EXAMPLES:
-- "Which game bro?" → "It's Valley Helicopter War bro! 🚁🔥"
-- "Nice video!" → "Thanks bro! More coming soon 🎮"
-- "Bhai mast hai" → "Shukriya bhai! 🔥"
-
-Reply ONLY with the reply text, no quotes, no prefix."""
-
-    for attempt in range(min(3, len(keys))):
-        key = random.choice(keys)
-        response = call_gemini_api(key, prompt, max_tokens=100)
-        if response:
-            response = response.strip().strip('"').strip("'")
-            if response.lower().startswith("reply:"):
-                response = response[6:].strip()
-            return response
-    return None
-
-
 def is_reply_safe(reply_text, is_abuse=False):
     if not reply_text or len(reply_text.strip()) < 3:
         return False, "too_short"
@@ -305,7 +325,7 @@ def is_reply_safe(reply_text, is_abuse=False):
 
 
 # ============================================================
-# 🤖 AUTO-REPLY FUNCTIONS (FB ONLY)
+# 🤖 FB COMMENTS
 # ============================================================
 def fetch_fb_comments(post_id, since_timestamp=None):
     url = f"https://graph.facebook.com/v24.0/{post_id}/comments"
@@ -361,18 +381,14 @@ def post_fb_reply(comment_id, reply_text):
 
 
 # ============================================================
-# 🔥 NEW: Direct FB page comments (game loop NAHI)
+# 🔥 MAIN AUTO-REPLY — BATCH MODE
 # ============================================================
 def process_fb_comments(actual_posted_titles):
-    """
-    🔥 NEW: Direct FB page se comments fetch karo
-    Game name hardcode NAHI — post message se context
-    """
     if not AUTO_COMMENT_ENABLED:
         log("🚫 Auto-comment disabled — skipping reply processing")
         return None
 
-    log("🤖 Auto-reply processing started (direct FB mode)...")
+    log("🤖 Auto-reply processing started (batch mode)...")
 
     replied_file = "logs/replied_comment_ids.json"
     replied_data = {"replied": [], "last_updated": ""}
@@ -397,7 +413,7 @@ def process_fb_comments(actual_posted_titles):
     cutoff_time = (now_ist() - timedelta(hours=MAX_COMMENT_AGE_HOURS)).timestamp()
     min_age_time = (now_ist() - timedelta(minutes=MIN_COMMENT_AGE_MIN)).timestamp()
 
-    # 🔥 FB Page ke saare posts fetch karo (last 28 din)
+    # FB Page ke saare posts fetch karo
     twenty_eight_days_ago = now_ist() - timedelta(days=28)
     since_timestamp = int(twenty_eight_days_ago.timestamp())
 
@@ -415,31 +431,29 @@ def process_fb_comments(actual_posted_titles):
         try:
             res = requests.get(next_url, params=params if page_count == 0 else None, timeout=20)
             if res.status_code != 200:
-                log(f"⚠️ FB posts fetch error: {res.status_code} {res.text[:200]}")
+                log(f"⚠️ FB posts error: {res.status_code}")
                 break
-
             data = res.json()
             posts = data.get("data", [])
             all_posts.extend(posts)
             log(f"  📄 Page {page_count + 1}: {len(posts)} posts")
-
             next_url = data.get("paging", {}).get("next")
             params = None
             page_count += 1
-
             if not next_url:
                 break
         except Exception as e:
-            log(f"⚠️ FB posts fetch error: {e}")
+            log(f"⚠️ FB posts error: {e}")
             break
 
-    log(f"✅ Total FB posts fetched: {len(all_posts)}")
+    log(f"✅ Total FB posts: {len(all_posts)}")
 
-    # 🔥 Har post ke comments check karo
+    # ============================================================
+    # STEP 1: Eligible comments collect karo
+    # ============================================================
+    eligible_comments = []
+
     for post in all_posts:
-        if replies_count >= MAX_REPLIES_PER_RUN:
-            break
-
         post_id = post.get("id", "")
         post_message = (post.get("message") or "").strip()
         post_link = post.get("permalink_url", f"https://facebook.com/{post_id}")
@@ -451,12 +465,7 @@ def process_fb_comments(actual_posted_titles):
         if not comments:
             continue
 
-        log(f"🔍 Post: {post_message[:60]} | Comments: {len(comments)}")
-
         for comment in comments:
-            if replies_count >= MAX_REPLIES_PER_RUN:
-                break
-
             comment_id = comment.get("id", "")
             comment_text = comment.get("message", "").strip()
             comment_time = comment.get("created_time", "")
@@ -465,19 +474,13 @@ def process_fb_comments(actual_posted_titles):
             if not comment_id or not comment_text:
                 continue
 
-            # Layer 1: Already replied?
             if comment_id in replied_ids:
                 continue
-
-            # Layer 2: can_reply?
             if not can_reply:
                 continue
-
-            # Layer 3: Own comment?
             if comment.get("from", {}).get("id") == FB_PAGE_ID:
                 continue
 
-            # Time checks
             try:
                 dt = datetime.fromisoformat(comment_time.replace("+0000", "+00:00"))
                 comment_ts = dt.timestamp()
@@ -488,60 +491,80 @@ def process_fb_comments(actual_posted_titles):
             except Exception:
                 pass
 
-            # Abuse check
             abuse_type = detect_abuse(comment_text)
             if abuse_type == "family_abuse":
-                reply_log["skipped"].append({
-                    "comment_id": comment_id,
-                    "comment_text": comment_text[:100],
-                    "reason": "family_abuse",
-                    "timestamp": now_ist_ampm(),
-                })
                 reply_log["total_skipped"] = reply_log.get("total_skipped", 0) + 1
                 replied_ids.add(comment_id)
                 continue
-
-            # Spam check
             if is_spam(comment_text):
-                reply_log["skipped"].append({
-                    "comment_id": comment_id,
-                    "comment_text": comment_text[:100],
-                    "reason": "spam",
-                    "timestamp": now_ist_ampm(),
-                })
                 reply_log["total_skipped"] = reply_log.get("total_skipped", 0) + 1
                 replied_ids.add(comment_id)
                 continue
 
-            # Layer 4: FB API verify
-            if check_if_already_replied(comment_id):
-                log(f"⏭️ Already replied (FB verify) — {comment_id}")
-                replied_ids.add(comment_id)
-                continue
+            eligible_comments.append({
+                "comment_id": comment_id,
+                "comment_text": comment_text,
+                "post_id": post_id,
+                "post_message": post_message,
+                "post_link": post_link,
+                "is_abuse": (abuse_type == "general_abuse"),
+            })
 
-            # 🔥 Gemini reply generate (game name optional)
-            is_abuse = (abuse_type == "general_abuse")
-            reply_text = generate_smart_reply(
-                comment_text, "", post_message[:100], is_abuse=is_abuse
-            )
+    log(f"📋 Eligible comments: {len(eligible_comments)}")
+
+    if not eligible_comments:
+        log("🤖 No eligible comments — skipping")
+        os.makedirs("logs", exist_ok=True)
+        replied_data["replied"] = list(replied_ids)[-5000:]
+        replied_data["last_updated"] = now_ist_ampm()
+        with open(replied_file, 'w', encoding='utf-8') as f:
+            json.dump(replied_data, f, indent=2)
+        reply_log["last_updated"] = now_ist_ampm()
+        with open(reply_log_file, 'w', encoding='utf-8') as f:
+            json.dump(reply_log, f, indent=2)
+        return reply_log
+
+    # ============================================================
+    # STEP 2: 5-5 ke batch mein Gemini ko bhejo
+    # ============================================================
+    BATCH_SIZE = 5
+    total_batches = (len(eligible_comments) + BATCH_SIZE - 1) // BATCH_SIZE
+
+    for batch_num in range(total_batches):
+        if replies_count >= MAX_REPLIES_PER_RUN:
+            break
+
+        batch_start = batch_num * BATCH_SIZE
+        batch_end = min(batch_start + BATCH_SIZE, len(eligible_comments))
+        batch = eligible_comments[batch_start:batch_end]
+
+        log(f"")
+        log(f"🔥 BATCH {batch_num + 1}/{total_batches} — {len(batch)} comments")
+        log(f"{'='*60}")
+
+        batch_replies = generate_batch_replies(batch)
+
+        log(f"📥 Got {len(batch_replies)} replies from Gemini")
+        log(f"{'='*60}")
+
+        for c in batch:
+            if replies_count >= MAX_REPLIES_PER_RUN:
+                break
+
+            comment_id = c["comment_id"]
+            reply_text = batch_replies.get(comment_id)
 
             if not reply_text:
+                log(f"  ⚠️ No reply for comment {comment_id}")
                 continue
 
-            # Safety check
-            safe, reason = is_reply_safe(reply_text, is_abuse=is_abuse)
+            safe, reason = is_reply_safe(reply_text, is_abuse=c["is_abuse"])
             if not safe:
-                log(f"⚠️ Reply unsafe: {reason}")
-                reply_log["skipped"].append({
-                    "comment_id": comment_id,
-                    "comment_text": comment_text[:100],
-                    "reason": f"unsafe_{reason}",
-                    "timestamp": now_ist_ampm(),
-                })
+                log(f"  ⚠️ Reply unsafe ({reason}): {reply_text[:60]}")
                 replied_ids.add(comment_id)
                 continue
 
-            # FB pe reply POST
+            log(f"  📤 Posting reply for '{c['comment_text'][:40]}'...")
             reply_id = post_fb_reply(comment_id, reply_text)
 
             if reply_id:
@@ -549,19 +572,21 @@ def process_fb_comments(actual_posted_titles):
                 reply_log["replies"].append({
                     "reply_id": reply_id,
                     "comment_id": comment_id,
-                    "post_id": post_id,
-                    "user_comment": comment_text[:200],
+                    "post_id": c["post_id"],
+                    "user_comment": c["comment_text"][:200],
                     "gemini_reply": reply_text,
-                    "type": "savage" if is_abuse else "friendly",
-                    "post_title": post_message[:100],
-                    "fb_post_link": post_link,
+                    "type": "savage" if c["is_abuse"] else "friendly",
+                    "post_title": c["post_message"][:100],
+                    "fb_post_link": c["post_link"],
                     "source_link": "",
                     "timestamp": now_ist_ampm(),
                     "status": "posted",
                 })
                 reply_log["total_replies"] = reply_log.get("total_replies", 0) + 1
                 replied_ids.add(comment_id)
-                log(f"✅ Reply posted: {reply_text[:60]}")
+                log(f"  ✅ Reply posted: {reply_text[:60]}")
+            else:
+                log(f"  ❌ Failed to post reply")
 
     # Save
     os.makedirs("logs", exist_ok=True)
@@ -846,7 +871,7 @@ def generate_auto_reply_section():
 
 
 # ============================================================
-# 📦 EXISTING FUNCTIONS (UNCHANGED)
+# 📦 EXISTING FUNCTIONS
 # ============================================================
 def git_commit_and_push(file_paths_to_add, commit_message="Auto-Agent: Sync dashboard [skip ci]"):
     try:
@@ -1054,7 +1079,6 @@ def fetch_fb_ig_data(game_list):
         log("⚠️ FB_ACCESS_TOKEN missing")
         return result, game_views_summary
 
-    # 🔥 ID → Source map banao (posted_links_editor se)
     id_to_source_map = {}
     if os.path.exists(posted_dir):
         for fname in os.listdir(posted_dir):
@@ -1283,7 +1307,6 @@ def fetch_fb_ig_data(game_list):
                     "source_link": src_link, "is_source_only": True,
                 })
 
-    # 🔥 Sort — Posted newest first, phir pending
     for game in game_list:
         posted_v = [x for x in result[game] if x.get("fb_posted") or x.get("ig_posted")]
         pending_v = [x for x in result[game] if not (x.get("fb_posted") or x.get("ig_posted"))]
