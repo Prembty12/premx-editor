@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 53 | **Last Updated:** 2026-09-27 09:15:00 AM IST
+**Total Videos:** 53 | **Last Updated:** 2026-09-27 09:32:10 AM IST
 
 ---
 
@@ -15,7 +15,7 @@
 | FB Posted | 19 / 53 |
 | IG Posted | 13 / 53 |
 | Total FB Views | **20,771** |
-| Total IG Views | **1,500** |
+| Total IG Views | **1,410** |
 
 ---
 
@@ -23,19 +23,19 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | Lightning Strike Melts Monsters ⚡💀  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingr | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdwLc5lCQmn/) | 60 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan233.mp4) |
-| 2 | Desert Bloodbath Slash ⚔️💀  #videogames #gamingcommunity #gaming #spiderman2 #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdrV8MyEadM/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan29.mp4) |
-| 3 | Can I beat this elite squad? 🤔⚔️  #videogames #gamingcommunity #gaming #spiderman2 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1776708160307603/) | 494 | [🟣 IG](https://www.instagram.com/reel/DdegZzvjmc_/) | 190 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan217.mp4) |
-| 4 | Spider-Man's Bridge Takedown 🕷️💥  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2008442809860960/) | 615 | [🟣 IG](https://www.instagram.com/reel/Ddc8azaESE5/) | 450 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan227.mp4) |
-| 5 | You won’t believe how Miles survived this attack! 😱  #videogames #gamingcommunity #gaming #marvelssp | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdbjSlEgsT7/) | 240 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan228.mp4) |
-| 6 | Spider-Man's wild boat hijack ends in flames! 🕷️🔥  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingreels  | [🔵 FB](https://www.facebook.com/reel/2610569156066695/) | 91 | [🟣 IG](https://www.instagram.com/reel/DdYEdVsku_9/) | 90 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan221.mp4) |
-| 7 | Can Spider-Man survive fighting a giant monster in the middle of a massive orange dust storm?  #videogames #gamingcommun | [🔵 FB](https://www.facebook.com/reel/1062657562837754/) | 107 | [🟣 IG](https://www.instagram.com/reel/DdURzWoDh6d/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan28.mp4) |
-| 8 | Spider-Man's wildest stunt will shock you! 🕷️  #videogames #gamingcommunity #gaming #marvelsspiderma | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdTztbFFBF9/) | 60 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan21.mp4) |
-| 9 | The green beast's dark secret will shock you!  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingreels #ree | [🔵 FB](https://www.facebook.com/reel/1788534072456957/) | 485 | [🟣 IG](https://www.instagram.com/reel/DdTzfy_Cojh/) | 190 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan222.mp4) |
-| 10 | SPIDER-MAN'S ULTIMATE VILLAIN SHOWDOWN: THE EPIC SLOW-MO COMBAT THAT WILL BLOW YOUR MIND!  #videogam | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdTylaPkf4p/) | 50 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan211.mp4) |
-| 11 | How does Spider-Man survive this epic military ambush?  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingr | [🔵 FB](https://www.facebook.com/reel/1639395280878916/) | 1,331 | [🟣 IG](https://www.instagram.com/reel/DdTYhE2AdR6/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan26.mp4) |
-| 12 | The secret behind Miles' red spider hoodie!  #videogames #gamingcommunity #gaming #marvelsspiderman2 | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdTXTBqFUVK/) | 40 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan245.mp4) |
-| 13 | Spider-Man's insane sand monster battle!  #videogames #gamingcommunity #gaming #spiderman2 #gamingre | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdSubDolYuF/) | 90 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan219.mp4) |
+| 1 | Spider-Man Climbs Giant Colossus 🔥  #videogames #gamingcommunity #gaming #spiderman2 #gamingreels #r | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdxrbGlAcgA/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan216.mp4) |
+| 2 | Lightning Strike Melts Monsters ⚡💀  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingr | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdwLc5lCQmn/) | 60 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan233.mp4) |
+| 3 | Desert Bloodbath Slash ⚔️💀  #videogames #gamingcommunity #gaming #spiderman2 #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdrV8MyEadM/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan29.mp4) |
+| 4 | Can I beat this elite squad? 🤔⚔️  #videogames #gamingcommunity #gaming #spiderman2 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1776708160307603/) | 494 | [🟣 IG](https://www.instagram.com/reel/DdegZzvjmc_/) | 190 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan227.mp4) |
+| 5 | Spider-Man's Bridge Takedown 🕷️💥  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2008442809860960/) | 615 | [🟣 IG](https://www.instagram.com/reel/Ddc8azaESE5/) | 450 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan228.mp4) |
+| 6 | You won’t believe how Miles survived this attack! 😱  #videogames #gamingcommunity #gaming #marvelssp | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdbjSlEgsT7/) | 240 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan228.mp4) |
+| 7 | Spider-Man's wild boat hijack ends in flames! 🕷️🔥  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingreels  | [🔵 FB](https://www.facebook.com/reel/2610569156066695/) | 91 | [🟣 IG](https://www.instagram.com/reel/DdYEdVsku_9/) | 90 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan28.mp4) |
+| 8 | Can Spider-Man survive fighting a giant monster in the middle of a massive orange dust storm?  #videogames #gamingcommun | [🔵 FB](https://www.facebook.com/reel/1062657562837754/) | 107 | [🟣 IG](https://www.instagram.com/reel/DdURzWoDh6d/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan21.mp4) |
+| 9 | Spider-Man's wildest stunt will shock you! 🕷️  #videogames #gamingcommunity #gaming #marvelsspiderma | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdTztbFFBF9/) | 60 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan222.mp4) |
+| 10 | The green beast's dark secret will shock you!  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingreels #ree | [🔵 FB](https://www.facebook.com/reel/1788534072456957/) | 485 | [🟣 IG](https://www.instagram.com/reel/DdTzfy_Cojh/) | 190 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan27.mp4) |
+| 11 | SPIDER-MAN'S ULTIMATE VILLAIN SHOWDOWN: THE EPIC SLOW-MO COMBAT THAT WILL BLOW YOUR MIND!  #videogam | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdTylaPkf4p/) | 50 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan211.mp4) |
+| 12 | How does Spider-Man survive this epic military ambush?  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingr | [🔵 FB](https://www.facebook.com/reel/1639395280878916/) | 1,331 | [🟣 IG](https://www.instagram.com/reel/DdTYhE2AdR6/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan211.mp4) |
+| 13 | The secret behind Miles' red spider hoodie!  #videogames #gamingcommunity #gaming #marvelsspiderman2 | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdTXTBqFUVK/) | 40 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan245.mp4) |
 | 14 | Spider-Man vs giant sand monster battle!  #videogames #gamingcommunity #gaming #spiderman2 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/934804913037610/) | 106 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan218.mp4) |
 | 15 | Can Spider-Man survive the ultimate showdown in the crumbling ruins of this epic battle?  #videogames #gamingcommunity # | [🔵 FB](https://www.facebook.com/reel/1591562232667306/) | 277 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan224.mp4) |
 | 16 | SANDBLOOD RAGE: SPIDER-MAN VS THE COLOSSAL SAND TITAN!  #videogames #gamingcommunity #gaming #spiderman2 #gamingreels #r | [🔵 FB](https://www.facebook.com/reel/1392931593021744/) | 214 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan226.mp4) |

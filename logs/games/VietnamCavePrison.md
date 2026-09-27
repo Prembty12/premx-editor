@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 27 | **Last Updated:** 2026-09-27 09:15:00 AM IST
+**Total Videos:** 27 | **Last Updated:** 2026-09-27 09:32:10 AM IST
 
 ---
 
@@ -14,7 +14,7 @@
 | Posted (FB or IG) | 4 / 27 |
 | FB Posted | 3 / 27 |
 | IG Posted | 4 / 27 |
-| Total FB Views | **1,409** |
+| Total FB Views | **1,414** |
 | Total IG Views | **420** |
 
 ---
@@ -23,7 +23,7 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | Valley Helicopter War 🚁💥  #videogames #gamingcommunity #gaming #vietnamcaveprison #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1780695949719463/) | 806 | [🟣 IG](https://www.instagram.com/reel/Ddwn1FmgvlH/) | 60 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison1.mp4) |
+| 1 | Valley Helicopter War 🚁💥  #videogames #gamingcommunity #gaming #vietnamcaveprison #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1780695949719463/) | 811 | [🟣 IG](https://www.instagram.com/reel/Ddwn1FmgvlH/) | 60 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison1.mp4) |
 | 2 | Would You Pull the Trigger? 😱  #videogames #gamingcommunity #gaming #vietnamcaveprison #gamingreels  | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Ddrp4-XiGwR/) | 60 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison2.mp4) |
 | 3 | Warehouse ambush Run 🔫  #videogames #gamingcommunity #gaming #vietnamcaveprison #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2642558112868316/) | 193 | [🟣 IG](https://www.instagram.com/reel/DdZ4mLwjkuo/) | 220 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison6.mp4) |
 | 4 | You won't believe how intense this dogfight gets!  #videogames #gamingcommunity #gaming #vietnamcaveprison #gamingreels  | [🔵 FB](https://www.facebook.com/reel/1364205288788033/) | 410 | [🟣 IG](https://www.instagram.com/reel/DdUSbpbAm0w/) | 80 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison7.mp4) |
