@@ -79,11 +79,26 @@ FB_GRAPH_URL = f"https://graph.facebook.com/{FB_API_VERSION}"
 DAYS_LIMIT = 28
 MAX_REPLIES_PER_RUN = 5
 MIN_COMMENT_AGE_MIN = 0
-MAX_COMMENT_AGE_HOURS = 168
+MAX_COMMENT_AGE_HOURS = 24          # ✅ 30 din
 POSTS_TO_SCAN = 25
 COMMENT_FETCH_WORKERS = 10
 
 AUTO_COMMENT_ENABLED = os.environ.get("AUTO_COMMENT", "true").lower() == "true"
+
+# ✅ Extended games list
+KNOWN_GAMES = [
+    "BGMI", "Free Fire", "GTA 5", "GTA San Andreas", "GTA", "CODM",
+    "Call of Duty", "God of War", "Spider-Man", "Minecraft", "PUBG",
+    "Fortnite", "Valorant", "Clash of Clans", "Clash Royale", "Roblox",
+    "Among Us", "Apex Legends", "FIFA", "PES", "WWE", "Naruto",
+    "Dragon Ball", "Tekken", "Mortal Kombat", "Resident Evil",
+    "Black Ops 6", "Black Ops", "Modern Warfare", "Warzone", "MW3",
+    "God of War Ragnarok", "Spider-Man 2", "Ghost of Tsushima",
+    "Red Dead Redemption", "Elden Ring", "Dark Souls", "Sekiro",
+    "Cyberpunk 2077", "Assassin's Creed", "Far Cry", "Battlefield",
+    "Need for Speed", "Forza", "Gran Turismo", "Halo", "Gears of War",
+    "Subway Surfers", "Candy Crush", "Temple Run", "Clash",
+]
 
 def log(msg):
     sys.stderr.write(f"{msg}\n")
@@ -223,7 +238,15 @@ def generate_batch_replies(comments_batch):
     for c in comments_batch:
         tone = "SAVAGE-HATER" if c["is_abuse"] else "FRIENDLY-FAN"
         safe_text = c["comment_text"].replace('"', "'").replace("\n", " ")[:300]
-        formatted += f'[{tone}] ID: "{c["comment_id"]}" | Game: "{c["game_name"]}" | Comment: "{safe_text}"\n'
+        caption_safe = c.get("post_title", "").replace('"', "'").replace("\n", " ")[:150]
+        hashtags_safe = ", ".join(c.get("post_hashtags", []))[:100]
+        formatted += (
+            f'[{tone}] ID: "{c["comment_id"]}" | '
+            f'Game: "{c["game_name"]}" | '
+            f'Hashtags: [{hashtags_safe}] | '
+            f'Caption: "{caption_safe}" | '
+            f'Comment: "{safe_text}"\n'
+        )
 
     prompt = f"""You are a SAVAGE, WITTY, and CONFIDENT gaming content creator replying to comments on your gaming channel.
 
@@ -231,37 +254,57 @@ For EACH comment below, write a SHORT reply (maximum 25 words).
 
 REPLY STYLE GUIDE:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-FRIENDLY-FAN comments → Friendly, warm, gaming-community tone. Thank them and hype them up.
-SAVAGE-HATER comments (abuse/insult) → Reply with a SAVAGE, WITTY, SARCASTIC comeback.
+FRIENDLY-FAN comments -> Friendly, warm, FUNNY, gaming-community tone.
+   - Make them laugh, feel welcomed, and want to comment again.
+   - Sometimes end with a playful question to boost engagement.
+   - Hype them up like a close friend.
+   - Examples:
+     * "Nice bro" -> "Thanks bro! 🔥 When are you joining the squad? 🎮"
+     * "Nice video" -> "Thanks man! More videos coming your way 😎"
+     * "OP gameplay" -> "Bro you're the OP one for commenting 😂🔥"
+     * "Which game?" -> "It's BGMI bro! Squad ready? 🎮"
+
+SAVAGE-HATER comments (abuse/insult) -> SAVAGE, WITTY, SARCASTIC comeback.
    - Match their energy but STAY CHILL and CONFIDENT.
    - Roast them with HUMOR, never with abuse.
-   - Make it FUNNY, not angry.
+   - Make it FUNNY, not angry - the audience should laugh.
+   - End with a playful taunt sometimes.
+   - Examples:
+     * "bakwas video" (trash video) -> "Bro watched for 3 hours just to comment? Dedication 😂"
+     * "chutiya" (idiot) -> "Bro you make one too, competition will grow 😎"
+     * "ghatiya" (terrible) -> "Bro did you go platinum? Give me tips 😂"
+     * "uninstall kar" (uninstall it) -> "Bro you install first, then we'll talk 😎"
+     * "time waste" -> "Bro you spent 2 hours, I spent 2 mins 😂🔥"
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 STRICT RULES:
 1. DETECT the language of each comment and REPLY IN THE SAME LANGUAGE.
-   - English → English
-   - Hindi (Devanagari) → Hindi
-   - Hinglish (Roman Hindi) → Hinglish
-   - Spanish / French / German / Japanese / Korean / Portuguese / Russian / Arabic / Italian / etc. → Reply in that same language.
+   - English -> English
+   - Hindi (Devanagari) -> Hindi
+   - Hinglish (Roman Hindi) -> Hinglish
+   - Spanish / French / German / Japanese / Korean / Portuguese / Russian / Arabic / Italian / etc. -> Reply in that same language.
 2. DO NOT use regional Indian languages such as Tamil, Telugu, Bengali, Marathi, Gujarati, Kannada, Malayalam, Punjabi, Odia, or Assamese.
    If the comment is in any of these languages, reply in ENGLISH or HINGLISH only.
 3. GAME NAME RULE (VERY IMPORTANT):
-   - IF the comment ASKS about the game name (e.g., "Konsa game hai?", "Which game?", "Game name?", "Ye kya khel rahe ho?", "Name of the game?", "What game is this?"), THEN mention the game name in the reply.
+   - You are given: Game name, Hashtags, and Caption for each comment.
+   - IF the comment ASKS about the game name (e.g., "Which game?", "Game name?", "What game is this?", "Name of the game?"), THEN mention the game name in the reply.
    - IF the comment does NOT ask about the game name, DO NOT mention the game name. Just reply naturally based on the comment's tone.
+   - Use the Caption to understand the CONTEXT of the post.
+   - Use Hashtags as additional clues for the game.
    - Examples:
-     • "Konsa game hai?" (Game: BGMI) → "BGMI bro! Battlegrounds Mobile India 🎮🔥"
-     • "Which game?" (Game: Free Fire) → "Free Fire bro! FF ka craze alag hai 🔥"
-     • "What game is this?" (Game: GTA 5) → "GTA 5 bro! Los Santos ka raja 😎"
-     • "Nice bro" (Game: BGMI) → "Thanks bro! 🔥"   (No game name)
-     • "bakwas video" (Game: GTA 5) → "Bhai 3 ghante dekh ke comment kiya? 😂"   (No game name)
-4. Include 1-2 emojis per reply (😂😎🔥🎮💀).
+     * "Which game?" (Game: BGMI) -> "It's BGMI bro! Battlegrounds Mobile India 🎮🔥"
+     * "Which game?" (Game: Free Fire) -> "It's Free Fire bro! FF vibes are different 🔥"
+     * "What game is this?" (Game: GTA 5) -> "It's GTA 5 bro! King of Los Santos 😎"
+     * "Nice bro" (Game: BGMI) -> "Thanks bro! 🔥"   (No game name)
+     * "bakwas video" (Game: GTA 5) -> "Bro watched for 3 hours just to comment? 😂"   (No game name)
+4. Include 1-2 emojis per reply (😂😎🔥🎮💀❤️).
 5. NEVER share any links.
 6. NEVER insult family, religion, or caste.
 7. NEVER use abusive words back.
 8. NEVER threaten anyone.
 9. Keep each reply to a maximum of 25 words.
-10. Be CONFIDENT — you are the owner of this gaming channel.
+10. Be CONFIDENT - you are the owner of this gaming channel.
+11. HOOK THEM BACK: Sometimes end with a playful question (e.g., "When are you joining the squad?").
 
 OUTPUT FORMAT:
 Reply ONLY with valid JSON. No extra text, no markdown, no explanation.
@@ -422,7 +465,7 @@ def post_fb_reply(comment_id, reply_text):
     return None
 
 def process_fb_comments(actual_posted_titles=None):
-    """DIRECT FB MODE — fast parallel fetch + detailed logging."""
+    """DIRECT FB MODE — parallel fetch + hashtag detection + detailed log."""
     if not AUTO_COMMENT_ENABLED:
         log("🚫 Auto-comment disabled — skipping reply processing")
         return None
@@ -451,9 +494,7 @@ def process_fb_comments(actual_posted_titles=None):
     cutoff_time = (now_ist() - timedelta(hours=MAX_COMMENT_AGE_HOURS)).timestamp()
     min_age_time = (now_ist() - timedelta(minutes=MIN_COMMENT_AGE_MIN)).timestamp()
 
-    # ==========================================
-    # STEP 1: FB Page ke latest posts uthao
-    # ==========================================
+    # STEP 1: FB Page ke latest posts
     log(f"📥 Fetching latest {POSTS_TO_SCAN} posts from FB Page: {FB_PAGE_ID}")
     posts_url = f"{FB_GRAPH_URL}/{FB_PAGE_ID}/posts"
     posts_params = {
@@ -476,9 +517,7 @@ def process_fb_comments(actual_posted_titles=None):
         log("ℹ️ No posts found on FB page.")
         return None
 
-    # ==========================================
-    # STEP 2: PARALLEL comment fetch (fast!)
-    # ==========================================
+    # STEP 2: PARALLEL comment fetch
     log(f"⚡ Parallel fetching comments from {len(posts)} posts ({COMMENT_FETCH_WORKERS} workers)...")
 
     post_comments_map = {}
@@ -506,19 +545,9 @@ def process_fb_comments(actual_posted_titles=None):
     total_comments = sum(len(c) for c in post_comments_map.values())
     log(f"✅ Total {total_comments} comments fetched from all posts")
 
-    # ==========================================
     # STEP 3: Filter valid comments
-    # ==========================================
     valid_comments = []
     skipped_logs = []
-
-    KNOWN_GAMES = [
-        "BGMI", "Free Fire", "GTA 5", "GTA San Andreas", "GTA", "CODM",
-        "Call of Duty", "God of War", "Spider-Man", "Minecraft", "PUBG",
-        "Fortnite", "Valorant", "Clash of Clans", "Clash Royale", "Roblox",
-        "Among Us", "Apex Legends", "FIFA", "PES", "WWE", "Naruto",
-        "Dragon Ball", "Tekken", "Mortal Kombat", "Resident Evil",
-    ]
 
     for post in posts:
         if len(valid_comments) >= MAX_REPLIES_PER_RUN:
@@ -531,13 +560,31 @@ def process_fb_comments(actual_posted_titles=None):
         if not comments:
             continue
 
-        game_name = "Facebook Post"
-        for g in KNOWN_GAMES:
-            if g.lower() in post_message.lower():
-                game_name = g
+        # ✅ Hashtag extract karo
+        hashtags = re.findall(r'#(\w+)', post_message)
+        log(f"      📌 Hashtags: {hashtags}")
+
+        # ✅ Hashtag se game detect karo
+        game_name = "Video Game"
+        for tag in hashtags:
+            tag_clean = tag.lower().replace("_", "").replace("-", "")
+            for g in KNOWN_GAMES:
+                g_clean = g.lower().replace(" ", "").replace("_", "").replace("-", "")
+                if g_clean == tag_clean or g_clean in tag_clean or tag_clean in g_clean:
+                    game_name = g
+                    break
+            if game_name != "Video Game":
                 break
 
+        # Fallback: caption mein direct search
+        if game_name == "Video Game":
+            for g in KNOWN_GAMES:
+                if g.lower() in post_message.lower():
+                    game_name = g
+                    break
+
         log(f"🔍 Post: {post_id} | {post_message} | {len(comments)} comments")
+        log(f"      🎮 Detected game: {game_name}")
 
         for comment in comments:
             if len(valid_comments) >= MAX_REPLIES_PER_RUN:
@@ -599,6 +646,7 @@ def process_fb_comments(actual_posted_titles=None):
                 "comment_text": comment_text,
                 "game_name": game_name,
                 "post_title": post_message,
+                "post_hashtags": hashtags,
                 "is_abuse": (abuse_type == "general_abuse"),
                 "post_id": post_id,
                 "fb_link": post.get("permalink_url", f"https://www.facebook.com/{post_id}"),
@@ -606,9 +654,7 @@ def process_fb_comments(actual_posted_titles=None):
                 "user_name": from_data.get("name", "Unknown User"),
             })
 
-    # ==========================================
     # STEP 4: Batch OpenRouter call
-    # ==========================================
     if not valid_comments:
         log("ℹ️ No valid comments to reply. Skipping batch API call.")
         replies_map = {}
@@ -616,9 +662,7 @@ def process_fb_comments(actual_posted_titles=None):
         log(f"📦 Batch mode: {len(valid_comments)} comments → 1 OpenRouter call")
         replies_map = generate_batch_replies(valid_comments)
 
-    # ==========================================
     # STEP 5: Post replies
-    # ==========================================
     replies_count = 0
     for c in valid_comments:
         comment_id = c["comment_id"]
@@ -667,9 +711,7 @@ def process_fb_comments(actual_posted_titles=None):
         else:
             log(f"❌ Failed to post reply for {comment_id[:20]}")
 
-    # ==========================================
     # STEP 6: Save state
-    # ==========================================
     reply_log["skipped"].extend(skipped_logs)
     reply_log["total_skipped"] = reply_log.get("total_skipped", 0) + len(skipped_logs)
 
