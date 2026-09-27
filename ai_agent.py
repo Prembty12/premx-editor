@@ -6,6 +6,7 @@ import requests
 import sys
 import subprocess
 import re
+import time
 from datetime import datetime, timedelta, timezone
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -67,7 +68,7 @@ OPENROUTER_KEYS = [
 ]
 
 FIXED_MODEL = "google/gemma-4-26b-a4b-it:free"
-FALLBACK_MODEL = "openrouter/free"
+FALLBACK_MODEL = "meta-llama/llama-3.3-70b-instruct:free"
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 FB_PAGE_ID = os.environ.get("PAGE_ID")
@@ -82,10 +83,10 @@ MIN_COMMENT_AGE_MIN = 0
 MAX_COMMENT_AGE_HOURS = 24          # ✅ 30 din
 POSTS_TO_SCAN = 25
 COMMENT_FETCH_WORKERS = 10
+MAX_JSON_RETRIES = 12                # ✅ 12 attempts
 
 AUTO_COMMENT_ENABLED = os.environ.get("AUTO_COMMENT", "true").lower() == "true"
 
-# ✅ Extended games list
 KNOWN_GAMES = [
     "BGMI", "Free Fire", "GTA 5", "GTA San Andreas", "GTA", "CODM",
     "Call of Duty", "God of War", "Spider-Man", "Minecraft", "PUBG",
@@ -98,6 +99,9 @@ KNOWN_GAMES = [
     "Cyberpunk 2077", "Assassin's Creed", "Far Cry", "Battlefield",
     "Need for Speed", "Forza", "Gran Turismo", "Halo", "Gears of War",
     "Subway Surfers", "Candy Crush", "Temple Run", "Clash",
+    "VietnamCavePrison", "combatoperation", "ghostandela", "mm2remastered",
+    "monkeyKing", "sifu", "codBlackops6", "SpiderMan2", "godofwar3",
+    "afghanistanredz", "spider",
 ]
 
 def log(msg):
@@ -197,43 +201,89 @@ def _call_openrouter_single(model_name, api_key, prompt, max_tokens=150):
                 if content:
                     return content.strip()
         else:
-            log(f"⚠️ OpenRouter {model_name} HTTP {res.status_code}: {res.text[:150]}")
+            log(f"   ⚠️ HTTP {res.status_code}: {res.text[:120]}")
     except Exception as e:
-        log(f"⚠️ OpenRouter {model_name} exception: {e}")
+        log(f"   ⚠️ Exception: {e}")
     return None
 
 def call_openrouter(prompt, max_tokens=150):
+    """Simple single call — fixed pehle, fallback baad."""
     valid_keys = [k for k in OPENROUTER_KEYS if k]
     if not valid_keys:
         log("❌ No OpenRouter API keys found.")
         return None
 
     primary_key = valid_keys[0]
-    log(f"🚀 Trying FIXED model: {FIXED_MODEL} (1 attempt)")
     result = _call_openrouter_single(FIXED_MODEL, primary_key, prompt, max_tokens)
     if result:
-        log(f"✅ FIXED model success")
         return result
 
-    log(f"🔄 Fixed failed. Switching to FALLBACK: {FALLBACK_MODEL} with all keys...")
     for idx, key in enumerate(valid_keys):
-        log(f"🔑 Trying Key {idx + 1} with {FALLBACK_MODEL}...")
         result = _call_openrouter_single(FALLBACK_MODEL, key, prompt, max_tokens)
         if result:
-            log(f"✅ Fallback success with Key {idx + 1}")
             return result
-        log(f"❌ Key {idx + 1} failed. Next...")
 
-    log("❌ All keys and models failed.")
     return None
 
 # ============================================================
-# 🎯 BATCH REPLY GENERATOR
+# 🎯 ROBUST JSON EXTRACTOR
 # ============================================================
-def generate_batch_replies(comments_batch):
+def _extract_json(response):
+    """Robust JSON extraction — 3 tarike."""
+    if not response:
+        return None
+
+    cleaned = response.strip()
+
+    # Remove markdown fences
+    if "```" in cleaned:
+        cleaned = re.sub(r'^```(?:json)?\s*', '', cleaned)
+        cleaned = re.sub(r'\s*```$', '', cleaned)
+        cleaned = cleaned.strip()
+
+    # Try 1: Direct parse
+    try:
+        result = json.loads(cleaned)
+        if isinstance(result, dict):
+            return result
+    except Exception:
+        pass
+
+    # Try 2: First { to last }
+    start = cleaned.find("{")
+    end = cleaned.rfind("}")
+    if start != -1 and end != -1 and end > start:
+        try:
+            result = json.loads(cleaned[start:end+1])
+            if isinstance(result, dict):
+                return result
+        except Exception:
+            pass
+
+    # Try 3: Regex JSON block
+    json_match = re.search(r'\{[\s\S]*\}', cleaned)
+    if json_match:
+        try:
+            result = json.loads(json_match.group())
+            if isinstance(result, dict):
+                return result
+        except Exception:
+            pass
+
+    return None
+
+# ============================================================
+# 🎯 BATCH REPLY GENERATOR — 12 RETRY MODE
+# ============================================================
+def generate_batch_replies(comments_batch, max_retries=MAX_JSON_RETRIES):
+    """
+    ✅ RETRY MODE: 12 attempts tak try karega, har baar alag key.
+    Valid JSON milte hi return kar dega.
+    """
     if not comments_batch:
         return {}
 
+    # Prompt build karo (ek hi baar)
     formatted = ""
     for c in comments_batch:
         tone = "SAVAGE-HATER" if c["is_abuse"] else "FRIENDLY-FAN"
@@ -258,104 +308,99 @@ FRIENDLY-FAN comments -> Friendly, warm, FUNNY, gaming-community tone.
    - Make them laugh, feel welcomed, and want to comment again.
    - Sometimes end with a playful question to boost engagement.
    - Hype them up like a close friend.
-   - Examples:
-     * "Nice bro" -> "Thanks bro! 🔥 When are you joining the squad? 🎮"
-     * "Nice video" -> "Thanks man! More videos coming your way 😎"
-     * "OP gameplay" -> "Bro you're the OP one for commenting 😂🔥"
-     * "Which game?" -> "It's BGMI bro! Squad ready? 🎮"
 
 SAVAGE-HATER comments (abuse/insult) -> SAVAGE, WITTY, SARCASTIC comeback.
    - Match their energy but STAY CHILL and CONFIDENT.
    - Roast them with HUMOR, never with abuse.
-   - Make it FUNNY, not angry - the audience should laugh.
-   - End with a playful taunt sometimes.
-   - Examples:
-     * "bakwas video" (trash video) -> "Bro watched for 3 hours just to comment? Dedication 😂"
-     * "chutiya" (idiot) -> "Bro you make one too, competition will grow 😎"
-     * "ghatiya" (terrible) -> "Bro did you go platinum? Give me tips 😂"
-     * "uninstall kar" (uninstall it) -> "Bro you install first, then we'll talk 😎"
-     * "time waste" -> "Bro you spent 2 hours, I spent 2 mins 😂🔥"
+   - Make it FUNNY, not angry.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 STRICT RULES:
-1. DETECT the language of each comment and REPLY IN THE SAME LANGUAGE.
-   - English -> English
-   - Hindi (Devanagari) -> Hindi
-   - Hinglish (Roman Hindi) -> Hinglish
-   - Spanish / French / German / Japanese / Korean / Portuguese / Russian / Arabic / Italian / etc. -> Reply in that same language.
-2. DO NOT use regional Indian languages such as Tamil, Telugu, Bengali, Marathi, Gujarati, Kannada, Malayalam, Punjabi, Odia, or Assamese.
-   If the comment is in any of these languages, reply in ENGLISH or HINGLISH only.
-3. GAME NAME RULE (VERY IMPORTANT):
-   - You are given: Game name, Hashtags, and Caption for each comment.
-   - IF the comment ASKS about the game name (e.g., "Which game?", "Game name?", "What game is this?", "Name of the game?"), THEN mention the game name in the reply.
-   - IF the comment does NOT ask about the game name, DO NOT mention the game name. Just reply naturally based on the comment's tone.
-   - Use the Caption to understand the CONTEXT of the post.
-   - Use Hashtags as additional clues for the game.
-   - Examples:
-     * "Which game?" (Game: BGMI) -> "It's BGMI bro! Battlegrounds Mobile India 🎮🔥"
-     * "Which game?" (Game: Free Fire) -> "It's Free Fire bro! FF vibes are different 🔥"
-     * "What game is this?" (Game: GTA 5) -> "It's GTA 5 bro! King of Los Santos 😎"
-     * "Nice bro" (Game: BGMI) -> "Thanks bro! 🔥"   (No game name)
-     * "bakwas video" (Game: GTA 5) -> "Bro watched for 3 hours just to comment? 😂"   (No game name)
-4. Include 1-2 emojis per reply (😂😎🔥🎮💀❤️).
-5. NEVER share any links.
+1. DETECT language of each comment and REPLY IN THE SAME LANGUAGE.
+2. DO NOT use regional Indian languages (Tamil, Telugu, Bengali, etc.). Reply in ENGLISH or HINGLISH only.
+3. GAME NAME RULE:
+   - IF the comment ASKS about the game name ("Which game?", "Game name?", "What game is this?"), THEN mention the game name.
+   - IF NOT asked, DO NOT mention the game name.
+   - Use Caption and Hashtags as context.
+4. Include 1-2 emojis per reply.
+5. NEVER share links.
 6. NEVER insult family, religion, or caste.
 7. NEVER use abusive words back.
-8. NEVER threaten anyone.
-9. Keep each reply to a maximum of 25 words.
-10. Be CONFIDENT - you are the owner of this gaming channel.
-11. HOOK THEM BACK: Sometimes end with a playful question (e.g., "When are you joining the squad?").
+8. MAX 25 words per reply.
+9. HOOK THEM BACK: Sometimes end with a playful question.
 
-OUTPUT FORMAT:
-Reply ONLY with valid JSON. No extra text, no markdown, no explanation.
-Keys must be the EXACT comment IDs provided.
+CRITICAL OUTPUT REQUIREMENT:
+- You MUST return ONLY valid JSON.
+- Keys = EXACT comment IDs.
+- Values = reply text.
+- NO extra text, NO markdown, NO explanation, NO "User Safety", ONLY JSON.
 
+Example format:
 {{
-  "COMMENT_ID_1": "reply text for comment 1",
-  "COMMENT_ID_2": "reply text for comment 2"
+  "COMMENT_ID_1": "reply text 1",
+  "COMMENT_ID_2": "reply text 2"
 }}
 
 COMMENTS TO REPLY:
 {formatted}
 
-JSON OUTPUT:"""
+YOUR JSON RESPONSE:"""
 
-    response = call_openrouter(prompt, max_tokens=800)
-    if not response:
-        log("❌ Batch API call failed.")
+    valid_keys = [k for k in OPENROUTER_KEYS if k]
+    if not valid_keys:
+        log("❌ No OpenRouter API keys found.")
         return {}
 
-    try:
-        cleaned = response.strip()
-        if "```" in cleaned:
-            cleaned = re.sub(r'^```(?:json)?\s*', '', cleaned)
-            cleaned = re.sub(r'\s*```$', '', cleaned)
-            cleaned = cleaned.strip()
-        start = cleaned.find("{")
-        end = cleaned.rfind("}")
-        if start != -1 and end != -1 and end > start:
-            cleaned = cleaned[start:end+1]
-        parsed = json.loads(cleaned)
+    for attempt in range(1, max_retries + 1):
+        key_index = (attempt - 1) % len(valid_keys)
+        current_key = valid_keys[key_index]
 
+        if attempt == 1:
+            model_to_use = FIXED_MODEL
+            log(f"🔄 Attempt {attempt}/{max_retries} | FIXED | Key {key_index + 1}")
+        else:
+            model_to_use = FALLBACK_MODEL
+            log(f"🔄 Attempt {attempt}/{max_retries} | FALLBACK | Key {key_index + 1}")
+
+        response = _call_openrouter_single(model_to_use, current_key, prompt, max_tokens=800)
+
+        if not response:
+            log(f"   ⚠️ Empty response — retry")
+            time.sleep(1)
+            continue
+
+        resp_stripped = response.strip().lower()
+        if resp_stripped in ["user safety: safe", "safe", "unsafe", "none"]:
+            log(f"   ⚠️ Safety model response detected — retry")
+            time.sleep(1)
+            continue
+
+        parsed = _extract_json(response)
+
+        if parsed is None:
+            log(f"   ⚠️ Invalid JSON — retry. Preview: {response[:100]}")
+            time.sleep(1)
+            continue
+
+        # Validate — valid replies collect karo
         result = {}
         for c in comments_batch:
             cid = c["comment_id"]
             if cid in parsed:
                 reply = str(parsed[cid]).strip().strip('"').strip("'")
-                if reply:
+                if reply and reply.lower() not in ["user safety: safe", "safe", "unsafe", "none"]:
                     result[cid] = reply
-            else:
-                log(f"⚠️ No reply for comment {cid} in batch response")
 
-        log(f"✅ Batch parse done: {len(result)}/{len(comments_batch)} replies")
-        return result
-    except json.JSONDecodeError as e:
-        log(f"⚠️ JSON parse error: {e}")
-        log(f"📄 Raw response (first 500 chars): {response[:500]}")
-        return {}
-    except Exception as e:
-        log(f"⚠️ Batch reply error: {e}")
-        return {}
+        if result:
+            log(f"   ✅ Valid JSON on attempt {attempt}: {len(result)}/{len(comments_batch)} replies")
+            return result
+        else:
+            log(f"   ⚠️ Parsed but no valid replies — retry")
+            time.sleep(1)
+            continue
+
+    log(f"❌ Failed to get valid JSON after {max_retries} attempts.")
+    return {}
 
 # ============================================================
 # 🚫 ABUSE DETECTION
@@ -465,7 +510,7 @@ def post_fb_reply(comment_id, reply_text):
     return None
 
 def process_fb_comments(actual_posted_titles=None):
-    """DIRECT FB MODE — parallel fetch + hashtag detection + detailed log."""
+    """DIRECT FB MODE — parallel fetch + hashtag detection + 12 retry JSON."""
     if not AUTO_COMMENT_ENABLED:
         log("🚫 Auto-comment disabled — skipping reply processing")
         return None
@@ -554,17 +599,18 @@ def process_fb_comments(actual_posted_titles=None):
             break
 
         post_id = post.get("id", "")
-        post_message = (post.get("message", "") or "")[:80]
+        post_message_full = (post.get("message", "") or "")
+        post_message = post_message_full[:80]
         comments = post_comments_map.get(post_id, [])
 
         if not comments:
             continue
 
-        # ✅ Hashtag extract karo
-        hashtags = re.findall(r'#(\w+)', post_message)
+        # ✅ Hashtag extract (full message se)
+        hashtags = re.findall(r'#(\w+)', post_message_full)
         log(f"      📌 Hashtags: {hashtags}")
 
-        # ✅ Hashtag se game detect karo
+        # ✅ Hashtag se game detect
         game_name = "Video Game"
         for tag in hashtags:
             tag_clean = tag.lower().replace("_", "").replace("-", "")
@@ -576,10 +622,10 @@ def process_fb_comments(actual_posted_titles=None):
             if game_name != "Video Game":
                 break
 
-        # Fallback: caption mein direct search
+        # Fallback: caption mein search
         if game_name == "Video Game":
             for g in KNOWN_GAMES:
-                if g.lower() in post_message.lower():
+                if g.lower() in post_message_full.lower():
                     game_name = g
                     break
 
@@ -654,12 +700,12 @@ def process_fb_comments(actual_posted_titles=None):
                 "user_name": from_data.get("name", "Unknown User"),
             })
 
-    # STEP 4: Batch OpenRouter call
+    # STEP 4: Batch OpenRouter call (12 retry)
     if not valid_comments:
         log("ℹ️ No valid comments to reply. Skipping batch API call.")
         replies_map = {}
     else:
-        log(f"📦 Batch mode: {len(valid_comments)} comments → 1 OpenRouter call")
+        log(f"📦 Batch mode: {len(valid_comments)} comments → Retry loop (max {MAX_JSON_RETRIES})")
         replies_map = generate_batch_replies(valid_comments)
 
     # STEP 5: Post replies
