@@ -1,1 +1,1 @@
-{"clip_duration": 15, "reason": "Glowing red staff forest combat", "start_time": 25, "status": "APPROVE", "title": "Red Staff Combat Slash ⚡⚔️"}
+{"clip_duration": 30, "reason": "Continuous high-intensity martial arts combat sequence.", "start_time": 0, "status": "APPROVE", "title": "Beating Up the Whole Gang 🥋🔥"}
