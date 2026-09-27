@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 22 | **Last Updated:** 2026-09-27 02:31:47 AM IST
+**Total Videos:** 22 | **Last Updated:** 2026-09-27 09:15:00 AM IST
 
 ---
 
@@ -14,8 +14,8 @@
 | Posted (FB or IG) | 6 / 22 |
 | FB Posted | 2 / 22 |
 | IG Posted | 6 / 22 |
-| Total FB Views | **308** |
-| Total IG Views | **2,180** |
+| Total FB Views | **464** |
+| Total IG Views | **2,880** |
 
 ---
 
@@ -23,11 +23,11 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | Kratos Titan Clash 💀🔥  #videogames #gamingcommunity #gaming #godofwar3 #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Ddw4xG3ieOp/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR32.mp4) |
-| 2 | Slayer Rips Monster Heart 💀  #videogames #gamingcommunity #gaming #godofwar3 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/29055320854074025/) | 99 | [🟣 IG](https://www.instagram.com/reel/Ddw1Ty0FYpO/) | 30 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR34.mp4) |
-| 3 | Giant Beast Clash 💀⚔️  #videogames #gamingcommunity #gaming #godofwar3 #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdvFrL0Agnu/) | 300 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR35.mp4) |
-| 4 | Trapped Inside Giant Beast 👹  #videogames #gamingcommunity #gaming #godofwar3 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1121298093949579/) | 209 | [🟣 IG](https://www.instagram.com/reel/Ddt5-4KlVj_/) | 1,040 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR312.mp4) |
-| 5 | Kratos Giant Boss Fight 🦖⚔️  #videogames #gamingcommunity #gaming #godofwar3 #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdcJxg-jUVD/) | 540 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR36.mp4) |
+| 1 | Kratos Titan Clash 💀🔥  #videogames #gamingcommunity #gaming #godofwar3 #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Ddw4xG3ieOp/) | 350 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR32.mp4) |
+| 2 | Slayer Rips Monster Heart 💀  #videogames #gamingcommunity #gaming #godofwar3 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/29055320854074025/) | 253 | [🟣 IG](https://www.instagram.com/reel/Ddw1Ty0FYpO/) | 330 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR34.mp4) |
+| 3 | Giant Beast Clash 💀⚔️  #videogames #gamingcommunity #gaming #godofwar3 #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdvFrL0Agnu/) | 310 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR35.mp4) |
+| 4 | Trapped Inside Giant Beast 👹  #videogames #gamingcommunity #gaming #godofwar3 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1121298093949579/) | 211 | [🟣 IG](https://www.instagram.com/reel/Ddt5-4KlVj_/) | 1,080 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR312.mp4) |
+| 5 | Kratos Giant Boss Fight 🦖⚔️  #videogames #gamingcommunity #gaming #godofwar3 #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdcJxg-jUVD/) | 550 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR36.mp4) |
 | 6 | Spare Her! Kratos Pleads 😭  #videogames #gamingcommunity #gaming #godofwar3 #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdbP6F8jD2a/) | 260 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR321.mp4) |
 | 7 | GODOFWAR321 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR321.mp4) |
 | 8 | GODOFWAR320 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR320.mp4) |

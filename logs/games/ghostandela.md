@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 48 | **Last Updated:** 2026-09-27 02:31:47 AM IST
+**Total Videos:** 48 | **Last Updated:** 2026-09-27 09:15:00 AM IST
 
 ---
 
@@ -14,7 +14,7 @@
 | Posted (FB or IG) | 3 / 48 |
 | FB Posted | 2 / 48 |
 | IG Posted | 3 / 48 |
-| Total FB Views | **1,450** |
+| Total FB Views | **1,451** |
 | Total IG Views | **2,930** |
 
 ---
@@ -25,7 +25,7 @@
 |---|---|---|---|---|---|---|
 | 1 | Walking Through Pure Fire 🔥💀  #videogames #gamingcommunity #gaming #ghostandela #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdwwvaCDs7Z/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela8.mp4) |
 | 2 | I Cut The Wrong Chain 😱  #videogames #gamingcommunity #gaming #ghostandela #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1581162263212204/) | 526 | [🟣 IG](https://www.instagram.com/reel/DdaXvNeDhq2/) | 260 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela3.mp4) |
-| 3 | Ghost's ultimate prison escape secret exposed!  #videogames #gamingcommunity #gaming #ghostandela #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/4490994824477364/) | 924 | [🟣 IG](https://www.instagram.com/reel/DdVoBPWkUDh/) | 2,660 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela4.mp4) |
+| 3 | Ghost's ultimate prison escape secret exposed!  #videogames #gamingcommunity #gaming #ghostandela #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/4490994824477364/) | 925 | [🟣 IG](https://www.instagram.com/reel/DdVoBPWkUDh/) | 2,660 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela4.mp4) |
 | 4 | ghostandela51 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela51.mp4) |
 | 5 | ghostandela50 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela50.mp4) |
 | 6 | ghostandela49 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela49.mp4) |
