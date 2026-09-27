@@ -154,6 +154,11 @@ def parse_game_links_file(filepath):
 # ============================================================
 # 🤖 GEMINI INTEGRATION
 # ============================================================
+def get_gemini_key():
+    valid = [k for k in GEMINI_KEYS if k]
+    return random.choice(valid) if valid else None
+
+
 def call_gemini_api(api_key, prompt, max_tokens=150):
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={api_key}"
     payload = {
@@ -184,21 +189,17 @@ def call_gemini_api(api_key, prompt, max_tokens=150):
 
 
 # ============================================================
-# 🔥 BATCH GEMINI — 5 comments ek saath
+# 🔥 BATCH GEMINI — 5 comments ek saath + JSON debug
 # ============================================================
 def generate_batch_replies(comments_data):
-    """
-    🔥 Batch: Ek saath multiple comments ke replies generate karo
-    comments_data = [
-        {"comment_id": "123", "comment_text": "Which game bro", "post_title": "...", "is_abuse": False},
-        ...
-    ]
-    Returns: {"123": "reply1", "124": "reply2", ...}
-    """
     keys = [k for k in GEMINI_KEYS if k]
     if not keys:
         log("  ⚠️ No Gemini keys available")
         return {}
+    
+    log(f"  🔍 DEBUG: {len(comments_data)} comments received")
+    if comments_data:
+        log(f"  🔍 DEBUG: keys in first comment: {list(comments_data[0].keys())}")
     
     # Build batch prompt
     prompt_parts = ["You are a gaming content creator. Reply to EACH comment below.\n\n"]
@@ -214,9 +215,9 @@ def generate_batch_replies(comments_data):
     
     for idx, c in enumerate(comments_data, 1):
         prompt_parts.append(f"===COMMENT_{idx}===\n")
-        prompt_parts.append(f"POST: {c['post_title'][:100]}\n")
-        prompt_parts.append(f"COMMENT: \"{c['comment_text']}\"\n")
-        prompt_parts.append(f"ABUSE: {c['is_abuse']}\n\n")
+        prompt_parts.append(f"POST: {c.get('post_message', c.get('post_title', ''))[:100]}\n")
+        prompt_parts.append(f"COMMENT: \"{c.get('comment_text', '')}\"\n")
+        prompt_parts.append(f"ABUSE: {c.get('is_abuse', False)}\n\n")
     
     prompt_parts.append("Now generate replies. Reply ONLY with the formatted output (===REPLY_1=== etc).\n")
     full_prompt = "".join(prompt_parts)
@@ -224,14 +225,34 @@ def generate_batch_replies(comments_data):
     log(f"  📤 Sending {len(comments_data)} comments to Gemini...")
     log(f"  📝 Prompt length: {len(full_prompt)} chars")
     
+    # 🔥 DEBUG DATA STRUCTURE
+    debug_entry = {
+        "timestamp": now_ist_ampm(),
+        "batch_size": len(comments_data),
+        "comments_sent": comments_data,
+        "prompt_sent": full_prompt,
+        "attempts": [],
+        "final_replies": {},
+        "status": "pending"
+    }
+    
     for attempt in range(min(3, len(keys))):
         key = random.choice(keys)
         log(f"  🎯 Attempt {attempt + 1}: calling Gemini...")
         
         response = call_gemini_api(key, full_prompt, max_tokens=1500)
         
+        attempt_data = {
+            "attempt_num": attempt + 1,
+            "key_used": key[:15] + "..." if key else "none",
+            "response_received": response,
+            "parsed_replies": {}
+        }
+        
         if not response:
             log(f"  ❌ Gemini attempt {attempt + 1} returned None")
+            attempt_data["error"] = "No response from Gemini"
+            debug_entry["attempts"].append(attempt_data)
             continue
         
         log(f"  ✅ Gemini responded ({len(response)} chars)")
@@ -252,14 +273,43 @@ def generate_batch_replies(comments_data):
                 continue
         
         log(f"  ✅ Parsed {len(replies)} replies from Gemini")
+        attempt_data["parsed_replies"] = replies
+        debug_entry["attempts"].append(attempt_data)
         
         if replies:
+            debug_entry["final_replies"] = replies
+            debug_entry["status"] = "success"
+            _save_gemini_debug(debug_entry)
             return replies
         else:
             log(f"  ⚠️ No replies parsed — trying next key")
+            attempt_data["error"] = "Parsing returned 0 replies"
     
     log(f"  ❌ All Gemini attempts failed")
+    debug_entry["status"] = "failed"
+    _save_gemini_debug(debug_entry)
     return {}
+
+
+def _save_gemini_debug(debug_entry):
+    try:
+        debug_file = "logs/gemini_batch_debug.json"
+        os.makedirs("logs", exist_ok=True)
+        existing = {"batches": [], "last_updated": ""}
+        if os.path.exists(debug_file):
+            try:
+                with open(debug_file, 'r', encoding='utf-8') as f:
+                    existing = json.load(f)
+            except Exception:
+                pass
+        existing.setdefault("batches", []).append(debug_entry)
+        existing["batches"] = existing["batches"][-50:]
+        existing["last_updated"] = now_ist_ampm()
+        with open(debug_file, 'w', encoding='utf-8') as f:
+            json.dump(existing, f, indent=2, ensure_ascii=False)
+        log(f"  💾 Debug saved to logs/gemini_batch_debug.json")
+    except Exception as e:
+        log(f"  ⚠️ Debug save error: {e}")
 
 
 # ============================================================
@@ -325,7 +375,7 @@ def is_reply_safe(reply_text, is_abuse=False):
 
 
 # ============================================================
-# 🤖 FB COMMENTS
+# 🤖 AUTO-REPLY FUNCTIONS (FB ONLY)
 # ============================================================
 def fetch_fb_comments(post_id, since_timestamp=None):
     url = f"https://graph.facebook.com/v24.0/{post_id}/comments"
@@ -348,7 +398,7 @@ def fetch_fb_comments(post_id, since_timestamp=None):
 
 
 def check_if_already_replied(comment_id):
-    url = f"https://graph.facebook.com/v19.0/{comment_id}/comments"
+    url = f"https://graph.facebook.com/v24.0/{comment_id}/comments"
     params = {"fields": "id,from", "access_token": FB_ACCESS_TOKEN, "limit": 10}
     try:
         res = requests.get(url, params=params, timeout=10)
@@ -367,7 +417,7 @@ def post_fb_reply(comment_id, reply_text):
         log(f"🚫 [AUTO_COMMENT OFF] Would post: {reply_text[:80]}")
         return f"disabled_{comment_id}"
 
-    url = f"https://graph.facebook.com/v19.0/{comment_id}/comments"
+    url = f"https://graph.facebook.com/v24.0/{comment_id}/comments"
     payload = {"message": reply_text, "access_token": FB_ACCESS_TOKEN}
     try:
         res = requests.post(url, data=payload, timeout=15)
@@ -381,7 +431,7 @@ def post_fb_reply(comment_id, reply_text):
 
 
 # ============================================================
-# 🔥 MAIN AUTO-REPLY — BATCH MODE
+# 🔥 MAIN AUTO-REPLY — BATCH MODE + DIRECT FB
 # ============================================================
 def process_fb_comments(actual_posted_titles):
     if not AUTO_COMMENT_ENABLED:
@@ -413,12 +463,11 @@ def process_fb_comments(actual_posted_titles):
     cutoff_time = (now_ist() - timedelta(hours=MAX_COMMENT_AGE_HOURS)).timestamp()
     min_age_time = (now_ist() - timedelta(minutes=MIN_COMMENT_AGE_MIN)).timestamp()
 
-    # FB Page ke saare posts fetch karo
     twenty_eight_days_ago = now_ist() - timedelta(days=28)
     since_timestamp = int(twenty_eight_days_ago.timestamp())
 
     all_posts = []
-    next_url = f"https://graph.facebook.com/v19.0/{FB_PAGE_ID}/posts"
+    next_url = f"https://graph.facebook.com/v24.0/{FB_PAGE_ID}/posts"
     params = {
         "fields": "id,message,created_time,permalink_url",
         "since": since_timestamp,
@@ -448,9 +497,7 @@ def process_fb_comments(actual_posted_titles):
 
     log(f"✅ Total FB posts: {len(all_posts)}")
 
-    # ============================================================
-    # STEP 1: Eligible comments collect karo
-    # ============================================================
+    # STEP 1: Eligible comments collect
     eligible_comments = []
 
     for post in all_posts:
@@ -524,9 +571,7 @@ def process_fb_comments(actual_posted_titles):
             json.dump(reply_log, f, indent=2)
         return reply_log
 
-    # ============================================================
-    # STEP 2: 5-5 ke batch mein Gemini ko bhejo
-    # ============================================================
+    # STEP 2: 5-5 batch
     BATCH_SIZE = 5
     total_batches = (len(eligible_comments) + BATCH_SIZE - 1) // BATCH_SIZE
 
@@ -1177,7 +1222,7 @@ def fetch_fb_ig_data(game_list):
     fb_videos = []
     ig_medias = []
     try:
-        fb_url = f"https://graph.facebook.com/v19.0/{FB_PAGE_ID}/videos"
+        fb_url = f"https://graph.facebook.com/v24.0/{FB_PAGE_ID}/videos"
         params = {"fields": "id,title,description,views,permalink_url,created_time",
                   "since": since_timestamp, "access_token": FB_ACCESS_TOKEN, "limit": 100}
         res = requests.get(fb_url, params=params, timeout=20)
@@ -1187,13 +1232,13 @@ def fetch_fb_ig_data(game_list):
     except Exception as e:
         log(f"❌ FB page fetch error: {e}")
     try:
-        ig_url = f"https://graph.facebook.com/v19.0/{FB_PAGE_ID}"
+        ig_url = f"https://graph.facebook.com/v24.0/{FB_PAGE_ID}"
         ig_params = {"fields": "instagram_business_account", "access_token": FB_ACCESS_TOKEN}
         res_ig_acc = requests.get(ig_url, params=ig_params, timeout=10)
         if res_ig_acc.status_code == 200:
             ig_id = res_ig_acc.json().get("instagram_business_account", {}).get("id")
             if ig_id:
-                media_url = f"https://graph.facebook.com/v19.0/{ig_id}/media"
+                media_url = f"https://graph.facebook.com/v24.0/{ig_id}/media"
                 media_params = {"fields": "id,caption,permalink,timestamp,like_count,comments_count",
                                 "access_token": FB_ACCESS_TOKEN, "limit": 100}
                 res_ig = requests.get(media_url, params=media_params, timeout=20)
@@ -1628,7 +1673,7 @@ def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploade
         "logs/agent_memory.json", "logs/rotation_history.json",
         "logs/games/", "logs/auto_reply_log.json",
         "logs/replied_comment_ids.json", "logs/trending_cache.json",
-        "logs/best_time_analysis.json"
+        "logs/best_time_analysis.json", "logs/gemini_batch_debug.json"
     ])
 
 
