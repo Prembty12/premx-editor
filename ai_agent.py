@@ -72,6 +72,10 @@ OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 FB_PAGE_ID = os.environ.get("PAGE_ID")
 FB_ACCESS_TOKEN = os.environ.get("PAGE_ACCESS_TOKEN")
 
+# ✅ Facebook Graph API Version
+FB_API_VERSION = "v24.0"
+FB_GRAPH_URL = f"https://graph.facebook.com/{FB_API_VERSION}"
+
 DAYS_LIMIT = 28
 MAX_REPLIES_PER_RUN = 5
 MIN_COMMENT_AGE_MIN = 2
@@ -182,13 +186,11 @@ def _call_openrouter_single(model_name, api_key, prompt, max_tokens=150):
     return None
 
 def call_openrouter(prompt, max_tokens=150):
-    """Fixed model 1 try → Fallback saari keys."""
     valid_keys = [k for k in OPENROUTER_KEYS if k]
     if not valid_keys:
         log("❌ No OpenRouter API keys found.")
         return None
 
-    # STEP 1: FIXED MODEL (1 try)
     primary_key = valid_keys[0]
     log(f"🚀 Trying FIXED model: {FIXED_MODEL} (1 attempt)")
     result = _call_openrouter_single(FIXED_MODEL, primary_key, prompt, max_tokens)
@@ -196,7 +198,6 @@ def call_openrouter(prompt, max_tokens=150):
         log(f"✅ FIXED model success")
         return result
 
-    # STEP 2: FALLBACK MODEL (saari keys, ek-ek baar)
     log(f"🔄 Fixed failed. Switching to FALLBACK: {FALLBACK_MODEL} with all keys...")
     for idx, key in enumerate(valid_keys):
         log(f"🔑 Trying Key {idx + 1} with {FALLBACK_MODEL}...")
@@ -326,13 +327,6 @@ FAMILY_ABUSE_PATTERNS = [
     r'(तेरी मां|तेरी माँ|तेरी बहन|तेरे बाप|तेरी बीवी|तेरी बेटी)',
 ]
 
-# ✅ FIXED: "ma" hata diya, sirf strong words rakhe
-FORBIDDEN_REPLY_WORDS = [
-    "maa", "mata", "behen", "behan", "baap", "beti", "biwi",
-    "caste", "religion", "hindu", "muslim", "christian", "sikh",
-    "kill", "die", "death", "murder", "rape", "suicide",
-]
-
 def detect_abuse(text):
     text_lower = text.lower()
     for pattern in FAMILY_ABUSE_PATTERNS:
@@ -355,30 +349,28 @@ def is_spam(text):
     return False
 
 def is_reply_safe(reply_text, is_abuse=False):
-    """✅ FIXED: Sirf ABUSE_PATTERNS check, substring word-check nahi."""
     if not reply_text or len(reply_text.strip()) < 2:
         return False, "too_short"
     if len(reply_text) > 400:
         return False, "too_long"
-    
+
     reply_lower = reply_text.lower()
-    
-    # Link block
+
     if "http://" in reply_lower or "https://" in reply_lower or ".com" in reply_lower:
         return False, "contains_link"
-    
-    # ✅ Sirf ABUSE_PATTERNS check (strong hai)
+
     for pattern in ABUSE_PATTERNS:
         if re.search(pattern, reply_lower, re.IGNORECASE):
             return False, "reply_contains_abuse"
-    
+
     return True, "safe"
 
 # ============================================================
-# 🤖 AUTO-REPLY FUNCTIONS (BATCH MODE)
+# 🤖 AUTO-REPLY FUNCTIONS (BATCH MODE, API v24.0)
 # ============================================================
 def fetch_fb_comments(post_id, since_timestamp=None):
-    url = f"https://graph.facebook.com/v24.0/{post_id}/comments"
+    """✅ Graph API v24.0 - Comments fetch karo."""
+    url = f"{FB_GRAPH_URL}/{post_id}/comments"
     params = {
         "fields": "id,message,from,created_time,can_reply",
         "access_token": FB_ACCESS_TOKEN,
@@ -389,15 +381,18 @@ def fetch_fb_comments(post_id, since_timestamp=None):
     try:
         res = requests.get(url, params=params, timeout=15)
         if res.status_code == 200:
-            return res.json().get("data", [])
+            data = res.json().get("data", [])
+            log(f"      📥 Fetched {len(data)} comments for {post_id}")
+            return data
         else:
-            log(f"⚠️ FB comments fetch error: {res.status_code} {res.text[:200]}")
+            log(f"⚠️ FB comments fetch error ({res.status_code}): {res.text[:200]}")
     except Exception as e:
         log(f"⚠️ FB comments fetch exception: {e}")
     return []
 
 def check_if_already_replied(comment_id):
-    url = f"https://graph.facebook.com/v24.0/{comment_id}/comments"
+    """✅ Graph API v24.0 - Already replied check."""
+    url = f"{FB_GRAPH_URL}/{comment_id}/comments"
     params = {"fields": "id,from", "access_token": FB_ACCESS_TOKEN, "limit": 10}
     try:
         res = requests.get(url, params=params, timeout=10)
@@ -411,18 +406,19 @@ def check_if_already_replied(comment_id):
     return False
 
 def post_fb_reply(comment_id, reply_text):
+    """✅ Graph API v24.0 - Reply post karo."""
     if not AUTO_COMMENT_ENABLED:
         log(f"🚫 [AUTO_COMMENT OFF] Would post: {reply_text[:80]}")
         return f"disabled_{comment_id}"
 
-    url = f"https://graph.facebook.com/v24.0/{comment_id}/comments"
+    url = f"{FB_GRAPH_URL}/{comment_id}/comments"
     payload = {"message": reply_text, "access_token": FB_ACCESS_TOKEN}
     try:
         res = requests.post(url, data=payload, timeout=15)
         if res.status_code == 200:
             return res.json().get("id")
         else:
-            log(f"⚠️ Reply post error: {res.status_code} {res.text[:200]}")
+            log(f"⚠️ Reply post error ({res.status_code}): {res.text[:200]}")
     except Exception as e:
         log(f"⚠️ Reply post exception: {e}")
     return None
@@ -433,7 +429,7 @@ def process_fb_comments(actual_posted_titles):
         return None
 
     log("🤖 Auto-reply processing started (BATCH MODE)...")
-    
+
     replied_file = "logs/replied_comment_ids.json"
     replied_data = {"replied": [], "last_updated": ""}
     if os.path.exists(replied_file):
@@ -456,27 +452,32 @@ def process_fb_comments(actual_posted_titles):
     cutoff_time = (now_ist() - timedelta(hours=MAX_COMMENT_AGE_HOURS)).timestamp()
     min_age_time = (now_ist() - timedelta(minutes=MIN_COMMENT_AGE_MIN)).timestamp()
 
-    # STEP 1: Collect valid comments
     valid_comments = []
     skipped_logs = []
 
+    # ==========================================
+    # STEP 1: Collect valid comments
+    # ==========================================
     for game_name, videos in actual_posted_titles.items():
         if len(valid_comments) >= MAX_REPLIES_PER_RUN:
             break
+
         for video in videos:
             if len(valid_comments) >= MAX_REPLIES_PER_RUN:
                 break
+
             if not video.get("fb_posted"):
                 continue
-            fb_link = video.get("fb_link", "")
-            if not fb_link:
+
+            # ✅ FIX: vid_id use karo (FB API se aata hai, always numeric)
+            post_id = str(video.get("vid_id", "")).strip()
+            if not post_id:
+                log(f"⚠️ No vid_id for: {video.get('title','')[:50]}")
                 continue
-            post_id_match = re.search(r'/(\d+)/?$', fb_link)
-            if not post_id_match:
-                continue
-            post_id = post_id_match.group(1)
+
+            log(f"🔍 Fetching comments for vid_id={post_id} | Game: {game_name}")
             comments = fetch_fb_comments(post_id)
-            
+
             for comment in comments:
                 if len(valid_comments) >= MAX_REPLIES_PER_RUN:
                     break
@@ -484,7 +485,7 @@ def process_fb_comments(actual_posted_titles):
                 comment_text = comment.get("message", "").strip()
                 comment_time = comment.get("created_time", "")
                 can_reply = comment.get("can_reply", True)
-                
+
                 if not comment_id or not comment_text:
                     continue
                 if comment_id in replied_ids:
@@ -494,7 +495,7 @@ def process_fb_comments(actual_posted_titles):
                 from_data = comment.get("from", {})
                 if from_data.get("id") == FB_PAGE_ID:
                     continue
-                
+
                 try:
                     dt = datetime.fromisoformat(comment_time.replace("+0000", "+00:00"))
                     comment_ts = dt.timestamp()
@@ -531,7 +532,6 @@ def process_fb_comments(actual_posted_titles):
                     replied_ids.add(comment_id)
                     continue
 
-                # ✅ Valid comment — add to batch
                 valid_comments.append({
                     "comment_id": comment_id,
                     "comment_text": comment_text,
@@ -539,12 +539,14 @@ def process_fb_comments(actual_posted_titles):
                     "post_title": video.get("title", ""),
                     "is_abuse": (abuse_type == "general_abuse"),
                     "post_id": post_id,
-                    "fb_link": fb_link,
+                    "fb_link": video.get("fb_link", ""),
                     "source_link": video.get("source_link", ""),
-                    "user_name": from_data.get("name", "Unknown User"),  # 👈 User name
+                    "user_name": from_data.get("name", "Unknown User"),
                 })
 
+    # ==========================================
     # STEP 2: Batch OpenRouter call
+    # ==========================================
     if not valid_comments:
         log("ℹ️ No valid comments to reply. Skipping batch API call.")
         replies_map = {}
@@ -552,12 +554,14 @@ def process_fb_comments(actual_posted_titles):
         log(f"📦 Batch mode: {len(valid_comments)} comments → 1 OpenRouter call")
         replies_map = generate_batch_replies(valid_comments)
 
-    # STEP 3: Post replies + detailed logging
+    # ==========================================
+    # STEP 3: Post replies
+    # ==========================================
     replies_count = 0
     for c in valid_comments:
         comment_id = c["comment_id"]
         reply_text = replies_map.get(comment_id)
-        
+
         if not reply_text:
             log(f"⚠️ No reply for {comment_id} — skipping")
             continue
@@ -581,9 +585,9 @@ def process_fb_comments(actual_posted_titles):
                 "reply_id": reply_id,
                 "comment_id": comment_id,
                 "post_id": c["post_id"],
-                "user_name": c["user_name"],                    # 👈 User name
-                "user_comment": c["comment_text"][:200],        # 👈 User ne kya comment kiya
-                "openrouter_reply": reply_text,                  # 👈 AI ne kya reply diya
+                "user_name": c["user_name"],
+                "user_comment": c["comment_text"][:200],
+                "openrouter_reply": reply_text,
                 "type": "savage" if c["is_abuse"] else "friendly",
                 "game": c["game_name"],
                 "post_title": c["post_title"][:100],
@@ -601,7 +605,9 @@ def process_fb_comments(actual_posted_titles):
         else:
             log(f"❌ Failed to post reply for {comment_id}")
 
+    # ==========================================
     # STEP 4: Save state
+    # ==========================================
     reply_log["skipped"].extend(skipped_logs)
     reply_log["total_skipped"] = reply_log.get("total_skipped", 0) + len(skipped_logs)
 
@@ -850,7 +856,6 @@ def generate_auto_reply_section():
         lines.append(f"| Savage Replies | {savage_count} |\n")
         lines.append(f"| Total | {len(replies)} |\n\n")
         lines.append("### 💬 Recent Replies (Last 20)\n\n")
-        # ✅ UPDATED: User Name column added
         lines.append("| # | Time | 👤 User | 💬 User Comment | 🤖 AI Reply | Type | Game | FB Post |\n")
         lines.append("|---|---|---|---|---|---|---|---|\n")
         for idx, r in enumerate(list(reversed(replies[-20:])), 1):
@@ -1054,7 +1059,8 @@ def parse_posted_file(filepath, game_name):
     return posts
 
 def fetch_fb_caption(vid_id, page_token):
-    url = f"https://graph.facebook.com/v24.0/{vid_id}?fields=description&access_token={page_token}"
+    """✅ Graph API v24.0"""
+    url = f"{FB_GRAPH_URL}/{vid_id}?fields=description&access_token={page_token}"
     try:
         res = requests.get(url, timeout=5).json()
         caption = res.get('description', '').strip()
@@ -1065,7 +1071,8 @@ def fetch_fb_caption(vid_id, page_token):
     return None
 
 def fetch_fb_views_by_id(vid_id, page_token):
-    url = f"https://graph.facebook.com/v24.0/{vid_id}/video_insights?access_token={page_token}"
+    """✅ Graph API v24.0"""
+    url = f"{FB_GRAPH_URL}/{vid_id}/video_insights?access_token={page_token}"
     try:
         res = requests.get(url, timeout=5).json()
         for metric in res.get('data', []):
@@ -1150,8 +1157,9 @@ def fetch_fb_ig_data(game_list):
                     if not title: title = f"Video {vid_id[:8]}"
                 post['title'] = title
                 post['fb_views'] = fb_views
-                post['fb_posted'] = fb_views > 0
-                post['fb_link'] = f"https://www.facebook.com/{vid_id}" if fb_views > 0 else ""
+                # ✅ FIX: fb_posted ab vid_id pe depend karta hai, views pe nahi
+                post['fb_posted'] = bool(vid_id)
+                post['fb_link'] = f"https://www.facebook.com/{vid_id}" if vid_id else ""
                 post['status'] = "✅ Live" if fb_views > 0 else "⏳ Pending"
                 return post
             with ThreadPoolExecutor(max_workers=10) as executor:
@@ -1183,23 +1191,25 @@ def fetch_fb_ig_data(game_list):
     fb_videos = []
     ig_medias = []
     try:
-        fb_url = f"https://graph.facebook.com/v24.0/{FB_PAGE_ID}/videos"
+        fb_url = f"{FB_GRAPH_URL}/{FB_PAGE_ID}/videos"
         params = {"fields": "id,title,description,views,permalink_url,created_time",
                   "since": since_timestamp, "access_token": FB_ACCESS_TOKEN, "limit": 100}
         res = requests.get(fb_url, params=params, timeout=20)
         if res.status_code == 200:
             fb_videos = res.json().get("data", [])
             log(f"✅ FB page: {len(fb_videos)} videos fetched")
+        else:
+            log(f"⚠️ FB page fetch error ({res.status_code}): {res.text[:200]}")
     except Exception as e:
         log(f"❌ FB page fetch error: {e}")
     try:
-        ig_url = f"https://graph.facebook.com/v24.0/{FB_PAGE_ID}"
+        ig_url = f"{FB_GRAPH_URL}/{FB_PAGE_ID}"
         ig_params = {"fields": "instagram_business_account", "access_token": FB_ACCESS_TOKEN}
         res_ig_acc = requests.get(ig_url, params=ig_params, timeout=10)
         if res_ig_acc.status_code == 200:
             ig_id = res_ig_acc.json().get("instagram_business_account", {}).get("id")
             if ig_id:
-                media_url = f"https://graph.facebook.com/v24.0/{ig_id}/media"
+                media_url = f"{FB_GRAPH_URL}/{ig_id}/media"
                 media_params = {"fields": "id,caption,permalink,timestamp,like_count,comments_count",
                                 "access_token": FB_ACCESS_TOKEN, "limit": 100}
                 res_ig = requests.get(media_url, params=media_params, timeout=20)
