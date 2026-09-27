@@ -65615,3 +65615,17 @@ size=   67945kB time=00:00:29.99 bitrate=18556.9kbits/s speed=64.4x
 ====================================================
 🏁 Pipeline Finished at: Sun Sep 27 20:53:54 UTC 2026
 ====================================================
+====================================================
+🚀 Pipeline Started at: Sun Sep 27 21:46:35 UTC 2026
+====================================================
+🔍 [STEP 0] Checking Facebook Cookie Session Health...
+⚠️ Checking Facebook Cookie Session Health...
+✅ Status: Cookies present and verified for pipeline execution.
+📈 [STEP 1] Pulling real analytics and insights from past posts...
+python3: can't open file '/home/runner/work/premx-editor/premx-editor/agent_brain.py': [Errno 2] No such file or directory
+🤖 [STEP 3] Consulting AI Agent Brain (ai_agent.py)...
+  File "/home/runner/work/premx-editor/premx-editor/ai_agent.py", line 1657
+    recent_logs = sorted(all_recent, key=lambda x: x.get("run", 0), reverse=True)[:5]
+SyntaxError: expected 'except' or 'finally' block
+🧠 AI Agent Raw Output: 
+⚠️ [WARNING] AI Agent ko koi valid game file nahi mili! Target File: 
