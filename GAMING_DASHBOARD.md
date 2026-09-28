@@ -1,6 +1,6 @@
 # 🚀 GAMING AGENT COMMAND & ANALYTICS DASHBOARD
 
-> **Last Updated:** 2026-09-29 01:40:20 AM IST | **Status:** All Systems Active
+> **Last Updated:** 2026-09-29 01:45:25 AM IST | **Status:** All Systems Active
 
 --- 
 
@@ -9,22 +9,22 @@
 | Rank | Game Name | Total Videos | Total Views | Avg Views / Video | Performance Tier |
 | :---: | :--- | :---: | :---: | :---: | :---: |
 | 🥇 | **codBlackops6** | 2 | 25,969 | 12,984 | 🔥 Viral / Hype |
-| 🥈 | **mm2remastered** | 2 | 21,602 | 10,801 | 🔥 Viral / Hype |
-| 🥉 | **AfghanistanRedZone** | 0 | 20,432 | 0 | 📈 Stable |
+| 🥈 | **mm2remastered** | 2 | 21,607 | 10,803 | 🔥 Viral / Hype |
+| 🥉 | **AfghanistanRedZone** | 0 | 20,433 | 0 | 📈 Stable |
 | 4️⃣ | **Callofdutyaw** | 3 | 19,801 | 6,600 | ⚡ Trending |
 | 5️⃣ | **SpiderMan2** | 1 | 15,894 | 15,894 | 🔥 Viral / Hype |
 | 6 | **MarvelsSpiderMan2** | 3 | 12,450 | 4,150 | ⚡ Trending |
 | 7 | **RescueOperation** | 3 | 8,339 | 2,779 | 📈 Stable |
-| 8 | **GODOFWAR3** | 3 | 6,605 | 2,201 | 📈 Stable |
-| 9 | **VietnamCavePrison** | 2 | 6,141 | 3,070 | 📈 Stable |
+| 8 | **GODOFWAR3** | 3 | 6,609 | 2,203 | 📈 Stable |
+| 9 | **VietnamCavePrison** | 2 | 6,145 | 3,072 | 📈 Stable |
 | 10 | **Ghost Destroys Mexican** | 0 | 4,821 | 0 | 📈 Stable |
 | 11 | **ghostandela** | 2 | 4,399 | 2,199 | 📈 Stable |
 | 12 | **UkraineCovertMission** | 2 | 3,072 | 1,536 | 📈 Stable |
-| 13 | **Russian_secret_missions** | 3 | 2,889 | 963 | 📈 Stable |
+| 13 | **Russian_secret_missions** | 3 | 2,903 | 967 | 📈 Stable |
 | 14 | **combatopration** | 2 | 1,684 | 842 | 📈 Stable |
 | 15 | **Ghost_soap_escap** | 3 | 1,632 | 544 | 📈 Stable |
-| 16 | **sifu** | 2 | 878 | 439 | 📈 Stable |
-| 17 | **GodofWarLaufey** | 3 | 784 | 261 | 📈 Stable |
+| 16 | **sifu** | 2 | 880 | 440 | 📈 Stable |
+| 17 | **GodofWarLaufey** | 3 | 786 | 262 | 📈 Stable |
 | 18 | **DiabloIV** | 0 | 540 | 0 | 📈 Stable |
 | 19 | **monkeyKing** | 2 | 446 | 223 | 📈 Stable |
 
@@ -36,11 +36,11 @@
 
 | Game Name | 📅 Last Posted | 📺 Latest Title | 🔵 FB | 👁️ FB Views | 🟣 IG | 👁️ IG Views | 📊 Remaining / Total | 📂 Source | 📜 All |
 |---|---|---|---|---|---|---|---|---|---|
-| **Russian_secret_missions** | 2026-09-29 01:00 AM | Scope Headshots Hit Different 🎯🔥  #videogames #gamingcommunity #gaming #russian_ | [🔵 FB](https://www.facebook.com/reel/1135871095448480/) | 249 | [🟣 IG](https://www.instagram.com/reel/Dd17e1DjJpi/) | 40 | **37** / 40 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions28.mp4) | **[📜 View 40](logs/games/Russian_secret_missions.md)** |
-| **GodofWarLaufey** | 2026-09-28 01:57 PM | Blonde Hero Vs Fire Demon ⚔️🔥  #videogames #gamingcommunity #gaming #godofwarlau | [🔵 FB](https://www.facebook.com/reel/1763278934904943/) | 63 | [🟣 IG](https://www.instagram.com/reel/Dd0QRr8G3L9/) | 70 | **14** / 17 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_10.mp4) | **[📜 View 17](logs/games/GodofWarLaufey.md)** |
-| **sifu** | 2026-09-28 03:26 AM | Beating Up the Whole Gang 🥋🔥  #videogames #gamingcommunity #gaming #sifu #gaming | [🔵 FB](https://www.facebook.com/reel/1635492871307578/) | 189 | [🟣 IG](https://www.instagram.com/reel/Ddzg0_6gv2H/) | 0 | **18** / 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu18.mp4) | **[📜 View 20](logs/games/sifu.md)** |
-| **GODOFWAR3** | 2026-09-28 01:27 AM | Kratos Titan Clash 💀🔥  #videogames #gamingcommunity #gaming #godofwar3 #gamingre | [🔵 FB](https://www.facebook.com/reel/1446641450685379/) | 2,778 | [🟣 IG](https://www.instagram.com/reel/Ddw4xG3ieOp/) | 490 | **19** / 22 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR37.mp4) | **[📜 View 22](logs/games/GODOFWAR3.md)** |
-| **VietnamCavePrison** | 2026-09-28 01:26 AM | Rocket Rain on Enemy Base 💣🔥  #videogames #gamingcommunity #gaming #vietnamcavep | [🔵 FB](https://www.facebook.com/reel/1817320662784795/) | 1,225 | [🟣 IG](https://www.instagram.com/reel/Ddxt8_plP93/) | 140 | **27** / 29 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison16.mp4) | **[📜 View 29](logs/games/VietnamCavePrison.md)** |
+| **Russian_secret_missions** | 2026-09-29 01:00 AM | Scope Headshots Hit Different 🎯🔥  #videogames #gamingcommunity #gaming #russian_ | [🔵 FB](https://www.facebook.com/reel/1135871095448480/) | 263 | [🟣 IG](https://www.instagram.com/reel/Dd17e1DjJpi/) | 40 | **37** / 40 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions28.mp4) | **[📜 View 40](logs/games/Russian_secret_missions.md)** |
+| **GodofWarLaufey** | 2026-09-28 01:57 PM | Blonde Hero Vs Fire Demon ⚔️🔥  #videogames #gamingcommunity #gaming #godofwarlau | [🔵 FB](https://www.facebook.com/reel/1763278934904943/) | 65 | [🟣 IG](https://www.instagram.com/reel/Dd0QRr8G3L9/) | 70 | **14** / 17 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_10.mp4) | **[📜 View 17](logs/games/GodofWarLaufey.md)** |
+| **sifu** | 2026-09-28 03:26 AM | Beating Up the Whole Gang 🥋🔥  #videogames #gamingcommunity #gaming #sifu #gaming | [🔵 FB](https://www.facebook.com/reel/1635492871307578/) | 191 | [🟣 IG](https://www.instagram.com/reel/Ddzg0_6gv2H/) | 0 | **18** / 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu18.mp4) | **[📜 View 20](logs/games/sifu.md)** |
+| **GODOFWAR3** | 2026-09-28 01:27 AM | Kratos Titan Clash 💀🔥  #videogames #gamingcommunity #gaming #godofwar3 #gamingre | [🔵 FB](https://www.facebook.com/reel/1446641450685379/) | 2,782 | [🟣 IG](https://www.instagram.com/reel/Ddw4xG3ieOp/) | 490 | **19** / 22 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR37.mp4) | **[📜 View 22](logs/games/GODOFWAR3.md)** |
+| **VietnamCavePrison** | 2026-09-28 01:26 AM | Rocket Rain on Enemy Base 💣🔥  #videogames #gamingcommunity #gaming #vietnamcavep | [🔵 FB](https://www.facebook.com/reel/1817320662784795/) | 1,227 | [🟣 IG](https://www.instagram.com/reel/Ddxt8_plP93/) | 140 | **27** / 29 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison16.mp4) | **[📜 View 29](logs/games/VietnamCavePrison.md)** |
 | **monkeyKing** | 2026-09-28 01:24 AM | Red Staff Combat Slash ⚡⚔️  #videogames #gamingcommunity #gaming #monkeyking #ga | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdzaCUfjLsh/) | 10 | **39** / 41 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing41.mp4) | **[📜 View 41](logs/games/monkeyKing.md)** |
 | **codBlackops6** | 2026-09-27 11:29 PM | Tactical Ruins Combat 🎯💥  #videogames #gamingcommunity #gaming #codblackops6 #ga | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdzM2RigM-d/) | 160 | **42** / 44 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops614.mp4) | **[📜 View 44](logs/games/codBlackops6.md)** |
 | **SpiderMan2** | 2026-09-27 10:27 PM | Spider-Man Climbs Giant Colossus 🔥  #videogames #gamingcommunity #gaming #spider | [🔵 FB](https://www.facebook.com/reel/1657819332435539/) | 51 | [🟣 IG](https://www.instagram.com/reel/DdxrbGlAcgA/) | 20 | **47** / 48 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan212.mp4) | **[📜 View 48](logs/games/SpiderMan2.md)** |
@@ -52,7 +52,7 @@
 | **Ghost Destroys Mexican** | 2026-09-26 11:52 AM | Storm Ship Boarding Climb 🌊⚓  #videogames #gamingcommunity #gaming #ghost destro | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdvYTdVDxHO/) | 50 | **19** / 19 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.82/Ghost_Destroys_Mexican_Oil_Ring5.mp4) | **[📜 View 19](logs/games/Ghost_Destroys_Mexican.md)** |
 | **DiabloIV** | 2026-09-26 02:09 AM | He Returned To Destroy You 🔥  #videogames #gamingcommunity #gaming #diabloiv #ga | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DduVnyLid_N/) | 90 | **17** / 17 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.102/DiabloIV6.mp4) | **[📜 View 17](logs/games/DiabloIV.md)** |
 | **mm2remastered** | 2026-09-25 03:20 PM | Red Sky Combat Zone 💀🔥  #videogames #gamingcommunity #gaming #mm2remastered #gam | [🔵 FB](https://www.facebook.com/reel/3584878615007660/) | 803 | ⏳ Pending | _0_ | **24** / 26 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_19.mp4) | **[📜 View 26](logs/games/mm2remastered.md)** |
-| **AfghanistanRedZone** | 2026-09-25 01:50 AM | Street Gunfight Mayhem 🔫💀  #videogames #gamingcommunity #gaming #afghanistanredz | [🔵 FB](https://www.facebook.com/reel/1440490007980933/) | 17,735 | [🟣 IG](https://www.instagram.com/reel/DdrsNGqivic/) | 900 | **9** / 9 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.101/AfghanistanRedZone1.mp4) | **[📜 View 9](logs/games/AfghanistanRedZone.md)** |
+| **AfghanistanRedZone** | 2026-09-25 01:50 AM | Street Gunfight Mayhem 🔫💀  #videogames #gamingcommunity #gaming #afghanistanredz | [🔵 FB](https://www.facebook.com/reel/1440490007980933/) | 17,736 | [🟣 IG](https://www.instagram.com/reel/DdrsNGqivic/) | 900 | **9** / 9 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.101/AfghanistanRedZone1.mp4) | **[📜 View 9](logs/games/AfghanistanRedZone.md)** |
 | **UkraineCovertMission** | 2026-09-24 11:54 PM | Sniper Fire & Big Booms 💥🎯  #videogames #gamingcommunity #gaming #ukrainecovertm | [🔵 FB](https://www.facebook.com/reel/1433881315316238/) | 477 | [🟣 IG](https://www.instagram.com/reel/DdrhIHCFEtY/) | 180 | **2** / 4 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.99/_Ukraine_Covert_Sniper_Mission5.mp4) | **[📜 View 4](logs/games/UkraineCovertMission.md)** |
 | **combatopration** | 2026-09-18 03:55 AM | He Pushed Too Far 🔥  #videogames #gamingcommunity #gaming #combatopration #gamin | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdZ7WiCgfFX/) | 220 | **17** / 19 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_7.mp4) | **[📜 View 19](logs/games/combatopration.md)** |
 
@@ -60,13 +60,13 @@
 
 ## 📈 Trending Games (Last 7 Days)
 
-> Auto-detected | Last Updated: 2026-09-29 01:40:19 AM
+> Auto-detected | Last Updated: 2026-09-29 01:45:24 AM
 
 | Rank | Game Name | Views (7d) | Avg / Video | Trend | FB Post | Source |
 |:---:|---|---|---|---|---|---|
-| 🥇 | **AfghanistanRedZone** | 19,419 | 9,709 | 🚀 **VIRAL** | [🔵](https://www.facebook.com/reel/1440490007980933/) | _N/A_ |
-| 🥈 | **GODOFWAR3** | 5,795 | 1,448 | 🔥 Trending | [🔵](https://www.facebook.com/reel/1446641450685379/) | _N/A_ |
-| 🥉 | **VietnamCavePrison** | 5,237 | 1,309 | ⚡ Steady | [🔵](https://www.facebook.com/reel/1817320662784795/) | _N/A_ |
+| 🥇 | **AfghanistanRedZone** | 19,420 | 9,710 | 🚀 **VIRAL** | [🔵](https://www.facebook.com/reel/1440490007980933/) | _N/A_ |
+| 🥈 | **GODOFWAR3** | 5,799 | 1,449 | 🔥 Trending | [🔵](https://www.facebook.com/reel/1446641450685379/) | _N/A_ |
+| 🥉 | **VietnamCavePrison** | 5,241 | 1,310 | ⚡ Steady | [🔵](https://www.facebook.com/reel/1817320662784795/) | _N/A_ |
 | 4️⃣ | **Callofdutyaw** | 7,297 | 1,042 | ⚡ Steady | _N/A_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison14.mp4) |
 
 ### 📉 Below Average This Week
@@ -76,18 +76,18 @@
 | mm2remastered | 4,518 | 753 |
 | UkraineCovertMission | 657 | 657 |
 | RescueOperation | 540 | 540 |
-| Russian_secret_missions | 1,037 | 518 |
-| sifu | 529 | 264 |
+| Russian_secret_missions | 1,051 | 525 |
+| sifu | 531 | 265 |
 
 ### 💡 Recommendation
 
-**Best game to post next:** 🚀 **AfghanistanRedZone** (Avg 9,709 views/video)
+**Best game to post next:** 🚀 **AfghanistanRedZone** (Avg 9,710 views/video)
 
 --- 
 
 ## 🎯 Best Time to Post (IST)
 
-> Analysis from 40 posts | Last Updated: 2026-09-29 01:40:19 AM
+> Analysis from 41 posts | Last Updated: 2026-09-29 01:45:24 AM
 
 | Rank | Time (IST) | Posts | Avg Views | Recommendation |
 |:---:|---|:---:|:---:|---|
@@ -106,47 +106,47 @@
 | Day | Posts | Avg Views |
 |---|---|---|
 | Monday | 9 | 292 |
-| Tuesday | 5 | 328 |
+| Tuesday | 6 | 321 |
 | Sunday | 26 | 244 |
 
 --- 
 
 ## 🤖 Auto-Reply Log (Direct FB Mode)
 
-> Status: 🚫 **DISABLED** | Last Updated: 2026-09-29 01:40:05 AM | Total Replies: 20 | Skipped: 0
+> Status: 🚫 **DISABLED** | Last Updated: 2026-09-29 01:45:15 AM | Total Replies: 21 | Skipped: 0
 
 ### 📊 Stats
 
 | Metric | Value |
 |---|---|
-| Friendly Replies | 20 |
+| Friendly Replies | 21 |
 | Savage Replies | 0 |
-| Total | 20 |
+| Total | 21 |
 
 ### 💬 Recent Replies (Last 20)
 
 | # | Time | 👤 User | 💬 User Comment | 🤖 AI Reply | Type | Game | FB Post |
 |---|---|---|---|---|---|---|---|
-| 1 | 2026-09-29 01:23:37  | **Facebook User** | Yves Nzinga mw2 | Yves Nzinga already in? 😎 Who else is joining the fight? | ✅ Friendly | afghanistanredz | [🔵](https://www.facebook.com/reel/1440490007980933/) |
-| 2 | 2026-09-29 01:23:29  | **Facebook User** | Walter Awinda og mw2 | Walter Awinda OG, bro! 🔥 What's your go-to loadout for that map? | ✅ Friendly | afghanistanredz | [🔵](https://www.facebook.com/reel/1440490007980933/) |
-| 3 | 2026-09-29 01:23:23  | **Facebook User** | PremxGamer when is the next video coming? | Next video dropping soon, bhai! What game you want next? 😎 | ✅ Friendly | God of War | [🔵](https://www.facebook.com/reel/1446641450685379/) |
-| 4 | 2026-09-29 01:09:42  | **Facebook User** | Yves Nzinga mw2 | Yves Nzinga, classic! Remember when? 😂 | ✅ Friendly | afghanistanredz | [🔵](https://www.facebook.com/reel/1440490007980933/) |
-| 5 | 2026-09-29 01:09:33  | **Facebook User** | Walter Awinda og mw2 | Walter Awinda, the OG! Bro, mw2 was lit 🔥 | ✅ Friendly | afghanistanredz | [🔵](https://www.facebook.com/reel/1440490007980933/) |
-| 6 | 2026-09-29 01:09:25  | **Facebook User** | PremxGamer when is the next video coming? | Bro, dropping this weekend! You hyped? 😎 | ✅ Friendly | God of War | [🔵](https://www.facebook.com/reel/1446641450685379/) |
-| 7 | 2026-09-29 12:33:22  | **Facebook User** | Yves Nzinga mw2 | already mentioned and still hitting different 😂 | ✅ Friendly | afghanistanredz | [🔵](https://www.facebook.com/reel/1440490007980933/) |
-| 8 | 2026-09-29 12:33:16  | **Facebook User** | Walter Awinda og mw2 | og mw2 though, that's the real deal 💀 | ✅ Friendly | afghanistanredz | [🔵](https://www.facebook.com/reel/1440490007980933/) |
-| 9 | 2026-09-29 12:33:08  | **Facebook User** | hello bro | hello bro! 🔥 that Kratos clip is insane, yaar | ✅ Friendly | God of War | [🔵](https://www.facebook.com/reel/1446641450685379/) |
-| 10 | 2026-09-29 12:22:22  | **Facebook User** | Yves Nzinga mw2 | reply text 2 | ✅ Friendly | afghanistanredz | [🔵](https://www.facebook.com/reel/1440490007980933/) |
-| 11 | 2026-09-29 12:22:17  | **Facebook User** | Walter Awinda og mw2 | reply text 1 | ✅ Friendly | afghanistanredz | [🔵](https://www.facebook.com/reel/1440490007980933/) |
-| 12 | 2026-09-28 11:42:40  | **Unknown User** | Yves Nzinga mw2 | Yves Nzinga? That's my boy! MW2 MVP vibes. 🤜🤛 Want a collab? | ✅ Friendly | afghanistanredz | [🔵](https://www.facebook.com/reel/1440490007980933/) |
-| 13 | 2026-09-28 11:42:35  | **Unknown User** | Walter Awinda og mw2 | Walter Awinda? Oh, MW2 legend! 😎 What's his next move? | ✅ Friendly | afghanistanredz | [🔵](https://www.facebook.com/reel/1440490007980933/) |
-| 14 | 2026-09-28 11:42:31  | **Unknown User** | Which game bro | VietnamCavePrison! 🚁💥 Desert ops chaos. Ever tried helicoptering through chaos?  | ✅ Friendly | VietnamCavePris | [🔵](https://www.facebook.com/reel/1780695949719463/) |
-| 15 | 2026-09-28 11:42:28  | **Unknown User** | Nice bro | Thanks, bro! 😎 Keep the hype alive! Got any game requests? 🎮 | ✅ Friendly | God of War | [🔵](https://www.facebook.com/reel/29055320854074025/) |
-| 16 | 2026-09-28 09:15:19  | **Unknown User** | game name | Nice pick! Afghanistan RedZ delivers epic street gunfights. Want tips for the be | ✅ Friendly | afghanistanredz | [🔵](https://www.facebook.com/reel/1440490007980933/) |
-| 17 | 2026-09-28 02:20:35  | **Unknown User** | Nice gameplay | Thanks! 😎 Keep those snipes coming—what’s your favorite clutch moment?🎯 | ✅ Friendly | Video Game | [🔵](https://www.facebook.com/reel/1861373075302275/) |
-| 18 | 2026-09-28 01:19:29  | **Unknown User** | Please tell me game name | It's Spider-Man! 🕸️💥 Want to swing by the next boss? Ready to web‑sling? | ✅ Friendly | Spider-Man | [🔵](https://www.facebook.com/reel/1657819332435539/) |
-| 19 | 2026-09-27 11:24:52  | **Unknown User** | Como se llama | Se llama Facebook Post, el juego más épico! 🎮🔥 | ✅ Friendly | Facebook Post | [🔵](https://www.facebook.com/reel/1440490007980933/) |
-| 20 | 2026-09-27 11:24:44  | **Unknown User** | It would be great to know which game it is... | It's the Facebook Post game! 🎮🔥 Check it out, the hype is real! | ✅ Friendly | Facebook Post | [🔵](https://www.facebook.com/reel/1440490007980933/) |
+| 1 | 2026-09-29 01:45:15  | **Facebook User** | Nice gameplay bro | Thanks bro! Those headshots were fire 🔥 What's your highest streak? | ✅ Friendly | Video Game | [🔵](https://www.facebook.com/reel/1135871095448480/) |
+| 2 | 2026-09-29 01:23:37  | **Facebook User** | Yves Nzinga mw2 | Yves Nzinga already in? 😎 Who else is joining the fight? | ✅ Friendly | afghanistanredz | [🔵](https://www.facebook.com/reel/1440490007980933/) |
+| 3 | 2026-09-29 01:23:29  | **Facebook User** | Walter Awinda og mw2 | Walter Awinda OG, bro! 🔥 What's your go-to loadout for that map? | ✅ Friendly | afghanistanredz | [🔵](https://www.facebook.com/reel/1440490007980933/) |
+| 4 | 2026-09-29 01:23:23  | **Facebook User** | PremxGamer when is the next video coming? | Next video dropping soon, bhai! What game you want next? 😎 | ✅ Friendly | God of War | [🔵](https://www.facebook.com/reel/1446641450685379/) |
+| 5 | 2026-09-29 01:09:42  | **Facebook User** | Yves Nzinga mw2 | Yves Nzinga, classic! Remember when? 😂 | ✅ Friendly | afghanistanredz | [🔵](https://www.facebook.com/reel/1440490007980933/) |
+| 6 | 2026-09-29 01:09:33  | **Facebook User** | Walter Awinda og mw2 | Walter Awinda, the OG! Bro, mw2 was lit 🔥 | ✅ Friendly | afghanistanredz | [🔵](https://www.facebook.com/reel/1440490007980933/) |
+| 7 | 2026-09-29 01:09:25  | **Facebook User** | PremxGamer when is the next video coming? | Bro, dropping this weekend! You hyped? 😎 | ✅ Friendly | God of War | [🔵](https://www.facebook.com/reel/1446641450685379/) |
+| 8 | 2026-09-29 12:33:22  | **Facebook User** | Yves Nzinga mw2 | already mentioned and still hitting different 😂 | ✅ Friendly | afghanistanredz | [🔵](https://www.facebook.com/reel/1440490007980933/) |
+| 9 | 2026-09-29 12:33:16  | **Facebook User** | Walter Awinda og mw2 | og mw2 though, that's the real deal 💀 | ✅ Friendly | afghanistanredz | [🔵](https://www.facebook.com/reel/1440490007980933/) |
+| 10 | 2026-09-29 12:33:08  | **Facebook User** | hello bro | hello bro! 🔥 that Kratos clip is insane, yaar | ✅ Friendly | God of War | [🔵](https://www.facebook.com/reel/1446641450685379/) |
+| 11 | 2026-09-29 12:22:22  | **Facebook User** | Yves Nzinga mw2 | reply text 2 | ✅ Friendly | afghanistanredz | [🔵](https://www.facebook.com/reel/1440490007980933/) |
+| 12 | 2026-09-29 12:22:17  | **Facebook User** | Walter Awinda og mw2 | reply text 1 | ✅ Friendly | afghanistanredz | [🔵](https://www.facebook.com/reel/1440490007980933/) |
+| 13 | 2026-09-28 11:42:40  | **Unknown User** | Yves Nzinga mw2 | Yves Nzinga? That's my boy! MW2 MVP vibes. 🤜🤛 Want a collab? | ✅ Friendly | afghanistanredz | [🔵](https://www.facebook.com/reel/1440490007980933/) |
+| 14 | 2026-09-28 11:42:35  | **Unknown User** | Walter Awinda og mw2 | Walter Awinda? Oh, MW2 legend! 😎 What's his next move? | ✅ Friendly | afghanistanredz | [🔵](https://www.facebook.com/reel/1440490007980933/) |
+| 15 | 2026-09-28 11:42:31  | **Unknown User** | Which game bro | VietnamCavePrison! 🚁💥 Desert ops chaos. Ever tried helicoptering through chaos?  | ✅ Friendly | VietnamCavePris | [🔵](https://www.facebook.com/reel/1780695949719463/) |
+| 16 | 2026-09-28 11:42:28  | **Unknown User** | Nice bro | Thanks, bro! 😎 Keep the hype alive! Got any game requests? 🎮 | ✅ Friendly | God of War | [🔵](https://www.facebook.com/reel/29055320854074025/) |
+| 17 | 2026-09-28 09:15:19  | **Unknown User** | game name | Nice pick! Afghanistan RedZ delivers epic street gunfights. Want tips for the be | ✅ Friendly | afghanistanredz | [🔵](https://www.facebook.com/reel/1440490007980933/) |
+| 18 | 2026-09-28 02:20:35  | **Unknown User** | Nice gameplay | Thanks! 😎 Keep those snipes coming—what’s your favorite clutch moment?🎯 | ✅ Friendly | Video Game | [🔵](https://www.facebook.com/reel/1861373075302275/) |
+| 19 | 2026-09-28 01:19:29  | **Unknown User** | Please tell me game name | It's Spider-Man! 🕸️💥 Want to swing by the next boss? Ready to web‑sling? | ✅ Friendly | Spider-Man | [🔵](https://www.facebook.com/reel/1657819332435539/) |
+| 20 | 2026-09-27 11:24:52  | **Unknown User** | Como se llama | Se llama Facebook Post, el juego más épico! 🎮🔥 | ✅ Friendly | Facebook Post | [🔵](https://www.facebook.com/reel/1440490007980933/) |
 
 --- 
 

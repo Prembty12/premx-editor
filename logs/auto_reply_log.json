@@ -1,5 +1,5 @@
 {
-  "total_replies": 20,
+  "total_replies": 21,
   "total_skipped": 0,
   "replies": [
     {
@@ -346,8 +346,26 @@
       "source_link": "",
       "timestamp": "2026-09-29 01:23:37 AM",
       "status": "posted"
+    },
+    {
+      "reply_id": "1089532337267395_1805082347354168",
+      "comment_id": "1089532337267395_2382213379297444",
+      "reply_to_id": "1089532337267395_2382213379297444",
+      "post_id": "100463226188818_1089532337267395",
+      "user_name": "Facebook User",
+      "user_id": "",
+      "user_comment": "Nice gameplay bro",
+      "openrouter_reply": "Thanks bro! Those headshots were fire 🔥 What's your highest streak?",
+      "type": "friendly",
+      "depth": 1,
+      "game": "Video Game",
+      "post_title": "Scope Headshots Hit Different 🎯🔥\n\n#videogames #gamingcommunity #gaming #russian_",
+      "fb_post_link": "https://www.facebook.com/reel/1135871095448480/",
+      "source_link": "",
+      "timestamp": "2026-09-29 01:45:15 AM",
+      "status": "posted"
     }
   ],
   "skipped": [],
-  "last_updated": "2026-09-29 01:40:05 AM"
+  "last_updated": "2026-09-29 01:45:15 AM"
 }
