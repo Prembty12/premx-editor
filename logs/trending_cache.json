@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-29 01:45:24 AM",
+  "last_updated": "2026-09-29 01:46:51 AM",
   "period_days": 7,
   "trending": [
     {
@@ -7,7 +7,7 @@
       "views_7d": 19420,
       "avg_per_video": 9710,
       "trend": "viral",
-      "ratio": 10.28480640225962,
+      "ratio": 10.284201235657546,
       "fb_link": "https://www.facebook.com/reel/1440490007980933/",
       "source_link": ""
     },
@@ -16,7 +16,7 @@
       "views_7d": 5799,
       "avg_per_video": 1449,
       "trend": "trending",
-      "ratio": 1.5347769801106272,
+      "ratio": 1.5346866725507502,
       "fb_link": "https://www.facebook.com/reel/1446641450685379/",
       "source_link": ""
     },
@@ -25,7 +25,7 @@
       "views_7d": 5241,
       "avg_per_video": 1310,
       "trend": "steady",
-      "ratio": 1.3875485465458397,
+      "ratio": 1.3874669020300088,
       "fb_link": "https://www.facebook.com/reel/1817320662784795/",
       "source_link": ""
     },
@@ -34,7 +34,7 @@
       "views_7d": 7297,
       "avg_per_video": 1042,
       "trend": "steady",
-      "ratio": 1.103683653054019,
+      "ratio": 1.1036187113857017,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison14.mp4"
     }
@@ -45,7 +45,7 @@
       "views_7d": 4518,
       "avg_per_video": 753,
       "trend": "slow",
-      "ratio": 0.797575614922914,
+      "ratio": 0.7975286849073258,
       "fb_link": "https://www.facebook.com/reel/3584878615007660/",
       "source_link": ""
     },
@@ -54,7 +54,7 @@
       "views_7d": 657,
       "avg_per_video": 657,
       "trend": "slow",
-      "ratio": 0.6958926680004708,
+      "ratio": 0.6958517210944396,
       "fb_link": "https://www.facebook.com/reel/1433881315316238/",
       "source_link": ""
     },
@@ -63,16 +63,16 @@
       "views_7d": 540,
       "avg_per_video": 540,
       "trend": "slow",
-      "ratio": 0.571966576438743,
+      "ratio": 0.5719329214474845,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation14.mp4"
     },
     {
       "game": "Russian_secret_missions",
-      "views_7d": 1051,
-      "avg_per_video": 525,
+      "views_7d": 1053,
+      "avg_per_video": 526,
       "trend": "slow",
-      "ratio": 0.5560786159821114,
+      "ratio": 0.5571050308914387,
       "fb_link": "https://www.facebook.com/reel/1135871095448480/",
       "source_link": ""
     },
@@ -81,7 +81,7 @@
       "views_7d": 531,
       "avg_per_video": 265,
       "trend": "below_avg",
-      "ratio": 0.2806873014004943,
+      "ratio": 0.28067078552515445,
       "fb_link": "https://www.facebook.com/reel/1635492871307578/",
       "source_link": ""
     }
@@ -91,7 +91,7 @@
     "views_7d": 19420,
     "avg_per_video": 9710,
     "trend": "viral",
-    "ratio": 10.28480640225962,
+    "ratio": 10.284201235657546,
     "fb_link": "https://www.facebook.com/reel/1440490007980933/",
     "source_link": ""
   }

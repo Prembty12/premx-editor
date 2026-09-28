@@ -1,6 +1,6 @@
 # 🚀 GAMING AGENT COMMAND & ANALYTICS DASHBOARD
 
-> **Last Updated:** 2026-09-29 01:45:25 AM IST | **Status:** All Systems Active
+> **Last Updated:** 2026-09-29 01:46:52 AM IST | **Status:** All Systems Active
 
 --- 
 
@@ -9,7 +9,7 @@
 | Rank | Game Name | Total Videos | Total Views | Avg Views / Video | Performance Tier |
 | :---: | :--- | :---: | :---: | :---: | :---: |
 | 🥇 | **codBlackops6** | 2 | 25,969 | 12,984 | 🔥 Viral / Hype |
-| 🥈 | **mm2remastered** | 2 | 21,607 | 10,803 | 🔥 Viral / Hype |
+| 🥈 | **mm2remastered** | 2 | 21,613 | 10,806 | 🔥 Viral / Hype |
 | 🥉 | **AfghanistanRedZone** | 0 | 20,433 | 0 | 📈 Stable |
 | 4️⃣ | **Callofdutyaw** | 3 | 19,801 | 6,600 | ⚡ Trending |
 | 5️⃣ | **SpiderMan2** | 1 | 15,894 | 15,894 | 🔥 Viral / Hype |
@@ -20,7 +20,7 @@
 | 10 | **Ghost Destroys Mexican** | 0 | 4,821 | 0 | 📈 Stable |
 | 11 | **ghostandela** | 2 | 4,399 | 2,199 | 📈 Stable |
 | 12 | **UkraineCovertMission** | 2 | 3,072 | 1,536 | 📈 Stable |
-| 13 | **Russian_secret_missions** | 3 | 2,903 | 967 | 📈 Stable |
+| 13 | **Russian_secret_missions** | 3 | 2,905 | 968 | 📈 Stable |
 | 14 | **combatopration** | 2 | 1,684 | 842 | 📈 Stable |
 | 15 | **Ghost_soap_escap** | 3 | 1,632 | 544 | 📈 Stable |
 | 16 | **sifu** | 2 | 880 | 440 | 📈 Stable |
@@ -36,7 +36,7 @@
 
 | Game Name | 📅 Last Posted | 📺 Latest Title | 🔵 FB | 👁️ FB Views | 🟣 IG | 👁️ IG Views | 📊 Remaining / Total | 📂 Source | 📜 All |
 |---|---|---|---|---|---|---|---|---|---|
-| **Russian_secret_missions** | 2026-09-29 01:00 AM | Scope Headshots Hit Different 🎯🔥  #videogames #gamingcommunity #gaming #russian_ | [🔵 FB](https://www.facebook.com/reel/1135871095448480/) | 263 | [🟣 IG](https://www.instagram.com/reel/Dd17e1DjJpi/) | 40 | **37** / 40 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions28.mp4) | **[📜 View 40](logs/games/Russian_secret_missions.md)** |
+| **Russian_secret_missions** | 2026-09-29 01:00 AM | Scope Headshots Hit Different 🎯🔥  #videogames #gamingcommunity #gaming #russian_ | [🔵 FB](https://www.facebook.com/reel/1135871095448480/) | 265 | [🟣 IG](https://www.instagram.com/reel/Dd17e1DjJpi/) | 40 | **37** / 40 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions28.mp4) | **[📜 View 40](logs/games/Russian_secret_missions.md)** |
 | **GodofWarLaufey** | 2026-09-28 01:57 PM | Blonde Hero Vs Fire Demon ⚔️🔥  #videogames #gamingcommunity #gaming #godofwarlau | [🔵 FB](https://www.facebook.com/reel/1763278934904943/) | 65 | [🟣 IG](https://www.instagram.com/reel/Dd0QRr8G3L9/) | 70 | **14** / 17 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_10.mp4) | **[📜 View 17](logs/games/GodofWarLaufey.md)** |
 | **sifu** | 2026-09-28 03:26 AM | Beating Up the Whole Gang 🥋🔥  #videogames #gamingcommunity #gaming #sifu #gaming | [🔵 FB](https://www.facebook.com/reel/1635492871307578/) | 191 | [🟣 IG](https://www.instagram.com/reel/Ddzg0_6gv2H/) | 0 | **18** / 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu18.mp4) | **[📜 View 20](logs/games/sifu.md)** |
 | **GODOFWAR3** | 2026-09-28 01:27 AM | Kratos Titan Clash 💀🔥  #videogames #gamingcommunity #gaming #godofwar3 #gamingre | [🔵 FB](https://www.facebook.com/reel/1446641450685379/) | 2,782 | [🟣 IG](https://www.instagram.com/reel/Ddw4xG3ieOp/) | 490 | **19** / 22 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR37.mp4) | **[📜 View 22](logs/games/GODOFWAR3.md)** |
@@ -60,7 +60,7 @@
 
 ## 📈 Trending Games (Last 7 Days)
 
-> Auto-detected | Last Updated: 2026-09-29 01:45:24 AM
+> Auto-detected | Last Updated: 2026-09-29 01:46:51 AM
 
 | Rank | Game Name | Views (7d) | Avg / Video | Trend | FB Post | Source |
 |:---:|---|---|---|---|---|---|
@@ -76,7 +76,7 @@
 | mm2remastered | 4,518 | 753 |
 | UkraineCovertMission | 657 | 657 |
 | RescueOperation | 540 | 540 |
-| Russian_secret_missions | 1,051 | 525 |
+| Russian_secret_missions | 1,053 | 526 |
 | sifu | 531 | 265 |
 
 ### 💡 Recommendation
@@ -87,7 +87,7 @@
 
 ## 🎯 Best Time to Post (IST)
 
-> Analysis from 41 posts | Last Updated: 2026-09-29 01:45:24 AM
+> Analysis from 42 posts | Last Updated: 2026-09-29 01:46:51 AM
 
 | Rank | Time (IST) | Posts | Avg Views | Recommendation |
 |:---:|---|:---:|:---:|---|
@@ -106,14 +106,14 @@
 | Day | Posts | Avg Views |
 |---|---|---|
 | Monday | 9 | 292 |
-| Tuesday | 6 | 321 |
+| Tuesday | 7 | 319 |
 | Sunday | 26 | 244 |
 
 --- 
 
 ## 🤖 Auto-Reply Log (Direct FB Mode)
 
-> Status: 🚫 **DISABLED** | Last Updated: 2026-09-29 01:45:15 AM | Total Replies: 21 | Skipped: 0
+> Status: 🚫 **DISABLED** | Last Updated: 2026-09-29 01:46:41 AM | Total Replies: 21 | Skipped: 0
 
 ### 📊 Stats
 
