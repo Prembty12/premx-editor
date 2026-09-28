@@ -1,12 +1,12 @@
 """
-💬 SPLIT AUTO-COMMENT SCRIPT (FINAL v4)
+💬 SPLIT AUTO-COMMENT SCRIPT (FINAL v5)
 =========================================
 ✅ FB auto-reply working
 ✅ Same KNOWN_GAMES + detection as full script
 ✅ Real username fetch (3-layer fallback)
 ✅ 3-level conversation thread
+✅ 🔥 NO DUPLICATE — 4-layer detection
 ✅ 10 comments batch (OpenRouter)
-✅ Duplicate protection via FB live check
 ✅ Auto-save logs (append mode — history preserved)
 ✅ Dashboard update (GAMING_DASHBOARD.md)
 ✅ Natural human replies (no robotic feel)
@@ -48,7 +48,6 @@ def now_ist_ampm():
 
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
-# ✅ Same as full script
 KNOWN_GAMES = [
     "BGMI", "Free Fire", "GTA 5", "GTA San Andreas", "GTA", "CODM",
     "Call of Duty", "God of War", "Spider-Man", "Minecraft", "PUBG",
@@ -349,7 +348,7 @@ def save_memory(mem, path="logs/agent_memory.json"):
 
 
 # ============================================================
-# 💬 FB AUTO-COMMENTER
+# 💬 FB AUTO-COMMENTER (with 4-layer duplicate protection)
 # ============================================================
 class FBAutoCommenter:
     def __init__(self,
@@ -385,8 +384,54 @@ class FBAutoCommenter:
         self.reply_log_file = reply_log_file
 
         self._name_cache = {}
+        self._page_name_cache = ""
+        self._replied_history_cache = None
 
         self.client = OpenRouterClient(keys=openrouter_keys, max_retries=max_json_retries)
+
+    # ---------- PAGE NAME ----------
+    def _get_page_name(self):
+        if self._page_name_cache:
+            return self._page_name_cache
+        try:
+            res = requests.get(
+                f"{self.fb_graph_url}/{self.fb_page_id}",
+                params={"fields": "name", "access_token": self.fb_access_token},
+                timeout=8)
+            if res.status_code == 200:
+                name = (res.json().get("name") or "").strip()
+                if name:
+                    self._page_name_cache = name
+                    return name
+        except Exception:
+            pass
+        self._page_name_cache = ""
+        return ""
+
+    # ---------- CHECK LOG HISTORY ----------
+    def _load_replied_history(self):
+        """Load comment_id → depth map from existing log."""
+        if self._replied_history_cache is not None:
+            return self._replied_history_cache
+        self._replied_history_cache = {}
+        if os.path.exists(self.reply_log_file):
+            try:
+                with open(self.reply_log_file, 'r', encoding='utf-8') as f:
+                    log_data = json.load(f)
+                for r in log_data.get("replies", []):
+                    cid = r.get("comment_id", "")
+                    depth = r.get("depth", 1)
+                    if cid:
+                        self._replied_history_cache[cid] = max(
+                            self._replied_history_cache.get(cid, 0), depth
+                        )
+            except Exception:
+                pass
+        return self._replied_history_cache
+
+    def _was_already_replied(self, comment_id):
+        """Check: pehle reply kiya tha ya nahi (log se)."""
+        return comment_id in self._load_replied_history()
 
     # ---------- USER NAME ----------
     def _get_user_name(self, user_id, fallback_from_field=None):
@@ -466,34 +511,71 @@ class FBAutoCommenter:
             log(f"⚠️ Reply post exception: {e}")
         return None
 
-    # ---------- THREAD ----------
+    # ---------- THREAD (4-LAYER DUPLICATE PROTECTION) ----------
     def _analyze_thread(self, top_comment):
         cid = top_comment.get("id", "")
+
+        # 🛡️ LAYER 1: Log history check
+        if self._was_already_replied(cid):
+            history_depth = self._load_replied_history().get(cid, 0)
+            return {
+                "depth": history_depth,
+                "should_reply": False,
+                "reason": "already_replied_log",
+            }
+
         replies = self._fetch_comment_replies(cid)
         replies_sorted = sorted(replies, key=lambda x: x.get("created_time", ""))
 
+        # 🛡️ LAYER 2: from.id se count
         our_count = sum(
             1 for r in replies_sorted
             if r.get("from", {}).get("id") == self.fb_page_id
         )
 
+        # 🛡️ LAYER 3: from.name fallback
+        if our_count == 0:
+            page_name = self._get_page_name()
+            if page_name:
+                our_count = sum(
+                    1 for r in replies_sorted
+                    if (r.get("from", {}).get("name") or "").strip().lower() == page_name.lower()
+                )
+
         if our_count >= self.max_conversation_depth:
             return {"depth": our_count, "should_reply": False, "reason": "max_depth"}
 
+        # 🛡️ LAYER 4: last reply check
         if replies_sorted and our_count > 0:
             last = replies_sorted[-1]
-            if last.get("from", {}).get("id") == self.fb_page_id:
+            last_from = last.get("from", {}) or {}
+            last_id = last_from.get("id", "")
+            last_name = (last_from.get("name") or "").strip().lower()
+            page_name = (self._get_page_name() or "").lower()
+
+            is_ours = (last_id == self.fb_page_id) or (page_name and last_name == page_name)
+            if is_ours:
+                log(f"      ⏭️ Last reply is ours — waiting for user")
                 return {"depth": our_count, "should_reply": False, "reason": "waiting_user"}
+
+        # Build context
+        page_name = self._get_page_name()
+        page_name_lower = page_name.lower() if page_name else ""
 
         thread_ctx = ""
         for r in replies_sorted[-6:]:
-            who = "US" if r.get("from", {}).get("id") == self.fb_page_id else "USER"
+            r_from = r.get("from", {}) or {}
+            is_us = (r_from.get("id") == self.fb_page_id
+                     or (page_name_lower and (r_from.get("name") or "").strip().lower() == page_name_lower))
+            who = "US" if is_us else "USER"
             msg = (r.get("message", "") or "").replace("\n", " ")[:150]
             thread_ctx += f"  {who}: {msg}\n"
 
         user_msgs = [top_comment] + [
             r for r in replies_sorted
-            if r.get("from", {}).get("id") != self.fb_page_id
+            if not ((r.get("from", {}).get("id") == self.fb_page_id)
+                    or (page_name_lower and
+                        (r.get("from", {}).get("name") or "").strip().lower() == page_name_lower))
         ]
         if not user_msgs:
             return {"depth": our_count, "should_reply": False, "reason": "no_user_msg"}
@@ -518,7 +600,6 @@ class FBAutoCommenter:
             "thread_context": thread_ctx,
         }
 
-    # ✅ Same as full script
     @staticmethod
     def _detect_game_from_post(post_message_full):
         hashtags = re.findall(r'#(\w+)', post_message_full)
@@ -548,7 +629,15 @@ class FBAutoCommenter:
             log("❌ FB_PAGE_ID or PAGE_ACCESS_TOKEN missing")
             return None
 
-        log("🤖 FB Auto-reply started...")
+        log("🤖 FB Auto-reply started (4-layer duplicate protection)...")
+
+        # Pre-fetch page name
+        page_name = self._get_page_name()
+        log(f"📄 Page name: {page_name or 'N/A'}")
+
+        # Pre-load replied history from log
+        replied_history = self._load_replied_history()
+        log(f"📂 Loaded {len(replied_history)} replied comment IDs from log")
 
         reply_log = {"total_replies": 0, "total_skipped": 0,
                      "replies": [], "skipped": []}
@@ -556,7 +645,7 @@ class FBAutoCommenter:
             try:
                 with open(self.reply_log_file, 'r', encoding='utf-8') as f:
                     reply_log = json.load(f)
-                log(f"📂 Loaded existing log: {len(reply_log.get('replies', []))} replies")
+                log(f"📂 Existing history: {len(reply_log.get('replies', []))} replies")
             except Exception:
                 pass
 
@@ -674,7 +763,7 @@ class FBAutoCommenter:
 
                 state = self._analyze_thread(comment)
                 if not state["should_reply"]:
-                    if state["reason"] in ("max_depth", "waiting_user"):
+                    if state["reason"] in ("max_depth", "waiting_user", "already_replied_log"):
                         log(f"      ⏭️ Thread skip ({state['reason']}) — {comment_id[:20]}")
                     continue
 
