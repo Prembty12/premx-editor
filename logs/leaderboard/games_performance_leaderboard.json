@@ -13,12 +13,12 @@
         "total_views": 21618,
         "uploaded_videos": 2,
         "avg_views_per_video": 10809,
-        "view_share_percentage": 13.65
+        "view_share_percentage": 13.64
     },
     {
         "rank": 3,
         "game_name": "AfghanistanRedZone",
-        "total_views": 20434,
+        "total_views": 20436,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
         "view_share_percentage": 12.9
@@ -50,9 +50,9 @@
     {
         "rank": 7,
         "game_name": "RescueOperation",
-        "total_views": 8339,
+        "total_views": 8341,
         "uploaded_videos": 3,
-        "avg_views_per_video": 2779,
+        "avg_views_per_video": 2780,
         "view_share_percentage": 5.26
     },
     {
@@ -91,16 +91,16 @@
         "rank": 12,
         "game_name": "UkraineCovertMission",
         "total_views": 3072,
-        "uploaded_videos": 2,
-        "avg_views_per_video": 1536,
+        "uploaded_videos": 3,
+        "avg_views_per_video": 1024,
         "view_share_percentage": 1.94
     },
     {
         "rank": 13,
         "game_name": "Russian_secret_missions",
-        "total_views": 2909,
+        "total_views": 2915,
         "uploaded_videos": 3,
-        "avg_views_per_video": 969,
+        "avg_views_per_video": 971,
         "view_share_percentage": 1.84
     },
     {
@@ -122,7 +122,7 @@
     {
         "rank": 16,
         "game_name": "sifu",
-        "total_views": 880,
+        "total_views": 881,
         "uploaded_videos": 2,
         "avg_views_per_video": 440,
         "view_share_percentage": 0.56
@@ -130,7 +130,7 @@
     {
         "rank": 17,
         "game_name": "GodofWarLaufey",
-        "total_views": 786,
+        "total_views": 787,
         "uploaded_videos": 3,
         "avg_views_per_video": 262,
         "view_share_percentage": 0.5
