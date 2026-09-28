@@ -1,1 +1,1 @@
-{"clip_duration": 30, "reason": "Continuous high-intensity martial arts combat sequence.", "start_time": 0, "status": "APPROVE", "title": "Beating Up the Whole Gang 🥋🔥"}
+{"clip_duration": 52, "reason": "Intense tactical shootout and scope action", "start_time": 5, "status": "APPROVE", "title": "Scope Headshots Hit Different 🎯🔥"}
