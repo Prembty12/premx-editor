@@ -1,5 +1,5 @@
 {
-  "total_replies": 17,
+  "total_replies": 20,
   "total_skipped": 0,
   "replies": [
     {
@@ -292,8 +292,62 @@
       "source_link": "",
       "timestamp": "2026-09-29 01:09:42 AM",
       "status": "posted"
+    },
+    {
+      "reply_id": "1088588340695128_1065589242756286",
+      "comment_id": "1088588340695128_1128288206199724",
+      "reply_to_id": "1088588340695128_1601899654759140",
+      "post_id": "100463226188818_1088588340695128",
+      "user_name": "Facebook User",
+      "user_id": "",
+      "user_comment": "PremxGamer when is the next video coming?",
+      "openrouter_reply": "Next video dropping soon, bhai! What game you want next? 😎",
+      "type": "friendly",
+      "depth": 2,
+      "game": "God of War",
+      "post_title": "Kratos Titan Clash 💀🔥\n\n#videogames #gamingcommunity #gaming #godofwar3 #gamingre",
+      "fb_post_link": "https://www.facebook.com/reel/1446641450685379/",
+      "source_link": "",
+      "timestamp": "2026-09-29 01:23:23 AM",
+      "status": "posted"
+    },
+    {
+      "reply_id": "1085624367658192_1641051890722758",
+      "comment_id": "1085624367658192_2159483424985121",
+      "reply_to_id": "1085624367658192_1930010061739795",
+      "post_id": "100463226188818_1085624367658192",
+      "user_name": "Facebook User",
+      "user_id": "",
+      "user_comment": "Walter Awinda og mw2",
+      "openrouter_reply": "Walter Awinda OG, bro! 🔥 What's your go-to loadout for that map?",
+      "type": "friendly",
+      "depth": 2,
+      "game": "afghanistanredz",
+      "post_title": "Street Gunfight Mayhem 🔫💀\n\n#videogames #gamingcommunity #gaming #afghanistanredz",
+      "fb_post_link": "https://www.facebook.com/reel/1440490007980933/",
+      "source_link": "",
+      "timestamp": "2026-09-29 01:23:29 AM",
+      "status": "posted"
+    },
+    {
+      "reply_id": "1085624367658192_1415509120672523",
+      "comment_id": "1085624367658192_1447956410632889",
+      "reply_to_id": "1085624367658192_1027967960297492",
+      "post_id": "100463226188818_1085624367658192",
+      "user_name": "Facebook User",
+      "user_id": "",
+      "user_comment": "Yves Nzinga mw2",
+      "openrouter_reply": "Yves Nzinga already in? 😎 Who else is joining the fight?",
+      "type": "friendly",
+      "depth": 2,
+      "game": "afghanistanredz",
+      "post_title": "Street Gunfight Mayhem 🔫💀\n\n#videogames #gamingcommunity #gaming #afghanistanredz",
+      "fb_post_link": "https://www.facebook.com/reel/1440490007980933/",
+      "source_link": "",
+      "timestamp": "2026-09-29 01:23:37 AM",
+      "status": "posted"
     }
   ],
   "skipped": [],
-  "last_updated": "2026-09-29 01:09:42 AM"
+  "last_updated": "2026-09-29 01:23:37 AM"
 }
