@@ -1,1 +1,1 @@
-{"clip_duration": 52, "reason": "Intense tactical shootout and scope action", "start_time": 5, "status": "APPROVE", "title": "Scope Headshots Hit Different 🎯🔥"}
+{"clip_duration": 34, "reason": "Intense cave combat with red damage screens", "start_time": 4, "status": "APPROVE", "title": "Cave Horde Survival Rush 💀"}
