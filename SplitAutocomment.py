@@ -1,14 +1,15 @@
 """
-💬 SPLIT AUTO-COMMENT SCRIPT (FULL FINAL)
-===========================================
+💬 SPLIT AUTO-COMMENT SCRIPT (FINAL v3)
+=========================================
 ✅ FB auto-reply working
-✅ Real username fetch
+✅ Real username fetch (3-layer fallback)
 ✅ 3-level conversation thread
 ✅ 10 comments batch (OpenRouter)
 ✅ Duplicate protection via FB live check
-✅ Auto-save logs
+✅ Auto-save logs (append mode — history preserved)
 ✅ Dashboard update (GAMING_DASHBOARD.md)
-✅ Memory + Trending + Best-Time analysis
+✅ Natural human replies (no robotic feel)
+✅ Engagement built-in naturally
 """
 
 import os
@@ -17,6 +18,7 @@ import json
 import time
 import sys
 import glob
+import random
 import requests
 from datetime import datetime, timedelta, timezone
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -113,7 +115,7 @@ def is_reply_safe(reply_text, is_abuse=False):
 
 
 # ============================================================
-# 🤖 OPENROUTER CLIENT
+# 🤖 OPENROUTER CLIENT (Simple Natural Prompt)
 # ============================================================
 class OpenRouterClient:
     def __init__(self, keys, fixed_model="dots-studio/dots-3-note-preview:free",
@@ -195,7 +197,7 @@ class OpenRouterClient:
 
         formatted = ""
         for c in comments_batch:
-            tone = "SAVAGE-HATER" if c["is_abuse"] else "FRIENDLY-FAN"
+            tone = "SAVAGE" if c["is_abuse"] else "FRIENDLY"
             safe_text = c["comment_text"].replace('"', "'").replace("\n", " ")[:300]
             caption_safe = c.get("post_title", "").replace('"', "'").replace("\n", " ")[:150]
             hashtags_safe = ", ".join(c.get("post_hashtags", []))[:100]
@@ -214,51 +216,31 @@ class OpenRouterClient:
                 f'Comment: "{safe_text}"\n'
             )
 
-        prompt = f"""You are a SAVAGE, WITTY, and CONFIDENT gaming content creator replying to comments on your gaming channel.
+        prompt = f"""You are a real gaming content creator replying to comments on your social media page.
 
-For EACH comment below, write a SHORT reply (maximum 25 words).
+Your replies should feel like a real human texting — casual, warm, funny, confident.
 
-REPLY STYLE GUIDE:
+RULES:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-FRIENDLY-FAN comments -> Friendly, warm, FUNNY, gaming-community tone.
-   - Make them laugh, feel welcomed, and want to comment again.
-   - Sometimes end with a playful question to boost engagement.
-   - Hype them up like a close friend.
+1. Reply in the SAME language as the comment (English/Hinglish only, no regional languages).
+2. Keep it SHORT — maximum 25 words.
+3. Use natural slang — bhai, bro, yaar, lol, chill, OP, fire, lit.
+4. Use 1-2 emojis max.
+5. Sound like a real person, not a robot. No "I appreciate", "Thank you for your feedback", etc.
+6. Match the vibe of the comment — hype if they hype, chill if they chill, roast if they roast.
+7. Make them WANT to reply back. Ask something, joke, tease, hype, or challenge — based on what fits the comment naturally.
+8. If comment asks game name → tell the game name.
+9. If comment is abusive → savage witty comeback, no abuse back, no crying, stay chill.
+10. If there's a "Conversation So Far" — continue naturally, don't repeat.
 
-SAVAGE-HATER comments (abuse/insult) -> SAVAGE, WITTY, SARCASTIC comeback.
-   - Match their energy but STAY CHILL and CONFIDENT.
-   - Roast them with HUMOR, never with abuse.
-   - Make it FUNNY, not angry.
+Use caption + hashtags for context if needed. Never share links. Never insult family/religion/caste.
 
-If a "Conversation So Far" section exists:
-   - Read prior context, DON'T repeat earlier reply.
-   - Continue the conversation naturally.
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CRITICAL: Return ONLY valid JSON. Keys = comment IDs. Values = reply text. No extra text, no markdown.
 
-STRICT RULES:
-1. DETECT language of each comment and REPLY IN THE SAME LANGUAGE.
-2. DO NOT use regional Indian languages (Tamil, Telugu, Bengali, etc.). Reply in ENGLISH or HINGLISH only.
-3. GAME NAME RULE:
-   - IF the comment ASKS about the game name ("Which game?", "Game name?", "What game is this?"), THEN mention the game name.
-   - IF NOT asked, DO NOT mention the game name.
-   - Use Caption and Hashtags as context.
-4. Include 1-2 emojis per reply.
-5. NEVER share links.
-6. NEVER insult family, religion, or caste.
-7. NEVER use abusive words back.
-8. MAX 25 words per reply.
-9. HOOK THEM BACK: Sometimes end with a playful question.
-
-CRITICAL OUTPUT REQUIREMENT:
-- You MUST return ONLY valid JSON.
-- Keys = EXACT comment IDs.
-- Values = reply text.
-- NO extra text, NO markdown, NO explanation, NO "User Safety", ONLY JSON.
-
-Example format:
+Example:
 {{
-  "COMMENT_ID_1": "reply text 1",
-  "COMMENT_ID_2": "reply text 2"
+  "COMMENT_ID_1": "reply 1",
+  "COMMENT_ID_2": "reply 2"
 }}
 
 COMMENTS TO REPLY:
@@ -309,7 +291,7 @@ YOUR JSON RESPONSE:"""
 
 
 # ============================================================
-# 📁 FILE DISCOVERY + MEMORY (dashboard ke liye)
+# 📁 FILE DISCOVERY + MEMORY
 # ============================================================
 def discover_game_files(links_dir="game_links_editor"):
     if not os.path.exists(links_dir):
@@ -407,28 +389,30 @@ class FBAutoCommenter:
 
     # ---------- USER NAME ----------
     def _get_user_name(self, user_id, fallback_from_field=None):
-        if fallback_from_field and fallback_from_field.strip():
-            return fallback_from_field.strip()
-        if not user_id:
-            return "Unknown User"
-        if user_id in self._name_cache:
-            return self._name_cache[user_id]
-        try:
-            res = requests.get(
-                f"{self.fb_graph_url}/{user_id}",
-                params={"fields": "name", "access_token": self.fb_access_token},
-                timeout=8)
-            if res.status_code == 200:
-                name = (res.json().get("name") or "").strip()
-                if name:
-                    self._name_cache[user_id] = name
-                    return name
-        except Exception:
-            pass
-        short = user_id[-6:] if len(user_id) > 6 else user_id
-        name = f"User_{short}"
-        self._name_cache[user_id] = name
-        return name
+        if fallback_from_field and str(fallback_from_field).strip():
+            return str(fallback_from_field).strip()
+        if user_id:
+            user_id = str(user_id).strip()
+            if user_id in self._name_cache:
+                return self._name_cache[user_id]
+            try:
+                res = requests.get(
+                    f"{self.fb_graph_url}/{user_id}",
+                    params={"fields": "name", "access_token": self.fb_access_token},
+                    timeout=8)
+                if res.status_code == 200:
+                    data = res.json()
+                    name = (data.get("name") or "").strip()
+                    if name:
+                        self._name_cache[user_id] = name
+                        return name
+            except Exception:
+                pass
+            short = user_id[-6:] if len(user_id) > 6 else user_id
+            name = f"User_{short}"
+            self._name_cache[user_id] = name
+            return name
+        return "Facebook User"
 
     # ---------- FB API ----------
     def _fetch_fb_comments(self, post_id, since_timestamp=None):
@@ -469,6 +453,8 @@ class FBAutoCommenter:
             log(f"🚫 [AUTO_COMMENT OFF] Would post: {reply_text[:80]}")
             return f"disabled_{reply_to_id}"
         try:
+            # Random delay (bot detection avoid)
+            time.sleep(random.uniform(2, 5))
             res = requests.post(
                 f"{self.fb_graph_url}/{reply_to_id}/comments",
                 data={"message": reply_text, "access_token": self.fb_access_token},
@@ -500,9 +486,9 @@ class FBAutoCommenter:
                 return {"depth": our_count, "should_reply": False, "reason": "waiting_user"}
 
         thread_ctx = ""
-        for r in replies_sorted[-4:]:
+        for r in replies_sorted[-6:]:
             who = "US" if r.get("from", {}).get("id") == self.fb_page_id else "USER"
-            msg = (r.get("message", "") or "").replace("\n", " ")[:100]
+            msg = (r.get("message", "") or "").replace("\n", " ")[:150]
             thread_ctx += f"  {who}: {msg}\n"
 
         user_msgs = [top_comment] + [
@@ -569,6 +555,7 @@ class FBAutoCommenter:
             try:
                 with open(self.reply_log_file, 'r', encoding='utf-8') as f:
                     reply_log = json.load(f)
+                log(f"📂 Loaded existing log: {len(reply_log.get('replies', []))} replies")
             except Exception:
                 pass
 
@@ -791,24 +778,24 @@ class FBAutoCommenter:
         except Exception as e:
             log(f"⚠️ replied_file save error: {e}")
 
-        reply_log["replies"] = reply_log.get("replies", [])[-200:]
-        reply_log["skipped"] = reply_log.get("skipped", [])[-100:]
+        reply_log["replies"] = reply_log.get("replies", [])[-500:]
+        reply_log["skipped"] = reply_log.get("skipped", [])[-200:]
         reply_log["last_updated"] = now_ist_ampm()
         try:
             with open(self.reply_log_file, 'w', encoding='utf-8') as f:
-                json.dump(reply_log, f, indent=2)
+                json.dump(reply_log, f, indent=2, ensure_ascii=False)
         except Exception as e:
             log(f"⚠️ reply_log save error: {e}")
 
-        log(f"🤖 FB Auto-reply done. {replies_count} replies posted.")
+        log(f"🤖 FB Auto-reply done. {replies_count} new replies. "
+            f"Total in history: {len(reply_log.get('replies', []))}")
         return reply_log
 
 
 # ============================================================
-# 📊 DASHBOARD UPDATE (game_analytics.py use karega)
+# 📊 DASHBOARD UPDATE
 # ============================================================
 def update_dashboard():
-    """game_analytics.py ko call karke dashboard update karo."""
     try:
         from game_analytics import AnalyticsEngine
     except ImportError as e:
@@ -825,7 +812,6 @@ def update_dashboard():
         os.environ.get("OPENROUTER_API_KEY_5"),
     ]
 
-    # Discover games
     game_list, file_mapping = discover_game_files()
     if not game_list:
         log("⚠️ No game files — dashboard skip")
@@ -842,15 +828,13 @@ def update_dashboard():
         fb_page_id=fb_page_id,
         fb_access_token=fb_token,
         openrouter_keys=openrouter_keys,
-        auto_comment_enabled=False,   # dashboard ke liye comment skip
+        auto_comment_enabled=False,
     )
 
-    # Fetch FB/IG data
     actual_posted_titles, game_views_summary = engine.fetch_fb_ig_data()
     if not game_views_summary:
         game_views_summary = {g: 0 for g in game_list}
 
-    # Trending + Best time
     try:
         engine.detect_trending_games(actual_posted_titles, game_views_summary, days=7)
     except Exception as e:
@@ -861,7 +845,6 @@ def update_dashboard():
     except Exception as e:
         log(f"⚠️ Best time error: {e}")
 
-    # Latest active game
     def latest_ts(g):
         t = ""
         for v in actual_posted_titles.get(g, []):
@@ -917,7 +900,6 @@ def update_dashboard():
 def main():
     auto_enabled = os.environ.get("AUTO_COMMENT", "true").lower() == "true"
 
-    # STEP 1: FB Auto-Comment
     if auto_enabled:
         commenter = FBAutoCommenter(
             fb_page_id=os.environ.get("PAGE_ID"),
@@ -935,18 +917,16 @@ def main():
         )
         result = commenter.run()
         if result:
-            log(f"\n✅ Auto-reply done: {result.get('total_replies', 0)} posted, "
+            log(f"\n✅ Auto-reply done: {result.get('total_replies', 0)} total, "
                 f"{result.get('total_skipped', 0)} skipped")
     else:
         log("🚫 AUTO_COMMENT=false — skipping replies")
 
-    # STEP 2: Dashboard Update
     try:
         update_dashboard()
     except Exception as e:
         log(f"⚠️ Dashboard update error: {e}")
 
-    # Final summary
     log(f"\n{'=' * 60}")
     log(f"🚀 SPLIT SCRIPT DONE — {now_ist_ampm()} IST")
     log(f"{'=' * 60}")
@@ -955,13 +935,13 @@ def main():
 if __name__ == "__main__":
     try:
         main()
-        log("✅ Script completed successfully — exiting")
+        log("✅ Completed successfully — exiting")
         sys.exit(0)
     except KeyboardInterrupt:
         log("⚠️ Interrupted by user")
         sys.exit(130)
     except Exception as e:
-        log(f"❌ Fatal error: {e}")
+        log(f"❌ FATAL ERROR: {e}")
         import traceback
         traceback.print_exc()
         sys.exit(1)
