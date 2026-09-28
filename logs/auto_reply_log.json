@@ -1,5 +1,5 @@
 {
-  "total_replies": 5,
+  "total_replies": 9,
   "total_skipped": 0,
   "replies": [
     {
@@ -76,8 +76,80 @@
       "source_link": "",
       "timestamp": "2026-09-28 09:15:19 AM",
       "status": "posted"
+    },
+    {
+      "reply_id": "1087610300792932_1639402737760250",
+      "comment_id": "1087610300792932_1001749736279986",
+      "reply_to_id": "1087610300792932_1001749736279986",
+      "post_id": "100463226188818_1087610300792932",
+      "user_name": "Unknown User",
+      "user_id": "",
+      "user_comment": "Nice bro",
+      "openrouter_reply": "Thanks, bro! \ud83d\ude0e Keep the hype alive! Got any game requests? \ud83c\udfae",
+      "type": "friendly",
+      "depth": 1,
+      "game": "God of War",
+      "post_title": "Slayer Rips Monster Heart \ud83d\udc80\n\n#videogames #gamingcommunity #gaming #godofwar3 #ga",
+      "fb_post_link": "https://www.facebook.com/reel/29055320854074025/",
+      "source_link": "",
+      "timestamp": "2026-09-28 11:42:28 PM",
+      "status": "posted"
+    },
+    {
+      "reply_id": "1087536450800317_1077233145205706",
+      "comment_id": "1087536450800317_1584324553176630",
+      "reply_to_id": "1087536450800317_1584324553176630",
+      "post_id": "100463226188818_1087536450800317",
+      "user_name": "Unknown User",
+      "user_id": "",
+      "user_comment": "Which game bro",
+      "openrouter_reply": "VietnamCavePrison! \ud83d\ude81\ud83d\udca5 Desert ops chaos. Ever tried helicoptering through chaos? \ud83d\ude02",
+      "type": "friendly",
+      "depth": 1,
+      "game": "VietnamCavePrison",
+      "post_title": "Valley Helicopter War \ud83d\ude81\ud83d\udca5\n\n#videogames #gamingcommunity #gaming #vietnamcavepriso",
+      "fb_post_link": "https://www.facebook.com/reel/1780695949719463/",
+      "source_link": "",
+      "timestamp": "2026-09-28 11:42:31 PM",
+      "status": "posted"
+    },
+    {
+      "reply_id": "1085624367658192_1755102992463193",
+      "comment_id": "1085624367658192_2159483424985121",
+      "reply_to_id": "1085624367658192_1930010061739795",
+      "post_id": "100463226188818_1085624367658192",
+      "user_name": "Unknown User",
+      "user_id": "",
+      "user_comment": "Walter Awinda og mw2",
+      "openrouter_reply": "Walter Awinda? Oh, MW2 legend! \ud83d\ude0e What's his next move?",
+      "type": "friendly",
+      "depth": 2,
+      "game": "afghanistanredz",
+      "post_title": "Street Gunfight Mayhem \ud83d\udd2b\ud83d\udc80\n\n#videogames #gamingcommunity #gaming #afghanistanredz",
+      "fb_post_link": "https://www.facebook.com/reel/1440490007980933/",
+      "source_link": "",
+      "timestamp": "2026-09-28 11:42:35 PM",
+      "status": "posted"
+    },
+    {
+      "reply_id": "1085624367658192_1872725887072024",
+      "comment_id": "1085624367658192_1447956410632889",
+      "reply_to_id": "1085624367658192_1027967960297492",
+      "post_id": "100463226188818_1085624367658192",
+      "user_name": "Unknown User",
+      "user_id": "",
+      "user_comment": "Yves Nzinga mw2",
+      "openrouter_reply": "Yves Nzinga? That's my boy! MW2 MVP vibes. \ud83e\udd1c\ud83e\udd1b Want a collab?",
+      "type": "friendly",
+      "depth": 2,
+      "game": "afghanistanredz",
+      "post_title": "Street Gunfight Mayhem \ud83d\udd2b\ud83d\udc80\n\n#videogames #gamingcommunity #gaming #afghanistanredz",
+      "fb_post_link": "https://www.facebook.com/reel/1440490007980933/",
+      "source_link": "",
+      "timestamp": "2026-09-28 11:42:40 PM",
+      "status": "posted"
     }
   ],
   "skipped": [],
-  "last_updated": "2026-09-28 09:15:19 AM"
+  "last_updated": "2026-09-28 11:42:40 PM"
 }
