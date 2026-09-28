@@ -2,17 +2,14 @@ name: SplitAutocomment Workflow
 
 on:
   schedule:
-    # Har 12 ghante mein automatic run hoga
     - cron: '0 */12 * * *'
   workflow_dispatch:
-    # GitHub dashboard se manually bhi run kar sakta hai
 
 permissions:
   contents: write
 
 jobs:
   run-gaming-agent:
-  
     runs-on: ubuntu-latest
 
     steps:
@@ -27,15 +24,9 @@ jobs:
           python-version: '3.10'
           cache: 'pip'
 
-      - name: Install System Dependencies (FFmpeg & Build Tools)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ffmpeg jq curl
-
       - name: Install Python Packages
         run: |
-          pip install --upgrade pip
-          pip install requests Pillow matplotlib reportlab
+          pip install --quiet requests Pillow matplotlib reportlab
 
       - name: Run Split Auto-Comment & Dashboard
         env:
