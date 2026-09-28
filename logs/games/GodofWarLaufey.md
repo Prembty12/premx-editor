@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 17 | **Last Updated:** 2026-09-29 12:51:08 AM IST
+**Total Videos:** 17 | **Last Updated:** 2026-09-29 01:09:54 AM IST
 
 ---
 
@@ -11,7 +11,7 @@
 | Metric | Value |
 |---|---|
 | Total Videos | **17** |
-| Posted (FB or IG) | 6 / 17 |
+| Posted | 6 / 17 |
 | FB Posted | 4 / 17 |
 | IG Posted | 4 / 17 |
 | Total FB Views | **150** |
@@ -21,7 +21,7 @@
 
 ## 📜 All Videos (Newest First)
 
-| # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
+| # | 📺 Title | 🔵 FB | 👁️ FB Views | 🟣 IG | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
 | 1 | Blonde Hero Vs Fire Demon ⚔️🔥  #videogames #gamingcommunity #gaming #godofwarlaufey #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1763278934904943/) | 59 | [🟣 IG](https://www.instagram.com/reel/Dd0QRr8G3L9/) | 70 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_4.mp4) |
 | 2 | Fire Giant Boss Fight 🔥⚔️  #videogames #gamingcommunity #gaming #godofwarlaufey #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Ddw7t8Djnt_/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_23.mp4) |
