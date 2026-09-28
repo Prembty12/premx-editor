@@ -1,5 +1,5 @@
 {
-  "total_replies": 11,
+  "total_replies": 14,
   "total_skipped": 0,
   "replies": [
     {
@@ -184,8 +184,62 @@
       "source_link": "",
       "timestamp": "2026-09-29 12:22:22 AM",
       "status": "posted"
+    },
+    {
+      "reply_id": "1088588340695128_1388979633426006",
+      "comment_id": "1088588340695128_1128288206199724",
+      "reply_to_id": "1088588340695128_1128288206199724",
+      "post_id": "100463226188818_1088588340695128",
+      "user_name": "Facebook User",
+      "user_id": "",
+      "user_comment": "hello bro",
+      "openrouter_reply": "hello bro! 🔥 that Kratos clip is insane, yaar",
+      "type": "friendly",
+      "depth": 1,
+      "game": "God of War",
+      "post_title": "Kratos Titan Clash 💀🔥\n\n#videogames #gamingcommunity #gaming #godofwar3 #gamingre",
+      "fb_post_link": "https://www.facebook.com/reel/1446641450685379/",
+      "source_link": "",
+      "timestamp": "2026-09-29 12:33:08 AM",
+      "status": "posted"
+    },
+    {
+      "reply_id": "1085624367658192_1592667065926442",
+      "comment_id": "1085624367658192_2159483424985121",
+      "reply_to_id": "1085624367658192_1930010061739795",
+      "post_id": "100463226188818_1085624367658192",
+      "user_name": "Facebook User",
+      "user_id": "",
+      "user_comment": "Walter Awinda og mw2",
+      "openrouter_reply": "og mw2 though, that's the real deal 💀",
+      "type": "friendly",
+      "depth": 2,
+      "game": "afghanistanredz",
+      "post_title": "Street Gunfight Mayhem 🔫💀\n\n#videogames #gamingcommunity #gaming #afghanistanredz",
+      "fb_post_link": "https://www.facebook.com/reel/1440490007980933/",
+      "source_link": "",
+      "timestamp": "2026-09-29 12:33:16 AM",
+      "status": "posted"
+    },
+    {
+      "reply_id": "1085624367658192_1863010231803942",
+      "comment_id": "1085624367658192_1447956410632889",
+      "reply_to_id": "1085624367658192_1027967960297492",
+      "post_id": "100463226188818_1085624367658192",
+      "user_name": "Facebook User",
+      "user_id": "",
+      "user_comment": "Yves Nzinga mw2",
+      "openrouter_reply": "already mentioned and still hitting different 😂",
+      "type": "friendly",
+      "depth": 2,
+      "game": "afghanistanredz",
+      "post_title": "Street Gunfight Mayhem 🔫💀\n\n#videogames #gamingcommunity #gaming #afghanistanredz",
+      "fb_post_link": "https://www.facebook.com/reel/1440490007980933/",
+      "source_link": "",
+      "timestamp": "2026-09-29 12:33:22 AM",
+      "status": "posted"
     }
   ],
   "skipped": [],
-  "last_updated": "2026-09-29 12:22:22 AM"
+  "last_updated": "2026-09-29 12:33:22 AM"
 }
