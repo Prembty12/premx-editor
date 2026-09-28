@@ -1,4 +1,4 @@
-name: Autonomous Gaming Agent Workflow
+name: SplitAutocomment Workflow
 
 on:
   schedule:
