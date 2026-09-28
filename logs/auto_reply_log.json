@@ -1,5 +1,5 @@
 {
-  "total_replies": 4,
+  "total_replies": 5,
   "total_skipped": 0,
   "replies": [
     {
@@ -61,8 +61,23 @@
       "source_link": "",
       "timestamp": "2026-09-28 02:20:35 AM",
       "status": "posted"
+    },
+    {
+      "reply_id": "1085624367658192_1567096261858614",
+      "comment_id": "1085624367658192_1072132042119740",
+      "post_id": "100463226188818_1085624367658192",
+      "user_name": "Unknown User",
+      "user_comment": "game name",
+      "openrouter_reply": "Nice pick! Afghanistan RedZ delivers epic street gunfights. Want tips for the best weapons? \ud83c\udfae\ud83d\udd2b",
+      "type": "friendly",
+      "game": "afghanistanredz",
+      "post_title": "Street Gunfight Mayhem \ud83d\udd2b\ud83d\udc80\n\n#videogames #gamingcommunity #gaming #afghanistanredz",
+      "fb_post_link": "https://www.facebook.com/reel/1440490007980933/",
+      "source_link": "",
+      "timestamp": "2026-09-28 09:15:19 AM",
+      "status": "posted"
     }
   ],
   "skipped": [],
-  "last_updated": "2026-09-28 03:19:51 AM"
+  "last_updated": "2026-09-28 09:15:19 AM"
 }
