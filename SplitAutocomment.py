@@ -1,7 +1,8 @@
 """
-💬 SPLIT AUTO-COMMENT SCRIPT (FINAL v3)
+💬 SPLIT AUTO-COMMENT SCRIPT (FINAL v4)
 =========================================
 ✅ FB auto-reply working
+✅ Same KNOWN_GAMES + detection as full script
 ✅ Real username fetch (3-layer fallback)
 ✅ 3-level conversation thread
 ✅ 10 comments batch (OpenRouter)
@@ -9,7 +10,6 @@
 ✅ Auto-save logs (append mode — history preserved)
 ✅ Dashboard update (GAMING_DASHBOARD.md)
 ✅ Natural human replies (no robotic feel)
-✅ Engagement built-in naturally
 """
 
 import os
@@ -48,6 +48,7 @@ def now_ist_ampm():
 
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
+# ✅ Same as full script
 KNOWN_GAMES = [
     "BGMI", "Free Fire", "GTA 5", "GTA San Andreas", "GTA", "CODM",
     "Call of Duty", "God of War", "Spider-Man", "Minecraft", "PUBG",
@@ -115,7 +116,7 @@ def is_reply_safe(reply_text, is_abuse=False):
 
 
 # ============================================================
-# 🤖 OPENROUTER CLIENT (Simple Natural Prompt)
+# 🤖 OPENROUTER CLIENT
 # ============================================================
 class OpenRouterClient:
     def __init__(self, keys, fixed_model="dots-studio/dots-3-note-preview:free",
@@ -453,7 +454,6 @@ class FBAutoCommenter:
             log(f"🚫 [AUTO_COMMENT OFF] Would post: {reply_text[:80]}")
             return f"disabled_{reply_to_id}"
         try:
-            # Random delay (bot detection avoid)
             time.sleep(random.uniform(2, 5))
             res = requests.post(
                 f"{self.fb_graph_url}/{reply_to_id}/comments",
@@ -518,6 +518,7 @@ class FBAutoCommenter:
             "thread_context": thread_ctx,
         }
 
+    # ✅ Same as full script
     @staticmethod
     def _detect_game_from_post(post_message_full):
         hashtags = re.findall(r'#(\w+)', post_message_full)
