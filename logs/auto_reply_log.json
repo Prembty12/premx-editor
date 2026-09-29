@@ -1,5 +1,5 @@
 {
-  "total_replies": 5,
+  "total_replies": 8,
   "total_skipped": 0,
   "replies": [
     {
@@ -91,8 +91,62 @@
       "source_link": "",
       "timestamp": "2026-09-29 11:52:21 PM",
       "status": "posted"
+    },
+    {
+      "reply_id": "1089532337267395_1540714398101232",
+      "comment_id": "1089532337267395_2382213379297444",
+      "reply_to_id": "1089532337267395_1140516784966635",
+      "post_id": "100463226188818_1089532337267395",
+      "user_name": "Facebook User",
+      "user_id": "",
+      "user_comment": "PremxGamer can you tell game name",
+      "openrouter_reply": "It's Russian Secret Missions, bro! 🎮🔥",
+      "type": "friendly",
+      "depth": 2,
+      "game": "Video Game",
+      "post_title": "Scope Headshots Hit Different 🎯🔥\n\n#videogames #gamingcommunity #gaming #russian_",
+      "fb_post_link": "https://www.facebook.com/reel/1135871095448480/",
+      "source_link": "",
+      "timestamp": "2026-09-30 12:05:44 AM",
+      "status": "posted"
+    },
+    {
+      "reply_id": "1089036790650283_2685727338512501",
+      "comment_id": "1089036790650283_3277071029153594",
+      "reply_to_id": "1089036790650283_1415540740566119",
+      "post_id": "100463226188818_1089036790650283",
+      "user_name": "Facebook User",
+      "user_id": "",
+      "user_comment": "PremxGamer thank you bro when you upload next god of war",
+      "openrouter_reply": "Next God of War drop soon, keep an eye out! ⏳🔥",
+      "type": "friendly",
+      "depth": 2,
+      "game": "God of War",
+      "post_title": "Blonde Hero Vs Fire Demon ⚔️🔥\n\n#videogames #gamingcommunity #gaming #godofwarlau",
+      "fb_post_link": "https://www.facebook.com/reel/1763278934904943/",
+      "source_link": "",
+      "timestamp": "2026-09-30 12:05:52 AM",
+      "status": "posted"
+    },
+    {
+      "reply_id": "1088659294021366_1044721011900306",
+      "comment_id": "1088659294021366_1781329876246421",
+      "reply_to_id": "1088659294021366_3300512693469701",
+      "post_id": "100463226188818_1088659294021366",
+      "user_name": "Facebook User",
+      "user_id": "",
+      "user_comment": "PremxGamer  when upload next game",
+      "openrouter_reply": "Next game drop is coming, stay hyped! 🎮💥",
+      "type": "friendly",
+      "depth": 2,
+      "game": "sifu",
+      "post_title": "Beating Up the Whole Gang 🥋🔥\n\n#videogames #gamingcommunity #gaming #sifu #gaming",
+      "fb_post_link": "https://www.facebook.com/reel/1635492871307578/",
+      "source_link": "",
+      "timestamp": "2026-09-30 12:06:01 AM",
+      "status": "posted"
     }
   ],
   "skipped": [],
-  "last_updated": "2026-09-29 11:56:18 PM"
+  "last_updated": "2026-09-30 12:06:01 AM"
 }
