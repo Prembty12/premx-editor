@@ -1,1 +1,1 @@
-{"clip_duration": 34, "reason": "Intense cave combat with red damage screens", "start_time": 4, "status": "APPROVE", "title": "Cave Horde Survival Rush 💀"}
+{"clip_duration": 35, "reason": "Intense close-quarters combat sequence throughout", "start_time": 3, "status": "APPROVE", "title": "Corridor Gunfight Chaos 💥💀"}
