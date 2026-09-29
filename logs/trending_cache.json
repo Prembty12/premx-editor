@@ -1,40 +1,40 @@
 {
-  "last_updated": "2026-09-29 03:25:50 PM",
+  "last_updated": "2026-09-29 03:49:11 PM",
   "period_days": 7,
   "trending": [
     {
       "game": "AfghanistanRedZone",
-      "views_7d": 19547,
-      "avg_per_video": 9773,
+      "views_7d": 19550,
+      "avg_per_video": 9775,
       "trend": "viral",
-      "ratio": 10.36373276776246,
+      "ratio": 10.357920762936363,
       "fb_link": "https://www.facebook.com/reel/1440490007980933/",
       "source_link": ""
     },
     {
       "game": "GODOFWAR3",
-      "views_7d": 5841,
+      "views_7d": 5842,
       "avg_per_video": 1460,
       "trend": "trending",
-      "ratio": 1.5482502651113468,
+      "ratio": 1.5470654029552011,
       "fb_link": "https://www.facebook.com/reel/1446641450685379/",
       "source_link": ""
     },
     {
       "game": "VietnamCavePrison",
-      "views_7d": 5558,
-      "avg_per_video": 1111,
+      "views_7d": 5565,
+      "avg_per_video": 1113,
       "trend": "steady",
-      "ratio": 1.178154825026511,
+      "ratio": 1.1793724612939307,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison6.mp4"
     },
     {
       "game": "Callofdutyaw",
-      "views_7d": 7330,
+      "views_7d": 7334,
       "avg_per_video": 1047,
       "trend": "steady",
-      "ratio": 1.1102863202545068,
+      "ratio": 1.1094366280096546,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison14.mp4"
     }
@@ -42,28 +42,28 @@
   "below_avg": [
     {
       "game": "Russian_secret_missions",
-      "views_7d": 1744,
-      "avg_per_video": 872,
+      "views_7d": 1752,
+      "avg_per_video": 876,
       "trend": "slow",
-      "ratio": 0.9247083775185578,
+      "ratio": 0.9282392417731207,
       "fb_link": "https://www.facebook.com/reel/1135871095448480/",
       "source_link": ""
     },
     {
       "game": "UkraineCovertMission",
-      "views_7d": 658,
-      "avg_per_video": 658,
+      "views_7d": 659,
+      "avg_per_video": 659,
       "trend": "slow",
-      "ratio": 0.6977730646871686,
+      "ratio": 0.6982986990051216,
       "fb_link": "https://www.facebook.com/reel/1433881315316238/",
       "source_link": ""
     },
     {
       "game": "mm2remastered",
-      "views_7d": 2315,
-      "avg_per_video": 578,
+      "views_7d": 2316,
+      "avg_per_video": 579,
       "trend": "slow",
-      "ratio": 0.6129374337221634,
+      "ratio": 0.6135279919938778,
       "fb_link": "https://www.facebook.com/reel/3584878615007660/",
       "source_link": ""
     },
@@ -72,26 +72,26 @@
       "views_7d": 540,
       "avg_per_video": 540,
       "trend": "slow",
-      "ratio": 0.5726405090137858,
+      "ratio": 0.5722022723258963,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation14.mp4"
     },
     {
       "game": "sifu",
-      "views_7d": 547,
-      "avg_per_video": 273,
+      "views_7d": 551,
+      "avg_per_video": 275,
       "trend": "below_avg",
-      "ratio": 0.28950159066808057,
+      "ratio": 0.2913993053511509,
       "fb_link": "https://www.facebook.com/reel/1635492871307578/",
       "source_link": ""
     }
   ],
   "recommendation": {
     "game": "AfghanistanRedZone",
-    "views_7d": 19547,
-    "avg_per_video": 9773,
+    "views_7d": 19550,
+    "avg_per_video": 9775,
     "trend": "viral",
-    "ratio": 10.36373276776246,
+    "ratio": 10.357920762936363,
     "fb_link": "https://www.facebook.com/reel/1440490007980933/",
     "source_link": ""
   }

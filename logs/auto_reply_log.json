@@ -1,5 +1,5 @@
 {
-  "total_replies": 26,
+  "total_replies": 28,
   "total_skipped": 0,
   "replies": [
     {
@@ -451,8 +451,44 @@
       "source_link": "",
       "timestamp": "2026-09-29 03:25:50 PM",
       "status": "posted"
+    },
+    {
+      "reply_id": "1089532337267395_1051172941079470",
+      "comment_id": "1089532337267395_2382213379297444",
+      "reply_to_id": "1089532337267395_1140516784966635",
+      "post_id": "100463226188818_1089532337267395",
+      "user_name": "Facebook User",
+      "user_id": "",
+      "user_comment": "PremxGamer can you tell game name",
+      "openrouter_reply": "It's Russian Secret Missions, bro! 🎮 What's your fave mission? Drop your streak!",
+      "type": "friendly",
+      "depth": 2,
+      "game": "Video Game",
+      "post_title": "Scope Headshots Hit Different 🎯🔥\n\n#videogames #gamingcommunity #gaming #russian_",
+      "fb_post_link": "https://www.facebook.com/reel/1135871095448480/",
+      "source_link": "",
+      "timestamp": "2026-09-29 03:49:05 PM",
+      "status": "posted"
+    },
+    {
+      "reply_id": "1088659294021366_1108232718380657",
+      "comment_id": "1088659294021366_1781329876246421",
+      "reply_to_id": "1088659294021366_1781329876246421",
+      "post_id": "100463226188818_1088659294021366",
+      "user_name": "Facebook User",
+      "user_id": "",
+      "user_comment": "Nice gameplay",
+      "openrouter_reply": "Thanks yaar! 😎 Which level gave you most trouble? Tell me!",
+      "type": "friendly",
+      "depth": 1,
+      "game": "sifu",
+      "post_title": "Beating Up the Whole Gang 🥋🔥\n\n#videogames #gamingcommunity #gaming #sifu #gaming",
+      "fb_post_link": "https://www.facebook.com/reel/1635492871307578/",
+      "source_link": "",
+      "timestamp": "2026-09-29 03:49:11 PM",
+      "status": "posted"
     }
   ],
   "skipped": [],
-  "last_updated": "2026-09-29 03:25:50 PM"
+  "last_updated": "2026-09-29 03:49:11 PM"
 }
