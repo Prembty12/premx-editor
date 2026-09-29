@@ -2200,7 +2200,7 @@ def run_agent_brain():
     }))
 
 
- if __name__ == "__main__":
+if __name__ == "__main__":
     try:
         main()
         log("✅ Completed successfully — exiting")
