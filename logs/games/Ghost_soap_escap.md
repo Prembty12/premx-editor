@@ -2,13 +2,26 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 19 | **Last Updated:** 2026-09-29 06:53:38 PM IST
+**Total Videos:** 19 | **Last Updated:** 2026-09-29 08:21:04 PM IST
+
+---
+
+## 📊 Summary
+
+| Metric | Value |
+|---|---|
+| Total Videos | **19** |
+| Posted (FB or IG) | 17 / 19 |
+| FB Posted | 15 / 19 |
+| IG Posted | 3 / 19 |
+| Total FB Views | **1,242** |
+| Total IG Views | **390** |
 
 ---
 
 ## 📜 All Videos (Newest First)
 
-| # | 📺 Title | 🔵 FB | 👁️ FB Views | 🟣 IG | 👁️ IG Views | 📂 Source |
+| # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
 | 1 | Tense Confrontation Between Soldiers 💀  #videogames #gamingcommunity #gaming #ghost_soap_escap #gami | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdvsqOUkm2U/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps1.mp4) |
 | 2 | Underwater Bloodbath 🩸🔥  #videogames #gamingcommunity #gaming #ghost_soap_escap #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DduCTJaj3Av/) | 150 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps17.mp4) |
@@ -20,12 +33,12 @@
 | 8 | Ghost soap escaps3 | [🔵 FB](https://www.facebook.com/18131955901638790) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps3.mp4) |
 | 9 | Ghost soap escaps20 | [🔵 FB](https://www.facebook.com/17941805172086251) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps20.mp4) |
 | 10 | Ghost soap escaps15 | [🔵 FB](https://www.facebook.com/17900151792604339) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps15.mp4) |
-| 11 | Ghost soap escaps19 | [🔵 FB](https://www.facebook.com/18006753671992334) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps19.mp4) |
-| 12 | Ghost soap escaps4 | [🔵 FB](https://www.facebook.com/17929431477407823) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps4.mp4) |
-| 13 | Ghost soap escaps7 | [🔵 FB](https://www.facebook.com/18111366068048394) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps7.mp4) |
-| 14 | Ghost soap escaps13 | [🔵 FB](https://www.facebook.com/18469725373115712) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps13.mp4) |
-| 15 | Ghost soap escaps17 | [🔵 FB](https://www.facebook.com/18337288684260588) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps17.mp4) |
-| 16 | Ghost soap escaps11 | [🔵 FB](https://www.facebook.com/18115698937973531) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps11.mp4) |
+| 11 | Ghost soap escaps13 | [🔵 FB](https://www.facebook.com/18469725373115712) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps13.mp4) |
+| 12 | Ghost soap escaps7 | [🔵 FB](https://www.facebook.com/18111366068048394) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps7.mp4) |
+| 13 | Ghost soap escaps19 | [🔵 FB](https://www.facebook.com/18006753671992334) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps19.mp4) |
+| 14 | Ghost soap escaps4 | [🔵 FB](https://www.facebook.com/17929431477407823) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps4.mp4) |
+| 15 | Ghost soap escaps11 | [🔵 FB](https://www.facebook.com/18115698937973531) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps11.mp4) |
+| 16 | Ghost soap escaps17 | [🔵 FB](https://www.facebook.com/18337288684260588) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps17.mp4) |
 | 17 | Ghost soap escaps1 | [🔵 FB](https://www.facebook.com/18128287015813519) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps1.mp4) |
 | 18 | Ghost_soap_escaps12 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps12.mp4) |
 | 19 | Ghost_soap_escaps9 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps9.mp4) |
