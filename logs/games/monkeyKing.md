@@ -2,26 +2,13 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 40 | **Last Updated:** 2026-09-29 03:55:44 PM IST
-
----
-
-## 📊 Summary
-
-| Metric | Value |
-|---|---|
-| Total Videos | **40** |
-| Posted (FB or IG) | 9 / 40 |
-| FB Posted | 5 / 40 |
-| IG Posted | 4 / 40 |
-| Total FB Views | **226** |
-| Total IG Views | **220** |
+**Total Videos:** 40 | **Last Updated:** 2026-09-29 06:53:38 PM IST
 
 ---
 
 ## 📜 All Videos (Newest First)
 
-| # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
+| # | 📺 Title | 🔵 FB | 👁️ FB Views | 🟣 IG | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
 | 1 | Red Staff Combat Slash ⚡⚔️  #videogames #gamingcommunity #gaming #monkeyking #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdzaCUfjLsh/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing41.mp4) |
 | 2 | Blue Beast Boss Fight ⚡️  #videogames #gamingcommunity #gaming #monkeyking #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Ddi4IfDAkrS/) | 120 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing7.mp4) |

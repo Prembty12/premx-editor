@@ -2,26 +2,13 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 19 | **Last Updated:** 2026-09-29 03:55:44 PM IST
-
----
-
-## 📊 Summary
-
-| Metric | Value |
-|---|---|
-| Total Videos | **19** |
-| Posted (FB or IG) | 18 / 19 |
-| FB Posted | 14 / 19 |
-| IG Posted | 4 / 19 |
-| Total FB Views | **5,599** |
-| Total IG Views | **2,760** |
+**Total Videos:** 19 | **Last Updated:** 2026-09-29 06:53:38 PM IST
 
 ---
 
 ## 📜 All Videos (Newest First)
 
-| # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
+| # | 📺 Title | 🔵 FB | 👁️ FB Views | 🟣 IG | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
 | 1 | Frozen Sniper Ops 🎯❄️  #videogames #gamingcommunity #gaming #rescueoperation #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdwZqBbjcOq/) | 540 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation14.mp4) |
 | 2 | Deadly Scope Precision 💀🔥  #videogames #gamingcommunity #gaming #rescueoperation #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdeTVXtjkS8/) | 310 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation1.mp4) |
@@ -33,12 +20,12 @@
 | 8 | Turned the corner and almost had a heart attack 🫣  #videogames #gamingcommunity #gaming #rescueoperation #gamingreels #r | [🔵 FB](https://www.facebook.com/reel/1547096549985295/) | 710 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation7.mp4) |
 | 9 | RescueOperation10 | [🔵 FB](https://www.facebook.com/18115845257514782) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation10.mp4) |
 | 10 | RescueOperation1 | [🔵 FB](https://www.facebook.com/18141505066601834) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation1.mp4) |
-| 11 | RescueOperation11 | [🔵 FB](https://www.facebook.com/18338823793287391) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation11.mp4) |
-| 12 | RescueOperation8 | [🔵 FB](https://www.facebook.com/18136516018533772) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation8.mp4) |
-| 13 | RescueOperation13 | [🔵 FB](https://www.facebook.com/17958793539000458) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation13.mp4) |
+| 11 | RescueOperation13 | [🔵 FB](https://www.facebook.com/17958793539000458) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation13.mp4) |
+| 12 | RescueOperation11 | [🔵 FB](https://www.facebook.com/18338823793287391) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation11.mp4) |
+| 13 | RescueOperation8 | [🔵 FB](https://www.facebook.com/18136516018533772) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation8.mp4) |
 | 14 | RescueOperation5 | [🔵 FB](https://www.facebook.com/18086238821269161) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation5.mp4) |
-| 15 | RescueOperation9 | [🔵 FB](https://www.facebook.com/18095374754634945) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation9.mp4) |
-| 16 | RescueOperation7 | [🔵 FB](https://www.facebook.com/17993243850048361) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation7.mp4) |
+| 15 | RescueOperation7 | [🔵 FB](https://www.facebook.com/17993243850048361) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation7.mp4) |
+| 16 | RescueOperation9 | [🔵 FB](https://www.facebook.com/18095374754634945) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation9.mp4) |
 | 17 | RescueOperation6 | [🔵 FB](https://www.facebook.com/18100448660357690) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation6.mp4) |
 | 18 | RescueOperation14 | [🔵 FB](https://www.facebook.com/18208015735317143) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation14.mp4) |
 | 19 | RescueOperation12 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation12.mp4) |
