@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 18 | **Last Updated:** 2026-09-30 12:58:37 AM IST
+**Total Videos:** 18 | **Last Updated:** 2026-09-30 01:01:17 AM IST
 
 ---
 
@@ -14,7 +14,7 @@
 | Posted (FB or IG) | 8 / 18 |
 | FB Posted | 5 / 18 |
 | IG Posted | 5 / 18 |
-| Total FB Views | **219** |
+| Total FB Views | **220** |
 | Total IG Views | **630** |
 
 ---
@@ -24,7 +24,7 @@
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
 | 1 | Yellow Maiden Slash Fury 💛⚔️  #videogames #gamingcommunity #gaming #godofwarlaufey #gamingreels #ree | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Dd4d80HDiYj/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_6.mp4) |
-| 2 | Blonde Hero Vs Fire Demon ⚔️🔥  #videogames #gamingcommunity #gaming #godofwarlaufey #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1763278934904943/) | 128 | [🟣 IG](https://www.instagram.com/reel/Dd0QRr8G3L9/) | 70 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_5.mp4) |
+| 2 | Blonde Hero Vs Fire Demon ⚔️🔥  #videogames #gamingcommunity #gaming #godofwarlaufey #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1763278934904943/) | 129 | [🟣 IG](https://www.instagram.com/reel/Dd0QRr8G3L9/) | 70 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_5.mp4) |
 | 3 | Fire Giant Boss Fight 🔥⚔️  #videogames #gamingcommunity #gaming #godofwarlaufey #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Ddw7t8Djnt_/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_23.mp4) |
 | 4 | Purple Fire Destroys Everything 🔥💜  #videogames #gamingcommunity #gaming #godofwarlaufey #gamingreel | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdvtUA_IJ6A/) | 230 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_10.mp4) |
 | 5 | She unlocked a forbidden god-tier ability! 😱🔥  #videogames #gamingcommunity #gaming #godofwarlaufey  #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1087626214135364/) | 91 | [🟣 IG](https://www.instagram.com/reel/Ddbfe5kCMH4/) | 310 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_12.mp4) |
