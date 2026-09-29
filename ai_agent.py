@@ -1,15 +1,14 @@
 """
-🚀 GAMING AGENT — FULL SCRIPT (v2 with upgraded Auto-Comment)
-==============================================================
-✅ All original features
-✅ UPGRADED Auto-Comment System:
+🚀 GAMING AGENT — FULL SCRIPT (v3 — Auto-Comment Fixed)
+=========================================================
+✅ All original features (rotation, dashboard, memory)
+✅ FIXED Auto-Comment:
+   - 4-layer duplicate protection (log + FB API)
+   - Log check FIRST (always)
+   - replied_ids.add() for comment_id + reply_id + reply_to_id
    - Real username fetch (3-layer fallback)
    - 3-level conversation thread
-   - 10 comments batch (was 5)
-   - 4-layer duplicate protection
-   - User reply detection — continue conversation
-   - Waiting user logic
-   - Chat history preserves
+   - 10 comments batch
 """
 
 import os
@@ -92,10 +91,10 @@ FB_API_VERSION = "v24.0"
 FB_GRAPH_URL = f"https://graph.facebook.com/{FB_API_VERSION}"
 
 DAYS_LIMIT = 28
-MAX_REPLIES_PER_RUN = 10          # ✅ 5 → 10
-MAX_CONVERSATION_DEPTH = 3        # ✅ 3-level conversation
+MAX_REPLIES_PER_RUN = 10
+MAX_CONVERSATION_DEPTH = 3
 MIN_COMMENT_AGE_MIN = 0
-MAX_COMMENT_AGE_HOURS = 24
+MAX_COMMENT_AGE_HOURS = 720
 POSTS_TO_SCAN = 25
 COMMENT_FETCH_WORKERS = 10
 MAX_JSON_RETRIES = 12
@@ -273,7 +272,7 @@ def _extract_json(response):
     return None
 
 # ============================================================
-# 🎯 BATCH REPLY GENERATOR — 12 RETRY MODE (with conversation)
+# 🎯 BATCH REPLY GENERATOR
 # ============================================================
 def generate_batch_replies(comments_batch, max_retries=MAX_JSON_RETRIES):
     if not comments_batch:
@@ -306,20 +305,20 @@ Your replies should feel like a real human texting — casual, warm, funny, conf
 
 RULES:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. Reply in the SAME language as the comment (English/Hinglish only, no regional languages).
+1. Reply in the SAME language as the comment (English/Hinglish only).
 2. Keep it SHORT — maximum 25 words.
 3. Use natural slang — bhai, bro, yaar, lol, chill, OP, fire, lit.
 4. Use 1-2 emojis max.
-5. Sound like a real person, not a robot. No "I appreciate", "Thank you for your feedback", etc.
-6. Match the vibe of the comment — hype if they hype, chill if they chill, roast if they roast.
-7. Make them WANT to reply back. Ask something, joke, tease, hype, or challenge — based on what fits the comment naturally.
+5. Sound like a real person, not a robot.
+6. Match the vibe of the comment.
+7. Make them WANT to reply back.
 8. If comment asks game name → tell the game name.
-9. If comment is abusive → savage witty comeback, no abuse back, no crying, stay chill.
+9. If comment is abusive → savage witty comeback, no abuse back.
 10. If there's a "Conversation So Far" — continue naturally, don't repeat.
 
-Use caption + hashtags for context if needed. Never share links. Never insult family/religion/caste.
+Never share links. Never insult family/religion/caste.
 
-CRITICAL: Return ONLY valid JSON. Keys = comment IDs. Values = reply text. No extra text, no markdown.
+CRITICAL: Return ONLY valid JSON. Keys = comment IDs. Values = reply text.
 
 Example:
 {{
@@ -357,13 +356,13 @@ YOUR JSON RESPONSE:"""
 
         resp_stripped = response.strip().lower()
         if resp_stripped in ["user safety: safe", "safe", "unsafe", "none"]:
-            log(f"   ⚠️ Safety model response detected — retry")
+            log(f"   ⚠️ Safety model response — retry")
             time.sleep(1)
             continue
 
         parsed = _extract_json(response)
         if parsed is None:
-            log(f"   ⚠️ Invalid JSON — retry. Preview: {response[:100]}")
+            log(f"   ⚠️ Invalid JSON — retry")
             time.sleep(1)
             continue
 
@@ -436,7 +435,7 @@ def is_reply_safe(reply_text, is_abuse=False):
     return True, "safe"
 
 # ============================================================
-# 🤖 AUTO-REPLY FUNCTIONS (UPGRADED — v2)
+# 🤖 AUTO-REPLY FUNCTIONS (FIXED v3)
 # ============================================================
 _page_name_cache = ""
 _user_name_cache = {}
@@ -490,7 +489,7 @@ def get_user_name(user_id, fallback_from_field=None):
     return "Facebook User"
 
 def load_replied_history():
-    """Load comment_id and reply_id from log."""
+    """✅ FIXED — comment_id + reply_id + reply_to_id load karo."""
     global _replied_history_cache
     if _replied_history_cache is not None:
         return _replied_history_cache
@@ -503,6 +502,7 @@ def load_replied_history():
             for r in log_data.get("replies", []):
                 cid = r.get("comment_id", "")
                 rid = r.get("reply_id", "")
+                r_to = r.get("reply_to_id", "")
                 depth = r.get("depth", 1)
                 if cid:
                     _replied_history_cache[cid] = max(
@@ -510,12 +510,29 @@ def load_replied_history():
                 if rid:
                     _replied_history_cache[rid] = max(
                         _replied_history_cache.get(rid, 0), depth)
+                if r_to:
+                    _replied_history_cache[r_to] = max(
+                        _replied_history_cache.get(r_to, 0), depth)
         except Exception:
             pass
     return _replied_history_cache
 
 def was_already_replied(comment_id):
-    return comment_id in load_replied_history()
+    """✅ FIXED — Dono files check karo."""
+    if not comment_id:
+        return False
+    if comment_id in load_replied_history():
+        return True
+    replied_file = "logs/replied_comment_ids.json"
+    if os.path.exists(replied_file):
+        try:
+            with open(replied_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            if comment_id in set(data.get("replied", [])):
+                return True
+        except Exception:
+            pass
+    return False
 
 def fetch_fb_comments(post_id, since_timestamp=None):
     url = f"{FB_GRAPH_URL}/{post_id}/comments"
@@ -537,7 +554,6 @@ def fetch_fb_comments(post_id, since_timestamp=None):
     return []
 
 def fetch_comment_replies(comment_id):
-    """Fetch nested replies — for conversation tracking."""
     url = f"{FB_GRAPH_URL}/{comment_id}/comments"
     params = {
         "fields": "id,message,from{name,id},created_time,can_reply",
@@ -552,22 +568,8 @@ def fetch_comment_replies(comment_id):
         pass
     return []
 
-def check_if_already_replied(comment_id):
-    """FB API se check karo humne reply kiya ya nahi."""
-    url = f"{FB_GRAPH_URL}/{comment_id}/comments"
-    params = {"fields": "id,from", "access_token": FB_ACCESS_TOKEN, "limit": 10}
-    try:
-        res = requests.get(url, params=params, timeout=10)
-        if res.status_code == 200:
-            replies = res.json().get("data", [])
-            for reply in replies:
-                if reply.get("from", {}).get("id") == FB_PAGE_ID:
-                    return True
-    except Exception:
-        pass
-    return False
-
 def post_fb_reply(comment_id, reply_text):
+    """✅ FIXED — Synthetic fallback ID."""
     if not AUTO_COMMENT_ENABLED:
         log(f"🚫 [AUTO_COMMENT OFF] Would post: {reply_text[:80]}")
         return f"disabled_{comment_id}"
@@ -575,10 +577,14 @@ def post_fb_reply(comment_id, reply_text):
     url = f"{FB_GRAPH_URL}/{comment_id}/comments"
     payload = {"message": reply_text, "access_token": FB_ACCESS_TOKEN}
     try:
-        time.sleep(random.uniform(2, 5))    # ✅ Random delay (bot detection avoid)
+        time.sleep(random.uniform(2, 5))
         res = requests.post(url, data=payload, timeout=15)
         if res.status_code == 200:
-            return res.json().get("id")
+            data = res.json()
+            rid = data.get("id")
+            if rid:
+                return rid
+            return f"synth_{comment_id}_{int(time.time())}"
         else:
             log(f"⚠️ Reply post error ({res.status_code}): {res.text[:200]}")
     except Exception as e:
@@ -586,13 +592,30 @@ def post_fb_reply(comment_id, reply_text):
     return None
 
 def analyze_thread(top_comment):
-    """
-    ✅ UPGRADED — 3-level conversation support
-    Returns: should_reply, depth, user_name, thread_context, reply_to_id
-    """
+    """✅ FIXED — Log check SABSE PEHLE (always)."""
     cid = top_comment.get("id", "")
+
+    # 🛡️ LAYER 1: LOG CHECK — SABSE PEHLE
+    if was_already_replied(cid):
+        return {
+            "should_reply": False,
+            "depth": load_replied_history().get(cid, 1),
+            "reason": "already_replied_log",
+        }
+
     replies = fetch_comment_replies(cid)
     replies_sorted = sorted(replies, key=lambda x: x.get("created_time", ""))
+
+    # 🛡️ LAYER 2: FB reply_ids log mein
+    history = load_replied_history()
+    for r in replies_sorted:
+        r_id = r.get("id", "")
+        if r_id and r_id in history:
+            return {
+                "should_reply": False,
+                "depth": history.get(r_id, 1),
+                "reason": "already_replied_log_reply_id",
+            }
 
     page_name = get_page_name()
     page_name_lower = page_name.lower() if page_name else ""
@@ -611,33 +634,12 @@ def analyze_thread(top_comment):
 
     our_count = len(our_replies)
 
-    # CASE 1: NO REPLIES — fresh comment
     if len(replies_sorted) == 0:
-        if was_already_replied(cid):
-            return {
-                "should_reply": False,
-                "depth": load_replied_history().get(cid, 1),
-                "reason": "already_replied_log",
-            }
         log(f"      🆕 Fresh comment — will reply")
-
-    # CASE 2: MAX DEPTH REACHED
     elif our_count >= MAX_CONVERSATION_DEPTH:
-        return {
-            "should_reply": False,
-            "depth": our_count,
-            "reason": "max_depth",
-        }
-
-    # CASE 3: HUMNE REPLY KIYA, USER CHUP
+        return {"should_reply": False, "depth": our_count, "reason": "max_depth"}
     elif our_count > 0 and len(user_replies) == 0:
-        return {
-            "should_reply": False,
-            "depth": our_count,
-            "reason": "waiting_user",
-        }
-
-    # CASE 4: HUMNE + USER DONO REPLY KIYE — ORDER CHECK
+        return {"should_reply": False, "depth": our_count, "reason": "waiting_user"}
     elif our_count > 0 and len(user_replies) > 0:
         last = replies_sorted[-1]
         last_from = last.get("from", {}) or {}
@@ -646,24 +648,9 @@ def analyze_thread(top_comment):
         last_is_ours = (last_id == FB_PAGE_ID
                         or (page_name_lower and last_name == page_name_lower))
         if last_is_ours:
-            return {
-                "should_reply": False,
-                "depth": our_count,
-                "reason": "waiting_user",
-            }
+            return {"should_reply": False, "depth": our_count, "reason": "waiting_user"}
         log(f"      💬 User replied — continuing (depth {our_count})")
 
-    # CASE 5: ONLY USER REPLIES, NO OURS
-    elif our_count == 0 and len(user_replies) > 0:
-        if was_already_replied(cid):
-            return {
-                "should_reply": False,
-                "depth": 0,
-                "reason": "already_replied_log",
-            }
-        log(f"      ⚠️ User replied but no ours — will reply")
-
-    # Build conversation context
     thread_ctx = ""
     for r in replies_sorted[-6:]:
         r_from = r.get("from", {}) or {}
@@ -675,7 +662,6 @@ def analyze_thread(top_comment):
         msg = (r.get("message", "") or "").replace("\n", " ")[:150]
         thread_ctx += f"  {who}: {msg}\n"
 
-    # Last user message
     user_msgs = [top_comment] + user_replies
     if not user_msgs:
         return {"should_reply": False, "depth": our_count, "reason": "no_user_msg"}
@@ -684,7 +670,6 @@ def analyze_thread(top_comment):
     if not last_text:
         return {"should_reply": False, "depth": our_count, "reason": "empty"}
 
-    # Original commenter info
     top_from = top_comment.get("from", {}) or {}
     user_id = top_from.get("id", "")
     user_name = get_user_name(user_id, top_from.get("name"))
@@ -701,14 +686,13 @@ def analyze_thread(top_comment):
     }
 
 def process_fb_comments(actual_posted_titles=None):
-    """UPGRADED — 10 batch, 3-level thread, real username."""
+    """✅ FIXED — replied_ids.add() for all 3 IDs."""
     if not AUTO_COMMENT_ENABLED:
         log("🚫 Auto-comment disabled — skipping reply processing")
         return None
 
-    log("🤖 Auto-reply processing started (UPGRADED v2)...")
+    log("🤖 Auto-reply processing started (v3 — fixed)...")
 
-    # Page name fetch
     page_name = get_page_name()
     log(f"📄 Page name: {page_name or 'N/A'}")
 
@@ -732,10 +716,15 @@ def process_fb_comments(actual_posted_titles=None):
         except Exception:
             pass
 
+    # ✅ Sync replied_ids from log history
+    history = load_replied_history()
+    for hid in history.keys():
+        replied_ids.add(hid)
+    log(f"📂 Replied history cache: {len(history)} IDs")
+
     cutoff_time = (now_ist() - timedelta(hours=MAX_COMMENT_AGE_HOURS)).timestamp()
     min_age_time = (now_ist() - timedelta(minutes=MIN_COMMENT_AGE_MIN)).timestamp()
 
-    # STEP 1: FB Page ke latest posts
     log(f"📥 Fetching latest {POSTS_TO_SCAN} posts from FB Page: {FB_PAGE_ID}")
     posts_url = f"{FB_GRAPH_URL}/{FB_PAGE_ID}/posts"
     posts_params = {
@@ -758,7 +747,6 @@ def process_fb_comments(actual_posted_titles=None):
         log("ℹ️ No posts found on FB page.")
         return None
 
-    # STEP 2: PARALLEL comment fetch
     log(f"⚡ Parallel fetching comments from {len(posts)} posts...")
 
     post_comments_map = {}
@@ -786,7 +774,6 @@ def process_fb_comments(actual_posted_titles=None):
     total_comments = sum(len(c) for c in post_comments_map.values())
     log(f"✅ Total {total_comments} comments fetched from all posts")
 
-    # STEP 3: Filter valid comments (thread-aware)
     valid_comments = []
     skipped_logs = []
     permanent_skip_ids = set()
@@ -803,11 +790,9 @@ def process_fb_comments(actual_posted_titles=None):
         if not comments:
             continue
 
-        # Hashtag extract
         hashtags = re.findall(r'#(\w+)', post_message_full)
         log(f"      📌 Hashtags: {hashtags}")
 
-        # Game detect from hashtag
         game_name = "Video Game"
         for tag in hashtags:
             tag_clean = tag.lower().replace("_", "").replace("-", "")
@@ -876,10 +861,10 @@ def process_fb_comments(actual_posted_titles=None):
                 permanent_skip_ids.add(comment_id)
                 continue
 
-            # ✅ THREAD ANALYSIS (3-level + conversation)
             state = analyze_thread(comment)
             if not state["should_reply"]:
-                if state["reason"] in ("max_depth", "waiting_user", "already_replied_log"):
+                if state["reason"] in ("max_depth", "waiting_user", "already_replied_log",
+                                        "already_replied_log_reply_id"):
                     log(f"      ⏭️ Skip ({state['reason']}) — {comment_id[:20]}")
                 continue
 
@@ -903,15 +888,13 @@ def process_fb_comments(actual_posted_titles=None):
                 "user_id": state["user_id"],
             })
 
-    # STEP 4: Batch OpenRouter call
     if not valid_comments:
-        log("ℹ️ No valid comments to reply. Skipping batch API call.")
+        log("ℹ️ No valid comments to reply.")
         replies_map = {}
     else:
-        log(f"📦 Batch mode: {len(valid_comments)} comments → Retry loop")
+        log(f"📦 Batch: {len(valid_comments)} comments → 12-retry loop")
         replies_map = generate_batch_replies(valid_comments)
 
-    # STEP 5: Post replies
     replies_count = 0
     for c in valid_comments:
         comment_id = c["comment_id"]
@@ -954,6 +937,12 @@ def process_fb_comments(actual_posted_titles=None):
                 "status": "posted",
             })
             reply_log["total_replies"] = reply_log.get("total_replies", 0) + 1
+
+            # ✅ CRITICAL FIX: 3 IDs add karo
+            replied_ids.add(comment_id)
+            replied_ids.add(reply_id)
+            replied_ids.add(c["reply_to_id"])
+
             log(f"✅ Reply posted [depth {c['current_depth'] + 1}] {comment_id[:20]}")
             log(f"   👤 User: {c['user_name']}")
             log(f"   💬 Comment: {c['comment_text'][:80]}")
@@ -961,15 +950,17 @@ def process_fb_comments(actual_posted_titles=None):
         else:
             log(f"❌ Failed to post reply for {comment_id[:20]}")
 
-    # STEP 6: Save state
     reply_log["skipped"].extend(skipped_logs)
     reply_log["total_skipped"] = reply_log.get("total_skipped", 0) + len(skipped_logs)
 
     os.makedirs("logs", exist_ok=True)
-    replied_data["replied"] = list(replied_ids | permanent_skip_ids)[-5000:]
+
+    # ✅ SAVE replied_ids (all IDs — 10000 limit)
+    replied_data["replied"] = list(replied_ids)[-10000:]
     replied_data["last_updated"] = now_ist_ampm()
     with open(replied_file, 'w', encoding='utf-8') as f:
         json.dump(replied_data, f, indent=2)
+    log(f"💾 Saved {len(replied_data['replied'])} IDs to replied_comment_ids.json")
 
     reply_log["replies"] = reply_log.get("replies", [])[-500:]
     reply_log["skipped"] = reply_log.get("skipped", [])[-200:]
@@ -977,7 +968,7 @@ def process_fb_comments(actual_posted_titles=None):
     with open(reply_log_file, 'w', encoding='utf-8') as f:
         json.dump(reply_log, f, indent=2, ensure_ascii=False)
 
-    log(f"🤖 Auto-reply done. {replies_count} replies posted (upgraded mode).")
+    log(f"🤖 Auto-reply done. {replies_count} replies posted.")
     log(f"📊 Total in history: {len(reply_log.get('replies', []))}")
     return reply_log
 
@@ -1198,7 +1189,7 @@ def generate_auto_reply_section():
     except Exception:
         return ""
     lines = []
-    lines.append("\n--- \n\n## 🤖 Auto-Reply Log (Upgraded v2)\n\n")
+    lines.append("\n--- \n\n## 🤖 Auto-Reply Log (Fixed v3)\n\n")
     status = "🚫 **DISABLED**" if not AUTO_COMMENT_ENABLED else "✅ **ACTIVE**"
     lines.append(f"> Auto-Comment Status: {status} | Last Updated: {data.get('last_updated', 'N/A')} | ")
     lines.append(f"Total Replies: {data.get('total_replies', 0)} | Skipped: {data.get('total_skipped', 0)}\n\n")
@@ -1245,7 +1236,7 @@ def generate_auto_reply_section():
     return "".join(lines)
 
 # ============================================================
-# 📦 EXISTING FUNCTIONS (same as before)
+# 📦 EXISTING FUNCTIONS (SAME)
 # ============================================================
 def git_commit_and_push(file_paths_to_add, commit_message="Auto-Agent: Sync dashboard [skip ci]"):
     try:
@@ -2080,7 +2071,7 @@ def run_agent_brain():
     if not game_views_summary:
         game_views_summary = {g: 0 for g in game_list}
 
-    # ✅ UPGRADED AUTO-COMMENT
+    # ✅ AUTO-COMMENT (FIXED)
     if AUTO_COMMENT_ENABLED:
         try:
             process_fb_comments(actual_posted_titles)
@@ -2190,7 +2181,7 @@ def run_agent_brain():
     log(f"""
 🚀 GAMING AGENT DASHBOARD
 > Last Updated: {now_ist_ampm()} IST
-> Auto-Comment: {"✅ ENABLED (v2)" if AUTO_COMMENT_ENABLED else "🚫 DISABLED"}
+> Auto-Comment: {"✅ ENABLED (v3 fixed)" if AUTO_COMMENT_ENABLED else "🚫 DISABLED"}
 
 📊 Status:
 • Game: {chosen_game}
