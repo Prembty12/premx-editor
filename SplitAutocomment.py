@@ -1,14 +1,10 @@
 """
-💬 SPLIT AUTO-COMMENT SCRIPT (FINAL v4)
-=========================================
+💬 SPLIT AUTO-COMMENT SCRIPT (FINAL v4 — Syntax Fixed)
+=======================================================
 ✅ Auto-comment upgraded (username, 3-level, 10 batch)
-✅ Dashboard — FULL data (reads agent_memory.json from full script)
-✅ 🔥 DUPLICATE FIX:
-   - Log check PEHLE (always)
-   - replied_ids.add() for comment_id + reply_id + reply_to_id
-   - reply_id fallback (synthetic)
-   - FB reply_id check
-✅ Rotation — display only (read from rotation_history.json)
+✅ Dashboard — FULL data (reads agent_memory.json)
+✅ DUPLICATE FIX: Log check first, replied_ids for 3 IDs
+✅ Rotation — display only
 ❌ NO rotation write
 ❌ NO game selection
 """
@@ -323,7 +319,7 @@ Your replies should feel like a real human texting — casual, warm, funny, conf
 
 RULES:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. Reply in the SAME language as the comment (English/Hinglish only, no regional languages).
+1. Reply in the SAME language as the comment (English/Hinglish only).
 2. Keep it SHORT — maximum 25 words.
 3. Use natural slang — bhai, bro, yaar, lol, chill, OP, fire, lit.
 4. Use 1-2 emojis max.
@@ -703,7 +699,7 @@ def process_fb_comments(actual_posted_titles=None):
         log("🚫 Auto-comment disabled")
         return None
 
-    log("🤖 Auto-reply started (duplicate-proof v4)...")
+    log("🤖 Auto-reply started (v4)...")
 
     page_name = get_page_name()
     log(f"📄 Page name: {page_name or 'N/A'}")
@@ -855,7 +851,9 @@ def process_fb_comments(actual_posted_titles=None):
                     "timestamp": now_ist_ampm(),
                 })
                 replied_ids.add(comment_id)
-                continue            state = analyze_thread(comment)
+                continue
+
+            state = analyze_thread(comment)
             if not state["should_reply"]:
                 if state["reason"] in ("max_depth", "waiting_user", "already_replied_log", "already_replied_log_reply_id"):
                     log(f"      ⏭️ Skip ({state['reason']}) — {comment_id[:20]}")
@@ -965,10 +963,9 @@ def process_fb_comments(actual_posted_titles=None):
 
 
 # ============================================================
-# 📊 DASHBOARD — READS FROM FULL SCRIPT'S DATA
+# 📊 DASHBOARD
 # ============================================================
 def update_dashboard_inline():
-    """Dashboard — reads actual_posted_titles from agent_memory.json."""
     log("\n" + "=" * 60)
     log("📊 DASHBOARD UPDATE (reads full script data)")
     log("=" * 60)
@@ -998,7 +995,7 @@ def update_dashboard_inline():
     game_list = sorted(set(game_list))
     log(f"📁 {len(game_list)} games")
 
-    # ✅ READ agent_memory.json (full script ne save kiya hai)
+    # ✅ READ agent_memory.json (full script ka data)
     memory = {}
     if os.path.exists("logs/agent_memory.json"):
         try:
@@ -1013,7 +1010,6 @@ def update_dashboard_inline():
 
     log(f"📊 Loaded {len(actual_posted_titles)} games from memory")
 
-    # Compute game_views_summary from memory
     game_views_summary = {}
     for g_name, videos in actual_posted_titles.items():
         total = 0
@@ -1029,7 +1025,6 @@ def update_dashboard_inline():
     if not game_views_summary:
         game_views_summary = {g: 0 for g in game_list}
 
-    # Trending + Best time
     try:
         detect_trending_games(actual_posted_titles, days=7)
     except Exception as e:
@@ -1039,7 +1034,6 @@ def update_dashboard_inline():
     except Exception as e:
         log(f"⚠️ Best time error: {e}")
 
-    # Generate dashboard
     generate_dashboard_md(actual_posted_titles, game_views_summary, game_stats, file_mapping)
 
 
@@ -1264,7 +1258,6 @@ def analyze_best_time():
 
 
 def generate_dashboard_md(actual_posted_titles, game_views_summary, game_stats, file_mapping):
-    """Dashboard with FULL Live Post Titles."""
     dashboard_path = "GAMING_DASHBOARD.md"
 
     total_views = sum(game_views_summary.values()) or 1
@@ -1291,7 +1284,7 @@ def generate_dashboard_md(actual_posted_titles, game_views_summary, game_stats, 
         md.append(f"| {rank} | **{item['game']}** | {item['uploaded_count']} | "
                   f"{item['total_views']:,} | {item['avg_views']:,} | {tier} |\n")
 
-    # 📺 Live Post Titles (from full script's data)
+    # 📺 Live Post Titles
     md.append("\n--- \n\n## 📺 Live Post Titles + Views (Latest per Game)\n\n")
     md.append("> 🔵 FB = Facebook live | 🟣 IG = Instagram live | ⏳ = Pending\n\n")
     md.append("| Game Name | 📅 Last Posted | 📺 Latest Title | 🔵 FB | 👁️ FB Views | "
@@ -1431,7 +1424,7 @@ def generate_dashboard_md(actual_posted_titles, game_views_summary, game_stats, 
     except Exception:
         md.append("_No data_\n")
 
-    # 🔄 Rotation Queue (READ-ONLY)
+    # 🔄 Rotation Queue (Read-Only)
     md.append("\n--- \n\n## 🔄 Game Rotation Queue (Read-Only)\n\n")
     rotation_file = "logs/rotation_history.json"
     if os.path.exists(rotation_file):
