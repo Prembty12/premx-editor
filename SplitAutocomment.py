@@ -1,13 +1,16 @@
 """
-💬 SPLIT AUTO-COMMENT SCRIPT (FINAL — Duplicate Bug Fixed)
-============================================================
+💬 SPLIT AUTO-COMMENT SCRIPT (FINAL v4)
+=========================================
 ✅ Auto-comment upgraded (username, 3-level, 10 batch)
-✅ Dashboard update (rotation read-only)
+✅ Dashboard — FULL data (reads agent_memory.json from full script)
 ✅ 🔥 DUPLICATE FIX:
    - Log check PEHLE (always)
-   - replied_ids.add() har reply ke baad
+   - replied_ids.add() for comment_id + reply_id + reply_to_id
    - reply_id fallback (synthetic)
    - FB reply_id check
+✅ Rotation — display only (read from rotation_history.json)
+❌ NO rotation write
+❌ NO game selection
 """
 
 import os
@@ -493,7 +496,6 @@ def get_user_name(user_id, fallback_from_field=None):
 
 
 def load_replied_history():
-    """Load comment_id → depth AND reply_id → depth from log."""
     global _replied_history_cache
     if _replied_history_cache is not None:
         return _replied_history_cache
@@ -523,7 +525,6 @@ def load_replied_history():
 
 
 def was_already_replied(comment_id):
-    """Check both log files."""
     if not comment_id:
         return False
     if comment_id in load_replied_history():
@@ -576,7 +577,6 @@ def fetch_comment_replies(comment_id):
 
 
 def post_fb_reply(comment_id, reply_text):
-    """Post reply — with synthetic fallback ID."""
     if not AUTO_COMMENT_ENABLED:
         log(f"🚫 [AUTO_COMMENT OFF] Would post: {reply_text[:80]}")
         return f"disabled_{comment_id}"
@@ -591,7 +591,6 @@ def post_fb_reply(comment_id, reply_text):
             reply_id = data.get("id")
             if reply_id:
                 return reply_id
-            log(f"⚠️ FB API no reply_id — using synthetic")
             return f"synth_{comment_id}_{int(time.time())}"
         log(f"⚠️ Reply post error ({res.status_code}): {res.text[:200]}")
     except Exception as e:
@@ -600,7 +599,6 @@ def post_fb_reply(comment_id, reply_text):
 
 
 def analyze_thread(top_comment):
-    """✅ Log check FIRST (always), then FB API."""
     cid = top_comment.get("id", "")
 
     # 🛡️ LAYER 1: LOG CHECK — SABSE PEHLE
@@ -705,12 +703,11 @@ def process_fb_comments(actual_posted_titles=None):
         log("🚫 Auto-comment disabled")
         return None
 
-    log("🤖 Auto-reply started (duplicate-proof v3)...")
+    log("🤖 Auto-reply started (duplicate-proof v4)...")
 
     page_name = get_page_name()
     log(f"📄 Page name: {page_name or 'N/A'}")
 
-    # Load state
     replied_file = "logs/replied_comment_ids.json"
     replied_data = {"replied": [], "last_updated": ""}
     if os.path.exists(replied_file):
@@ -858,9 +855,7 @@ def process_fb_comments(actual_posted_titles=None):
                     "timestamp": now_ist_ampm(),
                 })
                 replied_ids.add(comment_id)
-                continue
-
-            state = analyze_thread(comment)
+                continue            state = analyze_thread(comment)
             if not state["should_reply"]:
                 if state["reason"] in ("max_depth", "waiting_user", "already_replied_log", "already_replied_log_reply_id"):
                     log(f"      ⏭️ Skip ({state['reason']}) — {comment_id[:20]}")
@@ -970,22 +965,12 @@ def process_fb_comments(actual_posted_titles=None):
 
 
 # ============================================================
-# 📊 DASHBOARD UPDATE
+# 📊 DASHBOARD — READS FROM FULL SCRIPT'S DATA
 # ============================================================
-def update_dashboard():
-    try:
-        from game_analytics import AnalyticsEngine
-    except ImportError:
-        log("ℹ️ game_analytics not found — using inline dashboard logic")
-        update_dashboard_inline()
-        return
-    log("📊 Using game_analytics.py")
-
-
 def update_dashboard_inline():
-    """Inline dashboard — no external import needed."""
+    """Dashboard — reads actual_posted_titles from agent_memory.json."""
     log("\n" + "=" * 60)
-    log("📊 DASHBOARD UPDATE (inline)")
+    log("📊 DASHBOARD UPDATE (reads full script data)")
     log("=" * 60)
 
     links_dir = "game_links_editor"
@@ -1013,10 +998,38 @@ def update_dashboard_inline():
     game_list = sorted(set(game_list))
     log(f"📁 {len(game_list)} games")
 
-    actual_posted_titles, game_views_summary = fetch_fb_ig_data(game_list)
+    # ✅ READ agent_memory.json (full script ne save kiya hai)
+    memory = {}
+    if os.path.exists("logs/agent_memory.json"):
+        try:
+            with open("logs/agent_memory.json", 'r', encoding='utf-8') as f:
+                memory = json.load(f)
+            log(f"✅ Loaded agent_memory.json")
+        except Exception as e:
+            log(f"⚠️ Memory read error: {e}")
+
+    actual_posted_titles = memory.get("actual_posted_titles", {})
+    game_stats = memory.get("game_stats", {})
+
+    log(f"📊 Loaded {len(actual_posted_titles)} games from memory")
+
+    # Compute game_views_summary from memory
+    game_views_summary = {}
+    for g_name, videos in actual_posted_titles.items():
+        total = 0
+        for v in videos:
+            total += v.get("fb_views", 0) + v.get("ig_views", 0)
+        game_views_summary[g_name] = total
+
+    # Fallback: agar memory empty hai, to FB se fetch
+    if not actual_posted_titles:
+        log("⚠️ Memory empty — fetching from FB")
+        actual_posted_titles, game_views_summary = fetch_fb_ig_data(game_list)
+
     if not game_views_summary:
         game_views_summary = {g: 0 for g in game_list}
 
+    # Trending + Best time
     try:
         detect_trending_games(actual_posted_titles, days=7)
     except Exception as e:
@@ -1026,26 +1039,16 @@ def update_dashboard_inline():
     except Exception as e:
         log(f"⚠️ Best time error: {e}")
 
-    memory = {}
-    if os.path.exists("logs/agent_memory.json"):
-        try:
-            with open("logs/agent_memory.json", 'r', encoding='utf-8') as f:
-                memory = json.load(f)
-        except Exception:
-            pass
-    game_stats = memory.get("game_stats", {})
-
+    # Generate dashboard
     generate_dashboard_md(actual_posted_titles, game_views_summary, game_stats, file_mapping)
 
 
 def fetch_fb_ig_data(game_list):
-    """Simplified FB/IG data fetch."""
-    posted_dir = 'posted_links_editor'
+    """Fallback — FB/IG data fetch."""
     result = {g: [] for g in game_list}
     game_views_summary = {g: 0 for g in game_list}
 
     if not FB_ACCESS_TOKEN:
-        log("⚠️ FB_ACCESS_TOKEN missing")
         return result, game_views_summary
 
     since_ts = int((now_ist() - timedelta(days=DAYS_LIMIT)).timestamp())
@@ -1261,7 +1264,7 @@ def analyze_best_time():
 
 
 def generate_dashboard_md(actual_posted_titles, game_views_summary, game_stats, file_mapping):
-    """Generate dashboard MD."""
+    """Dashboard with FULL Live Post Titles."""
     dashboard_path = "GAMING_DASHBOARD.md"
 
     total_views = sum(game_views_summary.values()) or 1
@@ -1275,10 +1278,12 @@ def generate_dashboard_md(actual_posted_titles, game_views_summary, game_stats, 
     analytics.sort(key=lambda x: x["total_views"], reverse=True)
 
     md = ["# 🚀 GAMING AGENT DASHBOARD\n\n",
-          f"> **Last Updated:** {now_ist_ampm()} IST | **Status:** Active\n\n",
-          "--- \n\n## 🏆 Global Leaderboard\n\n",
-          "| Rank | Game | Videos | Views | Avg/Video | Tier |\n",
-          "|:---:|---|---|---|---|---|\n"]
+          f"> **Last Updated:** {now_ist_ampm()} IST | **Status:** Active\n\n"]
+
+    # 🏆 Global Leaderboard
+    md.append("--- \n\n## 🏆 Global Leaderboard\n\n")
+    md.append("| Rank | Game | Videos | Views | Avg/Video | Tier |\n")
+    md.append("|:---:|---|---|---|---|---|\n")
     medals = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣"]
     for idx, item in enumerate(analytics):
         rank = medals[idx] if idx < len(medals) else f"{idx+1}"
@@ -1286,6 +1291,98 @@ def generate_dashboard_md(actual_posted_titles, game_views_summary, game_stats, 
         md.append(f"| {rank} | **{item['game']}** | {item['uploaded_count']} | "
                   f"{item['total_views']:,} | {item['avg_views']:,} | {tier} |\n")
 
+    # 📺 Live Post Titles (from full script's data)
+    md.append("\n--- \n\n## 📺 Live Post Titles + Views (Latest per Game)\n\n")
+    md.append("> 🔵 FB = Facebook live | 🟣 IG = Instagram live | ⏳ = Pending\n\n")
+    md.append("| Game Name | 📅 Last Posted | 📺 Latest Title | 🔵 FB | 👁️ FB Views | "
+              "🟣 IG | 👁️ IG Views | 📊 Remaining / Total | 📂 Source | 📜 All |\n")
+    md.append("|---|---|---|---|---|---|---|---|---|---|\n")
+
+    def get_latest_post_time(g_name):
+        latest = ""
+        for v in actual_posted_titles.get(g_name, []):
+            if v.get("fb_posted") or v.get("ig_posted"):
+                ts = v.get("timestamp", "")
+                if ts > latest:
+                    latest = ts
+        return latest
+
+    sorted_games = sorted(actual_posted_titles.keys(),
+                          key=lambda g: get_latest_post_time(g) or "0000",
+                          reverse=True)
+
+    source_links_map, _, _ = load_source_data()
+    games_dir = "logs/games"
+    os.makedirs(games_dir, exist_ok=True)
+
+    for g_name in sorted_games:
+        videos = actual_posted_titles.get(g_name, [])
+        src_file = file_mapping.get(g_name, "")
+
+        total_vids = len(videos)
+        if src_file and os.path.exists(src_file):
+            try:
+                with open(src_file, 'r', encoding='utf-8', errors='ignore') as f:
+                    c = f.read()
+                pipe_count = len(re.findall(r'\|\s*Link:', c))
+                total_vids = max(pipe_count, total_vids, len(extract_urls(c)))
+            except Exception:
+                pass
+
+        uploaded_vids = game_stats.get(g_name, {}).get("uploaded_count", 0)
+        remaining_vids = max(0, total_vids - uploaded_vids)
+        if total_vids > 0:
+            progress_md = f"**{remaining_vids}** / {total_vids}"
+            if remaining_vids == 0:
+                progress_md = f"✅ {total_vids} / {total_vids}"
+        else:
+            progress_md = "_N/A_"
+
+        latest_post_time = get_latest_post_time(g_name)
+        if latest_post_time:
+            dt_ist = utc_to_ist(latest_post_time)
+            if dt_ist:
+                date_str = dt_ist.strftime("%Y-%m-%d %I:%M %p")
+            else:
+                date_str = str(latest_post_time)[:16]
+        else:
+            date_str = "—"
+
+        if not videos:
+            md.append(f"| **{g_name}** | {date_str} | _Not Posted Yet_ | ⏳ Pending | "
+                      f"_0_ | ⏳ Pending | _0_ | {progress_md} | _N/A_ | — |\n")
+            continue
+
+        latest_posted = None
+        latest_ts = ""
+        for v in videos:
+            if v.get("fb_posted") or v.get("ig_posted"):
+                ts = v.get("timestamp", "")
+                if ts > latest_ts:
+                    latest_ts = ts
+                    latest_posted = v
+
+        latest = latest_posted if latest_posted else videos[0]
+        title = (latest.get("title") or "").replace("\n", " ").replace("|", "\\|")[:80] or "_Untitled_"
+        fb_md = f"[🔵 FB]({latest['fb_link']})" if latest.get("fb_posted") and latest.get("fb_link") else "⏳ Pending"
+        fb_v_md = f"{latest.get('fb_views', 0):,}" if latest.get("fb_posted") else "_0_"
+        ig_md = f"[🟣 IG]({latest['ig_link']})" if latest.get("ig_posted") and latest.get("ig_link") else "⏳ Pending"
+        ig_v_md = f"{latest.get('ig_views', 0):,}" if latest.get("ig_posted") else "_0_"
+
+        src_link = latest.get("source_link", "") or (videos[0].get("source_link", "") if videos else "")
+        if not src_link:
+            src_urls = source_links_map.get(g_name, [])
+            src_link = src_urls[0] if src_urls else ""
+        src_md = f"[📂]({src_link})" if src_link else "_N/A_"
+
+        safe_name = re.sub(r'[^a-zA-Z0-9_-]', '_', g_name)
+        game_file_link = f"logs/games/{safe_name}.md"
+        all_md = f"**[📜 View {len(videos)}]({game_file_link})**"
+
+        md.append(f"| **{g_name}** | {date_str} | {title} | {fb_md} | {fb_v_md} | "
+                  f"{ig_md} | {ig_v_md} | {progress_md} | {src_md} | {all_md} |\n")
+
+    # 📈 Trending
     md.append("\n--- \n\n## 📈 Trending Games (Last 7 Days)\n\n")
     try:
         with open("logs/trending_cache.json", 'r', encoding='utf-8') as f:
@@ -1299,6 +1396,7 @@ def generate_dashboard_md(actual_posted_titles, game_views_summary, game_stats, 
     except Exception:
         md.append("_No data_\n")
 
+    # 🎯 Best Time
     md.append("\n--- \n\n## 🎯 Best Time to Post\n\n")
     try:
         with open("logs/best_time_analysis.json", 'r', encoding='utf-8') as f:
@@ -1311,6 +1409,7 @@ def generate_dashboard_md(actual_posted_titles, game_views_summary, game_stats, 
     except Exception:
         md.append("_No data_\n")
 
+    # 🤖 Auto-Reply Log
     md.append("\n--- \n\n## 🤖 Auto-Reply Log\n\n")
     try:
         with open("logs/auto_reply_log.json", 'r', encoding='utf-8') as f:
@@ -1332,6 +1431,7 @@ def generate_dashboard_md(actual_posted_titles, game_views_summary, game_stats, 
     except Exception:
         md.append("_No data_\n")
 
+    # 🔄 Rotation Queue (READ-ONLY)
     md.append("\n--- \n\n## 🔄 Game Rotation Queue (Read-Only)\n\n")
     rotation_file = "logs/rotation_history.json"
     if os.path.exists(rotation_file):
@@ -1355,11 +1455,13 @@ def generate_dashboard_md(actual_posted_titles, game_views_summary, game_stats, 
     else:
         md.append("_No rotation data_\n")
 
+    # 📜 Full Video History
     md.append("\n--- \n\n## 📜 Full Video History\n\n")
-    for g_name in sorted(actual_posted_titles.keys()):
+    for g_name in sorted_games:
         videos = actual_posted_titles.get(g_name, [])
         if videos:
-            md.append(f"- **🎮 {g_name}** — {len(videos)} videos\n")
+            safe_name = re.sub(r'[^a-zA-Z0-9_-]', '_', g_name)
+            md.append(f"- **🎮 {g_name}** — {len(videos)} videos — [📜 View All](logs/games/{safe_name}.md)\n")
 
     with open(dashboard_path, 'w', encoding='utf-8') as f:
         f.writelines(md)
@@ -1403,7 +1505,7 @@ def git_commit_and_push(file_paths, message="Auto-Agent: Update dashboard [skip 
 # ============================================================
 def main():
     log("=" * 60)
-    log("🚀 SPLIT AUTO-COMMENT — v3 (Duplicate Fixed)")
+    log("🚀 SPLIT SCRIPT v4 — Full Data Display")
     log("=" * 60)
 
     # STEP 1: Auto-comment
