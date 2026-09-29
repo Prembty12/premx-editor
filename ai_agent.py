@@ -1,10 +1,10 @@
 """
-🚀 GAMING AGENT — FULL SCRIPT (v3 — Auto-Comment Fixed)
-=========================================================
+🚀 GAMING AGENT — FULL SCRIPT (v4 — Reply Fix)
+================================================
 ✅ All original features (rotation, dashboard, memory)
 ✅ FIXED Auto-Comment:
-   - 4-layer duplicate protection (log + FB API)
-   - Log check FIRST (always)
+   - FB API pe bharosa (user ke naye reply detect honge)
+   - Log check SIRF fresh comment ke liye
    - replied_ids.add() for comment_id + reply_id + reply_to_id
    - Real username fetch (3-layer fallback)
    - 3-level conversation thread
@@ -435,7 +435,7 @@ def is_reply_safe(reply_text, is_abuse=False):
     return True, "safe"
 
 # ============================================================
-# 🤖 AUTO-REPLY FUNCTIONS (FIXED v3)
+# 🤖 AUTO-REPLY FUNCTIONS (FIXED v4)
 # ============================================================
 _page_name_cache = ""
 _user_name_cache = {}
@@ -489,7 +489,7 @@ def get_user_name(user_id, fallback_from_field=None):
     return "Facebook User"
 
 def load_replied_history():
-    """✅ FIXED — comment_id + reply_id + reply_to_id load karo."""
+    """Load comment_id + reply_id + reply_to_id from log."""
     global _replied_history_cache
     if _replied_history_cache is not None:
         return _replied_history_cache
@@ -518,7 +518,7 @@ def load_replied_history():
     return _replied_history_cache
 
 def was_already_replied(comment_id):
-    """✅ FIXED — Dono files check karo."""
+    """Dono files check karo."""
     if not comment_id:
         return False
     if comment_id in load_replied_history():
@@ -569,7 +569,7 @@ def fetch_comment_replies(comment_id):
     return []
 
 def post_fb_reply(comment_id, reply_text):
-    """✅ FIXED — Synthetic fallback ID."""
+    """Synthetic fallback ID."""
     if not AUTO_COMMENT_ENABLED:
         log(f"🚫 [AUTO_COMMENT OFF] Would post: {reply_text[:80]}")
         return f"disabled_{comment_id}"
@@ -591,31 +591,17 @@ def post_fb_reply(comment_id, reply_text):
         log(f"⚠️ Reply post exception: {e}")
     return None
 
+
 def analyze_thread(top_comment):
-    """✅ FIXED — Log check SABSE PEHLE (always)."""
+    """
+    ✅ FIXED — FB API pe bharosa karo (naye replies detect honge).
+    Log check SIRF fresh comment ke liye.
+    """
     cid = top_comment.get("id", "")
 
-    # 🛡️ LAYER 1: LOG CHECK — SABSE PEHLE
-    if was_already_replied(cid):
-        return {
-            "should_reply": False,
-            "depth": load_replied_history().get(cid, 1),
-            "reason": "already_replied_log",
-        }
-
+    # ✅ FB API se replies fetch karo PEHLE
     replies = fetch_comment_replies(cid)
     replies_sorted = sorted(replies, key=lambda x: x.get("created_time", ""))
-
-    # 🛡️ LAYER 2: FB reply_ids log mein
-    history = load_replied_history()
-    for r in replies_sorted:
-        r_id = r.get("id", "")
-        if r_id and r_id in history:
-            return {
-                "should_reply": False,
-                "depth": history.get(r_id, 1),
-                "reason": "already_replied_log_reply_id",
-            }
 
     page_name = get_page_name()
     page_name_lower = page_name.lower() if page_name else ""
@@ -634,12 +620,21 @@ def analyze_thread(top_comment):
 
     our_count = len(our_replies)
 
-    if len(replies_sorted) == 0:
-        log(f"      🆕 Fresh comment — will reply")
-    elif our_count >= MAX_CONVERSATION_DEPTH:
+    # ✅ MAX DEPTH
+    if our_count >= MAX_CONVERSATION_DEPTH:
         return {"should_reply": False, "depth": our_count, "reason": "max_depth"}
+
+    # ✅ FRESH COMMENT (no replies on FB)
+    if len(replies_sorted) == 0:
+        if was_already_replied(cid):
+            return {"should_reply": False, "depth": 0, "reason": "already_replied_log"}
+        log(f"      🆕 Fresh comment — will reply")
+
+    # ✅ HUMNE REPLY KIYA, USER CHUP
     elif our_count > 0 and len(user_replies) == 0:
         return {"should_reply": False, "depth": our_count, "reason": "waiting_user"}
+
+    # ✅ HUMNE + USER DONO — ORDER CHECK
     elif our_count > 0 and len(user_replies) > 0:
         last = replies_sorted[-1]
         last_from = last.get("from", {}) or {}
@@ -651,6 +646,7 @@ def analyze_thread(top_comment):
             return {"should_reply": False, "depth": our_count, "reason": "waiting_user"}
         log(f"      💬 User replied — continuing (depth {our_count})")
 
+    # ✅ Build context
     thread_ctx = ""
     for r in replies_sorted[-6:]:
         r_from = r.get("from", {}) or {}
@@ -685,13 +681,14 @@ def analyze_thread(top_comment):
         "thread_context": thread_ctx,
     }
 
+
 def process_fb_comments(actual_posted_titles=None):
-    """✅ FIXED — replied_ids.add() for all 3 IDs."""
+    """replied_ids.add() for all 3 IDs."""
     if not AUTO_COMMENT_ENABLED:
         log("🚫 Auto-comment disabled — skipping reply processing")
         return None
 
-    log("🤖 Auto-reply processing started (v3 — fixed)...")
+    log("🤖 Auto-reply processing started (v4 — fixed)...")
 
     page_name = get_page_name()
     log(f"📄 Page name: {page_name or 'N/A'}")
@@ -716,7 +713,6 @@ def process_fb_comments(actual_posted_titles=None):
         except Exception:
             pass
 
-    # ✅ Sync replied_ids from log history
     history = load_replied_history()
     for hid in history.keys():
         replied_ids.add(hid)
@@ -938,7 +934,7 @@ def process_fb_comments(actual_posted_titles=None):
             })
             reply_log["total_replies"] = reply_log.get("total_replies", 0) + 1
 
-            # ✅ CRITICAL FIX: 3 IDs add karo
+            # ✅ 3 IDs add
             replied_ids.add(comment_id)
             replied_ids.add(reply_id)
             replied_ids.add(c["reply_to_id"])
@@ -955,7 +951,6 @@ def process_fb_comments(actual_posted_titles=None):
 
     os.makedirs("logs", exist_ok=True)
 
-    # ✅ SAVE replied_ids (all IDs — 10000 limit)
     replied_data["replied"] = list(replied_ids)[-10000:]
     replied_data["last_updated"] = now_ist_ampm()
     with open(replied_file, 'w', encoding='utf-8') as f:
@@ -1189,7 +1184,7 @@ def generate_auto_reply_section():
     except Exception:
         return ""
     lines = []
-    lines.append("\n--- \n\n## 🤖 Auto-Reply Log (Fixed v3)\n\n")
+    lines.append("\n--- \n\n## 🤖 Auto-Reply Log (Fixed v4)\n\n")
     status = "🚫 **DISABLED**" if not AUTO_COMMENT_ENABLED else "✅ **ACTIVE**"
     lines.append(f"> Auto-Comment Status: {status} | Last Updated: {data.get('last_updated', 'N/A')} | ")
     lines.append(f"Total Replies: {data.get('total_replies', 0)} | Skipped: {data.get('total_skipped', 0)}\n\n")
@@ -2071,7 +2066,7 @@ def run_agent_brain():
     if not game_views_summary:
         game_views_summary = {g: 0 for g in game_list}
 
-    # ✅ AUTO-COMMENT (FIXED)
+    # ✅ AUTO-COMMENT (FIXED v4)
     if AUTO_COMMENT_ENABLED:
         try:
             process_fb_comments(actual_posted_titles)
@@ -2181,7 +2176,7 @@ def run_agent_brain():
     log(f"""
 🚀 GAMING AGENT DASHBOARD
 > Last Updated: {now_ist_ampm()} IST
-> Auto-Comment: {"✅ ENABLED (v3 fixed)" if AUTO_COMMENT_ENABLED else "🚫 DISABLED"}
+> Auto-Comment: {"✅ ENABLED (v4 fixed)" if AUTO_COMMENT_ENABLED else "🚫 DISABLED"}
 
 📊 Status:
 • Game: {chosen_game}
