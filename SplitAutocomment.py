@@ -1,28 +1,27 @@
 """
-🚀 GAMING AGENT — SPLIT SCRIPT (Final)
-========================================
-✅ Auto-comment working (duplicate-proof)
-✅ Dashboard working
-✅ Trending, best-time working
-✅ Rotation DISPLAY (dashboard pe purana data dikhega)
-❌ Rotation write (nahi hoga)
-❌ Game selection (nahi hoga)
-❌ Current/next change (nahi hoga)
+💬 SPLIT AUTO-COMMENT SCRIPT (FINAL — Duplicate Bug Fixed)
+============================================================
+✅ Auto-comment upgraded (username, 3-level, 10 batch)
+✅ Dashboard update (rotation read-only)
+✅ 🔥 DUPLICATE FIX:
+   - Log check PEHLE (always)
+   - replied_ids.add() har reply ke baad
+   - reply_id fallback (synthetic)
+   - FB reply_id check
 """
 
 import os
-import glob
+import re
 import json
+import time
+import sys
+import glob
 import random
 import requests
-import sys
 import subprocess
-import re
-import time
 from datetime import datetime, timedelta, timezone
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-# 🇮🇳 Indian Standard Time
 try:
     from zoneinfo import ZoneInfo
     IST = ZoneInfo("Asia/Kolkata")
@@ -30,12 +29,16 @@ except Exception:
     IST = timezone(timedelta(hours=5, minutes=30))
 
 
+# ============================================================
+# HELPERS
+# ============================================================
+def log(msg):
+    sys.stderr.write(f"{msg}\n")
+    sys.stderr.flush()
+
+
 def now_ist():
     return datetime.now(IST)
-
-
-def now_ist_str():
-    return datetime.now(IST).strftime("%Y-%m-%d %H:%M:%S")
 
 
 def now_ist_ampm():
@@ -55,80 +58,6 @@ def utc_to_ist(iso_time_str):
         return None
 
 
-# 📦 PDF aur Graph
-try:
-    import matplotlib
-    matplotlib.use('Agg')
-    import matplotlib.pyplot as plt
-    MATPLOTLIB_AVAILABLE = True
-except ImportError:
-    MATPLOTLIB_AVAILABLE = False
-
-try:
-    from reportlab.lib.pagesizes import letter
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-    from reportlab.lib import colors
-    REPORTLAB_AVAILABLE = True
-except ImportError:
-    REPORTLAB_AVAILABLE = False
-
-
-# ============================================================
-# 🔑 OPENROUTER API KEYS
-# ============================================================
-OPENROUTER_KEYS = [
-    os.environ.get("OPENROUTER_API_KEY"),
-    os.environ.get("OPENROUTER_API_KEY_2"),
-    os.environ.get("OPENROUTER_API_KEY_3"),
-    os.environ.get("OPENROUTER_API_KEY_4"),
-    os.environ.get("OPENROUTER_API_KEY_5"),
-]
-
-FIXED_MODEL = "dots-studio/dots-3-note-preview:free"
-FALLBACK_MODEL = "openrouter/free"
-OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-
-FB_PAGE_ID = os.environ.get("PAGE_ID")
-FB_ACCESS_TOKEN = os.environ.get("PAGE_ACCESS_TOKEN")
-
-FB_API_VERSION = "v24.0"
-FB_GRAPH_URL = f"https://graph.facebook.com/{FB_API_VERSION}"
-
-DAYS_LIMIT = 28
-MAX_REPLIES_PER_RUN = 10
-MAX_CONVERSATION_DEPTH = 3
-MIN_COMMENT_AGE_MIN = 0
-MAX_COMMENT_AGE_HOURS = 24
-POSTS_TO_SCAN = 25
-COMMENT_FETCH_WORKERS = 10
-MAX_JSON_RETRIES = 12
-
-AUTO_COMMENT_ENABLED = os.environ.get("AUTO_COMMENT", "true").lower() == "true"
-
-KNOWN_GAMES = [
-    "BGMI", "Free Fire", "GTA 5", "GTA San Andreas", "GTA", "CODM",
-    "Call of Duty", "God of War", "Spider-Man", "Minecraft", "PUBG",
-    "Fortnite", "Valorant", "Clash of Clans", "Clash Royale", "Roblox",
-    "Among Us", "Apex Legends", "FIFA", "PES", "WWE", "Naruto",
-    "Dragon Ball", "Tekken", "Mortal Kombat", "Resident Evil",
-    "Black Ops 6", "Black Ops", "Modern Warfare", "Warzone", "MW3",
-    "God of War Ragnarok", "Spider-Man 2", "Ghost of Tsushima",
-    "Red Dead Redemption", "Elden Ring", "Dark Souls", "Sekiro",
-    "Cyberpunk 2077", "Assassin's Creed", "Far Cry", "Battlefield",
-    "Need for Speed", "Forza", "Gran Turismo", "Halo", "Gears of War",
-    "Subway Surfers", "Candy Crush", "Temple Run", "Clash",
-    "VietnamCavePrison", "combatoperation", "ghostandela", "mm2remastered",
-    "monkeyKing", "sifu", "codBlackops6", "SpiderMan2", "godofwar3",
-    "afghanistanredz", "spider",
-]
-
-
-def log(msg):
-    sys.stderr.write(f"{msg}\n")
-    sys.stderr.flush()
-
-
 def normalize(s):
     if not s:
         return ""
@@ -137,8 +66,7 @@ def normalize(s):
 
 def extract_urls(text):
     urls = re.findall(r'https?://[^\s\)\]\'"<>,;]+', text)
-    cleaned = []
-    seen = set()
+    cleaned, seen = [], set()
     for u in urls:
         u = u.rstrip('.,;)\']"')
         if u and u not in seen:
@@ -151,7 +79,7 @@ def fix_fb_url(url, vid_id=""):
     if not url:
         return f"https://www.facebook.com/{vid_id}" if vid_id else ""
     url = str(url).strip()
-    if url.startswith("http://") or url.startswith("https://"):
+    if url.startswith(("http://", "https://")):
         return url
     if url.startswith("/"):
         return f"https://www.facebook.com{url}"
@@ -162,7 +90,7 @@ def fix_ig_url(url):
     if not url:
         return ""
     url = str(url).strip()
-    if url.startswith("http://") or url.startswith("https://"):
+    if url.startswith(("http://", "https://")):
         return url
     if url.startswith("/"):
         return f"https://www.instagram.com{url}"
@@ -198,8 +126,107 @@ def parse_game_links_file(filepath):
     return videos
 
 
+def parse_posted_file(filepath, game_name):
+    with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+        content = f.read()
+    posts, current_video = [], {}
+    for line in content.split('\n'):
+        line = line.strip()
+        if not line:
+            continue
+        if '| Link:' in line:
+            if current_video.get('vid_id'):
+                posts.append(current_video)
+            link_part = line.split('| Link:')[-1].strip()
+            video_name = line.split('| Link:')[0].strip()
+            current_video = {
+                'vid_id': None, 'title': None, 'link': link_part,
+                'video_name': video_name, 'platform': 'FB + IG', 'game': game_name,
+            }
+        elif 'Video id :' in line:
+            current_video['vid_id'] = line.split('Video id :')[-1].strip()
+        elif 'Title :' in line:
+            current_video['title'] = line.split('Title :')[-1].strip()
+    if current_video.get('vid_id'):
+        posts.append(current_video)
+    return posts
+
+
+def load_source_data(posted_dir="posted_links_editor"):
+    source_links_map, source_videos_count, source_titles_map = {}, {}, {}
+    if not os.path.exists(posted_dir):
+        return source_links_map, source_videos_count, source_titles_map
+    for fname in os.listdir(posted_dir):
+        if fname.endswith("_posted_links_editor.txt"):
+            gname = fname.replace("_posted_links_editor.txt", "")
+            try:
+                with open(os.path.join(posted_dir, fname), 'r',
+                          encoding='utf-8', errors='ignore') as f:
+                    content = f.read()
+                urls = extract_urls(content)
+                if urls:
+                    source_links_map[gname] = urls
+                vid_count = content.count("Video id :") or len(urls)
+                source_videos_count[gname] = vid_count
+                titles = re.findall(r'Title\s*:\s*(.+)', content)
+                source_titles_map[gname] = [t.strip() for t in titles]
+            except Exception:
+                pass
+    return source_links_map, source_videos_count, source_titles_map
+
+
 # ============================================================
-# 🤖 OPENROUTER INTEGRATION
+# 🔑 CONSTANTS
+# ============================================================
+OPENROUTER_KEYS = [
+    os.environ.get("OPENROUTER_API_KEY"),
+    os.environ.get("OPENROUTER_API_KEY_2"),
+    os.environ.get("OPENROUTER_API_KEY_3"),
+    os.environ.get("OPENROUTER_API_KEY_4"),
+    os.environ.get("OPENROUTER_API_KEY_5"),
+]
+
+FIXED_MODEL = "dots-studio/dots-3-note-preview:free"
+FALLBACK_MODEL = "openrouter/free"
+OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
+
+FB_PAGE_ID = os.environ.get("PAGE_ID")
+FB_ACCESS_TOKEN = os.environ.get("PAGE_ACCESS_TOKEN")
+
+FB_API_VERSION = "v24.0"
+FB_GRAPH_URL = f"https://graph.facebook.com/{FB_API_VERSION}"
+
+DAYS_LIMIT = 28
+MAX_REPLIES_PER_RUN = 10
+MAX_CONVERSATION_DEPTH = 3
+MIN_COMMENT_AGE_MIN = 0
+MAX_COMMENT_AGE_HOURS = 720
+POSTS_TO_SCAN = 25
+COMMENT_FETCH_WORKERS = 10
+MAX_JSON_RETRIES = 12
+
+AUTO_COMMENT_ENABLED = os.environ.get("AUTO_COMMENT", "true").lower() == "true"
+
+KNOWN_GAMES = [
+    "BGMI", "Free Fire", "GTA 5", "GTA San Andreas", "GTA", "CODM",
+    "Call of Duty", "God of War", "Spider-Man", "Minecraft", "PUBG",
+    "Fortnite", "Valorant", "Clash of Clans", "Clash Royale", "Roblox",
+    "Among Us", "Apex Legends", "FIFA", "PES", "WWE", "Naruto",
+    "Dragon Ball", "Tekken", "Mortal Kombat", "Resident Evil",
+    "Black Ops 6", "Black Ops", "Modern Warfare", "Warzone", "MW3",
+    "God of War Ragnarok", "Spider-Man 2", "Ghost of Tsushima",
+    "Red Dead Redemption", "Elden Ring", "Dark Souls", "Sekiro",
+    "Cyberpunk 2077", "Assassin's Creed", "Far Cry", "Battlefield",
+    "Need for Speed", "Forza", "Gran Turismo", "Halo", "Gears of War",
+    "Subway Surfers", "Candy Crush", "Temple Run", "Clash",
+    "VietnamCavePrison", "combatoperation", "ghostandela", "mm2remastered",
+    "monkeyKing", "sifu", "codBlackops6", "SpiderMan2", "godofwar3",
+    "afghanistanredz", "spider",
+]
+
+
+# ============================================================
+# 🤖 OPENROUTER CLIENT
 # ============================================================
 def _call_openrouter_single(model_name, api_key, prompt, max_tokens=150):
     if not api_key:
@@ -233,78 +260,51 @@ def _call_openrouter_single(model_name, api_key, prompt, max_tokens=150):
     return None
 
 
-def call_openrouter(prompt, max_tokens=150):
-    valid_keys = [k for k in OPENROUTER_KEYS if k]
-    if not valid_keys:
-        log("❌ No OpenRouter API keys found.")
-        return None
-    primary_key = valid_keys[0]
-    result = _call_openrouter_single(FIXED_MODEL, primary_key, prompt, max_tokens)
-    if result:
-        return result
-    for idx, key in enumerate(valid_keys):
-        result = _call_openrouter_single(FALLBACK_MODEL, key, prompt, max_tokens)
-        if result:
-            return result
-    return None
-
-
-# ============================================================
-# 🎯 ROBUST JSON EXTRACTOR
-# ============================================================
 def _extract_json(response):
     if not response:
         return None
     cleaned = response.strip()
     if "```" in cleaned:
         cleaned = re.sub(r'^```(?:json)?\s*', '', cleaned)
-        cleaned = re.sub(r'\s*```$', '', cleaned)
-        cleaned = cleaned.strip()
+        cleaned = re.sub(r'\s*```$', '', cleaned).strip()
     try:
-        result = json.loads(cleaned)
-        if isinstance(result, dict):
-            return result
+        r = json.loads(cleaned)
+        if isinstance(r, dict):
+            return r
     except Exception:
         pass
-    start = cleaned.find("{")
-    end = cleaned.rfind("}")
-    if start != -1 and end != -1 and end > start:
+    s, e = cleaned.find("{"), cleaned.rfind("}")
+    if s != -1 and e != -1 and e > s:
         try:
-            result = json.loads(cleaned[start:end+1])
-            if isinstance(result, dict):
-                return result
+            r = json.loads(cleaned[s:e + 1])
+            if isinstance(r, dict):
+                return r
         except Exception:
             pass
-    json_match = re.search(r'\{[\s\S]*\}', cleaned)
-    if json_match:
+    m = re.search(r'\{[\s\S]*\}', cleaned)
+    if m:
         try:
-            result = json.loads(json_match.group())
-            if isinstance(result, dict):
-                return result
+            r = json.loads(m.group())
+            if isinstance(r, dict):
+                return r
         except Exception:
             pass
     return None
 
 
-# ============================================================
-# 🎯 BATCH REPLY GENERATOR
-# ============================================================
 def generate_batch_replies(comments_batch, max_retries=MAX_JSON_RETRIES):
     if not comments_batch:
         return {}
-
     formatted = ""
     for c in comments_batch:
         tone = "SAVAGE" if c["is_abuse"] else "FRIENDLY"
         safe_text = c["comment_text"].replace('"', "'").replace("\n", " ")[:300]
         caption_safe = c.get("post_title", "").replace('"', "'").replace("\n", " ")[:150]
         hashtags_safe = ", ".join(c.get("post_hashtags", []))[:100]
-
         thread_ctx = c.get("thread_context", "")
         context_line = ""
         if thread_ctx:
             context_line = f'Conversation So Far:\n{thread_ctx}\n'
-
         formatted += (
             f'[{tone}] ID: "{c["comment_id"]}" | '
             f'Game: "{c["game_name"]}" | '
@@ -320,7 +320,7 @@ Your replies should feel like a real human texting — casual, warm, funny, conf
 
 RULES:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. Reply in the SAME language as the comment (English/Hinglish only).
+1. Reply in the SAME language as the comment (English/Hinglish only, no regional languages).
 2. Keep it SHORT — maximum 25 words.
 3. Use natural slang — bhai, bro, yaar, lol, chill, OP, fire, lit.
 4. Use 1-2 emojis max.
@@ -354,33 +354,24 @@ YOUR JSON RESPONSE:"""
     for attempt in range(1, max_retries + 1):
         key_index = (attempt - 1) % len(valid_keys)
         current_key = valid_keys[key_index]
-
-        if attempt == 1:
-            model_to_use = FIXED_MODEL
-            log(f"🔄 Attempt {attempt}/{max_retries} | FIXED | Key {key_index + 1}")
-        else:
-            model_to_use = FALLBACK_MODEL
-            log(f"🔄 Attempt {attempt}/{max_retries} | FALLBACK | Key {key_index + 1}")
+        model_to_use = FIXED_MODEL if attempt == 1 else FALLBACK_MODEL
+        tag = "FIXED" if attempt == 1 else "FALLBACK"
+        log(f"🔄 Attempt {attempt}/{max_retries} | {tag} | Key {key_index + 1}")
 
         response = _call_openrouter_single(model_to_use, current_key, prompt, max_tokens=1800)
-
         if not response:
-            log(f"   ⚠️ Empty response — retry")
+            log("   ⚠️ Empty response — retry")
             time.sleep(1)
             continue
-
-        resp_stripped = response.strip().lower()
-        if resp_stripped in ["user safety: safe", "safe", "unsafe", "none"]:
-            log(f"   ⚠️ Safety model response — retry")
+        if response.strip().lower() in ["user safety: safe", "safe", "unsafe", "none"]:
+            log("   ⚠️ Safety model response — retry")
             time.sleep(1)
             continue
-
         parsed = _extract_json(response)
         if parsed is None:
-            log(f"   ⚠️ Invalid JSON — retry")
+            log(f"   ⚠️ Invalid JSON — retry. Preview: {response[:100]}")
             time.sleep(1)
             continue
-
         result = {}
         for c in comments_batch:
             cid = c["comment_id"]
@@ -388,21 +379,18 @@ YOUR JSON RESPONSE:"""
                 reply = str(parsed[cid]).strip().strip('"').strip("'")
                 if reply and reply.lower() not in ["user safety: safe", "safe", "unsafe", "none"]:
                     result[cid] = reply
-
         if result:
             log(f"   ✅ Valid JSON on attempt {attempt}: {len(result)}/{len(comments_batch)} replies")
             return result
-        else:
-            log(f"   ⚠️ Parsed but no valid replies — retry")
-            time.sleep(1)
-            continue
+        log("   ⚠️ Parsed but no valid replies — retry")
+        time.sleep(1)
 
     log(f"❌ Failed to get valid JSON after {max_retries} attempts.")
     return {}
 
 
 # ============================================================
-# 🚫 ABUSE DETECTION
+# 🚫 ABUSE / SPAM DETECTION
 # ============================================================
 ABUSE_PATTERNS = [
     r'\b(madarchod|madrchod|bhosd|bhosdi|bhosdike|chutiya|chutya|chutiye|gaand|gandu|gaandu|harami|haramkhor|haramzada|kutta|kutte|kutiya|suar|saala|sala|bkl|mc|bc|bkc|lund|lauda|lavda|randi|rand)\b',
@@ -418,26 +406,21 @@ FAMILY_ABUSE_PATTERNS = [
 
 
 def detect_abuse(text):
-    text_lower = text.lower()
-    for pattern in FAMILY_ABUSE_PATTERNS:
-        if re.search(pattern, text_lower, re.IGNORECASE):
+    tl = text.lower()
+    for p in FAMILY_ABUSE_PATTERNS:
+        if re.search(p, tl, re.IGNORECASE):
             return "family_abuse"
-    for pattern in ABUSE_PATTERNS:
-        if re.search(pattern, text_lower, re.IGNORECASE):
+    for p in ABUSE_PATTERNS:
+        if re.search(p, tl, re.IGNORECASE):
             return "general_abuse"
     return "none"
 
 
 def is_spam(text):
-    text_lower = text.lower()
-    spam_indicators = [
-        "http://", "https://", ".com", ".xyz", "click here",
-        "follow me", "dm me", "join my", "subscribe my",
-    ]
-    for indicator in spam_indicators:
-        if indicator in text_lower:
-            return True
-    return False
+    tl = text.lower()
+    indicators = ["http://", "https://", ".com", ".xyz", "click here",
+                  "follow me", "dm me", "join my", "subscribe my"]
+    return any(i in tl for i in indicators)
 
 
 def is_reply_safe(reply_text, is_abuse=False):
@@ -445,17 +428,17 @@ def is_reply_safe(reply_text, is_abuse=False):
         return False, "too_short"
     if len(reply_text) > 400:
         return False, "too_long"
-    reply_lower = reply_text.lower()
-    if "http" in reply_lower or ".com" in reply_lower:
+    rl = reply_text.lower()
+    if "http" in rl or ".com" in rl:
         return False, "contains_link"
-    for pattern in ABUSE_PATTERNS:
-        if re.search(pattern, reply_lower, re.IGNORECASE):
+    for p in ABUSE_PATTERNS:
+        if re.search(p, rl, re.IGNORECASE):
             return False, "reply_contains_abuse"
     return True, "safe"
 
 
 # ============================================================
-# 🤖 AUTO-REPLY FUNCTIONS (FIXED — Duplicate-Proof)
+# 💬 AUTO-COMMENT (DUPLICATE-PROOF)
 # ============================================================
 _page_name_cache = ""
 _user_name_cache = {}
@@ -496,8 +479,7 @@ def get_user_name(user_id, fallback_from_field=None):
                 params={"fields": "name", "access_token": FB_ACCESS_TOKEN},
                 timeout=8)
             if res.status_code == 200:
-                data = res.json()
-                name = (data.get("name") or "").strip()
+                name = (res.json().get("name") or "").strip()
                 if name:
                     _user_name_cache[user_id] = name
                     return name
@@ -511,7 +493,7 @@ def get_user_name(user_id, fallback_from_field=None):
 
 
 def load_replied_history():
-    """Load comment_id + reply_id + reply_to_id from log."""
+    """Load comment_id → depth AND reply_id → depth from log."""
     global _replied_history_cache
     if _replied_history_cache is not None:
         return _replied_history_cache
@@ -541,7 +523,7 @@ def load_replied_history():
 
 
 def was_already_replied(comment_id):
-    """Check both files."""
+    """Check both log files."""
     if not comment_id:
         return False
     if comment_id in load_replied_history():
@@ -559,7 +541,6 @@ def was_already_replied(comment_id):
 
 
 def fetch_fb_comments(post_id, since_timestamp=None):
-    url = f"{FB_GRAPH_URL}/{post_id}/comments"
     params = {
         "fields": "id,message,from{name,id},created_time,can_reply",
         "access_token": FB_ACCESS_TOKEN,
@@ -568,25 +549,25 @@ def fetch_fb_comments(post_id, since_timestamp=None):
     if since_timestamp:
         params["since"] = since_timestamp
     try:
-        res = requests.get(url, params=params, timeout=15)
+        res = requests.get(f"{FB_GRAPH_URL}/{post_id}/comments",
+                           params=params, timeout=15)
         if res.status_code == 200:
             return res.json().get("data", [])
-        else:
-            log(f"      ⚠️ comments error ({res.status_code}): {res.text[:150]}")
+        log(f"      ⚠️ comments error ({res.status_code}): {res.text[:150]}")
     except Exception as e:
         log(f"      ⚠️ comments exception: {e}")
     return []
 
 
 def fetch_comment_replies(comment_id):
-    url = f"{FB_GRAPH_URL}/{comment_id}/comments"
     params = {
         "fields": "id,message,from{name,id},created_time,can_reply",
         "access_token": FB_ACCESS_TOKEN,
         "limit": 50,
     }
     try:
-        res = requests.get(url, params=params, timeout=15)
+        res = requests.get(f"{FB_GRAPH_URL}/{comment_id}/comments",
+                           params=params, timeout=15)
         if res.status_code == 200:
             return res.json().get("data", [])
     except Exception:
@@ -595,49 +576,53 @@ def fetch_comment_replies(comment_id):
 
 
 def post_fb_reply(comment_id, reply_text):
-    """Post reply with synthetic fallback ID."""
+    """Post reply — with synthetic fallback ID."""
     if not AUTO_COMMENT_ENABLED:
         log(f"🚫 [AUTO_COMMENT OFF] Would post: {reply_text[:80]}")
         return f"disabled_{comment_id}"
-
-    url = f"{FB_GRAPH_URL}/{comment_id}/comments"
-    payload = {"message": reply_text, "access_token": FB_ACCESS_TOKEN}
     try:
         time.sleep(random.uniform(2, 5))
-        res = requests.post(url, data=payload, timeout=15)
+        res = requests.post(
+            f"{FB_GRAPH_URL}/{comment_id}/comments",
+            data={"message": reply_text, "access_token": FB_ACCESS_TOKEN},
+            timeout=15)
         if res.status_code == 200:
             data = res.json()
-            rid = data.get("id")
-            if rid:
-                return rid
+            reply_id = data.get("id")
+            if reply_id:
+                return reply_id
+            log(f"⚠️ FB API no reply_id — using synthetic")
             return f"synth_{comment_id}_{int(time.time())}"
-        else:
-            log(f"⚠️ Reply post error ({res.status_code}): {res.text[:200]}")
+        log(f"⚠️ Reply post error ({res.status_code}): {res.text[:200]}")
     except Exception as e:
         log(f"⚠️ Reply post exception: {e}")
     return None
 
 
 def analyze_thread(top_comment):
-    """Log check FIRST (always)."""
+    """✅ Log check FIRST (always), then FB API."""
     cid = top_comment.get("id", "")
 
     # 🛡️ LAYER 1: LOG CHECK — SABSE PEHLE
     if was_already_replied(cid):
+        history_depth = load_replied_history().get(cid, 1)
+        log(f"      ⏭️ SKIP — comment_id already in log")
         return {
             "should_reply": False,
-            "depth": load_replied_history().get(cid, 1),
+            "depth": history_depth,
             "reason": "already_replied_log",
         }
 
+    # 🛡️ LAYER 2: FB API se replies
     replies = fetch_comment_replies(cid)
     replies_sorted = sorted(replies, key=lambda x: x.get("created_time", ""))
 
-    # 🛡️ LAYER 2: FB reply_ids log mein
+    # 🛡️ LAYER 3: FB reply_ids log mein
     history = load_replied_history()
     for r in replies_sorted:
         r_id = r.get("id", "")
         if r_id and r_id in history:
+            log(f"      ⏭️ SKIP — FB reply_id in log")
             return {
                 "should_reply": False,
                 "depth": history.get(r_id, 1),
@@ -677,6 +662,8 @@ def analyze_thread(top_comment):
         if last_is_ours:
             return {"should_reply": False, "depth": our_count, "reason": "waiting_user"}
         log(f"      💬 User replied — continuing (depth {our_count})")
+    elif our_count == 0 and len(user_replies) > 0:
+        log(f"      ⚠️ User replied but no ours — will reply")
 
     thread_ctx = ""
     for r in replies_sorted[-6:]:
@@ -714,16 +701,16 @@ def analyze_thread(top_comment):
 
 
 def process_fb_comments(actual_posted_titles=None):
-    """Duplicate-proof save."""
     if not AUTO_COMMENT_ENABLED:
-        log("🚫 Auto-comment disabled — skipping reply processing")
+        log("🚫 Auto-comment disabled")
         return None
 
-    log("🤖 Auto-reply processing started (fixed)...")
+    log("🤖 Auto-reply started (duplicate-proof v3)...")
 
     page_name = get_page_name()
     log(f"📄 Page name: {page_name or 'N/A'}")
 
+    # Load state
     replied_file = "logs/replied_comment_ids.json"
     replied_data = {"replied": [], "last_updated": ""}
     if os.path.exists(replied_file):
@@ -745,9 +732,9 @@ def process_fb_comments(actual_posted_titles=None):
             pass
 
     history = load_replied_history()
+    log(f"📂 Replied history cache: {len(history)} IDs")
     for hid in history.keys():
         replied_ids.add(hid)
-    log(f"📂 Replied history: {len(history)} IDs")
 
     cutoff_time = (now_ist() - timedelta(hours=MAX_COMMENT_AGE_HOURS)).timestamp()
     min_age_time = (now_ist() - timedelta(minutes=MIN_COMMENT_AGE_MIN)).timestamp()
@@ -757,10 +744,11 @@ def process_fb_comments(actual_posted_titles=None):
         res = requests.get(
             f"{FB_GRAPH_URL}/{FB_PAGE_ID}/posts",
             params={"fields": "id,message,created_time,permalink_url",
-                    "access_token": FB_ACCESS_TOKEN, "limit": POSTS_TO_SCAN},
+                    "access_token": FB_ACCESS_TOKEN,
+                    "limit": POSTS_TO_SCAN},
             timeout=20)
         if res.status_code != 200:
-            log(f"❌ FB posts error: {res.text[:200]}")
+            log(f"❌ FB posts error ({res.status_code}): {res.text[:300]}")
             return None
         posts = res.json().get("data", [])
         log(f"✅ {len(posts)} posts")
@@ -773,22 +761,22 @@ def process_fb_comments(actual_posted_titles=None):
 
     post_comments_map = {}
 
-    def fetch_post_comments_wrapper(post):
-        post_id = post.get("id", "")
-        if not post_id:
-            return (post_id, [])
+    def fetch_post_comments(post):
+        pid = post.get("id", "")
+        if not pid:
+            return (pid, [])
         try:
-            return (post_id, fetch_fb_comments(post_id))
+            return (pid, fetch_fb_comments(pid))
         except Exception as e:
-            log(f"      ⚠️ Error {post_id}: {e}")
-            return (post_id, [])
+            log(f"      ⚠️ Error {pid}: {e}")
+            return (pid, [])
 
-    with ThreadPoolExecutor(max_workers=COMMENT_FETCH_WORKERS) as executor:
-        futures = {executor.submit(fetch_post_comments_wrapper, p): p for p in posts}
-        for future in as_completed(futures):
+    with ThreadPoolExecutor(max_workers=COMMENT_FETCH_WORKERS) as ex:
+        futures = {ex.submit(fetch_post_comments, p): p for p in posts}
+        for fut in as_completed(futures):
             try:
-                post_id, comments = future.result()
-                post_comments_map[post_id] = comments
+                pid, comments = fut.result()
+                post_comments_map[pid] = comments
             except Exception as e:
                 log(f"⚠️ Parallel error: {e}")
 
@@ -802,7 +790,7 @@ def process_fb_comments(actual_posted_titles=None):
         if len(valid_comments) >= MAX_REPLIES_PER_RUN:
             break
         post_id = post.get("id", "")
-        post_message_full = (post.get("message", "") or "")
+        post_message_full = post.get("message", "") or ""
         post_message = post_message_full[:80]
         comments = post_comments_map.get(post_id, [])
         if not comments:
@@ -825,7 +813,7 @@ def process_fb_comments(actual_posted_titles=None):
                     game_name = g
                     break
 
-        log(f"🔍 Post: {post_id} | {post_message} | {len(comments)} comments")
+        log(f"🔍 Post {post_id} | {post_message} | {len(comments)} comments")
         log(f"      🎮 Game: {game_name}")
 
         for comment in comments:
@@ -846,8 +834,8 @@ def process_fb_comments(actual_posted_titles=None):
 
             try:
                 dt = datetime.fromisoformat(comment_time.replace("+0000", "+00:00"))
-                comment_ts = dt.timestamp()
-                if comment_ts < cutoff_time or comment_ts > min_age_time:
+                ts = dt.timestamp()
+                if ts < cutoff_time or ts > min_age_time:
                     continue
             except Exception:
                 pass
@@ -874,8 +862,7 @@ def process_fb_comments(actual_posted_titles=None):
 
             state = analyze_thread(comment)
             if not state["should_reply"]:
-                if state["reason"] in ("max_depth", "waiting_user", "already_replied_log",
-                                        "already_replied_log_reply_id"):
+                if state["reason"] in ("max_depth", "waiting_user", "already_replied_log", "already_replied_log_reply_id"):
                     log(f"      ⏭️ Skip ({state['reason']}) — {comment_id[:20]}")
                 continue
 
@@ -900,26 +887,24 @@ def process_fb_comments(actual_posted_titles=None):
             })
 
     if not valid_comments:
-        log("ℹ️ No valid comments to reply.")
+        log("ℹ️ No valid comments")
         replies_map = {}
     else:
-        log(f"📦 Batch: {len(valid_comments)} comments → 12-retry")
+        log(f"📦 Batch: {len(valid_comments)} comments → 12-retry loop")
         replies_map = generate_batch_replies(valid_comments)
 
     replies_count = 0
     for c in valid_comments:
-        comment_id = c["comment_id"]
-        reply_text = replies_map.get(comment_id)
-
+        cid = c["comment_id"]
+        reply_text = replies_map.get(cid)
         if not reply_text:
-            log(f"⚠️ No reply for {comment_id} — skipping")
+            log(f"⚠️ No reply for {cid} — skip")
             continue
-
         safe, reason = is_reply_safe(reply_text, is_abuse=c["is_abuse"])
         if not safe:
-            log(f"⚠️ Reply unsafe ({reason}) for {comment_id}")
+            log(f"⚠️ Unsafe ({reason}) for {cid}")
             skipped_logs.append({
-                "comment_id": comment_id,
+                "comment_id": cid,
                 "comment_text": c["comment_text"][:100],
                 "reason": f"unsafe_{reason}",
                 "timestamp": now_ist_ampm(),
@@ -931,7 +916,7 @@ def process_fb_comments(actual_posted_titles=None):
             replies_count += 1
             reply_log["replies"].append({
                 "reply_id": reply_id,
-                "comment_id": comment_id,
+                "comment_id": cid,
                 "reply_to_id": c["reply_to_id"],
                 "post_id": c["post_id"],
                 "user_name": c["user_name"],
@@ -948,18 +933,14 @@ def process_fb_comments(actual_posted_titles=None):
                 "status": "posted",
             })
             reply_log["total_replies"] = reply_log.get("total_replies", 0) + 1
-
-            # ✅ CRITICAL FIX: replied_ids mein add
-            replied_ids.add(comment_id)
+            replied_ids.add(cid)
             replied_ids.add(reply_id)
             replied_ids.add(c["reply_to_id"])
-
-            log(f"✅ Reply posted [depth {c['current_depth'] + 1}] {comment_id[:20]}")
-            log(f"   👤 User: {c['user_name']}")
-            log(f"   💬 Comment: {c['comment_text'][:80]}")
-            log(f"   🤖 AI Reply: {reply_text[:80]}")
+            log(f"✅ Posted [depth {c['current_depth'] + 1}] {cid[:20]} → user={c['user_name']}")
+            log(f"   💬 {c['comment_text'][:80]}")
+            log(f"   🤖 {reply_text[:80]}")
         else:
-            log(f"❌ Failed to post reply for {comment_id[:20]}")
+            log(f"❌ Failed to post for {cid}")
 
     reply_log["skipped"].extend(skipped_logs)
     reply_log["total_skipped"] = reply_log.get("total_skipped", 0) + len(skipped_logs)
@@ -977,25 +958,177 @@ def process_fb_comments(actual_posted_titles=None):
     reply_log["replies"] = reply_log.get("replies", [])[-500:]
     reply_log["skipped"] = reply_log.get("skipped", [])[-200:]
     reply_log["last_updated"] = now_ist_ampm()
-    with open(reply_log_file, 'w', encoding='utf-8') as f:
-        json.dump(reply_log, f, indent=2, ensure_ascii=False)
+    try:
+        with open(reply_log_file, 'w', encoding='utf-8') as f:
+            json.dump(reply_log, f, indent=2, ensure_ascii=False)
+    except Exception as e:
+        log(f"⚠️ reply_log save error: {e}")
 
-    log(f"🤖 Auto-reply done. {replies_count} replies posted.")
-    log(f"📊 Total in history: {len(reply_log.get('replies', []))}")
+    log(f"🤖 FB Auto-reply done. {replies_count} new replies. "
+        f"Total in history: {len(reply_log.get('replies', []))}")
     return reply_log
 
 
 # ============================================================
-# 📈 TRENDING GAMES
+# 📊 DASHBOARD UPDATE
 # ============================================================
-def detect_trending_games(actual_posted_titles, game_views_summary, days=7):
+def update_dashboard():
+    try:
+        from game_analytics import AnalyticsEngine
+    except ImportError:
+        log("ℹ️ game_analytics not found — using inline dashboard logic")
+        update_dashboard_inline()
+        return
+    log("📊 Using game_analytics.py")
+
+
+def update_dashboard_inline():
+    """Inline dashboard — no external import needed."""
+    log("\n" + "=" * 60)
+    log("📊 DASHBOARD UPDATE (inline)")
+    log("=" * 60)
+
+    links_dir = "game_links_editor"
+    os.makedirs("logs", exist_ok=True)
+
+    if not os.path.exists(links_dir):
+        log("⚠️ No game_links_editor — dashboard skip")
+        return
+
+    all_files = glob.glob(os.path.join(links_dir, "*.txt"))
+    all_files = [f for f in all_files
+                 if any(k in f for k in ("_uploaded_links", "_links_editor", "_posted_links"))]
+    valid_files = [f for f in all_files if os.path.exists(f)]
+
+    game_list, file_mapping = [], {}
+    for f in valid_files:
+        g = (os.path.basename(f)
+             .replace("_uploaded_links.txt", "")
+             .replace("_links_editor.txt", "")
+             .replace("_posted_links_editor.txt", "")
+             .replace(".txt", "").strip())
+        if g:
+            file_mapping[g] = f
+            game_list.append(g)
+    game_list = sorted(set(game_list))
+    log(f"📁 {len(game_list)} games")
+
+    actual_posted_titles, game_views_summary = fetch_fb_ig_data(game_list)
+    if not game_views_summary:
+        game_views_summary = {g: 0 for g in game_list}
+
+    try:
+        detect_trending_games(actual_posted_titles, days=7)
+    except Exception as e:
+        log(f"⚠️ Trending error: {e}")
+    try:
+        analyze_best_time()
+    except Exception as e:
+        log(f"⚠️ Best time error: {e}")
+
+    memory = {}
+    if os.path.exists("logs/agent_memory.json"):
+        try:
+            with open("logs/agent_memory.json", 'r', encoding='utf-8') as f:
+                memory = json.load(f)
+        except Exception:
+            pass
+    game_stats = memory.get("game_stats", {})
+
+    generate_dashboard_md(actual_posted_titles, game_views_summary, game_stats, file_mapping)
+
+
+def fetch_fb_ig_data(game_list):
+    """Simplified FB/IG data fetch."""
+    posted_dir = 'posted_links_editor'
+    result = {g: [] for g in game_list}
+    game_views_summary = {g: 0 for g in game_list}
+
+    if not FB_ACCESS_TOKEN:
+        log("⚠️ FB_ACCESS_TOKEN missing")
+        return result, game_views_summary
+
+    since_ts = int((now_ist() - timedelta(days=DAYS_LIMIT)).timestamp())
+    fb_videos, ig_medias = [], []
+    try:
+        res = requests.get(
+            f"{FB_GRAPH_URL}/{FB_PAGE_ID}/videos",
+            params={"fields": "id,title,description,views,permalink_url,created_time",
+                    "since": since_ts, "access_token": FB_ACCESS_TOKEN, "limit": 100},
+            timeout=20)
+        if res.status_code == 200:
+            fb_videos = res.json().get("data", [])
+            log(f"✅ FB page: {len(fb_videos)} videos fetched")
+    except Exception as e:
+        log(f"❌ FB page fetch error: {e}")
+
+    try:
+        res_ig_acc = requests.get(
+            f"{FB_GRAPH_URL}/{FB_PAGE_ID}",
+            params={"fields": "instagram_business_account",
+                    "access_token": FB_ACCESS_TOKEN},
+            timeout=10)
+        if res_ig_acc.status_code == 200:
+            ig_id = res_ig_acc.json().get("instagram_business_account", {}).get("id")
+            if ig_id:
+                res_ig = requests.get(
+                    f"{FB_GRAPH_URL}/{ig_id}/media",
+                    params={"fields": "id,caption,permalink,timestamp,like_count,comments_count",
+                            "access_token": FB_ACCESS_TOKEN, "limit": 100},
+                    timeout=20)
+                if res_ig.status_code == 200:
+                    ig_medias = res_ig.json().get("data", [])
+                    log(f"✅ IG: {len(ig_medias)} media fetched")
+    except Exception as e:
+        log(f"❌ IG fetch error: {e}")
+
+    for game in game_list:
+        game_norm = normalize(game)
+        for v in fb_videos:
+            title = (v.get("title") or v.get("description") or "").strip()
+            if not title or not (game_norm and game_norm in normalize(title)):
+                continue
+            fb_vid_id = str(v.get("id", "")).strip()
+            entry = {
+                "title": title,
+                "fb_link": fix_fb_url(v.get("permalink_url", ""), fb_vid_id),
+                "fb_views": int(v.get("views", 0) or 0),
+                "fb_posted": True, "ig_link": "", "ig_views": 0, "ig_posted": False,
+                "timestamp": v.get("created_time", ""),
+                "vid_id": fb_vid_id, "video_name": "",
+                "source_link": "",
+            }
+            result[game].append(entry)
+            game_views_summary[game] += entry["fb_views"]
+
+        for m in ig_medias:
+            caption = (m.get("caption") or "").strip()
+            if not caption or not (game_norm and game_norm in normalize(caption)):
+                continue
+            ig_views = (m.get("like_count", 0) * 10) + (m.get("comments_count", 0) * 20)
+            ig_media_id = str(m.get("id", "")).strip()
+            result[game].append({
+                "title": caption[:100], "fb_link": "", "fb_views": 0,
+                "fb_posted": False,
+                "ig_link": fix_ig_url(m.get("permalink", "")),
+                "ig_views": ig_views, "ig_posted": True,
+                "timestamp": m.get("timestamp", ""),
+                "vid_id": ig_media_id, "video_name": "",
+                "source_link": "",
+            })
+            game_views_summary[game] += ig_views
+
+    for game in game_list:
+        result[game].sort(key=lambda x: x.get("timestamp", "") or "0000", reverse=True)
+
+    return result, game_views_summary
+
+
+def detect_trending_games(actual_posted_titles, days=7):
     game_stats = {}
     for g_name, videos in actual_posted_titles.items():
-        total_views = 0
-        video_count = 0
-        latest_post = ""
-        latest_fb_link = ""
-        latest_source = ""
+        total_views, video_count = 0, 0
+        latest_post, latest_fb_link = "", ""
         for v in videos:
             if not (v.get("fb_posted") or v.get("ig_posted")):
                 continue
@@ -1011,17 +1144,17 @@ def detect_trending_games(actual_posted_titles, game_views_summary, days=7):
             if ts > latest_post:
                 latest_post = ts
                 latest_fb_link = v.get("fb_link", "")
-                latest_source = v.get("source_link", "")
         if video_count > 0:
             game_stats[g_name] = {
                 "total_views": total_views, "video_count": video_count,
                 "avg_views": total_views // video_count,
                 "latest_post": latest_post, "fb_link": latest_fb_link,
-                "source_link": latest_source,
+                "source_link": "",
             }
 
     if not game_stats:
-        result = {"last_updated": now_ist_ampm(), "period_days": days, "trending": [], "below_avg": [], "recommendation": None}
+        result = {"last_updated": now_ist_ampm(), "period_days": days,
+                  "trending": [], "below_avg": [], "recommendation": None}
         os.makedirs("logs", exist_ok=True)
         with open("logs/trending_cache.json", 'w', encoding='utf-8') as f:
             json.dump(result, f, indent=2)
@@ -1033,11 +1166,16 @@ def detect_trending_games(actual_posted_titles, game_views_summary, days=7):
     trending_list = []
     for g, s in game_stats.items():
         ratio = s["avg_views"] / overall_avg if overall_avg > 0 else 0
-        if ratio >= 2.0: trend = "viral"
-        elif ratio >= 1.5: trend = "trending"
-        elif ratio >= 1.0: trend = "steady"
-        elif ratio >= 0.5: trend = "slow"
-        else: trend = "below_avg"
+        if ratio >= 2.0:
+            trend = "viral"
+        elif ratio >= 1.5:
+            trend = "trending"
+        elif ratio >= 1.0:
+            trend = "steady"
+        elif ratio >= 0.5:
+            trend = "slow"
+        else:
+            trend = "below_avg"
         trending_list.append({
             "game": g, "views_7d": s["total_views"],
             "avg_per_video": s["avg_views"], "trend": trend, "ratio": ratio,
@@ -1049,30 +1187,23 @@ def detect_trending_games(actual_posted_titles, game_views_summary, days=7):
     below = [t for t in trending_list if t["trend"] in ("slow", "below_avg")][:5]
     best = trending_list[0] if trending_list else None
 
-    result = {
-        "last_updated": now_ist_ampm(), "period_days": days,
-        "trending": top, "below_avg": below, "recommendation": best,
-    }
+    result = {"last_updated": now_ist_ampm(), "period_days": days,
+              "trending": top, "below_avg": below, "recommendation": best}
     os.makedirs("logs", exist_ok=True)
     with open("logs/trending_cache.json", 'w', encoding='utf-8') as f:
         json.dump(result, f, indent=2)
     return result
 
 
-# ============================================================
-# 🎯 BEST TIME TO POST
-# ============================================================
-def analyze_best_time(all_history):
-    if not all_history:
-        try:
-            with open("logs/dashboard_history.json", 'r', encoding='utf-8') as f:
-                all_history = json.load(f)
-        except Exception:
-            all_history = {}
+def analyze_best_time():
+    all_history = {}
+    try:
+        with open("logs/dashboard_history.json", 'r', encoding='utf-8') as f:
+            all_history = json.load(f)
+    except Exception:
+        pass
 
-    hourly = {}
-    daily = {}
-
+    hourly, daily = {}, {}
     for game, entries in all_history.items():
         for entry in entries:
             ts = entry.get("timestamp", "")
@@ -1081,25 +1212,18 @@ def analyze_best_time(all_history):
                 continue
             dt = utc_to_ist(ts)
             if dt is None:
-                try:
-                    dt = datetime.strptime(ts, "%Y-%m-%d %H:%M:%S")
-                except Exception:
-                    try:
-                        dt = datetime.strptime(ts, "%Y-%m-%d %I:%M:%S %p")
-                    except Exception:
-                        continue
-            hour = dt.hour
-            day_name = dt.strftime("%A")
-            hourly.setdefault(hour, []).append(views)
-            daily.setdefault(day_name, []).append(views)
+                continue
+            hourly.setdefault(dt.hour, []).append(views)
+            daily.setdefault(dt.strftime("%A"), []).append(views)
 
     hourly_stats = []
     for hour, views_list in hourly.items():
         if len(views_list) < 2:
             continue
-        avg = sum(views_list) // len(views_list)
-        hourly_stats.append({"hour": hour, "posts": len(views_list), "avg_views": avg})
-
+        hourly_stats.append({
+            "hour": hour, "posts": len(views_list),
+            "avg_views": sum(views_list) // len(views_list),
+        })
     hourly_stats.sort(key=lambda x: x["avg_views"], reverse=True)
 
     top_slots = []
@@ -1119,7 +1243,10 @@ def analyze_best_time(all_history):
     daily_stats = {}
     for day, views_list in daily.items():
         if views_list:
-            daily_stats[day] = {"avg_views": sum(views_list) // len(views_list), "posts": len(views_list)}
+            daily_stats[day] = {
+                "avg_views": sum(views_list) // len(views_list),
+                "posts": len(views_list),
+            }
 
     result = {
         "last_updated": now_ist_ampm(),
@@ -1133,1071 +1260,170 @@ def analyze_best_time(all_history):
     return result
 
 
-# ============================================================
-# 🎨 DASHBOARD SECTIONS
-# ============================================================
-def generate_trending_section():
+def generate_dashboard_md(actual_posted_titles, game_views_summary, game_stats, file_mapping):
+    """Generate dashboard MD."""
+    dashboard_path = "GAMING_DASHBOARD.md"
+
+    total_views = sum(game_views_summary.values()) or 1
+    analytics = []
+    for g, v in game_views_summary.items():
+        uploaded = game_stats.get(g, {}).get("uploaded_count", 0)
+        avg = int(v / uploaded) if uploaded > 0 else 0
+        share = round((v / total_views) * 100, 2)
+        analytics.append({"game": g, "total_views": v, "uploaded_count": uploaded,
+                          "avg_views": avg, "share_pct": share})
+    analytics.sort(key=lambda x: x["total_views"], reverse=True)
+
+    md = ["# 🚀 GAMING AGENT DASHBOARD\n\n",
+          f"> **Last Updated:** {now_ist_ampm()} IST | **Status:** Active\n\n",
+          "--- \n\n## 🏆 Global Leaderboard\n\n",
+          "| Rank | Game | Videos | Views | Avg/Video | Tier |\n",
+          "|:---:|---|---|---|---|---|\n"]
+    medals = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣"]
+    for idx, item in enumerate(analytics):
+        rank = medals[idx] if idx < len(medals) else f"{idx+1}"
+        tier = "🔥 Viral" if item["avg_views"] > 7000 else ("⚡ Trending" if item["avg_views"] > 4000 else "📈 Stable")
+        md.append(f"| {rank} | **{item['game']}** | {item['uploaded_count']} | "
+                  f"{item['total_views']:,} | {item['avg_views']:,} | {tier} |\n")
+
+    md.append("\n--- \n\n## 📈 Trending Games (Last 7 Days)\n\n")
     try:
         with open("logs/trending_cache.json", 'r', encoding='utf-8') as f:
             data = json.load(f)
+        trending = data.get("trending", [])
+        if trending:
+            md.append("| Rank | Game | Views | Avg | Trend |\n|:---:|---|---|---|---|\n")
+            for idx, t in enumerate(trending, 1):
+                md.append(f"| {idx} | **{t['game']}** | {t['views_7d']:,} | "
+                          f"{t['avg_per_video']:,} | {t['trend']} |\n")
     except Exception:
-        return ""
-    lines = []
-    lines.append("\n--- \n\n## 📈 Trending Games (Last 7 Days)\n\n")
-    lines.append(f"> Auto-detected based on views performance | Last Updated: {data.get('last_updated', 'N/A')}\n\n")
-    trending = data.get("trending", [])
-    if trending:
-        lines.append("| Rank | Game Name | Views (7d) | Avg / Video | Trend | FB Post | Source |\n")
-        lines.append("|:---:|---|---|---|---|---|---|\n")
-        for idx, t in enumerate(trending, 1):
-            medals = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣"]
-            rank_icon = medals[idx-1] if idx <= 5 else str(idx)
-            trend_icon = {"viral": "🚀 **VIRAL**", "trending": "🔥 Trending", "steady": "⚡ Steady"}.get(t["trend"], "📈")
-            fb_link = t.get("fb_link", "")
-            fb_md = f"[🔵]({fb_link})" if fb_link else "_N/A_"
-            src_link = t.get("source_link", "")
-            src_md = f"[📂]({src_link})" if src_link else "_N/A_"
-            lines.append(f"| {rank_icon} | **{t['game']}** | {t['views_7d']:,} | {t['avg_per_video']:,} | {trend_icon} | {fb_md} | {src_md} |\n")
-    below = data.get("below_avg", [])
-    if below:
-        lines.append("\n### 📉 Below Average This Week\n\n")
-        lines.append("| Game | Views (7d) | Avg |\n|---|---|---|\n")
-        for b in below:
-            lines.append(f"| {b['game']} | {b['views_7d']:,} | {b['avg_per_video']:,} |\n")
-    rec = data.get("recommendation")
-    if rec:
-        lines.append("\n### 💡 Recommendation\n\n")
-        lines.append(f"**Best game to post next:** 🚀 **{rec['game']}** (Avg {rec['avg_per_video']:,} views/video)\n")
-    return "".join(lines)
+        md.append("_No data_\n")
 
-
-def generate_best_time_section():
+    md.append("\n--- \n\n## 🎯 Best Time to Post\n\n")
     try:
         with open("logs/best_time_analysis.json", 'r', encoding='utf-8') as f:
             data = json.load(f)
+        slots = data.get("top_slots", [])
+        if slots:
+            md.append("| Rank | Time | Avg Views |\n|:---:|---|---|\n")
+            for s in slots:
+                md.append(f"| {s['icon']} | **{s['time_slot']}** | {s['avg_views']:,} |\n")
     except Exception:
-        return ""
-    lines = []
-    lines.append("\n--- \n\n## 🎯 Best Time to Post (IST)\n\n")
-    lines.append(f"> Analysis from {data.get('total_posts_analyzed', 0)} posts | Last Updated: {data.get('last_updated', 'N/A')}\n\n")
-    slots = data.get("top_slots", [])
-    if slots:
-        lines.append("| Rank | Time (IST) | Posts | Avg Views | Recommendation |\n")
-        lines.append("|:---:|---|:---:|:---:|---|\n")
-        for s in slots:
-            rec_icon = {"BEST": "🔥 **BEST**", "Great": "⚡ **Great**", "Good": "✅ **Good**", "Average": "📊 Average", "Below avg": "📉 Below avg"}.get(s["recommendation"], s["recommendation"])
-            lines.append(f"| {s['icon']} | **{s['time_slot']}** | {s['posts']} | **{s['avg_views']:,}** | {rec_icon} |\n")
-    today = data.get("today_suggestion")
-    if today:
-        lines.append(f"\n### 💡 Today's Suggestion\n\n**Aaj post karo:** ⏰ **{today['time_slot']} IST**\n")
-    daily = data.get("daily", {})
-    if daily:
-        lines.append("\n### 📅 Weekly Pattern\n\n| Day | Posts | Avg Views |\n|---|---|---|\n")
-        for day in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]:
-            if day in daily:
-                lines.append(f"| {day} | {daily[day]['posts']} | {daily[day]['avg_views']:,} |\n")
-    return "".join(lines)
+        md.append("_No data_\n")
 
-
-def generate_auto_reply_section():
+    md.append("\n--- \n\n## 🤖 Auto-Reply Log\n\n")
     try:
         with open("logs/auto_reply_log.json", 'r', encoding='utf-8') as f:
             data = json.load(f)
+        md.append(f"> Total: {data.get('total_replies', 0)} | "
+                  f"Skipped: {data.get('total_skipped', 0)} | "
+                  f"Last: {data.get('last_updated', 'N/A')}\n\n")
+        replies = data.get("replies", [])
+        if replies:
+            md.append("| # | Time | User | Comment | AI Reply | Depth |\n")
+            md.append("|---|---|---|---|---|---|\n")
+            for idx, r in enumerate(list(reversed(replies[-20:])), 1):
+                un = (r.get("user_name", "?") or "?").replace("|", "\\|")[:20]
+                cm = (r.get("user_comment", "") or "").replace("\n", " ").replace("|", "\\|")[:50]
+                rp = (r.get("openrouter_reply", "") or "").replace("\n", " ").replace("|", "\\|")[:70]
+                ts = r.get("timestamp", "")[:20]
+                d = r.get("depth", 1)
+                md.append(f"| {idx} | {ts} | **{un}** | {cm} | {rp} | {d} |\n")
     except Exception:
-        return ""
-    lines = []
-    lines.append("\n--- \n\n## 🤖 Auto-Reply Log (Fixed)\n\n")
-    status = "🚫 **DISABLED**" if not AUTO_COMMENT_ENABLED else "✅ **ACTIVE**"
-    lines.append(f"> Auto-Comment Status: {status} | Last Updated: {data.get('last_updated', 'N/A')} | ")
-    lines.append(f"Total Replies: {data.get('total_replies', 0)} | Skipped: {data.get('total_skipped', 0)}\n\n")
-    replies = data.get("replies", [])
-    if replies:
-        friendly_count = sum(1 for r in replies if r.get("type") == "friendly")
-        savage_count = sum(1 for r in replies if r.get("type") == "savage")
-        lines.append("### 📊 Stats\n\n| Metric | Value |\n|---|---|\n")
-        lines.append(f"| Friendly Replies | {friendly_count} |\n")
-        lines.append(f"| Savage Replies | {savage_count} |\n")
-        lines.append(f"| Total | {len(replies)} |\n\n")
-        lines.append("### 💬 Recent Replies (Last 20)\n\n")
-        lines.append("| # | Time | 👤 User | 💬 User Comment | 🤖 AI Reply | Type | Depth | Game | FB Post |\n")
-        lines.append("|---|---|---|---|---|---|---|---|---|\n")
-        for idx, r in enumerate(list(reversed(replies[-20:])), 1):
-            user_name = (r.get("user_name", "Unknown") or "Unknown").replace("|", "\\|")[:20]
-            comment = (r.get("user_comment", "") or "").replace("\n", " ").replace("|", "\\|")[:60]
-            reply = (r.get("openrouter_reply", "") or "").replace("\n", " ").replace("|", "\\|")[:80]
-            ts = r.get("timestamp", "")[:20]
-            rtype = "😎 Savage" if r.get("type") == "savage" else "✅ Friendly"
-            depth = r.get("depth", 1)
-            game = (r.get("game", "") or "").replace("|", "\\|")[:15]
-            fb_link = r.get("fb_post_link", "")
-            fb_md = f"[🔵]({fb_link})" if fb_link else "_N/A_"
-            lines.append(f"| {idx} | {ts} | **{user_name}** | {comment} | {reply} | {rtype} | {depth} | {game} | {fb_md} |\n")
-        savages = [r for r in replies if r.get("type") == "savage"][-5:]
-        if savages:
-            lines.append("\n### 😎 Savage Replies (Last 5)\n\n| 👤 User | 💬 Abuse | 🤖 AI Reply | Game | FB Link |\n|---|---|---|---|---|\n")
-            for s in reversed(savages):
-                user_name = (s.get("user_name", "Unknown") or "Unknown").replace("|", "\\|")[:20]
-                comment = (s.get("user_comment", "") or "").replace("\n", " ").replace("|", "\\|")[:80]
-                reply = (s.get("openrouter_reply", "") or "").replace("\n", " ").replace("|", "\\|")[:100]
-                game = (s.get("game", "") or "").replace("|", "\\|")[:15]
-                fb_link = s.get("fb_post_link", "")
-                fb_md = f"[🔵]({fb_link})" if fb_link else "_N/A_"
-                lines.append(f"| **{user_name}** | {comment} | {reply} | {game} | {fb_md} |\n")
-    skipped = data.get("skipped", [])[-5:]
-    if skipped:
-        lines.append("\n### ⏭️ Skipped Comments (Last 5)\n\n| Comment | Reason |\n|---|---|\n")
-        for s in reversed(skipped):
-            comment = (s.get("comment_text", "") or "").replace("\n", " ").replace("|", "\\|")[:80]
-            reason = s.get("reason", "").replace("_", " ")
-            lines.append(f"| {comment} | {reason} |\n")
-    return "".join(lines)
+        md.append("_No data_\n")
 
-
-# ============================================================
-# 📦 HELPER FUNCTIONS
-# ============================================================
-def git_commit_and_push(file_paths_to_add, commit_message="Auto-Agent: Sync dashboard [skip ci]"):
-    try:
-        subprocess.run(["git", "config", "--global", "user.name", "github-actions[bot]"],
-                       check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        subprocess.run(["git", "config", "--global", "user.email", "41898282+github-actions[bot]@users.noreply.github.com"],
-                       check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        for path in file_paths_to_add:
-            if os.path.exists(path):
-                subprocess.run(["git", "add", path],
-                               check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        commit_res = subprocess.run(["git", "commit", "-m", commit_message],
-                                    capture_output=True, text=True, check=False)
-        log(f"🔄 Git Commit: {commit_res.stdout.strip()} {commit_res.stderr.strip()}")
-        subprocess.run(["git", "pull", "--rebase", "origin", "main"],
-                       capture_output=True, text=True, check=False)
-        push_res = subprocess.run(["git", "push"],
-                                  capture_output=True, text=True, check=False)
-        log(f"🔄 Git Push: {push_res.stdout.strip()} {push_res.stderr.strip()}")
-    except Exception as e:
-        log(f"⚠️ Git auto-push error: {e}")
-
-
-def generate_visual_reports(game_views_summary, game_stats):
-    reports_dir = "logs/reports"
-    os.makedirs(reports_dir, exist_ok=True)
-    chart_path = os.path.join(reports_dir, "views_chart.png")
-    total_platform_views = sum(game_views_summary.values()) or 1
-    analytics_data = []
-    for g_n, g_v in game_views_summary.items():
-        uploaded_count = game_stats.get(g_n, {}).get("uploaded_count", 0)
-        avg_views = int(g_v / uploaded_count) if uploaded_count > 0 else 0
-        share_pct = round((g_v / total_platform_views) * 100, 2)
-        analytics_data.append({
-            "game": g_n, "total_views": g_v, "uploaded_count": uploaded_count,
-            "avg_views": avg_views, "share_pct": share_pct
-        })
-    sorted_analytics = sorted(analytics_data, key=lambda x: x["total_views"], reverse=True)
-    if MATPLOTLIB_AVAILABLE and sorted_analytics:
-        try:
-            games = [item["game"] for item in sorted_analytics]
-            total_v = [item["total_views"] for item in sorted_analytics]
-            avg_v = [item["avg_views"] for item in sorted_analytics]
-            fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
-            ax1.bar(games, total_v, color='#4A90E2')
-            ax1.set_title("Total Views Leaderboard", fontsize=12, fontweight='bold')
-            ax1.set_ylabel("Views", fontsize=10, fontweight='bold')
-            ax1.tick_params(axis='x', rotation=30)
-            ax2.bar(games, avg_v, color='#50E3C2')
-            ax2.set_title("Efficiency: Avg Views per Video", fontsize=12, fontweight='bold')
-            ax2.set_ylabel("Avg Views / Video", fontsize=10, fontweight='bold')
-            ax2.tick_params(axis='x', rotation=30)
-            plt.suptitle("Advanced Gaming Performance Analytics", fontsize=14, fontweight='bold')
-            plt.tight_layout()
-            plt.savefig(chart_path, dpi=300)
-            plt.close()
-        except Exception as e:
-            log(f"⚠️ Chart error: {e}")
-    return sorted_analytics
-
-
-def load_source_data():
-    source_links_map = {}
-    source_videos_count = {}
-    source_titles_map = {}
-    posted_dir = "posted_links_editor"
-    if not os.path.exists(posted_dir):
-        return source_links_map, source_videos_count, source_titles_map
-    for fname in os.listdir(posted_dir):
-        if fname.endswith("_posted_links_editor.txt"):
-            gname = fname.replace("_posted_links_editor.txt", "")
-            try:
-                with open(os.path.join(posted_dir, fname), 'r', encoding='utf-8', errors='ignore') as f:
-                    content = f.read()
-                urls = extract_urls(content)
-                if urls:
-                    source_links_map[gname] = urls
-                vid_count = content.count("Video id :")
-                if vid_count == 0:
-                    vid_count = len(urls)
-                source_videos_count[gname] = vid_count
-                titles = re.findall(r'Title\s*:\s*(.+)', content)
-                source_titles_map[gname] = [t.strip() for t in titles]
-            except Exception:
-                pass
-    return source_links_map, source_videos_count, source_titles_map
-
-
-def parse_posted_file(filepath, game_name):
-    with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
-        content = f.read()
-    lines = content.split('\n')
-    posts = []
-    current_video = {}
-    for line in lines:
-        line = line.strip()
-        if not line:
-            continue
-        if '| Link:' in line:
-            if current_video.get('vid_id'):
-                posts.append(current_video)
-            link_part = line.split('| Link:')[-1].strip()
-            video_name = line.split('| Link:')[0].strip()
-            current_video = {
-                'vid_id': None, 'title': None, 'link': link_part,
-                'video_name': video_name, 'platform': 'FB + IG', 'game': game_name
-            }
-        elif 'Video id :' in line:
-            current_video['vid_id'] = line.split('Video id :')[-1].strip()
-        elif 'Title :' in line:
-            current_video['title'] = line.split('Title :')[-1].strip()
-    if current_video.get('vid_id'):
-        posts.append(current_video)
-    return posts
-
-
-def fetch_fb_caption(vid_id, page_token):
-    url = f"{FB_GRAPH_URL}/{vid_id}?fields=description&access_token={page_token}"
-    try:
-        res = requests.get(url, timeout=5).json()
-        caption = res.get('description', '').strip()
-        if caption:
-            return caption.split('\n')[0].strip()
-    except Exception:
-        pass
-    return None
-
-
-def fetch_fb_views_by_id(vid_id, page_token):
-    url = f"{FB_GRAPH_URL}/{vid_id}/video_insights?access_token={page_token}"
-    try:
-        res = requests.get(url, timeout=5).json()
-        for metric in res.get('data', []):
-            if metric.get('name') == 'total_video_views':
-                values = metric.get('values', [{}])
-                return values[0].get('value', 0)
-    except Exception:
-        pass
-    return 0
-
-
-def fetch_fb_ig_data(game_list):
-    posted_dir = 'posted_links_editor'
-    result = {g: [] for g in game_list}
-    game_views_summary = {g: 0 for g in game_list}
-    if not FB_ACCESS_TOKEN:
-        log("⚠️ FB_ACCESS_TOKEN missing")
-        return result, game_views_summary
-
-    id_to_source_map = {}
-    if os.path.exists(posted_dir):
-        for fname in os.listdir(posted_dir):
-            if not fname.endswith('_posted_links_editor.txt'):
-                continue
-            fpath = os.path.join(posted_dir, fname)
-            try:
-                with open(fpath, 'r', encoding='utf-8', errors='ignore') as f:
-                    content = f.read()
-                blocks = re.split(r'\n\s*\n', content)
-                for block in blocks:
-                    block_id = ""
-                    block_link = ""
-                    for bl in block.split('\n'):
-                        bl = bl.strip()
-                        if 'Video id :' in bl:
-                            block_id = bl.split('Video id :')[-1].strip()
-                        elif '| Link:' in bl:
-                            lp = bl.split('| Link:')[-1].strip()
-                            um = re.search(r'(https?://[^\s\n\r\)\]\'"<>,;]+)', lp)
-                            if um:
-                                block_link = um.group(1).rstrip('.,;)\']"')
-                    if block_id and block_link:
-                        id_to_source_map[block_id] = block_link
-            except Exception as e:
-                log(f"⚠️ ID map error {fname}: {e}")
-    log(f"📋 ID→Source map: {len(id_to_source_map)} entries")
-
-    if os.path.exists(posted_dir):
-        cutoff_date = now_ist() - timedelta(days=DAYS_LIMIT)
-        all_tasks = []
-        for filename in os.listdir(posted_dir):
-            if not filename.endswith('_posted_links_editor.txt'):
-                continue
-            game_name = filename.replace('_posted_links_editor.txt', '')
-            if game_name not in game_list:
-                continue
-            filepath = os.path.join(posted_dir, filename)
-            try:
-                file_mtime = datetime.fromtimestamp(os.path.getmtime(filepath), tz=IST)
-                if file_mtime < cutoff_date:
-                    continue
-            except Exception:
-                pass
-            try:
-                posts = parse_posted_file(filepath, game_name)
-                for p in posts:
-                    all_tasks.append(p)
-            except Exception as e:
-                log(f"⚠️ Parse error {game_name}: {e}")
-        if all_tasks:
-            log(f"📊 Total {len(all_tasks)} videos processing (parallel)...")
-
-            def process_video_task(post):
-                vid_id = post.get('vid_id')
-                if not vid_id:
-                    return post
-                fb_caption = fetch_fb_caption(vid_id, FB_ACCESS_TOKEN)
-                fb_views = fetch_fb_views_by_id(vid_id, FB_ACCESS_TOKEN)
-                if fb_caption: title = fb_caption
-                elif post.get('title'): title = post['title']
-                else:
-                    title = post.get('video_name', '').replace('_', ' ').strip()
-                    if not title: title = f"Video {vid_id[:8]}"
-                post['title'] = title
-                post['fb_views'] = fb_views
-                post['fb_posted'] = bool(vid_id)
-                post['fb_link'] = f"https://www.facebook.com/{vid_id}" if vid_id else ""
-                post['status'] = "✅ Live" if fb_views > 0 else "⏳ Pending"
-                return post
-
-            with ThreadPoolExecutor(max_workers=10) as executor:
-                futures = {executor.submit(process_video_task, p): p for p in all_tasks}
-                for future in as_completed(futures):
-                    try:
-                        r = future.result()
-                        game = r.get('game')
-                        if game in result:
-                            vid_id = str(r.get('vid_id', '')).strip()
-                            matched_source = id_to_source_map.get(vid_id, "")
-                            if not matched_source:
-                                matched_source = r.get('link', '')
-                            result[game].append({
-                                "title": r.get('title', 'Untitled'),
-                                "fb_link": fix_fb_url(r.get('fb_link', ''), vid_id),
-                                "fb_views": r.get('fb_views', 0),
-                                "fb_posted": r.get('fb_posted', False),
-                                "ig_link": "", "ig_views": 0, "ig_posted": False,
-                                "timestamp": "", "vid_id": vid_id,
-                                "video_name": r.get('video_name', ''),
-                                "source_link": matched_source,
-                            })
-                            game_views_summary[game] += r.get('fb_views', 0)
-                    except Exception as e:
-                        log(f"⚠️ Process error: {e}")
-
-    twenty_eight_days_ago = now_ist() - timedelta(days=DAYS_LIMIT)
-    since_timestamp = int(twenty_eight_days_ago.timestamp())
-    fb_videos = []
-    ig_medias = []
-    try:
-        fb_url = f"{FB_GRAPH_URL}/{FB_PAGE_ID}/videos"
-        params = {"fields": "id,title,description,views,permalink_url,created_time",
-                  "since": since_timestamp, "access_token": FB_ACCESS_TOKEN, "limit": 100}
-        res = requests.get(fb_url, params=params, timeout=20)
-        if res.status_code == 200:
-            fb_videos = res.json().get("data", [])
-            log(f"✅ FB page: {len(fb_videos)} videos fetched")
-    except Exception as e:
-        log(f"❌ FB page fetch error: {e}")
-    try:
-        ig_url = f"{FB_GRAPH_URL}/{FB_PAGE_ID}"
-        ig_params = {"fields": "instagram_business_account", "access_token": FB_ACCESS_TOKEN}
-        res_ig_acc = requests.get(ig_url, params=ig_params, timeout=10)
-        if res_ig_acc.status_code == 200:
-            ig_id = res_ig_acc.json().get("instagram_business_account", {}).get("id")
-            if ig_id:
-                media_url = f"{FB_GRAPH_URL}/{ig_id}/media"
-                media_params = {"fields": "id,caption,permalink,timestamp,like_count,comments_count",
-                                "access_token": FB_ACCESS_TOKEN, "limit": 100}
-                res_ig = requests.get(media_url, params=media_params, timeout=20)
-                if res_ig.status_code == 200:
-                    ig_medias = res_ig.json().get("data", [])
-                    log(f"✅ IG: {len(ig_medias)} media fetched")
-    except Exception as e:
-        log(f"❌ IG fetch error: {e}")
-    for game in game_list:
-        game_norm = normalize(game)
-        existing_titles = set()
-        for v in result[game]:
-            existing_titles.add(normalize(v.get("title", ""))[:40])
-        for v in fb_videos:
-            title = (v.get("title") or v.get("description") or "").strip()
-            if not title: continue
-            if game_norm and game_norm in normalize(title):
-                key = normalize(title)[:40]
-                if key in existing_titles: continue
-                fb_vid_id = str(v.get("id", "")).strip()
-                fb_link = fix_fb_url(v.get("permalink_url", ""), fb_vid_id)
-                matched_source = id_to_source_map.get(fb_vid_id, "")
-                entry = {
-                    "title": title, "fb_link": fb_link,
-                    "fb_views": int(v.get("views", 0) or 0),
-                    "fb_posted": True, "ig_link": "", "ig_views": 0, "ig_posted": False,
-                    "timestamp": v.get("created_time", ""),
-                    "vid_id": fb_vid_id, "video_name": "",
-                    "source_link": matched_source,
-                }
-                result[game].append(entry)
-                game_views_summary[game] += entry["fb_views"]
-                existing_titles.add(key)
-        for m in ig_medias:
-            caption = (m.get("caption") or "").strip()
-            if not caption: continue
-            if game_norm and game_norm in normalize(caption):
-                caption_norm = normalize(caption)[:40]
-                matched = False
-                for v in result[game]:
-                    v_norm = normalize(v.get("title", ""))[:40]
-                    if v_norm and (v_norm[:20] in caption_norm or caption_norm[:20] in v_norm):
-                        ig_views = (m.get("like_count", 0) * 10) + (m.get("comments_count", 0) * 20)
-                        v["ig_link"] = fix_ig_url(m.get("permalink", ""))
-                        v["ig_views"] = ig_views
-                        v["ig_posted"] = True
-                        game_views_summary[game] += ig_views
-                        matched = True
-                        break
-                if not matched and caption_norm not in existing_titles:
-                    ig_views = (m.get("like_count", 0) * 10) + (m.get("comments_count", 0) * 20)
-                    ig_media_id = str(m.get("id", "")).strip()
-                    matched_source = id_to_source_map.get(ig_media_id, "")
-                    result[game].append({
-                        "title": caption[:100], "fb_link": "", "fb_views": 0, "fb_posted": False,
-                        "ig_link": fix_ig_url(m.get("permalink", "")),
-                        "ig_views": ig_views, "ig_posted": True,
-                        "timestamp": m.get("timestamp", ""),
-                        "vid_id": ig_media_id, "video_name": "",
-                        "source_link": matched_source,
-                    })
-                    game_views_summary[game] += ig_views
-                    existing_titles.add(caption_norm)
-    games_links_dir = "game_links_editor"
-    for game in game_list:
-        src_file = None
-        for f in os.listdir(games_links_dir):
-            if not f.endswith(".txt"): continue
-            base = (f.replace(".txt", "").replace("_links_editor", "").replace("_uploaded_links", ""))
-            if base == game:
-                src_file = os.path.join(games_links_dir, f)
-                break
-        if not src_file:
-            for f in os.listdir(games_links_dir):
-                if f.endswith(".txt") and f.startswith(game):
-                    src_file = os.path.join(games_links_dir, f)
-                    break
-        if not src_file or not os.path.exists(src_file):
-            continue
-        src_videos = parse_game_links_file(src_file)
-        log(f"📂 {game}: {len(src_videos)} videos in source file")
-        existing_vids_lower = {}
-        for v in result[game]:
-            vname = (v.get("vid_id") or "").lower()
-            vtitle = (v.get("title") or "").lower()
-            if vname: existing_vids_lower[vname] = v
-            if vtitle: existing_vids_lower[vtitle[:30]] = v
-        for sv in src_videos:
-            vname = sv["video_name"]
-            vname_lower = vname.lower()
-            src_link = sv["source_link"]
-            matched = False
-            for key, v in list(existing_vids_lower.items()):
-                v_title_lower = (v.get("title") or "").lower()
-                v_vid_lower = (v.get("vid_id") or "").lower()
-                if (vname_lower == v_vid_lower
-                    or vname_lower in v_title_lower
-                    or v_title_lower[:20] == vname_lower[:20]
-                    or (len(vname) > 5 and vname_lower[-5:] in v_title_lower)):
-                    if not v.get("source_link"):
-                        v["source_link"] = src_link
-                    if not v.get("video_name"):
-                        v["video_name"] = vname
-                    matched = True
-                    break
-            if not matched:
-                result[game].append({
-                    "title": vname, "fb_link": "", "fb_views": 0, "fb_posted": False,
-                    "ig_link": "", "ig_views": 0, "ig_posted": False,
-                    "timestamp": "", "vid_id": vname, "video_name": vname,
-                    "source_link": src_link, "is_source_only": True,
-                })
-
-    for game in game_list:
-        posted_v = [x for x in result[game] if x.get("fb_posted") or x.get("ig_posted")]
-        pending_v = [x for x in result[game] if not (x.get("fb_posted") or x.get("ig_posted"))]
-        posted_v_sorted = sorted(posted_v, key=lambda x: x.get("timestamp", "") or "0000", reverse=True)
-
-        def pending_key(x):
-            vname = x.get("video_name") or x.get("vid_id") or ""
-            digits = re.findall(r'\d+', vname)
-            if digits:
-                try:
-                    return (0, -int(digits[-1]))
-                except ValueError:
-                    pass
-            return (1, vname)
-        pending_v_sorted = sorted(pending_v, key=pending_key)
-        result[game] = posted_v_sorted + pending_v_sorted
-
-    return result, game_views_summary
-
-
-def update_unified_dashboard(game_name, chosen_style, ai_title, specific_uploaded_link,
-                             post_link, platform_name, views_count,
-                             game_views_summary, game_stats, actual_posted_titles=None,
-                             file_mapping=None):
-    if actual_posted_titles is None:
-        actual_posted_titles = {}
-    if file_mapping is None:
-        file_mapping = {}
-    dashboard_path = "GAMING_DASHBOARD.md"
-    leaderboard_json = os.path.join("logs/leaderboard", "games_performance_leaderboard.json")
-    os.makedirs("logs/leaderboard", exist_ok=True)
-    timestamp = now_ist_ampm()
-    history_json = "logs/dashboard_history.json"
-    all_history = {}
-    if os.path.exists(history_json):
-        try:
-            with open(history_json, 'r', encoding='utf-8') as f:
-                all_history = json.load(f)
-        except Exception:
-            pass
-    if game_name not in all_history:
-        all_history[game_name] = []
-    new_entry = {
-        "timestamp": timestamp, "style": chosen_style, "ai_title": ai_title,
-        "actual_posted_title": "", "views": views_count,
-        "source_link": specific_uploaded_link, "post_link": post_link,
-        "platform": platform_name,
-    }
-    vids = actual_posted_titles.get(game_name, [])
-    if vids:
-        for v in vids:
-            if v.get("fb_posted") or v.get("ig_posted"):
-                new_entry["actual_posted_title"] = v.get("title", "")
-                break
-    all_history[game_name].append(new_entry)
-    try:
-        with open(history_json, 'w', encoding='utf-8') as f:
-            json.dump(all_history, f, indent=4)
-    except Exception:
-        pass
-    sorted_analytics = generate_visual_reports(game_views_summary, game_stats)
-    try:
-        with open(leaderboard_json, 'w', encoding='utf-8') as f:
-            json.dump([
-                {"rank": i + 1, "game_name": item["game"], "total_views": item["total_views"],
-                 "uploaded_videos": item["uploaded_count"], "avg_views_per_video": item["avg_views"],
-                 "view_share_percentage": item["share_pct"]}
-                for i, item in enumerate(sorted_analytics)
-            ], f, indent=4)
-    except Exception as e:
-        log(f"⚠️ Leaderboard error: {e}")
-    source_links_map, source_videos_count, _ = load_source_data()
-
-    def get_latest_post_time(g_name):
-        videos = actual_posted_titles.get(g_name, [])
-        latest_time = ""
-        for v in videos:
-            if v.get("fb_posted") or v.get("ig_posted"):
-                ts = v.get("timestamp", "")
-                if ts > latest_time: latest_time = ts
-        return latest_time
-    games_dir = "logs/games"
-    os.makedirs(games_dir, exist_ok=True)
-    game_file_links = {}
-    for g_name in sorted(actual_posted_titles.keys()):
-        videos = actual_posted_titles.get(g_name, [])
-        if not videos: continue
-
-        posted_v = [x for x in videos if x.get("fb_posted") or x.get("ig_posted")]
-        pending_v = [x for x in videos if not (x.get("fb_posted") or x.get("ig_posted"))]
-        posted_v_sorted = sorted(posted_v, key=lambda x: x.get("timestamp", "") or "0000", reverse=True)
-
-        def pending_key(x):
-            vname = x.get("video_name") or x.get("vid_id") or ""
-            digits = re.findall(r'\d+', vname)
-            if digits:
-                try:
-                    return (0, -int(digits[-1]))
-                except ValueError:
-                    pass
-            return (1, vname)
-        pending_v_sorted = sorted(pending_v, key=pending_key)
-        videos = posted_v_sorted + pending_v_sorted
-
-        src_file_for_game = file_mapping.get(g_name, "")
-        if not src_file_for_game:
-            for f in os.listdir("game_links_editor"):
-                if f.startswith(g_name) and f.endswith(".txt"):
-                    src_file_for_game = os.path.join("game_links_editor", f)
-                    break
-        file_links = []
-        if src_file_for_game and os.path.exists(src_file_for_game):
-            try:
-                with open(src_file_for_game, 'r', encoding='utf-8', errors='ignore') as f:
-                    fc = f.read()
-                file_links = re.findall(r'\|\s*Link:\s*(https?://[^\s\n\r\)\]\'"<>,;]+)', fc)
-                file_links = [u.rstrip('.,;)\']"') for u in file_links]
-            except Exception:
-                pass
-        posted_file_inner = os.path.join("posted_links_editor", f"{g_name}_posted_links_editor.txt")
-        posted_links_inner = []
-        if os.path.exists(posted_file_inner):
-            try:
-                with open(posted_file_inner, 'r', encoding='utf-8', errors='ignore') as pf:
-                    pcontent = pf.read()
-                posted_links_inner = re.findall(r'\|\s*Link:\s*(https?://[^\s\n\r\)\]\'"<>,;]+)', pcontent)
-                posted_links_inner = [u.rstrip('.,;)\']"') for u in posted_links_inner]
-            except Exception:
-                pass
-
-        safe_name = re.sub(r'[^a-zA-Z0-9_-]', '_', g_name)
-        game_filename = f"{safe_name}.md"
-        game_filepath = os.path.join(games_dir, game_filename)
-        game_file_links[g_name] = f"logs/games/{game_filename}"
-        gf_lines = []
-        gf_lines.append(f"# 🎮 {g_name} — Full Video History\n\n")
-        gf_lines.append(f"[⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)\n\n")
-        gf_lines.append(f"**Total Videos:** {len(videos)} | **Last Updated:** {now_ist_ampm()} IST\n\n")
-        gf_lines.append("---\n\n")
-        total_fb_views = sum(v.get('fb_views', 0) for v in videos)
-        total_ig_views = sum(v.get('ig_views', 0) for v in videos)
-        fb_count = sum(1 for v in videos if v.get('fb_posted'))
-        ig_count = sum(1 for v in videos if v.get('ig_posted'))
-        total_posted = sum(1 for v in videos if v.get('fb_posted') or v.get('ig_posted'))
-        gf_lines.append("## 📊 Summary\n\n| Metric | Value |\n|---|---|\n")
-        gf_lines.append(f"| Total Videos | **{len(videos)}** |\n")
-        gf_lines.append(f"| Posted (FB or IG) | {total_posted} / {len(videos)} |\n")
-        gf_lines.append(f"| FB Posted | {fb_count} / {len(videos)} |\n")
-        gf_lines.append(f"| IG Posted | {ig_count} / {len(videos)} |\n")
-        gf_lines.append(f"| Total FB Views | **{total_fb_views:,}** |\n")
-        gf_lines.append(f"| Total IG Views | **{total_ig_views:,}** |\n\n")
-        gf_lines.append("---\n\n## 📜 All Videos (Newest First)\n\n")
-        gf_lines.append("| # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |\n")
-        gf_lines.append("|---|---|---|---|---|---|---|\n")
-        for idx, v in enumerate(videos, 1):
-            title = (v.get("title") or "").replace("\n", " ").replace("|", "\\|")[:120] or "_Untitled_"
-            fb_md = f"[🔵 FB]({v['fb_link']})" if v.get("fb_posted") and v.get("fb_link") else "⏳ Pending"
-            fb_v_md = f"{v.get('fb_views', 0):,}" if v.get("fb_posted") else "_0_"
-            ig_md = f"[🟣 IG]({v['ig_link']})" if v.get("ig_posted") and v.get("ig_link") else "⏳ Pending"
-            ig_v_md = f"{v.get('ig_views', 0):,}" if v.get("ig_posted") else "_0_"
-
-            src_link = v.get("source_link", "")
-            if not src_link:
-                v_name = (v.get("video_name") or v.get("vid_id") or "").lower().strip()
-                v_digits = re.findall(r'\d+', v_name)
-                v_num = v_digits[-1] if v_digits else ""
-                game_clean = re.sub(r'[^a-z0-9]', '', g_name.lower())
-
-                if v_num and file_links:
-                    for fl in file_links:
-                        fl_clean = re.sub(r'[^a-z0-9]', '', fl.lower())
-                        if game_clean in fl_clean and v_num in fl:
-                            src_link = fl
-                            break
-                if not src_link and v_num and posted_links_inner:
-                    for pl in posted_links_inner:
-                        pl_clean = re.sub(r'[^a-z0-9]', '', pl.lower())
-                        if game_clean in pl_clean and v_num in pl:
-                            src_link = pl
-                            break
-                if not src_link and file_links and idx - 1 < len(file_links):
-                    src_link = file_links[idx - 1]
-                if not src_link and posted_links_inner and idx - 1 < len(posted_links_inner):
-                    src_link = posted_links_inner[idx - 1]
-                if not src_link:
-                    src_urls = source_links_map.get(g_name, [])
-                    if idx - 1 < len(src_urls):
-                        src_link = src_urls[idx - 1]
-                    elif src_urls:
-                        src_link = src_urls[-1]
-
-            src_md = f"[📂]({src_link})" if src_link else "_N/A_"
-            gf_lines.append(f"| {idx} | {title} | {fb_md} | {fb_v_md} | {ig_md} | {ig_v_md} | {src_md} |\n")
-        try:
-            with open(game_filepath, 'w', encoding='utf-8') as f:
-                f.writelines(gf_lines)
-        except Exception as e:
-            log(f"⚠️ Failed to write {game_filepath}: {e}")
-    md_content = []
-    md_content.append("# 🚀 GAMING AGENT COMMAND & ANALYTICS DASHBOARD\n\n")
-    md_content.append(f"> **Last Updated:** {now_ist_ampm()} IST | **Status:** All Systems Active & Synchronized\n\n")
-    md_content.append("--- \n\n## 🏆 Global Leaderboard & Performance Summary\n\n")
-    md_content.append("| Rank | Game Name | Total Videos | Total Views | Avg Views / Video | Performance Tier |\n")
-    md_content.append("| :---: | :--- | :---: | :---: | :---: | :---: |\n")
-    medals = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣"]
-    for idx, item in enumerate(sorted_analytics):
-        rank_icon = medals[idx] if idx < len(medals) else f"{idx + 1}"
-        tier = ("🔥 Viral / Hype" if item['avg_views'] > 7000
-                else "⚡ Trending" if item['avg_views'] > 4000
-                else "📈 Stable")
-        md_content.append(f"| {rank_icon} | **{item['game']}** | {item['uploaded_count']} | "
-                          f"{item['total_views']:,} | {item['avg_views']:,} | {tier} |\n")
-    md_content.append("\n--- \n\n## 📺 Live Post Titles + Views (Latest per Game)\n\n")
-    md_content.append("> 🔵 FB = Facebook post live | 🟣 IG = Instagram post live | ⏳ = Pending\n\n")
-    md_content.append("| Game Name | 📅 Last Posted | 📺 Latest Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📊 Remaining / Total | 📂 Source | 📜 All |\n")
-    md_content.append("|---|---|---|---|---|---|---|---|---|---|\n")
-    sorted_games = sorted(actual_posted_titles.keys(), key=lambda g: get_latest_post_time(g) or "0000", reverse=True)
-    for g_name in sorted_games:
-        videos = actual_posted_titles.get(g_name, [])
-        src_file = file_mapping.get(g_name, "")
-        total_vids = len(videos)
-        if src_file and os.path.exists(src_file):
-            try:
-                with open(src_file, 'r', encoding='utf-8', errors='ignore') as f:
-                    c = f.read()
-                pipe_count = len(re.findall(r'\|\s*Link:', c))
-                total_vids = max(pipe_count, total_vids, len(extract_urls(c)))
-            except Exception:
-                pass
-        uploaded_vids = game_stats.get(g_name, {}).get("uploaded_count", 0)
-        remaining_vids = max(0, total_vids - uploaded_vids)
-        if total_vids > 0:
-            progress_md = f"**{remaining_vids}** / {total_vids}"
-            if remaining_vids == 0: progress_md = f"✅ {total_vids} / {total_vids}"
-        else:
-            progress_md = "_N/A_"
-
-        latest_post_time = get_latest_post_time(g_name)
-        if latest_post_time:
-            dt_ist = utc_to_ist(latest_post_time)
-            if dt_ist:
-                date_str = dt_ist.strftime("%Y-%m-%d %I:%M %p")
-            else:
-                date_str = str(latest_post_time)[:16]
-        else:
-            date_str = "—"
-
-        if not videos:
-            md_content.append(f"| **{g_name}** | {date_str} | _Not Posted Yet_ | ⏳ Pending | _0_ | ⏳ Pending | _0_ | {progress_md} | _N/A_ | — |\n")
-            continue
-
-        latest_posted = None
-        latest_ts = ""
-        for v in videos:
-            if v.get("fb_posted") or v.get("ig_posted"):
-                ts = v.get("timestamp", "")
-                if ts > latest_ts:
-                    latest_ts = ts
-                    latest_posted = v
-
-        latest = latest_posted if latest_posted else videos[0]
-        title = (latest.get("title") or "").replace("\n", " ").replace("|", "\\|")[:80] or "_Untitled_"
-        fb_md = f"[🔵 FB]({latest['fb_link']})" if latest.get("fb_posted") and latest.get("fb_link") else "⏳ Pending"
-        fb_v_md = f"{latest.get('fb_views', 0):,}" if latest.get("fb_posted") else "_0_"
-        ig_md = f"[🟣 IG]({latest['ig_link']})" if latest.get("ig_posted") and latest.get("ig_link") else "⏳ Pending"
-        ig_v_md = f"{latest.get('ig_views', 0):,}" if latest.get("ig_posted") else "_0_"
-        src_link = latest.get("source_link", "") if latest else ""
-        if not src_link and videos: src_link = videos[0].get("source_link", "")
-        if not src_link:
-            src_urls = source_links_map.get(g_name, [])
-            src_link = src_urls[0] if src_urls else ""
-        src_md = f"[📂]({src_link})" if src_link else "_N/A_"
-        all_md = f"**[📜 View {len(videos)}]({game_file_links[g_name]})**" if g_name in game_file_links else f"_{len(videos)}_"
-        md_content.append(f"| **{g_name}** | {date_str} | {title} | {fb_md} | {fb_v_md} | {ig_md} | {ig_v_md} | {progress_md} | {src_md} | {all_md} |\n")
-    for section_func in [generate_trending_section, generate_best_time_section, generate_auto_reply_section]:
-        section = section_func()
-        if section: md_content.append(section)
-    md_content.append("\n--- \n\n## 📜 Full Video History\n\n")
-    md_content.append("> Click any game below to view its complete video list with all FB/IG links:\n\n")
-    for g_name in sorted_games:
-        videos = actual_posted_titles.get(g_name, [])
-        if not videos: continue
-        file_link = game_file_links.get(g_name, "")
-        if file_link:
-            md_content.append(f"- **🎮 {g_name}** — [📜 View All {len(videos)} Videos]({file_link})\n")
-
-    # ============================================================
-    # ✅ ROTATION SECTION — READ ONLY (purana data dikhega)
-    # ============================================================
+    md.append("\n--- \n\n## 🔄 Game Rotation Queue (Read-Only)\n\n")
     rotation_file = "logs/rotation_history.json"
     if os.path.exists(rotation_file):
         try:
             with open(rotation_file, 'r', encoding='utf-8') as f:
                 rot = json.load(f)
-            md_content.append("\n--- \n\n## 🔄 Game Rotation Queue (Read-Only)\n\n")
-            md_content.append(f"**📊 Total Games:** {rot.get('total_games', 0)} | "
-                              f"**🎯 Current:** `{rot.get('current_game', 'N/A')}` | "
-                              f"**⏭️ Next Game:** `{rot.get('next_game', 'N/A')}` "
-                              f"(Position #{rot.get('next_game_position', 0)}) | "
-                              f"**🔢 Total Runs:** {rot.get('total_runs', 0)}\n\n")
-            md_content.append(f"**Last Updated:** {rot.get('last_updated', 'N/A')} IST\n\n")
-            md_content.append("| # | Game Name | Uploaded | Last Run # | Next Turn In | Status |\n")
-            md_content.append("|:---:|---|:---:|:---:|:---:|:---:|\n")
-            for ginfo in rot.get("all_games", []):
-                pos = ginfo.get("position", 0)
-                gname = ginfo.get("game", "")
-                uploaded = ginfo.get("uploaded", 0)
-                last_run = ginfo.get("last_run", 0) or "—"
-                next_in = ginfo.get("next_turn_in", 0)
-                status = ginfo.get("status", "waiting")
-                if status == "current": status_md = "🎯 **CURRENT**"
-                elif status == "next_up": status_md = "⏭️ **NEXT UP**"
-                else: status_md = f"⏳ Wait {next_in}"
-                md_content.append(f"| {pos} | **{gname}** | {uploaded} | {last_run} | {next_in} | {status_md} |\n")
-            recent_logs = rot.get("rotation_log", [])[-5:]
-            if recent_logs:
-                md_content.append("\n### 📜 Recent Runs (Last 5)\n\n| Run # | Game | Timestamp (IST) |\n|:---:|---|---|\n")
-                for log_entry in reversed(recent_logs):
-                    md_content.append(f"| {log_entry['run']} | {log_entry['game']} | {log_entry['timestamp']} |\n")
+            md.append(f"**🎯 Current:** `{rot.get('current_game', 'N/A')}` | "
+                      f"**⏭️ Next:** `{rot.get('next_game', 'N/A')}` | "
+                      f"**🔢 Runs:** {rot.get('total_runs', 0)}\n\n")
+            md.append("| # | Game | Uploaded | Next Turn | Status |\n")
+            md.append("|:---:|---|:---:|:---:|:---:|\n")
+            for g in rot.get("all_games", []):
+                status = g.get("status", "waiting")
+                status_md = ("🎯 **CURRENT**" if status == "current"
+                             else "⏭️ **NEXT UP**" if status == "next_up"
+                             else f"⏳ Wait {g.get('next_turn_in', 0)}")
+                md.append(f"| {g.get('position', 0)} | **{g.get('game', '')}** | "
+                          f"{g.get('uploaded', 0)} | {g.get('next_turn_in', 0)} | {status_md} |\n")
         except Exception as e:
-            log(f"⚠️ Rotation section error: {e}")
+            md.append(f"_Error: {e}_\n")
+    else:
+        md.append("_No rotation data_\n")
+
+    md.append("\n--- \n\n## 📜 Full Video History\n\n")
+    for g_name in sorted(actual_posted_titles.keys()):
+        videos = actual_posted_titles.get(g_name, [])
+        if videos:
+            md.append(f"- **🎮 {g_name}** — {len(videos)} videos\n")
 
     with open(dashboard_path, 'w', encoding='utf-8') as f:
-        f.writelines(md_content)
+        f.writelines(md)
 
-    # ✅ Git commit — rotation_history.json INCLUDED
+    log(f"✅ Dashboard written: {dashboard_path}")
+
     git_commit_and_push([
-        dashboard_path, leaderboard_json, history_json,
-        "logs/agent_memory.json", "logs/rotation_history.json",
-        "logs/games/", "logs/auto_reply_log.json",
-        "logs/replied_comment_ids.json", "logs/trending_cache.json",
-        "logs/best_time_analysis.json"
+        dashboard_path,
+        "logs/auto_reply_log.json",
+        "logs/replied_comment_ids.json",
+        "logs/trending_cache.json",
+        "logs/best_time_analysis.json",
+        "logs/games/",
     ])
 
 
-def get_game_video_stats(target_file, memory, game_name):
-    total_links = 0
-    if target_file and os.path.exists(target_file):
-        try:
-            with open(target_file, 'r', encoding='utf-8', errors='ignore') as f:
-                content = f.read()
-            pipe_count = len(re.findall(r'\|\s*Link:', content))
-            url_count = len(extract_urls(content))
-            vid_count = content.count("Video id :")
-            total_links = max(pipe_count, url_count, vid_count)
-            log(f"📊 {game_name}: total={total_links}")
-        except Exception as e:
-            log(f"⚠️ Stats error: {e}")
-    game_stats = memory.get("game_stats", {})
-    if game_name not in game_stats:
-        game_stats[game_name] = {"uploaded_count": 0}
-    uploaded_links = game_stats[game_name]["uploaded_count"]
-    remaining_links = max(0, total_links - uploaded_links)
-    return total_links, uploaded_links, remaining_links, game_stats
+def git_commit_and_push(file_paths, message="Auto-Agent: Update dashboard [skip ci]"):
+    try:
+        subprocess.run(["git", "config", "--global", "user.name", "github-actions[bot]"],
+                       check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(["git", "config", "--global", "user.email",
+                        "41898282+github-actions[bot]@users.noreply.github.com"],
+                       check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        for path in file_paths:
+            if os.path.exists(path):
+                subprocess.run(["git", "add", path], check=False,
+                               stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        c = subprocess.run(["git", "commit", "-m", message],
+                           capture_output=True, text=True, check=False)
+        log(f"🔄 Git Commit: {c.stdout.strip()} {c.stderr.strip()}")
+        subprocess.run(["git", "pull", "--rebase", "origin", "main"],
+                       capture_output=True, text=True, check=False)
+        p = subprocess.run(["git", "push"], capture_output=True, text=True, check=False)
+        log(f"🔄 Git Push: {p.stdout.strip()} {p.stderr.strip()}")
+    except Exception as e:
+        log(f"⚠️ Git auto-push error: {e}")
 
 
 # ============================================================
-# 🚀 MAIN — SPLIT VERSION
+# 🚀 MAIN
 # ============================================================
-def run_agent_brain():
-    links_dir = "game_links_editor"
-    memory_file = "logs/agent_memory.json"
-    os.makedirs("logs", exist_ok=True)
-    os.makedirs(links_dir, exist_ok=True)
+def main():
+    log("=" * 60)
+    log("🚀 SPLIT AUTO-COMMENT — v3 (Duplicate Fixed)")
+    log("=" * 60)
 
-    if not AUTO_COMMENT_ENABLED:
-        log("🚫 AUTO_COMMENT=false — Auto-reply will be SKIPPED")
-
-    memory = {
-        "game_scores": {},
-        "title_styles": {
-            "curiosity": 10, "aggressive": 10, "question": 10, "emoji_heavy": 10,
-            "gaming_hype": 10, "clickbait": 10, "informative": 10, "epic_cinematic": 10,
-            "funny_roast": 10, "secret_hidden": 10, "exposed": 10, "unbelievable": 10,
-            "crazy": 10, "secret": 10, "shocking": 10
-        },
-        "last_used_style": "curiosity", "last_played_game": "",
-        "processed_viral_ids": [], "game_stats": {}, "actual_posted_titles": {}
-    }
-    if os.path.exists(memory_file):
-        try:
-            with open(memory_file, 'r', encoding='utf-8') as f:
-                loaded = json.load(f)
-                if isinstance(loaded, dict):
-                    memory.update(loaded)
-        except Exception:
-            pass
-    for g_name, videos in memory.get("actual_posted_titles", {}).items():
-        if not isinstance(videos, list): continue
-        for v in videos:
-            if not isinstance(v, dict): continue
-            fb = v.get("fb_link", "")
-            if fb and not str(fb).startswith("http"):
-                v["fb_link"] = fix_fb_url(fb, v.get("vid_id", ""))
-            ig = v.get("ig_link", "")
-            if ig and not str(ig).startswith("http"):
-                v["ig_link"] = fix_ig_url(ig)
-
-    all_files = glob.glob(os.path.join(links_dir, "*.txt"))
-    if not all_files:
-        all_files = glob.glob("game_links_editor/*.txt")
-    all_files = [f for f in all_files if ("_uploaded_links" in f or "_links_editor" in f or "_posted_links" in f)]
-    if not all_files:
-        log("❌ No valid game files found.")
-        sys.exit(1)
-    valid_game_files = [f for f in all_files if os.path.exists(f)]
-    game_list = []
-    file_mapping = {}
-    for f in valid_game_files:
-        g_name = (os.path.basename(f)
-                  .replace("_uploaded_links.txt", "")
-                  .replace("_links_editor.txt", "")
-                  .replace("_posted_links_editor.txt", "")
-                  .replace(".txt", "").strip())
-        if not g_name: continue
-        file_mapping[g_name] = f
-        game_list.append(g_name)
-    game_list = sorted(list(set(game_list)))
-    log(f"📁 Found {len(game_list)} games: {game_list}")
-
-    actual_posted_titles, game_views_summary = fetch_fb_ig_data(game_list)
-    if not game_views_summary:
-        game_views_summary = {g: 0 for g in game_list}
-
-    # ✅ AUTO-COMMENT
+    # STEP 1: Auto-comment
     if AUTO_COMMENT_ENABLED:
         try:
-            process_fb_comments(actual_posted_titles)
+            process_fb_comments()
         except Exception as e:
             log(f"⚠️ Auto-reply error: {e}")
     else:
         log("🚫 Auto-comment disabled")
 
-    # Trending + Best time
+    # STEP 2: Dashboard
     try:
-        detect_trending_games(actual_posted_titles, game_views_summary, days=7)
+        update_dashboard_inline()
     except Exception as e:
-        log(f"⚠️ Trending error: {e}")
-    try:
-        analyze_best_time({})
-    except Exception as e:
-        log(f"⚠️ Best time error: {e}")
+        log(f"⚠️ Dashboard error: {e}")
 
-    # ❌ Game selection HATA DIYA — bas display ke liye
-    chosen_game = game_list[0] if game_list else "DefaultGame"
-    log(f"ℹ️ No game rotation — using first game for dashboard context: {chosen_game}")
-
-    target_file = file_mapping.get(chosen_game, "")
-    attempts = 0
-    max_attempts = len(game_list)
-    while attempts < max_attempts:
-        if target_file and os.path.exists(target_file):
-            try:
-                with open(target_file, 'r', encoding='utf-8', errors='ignore') as f:
-                    content = f.read()
-                pipe_links = re.findall(r'\|\s*Link:\s*(https?://[^\s\n\r]+)', content)
-                urls = extract_urls(content)
-                if pipe_links or urls:
-                    log(f"✅ {chosen_game}: {len(pipe_links)} pipe links, {len(urls)} urls")
-                    break
-                else:
-                    log(f"⚠️ {chosen_game}: no URLs — trying next")
-            except Exception as e:
-                log(f"⚠️ {chosen_game}: Read error — {e}")
-        else:
-            log(f"⚠️ {chosen_game}: File not found")
-        current_idx = game_list.index(chosen_game)
-        next_idx = (current_idx + 1) % len(game_list)
-        chosen_game = game_list[next_idx]
-        target_file = file_mapping.get(chosen_game, "")
-        attempts += 1
-    if attempts >= max_attempts:
-        log(f"❌ All game files empty.")
-        sys.exit(1)
-
-    styles = memory.get("title_styles", {})
-    chosen_style = random.choices(list(styles.keys()), weights=list(styles.values()), k=1)[0]
-    game_hashtag = f"#{chosen_game.replace(' ', '')}"
-    generated_ai_title = f"🎮 {chosen_game} Gameplay | {game_hashtag}"
-    total_links, uploaded_links, remaining_links, game_stats = get_game_video_stats(
-        target_file, memory, chosen_game
-    )
-    specific_uploaded_link = "N/A"
-    try:
-        with open(target_file, 'r', encoding='utf-8', errors='ignore') as f:
-            content = f.read()
-        pipe_links = re.findall(r'\|\s*Link:\s*(https?://[^\s\n\r\)\]\'"<>,;]+)', content)
-        pipe_links = [u.rstrip('.,;)\']"') for u in pipe_links]
-        direct_urls = extract_urls(content)
-        all_urls = pipe_links if pipe_links else direct_urls
-        if all_urls:
-            link_index = uploaded_links % len(all_urls)
-            specific_uploaded_link = all_urls[link_index]
-    except Exception as e:
-        log(f"⚠️ Link extraction error: {e}")
-
-    game_stats[chosen_game]["uploaded_count"] = uploaded_links + 1
-    memory["game_stats"] = game_stats
-    memory["last_used_style"] = chosen_style
-    memory["actual_posted_titles"] = actual_posted_titles
-    try:
-        with open(memory_file, 'w', encoding='utf-8') as f:
-            json.dump(memory, f, indent=4)
-    except Exception:
-        pass
-
-    # ❌ save_rotation_history() call HATA DIYA
-    rotation_info = {"next_game": ""}
-    log("ℹ️ Rotation write disabled — display only")
-
-    latest_fb_link = ""
-    latest_ig_link = ""
-    latest_views = 0
-    if actual_posted_titles.get(chosen_game):
-        for v in actual_posted_titles[chosen_game]:
-            if v.get("fb_posted") or v.get("ig_posted"):
-                latest_fb_link = v.get("fb_link", "")
-                latest_ig_link = v.get("ig_link", "")
-                latest_views = v.get("fb_views", 0) + v.get("ig_views", 0)
-                break
-
-    update_unified_dashboard(
-        game_name=chosen_game, chosen_style=chosen_style, ai_title=generated_ai_title,
-        specific_uploaded_link=specific_uploaded_link,
-        post_link=latest_fb_link or latest_ig_link or "N/A",
-        platform_name="Facebook" if latest_fb_link else ("Instagram" if latest_ig_link else "Local / Pending"),
-        views_count=latest_views, game_views_summary=game_views_summary,
-        game_stats=memory.get("game_stats", {}), actual_posted_titles=actual_posted_titles,
-        file_mapping=file_mapping,
-    )
-
-    log(f"""
-🚀 GAMING AGENT — SPLIT VERSION
-> Last Updated: {now_ist_ampm()} IST
-> Auto-Comment: {"✅ ENABLED (fixed)" if AUTO_COMMENT_ENABLED else "🚫 DISABLED"}
-> Rotation: ❌ DISPLAY ONLY
-
-📊 Status:
-• Context Game: {chosen_game}
-• Views: {latest_views:,}
-• Total Videos: {total_links}
-""")
-
-    latest_title = ""
-    if actual_posted_titles.get(chosen_game):
-        for v in actual_posted_titles[chosen_game]:
-            if v.get("fb_posted") or v.get("ig_posted"):
-                latest_title = v.get("title", "")
-                break
-
-    print(json.dumps({
-        "target_file": target_file,
-        "game_name": chosen_game,
-        "chosen_style": chosen_style,
-        "ai_title": generated_ai_title,
-        "actual_posted_title": latest_title,
-        "source_url": specific_uploaded_link,
-        "total_links": total_links,
-        "uploaded_count": uploaded_links + 1,
-        "remaining_links": remaining_links,
-        "next_game": "",
-        "auto_comment": AUTO_COMMENT_ENABLED,
-    }))
+    log(f"\n{'=' * 60}")
+    log(f"✅ DONE — {now_ist_ampm()} IST")
+    log(f"{'=' * 60}")
 
 
 if __name__ == "__main__":
