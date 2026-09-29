@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-30 12:44:00 AM",
+  "last_updated": "2026-09-30 12:46:46 AM",
   "period_days": 7,
   "trending": [
     {
@@ -7,7 +7,7 @@
       "views_7d": 18957,
       "avg_per_video": 18957,
       "trend": "viral",
-      "ratio": 12.898843275119074,
+      "ratio": 12.898355698355699,
       "fb_link": "https://www.facebook.com/reel/1440490007980933/",
       "source_link": ""
     }
@@ -18,16 +18,16 @@
       "views_7d": 5866,
       "avg_per_video": 1466,
       "trend": "slow",
-      "ratio": 0.997505103198004,
+      "ratio": 0.9974673974673975,
       "fb_link": "https://www.facebook.com/reel/1446641450685379/",
       "source_link": ""
     },
     {
       "game": "VietnamCavePrison",
-      "views_7d": 5734,
-      "avg_per_video": 1146,
+      "views_7d": 5735,
+      "avg_per_video": 1147,
       "trend": "slow",
-      "ratio": 0.7797686550238149,
+      "ratio": 0.7804195804195805,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison6.mp4"
     },
@@ -36,7 +36,7 @@
       "views_7d": 7342,
       "avg_per_video": 1048,
       "trend": "slow",
-      "ratio": 0.7130868677704695,
+      "ratio": 0.7130599130599131,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison14.mp4"
     },
@@ -45,7 +45,7 @@
       "views_7d": 1922,
       "avg_per_video": 961,
       "trend": "slow",
-      "ratio": 0.6538897709231117,
+      "ratio": 0.6538650538650539,
       "fb_link": "https://www.facebook.com/reel/1135871095448480/",
       "source_link": ""
     },
@@ -54,7 +54,7 @@
       "views_7d": 659,
       "avg_per_video": 659,
       "trend": "below_avg",
-      "ratio": 0.4484009979587208,
+      "ratio": 0.4483840483840484,
       "fb_link": "https://www.facebook.com/reel/1433881315316238/",
       "source_link": ""
     }
@@ -64,7 +64,7 @@
     "views_7d": 18957,
     "avg_per_video": 18957,
     "trend": "viral",
-    "ratio": 12.898843275119074,
+    "ratio": 12.898355698355699,
     "fb_link": "https://www.facebook.com/reel/1440490007980933/",
     "source_link": ""
   }

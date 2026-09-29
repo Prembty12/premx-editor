@@ -1,6 +1,6 @@
 # 🚀 GAMING AGENT COMMAND & ANALYTICS DASHBOARD
 
-> **Last Updated:** 2026-09-30 12:44:00 AM IST | **Status:** All Systems Active & Synchronized
+> **Last Updated:** 2026-09-30 12:46:46 AM IST | **Status:** All Systems Active & Synchronized
 
 --- 
 
@@ -9,14 +9,14 @@
 | Rank | Game Name | Total Videos | Total Views | Avg Views / Video | Performance Tier |
 | :---: | :--- | :---: | :---: | :---: | :---: |
 | 🥇 | **codBlackops6** | 3 | 22,995 | 7,665 | 🔥 Viral / Hype |
-| 🥈 | **mm2remastered** | 3 | 22,129 | 7,376 | 🔥 Viral / Hype |
+| 🥈 | **mm2remastered** | 3 | 22,131 | 7,377 | 🔥 Viral / Hype |
 | 🥉 | **AfghanistanRedZone** | 0 | 20,754 | 0 | 📈 Stable |
 | 4️⃣ | **Callofdutyaw** | 4 | 19,892 | 4,973 | ⚡ Trending |
-| 5️⃣ | **SpiderMan2** | 1 | 15,907 | 15,907 | 🔥 Viral / Hype |
-| 6 | **MarvelsSpiderMan2** | 4 | 12,458 | 3,114 | 📈 Stable |
-| 7 | **RescueOperation** | 3 | 8,361 | 2,787 | 📈 Stable |
+| 5️⃣ | **SpiderMan2** | 1 | 15,908 | 15,908 | 🔥 Viral / Hype |
+| 6 | **MarvelsSpiderMan2** | 4 | 12,459 | 3,114 | 📈 Stable |
+| 7 | **RescueOperation** | 4 | 8,361 | 2,090 | 📈 Stable |
 | 8 | **GODOFWAR3** | 4 | 6,676 | 1,669 | 📈 Stable |
-| 9 | **VietnamCavePrison** | 3 | 6,558 | 2,186 | 📈 Stable |
+| 9 | **VietnamCavePrison** | 3 | 6,559 | 2,186 | 📈 Stable |
 | 10 | **Ghost Destroys Mexican** | 0 | 4,821 | 0 | 📈 Stable |
 | 11 | **ghostandela** | 3 | 4,409 | 1,469 | 📈 Stable |
 | 12 | **Russian_secret_missions** | 3 | 3,594 | 1,198 | 📈 Stable |
@@ -46,7 +46,7 @@
 | **SpiderMan2** | 2026-09-27 10:27 PM | Spider-Man Climbs Giant Colossus 🔥  #videogames #gamingcommunity #gaming #spider | [🔵 FB](https://www.facebook.com/reel/1657819332435539/) | 66 | [🟣 IG](https://www.instagram.com/reel/DdxrbGlAcgA/) | 20 | **47** / 48 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan212.mp4) | **[📜 View 48](logs/games/SpiderMan2.md)** |
 | **Callofdutyaw** | 2026-09-27 01:28 AM | Betrayal Under Fire 🔫🔥  #videogames #gamingcommunity #gaming #callofdutyaw #gami | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Ddw1w3-DvHV/) | 140 | **28** / 32 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison14.mp4) | **[📜 View 32](logs/games/Callofdutyaw.md)** |
 | **ghostandela** | 2026-09-27 12:44 AM | Walking Through Pure Fire 🔥💀  #videogames #gamingcommunity #gaming #ghostandela  | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdwwvaCDs7Z/) | 10 | **44** / 47 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela8.mp4) | **[📜 View 47](logs/games/ghostandela.md)** |
-| **RescueOperation** | 2026-09-26 09:23 PM | Frozen Sniper Ops 🎯❄️  #videogames #gamingcommunity #gaming #rescueoperation #ga | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdwZqBbjcOq/) | 540 | **16** / 19 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation14.mp4) | **[📜 View 19](logs/games/RescueOperation.md)** |
+| **RescueOperation** | 2026-09-26 09:23 PM | Frozen Sniper Ops 🎯❄️  #videogames #gamingcommunity #gaming #rescueoperation #ga | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdwZqBbjcOq/) | 540 | **15** / 19 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation14.mp4) | **[📜 View 19](logs/games/RescueOperation.md)** |
 | **MarvelsSpiderMan2** | 2026-09-26 07:19 PM | Lightning Strike Melts Monsters ⚡💀  #videogames #gamingcommunity #gaming #marvel | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdwLc5lCQmn/) | 70 | **43** / 47 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan233.mp4) | **[📜 View 47](logs/games/MarvelsSpiderMan2.md)** |
 | **Ghost_soap_escap** | 2026-09-26 02:50 PM | Tense Confrontation Between Soldiers 💀  #videogames #gamingcommunity #gaming #gh | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdvsqOUkm2U/) | 0 | **14** / 18 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps1.mp4) | **[📜 View 18](logs/games/Ghost_soap_escap.md)** |
 | **Ghost Destroys Mexican** | 2026-09-26 11:52 AM | Storm Ship Boarding Climb 🌊⚓  #videogames #gamingcommunity #gaming #ghost destro | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdvYTdVDxHO/) | 50 | **19** / 19 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.82/Ghost_Destroys_Mexican_Oil_Ring5.mp4) | **[📜 View 19](logs/games/Ghost_Destroys_Mexican.md)** |
@@ -60,7 +60,7 @@
 
 ## 📈 Trending Games (Last 7 Days)
 
-> Auto-detected based on views performance | Last Updated: 2026-09-30 12:44:00 AM
+> Auto-detected based on views performance | Last Updated: 2026-09-30 12:46:46 AM
 
 | Rank | Game Name | Views (7d) | Avg / Video | Trend | FB Post | Source |
 |:---:|---|---|---|---|---|---|
@@ -71,7 +71,7 @@
 | Game | Views (7d) | Avg |
 |---|---|---|
 | GODOFWAR3 | 5,866 | 1,466 |
-| VietnamCavePrison | 5,734 | 1,146 |
+| VietnamCavePrison | 5,735 | 1,147 |
 | Callofdutyaw | 7,342 | 1,048 |
 | Russian_secret_missions | 1,922 | 961 |
 | UkraineCovertMission | 659 | 659 |
@@ -84,7 +84,7 @@
 
 ## 🎯 Best Time to Post (IST)
 
-> Analysis from 57 posts | Last Updated: 2026-09-30 12:44:00 AM
+> Analysis from 58 posts | Last Updated: 2026-09-30 12:46:46 AM
 
 | Rank | Time (IST) | Posts | Avg Views | Recommendation |
 |:---:|---|:---:|:---:|---|
@@ -104,40 +104,45 @@
 |---|---|---|
 | Monday | 9 | 292 |
 | Tuesday | 20 | 492 |
-| Wednesday | 2 | 98 |
+| Wednesday | 3 | 88 |
 | Sunday | 26 | 244 |
 
 --- 
 
 ## 🤖 Auto-Reply Log (Fixed v4)
 
-> Auto-Comment Status: ✅ **ACTIVE** | Last Updated: 2026-09-30 12:44:00 AM | Total Replies: 13 | Skipped: 0
+> Auto-Comment Status: ✅ **ACTIVE** | Last Updated: 2026-09-30 12:46:46 AM | Total Replies: 18 | Skipped: 0
 
 ### 📊 Stats
 
 | Metric | Value |
 |---|---|
-| Friendly Replies | 13 |
+| Friendly Replies | 18 |
 | Savage Replies | 0 |
-| Total | 13 |
+| Total | 18 |
 
 ### 💬 Recent Replies (Last 20)
 
 | # | Time | 👤 User | 💬 User Comment | 🤖 AI Reply | Type | Depth | Game | FB Post |
 |---|---|---|---|---|---|---|---|---|
-| 1 | 2026-09-30 12:44:00  | **Facebook User** | Yves Nzinga mw2 | Yves Nzinga on MW2? Legendary move! Keep dominating 😎🚀 | ✅ Friendly | 2 | afghanistanredz | [🔵](https://www.facebook.com/reel/1440490007980933/) |
-| 2 | 2026-09-30 12:43:53  | **Facebook User** | Walter Awinda og mw2 | OG MW2 vibes, Walter Awinda! Let's clutch those rounds 💪🔥 | ✅ Friendly | 2 | afghanistanredz | [🔵](https://www.facebook.com/reel/1440490007980933/) |
-| 3 | 2026-09-30 12:43:45  | **Facebook User** | PremxGamer  when upload next game | Next drop tomorrow, yaar! New Sifu boss fight incoming 😎💥 | ✅ Friendly | 2 | sifu | [🔵](https://www.facebook.com/reel/1635492871307578/) |
-| 4 | 2026-09-30 12:43:38  | **Facebook User** | PremxGamer I am waiting bro | Soon, bro! Got some epic stuff cooking 😎🔥 Stay tuned! | ✅ Friendly | 2 | God of War | [🔵](https://www.facebook.com/reel/1763278934904943/) |
-| 5 | 2026-09-30 12:43:31  | **Facebook User** | PremxGamer can you tell game name | It's Call of Duty: MW2, bro! Those headshots are next level 🔥 | ✅ Friendly | 2 | Video Game | [🔵](https://www.facebook.com/reel/1135871095448480/) |
-| 6 | 2026-09-30 12:06:01  | **Facebook User** | PremxGamer  when upload next game | Next game drop is coming, stay hyped! 🎮💥 | ✅ Friendly | 2 | sifu | [🔵](https://www.facebook.com/reel/1635492871307578/) |
-| 7 | 2026-09-30 12:05:52  | **Facebook User** | PremxGamer thank you bro when you upload next god of war | Next God of War drop soon, keep an eye out! ⏳🔥 | ✅ Friendly | 2 | God of War | [🔵](https://www.facebook.com/reel/1763278934904943/) |
-| 8 | 2026-09-30 12:05:44  | **Facebook User** | PremxGamer can you tell game name | It's Russian Secret Missions, bro! 🎮🔥 | ✅ Friendly | 2 | Video Game | [🔵](https://www.facebook.com/reel/1135871095448480/) |
-| 9 | 2026-09-29 11:52:21  | **Facebook User** | Yves Nzinga mw2 | Yves Nzinga is a beast! 🔥 | ✅ Friendly | 2 | afghanistanredz | [🔵](https://www.facebook.com/reel/1440490007980933/) |
-| 10 | 2026-09-29 11:52:15  | **Facebook User** | Walter Awinda og mw2 | Walter Awinda is OG! Legend right there 💯 | ✅ Friendly | 2 | afghanistanredz | [🔵](https://www.facebook.com/reel/1440490007980933/) |
-| 11 | 2026-09-29 11:52:06  | **Facebook User** | PremxGamer  when upload next game | Next game dropping soon yaar, stay tuned! 🔥 | ✅ Friendly | 2 | sifu | [🔵](https://www.facebook.com/reel/1635492871307578/) |
-| 12 | 2026-09-29 11:51:56  | **Facebook User** | Super bro | Haha thanks bro! Glad you liked it 😎 | ✅ Friendly | 1 | God of War | [🔵](https://www.facebook.com/reel/1763278934904943/) |
-| 13 | 2026-09-29 11:51:49  | **Facebook User** | PremxGamer can you tell game name | Game is Call of Duty: Modern Warfare! 🔥 | ✅ Friendly | 2 | Video Game | [🔵](https://www.facebook.com/reel/1135871095448480/) |
+| 1 | 2026-09-30 12:46:46  | **Facebook User** | Yves Nzinga mw2 | MW2 wala action fire tha yaar! 🔥 | ✅ Friendly | 2 | afghanistanredz | [🔵](https://www.facebook.com/reel/1440490007980933/) |
+| 2 | 2026-09-30 12:46:37  | **Facebook User** | Walter Awinda og mw2 | Bhai MW2 da wela legendary hai! 🔥 | ✅ Friendly | 2 | afghanistanredz | [🔵](https://www.facebook.com/reel/1440490007980933/) |
+| 3 | 2026-09-30 12:46:26  | **Facebook User** | PremxGamer  when upload next game | Next game upload mein kaam chal raha h bhai — stay tuned! 🔥 | ✅ Friendly | 2 | sifu | [🔵](https://www.facebook.com/reel/1635492871307578/) |
+| 4 | 2026-09-30 12:46:21  | **Facebook User** | PremxGamer I am waiting bro | Bro patience karo! God of War part 2 abhi aa raha hai 🔥👀 | ✅ Friendly | 2 | God of War | [🔵](https://www.facebook.com/reel/1763278934904943/) |
+| 5 | 2026-09-30 12:46:14  | **Facebook User** | PremxGamer can you tell game name | Yaar game ka naam hai 'Video Game' — next video mein aur bataunga! 🎯 | ✅ Friendly | 2 | Video Game | [🔵](https://www.facebook.com/reel/1135871095448480/) |
+| 6 | 2026-09-30 12:44:00  | **Facebook User** | Yves Nzinga mw2 | Yves Nzinga on MW2? Legendary move! Keep dominating 😎🚀 | ✅ Friendly | 2 | afghanistanredz | [🔵](https://www.facebook.com/reel/1440490007980933/) |
+| 7 | 2026-09-30 12:43:53  | **Facebook User** | Walter Awinda og mw2 | OG MW2 vibes, Walter Awinda! Let's clutch those rounds 💪🔥 | ✅ Friendly | 2 | afghanistanredz | [🔵](https://www.facebook.com/reel/1440490007980933/) |
+| 8 | 2026-09-30 12:43:45  | **Facebook User** | PremxGamer  when upload next game | Next drop tomorrow, yaar! New Sifu boss fight incoming 😎💥 | ✅ Friendly | 2 | sifu | [🔵](https://www.facebook.com/reel/1635492871307578/) |
+| 9 | 2026-09-30 12:43:38  | **Facebook User** | PremxGamer I am waiting bro | Soon, bro! Got some epic stuff cooking 😎🔥 Stay tuned! | ✅ Friendly | 2 | God of War | [🔵](https://www.facebook.com/reel/1763278934904943/) |
+| 10 | 2026-09-30 12:43:31  | **Facebook User** | PremxGamer can you tell game name | It's Call of Duty: MW2, bro! Those headshots are next level 🔥 | ✅ Friendly | 2 | Video Game | [🔵](https://www.facebook.com/reel/1135871095448480/) |
+| 11 | 2026-09-30 12:06:01  | **Facebook User** | PremxGamer  when upload next game | Next game drop is coming, stay hyped! 🎮💥 | ✅ Friendly | 2 | sifu | [🔵](https://www.facebook.com/reel/1635492871307578/) |
+| 12 | 2026-09-30 12:05:52  | **Facebook User** | PremxGamer thank you bro when you upload next god of war | Next God of War drop soon, keep an eye out! ⏳🔥 | ✅ Friendly | 2 | God of War | [🔵](https://www.facebook.com/reel/1763278934904943/) |
+| 13 | 2026-09-30 12:05:44  | **Facebook User** | PremxGamer can you tell game name | It's Russian Secret Missions, bro! 🎮🔥 | ✅ Friendly | 2 | Video Game | [🔵](https://www.facebook.com/reel/1135871095448480/) |
+| 14 | 2026-09-29 11:52:21  | **Facebook User** | Yves Nzinga mw2 | Yves Nzinga is a beast! 🔥 | ✅ Friendly | 2 | afghanistanredz | [🔵](https://www.facebook.com/reel/1440490007980933/) |
+| 15 | 2026-09-29 11:52:15  | **Facebook User** | Walter Awinda og mw2 | Walter Awinda is OG! Legend right there 💯 | ✅ Friendly | 2 | afghanistanredz | [🔵](https://www.facebook.com/reel/1440490007980933/) |
+| 16 | 2026-09-29 11:52:06  | **Facebook User** | PremxGamer  when upload next game | Next game dropping soon yaar, stay tuned! 🔥 | ✅ Friendly | 2 | sifu | [🔵](https://www.facebook.com/reel/1635492871307578/) |
+| 17 | 2026-09-29 11:51:56  | **Facebook User** | Super bro | Haha thanks bro! Glad you liked it 😎 | ✅ Friendly | 1 | God of War | [🔵](https://www.facebook.com/reel/1763278934904943/) |
+| 18 | 2026-09-29 11:51:49  | **Facebook User** | PremxGamer can you tell game name | Game is Call of Duty: Modern Warfare! 🔥 | ✅ Friendly | 2 | Video Game | [🔵](https://www.facebook.com/reel/1135871095448480/) |
 
 --- 
 
@@ -169,38 +174,38 @@
 
 ## 🔄 Game Rotation Queue
 
-**📊 Total Games:** 19 | **🎯 Current:** `MarvelsSpiderMan2` | **⏭️ Next Game:** `RescueOperation` (Position #9) | **🔢 Total Runs:** 51
+**📊 Total Games:** 19 | **🎯 Current:** `RescueOperation` | **⏭️ Next Game:** `Russian_secret_missions` (Position #10) | **🔢 Total Runs:** 52
 
-**Last Updated:** 2026-09-30 12:44:00 AM IST
+**Last Updated:** 2026-09-30 12:46:46 AM IST
 
 | # | Game Name | Uploaded | Last Run # | Next Turn In | Status |
 |:---:|---|:---:|:---:|:---:|:---:|
-| 1 | **AfghanistanRedZone** | 0 | — | 12 | ⏳ Wait 12 |
-| 2 | **Callofdutyaw** | 4 | 47 | 13 | ⏳ Wait 13 |
-| 3 | **DiabloIV** | 0 | — | 14 | ⏳ Wait 14 |
-| 4 | **GODOFWAR3** | 4 | 48 | 15 | ⏳ Wait 15 |
-| 5 | **Ghost Destroys Mexican** | 0 | — | 16 | ⏳ Wait 16 |
-| 6 | **Ghost_soap_escap** | 4 | 49 | 17 | ⏳ Wait 17 |
-| 7 | **GodofWarLaufey** | 4 | 50 | 18 | ⏳ Wait 18 |
-| 8 | **MarvelsSpiderMan2** | 4 | 51 | 0 | 🎯 **CURRENT** |
-| 9 | **RescueOperation** | 3 | 37 | 1 | ⏭️ **NEXT UP** |
-| 10 | **Russian_secret_missions** | 3 | 38 | 2 | ⏳ Wait 2 |
-| 11 | **SpiderMan2** | 1 | 8 | 3 | ⏳ Wait 3 |
-| 12 | **UkraineCovertMission** | 3 | 39 | 4 | ⏳ Wait 4 |
-| 13 | **VietnamCavePrison** | 3 | 40 | 5 | ⏳ Wait 5 |
-| 14 | **codBlackops6** | 3 | 41 | 6 | ⏳ Wait 6 |
-| 15 | **combatopration** | 3 | 42 | 7 | ⏳ Wait 7 |
-| 16 | **ghostandela** | 3 | 43 | 8 | ⏳ Wait 8 |
-| 17 | **mm2remastered** | 3 | 44 | 9 | ⏳ Wait 9 |
-| 18 | **monkeyKing** | 3 | 45 | 10 | ⏳ Wait 10 |
-| 19 | **sifu** | 3 | 46 | 11 | ⏳ Wait 11 |
+| 1 | **AfghanistanRedZone** | 0 | — | 11 | ⏳ Wait 11 |
+| 2 | **Callofdutyaw** | 4 | 47 | 12 | ⏳ Wait 12 |
+| 3 | **DiabloIV** | 0 | — | 13 | ⏳ Wait 13 |
+| 4 | **GODOFWAR3** | 4 | 48 | 14 | ⏳ Wait 14 |
+| 5 | **Ghost Destroys Mexican** | 0 | — | 15 | ⏳ Wait 15 |
+| 6 | **Ghost_soap_escap** | 4 | 49 | 16 | ⏳ Wait 16 |
+| 7 | **GodofWarLaufey** | 4 | 50 | 17 | ⏳ Wait 17 |
+| 8 | **MarvelsSpiderMan2** | 4 | 51 | 18 | ⏳ Wait 18 |
+| 9 | **RescueOperation** | 4 | 52 | 0 | 🎯 **CURRENT** |
+| 10 | **Russian_secret_missions** | 3 | 38 | 1 | ⏭️ **NEXT UP** |
+| 11 | **SpiderMan2** | 1 | 8 | 2 | ⏳ Wait 2 |
+| 12 | **UkraineCovertMission** | 3 | 39 | 3 | ⏳ Wait 3 |
+| 13 | **VietnamCavePrison** | 3 | 40 | 4 | ⏳ Wait 4 |
+| 14 | **codBlackops6** | 3 | 41 | 5 | ⏳ Wait 5 |
+| 15 | **combatopration** | 3 | 42 | 6 | ⏳ Wait 6 |
+| 16 | **ghostandela** | 3 | 43 | 7 | ⏳ Wait 7 |
+| 17 | **mm2remastered** | 3 | 44 | 8 | ⏳ Wait 8 |
+| 18 | **monkeyKing** | 3 | 45 | 9 | ⏳ Wait 9 |
+| 19 | **sifu** | 3 | 46 | 10 | ⏳ Wait 10 |
 
 ### 📜 Recent Runs (Last 5)
 
 | Run # | Game | Timestamp (IST) |
 |:---:|---|---|
+| 52 | RescueOperation | 2026-09-30 12:46:46 AM |
 | 51 | MarvelsSpiderMan2 | 2026-09-30 12:44:00 AM |
 | 50 | GodofWarLaufey | 2026-09-30 12:31:33 AM |
 | 49 | Ghost_soap_escap | 2026-09-30 12:28:52 AM |
 | 48 | GODOFWAR3 | 2026-09-29 11:52:21 PM |
-| 47 | Callofdutyaw | 2026-09-29 08:21:04 PM |
