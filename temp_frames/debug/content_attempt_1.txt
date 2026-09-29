@@ -1,1 +1,1 @@
-{"clip_duration": 15, "reason": "Intense hallway combat with multiple enemies.", "start_time": 15, "status": "APPROVE", "title": "Hallway Beatdown 🥋🔥"}
+{"clip_duration": 30, "reason": "Intense sword combat with flashy golden moves", "start_time": 0, "status": "APPROVE", "title": "Yellow Maiden Slash Fury 💛⚔️"}
