@@ -1,1 +1,1 @@
-{"clip_duration": 35, "reason": "Intense close-quarters combat sequence throughout", "start_time": 3, "status": "APPROVE", "title": "Corridor Gunfight Chaos 💥💀"}
+{"clip_duration": 15, "reason": "Intense hallway combat with multiple enemies.", "start_time": 15, "status": "APPROVE", "title": "Hallway Beatdown 🥋🔥"}
