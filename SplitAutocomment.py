@@ -1,12 +1,11 @@
 """
-💬 SPLIT AUTO-COMMENT SCRIPT (FINAL v4 — Syntax Fixed)
-=======================================================
+💬 SPLIT AUTO-COMMENT SCRIPT (FINAL v5 — Reply Fix)
+=====================================================
 ✅ Auto-comment upgraded (username, 3-level, 10 batch)
 ✅ Dashboard — FULL data (reads agent_memory.json)
-✅ DUPLICATE FIX: Log check first, replied_ids for 3 IDs
-✅ Rotation — display only
-❌ NO rotation write
-❌ NO game selection
+✅ 🔥 FIX: FB API pe bharosa karo — user ke naye reply detect honge
+✅ Log check sirf FRESH comment ke liye
+✅ Duplicate protection
 """
 
 import os
@@ -96,61 +95,6 @@ def fix_ig_url(url):
     return f"https://www.instagram.com/{url}"
 
 
-def parse_game_links_file(filepath):
-    videos = []
-    if not filepath or not os.path.exists(filepath):
-        return videos
-    try:
-        with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
-            content = f.read()
-        for line in content.split('\n'):
-            line = line.strip()
-            if not line:
-                continue
-            if '| Link:' in line:
-                parts = line.split('| Link:')
-                video_name = parts[0].strip()
-                link = parts[1].strip() if len(parts) > 1 else ""
-                url_match = re.search(r'(https?://[^\s\n\r\)\]\'"<>,;]+)', link)
-                if url_match:
-                    link = url_match.group(1).rstrip('.,;)\']"')
-                if video_name:
-                    videos.append({"video_name": video_name, "source_link": link})
-        if not videos:
-            urls = extract_urls(content)
-            for idx, u in enumerate(urls, 1):
-                videos.append({"video_name": f"Video_{idx}", "source_link": u})
-    except Exception as e:
-        log(f"⚠️ parse_game_links_file error: {e}")
-    return videos
-
-
-def parse_posted_file(filepath, game_name):
-    with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
-        content = f.read()
-    posts, current_video = [], {}
-    for line in content.split('\n'):
-        line = line.strip()
-        if not line:
-            continue
-        if '| Link:' in line:
-            if current_video.get('vid_id'):
-                posts.append(current_video)
-            link_part = line.split('| Link:')[-1].strip()
-            video_name = line.split('| Link:')[0].strip()
-            current_video = {
-                'vid_id': None, 'title': None, 'link': link_part,
-                'video_name': video_name, 'platform': 'FB + IG', 'game': game_name,
-            }
-        elif 'Video id :' in line:
-            current_video['vid_id'] = line.split('Video id :')[-1].strip()
-        elif 'Title :' in line:
-            current_video['title'] = line.split('Title :')[-1].strip()
-    if current_video.get('vid_id'):
-        posts.append(current_video)
-    return posts
-
-
 def load_source_data(posted_dir="posted_links_editor"):
     source_links_map, source_videos_count, source_titles_map = {}, {}, {}
     if not os.path.exists(posted_dir):
@@ -199,7 +143,7 @@ DAYS_LIMIT = 28
 MAX_REPLIES_PER_RUN = 10
 MAX_CONVERSATION_DEPTH = 3
 MIN_COMMENT_AGE_MIN = 0
-MAX_COMMENT_AGE_HOURS = 720
+MAX_COMMENT_AGE_HOURS = 24
 POSTS_TO_SCAN = 25
 COMMENT_FETCH_WORKERS = 10
 MAX_JSON_RETRIES = 12
@@ -437,7 +381,7 @@ def is_reply_safe(reply_text, is_abuse=False):
 
 
 # ============================================================
-# 💬 AUTO-COMMENT (DUPLICATE-PROOF)
+# 💬 AUTO-COMMENT (FIXED — FB API FIRST)
 # ============================================================
 _page_name_cache = ""
 _user_name_cache = {}
@@ -595,33 +539,14 @@ def post_fb_reply(comment_id, reply_text):
 
 
 def analyze_thread(top_comment):
+    """
+    ✅ FIXED — FB API pe bharosa karo (naye replies detect honge).
+    """
     cid = top_comment.get("id", "")
 
-    # 🛡️ LAYER 1: LOG CHECK — SABSE PEHLE
-    if was_already_replied(cid):
-        history_depth = load_replied_history().get(cid, 1)
-        log(f"      ⏭️ SKIP — comment_id already in log")
-        return {
-            "should_reply": False,
-            "depth": history_depth,
-            "reason": "already_replied_log",
-        }
-
-    # 🛡️ LAYER 2: FB API se replies
+    # ✅ FB API se replies fetch karo PEHLE
     replies = fetch_comment_replies(cid)
     replies_sorted = sorted(replies, key=lambda x: x.get("created_time", ""))
-
-    # 🛡️ LAYER 3: FB reply_ids log mein
-    history = load_replied_history()
-    for r in replies_sorted:
-        r_id = r.get("id", "")
-        if r_id and r_id in history:
-            log(f"      ⏭️ SKIP — FB reply_id in log")
-            return {
-                "should_reply": False,
-                "depth": history.get(r_id, 1),
-                "reason": "already_replied_log_reply_id",
-            }
 
     page_name = get_page_name()
     page_name_lower = page_name.lower() if page_name else ""
@@ -640,12 +565,21 @@ def analyze_thread(top_comment):
 
     our_count = len(our_replies)
 
-    if len(replies_sorted) == 0:
-        log(f"      🆕 Fresh comment — will reply")
-    elif our_count >= MAX_CONVERSATION_DEPTH:
+    # ✅ MAX DEPTH
+    if our_count >= MAX_CONVERSATION_DEPTH:
         return {"should_reply": False, "depth": our_count, "reason": "max_depth"}
+
+    # ✅ FRESH COMMENT (no replies on FB)
+    if len(replies_sorted) == 0:
+        if was_already_replied(cid):
+            return {"should_reply": False, "depth": 0, "reason": "already_replied_log"}
+        log(f"      🆕 Fresh comment — will reply")
+
+    # ✅ HUMNE REPLY KIYA, USER CHUP
     elif our_count > 0 and len(user_replies) == 0:
         return {"should_reply": False, "depth": our_count, "reason": "waiting_user"}
+
+    # ✅ HUMNE + USER DONO — ORDER CHECK
     elif our_count > 0 and len(user_replies) > 0:
         last = replies_sorted[-1]
         last_from = last.get("from", {}) or {}
@@ -656,9 +590,8 @@ def analyze_thread(top_comment):
         if last_is_ours:
             return {"should_reply": False, "depth": our_count, "reason": "waiting_user"}
         log(f"      💬 User replied — continuing (depth {our_count})")
-    elif our_count == 0 and len(user_replies) > 0:
-        log(f"      ⚠️ User replied but no ours — will reply")
 
+    # ✅ Build context
     thread_ctx = ""
     for r in replies_sorted[-6:]:
         r_from = r.get("from", {}) or {}
@@ -673,6 +606,7 @@ def analyze_thread(top_comment):
     user_msgs = [top_comment] + user_replies
     if not user_msgs:
         return {"should_reply": False, "depth": our_count, "reason": "no_user_msg"}
+
     last_user = user_msgs[-1]
     last_text = (last_user.get("message") or "").strip()
     if not last_text:
@@ -699,7 +633,7 @@ def process_fb_comments(actual_posted_titles=None):
         log("🚫 Auto-comment disabled")
         return None
 
-    log("🤖 Auto-reply started (v4)...")
+    log("🤖 Auto-reply started (v5 — FB API first)...")
 
     page_name = get_page_name()
     log(f"📄 Page name: {page_name or 'N/A'}")
@@ -726,8 +660,6 @@ def process_fb_comments(actual_posted_titles=None):
 
     history = load_replied_history()
     log(f"📂 Replied history cache: {len(history)} IDs")
-    for hid in history.keys():
-        replied_ids.add(hid)
 
     cutoff_time = (now_ist() - timedelta(hours=MAX_COMMENT_AGE_HOURS)).timestamp()
     min_age_time = (now_ist() - timedelta(minutes=MIN_COMMENT_AGE_MIN)).timestamp()
@@ -967,7 +899,7 @@ def process_fb_comments(actual_posted_titles=None):
 # ============================================================
 def update_dashboard_inline():
     log("\n" + "=" * 60)
-    log("📊 DASHBOARD UPDATE (reads full script data)")
+    log("📊 DASHBOARD UPDATE")
     log("=" * 60)
 
     links_dir = "game_links_editor"
@@ -995,7 +927,6 @@ def update_dashboard_inline():
     game_list = sorted(set(game_list))
     log(f"📁 {len(game_list)} games")
 
-    # ✅ READ agent_memory.json (full script ka data)
     memory = {}
     if os.path.exists("logs/agent_memory.json"):
         try:
@@ -1017,7 +948,6 @@ def update_dashboard_inline():
             total += v.get("fb_views", 0) + v.get("ig_views", 0)
         game_views_summary[g_name] = total
 
-    # Fallback: agar memory empty hai, to FB se fetch
     if not actual_posted_titles:
         log("⚠️ Memory empty — fetching from FB")
         actual_posted_titles, game_views_summary = fetch_fb_ig_data(game_list)
@@ -1038,7 +968,6 @@ def update_dashboard_inline():
 
 
 def fetch_fb_ig_data(game_list):
-    """Fallback — FB/IG data fetch."""
     result = {g: [] for g in game_list}
     game_views_summary = {g: 0 for g in game_list}
 
@@ -1273,7 +1202,7 @@ def generate_dashboard_md(actual_posted_titles, game_views_summary, game_stats, 
     md = ["# 🚀 GAMING AGENT DASHBOARD\n\n",
           f"> **Last Updated:** {now_ist_ampm()} IST | **Status:** Active\n\n"]
 
-    # 🏆 Global Leaderboard
+    # Leaderboard
     md.append("--- \n\n## 🏆 Global Leaderboard\n\n")
     md.append("| Rank | Game | Videos | Views | Avg/Video | Tier |\n")
     md.append("|:---:|---|---|---|---|---|\n")
@@ -1284,7 +1213,7 @@ def generate_dashboard_md(actual_posted_titles, game_views_summary, game_stats, 
         md.append(f"| {rank} | **{item['game']}** | {item['uploaded_count']} | "
                   f"{item['total_views']:,} | {item['avg_views']:,} | {tier} |\n")
 
-    # 📺 Live Post Titles
+    # Live Post Titles
     md.append("\n--- \n\n## 📺 Live Post Titles + Views (Latest per Game)\n\n")
     md.append("> 🔵 FB = Facebook live | 🟣 IG = Instagram live | ⏳ = Pending\n\n")
     md.append("| Game Name | 📅 Last Posted | 📺 Latest Title | 🔵 FB | 👁️ FB Views | "
@@ -1375,7 +1304,7 @@ def generate_dashboard_md(actual_posted_titles, game_views_summary, game_stats, 
         md.append(f"| **{g_name}** | {date_str} | {title} | {fb_md} | {fb_v_md} | "
                   f"{ig_md} | {ig_v_md} | {progress_md} | {src_md} | {all_md} |\n")
 
-    # 📈 Trending
+    # Trending
     md.append("\n--- \n\n## 📈 Trending Games (Last 7 Days)\n\n")
     try:
         with open("logs/trending_cache.json", 'r', encoding='utf-8') as f:
@@ -1389,7 +1318,7 @@ def generate_dashboard_md(actual_posted_titles, game_views_summary, game_stats, 
     except Exception:
         md.append("_No data_\n")
 
-    # 🎯 Best Time
+    # Best Time
     md.append("\n--- \n\n## 🎯 Best Time to Post\n\n")
     try:
         with open("logs/best_time_analysis.json", 'r', encoding='utf-8') as f:
@@ -1402,7 +1331,7 @@ def generate_dashboard_md(actual_posted_titles, game_views_summary, game_stats, 
     except Exception:
         md.append("_No data_\n")
 
-    # 🤖 Auto-Reply Log
+    # Auto-Reply Log
     md.append("\n--- \n\n## 🤖 Auto-Reply Log\n\n")
     try:
         with open("logs/auto_reply_log.json", 'r', encoding='utf-8') as f:
@@ -1424,7 +1353,7 @@ def generate_dashboard_md(actual_posted_titles, game_views_summary, game_stats, 
     except Exception:
         md.append("_No data_\n")
 
-    # 🔄 Rotation Queue (Read-Only)
+    # Rotation Queue
     md.append("\n--- \n\n## 🔄 Game Rotation Queue (Read-Only)\n\n")
     rotation_file = "logs/rotation_history.json"
     if os.path.exists(rotation_file):
@@ -1448,7 +1377,7 @@ def generate_dashboard_md(actual_posted_titles, game_views_summary, game_stats, 
     else:
         md.append("_No rotation data_\n")
 
-    # 📜 Full Video History
+    # Full Video History
     md.append("\n--- \n\n## 📜 Full Video History\n\n")
     for g_name in sorted_games:
         videos = actual_posted_titles.get(g_name, [])
@@ -1498,10 +1427,9 @@ def git_commit_and_push(file_paths, message="Auto-Agent: Update dashboard [skip 
 # ============================================================
 def main():
     log("=" * 60)
-    log("🚀 SPLIT SCRIPT v4 — Full Data Display")
+    log("🚀 SPLIT SCRIPT v5 — Reply Fix")
     log("=" * 60)
 
-    # STEP 1: Auto-comment
     if AUTO_COMMENT_ENABLED:
         try:
             process_fb_comments()
@@ -1510,7 +1438,6 @@ def main():
     else:
         log("🚫 Auto-comment disabled")
 
-    # STEP 2: Dashboard
     try:
         update_dashboard_inline()
     except Exception as e:
