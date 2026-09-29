@@ -1,5 +1,5 @@
 {
-  "total_replies": 28,
+  "total_replies": 30,
   "total_skipped": 0,
   "replies": [
     {
@@ -487,8 +487,44 @@
       "source_link": "",
       "timestamp": "2026-09-29 03:49:11 PM",
       "status": "posted"
+    },
+    {
+      "reply_id": "1089532337267395_28394036590258119",
+      "comment_id": "1089532337267395_2382213379297444",
+      "reply_to_id": "1089532337267395_1140516784966635",
+      "post_id": "100463226188818_1089532337267395",
+      "user_name": "Facebook User",
+      "user_id": "",
+      "user_comment": "PremxGamer can you tell game name",
+      "openrouter_reply": "Game is Russian Secret Missions, bro! 🎮 Which weapon are you rocking for those epic headshots?",
+      "type": "friendly",
+      "depth": 2,
+      "game": "Video Game",
+      "post_title": "Scope Headshots Hit Different 🎯🔥\n\n#videogames #gamingcommunity #gaming #russian_",
+      "fb_post_link": "https://www.facebook.com/reel/1135871095448480/",
+      "source_link": "",
+      "timestamp": "2026-09-29 03:55:36 PM",
+      "status": "posted"
+    },
+    {
+      "reply_id": "1088659294021366_2521365408362127",
+      "comment_id": "1088659294021366_1781329876246421",
+      "reply_to_id": "1088659294021366_3300512693469701",
+      "post_id": "100463226188818_1088659294021366",
+      "user_name": "Facebook User",
+      "user_id": "",
+      "user_comment": "PremxGamer  when upload next game",
+      "openrouter_reply": "Next up is Sifu, bro! 🚀 What combo are you crushing right now?",
+      "type": "friendly",
+      "depth": 2,
+      "game": "sifu",
+      "post_title": "Beating Up the Whole Gang 🥋🔥\n\n#videogames #gamingcommunity #gaming #sifu #gaming",
+      "fb_post_link": "https://www.facebook.com/reel/1635492871307578/",
+      "source_link": "",
+      "timestamp": "2026-09-29 03:55:44 PM",
+      "status": "posted"
     }
   ],
   "skipped": [],
-  "last_updated": "2026-09-29 03:49:11 PM"
+  "last_updated": "2026-09-29 03:55:44 PM"
 }

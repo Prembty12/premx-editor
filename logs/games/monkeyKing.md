@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 41 | **Last Updated:** 2026-09-29 03:49:11 PM IST
+**Total Videos:** 40 | **Last Updated:** 2026-09-29 03:55:44 PM IST
 
 ---
 
@@ -10,10 +10,10 @@
 
 | Metric | Value |
 |---|---|
-| Total Videos | **41** |
-| Posted (FB or IG) | 9 / 41 |
-| FB Posted | 5 / 41 |
-| IG Posted | 4 / 41 |
+| Total Videos | **40** |
+| Posted (FB or IG) | 9 / 40 |
+| FB Posted | 5 / 40 |
+| IG Posted | 4 / 40 |
 | Total FB Views | **226** |
 | Total IG Views | **220** |
 
@@ -46,21 +46,20 @@
 | 21 | monkeyKing28 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing28.mp4) |
 | 22 | monkeyKing27 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing27.mp4) |
 | 23 | monkeyKing25 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing25.mp4) |
-| 24 | monkeyKing24 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing24.mp4) |
-| 25 | monkeyKing23 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing23.mp4) |
-| 26 | monkeyKing22 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing22.mp4) |
-| 27 | monkeyKing21 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing21.mp4) |
-| 28 | monkeyKing20 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing20.mp4) |
-| 29 | monkeyKing19 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing19.mp4) |
-| 30 | monkeyKing18 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing18.mp4) |
-| 31 | monkeyKing17 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing17.mp4) |
-| 32 | monkeyKing15 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing15.mp4) |
-| 33 | monkeyKing14 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing14.mp4) |
-| 34 | monkeyKing13 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing13.mp4) |
-| 35 | monkeyKing12 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing12.mp4) |
-| 36 | monkeyKing11 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing11.mp4) |
-| 37 | monkeyKing10 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing10.mp4) |
-| 38 | monkeyKing9 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing9.mp4) |
-| 39 | monkeyKing8 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing8.mp4) |
-| 40 | monkeyKing7 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing7.mp4) |
-| 41 | monkeyKing6 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing6.mp4) |
+| 24 | monkeyKing23 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing23.mp4) |
+| 25 | monkeyKing22 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing22.mp4) |
+| 26 | monkeyKing21 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing21.mp4) |
+| 27 | monkeyKing20 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing20.mp4) |
+| 28 | monkeyKing19 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing19.mp4) |
+| 29 | monkeyKing18 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing18.mp4) |
+| 30 | monkeyKing17 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing17.mp4) |
+| 31 | monkeyKing15 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing15.mp4) |
+| 32 | monkeyKing14 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing14.mp4) |
+| 33 | monkeyKing13 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing13.mp4) |
+| 34 | monkeyKing12 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing12.mp4) |
+| 35 | monkeyKing11 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing11.mp4) |
+| 36 | monkeyKing10 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing10.mp4) |
+| 37 | monkeyKing9 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing9.mp4) |
+| 38 | monkeyKing8 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing8.mp4) |
+| 39 | monkeyKing7 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing7.mp4) |
+| 40 | monkeyKing6 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing6.mp4) |
