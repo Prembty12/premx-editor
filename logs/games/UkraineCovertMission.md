@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 4 | **Last Updated:** 2026-09-29 01:57:59 AM IST
+**Total Videos:** 4 | **Last Updated:** 2026-09-29 08:43:28 AM IST
 
 ---
 
@@ -11,7 +11,7 @@
 | Metric | Value |
 |---|---|
 | Total Videos | **4** |
-| Posted (FB or IG) | 4 / 4 |
+| Posted | 4 / 4 |
 | FB Posted | 4 / 4 |
 | IG Posted | 2 / 4 |
 | Total FB Views | **2,512** |
@@ -21,7 +21,7 @@
 
 ## 📜 All Videos (Newest First)
 
-| # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
+| # | 📺 Title | 🔵 FB | 👁️ FB Views | 🟣 IG | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
 | 1 | Sniper Fire & Big Booms 💥🎯  #videogames #gamingcommunity #gaming #ukrainecovertmission #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1433881315316238/) | 477 | [🟣 IG](https://www.instagram.com/reel/DdrhIHCFEtY/) | 180 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.99/_Ukraine_Covert_Sniper_Mission8.mp4) |
 | 2 | Silent Sniper Red Ruins 🎯💀  #videogames #gamingcommunity #gaming # ukrainecovertmission #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1355101823216986/) | 417 | [🟣 IG](https://www.instagram.com/reel/DdWZDEqATr-/) | 380 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.99/_Ukraine_Covert_Sniper_Mission5.mp4) |
