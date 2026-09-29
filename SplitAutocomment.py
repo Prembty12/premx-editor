@@ -2200,5 +2200,16 @@ def run_agent_brain():
     }))
 
 
-if __name__ == "__main__":
-    run_agent_brain()
+ if __name__ == "__main__":
+    try:
+        main()
+        log("✅ Completed successfully — exiting")
+        sys.exit(0)
+    except KeyboardInterrupt:
+        log("⚠️ Interrupted by user")
+        sys.exit(130)
+    except Exception as e:
+        log(f"❌ FATAL ERROR: {e}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
