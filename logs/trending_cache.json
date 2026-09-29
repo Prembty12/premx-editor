@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-29 11:52:21 PM",
+  "last_updated": "2026-09-29 11:56:18 PM",
   "period_days": 7,
   "trending": [
     {
@@ -27,7 +27,7 @@
       "trend": "steady",
       "ratio": 1.186356553356034,
       "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison6.mp4"
+      "source_link": ""
     },
     {
       "game": "Callofdutyaw",
@@ -36,7 +36,7 @@
       "trend": "steady",
       "ratio": 1.0887054885438912,
       "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison14.mp4"
+      "source_link": ""
     }
   ],
   "below_avg": [
@@ -74,7 +74,7 @@
       "trend": "slow",
       "ratio": 0.5609742021123103,
       "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation14.mp4"
+      "source_link": ""
     },
     {
       "game": "codBlackops6",
