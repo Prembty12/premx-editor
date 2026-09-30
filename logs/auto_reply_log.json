@@ -1,5 +1,5 @@
 {
-  "total_replies": 21,
+  "total_replies": 23,
   "total_skipped": 0,
   "replies": [
     {
@@ -379,8 +379,44 @@
       "source_link": "",
       "timestamp": "2026-09-30 05:29:59 AM",
       "status": "posted"
+    },
+    {
+      "reply_id": "1089036790650283_2156463848608447",
+      "comment_id": "1089036790650283_3277071029153594",
+      "reply_to_id": "1089036790650283_1806454103707538",
+      "post_id": "100463226188818_1089036790650283",
+      "user_name": "Facebook User",
+      "user_id": "",
+      "user_comment": "PremxGamer I am waiting bro",
+      "openrouter_reply": "Bro, I'm cooking up something fire for God of War. Stay tuned! 😎",
+      "type": "friendly",
+      "depth": 2,
+      "game": "God of War",
+      "post_title": "Blonde Hero Vs Fire Demon ⚔️🔥\n\n#videogames #gamingcommunity #gaming #godofwarlau",
+      "fb_post_link": "https://www.facebook.com/reel/1763278934904943/",
+      "source_link": "",
+      "timestamp": "2026-09-30 08:38:19 AM",
+      "status": "posted"
+    },
+    {
+      "reply_id": "1088659294021366_1133036182485459",
+      "comment_id": "1088659294021366_1781329876246421",
+      "reply_to_id": "1088659294021366_3300512693469701",
+      "post_id": "100463226188818_1088659294021366",
+      "user_name": "Facebook User",
+      "user_id": "",
+      "user_comment": "PremxGamer  when upload next game",
+      "openrouter_reply": "Next game upload soon, bro! But first, tell me which sifu level kicked your butt? 😜",
+      "type": "friendly",
+      "depth": 2,
+      "game": "sifu",
+      "post_title": "Beating Up the Whole Gang 🥋🔥\n\n#videogames #gamingcommunity #gaming #sifu #gaming",
+      "fb_post_link": "https://www.facebook.com/reel/1635492871307578/",
+      "source_link": "",
+      "timestamp": "2026-09-30 08:38:25 AM",
+      "status": "posted"
     }
   ],
   "skipped": [],
-  "last_updated": "2026-09-30 05:29:59 AM"
+  "last_updated": "2026-09-30 08:38:25 AM"
 }
