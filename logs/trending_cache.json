@@ -1,13 +1,13 @@
 {
-  "last_updated": "2026-09-30 01:14:28 PM",
+  "last_updated": "2026-09-30 03:20:55 PM",
   "period_days": 7,
   "trending": [
     {
       "game": "AfghanistanRedZone",
-      "views_7d": 19053,
-      "avg_per_video": 19053,
+      "views_7d": 19075,
+      "avg_per_video": 19075,
       "trend": "viral",
-      "ratio": 12.879933901678747,
+      "ratio": 12.864850687549177,
       "fb_link": "https://www.facebook.com/reel/1440490007980933/",
       "source_link": ""
     }
@@ -15,56 +15,56 @@
   "below_avg": [
     {
       "game": "GODOFWAR3",
-      "views_7d": 5879,
-      "avg_per_video": 1469,
+      "views_7d": 5890,
+      "avg_per_video": 1472,
       "trend": "slow",
-      "ratio": 0.9930521650955796,
+      "ratio": 0.9927685563340702,
       "fb_link": "https://www.facebook.com/reel/1446641450685379/",
       "source_link": ""
     },
     {
       "game": "Callofdutyaw",
-      "views_7d": 7346,
+      "views_7d": 7347,
       "avg_per_video": 1049,
       "trend": "slow",
-      "ratio": 0.7091298306230518,
+      "ratio": 0.7074824834201356,
       "fb_link": "",
-      "source_link": ""
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison14.mp4"
     },
     {
       "game": "Russian_secret_missions",
-      "views_7d": 2004,
-      "avg_per_video": 1002,
+      "views_7d": 2012,
+      "avg_per_video": 1006,
       "trend": "slow",
-      "ratio": 0.6773575693844593,
+      "ratio": 0.678481771516355,
       "fb_link": "https://www.facebook.com/reel/1135871095448480/",
       "source_link": ""
     },
     {
       "game": "VietnamCavePrison",
-      "views_7d": 5819,
-      "avg_per_video": 969,
+      "views_7d": 5934,
+      "avg_per_video": 989,
       "trend": "slow",
-      "ratio": 0.6550493859616179,
+      "ratio": 0.6670163737869534,
       "fb_link": "",
-      "source_link": ""
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison17.mp4"
     },
     {
       "game": "UkraineCovertMission",
       "views_7d": 659,
       "avg_per_video": 659,
       "trend": "below_avg",
-      "ratio": 0.4454876628985616,
+      "ratio": 0.4444527708044513,
       "fb_link": "https://www.facebook.com/reel/1433881315316238/",
       "source_link": ""
     }
   ],
   "recommendation": {
     "game": "AfghanistanRedZone",
-    "views_7d": 19053,
-    "avg_per_video": 19053,
+    "views_7d": 19075,
+    "avg_per_video": 19075,
     "trend": "viral",
-    "ratio": 12.879933901678747,
+    "ratio": 12.864850687549177,
     "fb_link": "https://www.facebook.com/reel/1440490007980933/",
     "source_link": ""
   }
