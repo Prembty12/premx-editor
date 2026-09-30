@@ -1,8 +1,8 @@
 """
-🚀 GAMING AGENT — FULL SCRIPT (v5 — Duplicate Reply Fixed)
+🚀 GAMING AGENT — FULL SCRIPT (v6 — Timeout-Safe Reply Posting)
 ============================================================
 ✅ All original features (rotation, dashboard, memory)
-✅ FIXED Auto-Comment:
+✅ FIXED Auto-Comment (v6):
    - fetch_comment_replies() — RECURSIVE (nested replies fetch)
    - analyze_thread() — last reply check FIRST (no duplicate)
    - FB API pe bharosa (naye replies detect)
@@ -11,6 +11,8 @@
    - Real username fetch (3-layer fallback)
    - 3-level conversation thread
    - 10 comments batch
+   - 🆕 _check_reply_exists() — timeout ke baad verify karo
+   - 🆕 post_fb_reply() — 45s timeout + retry + verify + unverified fallback
 """
 
 import os
@@ -437,7 +439,7 @@ def is_reply_safe(reply_text, is_abuse=False):
     return True, "safe"
 
 # ============================================================
-# 🤖 AUTO-REPLY FUNCTIONS (FIXED v5)
+# 🤖 AUTO-REPLY FUNCTIONS (FIXED v6)
 # ============================================================
 _page_name_cache = ""
 _user_name_cache = {}
@@ -556,7 +558,7 @@ def fetch_fb_comments(post_id, since_timestamp=None):
     return []
 
 
-# ✅ FIXED: RECURSIVE — nested replies bhi fetch karo
+# ✅ RECURSIVE — nested replies bhi fetch karo
 def fetch_comment_replies(comment_id, depth=0, max_depth=3):
     """Recursively fetch all nested replies."""
     if depth >= max_depth:
@@ -583,34 +585,113 @@ def fetch_comment_replies(comment_id, depth=0, max_depth=3):
     return all_replies
 
 
+# 🆕 v6: Verify if our reply actually landed on FB (used after timeout)
+def _check_reply_exists(comment_id, reply_text, page_name):
+    """
+    Timeout ke baad verify karo ki humara reply FB pe land hua ya nahi.
+    Returns reply_id if found, else empty string.
+    """
+    try:
+        replies = fetch_comment_replies(comment_id)
+        reply_text_lower = reply_text.strip().lower()
+        page_name_lower = (page_name or "").strip().lower()
+
+        for r in replies:
+            r_from = r.get("from", {}) or {}
+            r_from_id = r_from.get("id", "")
+            r_name = (r_from.get("name") or "").strip().lower()
+            is_ours = (r_from_id == FB_PAGE_ID) or (page_name_lower and r_name == page_name_lower)
+            if not is_ours:
+                continue
+            r_msg = (r.get("message") or "").strip().lower()
+            if r_msg == reply_text_lower or (len(reply_text_lower) >= 20 and reply_text_lower[:40] in r_msg):
+                return r.get("id", "")
+    except Exception as e:
+        log(f"      ⚠️ _check_reply_exists error: {e}")
+    return ""
+
+
+# ✅ FIXED v6: Timeout-safe reply posting with verification
 def post_fb_reply(comment_id, reply_text):
-    """Synthetic fallback ID."""
+    """
+    Post reply with retry + timeout recovery.
+    Agar timeout ho jaye, FB pe verify karo — reply may have actually landed.
+    """
     if not AUTO_COMMENT_ENABLED:
         log(f"🚫 [AUTO_COMMENT OFF] Would post: {reply_text[:80]}")
         return f"disabled_{comment_id}"
 
     url = f"{FB_GRAPH_URL}/{comment_id}/comments"
     payload = {"message": reply_text, "access_token": FB_ACCESS_TOKEN}
+    page_name = get_page_name()
+
+    # ── Attempt loop (max 2 tries) ──
+    for attempt in (1, 2):
+        try:
+            time.sleep(random.uniform(2, 5))
+            res = requests.post(url, data=payload, timeout=45)  # ⬅️ 15 → 45 sec
+
+            if res.status_code == 200:
+                data = res.json()
+                rid = data.get("id")
+                if rid:
+                    return rid
+                # Posted but no ID returned — verify via GET
+                log(f"      🔍 No ID in response — verifying...")
+                time.sleep(3)
+                found = _check_reply_exists(comment_id, reply_text, page_name)
+                if found:
+                    return found
+                return f"synth_{comment_id}_{int(time.time())}"
+
+            else:
+                log(f"⚠️ Reply post error ({res.status_code}): {res.text[:200]}")
+                if attempt == 2:
+                    break
+
+        except requests.exceptions.ReadTimeout:
+            # ⬅️ MAIN FIX: timeout ho gaya lekin reply land ho sakta hai
+            log(f"⏱️ Reply POST timeout (attempt {attempt}) — verifying if it landed...")
+            time.sleep(6)
+            found = _check_reply_exists(comment_id, reply_text, page_name)
+            if found:
+                log(f"      ✅ Reply actually landed despite timeout! ID: {found}")
+                return found
+            log(f"      ❌ Not found yet — will retry...")
+
+        except requests.exceptions.ConnectionError as e:
+            log(f"⚠️ Reply post connection error (attempt {attempt}): {e}")
+            time.sleep(4)
+            # Timeout jaise handle — verify karo
+            found = _check_reply_exists(comment_id, reply_text, page_name)
+            if found:
+                log(f"      ✅ Reply found after connection error! ID: {found}")
+                return found
+
+        except Exception as e:
+            log(f"⚠️ Reply post exception (attempt {attempt}): {e}")
+            if attempt == 2:
+                break
+
+    # ── Final late verification (FB sometimes processes after response) ──
+    log(f"      ⏳ Final verification after cooldown...")
     try:
-        time.sleep(random.uniform(2, 5))
-        res = requests.post(url, data=payload, timeout=15)
-        if res.status_code == 200:
-            data = res.json()
-            rid = data.get("id")
-            if rid:
-                return rid
-            return f"synth_{comment_id}_{int(time.time())}"
-        else:
-            log(f"⚠️ Reply post error ({res.status_code}): {res.text[:200]}")
-    except Exception as e:
-        log(f"⚠️ Reply post exception: {e}")
-    return None
+        time.sleep(10)
+        found = _check_reply_exists(comment_id, reply_text, page_name)
+        if found:
+            log(f"      ✅ Reply found on late verification! ID: {found}")
+            return found
+    except Exception:
+        pass
+
+    log(f"      ❌ Reply verification failed — reply may or may not be live on FB")
+    # ⬅️ IMPORTANT: return unique ID so it still gets logged (not dropped)
+    return f"unverified_{comment_id}_{int(time.time())}"
 
 
 # ✅ FIXED: Last reply check FIRST — no duplicate
 def analyze_thread(top_comment):
     """
-    ✅ FIXED v5:
     - FB API se recursive replies fetch
     - Last reply check FIRST (agar humara hai → SKIP)
     - Log check SIRF fresh comment ke liye
@@ -711,7 +792,7 @@ def process_fb_comments(actual_posted_titles=None):
         log("🚫 Auto-comment disabled — skipping reply processing")
         return None
 
-    log("🤖 Auto-reply processing started (v5 — fixed)...")
+    log("🤖 Auto-reply processing started (v6 — timeout-safe)...")
 
     page_name = get_page_name()
     log(f"📄 Page name: {page_name or 'N/A'}")
@@ -953,7 +1034,7 @@ def process_fb_comments(actual_posted_titles=None):
                 "fb_post_link": c["fb_link"],
                 "source_link": c["source_link"],
                 "timestamp": now_ist_ampm(),
-                "status": "posted",
+                "status": "posted" if not str(reply_id).startswith("unverified_") else "unverified",
             })
             reply_log["total_replies"] = reply_log.get("total_replies", 0) + 1
 
@@ -966,6 +1047,7 @@ def process_fb_comments(actual_posted_titles=None):
             log(f"   👤 User: {c['user_name']}")
             log(f"   💬 Comment: {c['comment_text'][:80]}")
             log(f"   🤖 AI Reply: {reply_text[:80]}")
+            log(f"   🆔 Reply ID: {reply_id}")
         else:
             log(f"❌ Failed to post reply for {comment_id[:20]}")
 
@@ -1207,7 +1289,7 @@ def generate_auto_reply_section():
     except Exception:
         return ""
     lines = []
-    lines.append("\n--- \n\n## 🤖 Auto-Reply Log (Fixed v5)\n\n")
+    lines.append("\n--- \n\n## 🤖 Auto-Reply Log (v6 Timeout-Safe)\n\n")
     status = "🚫 **DISABLED**" if not AUTO_COMMENT_ENABLED else "✅ **ACTIVE**"
     lines.append(f"> Auto-Comment Status: {status} | Last Updated: {data.get('last_updated', 'N/A')} | ")
     lines.append(f"Total Replies: {data.get('total_replies', 0)} | Skipped: {data.get('total_skipped', 0)}\n\n")
@@ -1215,9 +1297,11 @@ def generate_auto_reply_section():
     if replies:
         friendly_count = sum(1 for r in replies if r.get("type") == "friendly")
         savage_count = sum(1 for r in replies if r.get("type") == "savage")
+        unverified_count = sum(1 for r in replies if str(r.get("reply_id", "")).startswith("unverified_"))
         lines.append("### 📊 Stats\n\n| Metric | Value |\n|---|---|\n")
         lines.append(f"| Friendly Replies | {friendly_count} |\n")
         lines.append(f"| Savage Replies | {savage_count} |\n")
+        lines.append(f"| Unverified (timeout) | {unverified_count} |\n")
         lines.append(f"| Total | {len(replies)} |\n\n")
         lines.append("### 💬 Recent Replies (Last 20)\n\n")
         lines.append("| # | Time | 👤 User | 💬 User Comment | 🤖 AI Reply | Type | Depth | Game | FB Post |\n")
@@ -2089,7 +2173,7 @@ def run_agent_brain():
     if not game_views_summary:
         game_views_summary = {g: 0 for g in game_list}
 
-    # ✅ AUTO-COMMENT (FIXED v5)
+    # ✅ AUTO-COMMENT (v6 — timeout-safe)
     if AUTO_COMMENT_ENABLED:
         try:
             process_fb_comments(actual_posted_titles)
@@ -2199,7 +2283,7 @@ def run_agent_brain():
     log(f"""
 🚀 GAMING AGENT DASHBOARD
 > Last Updated: {now_ist_ampm()} IST
-> Auto-Comment: {"✅ ENABLED (v5 fixed)" if AUTO_COMMENT_ENABLED else "🚫 DISABLED"}
+> Auto-Comment: {"✅ ENABLED (v6 timeout-safe)" if AUTO_COMMENT_ENABLED else "🚫 DISABLED"}
 
 📊 Status:
 • Game: {chosen_game}
