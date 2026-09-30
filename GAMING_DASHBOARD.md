@@ -1,18 +1,18 @@
-# 🚀 GAMING AGENT COMMAND & ANALYTICS DASHBOARD
+# 🚀 GAMING AGENT DASHBOARD
 
-> **Last Updated:** 2026-09-30 04:12:22 PM IST | **Status:** All Systems Active & Synchronized
+> **Last Updated:** 2026-09-30 04:58:37 PM IST | **Status:** Active
 
 --- 
 
-## 🏆 Global Leaderboard & Performance Summary
+## 🏆 Global Leaderboard
 
-| Rank | Game Name | Total Videos | Total Views | Avg Views / Video | Performance Tier |
-| :---: | :--- | :---: | :---: | :---: | :---: |
+| Rank | Game | Videos | Views | Avg/Video | Tier |
+|:---:|---|---|---|---|---|
 | 🥇 | **codBlackops6** | 4 | 23,686 | 5,921 | ⚡ Trending |
 | 🥈 | **mm2remastered** | 4 | 22,317 | 5,579 | ⚡ Trending |
 | 🥉 | **AfghanistanRedZone** | 0 | 20,892 | 0 | 📈 Stable |
 | 4️⃣ | **Callofdutyaw** | 4 | 19,915 | 4,978 | ⚡ Trending |
-| 5️⃣ | **SpiderMan2** | 1 | 15,672 | 15,672 | 🔥 Viral / Hype |
+| 5️⃣ | **SpiderMan2** | 1 | 15,672 | 15,672 | 🔥 Viral |
 | 6 | **MarvelsSpiderMan2** | 4 | 12,466 | 3,116 | 📈 Stable |
 | 7 | **RescueOperation** | 4 | 8,366 | 2,091 | 📈 Stable |
 | 8 | **VietnamCavePrison** | 4 | 6,803 | 1,700 | 📈 Stable |
@@ -23,7 +23,7 @@
 | 13 | **ghostandela** | 4 | 1,730 | 432 | 📈 Stable |
 | 14 | **Ghost_soap_escap** | 4 | 1,632 | 408 | 📈 Stable |
 | 15 | **combatopration** | 4 | 1,625 | 406 | 📈 Stable |
-| 16 | **sifu** | 4 | 975 | 243 | 📈 Stable |
+| 16 | **sifu** | 4 | 935 | 233 | 📈 Stable |
 | 17 | **GodofWarLaufey** | 4 | 900 | 225 | 📈 Stable |
 | 18 | **DiabloIV** | 0 | 540 | 0 | 📈 Stable |
 | 19 | **monkeyKing** | 4 | 446 | 111 | 📈 Stable |
@@ -32,9 +32,9 @@
 
 ## 📺 Live Post Titles + Views (Latest per Game)
 
-> 🔵 FB = Facebook post live | 🟣 IG = Instagram post live | ⏳ = Pending
+> 🔵 FB = Facebook live | 🟣 IG = Instagram live | ⏳ = Pending
 
-| Game Name | 📅 Last Posted | 📺 Latest Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📊 Remaining / Total | 📂 Source | 📜 All |
+| Game Name | 📅 Last Posted | 📺 Latest Title | 🔵 FB | 👁️ FB Views | 🟣 IG | 👁️ IG Views | 📊 Remaining / Total | 📂 Source | 📜 All |
 |---|---|---|---|---|---|---|---|---|---|
 | **monkeyKing** | 2026-09-30 04:01 PM | Boss Melts in Flames 🔥💀  #videogames #gamingcommunity #gaming #monkeyking #gamin | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Dd6IDhzDy6r/) | 0 | **37** / 41 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing32.mp4) | **[📜 View 41](logs/games/monkeyKing.md)** |
 | **GodofWarLaufey** | 2026-09-30 01:04 PM | Yellow Maiden Slash Fury 💛⚔️  #videogames #gamingcommunity #gaming #godofwarlauf | [🔵 FB](https://www.facebook.com/reel/1603004798228681/) | 36 | [🟣 IG](https://www.instagram.com/reel/Dd4d80HDiYj/) | 0 | **14** / 18 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_10.mp4) | **[📜 View 18](logs/games/GodofWarLaufey.md)** |
@@ -60,137 +60,74 @@
 
 ## 📈 Trending Games (Last 7 Days)
 
-> Auto-detected based on views performance | Last Updated: 2026-09-30 04:12:22 PM
-
-| Rank | Game Name | Views (7d) | Avg / Video | Trend | FB Post | Source |
-|:---:|---|---|---|---|---|---|
-| 🥇 | **AfghanistanRedZone** | 19,095 | 19,095 | 🚀 **VIRAL** | [🔵](https://www.facebook.com/reel/1440490007980933/) | _N/A_ |
-
-### 📉 Below Average This Week
-
-| Game | Views (7d) | Avg |
-|---|---|---|
-| GODOFWAR3 | 5,890 | 1,472 |
-| Callofdutyaw | 7,347 | 1,049 |
-| Russian_secret_missions | 2,015 | 1,007 |
-| VietnamCavePrison | 5,979 | 996 |
-| UkraineCovertMission | 659 | 659 |
-
-### 💡 Recommendation
-
-**Best game to post next:** 🚀 **AfghanistanRedZone** (Avg 19,095 views/video)
+| Rank | Game | Views | Avg | Trend |
+|:---:|---|---|---|---|
+| 1 | **AfghanistanRedZone** | 19,095 | 19,095 | viral |
 
 --- 
 
-## 🎯 Best Time to Post (IST)
+## 🎯 Best Time to Post
 
-> Analysis from 67 posts | Last Updated: 2026-09-30 04:12:22 PM
-
-| Rank | Time (IST) | Posts | Avg Views | Recommendation |
-|:---:|---|:---:|:---:|---|
-| 🥇 | **23:00 - 00:00** | 2 | **1,740** | 🔥 **BEST** |
-| 🥈 | **13:00 - 14:00** | 4 | **518** | ⚡ **Great** |
-| 🥉 | **03:00 - 04:00** | 2 | **500** | ✅ **Good** |
-| 4 | **22:00 - 23:00** | 4 | **463** | 📊 Average |
-| 5 | **00:00 - 01:00** | 9 | **393** | 📉 Below avg |
-
-### 💡 Today's Suggestion
-
-**Aaj post karo:** ⏰ **23:00 - 00:00 IST**
-
-### 📅 Weekly Pattern
-
-| Day | Posts | Avg Views |
-|---|---|---|
-| Monday | 9 | 292 |
-| Tuesday | 20 | 492 |
-| Wednesday | 12 | 448 |
-| Sunday | 26 | 244 |
 
 --- 
 
-## 🤖 Auto-Reply Log (v6 Timeout-Safe)
+## 🤖 Auto-Reply Log (SHARED)
 
-> Auto-Comment Status: ✅ **ACTIVE** | Last Updated: 2026-09-30 04:12:22 PM | Total Replies: 2 | Skipped: 0
+> Total: 2 | Skipped: 0 | Last: 2026-09-30 04:58:37 PM
 
-### 📊 Stats
+| # | Time | User | Comment | AI Reply | Depth |
+|---|---|---|---|---|---|
+| 1 | 2026-09-30 01:13:05  | **Facebook User** | PremxGamer I am not play it but game is amazing | Bro, it's God of War and it's fire! You should totally play it, yaar 🔥 | 2 |
+| 2 | 2026-09-30 01:07:53  | **Facebook User** | Which game bro | Bro, it's God of War! 🔥 Have you played it yet? | 1 |
 
-| Metric | Value |
-|---|---|
-| Friendly Replies | 2 |
-| Savage Replies | 0 |
-| Unverified (timeout) | 0 |
-| Total | 2 |
+--- 
 
-### 💬 Recent Replies (Last 20)
+## 🔄 Game Rotation Queue (Read-Only)
 
-| # | Time | 👤 User | 💬 User Comment | 🤖 AI Reply | Type | Depth | Game | FB Post |
-|---|---|---|---|---|---|---|---|---|
-| 1 | 2026-09-30 01:13:05  | **Facebook User** | PremxGamer I am not play it but game is amazing | Bro, it's God of War and it's fire! You should totally play it, yaar 🔥 | ✅ Friendly | 2 | God of War | [🔵](https://www.facebook.com/reel/1603004798228681/) |
-| 2 | 2026-09-30 01:07:53  | **Facebook User** | Which game bro | Bro, it's God of War! 🔥 Have you played it yet? | ✅ Friendly | 1 | God of War | [🔵](https://www.facebook.com/reel/1603004798228681/) |
+**🎯 Current:** `sifu` | **⏭️ Next:** `AfghanistanRedZone` | **🔢 Runs:** 61
+
+| # | Game | Uploaded | Next Turn | Status |
+|:---:|---|:---:|:---:|:---:|
+| 1 | **AfghanistanRedZone** | 0 | 1 | ⏭️ **NEXT UP** |
+| 2 | **Callofdutyaw** | 4 | 2 | ⏳ Wait 2 |
+| 3 | **DiabloIV** | 0 | 3 | ⏳ Wait 3 |
+| 4 | **GODOFWAR3** | 4 | 4 | ⏳ Wait 4 |
+| 5 | **Ghost Destroys Mexican** | 0 | 5 | ⏳ Wait 5 |
+| 6 | **Ghost_soap_escap** | 4 | 6 | ⏳ Wait 6 |
+| 7 | **GodofWarLaufey** | 4 | 7 | ⏳ Wait 7 |
+| 8 | **MarvelsSpiderMan2** | 4 | 8 | ⏳ Wait 8 |
+| 9 | **RescueOperation** | 4 | 9 | ⏳ Wait 9 |
+| 10 | **Russian_secret_missions** | 4 | 10 | ⏳ Wait 10 |
+| 11 | **SpiderMan2** | 1 | 11 | ⏳ Wait 11 |
+| 12 | **UkraineCovertMission** | 4 | 12 | ⏳ Wait 12 |
+| 13 | **VietnamCavePrison** | 4 | 13 | ⏳ Wait 13 |
+| 14 | **codBlackops6** | 4 | 14 | ⏳ Wait 14 |
+| 15 | **combatopration** | 4 | 15 | ⏳ Wait 15 |
+| 16 | **ghostandela** | 4 | 16 | ⏳ Wait 16 |
+| 17 | **mm2remastered** | 4 | 17 | ⏳ Wait 17 |
+| 18 | **monkeyKing** | 4 | 18 | ⏳ Wait 18 |
+| 19 | **sifu** | 4 | 0 | 🎯 **CURRENT** |
 
 --- 
 
 ## 📜 Full Video History
 
-> Click any game below to view its complete video list with all FB/IG links:
-
-- **🎮 monkeyKing** — [📜 View All 41 Videos](logs/games/monkeyKing.md)
-- **🎮 GodofWarLaufey** — [📜 View All 18 Videos](logs/games/GodofWarLaufey.md)
-- **🎮 VietnamCavePrison** — [📜 View All 31 Videos](logs/games/VietnamCavePrison.md)
-- **🎮 codBlackops6** — [📜 View All 40 Videos](logs/games/codBlackops6.md)
-- **🎮 Russian_secret_missions** — [📜 View All 39 Videos](logs/games/Russian_secret_missions.md)
-- **🎮 sifu** — [📜 View All 20 Videos](logs/games/sifu.md)
-- **🎮 GODOFWAR3** — [📜 View All 22 Videos](logs/games/GODOFWAR3.md)
-- **🎮 SpiderMan2** — [📜 View All 47 Videos](logs/games/SpiderMan2.md)
-- **🎮 Callofdutyaw** — [📜 View All 32 Videos](logs/games/Callofdutyaw.md)
-- **🎮 ghostandela** — [📜 View All 47 Videos](logs/games/ghostandela.md)
-- **🎮 RescueOperation** — [📜 View All 19 Videos](logs/games/RescueOperation.md)
-- **🎮 MarvelsSpiderMan2** — [📜 View All 47 Videos](logs/games/MarvelsSpiderMan2.md)
-- **🎮 Ghost_soap_escap** — [📜 View All 18 Videos](logs/games/Ghost_soap_escap.md)
-- **🎮 Ghost Destroys Mexican** — [📜 View All 19 Videos](logs/games/Ghost_Destroys_Mexican.md)
-- **🎮 DiabloIV** — [📜 View All 17 Videos](logs/games/DiabloIV.md)
-- **🎮 mm2remastered** — [📜 View All 25 Videos](logs/games/mm2remastered.md)
-- **🎮 AfghanistanRedZone** — [📜 View All 9 Videos](logs/games/AfghanistanRedZone.md)
-- **🎮 UkraineCovertMission** — [📜 View All 4 Videos](logs/games/UkraineCovertMission.md)
-- **🎮 combatopration** — [📜 View All 19 Videos](logs/games/combatopration.md)
-
---- 
-
-## 🔄 Game Rotation Queue
-
-**📊 Total Games:** 19 | **🎯 Current:** `sifu` | **⏭️ Next Game:** `AfghanistanRedZone` (Position #1) | **🔢 Total Runs:** 61
-
-**Last Updated:** 2026-09-30 04:12:22 PM IST
-
-| # | Game Name | Uploaded | Last Run # | Next Turn In | Status |
-|:---:|---|:---:|:---:|:---:|:---:|
-| 1 | **AfghanistanRedZone** | 0 | — | 1 | ⏭️ **NEXT UP** |
-| 2 | **Callofdutyaw** | 4 | 47 | 2 | ⏳ Wait 2 |
-| 3 | **DiabloIV** | 0 | — | 3 | ⏳ Wait 3 |
-| 4 | **GODOFWAR3** | 4 | 48 | 4 | ⏳ Wait 4 |
-| 5 | **Ghost Destroys Mexican** | 0 | — | 5 | ⏳ Wait 5 |
-| 6 | **Ghost_soap_escap** | 4 | 49 | 6 | ⏳ Wait 6 |
-| 7 | **GodofWarLaufey** | 4 | 50 | 7 | ⏳ Wait 7 |
-| 8 | **MarvelsSpiderMan2** | 4 | 51 | 8 | ⏳ Wait 8 |
-| 9 | **RescueOperation** | 4 | 52 | 9 | ⏳ Wait 9 |
-| 10 | **Russian_secret_missions** | 4 | 53 | 10 | ⏳ Wait 10 |
-| 11 | **SpiderMan2** | 1 | 8 | 11 | ⏳ Wait 11 |
-| 12 | **UkraineCovertMission** | 4 | 54 | 12 | ⏳ Wait 12 |
-| 13 | **VietnamCavePrison** | 4 | 55 | 13 | ⏳ Wait 13 |
-| 14 | **codBlackops6** | 4 | 56 | 14 | ⏳ Wait 14 |
-| 15 | **combatopration** | 4 | 57 | 15 | ⏳ Wait 15 |
-| 16 | **ghostandela** | 4 | 58 | 16 | ⏳ Wait 16 |
-| 17 | **mm2remastered** | 4 | 59 | 17 | ⏳ Wait 17 |
-| 18 | **monkeyKing** | 4 | 60 | 18 | ⏳ Wait 18 |
-| 19 | **sifu** | 4 | 61 | 0 | 🎯 **CURRENT** |
-
-### 📜 Recent Runs (Last 5)
-
-| Run # | Game | Timestamp (IST) |
-|:---:|---|---|
-| 61 | sifu | 2026-09-30 04:12:22 PM |
-| 60 | monkeyKing | 2026-09-30 03:59:13 PM |
-| 59 | mm2remastered | 2026-09-30 03:56:58 PM |
-| 58 | ghostandela | 2026-09-30 03:24:47 PM |
-| 57 | combatopration | 2026-09-30 03:20:55 PM |
+- **🎮 monkeyKing** — 41 videos — [📜 View All](logs/games/monkeyKing.md)
+- **🎮 GodofWarLaufey** — 18 videos — [📜 View All](logs/games/GodofWarLaufey.md)
+- **🎮 VietnamCavePrison** — 31 videos — [📜 View All](logs/games/VietnamCavePrison.md)
+- **🎮 codBlackops6** — 40 videos — [📜 View All](logs/games/codBlackops6.md)
+- **🎮 Russian_secret_missions** — 39 videos — [📜 View All](logs/games/Russian_secret_missions.md)
+- **🎮 sifu** — 20 videos — [📜 View All](logs/games/sifu.md)
+- **🎮 GODOFWAR3** — 22 videos — [📜 View All](logs/games/GODOFWAR3.md)
+- **🎮 SpiderMan2** — 47 videos — [📜 View All](logs/games/SpiderMan2.md)
+- **🎮 Callofdutyaw** — 32 videos — [📜 View All](logs/games/Callofdutyaw.md)
+- **🎮 ghostandela** — 47 videos — [📜 View All](logs/games/ghostandela.md)
+- **🎮 RescueOperation** — 19 videos — [📜 View All](logs/games/RescueOperation.md)
+- **🎮 MarvelsSpiderMan2** — 47 videos — [📜 View All](logs/games/MarvelsSpiderMan2.md)
+- **🎮 Ghost_soap_escap** — 18 videos — [📜 View All](logs/games/Ghost_soap_escap.md)
+- **🎮 Ghost Destroys Mexican** — 19 videos — [📜 View All](logs/games/Ghost_Destroys_Mexican.md)
+- **🎮 DiabloIV** — 17 videos — [📜 View All](logs/games/DiabloIV.md)
+- **🎮 mm2remastered** — 25 videos — [📜 View All](logs/games/mm2remastered.md)
+- **🎮 AfghanistanRedZone** — 9 videos — [📜 View All](logs/games/AfghanistanRedZone.md)
+- **🎮 UkraineCovertMission** — 4 videos — [📜 View All](logs/games/UkraineCovertMission.md)
+- **🎮 combatopration** — 19 videos — [📜 View All](logs/games/combatopration.md)
