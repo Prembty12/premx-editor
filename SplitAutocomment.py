@@ -1,11 +1,12 @@
 """
-💬 SPLIT AUTO-COMMENT SCRIPT (FINAL v5 — Reply Fix)
-=====================================================
-✅ Auto-comment upgraded (username, 3-level, 10 batch)
-✅ Dashboard — FULL data (reads agent_memory.json)
-✅ 🔥 FIX: FB API pe bharosa karo — user ke naye reply detect honge
+💬 SPLIT AUTO-COMMENT SCRIPT (FINAL v6 — Shared Log Fix)
+=========================================================
+✅ Auto-comment — Full script ke SATH log share karta hai
+✅ FB API pe bharosa (user ke naye reply detect honge)
+✅ Recursive nested replies fetch
+✅ Last reply check FIRST — no duplicate
 ✅ Log check sirf FRESH comment ke liye
-✅ Duplicate protection
+✅ 🔥 FIX: reply_to_id bhi log me — nested reply pe double reply nahi
 """
 
 import os
@@ -147,6 +148,10 @@ MAX_COMMENT_AGE_HOURS = 24
 POSTS_TO_SCAN = 25
 COMMENT_FETCH_WORKERS = 10
 MAX_JSON_RETRIES = 12
+
+# 🔥 SHARED LOG FILES — FULL SCRIPT BHI YEH HI USE KARTA HAI
+SHARED_REPLY_LOG = "logs/auto_reply_log.json"
+SHARED_REPLIED_IDS = "logs/replied_comment_ids.json"
 
 AUTO_COMMENT_ENABLED = os.environ.get("AUTO_COMMENT", "true").lower() == "true"
 
@@ -381,7 +386,7 @@ def is_reply_safe(reply_text, is_abuse=False):
 
 
 # ============================================================
-# 💬 AUTO-COMMENT (FIXED — FB API FIRST)
+# 💬 AUTO-COMMENT — SHARED LOG (v6 FIXED)
 # ============================================================
 _page_name_cache = ""
 _user_name_cache = {}
@@ -436,43 +441,46 @@ def get_user_name(user_id, fallback_from_field=None):
 
 
 def load_replied_history():
+    """
+    ✅ SHARED LOG READER — full script bhi yahi file likhta hai.
+    Loads comment_id + reply_id + reply_to_id sab.
+    """
     global _replied_history_cache
     if _replied_history_cache is not None:
         return _replied_history_cache
     _replied_history_cache = {}
-    reply_log_file = "logs/auto_reply_log.json"
-    if os.path.exists(reply_log_file):
+    if os.path.exists(SHARED_REPLY_LOG):
         try:
-            with open(reply_log_file, 'r', encoding='utf-8') as f:
+            with open(SHARED_REPLY_LOG, 'r', encoding='utf-8') as f:
                 log_data = json.load(f)
             for r in log_data.get("replies", []):
                 cid = r.get("comment_id", "")
                 rid = r.get("reply_id", "")
                 r_to = r.get("reply_to_id", "")
                 depth = r.get("depth", 1)
-                if cid:
-                    _replied_history_cache[cid] = max(
-                        _replied_history_cache.get(cid, 0), depth)
-                if rid:
-                    _replied_history_cache[rid] = max(
-                        _replied_history_cache.get(rid, 0), depth)
-                if r_to:
-                    _replied_history_cache[r_to] = max(
-                        _replied_history_cache.get(r_to, 0), depth)
+                for key in (cid, rid, r_to):
+                    if key:
+                        _replied_history_cache[key] = max(
+                            _replied_history_cache.get(key, 0), depth)
         except Exception:
             pass
     return _replied_history_cache
 
 
 def was_already_replied(comment_id):
+    """
+    ✅ SHARED — dono scripts same log check karte hain.
+    Check 2 files:
+      1. logs/auto_reply_log.json (via load_replied_history)
+      2. logs/replied_comment_ids.json
+    """
     if not comment_id:
         return False
     if comment_id in load_replied_history():
         return True
-    replied_file = "logs/replied_comment_ids.json"
-    if os.path.exists(replied_file):
+    if os.path.exists(SHARED_REPLIED_IDS):
         try:
-            with open(replied_file, 'r', encoding='utf-8') as f:
+            with open(SHARED_REPLIED_IDS, 'r', encoding='utf-8') as f:
                 data = json.load(f)
             if comment_id in set(data.get("replied", [])):
                 return True
@@ -500,20 +508,28 @@ def fetch_fb_comments(post_id, since_timestamp=None):
     return []
 
 
-def fetch_comment_replies(comment_id):
+def fetch_comment_replies(comment_id, depth=0, max_depth=3):
+    """✅ RECURSIVE — nested replies bhi fetch karo."""
+    if depth >= max_depth:
+        return []
     params = {
         "fields": "id,message,from{name,id},created_time,can_reply",
         "access_token": FB_ACCESS_TOKEN,
         "limit": 50,
     }
+    all_replies = []
     try:
         res = requests.get(f"{FB_GRAPH_URL}/{comment_id}/comments",
                            params=params, timeout=15)
         if res.status_code == 200:
-            return res.json().get("data", [])
+            replies = res.json().get("data", [])
+            for r in replies:
+                all_replies.append(r)
+                nested = fetch_comment_replies(r["id"], depth + 1, max_depth)
+                all_replies.extend(nested)
     except Exception:
         pass
-    return []
+    return all_replies
 
 
 def post_fb_reply(comment_id, reply_text):
@@ -538,13 +554,25 @@ def post_fb_reply(comment_id, reply_text):
     return None
 
 
+def _is_our_reply(reply_obj, page_name_lower):
+    r_from = reply_obj.get("from", {}) or {}
+    r_id = r_from.get("id", "")
+    r_name = (r_from.get("name") or "").strip().lower()
+    return (r_id == FB_PAGE_ID
+            or (page_name_lower and r_name == page_name_lower))
+
+
 def analyze_thread(top_comment):
     """
-    ✅ FIXED — FB API pe bharosa karo (naye replies detect honge).
+    ✅ v6 FIXED LOGIC:
+    1. FB API se recursive replies fetch
+    2. Last reply check FIRST (agar humara hai → SKIP)
+    3. Log check sirf FRESH comment ke liye
+    4. Nested reply pe bhi check — agar uska reply ho chuka hai to skip
     """
     cid = top_comment.get("id", "")
 
-    # ✅ FB API se replies fetch karo PEHLE
+    # Step 1: FB API se replies fetch (recursive)
     replies = fetch_comment_replies(cid)
     replies_sorted = sorted(replies, key=lambda x: x.get("created_time", ""))
 
@@ -553,53 +581,45 @@ def analyze_thread(top_comment):
 
     our_replies, user_replies = [], []
     for r in replies_sorted:
-        r_from = r.get("from", {}) or {}
-        r_id = r_from.get("id", "")
-        r_name = (r_from.get("name") or "").strip().lower()
-        is_ours = (r_id == FB_PAGE_ID
-                   or (page_name_lower and r_name == page_name_lower))
-        if is_ours:
+        if _is_our_reply(r, page_name_lower):
             our_replies.append(r)
         else:
             user_replies.append(r)
 
     our_count = len(our_replies)
 
-    # ✅ MAX DEPTH
+    # Step 2: MAX DEPTH check
     if our_count >= MAX_CONVERSATION_DEPTH:
         return {"should_reply": False, "depth": our_count, "reason": "max_depth"}
 
-    # ✅ FRESH COMMENT (no replies on FB)
+    # Step 3: FRESH COMMENT (FB pe koi replies nahi)
     if len(replies_sorted) == 0:
+        # ✅ SHARED LOG CHECK — agar kisi ne bhi reply kiya to skip
         if was_already_replied(cid):
+            log(f"      ⏭️ Fresh on FB but IN SHARED LOG — skip")
             return {"should_reply": False, "depth": 0, "reason": "already_replied_log"}
-        log(f"      🆕 Fresh comment — will reply")
+        log(f"      🆕 Fresh comment — WILL REPLY")
 
-    # ✅ HUMNE REPLY KIYA, USER CHUP
-    elif our_count > 0 and len(user_replies) == 0:
-        return {"should_reply": False, "depth": our_count, "reason": "waiting_user"}
-
-    # ✅ HUMNE + USER DONO — ORDER CHECK
-    elif our_count > 0 and len(user_replies) > 0:
+    # Step 4: Replies hain FB pe
+    else:
         last = replies_sorted[-1]
-        last_from = last.get("from", {}) or {}
-        last_id = last_from.get("id", "")
-        last_name = (last_from.get("name") or "").strip().lower()
-        last_is_ours = (last_id == FB_PAGE_ID
-                        or (page_name_lower and last_name == page_name_lower))
-        if last_is_ours:
+        if _is_our_reply(last, page_name_lower):
+            log(f"      ⏭️ Last reply is OURS — waiting for user")
             return {"should_reply": False, "depth": our_count, "reason": "waiting_user"}
-        log(f"      💬 User replied — continuing (depth {our_count})")
 
-    # ✅ Build context
+        # Last reply USER ka hai — check karo ki IS user reply ka already jawab diya hai kya?
+        last_user_id = last.get("id", "")
+        if last_user_id and was_already_replied(last_user_id):
+            log(f"      ⏭️ Already replied to this user reply — skip")
+            return {"should_reply": False, "depth": our_count,
+                    "reason": "already_replied_this_reply"}
+
+        log(f"      💬 NEW user reply — continuing (depth {our_count})")
+
+    # Step 5: Build context
     thread_ctx = ""
     for r in replies_sorted[-6:]:
-        r_from = r.get("from", {}) or {}
-        r_id = r_from.get("id", "")
-        r_name = (r_from.get("name") or "").strip().lower()
-        is_us = (r_id == FB_PAGE_ID
-                 or (page_name_lower and r_name == page_name_lower))
-        who = "US" if is_us else "USER"
+        who = "US" if _is_our_reply(r, page_name_lower) else "USER"
         msg = (r.get("message", "") or "").replace("\n", " ")[:150]
         thread_ctx += f"  {who}: {msg}\n"
 
@@ -633,32 +653,36 @@ def process_fb_comments(actual_posted_titles=None):
         log("🚫 Auto-comment disabled")
         return None
 
-    log("🤖 Auto-reply started (v5 — FB API first)...")
+    log("🤖 Auto-reply started (v6 — SHARED LOG)...")
+    log(f"📂 Shared log: {SHARED_REPLY_LOG}")
 
     page_name = get_page_name()
     log(f"📄 Page name: {page_name or 'N/A'}")
 
-    replied_file = "logs/replied_comment_ids.json"
+    # ✅ Load shared replied_ids
     replied_data = {"replied": [], "last_updated": ""}
-    if os.path.exists(replied_file):
+    if os.path.exists(SHARED_REPLIED_IDS):
         try:
-            with open(replied_file, 'r', encoding='utf-8') as f:
+            with open(SHARED_REPLIED_IDS, 'r', encoding='utf-8') as f:
                 replied_data = json.load(f)
         except Exception:
             pass
     replied_ids = set(replied_data.get("replied", []))
 
-    reply_log_file = "logs/auto_reply_log.json"
+    # ✅ Load shared reply_log
     reply_log = {"total_replies": 0, "total_skipped": 0, "replies": [], "skipped": []}
-    if os.path.exists(reply_log_file):
+    if os.path.exists(SHARED_REPLY_LOG):
         try:
-            with open(reply_log_file, 'r', encoding='utf-8') as f:
+            with open(SHARED_REPLY_LOG, 'r', encoding='utf-8') as f:
                 reply_log = json.load(f)
-            log(f"📂 Existing history: {len(reply_log.get('replies', []))} replies")
+            log(f"📂 Existing history: {len(reply_log.get('replies', []))} replies (SHARED)")
         except Exception:
             pass
 
+    # ✅ Prime cache with shared history
     history = load_replied_history()
+    for hid in history.keys():
+        replied_ids.add(hid)
     log(f"📂 Replied history cache: {len(history)} IDs")
 
     cutoff_time = (now_ist() - timedelta(hours=MAX_COMMENT_AGE_HOURS)).timestamp()
@@ -787,7 +811,9 @@ def process_fb_comments(actual_posted_titles=None):
 
             state = analyze_thread(comment)
             if not state["should_reply"]:
-                if state["reason"] in ("max_depth", "waiting_user", "already_replied_log", "already_replied_log_reply_id"):
+                if state["reason"] in ("max_depth", "waiting_user",
+                                        "already_replied_log",
+                                        "already_replied_this_reply"):
                     log(f"      ⏭️ Skip ({state['reason']}) — {comment_id[:20]}")
                 continue
 
@@ -805,7 +831,8 @@ def process_fb_comments(actual_posted_titles=None):
                 "post_hashtags": hashtags,
                 "is_abuse": (abuse_type == "general_abuse"),
                 "post_id": post_id,
-                "fb_link": post.get("permalink_url", f"https://www.facebook.com/{post_id}"),
+                "fb_link": post.get("permalink_url",
+                                    f"https://www.facebook.com/{post_id}"),
                 "source_link": "",
                 "user_name": state["user_name"],
                 "user_id": state["user_id"],
@@ -858,9 +885,12 @@ def process_fb_comments(actual_posted_titles=None):
                 "status": "posted",
             })
             reply_log["total_replies"] = reply_log.get("total_replies", 0) + 1
+
+            # ✅ 3 IDs add karo — dono scripts skip karein
             replied_ids.add(cid)
             replied_ids.add(reply_id)
             replied_ids.add(c["reply_to_id"])
+
             log(f"✅ Posted [depth {c['current_depth'] + 1}] {cid[:20]} → user={c['user_name']}")
             log(f"   💬 {c['comment_text'][:80]}")
             log(f"   🤖 {reply_text[:80]}")
@@ -871,12 +901,14 @@ def process_fb_comments(actual_posted_titles=None):
     reply_log["total_skipped"] = reply_log.get("total_skipped", 0) + len(skipped_logs)
 
     os.makedirs("logs", exist_ok=True)
+
+    # ✅ SAVE to SHARED files
     replied_data["replied"] = list(replied_ids)[-10000:]
     replied_data["last_updated"] = now_ist_ampm()
     try:
-        with open(replied_file, 'w', encoding='utf-8') as f:
+        with open(SHARED_REPLIED_IDS, 'w', encoding='utf-8') as f:
             json.dump(replied_data, f, indent=2)
-        log(f"💾 Saved {len(replied_data['replied'])} IDs to replied_comment_ids.json")
+        log(f"💾 Saved {len(replied_data['replied'])} IDs to {SHARED_REPLIED_IDS}")
     except Exception as e:
         log(f"⚠️ replied_file save error: {e}")
 
@@ -884,13 +916,14 @@ def process_fb_comments(actual_posted_titles=None):
     reply_log["skipped"] = reply_log.get("skipped", [])[-200:]
     reply_log["last_updated"] = now_ist_ampm()
     try:
-        with open(reply_log_file, 'w', encoding='utf-8') as f:
+        with open(SHARED_REPLY_LOG, 'w', encoding='utf-8') as f:
             json.dump(reply_log, f, indent=2, ensure_ascii=False)
+        log(f"💾 Shared log updated: {SHARED_REPLY_LOG}")
     except Exception as e:
         log(f"⚠️ reply_log save error: {e}")
 
     log(f"🤖 FB Auto-reply done. {replies_count} new replies. "
-        f"Total in history: {len(reply_log.get('replies', []))}")
+        f"Total in SHARED history: {len(reply_log.get('replies', []))}")
     return reply_log
 
 
@@ -1202,7 +1235,6 @@ def generate_dashboard_md(actual_posted_titles, game_views_summary, game_stats, 
     md = ["# 🚀 GAMING AGENT DASHBOARD\n\n",
           f"> **Last Updated:** {now_ist_ampm()} IST | **Status:** Active\n\n"]
 
-    # Leaderboard
     md.append("--- \n\n## 🏆 Global Leaderboard\n\n")
     md.append("| Rank | Game | Videos | Views | Avg/Video | Tier |\n")
     md.append("|:---:|---|---|---|---|---|\n")
@@ -1213,7 +1245,6 @@ def generate_dashboard_md(actual_posted_titles, game_views_summary, game_stats, 
         md.append(f"| {rank} | **{item['game']}** | {item['uploaded_count']} | "
                   f"{item['total_views']:,} | {item['avg_views']:,} | {tier} |\n")
 
-    # Live Post Titles
     md.append("\n--- \n\n## 📺 Live Post Titles + Views (Latest per Game)\n\n")
     md.append("> 🔵 FB = Facebook live | 🟣 IG = Instagram live | ⏳ = Pending\n\n")
     md.append("| Game Name | 📅 Last Posted | 📺 Latest Title | 🔵 FB | 👁️ FB Views | "
@@ -1304,7 +1335,6 @@ def generate_dashboard_md(actual_posted_titles, game_views_summary, game_stats, 
         md.append(f"| **{g_name}** | {date_str} | {title} | {fb_md} | {fb_v_md} | "
                   f"{ig_md} | {ig_v_md} | {progress_md} | {src_md} | {all_md} |\n")
 
-    # Trending
     md.append("\n--- \n\n## 📈 Trending Games (Last 7 Days)\n\n")
     try:
         with open("logs/trending_cache.json", 'r', encoding='utf-8') as f:
@@ -1318,7 +1348,6 @@ def generate_dashboard_md(actual_posted_titles, game_views_summary, game_stats, 
     except Exception:
         md.append("_No data_\n")
 
-    # Best Time
     md.append("\n--- \n\n## 🎯 Best Time to Post\n\n")
     try:
         with open("logs/best_time_analysis.json", 'r', encoding='utf-8') as f:
@@ -1331,10 +1360,9 @@ def generate_dashboard_md(actual_posted_titles, game_views_summary, game_stats, 
     except Exception:
         md.append("_No data_\n")
 
-    # Auto-Reply Log
-    md.append("\n--- \n\n## 🤖 Auto-Reply Log\n\n")
+    md.append("\n--- \n\n## 🤖 Auto-Reply Log (SHARED)\n\n")
     try:
-        with open("logs/auto_reply_log.json", 'r', encoding='utf-8') as f:
+        with open(SHARED_REPLY_LOG, 'r', encoding='utf-8') as f:
             data = json.load(f)
         md.append(f"> Total: {data.get('total_replies', 0)} | "
                   f"Skipped: {data.get('total_skipped', 0)} | "
@@ -1353,7 +1381,6 @@ def generate_dashboard_md(actual_posted_titles, game_views_summary, game_stats, 
     except Exception:
         md.append("_No data_\n")
 
-    # Rotation Queue
     md.append("\n--- \n\n## 🔄 Game Rotation Queue (Read-Only)\n\n")
     rotation_file = "logs/rotation_history.json"
     if os.path.exists(rotation_file):
@@ -1377,7 +1404,6 @@ def generate_dashboard_md(actual_posted_titles, game_views_summary, game_stats, 
     else:
         md.append("_No rotation data_\n")
 
-    # Full Video History
     md.append("\n--- \n\n## 📜 Full Video History\n\n")
     for g_name in sorted_games:
         videos = actual_posted_titles.get(g_name, [])
@@ -1392,8 +1418,8 @@ def generate_dashboard_md(actual_posted_titles, game_views_summary, game_stats, 
 
     git_commit_and_push([
         dashboard_path,
-        "logs/auto_reply_log.json",
-        "logs/replied_comment_ids.json",
+        SHARED_REPLY_LOG,
+        SHARED_REPLIED_IDS,
         "logs/trending_cache.json",
         "logs/best_time_analysis.json",
         "logs/games/",
@@ -1427,8 +1453,10 @@ def git_commit_and_push(file_paths, message="Auto-Agent: Update dashboard [skip 
 # ============================================================
 def main():
     log("=" * 60)
-    log("🚀 SPLIT SCRIPT v5 — Reply Fix")
+    log("🚀 SPLIT SCRIPT v6 — Shared Log Fix")
     log("=" * 60)
+    log(f"📂 Shared log: {SHARED_REPLY_LOG}")
+    log(f"📂 Shared IDs: {SHARED_REPLIED_IDS}")
 
     if AUTO_COMMENT_ENABLED:
         try:
