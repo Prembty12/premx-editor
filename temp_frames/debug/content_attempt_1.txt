@@ -1,1 +1,1 @@
-{"clip_duration": 30, "reason": "Intense sword combat with flashy golden moves", "start_time": 0, "status": "APPROVE", "title": "Yellow Maiden Slash Fury 💛⚔️"}
+{"clip_duration": 32, "reason": "Continuous intense forest combat action", "start_time": 3, "status": "APPROVE", "title": "Deadly Forest Ambush 🌲💀"}
