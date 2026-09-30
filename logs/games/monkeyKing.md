@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 41 | **Last Updated:** 2026-09-30 06:59:47 PM IST
+**Total Videos:** 41 | **Last Updated:** 2026-09-30 11:08:56 PM IST
 
 ---
 
@@ -15,7 +15,7 @@
 | FB Posted | 6 / 41 |
 | IG Posted | 5 / 41 |
 | Total FB Views | **226** |
-| Total IG Views | **220** |
+| Total IG Views | **240** |
 
 ---
 
@@ -23,14 +23,14 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | Boss Melts in Flames 🔥💀  #videogames #gamingcommunity #gaming #monkeyking #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Dd6IDhzDy6r/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing32.mp4) |
+| 1 | Boss Melts in Flames 🔥💀  #videogames #gamingcommunity #gaming #monkeyking #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Dd6IDhzDy6r/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing32.mp4) |
 | 2 | Red Staff Combat Slash ⚡⚔️  #videogames #gamingcommunity #gaming #monkeyking #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdzaCUfjLsh/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing41.mp4) |
 | 3 | Blue Beast Boss Fight ⚡️  #videogames #gamingcommunity #gaming #monkeyking #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Ddi4IfDAkrS/) | 120 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing8.mp4) |
 | 4 | Deep Forest Survival Run 🌲⚔️  #videogames #gamingcommunity #gaming #monkeyking #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Ddak_htilfE/) | 40 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing35.mp4) |
 | 5 | This Monkey King Combat Will Shock You!  #videogames #gamingcommunity #gaming #monkeyking #gamingree | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdV9wLCj6ZV/) | 50 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing16.mp4) |
 | 6 | This Fire Boss Fight Goes Totally Insane 🔥😱  #videogames #gamingcommunity #gaming #monkeyking #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1407808034823324/) | 226 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing11.mp4) |
-| 7 | monkeyKing16 | [🔵 FB](https://www.facebook.com/18075922229524708) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing16.mp4) |
-| 8 | monkeyKing30 | [🔵 FB](https://www.facebook.com/18116341516984824) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing30.mp4) |
+| 7 | monkeyKing30 | [🔵 FB](https://www.facebook.com/18116341516984824) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing30.mp4) |
+| 8 | monkeyKing16 | [🔵 FB](https://www.facebook.com/18075922229524708) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing16.mp4) |
 | 9 | monkeyKing35 | [🔵 FB](https://www.facebook.com/18224644636330514) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing35.mp4) |
 | 10 | monkeyKing41 | [🔵 FB](https://www.facebook.com/17989196184060636) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing41.mp4) |
 | 11 | monkeyKing32 | [🔵 FB](https://www.facebook.com/18162489952499717) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing32.mp4) |
