@@ -1,1 +1,1 @@
-{"clip_duration": 18, "reason": "Intense fire combat and magic explosion sequence", "start_time": 2, "status": "APPROVE", "title": "Boss Melts in Flames 🔥💀"}
+{"clip_duration": 38, "reason": "Intense boss combat with magic and explosions", "start_time": 0, "status": "APPROVE", "title": "Blue Fire Boss Clash 🩸⚡"}
