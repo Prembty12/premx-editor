@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-30 11:11:26 PM",
+  "last_updated": "2026-10-01 03:05:59 AM",
   "period_days": 7,
   "trending": [
     {
@@ -20,7 +20,7 @@
       "trend": "slow",
       "ratio": 0.7910247823174816,
       "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR316.mp4"
+      "source_link": ""
     },
     {
       "game": "Callofdutyaw",
@@ -29,7 +29,7 @@
       "trend": "slow",
       "ratio": 0.7032819825853985,
       "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison14.mp4"
+      "source_link": ""
     },
     {
       "game": "Russian_secret_missions",
@@ -47,7 +47,7 @@
       "trend": "slow",
       "ratio": 0.6858673811118553,
       "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison17.mp4"
+      "source_link": ""
     },
     {
       "game": "mm2remastered",
