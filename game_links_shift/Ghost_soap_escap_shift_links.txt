@@ -1,3 +1,4 @@
 Ghost_soap_escaps22 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps22.mp4 | REJECT (OpenRouter): Dark cinematic walking and talking.
 Ghost_soap_escaps8 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps8.mp4 | REJECT (OpenRouter): Only boring walking and inventory menus.
 Ghost_soap_escaps12 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps12.mp4 | REJECT (OpenRouter): No action, just dark walking and reading.
+Ghost_soap_escaps9 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps9.mp4 | REJECT (OpenRouter): Only menus and boring dark walking
