@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-09-30 06:59:47 PM",
+  "last_updated": "2026-09-30 10:38:42 PM",
   "period_days": 7,
   "trending": [
     {
@@ -7,7 +7,7 @@
       "views_7d": 19126,
       "avg_per_video": 19126,
       "trend": "viral",
-      "ratio": 12.8463002350834,
+      "ratio": 12.736043801561172,
       "fb_link": "https://www.facebook.com/reel/1440490007980933/",
       "source_link": ""
     }
@@ -18,7 +18,7 @@
       "views_7d": 5893,
       "avg_per_video": 1473,
       "trend": "slow",
-      "ratio": 0.9893652748236875,
+      "ratio": 0.9808738115497022,
       "fb_link": "https://www.facebook.com/reel/1446641450685379/",
       "source_link": ""
     },
@@ -27,35 +27,35 @@
       "views_7d": 7348,
       "avg_per_video": 1049,
       "trend": "slow",
-      "ratio": 0.7045785290495914,
+      "ratio": 0.6985313158965633,
       "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison14.mp4"
+      "source_link": ""
     },
     {
       "game": "VietnamCavePrison",
       "views_7d": 6094,
       "avg_per_video": 1015,
       "trend": "slow",
-      "ratio": 0.6817418560394045,
+      "ratio": 0.675890644075321,
       "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison17.mp4"
+      "source_link": ""
     },
     {
       "game": "Russian_secret_missions",
       "views_7d": 2028,
       "avg_per_video": 1014,
       "trend": "slow",
-      "ratio": 0.6810701891861637,
+      "ratio": 0.6752247419629315,
       "fb_link": "https://www.facebook.com/reel/1135871095448480/",
       "source_link": ""
     },
     {
-      "game": "UkraineCovertMission",
-      "views_7d": 659,
-      "avg_per_video": 659,
-      "trend": "below_avg",
-      "ratio": 0.4426284562856823,
-      "fb_link": "https://www.facebook.com/reel/1433881315316238/",
+      "game": "mm2remastered",
+      "views_7d": 1695,
+      "avg_per_video": 847,
+      "trend": "slow",
+      "ratio": 0.5640190891938885,
+      "fb_link": "https://www.facebook.com/reel/3584878615007660/",
       "source_link": ""
     }
   ],
@@ -64,7 +64,7 @@
     "views_7d": 19126,
     "avg_per_video": 19126,
     "trend": "viral",
-    "ratio": 12.8463002350834,
+    "ratio": 12.736043801561172,
     "fb_link": "https://www.facebook.com/reel/1440490007980933/",
     "source_link": ""
   }
