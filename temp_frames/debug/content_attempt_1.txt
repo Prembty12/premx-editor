@@ -1,1 +1,1 @@
-{"clip_duration": 32, "reason": "Continuous intense forest combat action", "start_time": 3, "status": "APPROVE", "title": "Deadly Forest Ambush 🌲💀"}
+{"clip_duration": 18, "reason": "Intense fire combat and magic explosion sequence", "start_time": 2, "status": "APPROVE", "title": "Boss Melts in Flames 🔥💀"}
