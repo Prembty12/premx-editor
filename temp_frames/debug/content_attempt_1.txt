@@ -1,1 +1,1 @@
-{"clip_duration": 38, "reason": "Intense boss combat with magic and explosions", "start_time": 0, "status": "APPROVE", "title": "Blue Fire Boss Clash 🩸⚡"}
+{"clip_duration": 23, "reason": "Epic cinematic giant beast magic cage drama.", "start_time": 24, "status": "APPROVE", "title": "Giant Beast Magic Cage Clash 🐯💥"}
