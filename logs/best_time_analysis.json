@@ -1,6 +1,6 @@
 {
-  "last_updated": "2026-10-01 02:29:16 PM",
-  "total_posts_analyzed": 75,
+  "last_updated": "2026-10-01 11:33:01 PM",
+  "total_posts_analyzed": 76,
   "top_slots": [
     {
       "rank": 1,
@@ -13,33 +13,33 @@
     {
       "rank": 2,
       "icon": "\ud83e\udd48",
-      "time_slot": "23:00 - 00:00",
-      "posts": 4,
-      "avg_views": 887,
+      "time_slot": "14:00 - 15:00",
+      "posts": 2,
+      "avg_views": 981,
       "recommendation": "Great"
     },
     {
       "rank": 3,
       "icon": "\ud83e\udd49",
-      "time_slot": "13:00 - 14:00",
+      "time_slot": "23:00 - 00:00",
       "posts": 4,
-      "avg_views": 518,
+      "avg_views": 887,
       "recommendation": "Good"
     },
     {
       "rank": 4,
       "icon": "4",
-      "time_slot": "03:00 - 04:00",
-      "posts": 2,
-      "avg_views": 500,
+      "time_slot": "13:00 - 14:00",
+      "posts": 4,
+      "avg_views": 518,
       "recommendation": "Average"
     },
     {
       "rank": 5,
       "icon": "5",
-      "time_slot": "22:00 - 23:00",
-      "posts": 4,
-      "avg_views": 463,
+      "time_slot": "03:00 - 04:00",
+      "posts": 2,
+      "avg_views": 500,
       "recommendation": "Below avg"
     }
   ],
@@ -61,8 +61,8 @@
       "posts": 17
     },
     "Thursday": {
-      "avg_views": 637,
-      "posts": 3
+      "avg_views": 643,
+      "posts": 4
     }
   },
   "today_suggestion": {
