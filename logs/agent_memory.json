@@ -9,7 +9,8 @@
         "monkeyKing": 20,
         "sifu": 20,
         "Russian_secret_missions": 15,
-        "MarvelsSpiderMan2": 15
+        "MarvelsSpiderMan2": 15,
+        "RescueOperation": 15
     },
     "title_styles": {
         "curiosity": 10,
@@ -21,7 +22,7 @@
         "informative": 10,
         "epic_cinematic": 16,
         "funny_roast": 10,
-        "secret_hidden": 16,
+        "secret_hidden": 19,
         "exposed": 22,
         "unbelievable": 13,
         "crazy": 13,

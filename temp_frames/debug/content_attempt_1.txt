@@ -1,1 +1,1 @@
-{"clip_duration": 20, "reason": "Dramatic cinematic villain reveal and intense close-ups.", "start_time": 11, "status": "APPROVE", "title": "Villain's Green Menace Revealed 🕷️"}
+{"clip_duration": 34, "reason": "Full sniper target sequence with explosions and hits", "start_time": 15, "status": "APPROVE", "title": "Can you hit this sniper shot? 🎯"}
