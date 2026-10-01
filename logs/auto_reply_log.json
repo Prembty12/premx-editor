@@ -1,5 +1,5 @@
 {
-  "total_replies": 8,
+  "total_replies": 9,
   "total_skipped": 0,
   "replies": [
     {
@@ -145,8 +145,26 @@
       "source_link": "",
       "timestamp": "2026-10-01 09:23:52 PM",
       "status": "posted"
+    },
+    {
+      "reply_id": "1091966347023994_3202219663302948",
+      "comment_id": "1091966347023994_1600321591542294",
+      "reply_to_id": "1091966347023994_1388077166363389",
+      "post_id": "100463226188818_1091966347023994",
+      "user_name": "Facebook User",
+      "user_id": "",
+      "user_comment": "PremxGamer ok bro next video when upload",
+      "openrouter_reply": "Bro, next video drops soon! Gonna be lit with more Sifu beats. What move should I show next? 🔥",
+      "type": "friendly",
+      "depth": 2,
+      "game": "sifu",
+      "post_title": "Hallway Beatdown 🥋🔥\n\n#videogames #gamingcommunity #gaming #sifu #gamingreels #re",
+      "fb_post_link": "https://www.facebook.com/reel/1536392984956953/",
+      "source_link": "",
+      "timestamp": "2026-10-01 09:35:50 PM",
+      "status": "posted"
     }
   ],
   "skipped": [],
-  "last_updated": "2026-10-01 09:23:52 PM"
+  "last_updated": "2026-10-01 09:35:50 PM"
 }
