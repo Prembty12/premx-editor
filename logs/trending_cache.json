@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-01 09:44:08 AM",
+  "last_updated": "2026-10-01 11:34:56 AM",
   "period_days": 7,
   "trending": [
     {
@@ -38,7 +38,7 @@
       "trend": "slow",
       "ratio": 0.6940197841726619,
       "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison17.mp4"
+      "source_link": ""
     },
     {
       "game": "mm2remastered",
@@ -56,7 +56,7 @@
       "trend": "below_avg",
       "ratio": 0.4856115107913669,
       "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison14.mp4"
+      "source_link": ""
     }
   ],
   "recommendation": {
