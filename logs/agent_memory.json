@@ -8,7 +8,8 @@
         "codBlackops6": 20,
         "monkeyKing": 20,
         "sifu": 20,
-        "Russian_secret_missions": 15
+        "Russian_secret_missions": 15,
+        "MarvelsSpiderMan2": 15
     },
     "title_styles": {
         "curiosity": 10,
@@ -23,7 +24,7 @@
         "secret_hidden": 16,
         "exposed": 22,
         "unbelievable": 13,
-        "crazy": 10,
+        "crazy": 13,
         "secret": 10,
         "shocking": 16
     },

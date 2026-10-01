@@ -1,1 +1,1 @@
-{"clip_duration": 23, "reason": "Epic cinematic giant beast magic cage drama.", "start_time": 24, "status": "APPROVE", "title": "Giant Beast Magic Cage Clash 🐯💥"}
+{"clip_duration": 20, "reason": "Dramatic cinematic villain reveal and intense close-ups.", "start_time": 11, "status": "APPROVE", "title": "Villain's Green Menace Revealed 🕷️"}
