@@ -1,5 +1,5 @@
 {
-  "total_replies": 6,
+  "total_replies": 7,
   "total_skipped": 0,
   "replies": [
     {
@@ -109,8 +109,26 @@
       "source_link": "",
       "timestamp": "2026-10-01 11:40:26 AM",
       "status": "posted"
+    },
+    {
+      "reply_id": "1091966410357321_29172137739049826",
+      "comment_id": "1091966410357321_945180108177054",
+      "reply_to_id": "1091966410357321_945180108177054",
+      "post_id": "100463226188818_1091966410357321",
+      "user_name": "Facebook User",
+      "user_id": "",
+      "user_comment": "Very good",
+      "openrouter_reply": "Thanks, bro! Was that shot epic or what? Your turn! 🎯",
+      "type": "friendly",
+      "depth": 1,
+      "game": "Video Game",
+      "post_title": "Can you hit this sniper shot? 🎯\n\n#videogames #gamingcommunity #gaming #rescueope",
+      "fb_post_link": "https://www.facebook.com/reel/1553685666509531/",
+      "source_link": "",
+      "timestamp": "2026-10-01 02:25:29 PM",
+      "status": "posted"
     }
   ],
   "skipped": [],
-  "last_updated": "2026-10-01 02:17:59 PM"
+  "last_updated": "2026-10-01 02:25:29 PM"
 }
