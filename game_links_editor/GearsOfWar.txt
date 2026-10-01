@@ -3,3 +3,4 @@ GearsOfWar2 | Link: https://github.com/Prembty12/premx-editor/releases/download/
 GearsOfWar3 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar3.mp4
 GearsOfWar4 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar4.mp4
 GearsOfWar5 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar5.mp4
+GearsOfWar6 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar6.mp4
