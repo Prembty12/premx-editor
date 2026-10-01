@@ -1,5 +1,5 @@
 {
-  "total_replies": 5,
+  "total_replies": 6,
   "total_skipped": 0,
   "replies": [
     {
@@ -91,8 +91,26 @@
       "source_link": "",
       "timestamp": "2026-10-01 08:57:37 AM",
       "status": "posted"
+    },
+    {
+      "reply_id": "1091836560370306_1086093831004381",
+      "comment_id": "1091836560370306_2337279823781695",
+      "reply_to_id": "1091836560370306_2048759862494546",
+      "post_id": "100463226188818_1091836560370306",
+      "user_name": "Facebook User",
+      "user_id": "",
+      "user_comment": "PremxGamer Tel me game name",
+      "openrouter_reply": "Yo PremxGamer, it's God of War! That boss fight was lit, what's your take? 🔥",
+      "type": "friendly",
+      "depth": 2,
+      "game": "God of War",
+      "post_title": "Blue Fire Boss Clash 🩸⚡\n\n#videogames #gamingcommunity #gaming #godofwar3 #gaming",
+      "fb_post_link": "https://www.facebook.com/reel/2038641333436729/",
+      "source_link": "",
+      "timestamp": "2026-10-01 11:40:26 AM",
+      "status": "posted"
     }
   ],
   "skipped": [],
-  "last_updated": "2026-10-01 11:34:56 AM"
+  "last_updated": "2026-10-01 11:40:26 AM"
 }
