@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-01 02:17:59 PM",
+  "last_updated": "2026-10-01 02:29:16 PM",
   "period_days": 7,
   "trending": [
     {
@@ -7,7 +7,7 @@
       "views_7d": 19363,
       "avg_per_video": 19363,
       "trend": "viral",
-      "ratio": 13.037593984962406,
+      "ratio": 13.033693579148125,
       "fb_link": "https://www.facebook.com/reel/1440490007980933/",
       "source_link": ""
     }
@@ -15,28 +15,28 @@
   "below_avg": [
     {
       "game": "GODOFWAR3",
-      "views_7d": 6582,
-      "avg_per_video": 1316,
+      "views_7d": 6585,
+      "avg_per_video": 1317,
       "trend": "slow",
-      "ratio": 0.8860958366064414,
+      "ratio": 0.8865038704610897,
       "fb_link": "https://www.facebook.com/reel/2038641333436729/",
       "source_link": ""
     },
     {
       "game": "VietnamCavePrison",
-      "views_7d": 6461,
-      "avg_per_video": 1076,
+      "views_7d": 6469,
+      "avg_per_video": 1078,
       "trend": "slow",
-      "ratio": 0.7244978116934127,
+      "ratio": 0.725627313862608,
       "fb_link": "https://www.facebook.com/reel/918327307798474/",
       "source_link": ""
     },
     {
       "game": "Russian_secret_missions",
-      "views_7d": 2079,
-      "avg_per_video": 1039,
+      "views_7d": 2080,
+      "avg_per_video": 1040,
       "trend": "slow",
-      "ratio": 0.699584782852654,
+      "ratio": 0.7000486144871172,
       "fb_link": "https://www.facebook.com/reel/1135871095448480/",
       "source_link": ""
     },
@@ -45,7 +45,7 @@
       "views_7d": 1697,
       "avg_per_video": 848,
       "trend": "slow",
-      "ratio": 0.5709796880260352,
+      "ratio": 0.570808870274111,
       "fb_link": "https://www.facebook.com/reel/3584878615007660/",
       "source_link": ""
     },
@@ -54,7 +54,7 @@
       "views_7d": 4323,
       "avg_per_video": 720,
       "trend": "below_avg",
-      "ratio": 0.4847940747390865,
+      "ratio": 0.4846490407987734,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison14.mp4"
     }
@@ -64,7 +64,7 @@
     "views_7d": 19363,
     "avg_per_video": 19363,
     "trend": "viral",
-    "ratio": 13.037593984962406,
+    "ratio": 13.033693579148125,
     "fb_link": "https://www.facebook.com/reel/1440490007980933/",
     "source_link": ""
   }
