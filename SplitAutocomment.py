@@ -1,6 +1,6 @@
 """
-💬 SPLIT AUTO-COMMENT SCRIPT (v7 — JSON-Only Writer)
-=====================================================
+💬 SPLIT AUTO-COMMENT SCRIPT (v9 — Schema + User Name Fix)
+============================================================
 ✅ ONLY writes 2 JSON files:
    - logs/auto_reply_log.json
    - logs/replied_comment_ids.json
@@ -9,6 +9,8 @@
 ✅ Shared log with full script (no duplicate replies)
 ✅ Recursive nested replies fetch
 ✅ Last reply check FIRST — no duplicate
+✅ 🆕 JSON Schema (strict) + auto-fallback to json_object
+✅ 🆕 User Name 5-layer fallback + LAST user reply se naam
 """
 
 import os
@@ -99,17 +101,47 @@ KNOWN_GAMES = [
 
 
 # ============================================================
-# 🤖 OPENROUTER CLIENT
+# 🤖 OPENROUTER CLIENT (v9 — JSON Schema + Fallback)
 # ============================================================
-def _call_openrouter_single(model_name, api_key, prompt, max_tokens=150):
+def _build_json_schema():
+    """Strict JSON schema for batch replies."""
+    return {
+        "type": "json_schema",
+        "json_schema": {
+            "name": "batch_replies",
+            "strict": True,
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "replies": {
+                        "type": "object",
+                        "description": "Map of comment_id to reply text",
+                        "additionalProperties": {"type": "string"}
+                    }
+                },
+                "required": ["replies"],
+                "additionalProperties": False
+            }
+        }
+    }
+
+
+def _call_openrouter_single(model_name, api_key, prompt,
+                             max_tokens=150, use_schema=False):
+    """
+    v9: Agar use_schema=True → strict json_schema try kare.
+    Fail ho jaye (400/schema not supported) → auto fallback to json_object.
+    """
     if not api_key:
         return None
+
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
         "HTTP-Referer": "https://github.com/",
         "X-Title": "Gaming Auto-Agent",
     }
+
     payload = {
         "model": model_name,
         "messages": [{"role": "user", "content": prompt}],
@@ -117,8 +149,22 @@ def _call_openrouter_single(model_name, api_key, prompt, max_tokens=150):
         "max_tokens": max_tokens,
         "top_p": 0.95,
     }
+
+    if use_schema:
+        payload["response_format"] = _build_json_schema()
+        mode_tag = "SCHEMA"
+    else:
+        payload["response_format"] = {"type": "json_object"}
+        mode_tag = "JSON_OBJ"
+
+    # ✅ response-healing plugin (only for json_object)
+    if not use_schema:
+        payload["plugins"] = [{"id": "response-healing"}]
+
     try:
-        res = requests.post(OPENROUTER_URL, headers=headers, json=payload, timeout=40)
+        res = requests.post(OPENROUTER_URL, headers=headers,
+                            json=payload, timeout=40)
+
         if res.status_code == 200:
             data = res.json()
             choices = data.get("choices", [])
@@ -126,11 +172,26 @@ def _call_openrouter_single(model_name, api_key, prompt, max_tokens=150):
                 content = choices[0].get("message", {}).get("content", "")
                 if content:
                     return content.strip()
-        else:
-            log(f"   ⚠️ HTTP {res.status_code}: {res.text[:120]}")
+            log(f"   ⚠️ [{mode_tag}] Empty choices")
+            return None
+
+        # 🔥 Auto-fallback: schema not supported
+        if res.status_code == 400 and use_schema:
+            err = res.text.lower()
+            if ("json_schema" in err or "response_format" in err
+                    or "schema" in err or "not supported" in err):
+                log(f"   ⚠️ [{mode_tag}] Not supported — falling back to json_object")
+                return _call_openrouter_single(
+                    model_name, api_key, prompt,
+                    max_tokens=max_tokens, use_schema=False
+                )
+
+        log(f"   ⚠️ [{mode_tag}] HTTP {res.status_code}: {res.text[:150]}")
+        return None
+
     except Exception as e:
-        log(f"   ⚠️ Exception: {e}")
-    return None
+        log(f"   ⚠️ [{mode_tag}] Exception: {e}")
+        return None
 
 
 def _extract_json(response):
@@ -165,9 +226,30 @@ def _extract_json(response):
     return None
 
 
+def _normalize_parsed_replies(parsed):
+    """
+    v9: Handle BOTH output shapes:
+      Format A (schema):  {"replies": {"id1": "text1"}}
+      Format B (old):     {"id1": "text1"}
+    Returns flat dict {comment_id: reply_text}
+    """
+    if not isinstance(parsed, dict):
+        return {}
+    inner = parsed.get("replies")
+    if isinstance(inner, dict):
+        return {str(k): str(v) for k, v in inner.items() if v}
+    skip = {"user safety: safe", "safe", "unsafe", "none"}
+    flat = {}
+    for k, v in parsed.items():
+        if isinstance(v, str) and v.strip().lower() not in skip:
+            flat[str(k)] = v
+    return flat
+
+
 def generate_batch_replies(comments_batch, max_retries=MAX_JSON_RETRIES):
     if not comments_batch:
         return {}
+
     formatted = ""
     for c in comments_batch:
         tone = "SAVAGE" if c["is_abuse"] else "FRIENDLY"
@@ -210,8 +292,10 @@ CRITICAL: Return ONLY valid JSON. Keys = comment IDs. Values = reply text.
 
 Example:
 {{
-  "COMMENT_ID_1": "reply 1",
-  "COMMENT_ID_2": "reply 2"
+  "replies": {{
+    "COMMENT_ID_1": "reply 1",
+    "COMMENT_ID_2": "reply 2"
+  }}
 }}
 
 COMMENTS TO REPLY:
@@ -229,32 +313,50 @@ YOUR JSON RESPONSE:"""
         current_key = valid_keys[key_index]
         model_to_use = FIXED_MODEL if attempt == 1 else FALLBACK_MODEL
         tag = "FIXED" if attempt == 1 else "FALLBACK"
-        log(f"🔄 Attempt {attempt}/{max_retries} | {tag} | Key {key_index + 1}")
 
-        response = _call_openrouter_single(model_to_use, current_key, prompt, max_tokens=1800)
+        # 🔥 First 2 attempts → SCHEMA, then JSON_OBJ
+        use_schema = attempt <= 2
+        schema_tag = "SCHEMA" if use_schema else "JSON_OBJ"
+
+        log(f"🔄 Attempt {attempt}/{max_retries} | {tag} | {schema_tag} | Key {key_index + 1}")
+
+        response = _call_openrouter_single(
+            model_to_use, current_key, prompt,
+            max_tokens=1800,
+            use_schema=use_schema
+        )
+
         if not response:
             log("   ⚠️ Empty response — retry")
             time.sleep(1)
             continue
+
         if response.strip().lower() in ["user safety: safe", "safe", "unsafe", "none"]:
             log("   ⚠️ Safety model response — retry")
             time.sleep(1)
             continue
+
         parsed = _extract_json(response)
         if parsed is None:
             log(f"   ⚠️ Invalid JSON — retry. Preview: {response[:100]}")
             time.sleep(1)
             continue
+
+        # 🔥 Normalize (schema-nested OR flat)
+        flat_replies = _normalize_parsed_replies(parsed)
+
         result = {}
         for c in comments_batch:
             cid = c["comment_id"]
-            if cid in parsed:
-                reply = str(parsed[cid]).strip().strip('"').strip("'")
+            if cid in flat_replies:
+                reply = str(flat_replies[cid]).strip().strip('"').strip("'")
                 if reply and reply.lower() not in ["user safety: safe", "safe", "unsafe", "none"]:
                     result[cid] = reply
+
         if result:
             log(f"   ✅ Valid JSON on attempt {attempt}: {len(result)}/{len(comments_batch)} replies")
             return result
+
         log("   ⚠️ Parsed but no valid replies — retry")
         time.sleep(1)
 
@@ -311,7 +413,7 @@ def is_reply_safe(reply_text, is_abuse=False):
 
 
 # ============================================================
-# 💬 AUTO-COMMENT — SHARED LOG (v7)
+# 💬 AUTO-COMMENT — SHARED LOG (v9)
 # ============================================================
 _page_name_cache = ""
 _user_name_cache = {}
@@ -338,26 +440,88 @@ def get_page_name():
     return ""
 
 
-def get_user_name(user_id, fallback_from_field=None):
+def fetch_comment_author(comment_id):
+    """v9: Specific comment_id se from{name,id,username} fetch karo."""
+    if not comment_id:
+        return {}
+    try:
+        res = requests.get(
+            f"{FB_GRAPH_URL}/{comment_id}",
+            params={"fields": "from{name,id,username}",
+                    "access_token": FB_ACCESS_TOKEN},
+            timeout=8)
+        if res.status_code == 200:
+            return res.json().get("from", {}) or {}
+    except Exception:
+        pass
+    return {}
+
+
+def get_user_name(user_id, fallback_from_field=None, comment_obj=None):
+    """
+    v9: 5-layer user name fetch:
+      1. fallback_from_field
+      2. cache (skip User_XXXX placeholder)
+      3. comment_obj.from.name
+      4. API with multiple field combos (name/first_name/last_name/username)
+      5. User_XXXXXX placeholder
+    """
     global _user_name_cache
+
+    # Layer 1: fallback from field
     if fallback_from_field and str(fallback_from_field).strip():
-        return str(fallback_from_field).strip()
+        name = str(fallback_from_field).strip()
+        if name and name.lower() != "facebook user":
+            if user_id:
+                _user_name_cache[str(user_id)] = name
+            return name
+
+    # Layer 2: cache (skip placeholder)
     if user_id:
         user_id = str(user_id).strip()
-        if user_id in _user_name_cache:
-            return _user_name_cache[user_id]
-        try:
-            res = requests.get(
-                f"{FB_GRAPH_URL}/{user_id}",
-                params={"fields": "name", "access_token": FB_ACCESS_TOKEN},
-                timeout=8)
-            if res.status_code == 200:
-                name = (res.json().get("name") or "").strip()
-                if name:
-                    _user_name_cache[user_id] = name
-                    return name
-        except Exception:
-            pass
+        cached = _user_name_cache.get(user_id, "")
+        if cached and not cached.startswith("User_"):
+            return cached
+
+    # Layer 3: from comment_obj
+    if comment_obj:
+        cfrom = comment_obj.get("from", {}) or {}
+        cname = (cfrom.get("name") or "").strip()
+        if cname:
+            if user_id:
+                _user_name_cache[str(user_id)] = cname
+            return cname
+
+    # Layer 4: API — multiple field combos
+    if user_id:
+        user_id = str(user_id).strip()
+        for fields in ["name,first_name,last_name,username",
+                       "name,first_name,last_name",
+                       "name"]:
+            try:
+                res = requests.get(
+                    f"{FB_GRAPH_URL}/{user_id}",
+                    params={"fields": fields, "access_token": FB_ACCESS_TOKEN},
+                    timeout=8)
+                if res.status_code == 200:
+                    data = res.json()
+                    name = (data.get("name") or "").strip()
+                    if not name:
+                        first = (data.get("first_name") or "").strip()
+                        last = (data.get("last_name") or "").strip()
+                        name = f"{first} {last}".strip()
+                    if not name:
+                        uname = (data.get("username") or "").strip()
+                        if uname:
+                            name = f"@{uname}"
+                    if name:
+                        _user_name_cache[user_id] = name
+                        return name
+            except Exception:
+                continue
+
+    # Layer 5: placeholder
+    if user_id:
         short = user_id[-6:] if len(user_id) > 6 else user_id
         name = f"User_{short}"
         _user_name_cache[user_id] = name
@@ -477,7 +641,15 @@ def _is_our_reply(reply_obj, page_name_lower):
 
 
 def analyze_thread(top_comment):
+    """
+    v9: Analyze thread with user name fix.
+    - Recursive replies fetch
+    - Last reply check FIRST
+    - Log check SIRF fresh comment ke liye
+    - 🔥 LAST user reply ka naam use karo (top comment ka nahi)
+    """
     cid = top_comment.get("id", "")
+
     replies = fetch_comment_replies(cid)
     replies_sorted = sorted(replies, key=lambda x: x.get("created_time", ""))
 
@@ -525,14 +697,32 @@ def analyze_thread(top_comment):
     if not user_msgs:
         return {"should_reply": False, "depth": our_count, "reason": "no_user_msg"}
 
+    # 🔥 FIX: LAST user reply ka from use karo
     last_user = user_msgs[-1]
     last_text = (last_user.get("message") or "").strip()
     if not last_text:
         return {"should_reply": False, "depth": our_count, "reason": "empty"}
 
-    top_from = top_comment.get("from", {}) or {}
-    user_id = top_from.get("id", "")
-    user_name = get_user_name(user_id, top_from.get("name"))
+    last_from = last_user.get("from", {}) or {}
+    user_id = last_from.get("id", "")
+    user_name_raw = last_from.get("name", "")
+
+    # Agar last_user me from missing → direct fetch
+    if not user_name_raw and not user_id:
+        fetched = fetch_comment_author(last_user.get("id", ""))
+        if fetched:
+            user_id = fetched.get("id", "")
+            user_name_raw = fetched.get("name", "")
+
+    # Agar abhi bhi missing → top comment se try
+    if not user_name_raw and not user_id:
+        top_from = top_comment.get("from", {}) or {}
+        user_id = top_from.get("id", "")
+        user_name_raw = top_from.get("name", "")
+
+    user_name = get_user_name(user_id, user_name_raw, comment_obj=last_user)
+
+    log(f"      👤 User resolved: {user_name}")
 
     return {
         "should_reply": True,
@@ -551,7 +741,7 @@ def process_fb_comments(actual_posted_titles=None):
         log("🚫 Auto-comment disabled")
         return None
 
-    log("🤖 Auto-reply started (v7 — JSON ONLY)...")
+    log("🤖 Auto-reply started (v9 — Schema + User Fix)...")
     log(f"📂 Shared log: {SHARED_REPLY_LOG}")
     log(f"📂 Shared IDs: {SHARED_REPLIED_IDS}")
 
@@ -738,7 +928,7 @@ def process_fb_comments(actual_posted_titles=None):
         log("ℹ️ No valid comments")
         replies_map = {}
     else:
-        log(f"📦 Batch: {len(valid_comments)} comments → 12-retry loop")
+        log(f"📦 Batch: {len(valid_comments)} comments → 12-retry loop (SCHEMA → JSON_OBJ)")
         replies_map = generate_batch_replies(valid_comments)
 
     replies_count = 0
@@ -797,7 +987,6 @@ def process_fb_comments(actual_posted_titles=None):
 
     os.makedirs("logs", exist_ok=True)
 
-    # ✅ SAVE ONLY 2 JSON FILES
     replied_data["replied"] = list(replied_ids)[-10000:]
     replied_data["last_updated"] = now_ist_ampm()
     try:
@@ -852,7 +1041,7 @@ def git_commit_and_push(file_paths, message="Auto-Reply: Update JSON logs [skip 
 # ============================================================
 def main():
     log("=" * 60)
-    log("🚀 SPLIT SCRIPT v7 — JSON-Only Writer")
+    log("🚀 SPLIT SCRIPT v9 — Schema + User Name Fix")
     log("=" * 60)
     log(f"📂 Writes ONLY: {SHARED_REPLY_LOG}")
     log(f"📂 Writes ONLY: {SHARED_REPLIED_IDS}")
@@ -869,7 +1058,6 @@ def main():
     else:
         log("🚫 Auto-comment disabled")
 
-    # ✅ Push ONLY 2 JSON files — nothing else
     try:
         git_commit_and_push([SHARED_REPLY_LOG, SHARED_REPLIED_IDS])
     except Exception as e:
