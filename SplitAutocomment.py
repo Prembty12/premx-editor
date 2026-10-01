@@ -1,6 +1,6 @@
 """
-💬 SPLIT AUTO-COMMENT SCRIPT (v10 — Schema + User Name Fix v2)
-================================================================
+💬 SPLIT AUTO-COMMENT SCRIPT (v9 — Schema + User Name Fix)
+============================================================
 ✅ ONLY writes 2 JSON files:
    - logs/auto_reply_log.json
    - logs/replied_comment_ids.json
@@ -9,8 +9,8 @@
 ✅ Shared log with full script (no duplicate replies)
 ✅ Recursive nested replies fetch
 ✅ Last reply check FIRST — no duplicate
-✅ JSON Schema (strict) + auto-fallback to json_object
-✅ 🆕 User Name 5-layer fallback + forced fetch + username field
+✅ 🆕 JSON Schema (strict) + auto-fallback to json_object
+✅ 🆕 User Name 5-layer fallback + LAST user reply se naam
 """
 
 import os
@@ -76,6 +76,7 @@ POSTS_TO_SCAN = 25
 COMMENT_FETCH_WORKERS = 10
 MAX_JSON_RETRIES = 12
 
+# 🔥 ONLY THESE 2 FILES WILL BE WRITTEN
 SHARED_REPLY_LOG = "logs/auto_reply_log.json"
 SHARED_REPLIED_IDS = "logs/replied_comment_ids.json"
 
@@ -100,9 +101,10 @@ KNOWN_GAMES = [
 
 
 # ============================================================
-# 🤖 OPENROUTER CLIENT (Schema + Fallback)
+# 🤖 OPENROUTER CLIENT (v9 — JSON Schema + Fallback)
 # ============================================================
 def _build_json_schema():
+    """Strict JSON schema for batch replies."""
     return {
         "type": "json_schema",
         "json_schema": {
@@ -126,6 +128,10 @@ def _build_json_schema():
 
 def _call_openrouter_single(model_name, api_key, prompt,
                              max_tokens=150, use_schema=False):
+    """
+    v9: Agar use_schema=True → strict json_schema try kare.
+    Fail ho jaye (400/schema not supported) → auto fallback to json_object.
+    """
     if not api_key:
         return None
 
@@ -151,6 +157,7 @@ def _call_openrouter_single(model_name, api_key, prompt,
         payload["response_format"] = {"type": "json_object"}
         mode_tag = "JSON_OBJ"
 
+    # ✅ response-healing plugin (only for json_object)
     if not use_schema:
         payload["plugins"] = [{"id": "response-healing"}]
 
@@ -168,6 +175,7 @@ def _call_openrouter_single(model_name, api_key, prompt,
             log(f"   ⚠️ [{mode_tag}] Empty choices")
             return None
 
+        # 🔥 Auto-fallback: schema not supported
         if res.status_code == 400 and use_schema:
             err = res.text.lower()
             if ("json_schema" in err or "response_format" in err
@@ -219,6 +227,12 @@ def _extract_json(response):
 
 
 def _normalize_parsed_replies(parsed):
+    """
+    v9: Handle BOTH output shapes:
+      Format A (schema):  {"replies": {"id1": "text1"}}
+      Format B (old):     {"id1": "text1"}
+    Returns flat dict {comment_id: reply_text}
+    """
     if not isinstance(parsed, dict):
         return {}
     inner = parsed.get("replies")
@@ -300,6 +314,7 @@ YOUR JSON RESPONSE:"""
         model_to_use = FIXED_MODEL if attempt == 1 else FALLBACK_MODEL
         tag = "FIXED" if attempt == 1 else "FALLBACK"
 
+        # 🔥 First 2 attempts → SCHEMA, then JSON_OBJ
         use_schema = attempt <= 2
         schema_tag = "SCHEMA" if use_schema else "JSON_OBJ"
 
@@ -327,6 +342,7 @@ YOUR JSON RESPONSE:"""
             time.sleep(1)
             continue
 
+        # 🔥 Normalize (schema-nested OR flat)
         flat_replies = _normalize_parsed_replies(parsed)
 
         result = {}
@@ -397,7 +413,7 @@ def is_reply_safe(reply_text, is_abuse=False):
 
 
 # ============================================================
-# 💬 AUTO-COMMENT — SHARED LOG (v10)
+# 💬 AUTO-COMMENT — SHARED LOG (v9)
 # ============================================================
 _page_name_cache = ""
 _user_name_cache = {}
@@ -425,35 +441,30 @@ def get_page_name():
 
 
 def fetch_comment_author(comment_id):
-    """
-    v10: Specific comment_id se from fetch karo — multiple field combos try.
-    """
+    """v9: Specific comment_id se from{name,id,username} fetch karo."""
     if not comment_id:
         return {}
-    for fields in ["from{name,id,username}", "from{name,id}", "from"]:
-        try:
-            res = requests.get(
-                f"{FB_GRAPH_URL}/{comment_id}",
-                params={"fields": fields, "access_token": FB_ACCESS_TOKEN},
-                timeout=8)
-            if res.status_code == 200:
-                data = res.json()
-                from_data = data.get("from", {}) or {}
-                if from_data.get("name"):
-                    return from_data
-                if from_data.get("id"):
-                    return from_data
-                if from_data.get("username"):
-                    from_data["name"] = f"@{from_data['username']}"
-                    return from_data
-        except Exception:
-            continue
+    try:
+        res = requests.get(
+            f"{FB_GRAPH_URL}/{comment_id}",
+            params={"fields": "from{name,id,username}",
+                    "access_token": FB_ACCESS_TOKEN},
+            timeout=8)
+        if res.status_code == 200:
+            return res.json().get("from", {}) or {}
+    except Exception:
+        pass
     return {}
 
 
 def get_user_name(user_id, fallback_from_field=None, comment_obj=None):
     """
-    v10: 5-layer user name fetch.
+    v9: 5-layer user name fetch:
+      1. fallback_from_field
+      2. cache (skip User_XXXX placeholder)
+      3. comment_obj.from.name
+      4. API with multiple field combos (name/first_name/last_name/username)
+      5. User_XXXXXX placeholder
     """
     global _user_name_cache
 
@@ -559,7 +570,7 @@ def was_already_replied(comment_id):
 
 def fetch_fb_comments(post_id, since_timestamp=None):
     params = {
-        "fields": "id,message,from{name,id,username},created_time,can_reply",
+        "fields": "id,message,from{name,id},created_time,can_reply",
         "access_token": FB_ACCESS_TOKEN,
         "limit": 50,
     }
@@ -580,7 +591,7 @@ def fetch_comment_replies(comment_id, depth=0, max_depth=3):
     if depth >= max_depth:
         return []
     params = {
-        "fields": "id,message,from{name,id,username},created_time,can_reply",
+        "fields": "id,message,from{name,id},created_time,can_reply",
         "access_token": FB_ACCESS_TOKEN,
         "limit": 50,
     }
@@ -631,7 +642,11 @@ def _is_our_reply(reply_obj, page_name_lower):
 
 def analyze_thread(top_comment):
     """
-    v10: Analyze thread with forced user name fetch.
+    v9: Analyze thread with user name fix.
+    - Recursive replies fetch
+    - Last reply check FIRST
+    - Log check SIRF fresh comment ke liye
+    - 🔥 LAST user reply ka naam use karo (top comment ka nahi)
     """
     cid = top_comment.get("id", "")
 
@@ -692,53 +707,21 @@ def analyze_thread(top_comment):
     user_id = last_from.get("id", "")
     user_name_raw = last_from.get("name", "")
 
-    # 🔥 FIX 1: Agar name missing → direct comment_id se fetch (chahe id ho ya na ho)
-    if not user_name_raw:
-        log(f"      🔍 Name missing → fetching comment author...")
+    # Agar last_user me from missing → direct fetch
+    if not user_name_raw and not user_id:
         fetched = fetch_comment_author(last_user.get("id", ""))
         if fetched:
-            if not user_id:
-                user_id = fetched.get("id", "")
-            if not user_name_raw:
-                user_name_raw = fetched.get("name", "")
-            if not user_name_raw:
-                user_name_raw = fetched.get("username", "")
-            log(f"      🔍 Fetched: id={user_id} | name='{user_name_raw}'")
+            user_id = fetched.get("id", "")
+            user_name_raw = fetched.get("name", "")
 
-    # 🔥 FIX 2: Agar abhi bhi missing → top comment se try
-    if not user_name_raw:
+    # Agar abhi bhi missing → top comment se try
+    if not user_name_raw and not user_id:
         top_from = top_comment.get("from", {}) or {}
-        if not user_id:
-            user_id = top_from.get("id", "")
-        if not user_name_raw:
-            user_name_raw = top_from.get("name", "")
-            log(f"      🔍 Top comment fallback: '{user_name_raw}'")
-
-    # 🔥 FIX 3: Agar user_id hai lekin name nahi → direct user API
-    if user_id and not user_name_raw:
-        log(f"      🔍 Name still missing — trying user API...")
-        try:
-            res = requests.get(
-                f"{FB_GRAPH_URL}/{user_id}",
-                params={"fields": "name,first_name,last_name,username",
-                        "access_token": FB_ACCESS_TOKEN},
-                timeout=8)
-            if res.status_code == 200:
-                data = res.json()
-                user_name_raw = (data.get("name") or "").strip()
-                if not user_name_raw:
-                    first = (data.get("first_name") or "").strip()
-                    last = (data.get("last_name") or "").strip()
-                    user_name_raw = f"{first} {last}".strip()
-                if not user_name_raw:
-                    uname = (data.get("username") or "").strip()
-                    if uname:
-                        user_name_raw = f"@{uname}"
-                log(f"      🔍 User API result: '{user_name_raw}'")
-        except Exception as e:
-            log(f"      ⚠️ User API error: {e}")
+        user_id = top_from.get("id", "")
+        user_name_raw = top_from.get("name", "")
 
     user_name = get_user_name(user_id, user_name_raw, comment_obj=last_user)
+
     log(f"      👤 User resolved: {user_name}")
 
     return {
@@ -758,7 +741,7 @@ def process_fb_comments(actual_posted_titles=None):
         log("🚫 Auto-comment disabled")
         return None
 
-    log("🤖 Auto-reply started (v10 — Schema + User Fix v2)...")
+    log("🤖 Auto-reply started (v9 — Schema + User Fix)...")
     log(f"📂 Shared log: {SHARED_REPLY_LOG}")
     log(f"📂 Shared IDs: {SHARED_REPLIED_IDS}")
 
@@ -1058,7 +1041,7 @@ def git_commit_and_push(file_paths, message="Auto-Reply: Update JSON logs [skip 
 # ============================================================
 def main():
     log("=" * 60)
-    log("🚀 SPLIT SCRIPT v10 — Schema + User Name Fix v2")
+    log("🚀 SPLIT SCRIPT v9 — Schema + User Name Fix")
     log("=" * 60)
     log(f"📂 Writes ONLY: {SHARED_REPLY_LOG}")
     log(f"📂 Writes ONLY: {SHARED_REPLIED_IDS}")
