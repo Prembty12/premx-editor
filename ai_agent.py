@@ -207,7 +207,9 @@ def _call_openrouter_single(model_name, api_key, prompt, max_tokens=150):
         "messages": [{"role": "user", "content": prompt}],
         "temperature": 0.9,
         "max_tokens": max_tokens,
-        "top_p": 0.95,
+       "top_p": 0.95,
+       "response_format": {"type": "json_object"},
+       "plugins": [{"id": "response-healing"}],
     }
     try:
         res = requests.post(OPENROUTER_URL, headers=headers, json=payload, timeout=40)
