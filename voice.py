@@ -2,7 +2,7 @@ import os
 import torch
 import torch.serialization
 import numpy as np
-import scipy.io.wavfile as wavfile
+import wave
 from bark import SAMPLE_RATE, generate_audio, preload_models
 
 # PyTorch 2.6 security unpickling fix
@@ -37,32 +37,37 @@ for i, text in enumerate(cod_chunks):
     audio_array = generate_audio(text, history_prompt="v2/en_speaker_6")
     
     filename = f"chunk_{i}.wav"
-    wavfile.write(filename, SAMPLE_RATE, (audio_array * 32767).astype(np.int16))
+    # Audio ko WAV format mein save karna
+    audio_int16 = (audio_array * 32767).astype(np.int16)
+    
+    with wave.open(filename, 'wb') as wav_file:
+        wav_file.setnchannels(1)  # Mono
+        wav_file.setsampwidth(2)  # 2 bytes per sample (16-bit)
+        wav_file.setframerate(SAMPLE_RATE)
+        wav_file.writeframes(audio_int16.tobytes())
+        
     temp_wavs.append(filename)
 
-with open("cod_list.txt", "w") as f:
-    for wav in temp_wavs:
-        f.write(f"file '{wav}'\n")
+# Bina FFmpeg ke pure Python se WAV files ko aapas mein jodna (Concatenate)
+final_output = "cod_final_pure.wav"
+print("[*] Merging chunks using pure Python...")
 
-raw_combined = "cod_raw_combined.wav"
-final_output = "cod_final_1min.mp3"
+data = []
+for wav_file in temp_wavs:
+    with wave.open(wav_file, 'rb') as w:
+        data.append(w.readframes(w.getnframes()))
 
-print("[*] Merging chunks and applying heavy military radio/stadium effects...")
-os.system(f"ffmpeg -y -f concat -safe 0 -i cod_list.txt -c copy {raw_combined}")
+# Final combined file likhna
+with wave.open(final_output, 'wb') as final_wav:
+    final_wav.setnchannels(1)
+    final_wav.setsampwidth(2)
+    final_wav.setframerate(SAMPLE_RATE)
+    for block in data:
+        final_wav.writeframes(block)
 
-ffmpeg_cmd = (
-    f"ffmpeg -y -i {raw_combined} "
-    f"\"-filter:a\" \"volume=3.5,treble=g=10,bass=g=5,compand=attacks=0:points=-80/-80|-45/-30|0/-5\" "
-    f"{final_output}"
-)
-os.system(ffmpeg_cmd)
-
+# Temporary files ko delete karna
 for wav in temp_wavs:
     if os.path.exists(wav):
         os.remove(wav)
-if os.path.exists("cod_list.txt"):
-    os.remove("cod_list.txt")
-if os.path.exists(raw_combined):
-    os.remove(raw_combined)
 
-print(f"[+] Success! 1-minute Call of Duty hype voiceover saved as: {final_output}")
+print(f"[+] Success! Pure AI voiceover saved as: {final_output}")
