@@ -25,7 +25,7 @@ jobs:
 
       - name: Run TTS Script
         run: |
-          python test_bark.py
+          python voice.py
           # python test_coqui.py
 
       - name: Upload Generated Audio as Artifact
