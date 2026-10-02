@@ -1,12 +1,13 @@
-from transformers import AutoProcessor, AutoModelForTextToSpeech
+from transformers import AutoProcessor, BarkModel
 import scipy.io.wavfile
 import torch
 
-# Processor aur model load karna
+print("Loading Bark model and processor...")
+# Sahi import (BarkModel) ka use kiya hai taaki ImportError na aaye
 processor = AutoProcessor.from_pretrained("suno/bark")
-model = AutoModelForTextToSpeech.from_pretrained("suno/bark")
+model = BarkModel.from_pretrained("suno/bark")
 
-# 30-second ka bada, aggressive aur chilaane wala script
+# 30-second ka high-energy, aggressive aur screaming cues wala text
 text_prompt = (
     "WAIT! STOP SCROLLING RIGHT NOW! [screaming] "
     "What if Spider-Man... finally SNAPPED?! "
@@ -17,12 +18,12 @@ text_prompt = (
     "WOAH! You are NOT ready for what happens next! Watch till the end!"
 )
 
-# Voice preset (aggressiveness ke liye)
+print("Generating audio...")
 inputs = processor(text_prompt, voice_preset="v2/en_speaker_6")
 
 # Audio generate karna
 speech_values = model.generate(**inputs)
 
 # WAV file save karna
-scipy.io.wavfile.write("bark_30sec_screaming.wav", rate=model.config.sampling_rate, data=speech_values.cpu().numpy().squeeze())
+scipy.io.wavfile.write("bark_30sec_screaming.wav", rate=24000, data=speech_values.cpu().numpy().squeeze())
 print("30-second screaming Bark audio generated successfully!")
