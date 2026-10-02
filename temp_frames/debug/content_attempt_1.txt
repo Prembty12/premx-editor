@@ -1,1 +1,1 @@
-{"clip_duration": 35, "reason": "Intense gunfight action with orange arcs", "start_time": 5, "status": "APPROVE", "title": "Orange Arcs Combat Rush 🟠🔫"}
+{"clip_duration": 54, "reason": "No action, only talking and walking.", "start_time": 0, "status": "REJECT", "title": ""}
