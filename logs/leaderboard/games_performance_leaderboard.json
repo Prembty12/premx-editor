@@ -2,74 +2,74 @@
     {
         "rank": 1,
         "game_name": "codBlackops6",
-        "total_views": 23988,
-        "uploaded_videos": 4,
-        "avg_views_per_video": 5997,
-        "view_share_percentage": 15.39
+        "total_views": 24036,
+        "uploaded_videos": 5,
+        "avg_views_per_video": 4807,
+        "view_share_percentage": 15.41
     },
     {
         "rank": 2,
         "game_name": "mm2remastered",
-        "total_views": 22482,
+        "total_views": 22320,
         "uploaded_videos": 4,
-        "avg_views_per_video": 5620,
-        "view_share_percentage": 14.43
+        "avg_views_per_video": 5580,
+        "view_share_percentage": 14.31
     },
     {
         "rank": 3,
         "game_name": "AfghanistanRedZone",
-        "total_views": 21305,
+        "total_views": 21187,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 13.67
+        "view_share_percentage": 13.58
     },
     {
         "rank": 4,
         "game_name": "Callofdutyaw",
-        "total_views": 18482,
+        "total_views": 18489,
         "uploaded_videos": 5,
-        "avg_views_per_video": 3696,
-        "view_share_percentage": 11.86
+        "avg_views_per_video": 3697,
+        "view_share_percentage": 11.85
     },
     {
         "rank": 5,
         "game_name": "SpiderMan2",
-        "total_views": 15585,
+        "total_views": 15586,
         "uploaded_videos": 1,
-        "avg_views_per_video": 15585,
-        "view_share_percentage": 10.0
+        "avg_views_per_video": 15586,
+        "view_share_percentage": 9.99
     },
     {
         "rank": 6,
         "game_name": "MarvelsSpiderMan2",
-        "total_views": 12489,
+        "total_views": 12490,
         "uploaded_videos": 5,
-        "avg_views_per_video": 2497,
-        "view_share_percentage": 8.02
+        "avg_views_per_video": 2498,
+        "view_share_percentage": 8.01
     },
     {
         "rank": 7,
         "game_name": "RescueOperation",
-        "total_views": 8299,
+        "total_views": 8390,
         "uploaded_videos": 5,
-        "avg_views_per_video": 1659,
-        "view_share_percentage": 5.33
+        "avg_views_per_video": 1678,
+        "view_share_percentage": 5.38
     },
     {
         "rank": 8,
         "game_name": "GODOFWAR3",
-        "total_views": 7626,
+        "total_views": 7729,
         "uploaded_videos": 5,
-        "avg_views_per_video": 1525,
-        "view_share_percentage": 4.89
+        "avg_views_per_video": 1545,
+        "view_share_percentage": 4.95
     },
     {
         "rank": 9,
         "game_name": "VietnamCavePrison",
-        "total_views": 7546,
+        "total_views": 7699,
         "uploaded_videos": 5,
-        "avg_views_per_video": 1509,
-        "view_share_percentage": 4.84
+        "avg_views_per_video": 1539,
+        "view_share_percentage": 4.94
     },
     {
         "rank": 10,
@@ -82,9 +82,9 @@
     {
         "rank": 11,
         "game_name": "Russian_secret_missions",
-        "total_views": 3759,
+        "total_views": 3762,
         "uploaded_videos": 5,
-        "avg_views_per_video": 751,
+        "avg_views_per_video": 752,
         "view_share_percentage": 2.41
     },
     {
@@ -98,9 +98,9 @@
     {
         "rank": 13,
         "game_name": "ghostandela",
-        "total_views": 1730,
+        "total_views": 1733,
         "uploaded_videos": 4,
-        "avg_views_per_video": 432,
+        "avg_views_per_video": 433,
         "view_share_percentage": 1.11
     },
     {
@@ -114,18 +114,18 @@
     {
         "rank": 15,
         "game_name": "GodofWarLaufey",
-        "total_views": 1035,
+        "total_views": 1043,
         "uploaded_videos": 5,
-        "avg_views_per_video": 207,
-        "view_share_percentage": 0.66
+        "avg_views_per_video": 208,
+        "view_share_percentage": 0.67
     },
     {
         "rank": 16,
         "game_name": "sifu",
-        "total_views": 895,
+        "total_views": 925,
         "uploaded_videos": 4,
-        "avg_views_per_video": 223,
-        "view_share_percentage": 0.57
+        "avg_views_per_video": 231,
+        "view_share_percentage": 0.59
     },
     {
         "rank": 17,
@@ -150,5 +150,13 @@
         "uploaded_videos": 4,
         "avg_views_per_video": 104,
         "view_share_percentage": 0.27
+    },
+    {
+        "rank": 20,
+        "game_name": "GearsOfWar",
+        "total_views": 0,
+        "uploaded_videos": 0,
+        "avg_views_per_video": 0,
+        "view_share_percentage": 0.0
     }
 ]
