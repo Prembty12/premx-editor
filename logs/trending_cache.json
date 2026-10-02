@@ -1,71 +1,107 @@
 {
-  "last_updated": "2026-10-02 10:59:57 PM",
+  "last_updated": "2026-10-02 11:02:37 PM",
   "period_days": 7,
   "trending": [
     {
       "game": "AfghanistanRedZone",
-      "views_7d": 19577,
-      "avg_per_video": 19577,
+      "views_7d": 900,
+      "avg_per_video": 900,
       "trend": "viral",
-      "ratio": 12.917375366568914,
-      "fb_link": "https://www.facebook.com/reel/1440490007980933/",
-      "source_link": ""
+      "ratio": 5.066225165562914,
+      "fb_link": "",
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.101/AfghanistanRedZone6.mp4"
+    },
+    {
+      "game": "GODOFWAR3",
+      "views_7d": 2840,
+      "avg_per_video": 568,
+      "trend": "viral",
+      "ratio": 3.197350993377483,
+      "fb_link": "",
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR316.mp4"
+    },
+    {
+      "game": "RescueOperation",
+      "views_7d": 730,
+      "avg_per_video": 365,
+      "trend": "viral",
+      "ratio": 2.0546357615894038,
+      "fb_link": "",
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.93/RescueOperation12.mp4"
+    },
+    {
+      "game": "codBlackops6",
+      "views_7d": 1010,
+      "avg_per_video": 202,
+      "trend": "steady",
+      "ratio": 1.1370860927152318,
+      "fb_link": "",
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops616.mp4"
+    },
+    {
+      "game": "Russian_secret_missions",
+      "views_7d": 400,
+      "avg_per_video": 200,
+      "trend": "steady",
+      "ratio": 1.1258278145695364,
+      "fb_link": "",
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions4.mp4"
     }
   ],
   "below_avg": [
     {
-      "game": "GODOFWAR3",
-      "views_7d": 6984,
-      "avg_per_video": 1396,
-      "trend": "slow",
-      "ratio": 0.9211143695014662,
-      "fb_link": "https://www.facebook.com/reel/2038641333436729/",
-      "source_link": ""
-    },
-    {
       "game": "VietnamCavePrison",
-      "views_7d": 7385,
-      "avg_per_video": 1055,
+      "views_7d": 860,
+      "avg_per_video": 122,
       "trend": "slow",
-      "ratio": 0.6961143695014662,
-      "fb_link": "https://www.facebook.com/reel/1099863842821573/",
-      "source_link": ""
-    },
-    {
-      "game": "Russian_secret_missions",
-      "views_7d": 2091,
-      "avg_per_video": 1045,
-      "trend": "slow",
-      "ratio": 0.689516129032258,
-      "fb_link": "https://www.facebook.com/reel/1135871095448480/",
-      "source_link": ""
-    },
-    {
-      "game": "mm2remastered",
-      "views_7d": 820,
-      "avg_per_video": 820,
-      "trend": "slow",
-      "ratio": 0.5410557184750733,
-      "fb_link": "https://www.facebook.com/reel/3584878615007660/",
-      "source_link": ""
+      "ratio": 0.6867549668874172,
+      "fb_link": "",
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison1.mp4"
     },
     {
       "game": "Callofdutyaw",
-      "views_7d": 4343,
-      "avg_per_video": 723,
-      "trend": "below_avg",
-      "ratio": 0.4770527859237536,
+      "views_7d": 690,
+      "avg_per_video": 115,
+      "trend": "slow",
+      "ratio": 0.6473509933774834,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison14.mp4"
+    },
+    {
+      "game": "Ghost_soap_escap",
+      "views_7d": 150,
+      "avg_per_video": 75,
+      "trend": "below_avg",
+      "ratio": 0.42218543046357615,
+      "fb_link": "",
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps1.mp4"
+    },
+    {
+      "game": "GodofWarLaufey",
+      "views_7d": 360,
+      "avg_per_video": 72,
+      "trend": "below_avg",
+      "ratio": 0.4052980132450331,
+      "fb_link": "",
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_15.mp4"
+    },
+    {
+      "game": "DiabloIV",
+      "views_7d": 250,
+      "avg_per_video": 50,
+      "trend": "below_avg",
+      "ratio": 0.2814569536423841,
+      "fb_link": "",
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.102/DiabloIV6.mp4"
     }
   ],
   "recommendation": {
     "game": "AfghanistanRedZone",
-    "views_7d": 19577,
-    "avg_per_video": 19577,
+    "views_7d": 900,
+    "avg_per_video": 900,
     "trend": "viral",
-    "ratio": 12.917375366568914,
-    "fb_link": "https://www.facebook.com/reel/1440490007980933/",
-    "source_link": ""
+    "ratio": 5.066225165562914,
+    "fb_link": "",
+    "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.101/AfghanistanRedZone6.mp4"
   }
 }
