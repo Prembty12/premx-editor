@@ -1,7 +1,7 @@
 name: Test Heavy TTS Models
 
 on:
-  workflow_dispatch: # Isko aap GitHub dashboard se manually trigger kar sakte ho
+  workflow_dispatch: # GitHub dashboard se manually run karne ke liye
 
 jobs:
   run-tts:
@@ -15,18 +15,15 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install Dependencies (Bark / Coqui)
+      - name: Install Dependencies
         run: |
           pip install --upgrade pip
           pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
-          pip install transformers scipy
-          # Agar Coqui test karna ho toh: pip install TTS
-          # Agar Bark test karna ho toh upar wale dependencies kaafi hain.
+          pip install transformers[torch] accelerate sentencepiece scipy
 
       - name: Run TTS Script
         run: |
           python voice.py
-          # python test_coqui.py
 
       - name: Upload Generated Audio as Artifact
         uses: actions/upload-artifact@v4
