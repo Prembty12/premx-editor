@@ -1,1 +1,7 @@
-{"clip_duration":15,"reason":"Intense kitchen brawl combat sequence.","start_time":15,"status":"APPROVE","title":"Kitchen Beatdown Mayhem 🥊💥"}
+{
+  "clip_duration": 15,
+  "reason": "Visceral cinematic beast combat and eating scene",
+  "start_time": 23,
+  "status": "APPROVE",
+  "title": "Beast Eats Enemy Alive 🩸"
+}

@@ -1,7 +1,1 @@
-{
-  "clip_duration": 38,
-  "reason": "High-stakes armed interrogation with tense cinematic payoff",
-  "start_time": 0,
-  "status": "APPROVE",
-  "title": "Would You Pull the Trigger? 😱"
-}
+{"clip_duration": 15, "reason": "Mostly black screens and dialogue, no gameplay action.", "start_time": 25, "status": "REJECT", "title": "Dark Dialogue Cutscenes"}
