@@ -1,69 +1,69 @@
 {
-  "last_updated": "2026-10-03 09:23:42 AM",
+  "last_updated": "2026-10-03 09:14:30 PM",
   "period_days": 7,
   "trending": [
     {
       "game": "GODOFWAR3",
-      "views_7d": 6996,
-      "avg_per_video": 1399,
+      "views_7d": 7007,
+      "avg_per_video": 1401,
       "trend": "viral",
-      "ratio": 2.99171344560278,
+      "ratio": 3.1606256579936836,
       "fb_link": "https://www.facebook.com/reel/2038641333436729/",
       "source_link": ""
     },
     {
       "game": "VietnamCavePrison",
-      "views_7d": 7509,
-      "avg_per_video": 1251,
+      "views_7d": 7584,
+      "avg_per_video": 1264,
       "trend": "viral",
-      "ratio": 2.6752205292702484,
+      "ratio": 2.8515566250563995,
       "fb_link": "https://www.facebook.com/reel/1099863842821573/",
       "source_link": ""
     },
     {
       "game": "Russian_secret_missions",
-      "views_7d": 2094,
-      "avg_per_video": 1047,
+      "views_7d": 2097,
+      "avg_per_video": 1048,
       "trend": "viral",
-      "ratio": 2.23897353648757,
+      "ratio": 2.3642653030530907,
       "fb_link": "https://www.facebook.com/reel/1135871095448480/",
       "source_link": ""
     },
     {
       "game": "Callofdutyaw",
-      "views_7d": 4318,
-      "avg_per_video": 863,
+      "views_7d": 4320,
+      "avg_per_video": 864,
       "trend": "trending",
-      "ratio": 1.8454958567228015,
+      "ratio": 1.949165288013235,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison14.mp4"
     },
     {
-      "game": "mm2remastered",
-      "views_7d": 821,
-      "avg_per_video": 821,
+      "game": "RescueOperation",
+      "views_7d": 1461,
+      "avg_per_video": 730,
       "trend": "trending",
-      "ratio": 1.7556802993851912,
-      "fb_link": "https://www.facebook.com/reel/3584878615007660/",
+      "ratio": 1.646864190103775,
+      "fb_link": "https://www.facebook.com/reel/1553685666509531/",
       "source_link": ""
     }
   ],
   "below_avg": [
     {
       "game": "sifu",
-      "views_7d": 592,
-      "avg_per_video": 296,
-      "trend": "slow",
-      "ratio": 0.6329858326650628,
-      "fb_link": "https://www.facebook.com/reel/1536392984956953/",
-      "source_link": ""
+      "views_7d": 661,
+      "avg_per_video": 220,
+      "trend": "below_avg",
+      "ratio": 0.49631523537374045,
+      "fb_link": "",
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu11.mp4"
     },
     {
       "game": "GodofWarLaufey",
-      "views_7d": 655,
-      "avg_per_video": 131,
+      "views_7d": 676,
+      "avg_per_video": 135,
       "trend": "below_avg",
-      "ratio": 0.2801390002673082,
+      "ratio": 0.304557076252068,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_15.mp4"
     },
@@ -72,35 +72,35 @@
       "views_7d": 150,
       "avg_per_video": 75,
       "trend": "below_avg",
-      "ratio": 0.16038492381716118,
+      "ratio": 0.16919837569559332,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps1.mp4"
     },
     {
       "game": "DiabloIV",
-      "views_7d": 250,
-      "avg_per_video": 62,
+      "views_7d": 200,
+      "avg_per_video": 66,
       "trend": "below_avg",
-      "ratio": 0.1325848703555199,
+      "ratio": 0.14889457061212213,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.102/DiabloIV6.mp4"
     },
     {
       "game": "SpiderMan2",
-      "views_7d": 185,
-      "avg_per_video": 61,
+      "views_7d": 186,
+      "avg_per_video": 62,
       "trend": "below_avg",
-      "ratio": 0.13044640470462443,
+      "ratio": 0.13987065724169048,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan210.mp4"
     }
   ],
   "recommendation": {
     "game": "GODOFWAR3",
-    "views_7d": 6996,
-    "avg_per_video": 1399,
+    "views_7d": 7007,
+    "avg_per_video": 1401,
     "trend": "viral",
-    "ratio": 2.99171344560278,
+    "ratio": 3.1606256579936836,
     "fb_link": "https://www.facebook.com/reel/2038641333436729/",
     "source_link": ""
   }
