@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 40 | **Last Updated:** 2026-10-03 09:21:07 AM IST
+**Total Videos:** 39 | **Last Updated:** 2026-10-03 09:23:42 AM IST
 
 ---
 
@@ -10,10 +10,10 @@
 
 | Metric | Value |
 |---|---|
-| Total Videos | **40** |
-| Posted (FB or IG) | 10 / 40 |
-| FB Posted | 6 / 40 |
-| IG Posted | 4 / 40 |
+| Total Videos | **39** |
+| Posted (FB or IG) | 10 / 39 |
+| FB Posted | 6 / 39 |
+| IG Posted | 4 / 39 |
 | Total FB Views | **226** |
 | Total IG Views | **190** |
 
@@ -28,10 +28,10 @@
 | 3 | Blue Beast Boss Fight ⚡️  #videogames #gamingcommunity #gaming #monkeyking #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Ddi4IfDAkrS/) | 120 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing8.mp4) |
 | 4 | Deep Forest Survival Run 🌲⚔️  #videogames #gamingcommunity #gaming #monkeyking #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Ddak_htilfE/) | 40 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing35.mp4) |
 | 5 | This Fire Boss Fight Goes Totally Insane 🔥😱  #videogames #gamingcommunity #gaming #monkeyking #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1407808034823324/) | 226 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing10.mp4) |
-| 6 | monkeyKing30 | [🔵 FB](https://www.facebook.com/18116341516984824) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing30.mp4) |
-| 7 | monkeyKing16 | [🔵 FB](https://www.facebook.com/18075922229524708) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing16.mp4) |
+| 6 | monkeyKing16 | [🔵 FB](https://www.facebook.com/18075922229524708) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing16.mp4) |
+| 7 | monkeyKing41 | [🔵 FB](https://www.facebook.com/17989196184060636) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing41.mp4) |
 | 8 | monkeyKing35 | [🔵 FB](https://www.facebook.com/18224644636330514) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing35.mp4) |
-| 9 | monkeyKing41 | [🔵 FB](https://www.facebook.com/17989196184060636) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing41.mp4) |
+| 9 | monkeyKing30 | [🔵 FB](https://www.facebook.com/18116341516984824) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing30.mp4) |
 | 10 | monkeyKing32 | [🔵 FB](https://www.facebook.com/18162489952499717) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing32.mp4) |
 | 11 | monkeyKing42 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing42.mp4) |
 | 12 | monkeyKing40 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing40.mp4) |
@@ -56,10 +56,9 @@
 | 31 | monkeyKing15 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing15.mp4) |
 | 32 | monkeyKing14 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing14.mp4) |
 | 33 | monkeyKing13 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing13.mp4) |
-| 34 | monkeyKing12 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing12.mp4) |
-| 35 | monkeyKing11 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing11.mp4) |
-| 36 | monkeyKing10 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing10.mp4) |
-| 37 | monkeyKing9 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing9.mp4) |
-| 38 | monkeyKing8 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing8.mp4) |
-| 39 | monkeyKing7 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing7.mp4) |
-| 40 | monkeyKing6 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing6.mp4) |
+| 34 | monkeyKing11 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing11.mp4) |
+| 35 | monkeyKing10 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing10.mp4) |
+| 36 | monkeyKing9 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing9.mp4) |
+| 37 | monkeyKing8 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing8.mp4) |
+| 38 | monkeyKing7 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing7.mp4) |
+| 39 | monkeyKing6 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing6.mp4) |
