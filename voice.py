@@ -1,69 +1,61 @@
 import os
+import subprocess
 import torch
-import torch.serialization
-import numpy as np
-import wave
+from TTS.api import TTS
 
-# PyTorch 2.6 Unpickling & Weights Only Fix
-_original_load = torch.load
-def _patched_load(*args, **kwargs):
-    kwargs['weights_only'] = False
-    return _original_load(*args, **kwargs)
-torch.load = _patched_load
+# Configuration
+AUDIO_URL = "https://vocaroo.com/195UOPKZUlpt"
+REFERENCE_AUDIO = "voice_sample.wav"
+OUTPUT_AUDIO = "cloned_output.wav"
+TEXT_TO_SPEAK = "Bhai, yeh wala move dekh kar tumhare hosh ud jayenge! Absolute domination on the battlefield!"
 
-from bark import SAMPLE_RATE, generate_audio, preload_models
-
-# CPU mode force karna GitHub Actions ke liye
-os.environ["SUNO_OFFLOAD_CPU"] = "True"
-os.environ["SUNO_USE_SMALL_MODELS"] = "True"
-
-print("[*] Loading Bark AI Models...")
-preload_models()
-
-cod_chunks = [
-    "[shouts] GO GO GO! Move up! They are planting the bomb at B site! What are you doing?! Shoot them!",
-    "[angry] Reloading! Cover me! Sniper on the left roof, watch out! Watch out!",
-    "[screaming] CONTACT! Multiple hostiles incoming! Light them up with everything we got! Fire!",
-    "[shouts] Grenade out! Get down! Boom! That's what you get!",
-    "[angry] Push forward, do not let them breathe! Clear the building, room by room!",
-    "[shouts] Mission success! That is how we do it in Task Force 141! Absolute domination!"
-]
-
-temp_wavs = []
-
-print("[*] Generating emotional voice chunks via Bark...")
-for i, text in enumerate(cod_chunks):
-    print(f"Generating chunk {i+1}/6...")
-    audio_array = generate_audio(text, history_prompt="v2/en_speaker_6")
-    
-    filename = f"chunk_{i}.wav"
-    audio_int16 = (audio_array * 32767).astype(np.int16)
-    
-    with wave.open(filename, 'wb') as wav_file:
-        wav_file.setnchannels(1)
-        wav_file.setsampwidth(2)
-        wav_file.setframerate(SAMPLE_RATE)
-        wav_file.writeframes(audio_int16.tobytes())
+def download_reference_audio():
+    print("=== Step 1: Downloading Vocaroo Sample ===")
+    if os.path.exists(REFERENCE_AUDIO):
+        os.remove(REFERENCE_AUDIO)
         
-    temp_wavs.append(filename)
+    cmd = [
+        "yt-dlp",
+        "-x",
+        "--audio-format", "wav",
+        "-o", "voice_sample.%(ext)s",
+        AUDIO_URL
+    ]
+    
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    if result.returncode == 0:
+        print(f"[+] Audio successfully downloaded as {REFERENCE_AUDIO}")
+    else:
+        print(f"[-] Error: {result.stderr}")
 
-final_output = "cod_final_pure.wav"
-print("[*] Merging chunks using pure Python...")
+def generate_cloned_voice():
+    print("\n=== Step 2: Generating Cloned Voice with XTTS ===")
+    
+    if not os.path.exists(REFERENCE_AUDIO):
+        print(f"[-] Error: '{REFERENCE_AUDIO}' file nahi mili!")
+        return
 
-data = []
-for wav_file in temp_wavs:
-    with wave.open(wav_file, 'rb') as w:
-        data.append(w.readframes(w.getnframes()))
+    # GitHub Actions CPU par chalega
+    device = "cpu"
+    print(f"[*] Using device: {device}")
+    
+    print("[*] Loading XTTS model...")
+    tts = TTS("tts_models/multilingual/multi-dataset/xtts_v2").to(device)
+    
+    print(f"[*] Converting text to voice: '{TEXT_TO_SPEAK}'")
+    
+    tts.tts_to_file(
+        text=TEXT_TO_SPEAK,
+        file_path=OUTPUT_AUDIO,
+        speaker_wav=REFERENCE_AUDIO,
+        language="en",
+        split_sentences=True
+    )
+    
+    print(f"[+] Success! Cloned audio saved as: {OUTPUT_AUDIO}")
 
-with wave.open(final_output, 'wb') as final_wav:
-    final_wav.setnchannels(1)
-    final_wav.setsampwidth(2)
-    final_wav.setframerate(SAMPLE_RATE)
-    for block in data:
-        final_wav.writeframes(block)
-
-for wav in temp_wavs:
-    if os.path.exists(wav):
-        os.remove(wav)
-
-print(f"[+] Success! Pure AI voiceover saved as: {final_output}")
+if __name__ == "__main__":
+    print("=== Voice Cloning Process Started ===")
+    download_reference_audio()
+    generate_cloned_voice()
+    print("=== Process Finished ===")
