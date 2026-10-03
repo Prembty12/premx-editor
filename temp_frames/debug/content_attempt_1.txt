@@ -1,1 +1,1 @@
-{"clip_duration": 54, "reason": "No action, only talking and walking.", "start_time": 0, "status": "REJECT", "title": ""}
+{"clip_duration":15,"reason":"Intense kitchen brawl combat sequence.","start_time":15,"status":"APPROVE","title":"Kitchen Beatdown Mayhem 🥊💥"}
