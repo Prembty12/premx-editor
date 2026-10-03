@@ -2,7 +2,7 @@ import os
 import whisper
 
 def main():
-    audio_path = "audio.mp3"
+    audio_path = "my_voice.m4a"
     output_path = "transcript.txt"
     
     if not os.path.exists(audio_path):
@@ -10,10 +10,9 @@ def main():
         return
 
     print("Whisper model load ho raha hai (base/small)...")
-    # Aap 'base', 'small', ya 'medium' model select kar sakte hain
     model = whisper.load_model("base")
 
-    print("Audio transcribe ho rahi hai with detailed timestamps...")
+    print(f"'{audio_path}' transcribe ho rahi hai with detailed timestamps...")
     result = model.transcribe(audio_path, verbose=False)
 
     print(f"Transcript save ho raha hai: {output_path}")
@@ -22,7 +21,6 @@ def main():
             start = segment["start"]
             end = segment["end"]
             text = segment["text"].strip()
-            # Format: [00:00.000 --> 00:05.000] Text here
             f.write(f"[{format_time(start)} --> {format_time(end)}] {text}\n")
 
     print("Transcription successfully complete ho gayi!")
