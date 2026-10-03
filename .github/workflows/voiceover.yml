@@ -1,11 +1,15 @@
-name: Generate COD Bark Voiceover
+name: Cloud Whisper Transcription
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # Manual trigger button GitHub par
+  push:
+    paths:
+      - 'audio.mp3' # Jaise hi aap audio.mp3 push karoge, yeh chal padega
 
 jobs:
-  build:
+  transcribe:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -13,20 +17,22 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+        python-version: '3.10'
 
-      - name: Install Dependencies
+      - name: Install FFmpeg & Dependencies
         run: |
-          pip install --upgrade pip
-          pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
-          pip install TTS yt-dlp
           sudo apt-get update && sudo apt-get install -y ffmpeg
+          pip install --upgrade pip
+          pip install openai-whisper setuptools-rust
 
-      - name: Run Bark Voice Script
-        run: python voice.py
+      - name: Run Transcription Script
+        run: |
+          python voice.py
 
-      - name: Upload Audio Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: voice-output
-          path: cloned_output.wav
+      - name: Commit and Push Transcript Back to Repo
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add transcript.txt
+          git commit -m "Auto-generated transcript via GitHub Actions" || echo "No changes to commit"
+          git push
