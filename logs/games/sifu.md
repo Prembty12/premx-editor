@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 20 | **Last Updated:** 2026-10-02 11:04:55 PM IST
+**Total Videos:** 20 | **Last Updated:** 2026-10-03 09:21:07 AM IST
 
 ---
 
@@ -14,7 +14,7 @@
 | Posted (FB or IG) | 9 / 20 |
 | FB Posted | 8 / 20 |
 | IG Posted | 3 / 20 |
-| Total FB Views | **834** |
+| Total FB Views | **853** |
 | Total IG Views | **90** |
 
 ---
@@ -23,15 +23,15 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | Hallway Beatdown 🥋🔥  #videogames #gamingcommunity #gaming #sifu #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1536392984956953/) | 275 | [🟣 IG](https://www.instagram.com/reel/DdjNjBFCvUn/) | 30 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu1.mp4) |
-| 2 | Beating Up the Whole Gang 🥋🔥  #videogames #gamingcommunity #gaming #sifu #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1635492871307578/) | 268 | [🟣 IG](https://www.instagram.com/reel/Ddzg0_6gv2H/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu2.mp4) |
+| 1 | Hallway Beatdown 🥋🔥  #videogames #gamingcommunity #gaming #sifu #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1536392984956953/) | 291 | [🟣 IG](https://www.instagram.com/reel/DdjNjBFCvUn/) | 30 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu1.mp4) |
+| 2 | Beating Up the Whole Gang 🥋🔥  #videogames #gamingcommunity #gaming #sifu #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1635492871307578/) | 271 | [🟣 IG](https://www.instagram.com/reel/Ddzg0_6gv2H/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu2.mp4) |
 | 3 | Stick Fight Fury 🥋🔥  #videogames #gamingcommunity #gaming #sifu #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Dda0qBkja1S/) | 60 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu17.mp4) |
 | 4 | Tiny fighter vs giant boss! 👊💥  #videogames #gamingcommunity #gaming #sifu #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1101493405643422/) | 291 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu5.mp4) |
 | 5 | sifu3 | [🔵 FB](https://www.facebook.com/17955462258252297) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu3.mp4) |
-| 6 | sifu7 | [🔵 FB](https://www.facebook.com/17960228733211678) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu7.mp4) |
-| 7 | sifu17 | [🔵 FB](https://www.facebook.com/18102462185570793) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu17.mp4) |
-| 8 | sifu18 | [🔵 FB](https://www.facebook.com/17916710871245907) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu18.mp4) |
-| 9 | sifu10 | [🔵 FB](https://www.facebook.com/18079585196705519) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu10.mp4) |
+| 6 | sifu18 | [🔵 FB](https://www.facebook.com/17916710871245907) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu18.mp4) |
+| 7 | sifu10 | [🔵 FB](https://www.facebook.com/18079585196705519) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu10.mp4) |
+| 8 | sifu17 | [🔵 FB](https://www.facebook.com/18102462185570793) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu17.mp4) |
+| 9 | sifu7 | [🔵 FB](https://www.facebook.com/17960228733211678) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu7.mp4) |
 | 10 | sifu16 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu16.mp4) |
 | 11 | sifu15 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu15.mp4) |
 | 12 | sifu14 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu14.mp4) |
