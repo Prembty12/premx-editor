@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 19 | **Last Updated:** 2026-10-04 09:52:30 AM IST
+**Total Videos:** 19 | **Last Updated:** 2026-10-04 09:57:53 PM IST
 
 ---
 
@@ -14,7 +14,7 @@
 | Posted (FB or IG) | 10 / 19 |
 | FB Posted | 7 / 19 |
 | IG Posted | 6 / 19 |
-| Total FB Views | **407** |
+| Total FB Views | **409** |
 | Total IG Views | **680** |
 
 ---
@@ -24,7 +24,7 @@
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
 | 1 | Giant Beast Magic Cage Clash 🐯💥  #videogames #gamingcommunity #gaming #godofwarlaufey #gamingreels # | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Dd65j8VgUDf/) | 40 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_15.mp4) |
-| 2 | Yellow Maiden Slash Fury 💛⚔️  #videogames #gamingcommunity #gaming #godofwarlaufey #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1603004798228681/) | 145 | [🟣 IG](https://www.instagram.com/reel/Dd4d80HDiYj/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_5.mp4) |
+| 2 | Yellow Maiden Slash Fury 💛⚔️  #videogames #gamingcommunity #gaming #godofwarlaufey #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1603004798228681/) | 147 | [🟣 IG](https://www.instagram.com/reel/Dd4d80HDiYj/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_5.mp4) |
 | 3 | Blonde Hero Vs Fire Demon ⚔️🔥  #videogames #gamingcommunity #gaming #godofwarlaufey #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1763278934904943/) | 168 | [🟣 IG](https://www.instagram.com/reel/Dd0QRr8G3L9/) | 80 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_7.mp4) |
 | 4 | Fire Giant Boss Fight 🔥⚔️  #videogames #gamingcommunity #gaming #godofwarlaufey #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Ddw7t8Djnt_/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_23.mp4) |
 | 5 | Purple Fire Destroys Everything 🔥💜  #videogames #gamingcommunity #gaming #godofwarlaufey #gamingreel | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdvtUA_IJ6A/) | 230 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_10.mp4) |
