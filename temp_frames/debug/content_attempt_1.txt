@@ -1,7 +1,1 @@
-{
-  "clip_duration": 15,
-  "reason": "Visceral cinematic beast combat and eating scene",
-  "start_time": 23,
-  "status": "APPROVE",
-  "title": "Beast Eats Enemy Alive 🩸"
-}
+{"clip_duration": 35, "reason": "Cinematic beast attack and dramatic march", "start_time": 0, "status": "APPROVE", "title": "Monsters Rise Up 🩸🔥"}
