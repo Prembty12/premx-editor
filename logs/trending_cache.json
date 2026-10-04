@@ -1,107 +1,107 @@
 {
-  "last_updated": "2026-10-03 09:17:30 PM",
+  "last_updated": "2026-10-04 09:52:30 AM",
   "period_days": 7,
   "trending": [
     {
       "game": "GODOFWAR3",
-      "views_7d": 7007,
-      "avg_per_video": 1401,
+      "views_7d": 5285,
+      "avg_per_video": 1321,
       "trend": "viral",
-      "ratio": 3.1606256579936836,
-      "fb_link": "https://www.facebook.com/reel/2038641333436729/",
-      "source_link": ""
+      "ratio": 3.247980330172111,
+      "fb_link": "",
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR313.mp4"
     },
     {
       "game": "VietnamCavePrison",
-      "views_7d": 7585,
-      "avg_per_video": 1264,
+      "views_7d": 7651,
+      "avg_per_video": 1275,
       "trend": "viral",
-      "ratio": 2.8515566250563995,
+      "ratio": 3.134878819810327,
       "fb_link": "https://www.facebook.com/reel/1099863842821573/",
       "source_link": ""
     },
     {
       "game": "Russian_secret_missions",
-      "views_7d": 2097,
-      "avg_per_video": 1048,
+      "views_7d": 2100,
+      "avg_per_video": 1050,
       "trend": "viral",
-      "ratio": 2.3642653030530907,
+      "ratio": 2.5816649104320337,
       "fb_link": "https://www.facebook.com/reel/1135871095448480/",
       "source_link": ""
     },
     {
-      "game": "Callofdutyaw",
-      "views_7d": 4320,
-      "avg_per_video": 864,
+      "game": "RescueOperation",
+      "views_7d": 1479,
+      "avg_per_video": 739,
       "trend": "trending",
-      "ratio": 1.949165288013235,
-      "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison14.mp4"
+      "ratio": 1.8170003512469266,
+      "fb_link": "https://www.facebook.com/reel/1553685666509531/",
+      "source_link": ""
     },
     {
-      "game": "RescueOperation",
-      "views_7d": 1461,
-      "avg_per_video": 730,
+      "game": "codBlackops6",
+      "views_7d": 3393,
+      "avg_per_video": 678,
       "trend": "trending",
-      "ratio": 1.646864190103775,
-      "fb_link": "https://www.facebook.com/reel/1553685666509531/",
+      "ratio": 1.6670179135932561,
+      "fb_link": "https://www.facebook.com/reel/887791697632800/",
       "source_link": ""
     }
   ],
   "below_avg": [
     {
       "game": "sifu",
-      "views_7d": 661,
-      "avg_per_video": 220,
-      "trend": "below_avg",
-      "ratio": 0.49631523537374045,
+      "views_7d": 685,
+      "avg_per_video": 228,
+      "trend": "slow",
+      "ratio": 0.5605900948366702,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu11.mp4"
     },
     {
       "game": "GodofWarLaufey",
-      "views_7d": 676,
-      "avg_per_video": 135,
+      "views_7d": 683,
+      "avg_per_video": 136,
       "trend": "below_avg",
-      "ratio": 0.304557076252068,
+      "ratio": 0.3343870741131015,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_15.mp4"
     },
     {
-      "game": "Ghost_soap_escap",
-      "views_7d": 150,
-      "avg_per_video": 75,
+      "game": "Callofdutyaw",
+      "views_7d": 170,
+      "avg_per_video": 85,
       "trend": "below_avg",
-      "ratio": 0.16919837569559332,
+      "ratio": 0.20899192132068845,
       "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.40/Ghost_soap_escaps1.mp4"
-    },
-    {
-      "game": "DiabloIV",
-      "views_7d": 200,
-      "avg_per_video": 66,
-      "trend": "below_avg",
-      "ratio": 0.14889457061212213,
-      "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.102/DiabloIV6.mp4"
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison14.mp4"
     },
     {
       "game": "SpiderMan2",
-      "views_7d": 186,
+      "views_7d": 187,
       "avg_per_video": 62,
       "trend": "below_avg",
-      "ratio": 0.13987065724169048,
+      "ratio": 0.15244116613979627,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan210.mp4"
+    },
+    {
+      "game": "Ghost Destroys Mexican",
+      "views_7d": 50,
+      "avg_per_video": 50,
+      "trend": "below_avg",
+      "ratio": 0.12293642430628732,
+      "fb_link": "",
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.82/Ghost_Destroys_Mexican_Oil_Ring5.mp4"
     }
   ],
   "recommendation": {
     "game": "GODOFWAR3",
-    "views_7d": 7007,
-    "avg_per_video": 1401,
+    "views_7d": 5285,
+    "avg_per_video": 1321,
     "trend": "viral",
-    "ratio": 3.1606256579936836,
-    "fb_link": "https://www.facebook.com/reel/2038641333436729/",
-    "source_link": ""
+    "ratio": 3.247980330172111,
+    "fb_link": "",
+    "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR313.mp4"
   }
 }
