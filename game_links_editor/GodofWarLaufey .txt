@@ -10,5 +10,3 @@ GodofWarLaufey_2 | Link: https://github.com/Prembty12/premx-editor/releases/down
 
 GodofWarLaufey_16 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_16.mp4
 
-GodofWarLaufey_19 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_19.mp4
-

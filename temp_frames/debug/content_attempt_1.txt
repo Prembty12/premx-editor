@@ -1,1 +1,1 @@
-{"clip_duration": 35, "reason": "Cinematic beast attack and dramatic march", "start_time": 0, "status": "APPROVE", "title": "Monsters Rise Up 🩸🔥"}
+{"clip_duration": 35, "reason": "Cinematic magic battle with fiery explosions.", "start_time": 0, "status": "APPROVE", "title": "Fire Magic Unleashed 🔥💥"}
