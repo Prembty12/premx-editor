@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 21 | **Last Updated:** 2026-10-05 11:53:43 PM IST
+**Total Videos:** 21 | **Last Updated:** 2026-10-06 12:21:46 AM IST
 
 ---
 
@@ -13,9 +13,9 @@
 | Total Videos | **21** |
 | Posted (FB or IG) | 14 / 21 |
 | FB Posted | 9 / 21 |
-| IG Posted | 8 / 21 |
+| IG Posted | 7 / 21 |
 | Total FB Views | **410** |
-| Total IG Views | **920** |
+| Total IG Views | **610** |
 
 ---
 
@@ -30,7 +30,7 @@
 | 5 | Blonde Hero Vs Fire Demon ⚔️🔥  #videogames #gamingcommunity #gaming #godofwarlaufey #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1763278934904943/) | 169 | [🟣 IG](https://www.instagram.com/reel/Dd0QRr8G3L9/) | 80 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_13.mp4) |
 | 6 | Fire Giant Boss Fight 🔥⚔️  #videogames #gamingcommunity #gaming #godofwarlaufey #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Ddw7t8Djnt_/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_23.mp4) |
 | 7 | Purple Fire Destroys Everything 🔥💜  #videogames #gamingcommunity #gaming #godofwarlaufey #gamingreel | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdvtUA_IJ6A/) | 230 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_10.mp4) |
-| 8 | She unlocked a forbidden god-tier ability! 😱🔥  #videogames #gamingcommunity #gaming #godofwarlaufey  #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1087626214135364/) | 94 | [🟣 IG](https://www.instagram.com/reel/Ddbfe5kCMH4/) | 310 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_5.mp4) |
+| 8 | She unlocked a forbidden god-tier ability! 😱🔥  #videogames #gamingcommunity #gaming #godofwarlaufey  #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1087626214135364/) | 94 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_5.mp4) |
 | 9 | GodofWarLaufey 10 | [🔵 FB](https://www.facebook.com/17961323568227228) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_10.mp4) |
 | 10 | GodofWarLaufey 23 | [🔵 FB](https://www.facebook.com/18132622645709069) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_23.mp4) |
 | 11 | GodofWarLaufey 6 | [🔵 FB](https://www.facebook.com/18128933026756419) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_6.mp4) |
