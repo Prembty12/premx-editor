@@ -1,22 +1,13 @@
 {
-  "last_updated": "2026-10-05 09:17:07 PM",
+  "last_updated": "2026-10-05 09:50:23 PM",
   "period_days": 7,
   "trending": [
-    {
-      "game": "GearsOfWar",
-      "views_7d": 1566,
-      "avg_per_video": 1566,
-      "trend": "viral",
-      "ratio": 2.314969941854735,
-      "fb_link": "https://www.facebook.com/reel/2563430397490305/",
-      "source_link": ""
-    },
     {
       "game": "GODOFWAR3",
       "views_7d": 4520,
       "avg_per_video": 1506,
       "trend": "viral",
-      "ratio": 2.2262737755001476,
+      "ratio": 2.345063843039551,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR313.mp4"
     },
@@ -24,26 +15,35 @@
       "game": "Russian_secret_missions",
       "views_7d": 1324,
       "avg_per_video": 1324,
-      "trend": "trending",
-      "ratio": 1.9572287375578987,
+      "trend": "viral",
+      "ratio": 2.061663033322952,
       "fb_link": "https://www.facebook.com/reel/1135871095448480/",
       "source_link": ""
     },
     {
       "game": "VietnamCavePrison",
-      "views_7d": 5921,
-      "avg_per_video": 986,
-      "trend": "steady",
-      "ratio": 1.4575736670937223,
+      "views_7d": 5931,
+      "avg_per_video": 988,
+      "trend": "trending",
+      "ratio": 1.5384615384615383,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison18.mp4"
     },
     {
+      "game": "RescueOperation",
+      "views_7d": 983,
+      "avg_per_video": 983,
+      "trend": "trending",
+      "ratio": 1.5306758019308626,
+      "fb_link": "https://www.facebook.com/reel/1553685666509531/",
+      "source_link": ""
+    },
+    {
       "game": "codBlackops6",
-      "views_7d": 2943,
+      "views_7d": 2944,
       "avg_per_video": 981,
-      "trend": "steady",
-      "ratio": 1.4501823198975066,
+      "trend": "trending",
+      "ratio": 1.5275615073185922,
       "fb_link": "https://www.facebook.com/reel/887791697632800/",
       "source_link": ""
     }
@@ -51,10 +51,10 @@
   "below_avg": [
     {
       "game": "SpiderMan2",
-      "views_7d": 1787,
-      "avg_per_video": 595,
+      "views_7d": 1795,
+      "avg_per_video": 598,
       "trend": "slow",
-      "ratio": 0.87957031634966,
+      "ratio": 0.9311740890688258,
       "fb_link": "https://www.facebook.com/reel/1379906203935081/",
       "source_link": ""
     },
@@ -63,16 +63,16 @@
       "views_7d": 713,
       "avg_per_video": 237,
       "trend": "below_avg",
-      "ratio": 0.35034985710062083,
+      "ratio": 0.369043911554033,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu11.mp4"
     },
     {
       "game": "mm2remastered",
-      "views_7d": 178,
-      "avg_per_video": 178,
+      "views_7d": 207,
+      "avg_per_video": 207,
       "trend": "below_avg",
-      "ratio": 0.2631319601852764,
+      "ratio": 0.32232949236997815,
       "fb_link": "https://www.facebook.com/reel/1146787337671460/",
       "source_link": ""
     },
@@ -81,27 +81,27 @@
       "views_7d": 656,
       "avg_per_video": 164,
       "trend": "below_avg",
-      "ratio": 0.24243618803587266,
+      "ratio": 0.25537215820616627,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_19.mp4"
     },
     {
-      "game": "monkeyKing",
-      "views_7d": 30,
-      "avg_per_video": 15,
+      "game": "Callofdutyaw",
+      "views_7d": 158,
+      "avg_per_video": 158,
       "trend": "below_avg",
-      "ratio": 0.02217404158864689,
-      "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing32.mp4"
+      "ratio": 0.24602927436935532,
+      "fb_link": "https://www.facebook.com/reel/1423098925813250/",
+      "source_link": ""
     }
   ],
   "recommendation": {
-    "game": "GearsOfWar",
-    "views_7d": 1566,
-    "avg_per_video": 1566,
+    "game": "GODOFWAR3",
+    "views_7d": 4520,
+    "avg_per_video": 1506,
     "trend": "viral",
-    "ratio": 2.314969941854735,
-    "fb_link": "https://www.facebook.com/reel/2563430397490305/",
-    "source_link": ""
+    "ratio": 2.345063843039551,
+    "fb_link": "",
+    "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR313.mp4"
   }
 }
