@@ -485,13 +485,15 @@ def classify_slots_combined(video_path, slots, srt_content):
         dialog_ratio = dialog_count / total
         calm_ratio = calm_count / total
 
-        if action_ratio >= 0.25:
+        if action_ratio >= 0.15:
             slot["type"] = "action"
         elif dialog_ratio >= 0.4:
             slot["type"] = "dialog"
         elif calm_ratio >= 0.6:
             slot["type"] = "calm"
-        elif dialog_ratio >= 0.25:
+        elif action_ratio >= 0.10:
+            slot["type"] = "action"
+        elif dialog_ratio >= 0.20:
             slot["type"] = "dialog"
         else:
             slot["type"] = "calm"
