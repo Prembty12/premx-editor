@@ -2,10 +2,8 @@ name: Autonomous Gaming Agent Workflow
 
 on:
   schedule:
-    # Har 3 ghante mein automatic run hoga (Cron expression)
     - cron: '0 */12 * * *'
   workflow_dispatch:
-    # Tu ise GitHub dashboard se manually bhi run kar sakta hai
 
 permissions:
   contents: write
@@ -33,32 +31,51 @@ jobs:
       - name: Install Python Packages
         run: |
           pip install --upgrade pip
-          pip install requests Pillow
+          pip install requests Pillow python-dotenv
 
       - name: Make Shell Scripts Executable
         run: |
-          chmod +x run.sh loop.sh
+          chmod +x run.sh loop.sh fallback.sh
 
       - name: Run Master Pipeline
         env:
+          # ── Gemini Keys
           GEMINI_API_KEY_1: ${{ secrets.GEMINI_API_KEY_1 }}
           GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}
           GEMINI_API_KEY_3: ${{ secrets.GEMINI_API_KEY_3 }}
           GEMINI_API_KEY_4: ${{ secrets.GEMINI_API_KEY_4 }}
           GEMINI_API_KEY_5: ${{ secrets.GEMINI_API_KEY_5 }}
-          GEMINI_API_KEY_6: ${{ secrets.GEMINI_API_KEY_6 }}      
+          GEMINI_API_KEY_6: ${{ secrets.GEMINI_API_KEY_6 }}
+
+          # ── Facebook / Instagram
           PAGE_ACCESS_TOKEN: ${{ secrets.PAGE_ACCESS_TOKEN }}
           PAGE_ID: ${{ secrets.PAGE_ID }}
           IG_ID: ${{ secrets.IG_ID }}
           FB_C_USER: ${{ secrets.FB_C_USER }}
           FB_XS: ${{ secrets.FB_XS }}
-          POST_MODE: '2'   # POST_MODE: ${{ vars.POST_MODE }}
+          POST_MODE: '2'
+
+          # ── GitHub
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+          # ── OpenRouter (fallback brain + commentary script)
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           OPENROUTER_API_KEY_2: ${{ secrets.OPENROUTER_API_KEY_2 }}
           OPENROUTER_API_KEY_3: ${{ secrets.OPENROUTER_API_KEY_3 }}
           OPENROUTER_API_KEY_4: ${{ secrets.OPENROUTER_API_KEY_4 }}
+          OPENROUTER_API_KEY_5: ${{ secrets.OPENROUTER_API_KEY_5 }}
+
+          # ── 🎙️ COMMENTARY KEYS
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          VOICE_ID: ${{ secrets.VOICE_ID }}
+
+          # ── 🎚️ MASTER SWITCHES (true / false)
+          COMMENTARY_ENABLED: 'true'       # 🎙️ AI commentary dub ON/OFF
+          AUTO_COMMENT: 'true'             # 🤖 Auto-reply ON/OFF
+          DEBUG: '1'                       # 🐛 Verbose logs
+
         run: |
           bash run.sh
 
