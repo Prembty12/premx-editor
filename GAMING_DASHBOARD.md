@@ -1,6 +1,6 @@
 # 🚀 GAMING AGENT COMMAND & ANALYTICS DASHBOARD
 
-> **Last Updated:** 2026-10-05 02:03:09 PM IST | **Status:** All Systems Active & Synchronized
+> **Last Updated:** 2026-10-05 02:06:03 PM IST | **Status:** All Systems Active & Synchronized
 
 --- 
 
@@ -11,15 +11,15 @@
 | 🥇 | **mm2remastered** | 5 | 23,577 | 4,715 | ⚡ Trending |
 | 🥈 | **AfghanistanRedZone** | 0 | 21,209 | 0 | 📈 Stable |
 | 🥉 | **Callofdutyaw** | 6 | 18,573 | 3,095 | 📈 Stable |
-| 4️⃣ | **SpiderMan2** | 1 | 15,922 | 15,922 | 🔥 Viral / Hype |
-| 5️⃣ | **MarvelsSpiderMan2** | 6 | 13,788 | 2,298 | 📈 Stable |
+| 4️⃣ | **SpiderMan2** | 1 | 15,928 | 15,928 | 🔥 Viral / Hype |
+| 5️⃣ | **MarvelsSpiderMan2** | 6 | 13,794 | 2,299 | 📈 Stable |
 | 6 | **VietnamCavePrison** | 5 | 8,350 | 1,670 | 📈 Stable |
 | 7 | **GODOFWAR3** | 6 | 7,918 | 1,319 | 📈 Stable |
-| 8 | **RescueOperation** | 5 | 7,810 | 1,562 | 📈 Stable |
+| 8 | **RescueOperation** | 5 | 7,814 | 1,562 | 📈 Stable |
 | 9 | **codBlackops6** | 5 | 5,867 | 1,173 | 📈 Stable |
 | 10 | **Ghost Destroys Mexican** | 0 | 3,967 | 0 | 📈 Stable |
 | 11 | **Russian_secret_missions** | 6 | 3,320 | 553 | 📈 Stable |
-| 12 | **UkraineCovertMission** | 5 | 2,699 | 539 | 📈 Stable |
+| 12 | **UkraineCovertMission** | 6 | 2,699 | 449 | 📈 Stable |
 | 13 | **ghostandela** | 5 | 1,746 | 349 | 📈 Stable |
 | 14 | **GearsOfWar** | 1 | 1,471 | 1,471 | 📈 Stable |
 | 15 | **GodofWarLaufey** | 6 | 1,300 | 216 | 📈 Stable |
@@ -37,8 +37,8 @@
 
 | Game Name | 📅 Last Posted | 📺 Latest Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📊 Remaining / Total | 📂 Source | 📜 All |
 |---|---|---|---|---|---|---|---|---|---|
-| **MarvelsSpiderMan2** | 2026-10-05 10:50 AM | Superpowered Street Beatdown 💥⚡️  #videogames #gamingcommunity #gaming #marvelss | [🔵 FB](https://www.facebook.com/reel/1379906203935081/) | 1,364 | [🟣 IG](https://www.instagram.com/reel/DeGUflNDhSL/) | 10 | **43** / 49 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan230.mp4) | **[📜 View 49](logs/games/MarvelsSpiderMan2.md)** |
-| **SpiderMan2** | 2026-10-05 10:50 AM | Superpowered Street Beatdown 💥⚡️  #videogames #gamingcommunity #gaming #marvelss | [🔵 FB](https://www.facebook.com/reel/1379906203935081/) | 1,364 | [🟣 IG](https://www.instagram.com/reel/DeGUflNDhSL/) | 10 | **45** / 46 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan212.mp4) | **[📜 View 46](logs/games/SpiderMan2.md)** |
+| **MarvelsSpiderMan2** | 2026-10-05 10:50 AM | Superpowered Street Beatdown 💥⚡️  #videogames #gamingcommunity #gaming #marvelss | [🔵 FB](https://www.facebook.com/reel/1379906203935081/) | 1,370 | [🟣 IG](https://www.instagram.com/reel/DeGUflNDhSL/) | 10 | **43** / 49 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan230.mp4) | **[📜 View 49](logs/games/MarvelsSpiderMan2.md)** |
+| **SpiderMan2** | 2026-10-05 10:50 AM | Superpowered Street Beatdown 💥⚡️  #videogames #gamingcommunity #gaming #marvelss | [🔵 FB](https://www.facebook.com/reel/1379906203935081/) | 1,370 | [🟣 IG](https://www.instagram.com/reel/DeGUflNDhSL/) | 10 | **45** / 46 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.13/SpiderMan212.mp4) | **[📜 View 46](logs/games/SpiderMan2.md)** |
 | **GodofWarLaufey** | 2026-10-04 10:00 PM | Fire Magic Unleashed 🔥💥  #videogames #gamingcommunity #gaming #godofwarlaufey #g | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeFERwHFS_r/) | 210 | **14** / 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_19.mp4) | **[📜 View 20](logs/games/GodofWarLaufey.md)** |
 | **GearsOfWar** | 2026-10-04 04:25 PM | Monsters Rise Up 🩸🔥  #videogames #gamingcommunity #gaming #gearsofwar #gamingree | [🔵 FB](https://www.facebook.com/reel/2563430397490305/) | 1,411 | [🟣 IG](https://www.instagram.com/reel/DeDxVY2mRE9/) | 60 | **12** / 13 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar9.mp4) | **[📜 View 13](logs/games/GearsOfWar.md)** |
 | **GODOFWAR3** | 2026-10-03 09:21 PM | Beast Eats Enemy Alive 🩸  #videogames #gamingcommunity #gaming #godofwar3 #gamin | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeCa-S_jZn9/) | 70 | **18** / 24 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR313.mp4) | **[📜 View 24](logs/games/GODOFWAR3.md)** |
@@ -62,7 +62,7 @@
 
 ## 📈 Trending Games (Last 7 Days)
 
-> Auto-detected based on views performance | Last Updated: 2026-10-05 02:03:09 PM
+> Auto-detected based on views performance | Last Updated: 2026-10-05 02:06:03 PM
 
 | Rank | Game Name | Views (7d) | Avg / Video | Trend | FB Post | Source |
 |:---:|---|---|---|---|---|---|
@@ -76,8 +76,8 @@
 
 | Game | Views (7d) | Avg |
 |---|---|---|
-| MarvelsSpiderMan2 | 1,394 | 697 |
-| SpiderMan2 | 1,491 | 497 |
+| MarvelsSpiderMan2 | 1,400 | 700 |
+| SpiderMan2 | 1,497 | 499 |
 | sifu | 709 | 236 |
 | GodofWarLaufey | 646 | 161 |
 | monkeyKing | 30 | 15 |
@@ -90,12 +90,12 @@
 
 ## 🎯 Best Time to Post (IST)
 
-> Analysis from 88 posts | Last Updated: 2026-10-05 02:03:09 PM
+> Analysis from 89 posts | Last Updated: 2026-10-05 02:06:03 PM
 
 | Rank | Time (IST) | Posts | Avg Views | Recommendation |
 |:---:|---|:---:|:---:|---|
 | 🥇 | **18:00 - 19:00** | 2 | **1,734** | 🔥 **BEST** |
-| 🥈 | **14:00 - 15:00** | 2 | **981** | ⚡ **Great** |
+| 🥈 | **14:00 - 15:00** | 3 | **1,095** | ⚡ **Great** |
 | 🥉 | **23:00 - 00:00** | 7 | **719** | ✅ **Good** |
 | 4 | **13:00 - 14:00** | 4 | **518** | 📊 Average |
 | 5 | **03:00 - 04:00** | 2 | **500** | 📉 Below avg |
@@ -108,7 +108,7 @@
 
 | Day | Posts | Avg Views |
 |---|---|---|
-| Monday | 10 | 265 |
+| Monday | 11 | 361 |
 | Tuesday | 20 | 492 |
 | Wednesday | 17 | 538 |
 | Thursday | 5 | 645 |
@@ -120,7 +120,7 @@
 
 ## 🤖 Auto-Reply Log (v6 Timeout-Safe)
 
-> Auto-Comment Status: ✅ **ACTIVE** | Last Updated: 2026-10-05 02:03:09 PM | Total Replies: 10 | Skipped: 0
+> Auto-Comment Status: ✅ **ACTIVE** | Last Updated: 2026-10-05 02:06:03 PM | Total Replies: 10 | Skipped: 0
 
 ### 📊 Stats
 
@@ -177,39 +177,39 @@
 
 ## 🔄 Game Rotation Queue
 
-**📊 Total Games:** 20 | **🎯 Current:** `Russian_secret_missions` | **⏭️ Next Game:** `SpiderMan2` (Position #12) | **🔢 Total Runs:** 82
+**📊 Total Games:** 20 | **🎯 Current:** `UkraineCovertMission` | **⏭️ Next Game:** `VietnamCavePrison` (Position #14) | **🔢 Total Runs:** 83
 
-**Last Updated:** 2026-10-05 02:03:09 PM IST
+**Last Updated:** 2026-10-05 02:06:03 PM IST
 
 | # | Game Name | Uploaded | Last Run # | Next Turn In | Status |
 |:---:|---|:---:|:---:|:---:|:---:|
-| 1 | **AfghanistanRedZone** | 0 | — | 10 | ⏳ Wait 10 |
-| 2 | **Callofdutyaw** | 6 | 77 | 11 | ⏳ Wait 11 |
-| 3 | **DiabloIV** | 0 | — | 12 | ⏳ Wait 12 |
-| 4 | **GODOFWAR3** | 6 | 78 | 13 | ⏳ Wait 13 |
-| 5 | **GearsOfWar** | 1 | 79 | 14 | ⏳ Wait 14 |
-| 6 | **Ghost Destroys Mexican** | 0 | — | 15 | ⏳ Wait 15 |
-| 7 | **Ghost_soap_escap** | 5 | 64 | 16 | ⏳ Wait 16 |
-| 8 | **GodofWarLaufey** | 6 | 80 | 17 | ⏳ Wait 17 |
-| 9 | **MarvelsSpiderMan2** | 6 | 81 | 18 | ⏳ Wait 18 |
-| 10 | **RescueOperation** | 5 | 67 | 19 | ⏳ Wait 19 |
-| 11 | **Russian_secret_missions** | 6 | 82 | 0 | 🎯 **CURRENT** |
-| 12 | **SpiderMan2** | 1 | 8 | 1 | ⏭️ **NEXT UP** |
-| 13 | **UkraineCovertMission** | 5 | 69 | 2 | ⏳ Wait 2 |
-| 14 | **VietnamCavePrison** | 5 | 70 | 3 | ⏳ Wait 3 |
-| 15 | **codBlackops6** | 5 | 71 | 4 | ⏳ Wait 4 |
-| 16 | **combatopration** | 5 | 72 | 5 | ⏳ Wait 5 |
-| 17 | **ghostandela** | 5 | 73 | 6 | ⏳ Wait 6 |
-| 18 | **mm2remastered** | 5 | 74 | 7 | ⏳ Wait 7 |
-| 19 | **monkeyKing** | 5 | 75 | 8 | ⏳ Wait 8 |
-| 20 | **sifu** | 5 | 76 | 9 | ⏳ Wait 9 |
+| 1 | **AfghanistanRedZone** | 0 | — | 8 | ⏳ Wait 8 |
+| 2 | **Callofdutyaw** | 6 | 77 | 9 | ⏳ Wait 9 |
+| 3 | **DiabloIV** | 0 | — | 10 | ⏳ Wait 10 |
+| 4 | **GODOFWAR3** | 6 | 78 | 11 | ⏳ Wait 11 |
+| 5 | **GearsOfWar** | 1 | 79 | 12 | ⏳ Wait 12 |
+| 6 | **Ghost Destroys Mexican** | 0 | — | 13 | ⏳ Wait 13 |
+| 7 | **Ghost_soap_escap** | 5 | 64 | 14 | ⏳ Wait 14 |
+| 8 | **GodofWarLaufey** | 6 | 80 | 15 | ⏳ Wait 15 |
+| 9 | **MarvelsSpiderMan2** | 6 | 81 | 16 | ⏳ Wait 16 |
+| 10 | **RescueOperation** | 5 | 67 | 17 | ⏳ Wait 17 |
+| 11 | **Russian_secret_missions** | 6 | 82 | 18 | ⏳ Wait 18 |
+| 12 | **SpiderMan2** | 1 | 8 | 19 | ⏳ Wait 19 |
+| 13 | **UkraineCovertMission** | 6 | 83 | 0 | 🎯 **CURRENT** |
+| 14 | **VietnamCavePrison** | 5 | 70 | 1 | ⏭️ **NEXT UP** |
+| 15 | **codBlackops6** | 5 | 71 | 2 | ⏳ Wait 2 |
+| 16 | **combatopration** | 5 | 72 | 3 | ⏳ Wait 3 |
+| 17 | **ghostandela** | 5 | 73 | 4 | ⏳ Wait 4 |
+| 18 | **mm2remastered** | 5 | 74 | 5 | ⏳ Wait 5 |
+| 19 | **monkeyKing** | 5 | 75 | 6 | ⏳ Wait 6 |
+| 20 | **sifu** | 5 | 76 | 7 | ⏳ Wait 7 |
 
 ### 📜 Recent Runs (Last 5)
 
 | Run # | Game | Timestamp (IST) |
 |:---:|---|---|
+| 83 | UkraineCovertMission | 2026-10-05 02:06:03 PM |
 | 82 | Russian_secret_missions | 2026-10-05 02:03:09 PM |
 | 81 | MarvelsSpiderMan2 | 2026-10-05 09:38:12 AM |
 | 80 | GodofWarLaufey | 2026-10-04 09:57:53 PM |
 | 79 | GearsOfWar | 2026-10-04 09:52:30 AM |
-| 78 | GODOFWAR3 | 2026-10-03 09:17:30 PM |

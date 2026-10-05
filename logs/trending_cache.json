@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-05 02:03:09 PM",
+  "last_updated": "2026-10-05 02:06:03 PM",
   "period_days": 7,
   "trending": [
     {
@@ -7,7 +7,7 @@
       "views_7d": 4520,
       "avg_per_video": 1506,
       "trend": "trending",
-      "ratio": 1.8425091758425092,
+      "ratio": 1.8414851044908847,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR313.mp4"
     },
@@ -16,7 +16,7 @@
       "views_7d": 1471,
       "avg_per_video": 1471,
       "trend": "trending",
-      "ratio": 1.7996885774663551,
+      "ratio": 1.7986883059137393,
       "fb_link": "https://www.facebook.com/reel/2563430397490305/",
       "source_link": ""
     },
@@ -25,7 +25,7 @@
       "views_7d": 1324,
       "avg_per_video": 1324,
       "trend": "trending",
-      "ratio": 1.6198420642865088,
+      "ratio": 1.6189417518897287,
       "fb_link": "https://www.facebook.com/reel/1135871095448480/",
       "source_link": ""
     },
@@ -34,7 +34,7 @@
       "views_7d": 5769,
       "avg_per_video": 1153,
       "trend": "steady",
-      "ratio": 1.4106328550772995,
+      "ratio": 1.4098488216985325,
       "fb_link": "https://www.facebook.com/reel/1099863842821573/",
       "source_link": ""
     },
@@ -43,7 +43,7 @@
       "views_7d": 2937,
       "avg_per_video": 979,
       "trend": "steady",
-      "ratio": 1.1977533088644199,
+      "ratio": 1.1970875944864383,
       "fb_link": "https://www.facebook.com/reel/887791697632800/",
       "source_link": ""
     }
@@ -51,19 +51,19 @@
   "below_avg": [
     {
       "game": "MarvelsSpiderMan2",
-      "views_7d": 1394,
-      "avg_per_video": 697,
+      "views_7d": 1400,
+      "avg_per_video": 700,
       "trend": "slow",
-      "ratio": 0.8527416305194083,
+      "ratio": 0.8559359715429079,
       "fb_link": "https://www.facebook.com/reel/1379906203935081/",
       "source_link": ""
     },
     {
       "game": "SpiderMan2",
-      "views_7d": 1491,
-      "avg_per_video": 497,
+      "views_7d": 1497,
+      "avg_per_video": 499,
       "trend": "slow",
-      "ratio": 0.6080524969413859,
+      "ratio": 0.6101600711427301,
       "fb_link": "https://www.facebook.com/reel/1379906203935081/",
       "source_link": ""
     },
@@ -72,7 +72,7 @@
       "views_7d": 709,
       "avg_per_video": 236,
       "trend": "below_avg",
-      "ratio": 0.2887331776220665,
+      "ratio": 0.28857269897732324,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu11.mp4"
     },
@@ -81,7 +81,7 @@
       "views_7d": 646,
       "avg_per_video": 161,
       "trend": "below_avg",
-      "ratio": 0.19697475253030808,
+      "ratio": 0.19686527345486882,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_19.mp4"
     },
@@ -90,7 +90,7 @@
       "views_7d": 30,
       "avg_per_video": 15,
       "trend": "below_avg",
-      "ratio": 0.018351685018351684,
+      "ratio": 0.018341485104490882,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing32.mp4"
     }
@@ -100,7 +100,7 @@
     "views_7d": 4520,
     "avg_per_video": 1506,
     "trend": "trending",
-    "ratio": 1.8425091758425092,
+    "ratio": 1.8414851044908847,
     "fb_link": "",
     "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR313.mp4"
   }
