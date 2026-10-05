@@ -86,7 +86,7 @@ SEGMENTS_DIR       = "segments"
 
 MIN_SLOTS_HARD = 6
 MAX_SLOTS_HARD = 20
-DUCK_VOLUME = 0.7
+DUCK_VOLUME = 0.25
 ANALYSIS_FRAMES = 60
 GRID_COLS = 6
 GRID_ROWS = 10
@@ -765,6 +765,8 @@ def generate_audio(segments):
             "voice_settings": {
                 "stability": 0.4,
                 "similarity_boost": 0.75,
+                "style": 0.5,      
+                "use_speaker_boost": True,    
                 "speed": 1.0
             }
         }
@@ -868,7 +870,7 @@ def merge_final(video_path, commentary_audio, out_path, audio_files):
 
     filter_complex = (
         f"[0:a]volume='{volume_expr}':eval=frame[bg];"
-        f"[1:a]volume=1.0[vo];"
+        f"[1:a]volume=1.4[vo];"
         f"[bg][vo]amix=inputs=2:duration=first:dropout_transition=0:"
         f"normalize=0,alimiter=limit=0.95[aout]"
     )
