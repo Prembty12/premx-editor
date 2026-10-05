@@ -1,1 +1,1 @@
-{"clip_duration": 23, "reason": "Intense tactical sniper combat and explosions", "start_time": 34, "status": "APPROVE", "title": "Who Is The Real Target? 🎯🩸"}
+{"clip_duration":45,"reason":"Constant intense FPS combat action throughout","start_time":0,"status":"APPROVE","title":"Pure Shootout Chaos Unleashed 💥🔫"}
