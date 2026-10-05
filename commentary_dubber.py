@@ -75,7 +75,7 @@ GROQ_KEYS = _collect_keys(
 )
 
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
-VOICE_ID           = ARGS.voice or os.getenv("VOICE_ID", "pNInz6obpgDQGcFmaJgB")
+VOICE_ID           = ARGS.voice or os.getenv("VOICE_ID", "91w4XjqhkWTX1Jr3O344")
 
 
 # Paths
