@@ -1,1 +1,1 @@
-{"clip_duration": 18, "reason": "Intense beast boss fight action.", "start_time": 0, "status": "APPROVE", "title": "Giant Beast Battle 🦖💥"}
+{"clip_duration":25,"reason":"Intense cinematic superhero action and shocked faces","start_time":2,"status":"APPROVE","title":"Hero's Ultimate Shock Therapy 💀⚡"}
