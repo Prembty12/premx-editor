@@ -562,6 +562,31 @@ else
     exit 1
 fi
 
+# ================= 8.5 🎙️ AI COMMENTARY DUBBING =================
+echo "🎙️ [STEP 8.5] AI Commentary Dubber..."
+
+# 🎛️ Commentary ON/OFF switch (default: ON)
+COMMENTARY_ENABLED="${COMMENTARY_ENABLED:-true}"
+echo "   🎛️  Commentary: $COMMENTARY_ENABLED"
+
+if [ "$COMMENTARY_ENABLED" = "true" ]; then
+    DUBBED_CLIP_PATH="$FRAMES_DIR/final_dubbed_clip.mp4"
+
+    python3 commentary_dubber.py \
+        --video "$FINAL_CLIP_PATH" \
+        --out "$DUBBED_CLIP_PATH"
+
+    if [ -f "$DUBBED_CLIP_PATH" ] && [ -s "$DUBBED_CLIP_PATH" ]; then
+        echo "🎉 Commentary dubbed successfully!"
+        FINAL_CLIP_PATH="$DUBBED_CLIP_PATH"
+    else
+        echo "⚠️ Commentary failed — original clip use hoga"
+    fi
+else
+    echo "🚫 Commentary OFF — original clip use hoga"
+fi
+# ================================================================
+
 # ================= 5. 🚀 CRON-SAFE PLATFORM CONTROLLER =================
 POST_MODE="$DEFAULT_POST_MODE"
 echo "🚀 Using Posting Mode: $POST_MODE (1: Both, 2: Insta Only, 3: FB Only)"
