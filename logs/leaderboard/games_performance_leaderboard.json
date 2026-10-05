@@ -2,10 +2,10 @@
     {
         "rank": 1,
         "game_name": "mm2remastered",
-        "total_views": 23395,
+        "total_views": 23435,
         "uploaded_videos": 6,
-        "avg_views_per_video": 3899,
-        "view_share_percentage": 16.48
+        "avg_views_per_video": 3905,
+        "view_share_percentage": 16.5
     },
     {
         "rank": 2,
@@ -13,38 +13,38 @@
         "total_views": 21212,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 14.94
+        "view_share_percentage": 14.93
     },
     {
         "rank": 3,
         "game_name": "Callofdutyaw",
         "total_views": 18574,
-        "uploaded_videos": 6,
-        "avg_views_per_video": 3095,
-        "view_share_percentage": 13.09
+        "uploaded_videos": 7,
+        "avg_views_per_video": 2653,
+        "view_share_percentage": 13.07
     },
     {
         "rank": 4,
         "game_name": "SpiderMan2",
-        "total_views": 16201,
+        "total_views": 16204,
         "uploaded_videos": 1,
-        "avg_views_per_video": 16201,
+        "avg_views_per_video": 16204,
         "view_share_percentage": 11.41
     },
     {
         "rank": 5,
         "game_name": "MarvelsSpiderMan2",
-        "total_views": 14067,
+        "total_views": 14070,
         "uploaded_videos": 6,
-        "avg_views_per_video": 2344,
-        "view_share_percentage": 9.91
+        "avg_views_per_video": 2345,
+        "view_share_percentage": 9.9
     },
     {
         "rank": 6,
         "game_name": "VietnamCavePrison",
-        "total_views": 8440,
+        "total_views": 8460,
         "uploaded_videos": 6,
-        "avg_views_per_video": 1406,
+        "avg_views_per_video": 1410,
         "view_share_percentage": 5.95
     },
     {
@@ -53,7 +53,7 @@
         "total_views": 7918,
         "uploaded_videos": 6,
         "avg_views_per_video": 1319,
-        "view_share_percentage": 5.58
+        "view_share_percentage": 5.57
     },
     {
         "rank": 8,
@@ -69,7 +69,7 @@
         "total_views": 5873,
         "uploaded_videos": 6,
         "avg_views_per_video": 978,
-        "view_share_percentage": 4.14
+        "view_share_percentage": 4.13
     },
     {
         "rank": 10,
@@ -81,6 +81,14 @@
     },
     {
         "rank": 11,
+        "game_name": "UkraineCovertMission",
+        "total_views": 3328,
+        "uploaded_videos": 6,
+        "avg_views_per_video": 554,
+        "view_share_percentage": 2.34
+    },
+    {
+        "rank": 12,
         "game_name": "Russian_secret_missions",
         "total_views": 3320,
         "uploaded_videos": 6,
@@ -88,20 +96,12 @@
         "view_share_percentage": 2.34
     },
     {
-        "rank": 12,
-        "game_name": "UkraineCovertMission",
-        "total_views": 3271,
-        "uploaded_videos": 6,
-        "avg_views_per_video": 545,
-        "view_share_percentage": 2.3
-    },
-    {
         "rank": 13,
         "game_name": "GearsOfWar",
-        "total_views": 1550,
+        "total_views": 1556,
         "uploaded_videos": 1,
-        "avg_views_per_video": 1550,
-        "view_share_percentage": 1.09
+        "avg_views_per_video": 1556,
+        "view_share_percentage": 1.1
     },
     {
         "rank": 14,
@@ -114,9 +114,9 @@
     {
         "rank": 15,
         "game_name": "GodofWarLaufey",
-        "total_views": 1300,
+        "total_views": 1310,
         "uploaded_videos": 6,
-        "avg_views_per_video": 216,
+        "avg_views_per_video": 218,
         "view_share_percentage": 0.92
     },
     {
