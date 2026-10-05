@@ -72,7 +72,7 @@ jobs:
           VOICE_ID: ${{ secrets.VOICE_ID }}
 
           # ── 🎚️ MASTER SWITCHES (true / false)
-          COMMENTARY_ENABLED: 'true'       # 🎙️ AI commentary dub ON/OFF
+          COMMENTARY_ENABLED: 'false'       # 🎙️ AI commentary dub ON/OFF
           AUTO_COMMENT: 'true'             # 🤖 Auto-reply ON/OFF
           DEBUG: '1'                       # 🐛 Verbose logs
 
