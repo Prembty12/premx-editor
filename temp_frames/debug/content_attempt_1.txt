@@ -1,1 +1,1 @@
-{"clip_duration": 56, "reason": "Continuous intense red-lit combat sequence", "start_time": 0, "status": "APPROVE", "title": "Red Hot Gunfight 🔥🎯"}
+{"clip_duration": 35, "reason": "Intense sci-fi squad combat with explosions", "start_time": 6, "status": "APPROVE", "title": "They Walked Into Ambush 💀🔥"}
