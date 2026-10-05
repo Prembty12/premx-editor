@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 19 | **Last Updated:** 2026-10-05 07:54:30 PM IST
+**Total Videos:** 19 | **Last Updated:** 2026-10-05 09:12:15 PM IST
 
 ---
 
@@ -30,9 +30,9 @@
 | 5 | The missile is coming... we can't stop it 😱🔥  #videogames #gamingcommunity #gaming #ghost destroys mexican #gamingreels  | [🔵 FB](https://www.facebook.com/reel/1965423384100872/) | 792 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.82/Ghost_Destroys_Mexican_Oil_Ring12.mp4) |
 | 6 | Will they survive this chaotic offshore raid? 💥👀  #videogames #gamingcommunity #gaming #ghost destroys mexican #gamingre | [🔵 FB](https://www.facebook.com/reel/1791367398728313/) | 2,067 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.82/Ghost_Destroys_Mexican_Oil_Ring7.mp4) |
 | 7 | Ghost Destroys Mexican Oil Ring4 | [🔵 FB](https://www.facebook.com/17995299407817302) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.82/Ghost_Destroys_Mexican_Oil_Ring4.mp4) |
-| 8 | Ghost Destroys Mexican Oil Ring14 | [🔵 FB](https://www.facebook.com/18165115042462655) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.82/Ghost_Destroys_Mexican_Oil_Ring14.mp4) |
-| 9 | Ghost Destroys Mexican Oil Ring6 | [🔵 FB](https://www.facebook.com/18095022893636474) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.82/Ghost_Destroys_Mexican_Oil_Ring6.mp4) |
-| 10 | Ghost Destroys Mexican Oil Ring18 | [🔵 FB](https://www.facebook.com/17932564512380682) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.82/Ghost_Destroys_Mexican_Oil_Ring18.mp4) |
+| 8 | Ghost Destroys Mexican Oil Ring6 | [🔵 FB](https://www.facebook.com/18095022893636474) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.82/Ghost_Destroys_Mexican_Oil_Ring6.mp4) |
+| 9 | Ghost Destroys Mexican Oil Ring18 | [🔵 FB](https://www.facebook.com/17932564512380682) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.82/Ghost_Destroys_Mexican_Oil_Ring18.mp4) |
+| 10 | Ghost Destroys Mexican Oil Ring14 | [🔵 FB](https://www.facebook.com/18165115042462655) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.82/Ghost_Destroys_Mexican_Oil_Ring14.mp4) |
 | 11 | Ghost Destroys Mexican Oil Ring12 | [🔵 FB](https://www.facebook.com/18128341303667041) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.82/Ghost_Destroys_Mexican_Oil_Ring12.mp4) |
 | 12 | Ghost Destroys Mexican Oil Ring2 | [🔵 FB](https://www.facebook.com/18132019315657031) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.82/Ghost_Destroys_Mexican_Oil_Ring2.mp4) |
 | 13 | Ghost Destroys Mexican Oil Ring7 | [🔵 FB](https://www.facebook.com/17906066745549716) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.82/Ghost_Destroys_Mexican_Oil_Ring7.mp4) |

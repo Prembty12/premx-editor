@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 38 | **Last Updated:** 2026-10-05 07:54:30 PM IST
+**Total Videos:** 38 | **Last Updated:** 2026-10-05 09:12:15 PM IST
 
 ---
 
@@ -28,11 +28,11 @@
 | 3 | City Sniper Bloodbath Action 🩸🎯  #videogames #gamingcommunity #gaming #russian_secret_missions #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1795873828500766/) | 630 | [🟣 IG](https://www.instagram.com/reel/DdbxSIFCN1X/) | 250 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions6.mp4) |
 | 4 | 💥🔫 Intense Combat!  #videogames #gamingcommunity #gaming #russian_secret_missions #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1353285143546456/) | 338 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions7.mp4) |
 | 5 | Russian secret missions16 | [🔵 FB](https://www.facebook.com/18114301979074274) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions16.mp4) |
-| 6 | Russian secret missions36 | [🔵 FB](https://www.facebook.com/18115022480283872) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions36.mp4) |
-| 7 | Russian secret missions28 | [🔵 FB](https://www.facebook.com/18585086704064921) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions28.mp4) |
+| 6 | Russian secret missions28 | [🔵 FB](https://www.facebook.com/18585086704064921) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions28.mp4) |
+| 7 | Russian secret missions36 | [🔵 FB](https://www.facebook.com/18115022480283872) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions36.mp4) |
 | 8 | Russian secret missions19 | [🔵 FB](https://www.facebook.com/17895666036667154) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions19.mp4) |
-| 9 | Russian secret missions9 | [🔵 FB](https://www.facebook.com/17906968197517767) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions9.mp4) |
-| 10 | Russian secret missions21 | [🔵 FB](https://www.facebook.com/18071871605725985) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions21.mp4) |
+| 9 | Russian secret missions21 | [🔵 FB](https://www.facebook.com/18071871605725985) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions21.mp4) |
+| 10 | Russian secret missions9 | [🔵 FB](https://www.facebook.com/17906968197517767) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions9.mp4) |
 | 11 | Russian secret missions32 | [🔵 FB](https://www.facebook.com/17986580754061824) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions32.mp4) |
 | 12 | Russian secret missions12 | [🔵 FB](https://www.facebook.com/17910214902532894) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions12.mp4) |
 | 13 | Russian secret missions13 | [🔵 FB](https://www.facebook.com/18107073170271555) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions13.mp4) |

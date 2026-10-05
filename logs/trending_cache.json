@@ -1,13 +1,13 @@
 {
-  "last_updated": "2026-10-05 07:54:30 PM",
+  "last_updated": "2026-10-05 09:12:15 PM",
   "period_days": 7,
   "trending": [
     {
       "game": "GearsOfWar",
-      "views_7d": 1556,
-      "avg_per_video": 1556,
+      "views_7d": 1566,
+      "avg_per_video": 1566,
       "trend": "viral",
-      "ratio": 2.201960982512888,
+      "ratio": 2.315882874889086,
       "fb_link": "https://www.facebook.com/reel/2563430397490305/",
       "source_link": ""
     },
@@ -16,7 +16,7 @@
       "views_7d": 4520,
       "avg_per_video": 1506,
       "trend": "viral",
-      "ratio": 2.1312038815323966,
+      "ratio": 2.22715173025732,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR313.mp4"
     },
@@ -25,45 +25,36 @@
       "views_7d": 1324,
       "avg_per_video": 1324,
       "trend": "trending",
-      "ratio": 1.8736480339634085,
+      "ratio": 1.9580005915409642,
       "fb_link": "https://www.facebook.com/reel/1135871095448480/",
       "source_link": ""
     },
     {
-      "game": "codBlackops6",
-      "views_7d": 2942,
-      "avg_per_video": 980,
-      "trend": "steady",
-      "ratio": 1.3868391792176287,
-      "fb_link": "https://www.facebook.com/reel/887791697632800/",
-      "source_link": ""
-    },
-    {
       "game": "VietnamCavePrison",
-      "views_7d": 5879,
-      "avg_per_video": 979,
+      "views_7d": 5920,
+      "avg_per_video": 986,
       "trend": "steady",
-      "ratio": 1.3854240371980189,
+      "ratio": 1.458148476782017,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison18.mp4"
+    },
+    {
+      "game": "codBlackops6",
+      "views_7d": 2943,
+      "avg_per_video": 981,
+      "trend": "steady",
+      "ratio": 1.45075421472937,
+      "fb_link": "https://www.facebook.com/reel/887791697632800/",
+      "source_link": ""
     }
   ],
   "below_avg": [
     {
-      "game": "UkraineCovertMission",
-      "views_7d": 629,
-      "avg_per_video": 629,
-      "trend": "slow",
-      "ratio": 0.89012433033458,
-      "fb_link": "https://www.facebook.com/reel/1063836943354242/",
-      "source_link": ""
-    },
-    {
       "game": "SpiderMan2",
-      "views_7d": 1773,
-      "avg_per_video": 591,
+      "views_7d": 1787,
+      "avg_per_video": 595,
       "trend": "slow",
-      "ratio": 0.8363489335894067,
+      "ratio": 0.8799171842650103,
       "fb_link": "https://www.facebook.com/reel/1379906203935081/",
       "source_link": ""
     },
@@ -72,35 +63,44 @@
       "views_7d": 713,
       "avg_per_video": 237,
       "trend": "below_avg",
-      "ratio": 0.3353886586475286,
+      "ratio": 0.3504880212954747,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu11.mp4"
+    },
+    {
+      "game": "mm2remastered",
+      "views_7d": 176,
+      "avg_per_video": 176,
+      "trend": "below_avg",
+      "ratio": 0.26027802425317953,
+      "fb_link": "https://www.facebook.com/reel/1146787337671460/",
+      "source_link": ""
     },
     {
       "game": "GodofWarLaufey",
       "views_7d": 656,
       "avg_per_video": 164,
       "trend": "below_avg",
-      "ratio": 0.23208329121601134,
+      "ratio": 0.24253179532682637,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_19.mp4"
     },
     {
-      "game": "mm2remastered",
-      "views_7d": 111,
-      "avg_per_video": 111,
+      "game": "monkeyKing",
+      "views_7d": 30,
+      "avg_per_video": 15,
       "trend": "below_avg",
-      "ratio": 0.1570807641766906,
-      "fb_link": "https://www.facebook.com/reel/1146787337671460/",
-      "source_link": ""
+      "ratio": 0.022182786157941437,
+      "fb_link": "",
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing32.mp4"
     }
   ],
   "recommendation": {
     "game": "GearsOfWar",
-    "views_7d": 1556,
-    "avg_per_video": 1556,
+    "views_7d": 1566,
+    "avg_per_video": 1566,
     "trend": "viral",
-    "ratio": 2.201960982512888,
+    "ratio": 2.315882874889086,
     "fb_link": "https://www.facebook.com/reel/2563430397490305/",
     "source_link": ""
   }
