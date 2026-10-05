@@ -1,1 +1,1 @@
-{"clip_duration":25,"reason":"Intense cinematic superhero action and shocked faces","start_time":2,"status":"APPROVE","title":"Hero's Ultimate Shock Therapy 💀⚡"}
+{"clip_duration": 23, "reason": "Intense tactical sniper combat and explosions", "start_time": 34, "status": "APPROVE", "title": "Who Is The Real Target? 🎯🩸"}
