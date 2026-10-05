@@ -1,1 +1,1 @@
-{"clip_duration": 38, "reason": "Intense zombie combat with explosions", "start_time": 0, "status": "APPROVE", "title": "Zombie Crate Siege 💀💥"}
+{"clip_duration":30,"reason":"Intense laser shooting action in fiery corridor.","start_time":0,"status":"APPROVE","title":"Shooting lasers under fire! 🔥⚡"}
