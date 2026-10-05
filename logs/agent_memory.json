@@ -13,7 +13,8 @@
         "RescueOperation": 15,
         "GearsOfWar": 15,
         "UkraineCovertMission": 15,
-        "ghostandela": 15
+        "ghostandela": 15,
+        "mm2remastered": 15
     },
     "title_styles": {
         "curiosity": 10,
@@ -29,7 +30,7 @@
         "exposed": 25,
         "unbelievable": 22,
         "crazy": 13,
-        "secret": 10,
+        "secret": 13,
         "shocking": 22
     },
     "last_used_style": "secret",
