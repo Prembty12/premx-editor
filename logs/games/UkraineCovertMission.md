@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 6 | **Last Updated:** 2026-10-05 07:22:25 PM IST
+**Total Videos:** 6 | **Last Updated:** 2026-10-05 07:25:30 PM IST
 
 ---
 
@@ -14,8 +14,8 @@
 | Posted (FB or IG) | 6 / 6 |
 | FB Posted | 6 / 6 |
 | IG Posted | 2 / 6 |
-| Total FB Views | **2,850** |
-| Total IG Views | **400** |
+| Total FB Views | **2,851** |
+| Total IG Views | **420** |
 
 ---
 
@@ -23,7 +23,7 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | Silent Sniper Takedowns 🎯🔥  #videogames #gamingcommunity #gaming #ukrainecovertmission #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1063836943354242/) | 331 | [🟣 IG](https://www.instagram.com/reel/DeGzRwVgWd0/) | 220 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.99/_Ukraine_Covert_Sniper_Mission5.mp4) |
+| 1 | Silent Sniper Takedowns 🎯🔥  #videogames #gamingcommunity #gaming #ukrainecovertmission #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1063836943354242/) | 332 | [🟣 IG](https://www.instagram.com/reel/DeGzRwVgWd0/) | 240 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.99/_Ukraine_Covert_Sniper_Mission5.mp4) |
 | 2 | Sniper Fire & Big Booms 💥🎯  #videogames #gamingcommunity #gaming #ukrainecovertmission #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1433881315316238/) | 481 | [🟣 IG](https://www.instagram.com/reel/DdrhIHCFEtY/) | 180 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.99/_Ukraine_Covert_Sniper_Mission8.mp4) |
 | 3 | Silent Sniper Red Ruins 🎯💀  #videogames #gamingcommunity #gaming # ukrainecovertmission #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1355101823216986/) | 418 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.99/_Ukraine_Covert_Sniper_Mission8.mp4) |
 | 4 | 🎯 SNIPER AMBUSH GOES WRONG! 💥🔥  #videogames #gamingcommunity #gaming # ukrainecovertmission #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/28673739162230199/) | 1,620 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.99/_Ukraine_Covert_Sniper_Mission8.mp4) |

@@ -1,13 +1,13 @@
 {
-  "last_updated": "2026-10-05 07:22:25 PM",
+  "last_updated": "2026-10-05 07:25:30 PM",
   "period_days": 7,
   "trending": [
     {
       "game": "GearsOfWar",
-      "views_7d": 1549,
-      "avg_per_video": 1549,
+      "views_7d": 1550,
+      "avg_per_video": 1550,
       "trend": "viral",
-      "ratio": 2.217609162491052,
+      "ratio": 2.2140597898173655,
       "fb_link": "https://www.facebook.com/reel/2563430397490305/",
       "source_link": ""
     },
@@ -16,7 +16,7 @@
       "views_7d": 4520,
       "avg_per_video": 1506,
       "trend": "viral",
-      "ratio": 2.156048675733715,
+      "ratio": 2.1512090602999696,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR313.mp4"
     },
@@ -25,7 +25,7 @@
       "views_7d": 1324,
       "avg_per_video": 1324,
       "trend": "trending",
-      "ratio": 1.8954903364352182,
+      "ratio": 1.8912355882052851,
       "fb_link": "https://www.facebook.com/reel/1135871095448480/",
       "source_link": ""
     },
@@ -34,7 +34,7 @@
       "views_7d": 2942,
       "avg_per_video": 980,
       "trend": "steady",
-      "ratio": 1.4030064423765212,
+      "ratio": 1.399857157432915,
       "fb_link": "https://www.facebook.com/reel/887791697632800/",
       "source_link": ""
     },
@@ -43,7 +43,7 @@
       "views_7d": 5859,
       "avg_per_video": 976,
       "trend": "steady",
-      "ratio": 1.397279885468862,
+      "ratio": 1.3941434547495153,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison18.mp4"
     }
@@ -54,16 +54,16 @@
       "views_7d": 1770,
       "avg_per_video": 590,
       "trend": "slow",
-      "ratio": 0.8446671438797423,
+      "ratio": 0.8427711458014489,
       "fb_link": "https://www.facebook.com/reel/1379906203935081/",
       "source_link": ""
     },
     {
       "game": "UkraineCovertMission",
-      "views_7d": 551,
-      "avg_per_video": 551,
+      "views_7d": 572,
+      "avg_per_video": 572,
       "trend": "slow",
-      "ratio": 0.7888332140300645,
+      "ratio": 0.8170594837261504,
       "fb_link": "https://www.facebook.com/reel/1063836943354242/",
       "source_link": ""
     },
@@ -72,7 +72,7 @@
       "views_7d": 713,
       "avg_per_video": 237,
       "trend": "below_avg",
-      "ratio": 0.33929849677881174,
+      "ratio": 0.33853688399142945,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu11.mp4"
     },
@@ -81,7 +81,7 @@
       "views_7d": 646,
       "avg_per_video": 161,
       "trend": "below_avg",
-      "ratio": 0.2304939155332856,
+      "ratio": 0.22997653300683604,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_19.mp4"
     },
@@ -90,17 +90,17 @@
       "views_7d": 91,
       "avg_per_video": 91,
       "trend": "below_avg",
-      "ratio": 0.13027916964924838,
+      "ratio": 0.12998673604734212,
       "fb_link": "https://www.facebook.com/reel/1146787337671460/",
       "source_link": ""
     }
   ],
   "recommendation": {
     "game": "GearsOfWar",
-    "views_7d": 1549,
-    "avg_per_video": 1549,
+    "views_7d": 1550,
+    "avg_per_video": 1550,
     "trend": "viral",
-    "ratio": 2.217609162491052,
+    "ratio": 2.2140597898173655,
     "fb_link": "https://www.facebook.com/reel/2563430397490305/",
     "source_link": ""
   }
