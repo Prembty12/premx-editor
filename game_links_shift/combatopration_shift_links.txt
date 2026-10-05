@@ -1,2 +1,3 @@
 combatopration_16 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_16.mp4 | REJECT (OpenRouter): Only menus, logos, and boring cinematic walking.
 combatopration_6 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_6.mp4 | REJECT (OpenRouter): No action or combat, just boring walking.
+combatopration_13 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_13.mp4 | REJECT (OpenRouter): No gameplay action, only static menu screens.
