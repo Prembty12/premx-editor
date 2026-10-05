@@ -2,10 +2,10 @@
     {
         "rank": 1,
         "game_name": "mm2remastered",
-        "total_views": 23632,
+        "total_views": 23633,
         "uploaded_videos": 5,
         "avg_views_per_video": 4726,
-        "view_share_percentage": 16.67
+        "view_share_percentage": 16.66
     },
     {
         "rank": 2,
@@ -13,7 +13,7 @@
         "total_views": 21209,
         "uploaded_videos": 0,
         "avg_views_per_video": 0,
-        "view_share_percentage": 14.96
+        "view_share_percentage": 14.95
     },
     {
         "rank": 3,
@@ -26,25 +26,25 @@
     {
         "rank": 4,
         "game_name": "SpiderMan2",
-        "total_views": 16144,
+        "total_views": 16151,
         "uploaded_videos": 1,
-        "avg_views_per_video": 16144,
+        "avg_views_per_video": 16151,
         "view_share_percentage": 11.39
     },
     {
         "rank": 5,
         "game_name": "MarvelsSpiderMan2",
-        "total_views": 14010,
+        "total_views": 14017,
         "uploaded_videos": 6,
-        "avg_views_per_video": 2335,
+        "avg_views_per_video": 2336,
         "view_share_percentage": 9.88
     },
     {
         "rank": 6,
         "game_name": "VietnamCavePrison",
-        "total_views": 8390,
+        "total_views": 8400,
         "uploaded_videos": 6,
-        "avg_views_per_video": 1398,
+        "avg_views_per_video": 1400,
         "view_share_percentage": 5.92
     },
     {
@@ -53,7 +53,7 @@
         "total_views": 7918,
         "uploaded_videos": 6,
         "avg_views_per_video": 1319,
-        "view_share_percentage": 5.59
+        "view_share_percentage": 5.58
     },
     {
         "rank": 8,
@@ -90,17 +90,17 @@
     {
         "rank": 12,
         "game_name": "UkraineCovertMission",
-        "total_views": 3007,
+        "total_views": 3073,
         "uploaded_videos": 6,
-        "avg_views_per_video": 501,
-        "view_share_percentage": 2.12
+        "avg_views_per_video": 512,
+        "view_share_percentage": 2.17
     },
     {
         "rank": 13,
         "game_name": "GearsOfWar",
-        "total_views": 1518,
+        "total_views": 1520,
         "uploaded_videos": 1,
-        "avg_views_per_video": 1518,
+        "avg_views_per_video": 1520,
         "view_share_percentage": 1.07
     },
     {
@@ -125,7 +125,7 @@
         "total_views": 1269,
         "uploaded_videos": 5,
         "avg_views_per_video": 253,
-        "view_share_percentage": 0.9
+        "view_share_percentage": 0.89
     },
     {
         "rank": 17,
@@ -155,8 +155,8 @@
         "rank": 20,
         "game_name": "combatopration",
         "total_views": 237,
-        "uploaded_videos": 5,
-        "avg_views_per_video": 47,
+        "uploaded_videos": 6,
+        "avg_views_per_video": 39,
         "view_share_percentage": 0.17
     }
 ]
