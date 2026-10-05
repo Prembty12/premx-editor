@@ -540,9 +540,9 @@ def classify_slots_combined(video_path, slots, srt_content):
         # Action boosts
         if slot["type"] == "action":
             if slot["scene_count"] >= 3:
-                voice_speed += 0.03
+                voice_speed += 0.05
             if slot["avg_loud"] > -12:
-                voice_speed += 0.02
+                voice_speed += 0.04
 
         slot["voice_speed"] = round(max(VOICE_SPEED_MIN, min(VOICE_SPEED_MAX, voice_speed)), 2)
 
@@ -650,21 +650,28 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 **REACTION PATTERNS (use 10-14 varied):**
 1. BIG ACTION: "OHHHH! He's GONE!", "BRO! That was NASTY!", "AYYYY! Dropped him!"
 2. SWEARING (max 5-8 total, censor): "OHHH Fuckk that was CLEAN!", "Holy sh*t!"
-3. VIEWER QUESTIONS (2-4): "Chat, is this game worth buying?", "Yo, anyone else play this?"
-4. GRAPHICS (2-4): "Bro these graphics are CRISPY!", "Nah this lighting is too good."
+3. VIEWER QUESTIONS (2-4): "Guys, is this game worth buying?", "Yo, anyone else play this?"
+4. GRAPHICS (2-3): "Bro these graphics are INSANE!", "Yo the visuals are FIRE!", "Nah the lighting is next level!", "These graphics look AMAZING!", "Bro the details are CRAZY!"
 5. ENEMY ROAST: "Bro this guy's aim is worse than mine.", "Enemy NPCs look so confused lol."
 6. GAME JOKES: "Bro reloading with 1 HP left, risky business.", "This map design is cursed."
 7. CINEMATIC: "Okay that was actually cinema, wow."
 8. FUNNY: "Bro's collecting stuff like it's a grocery run."
 9. FOLLOW REQUEST (2-3 total): "Ayy if you're vibing, hit that follow yo."
 10. HYPE: "Okay okay okay — something's coming!", "Wait wait WAIT!"
-11. CHILL: "Just vibing here, chilling.", "Too quiet... suspicious."
+11. CHILL: "Just vibing here, chilling.", "Too quiet... sus.", "Too quiet... something's off.", "Too quiet... fishy.", "Too quiet... suspicious."
 12. WEIRD: "What even is that thing?!"
-13. PREDICTIONS (2-4): "He's gonna die here, watch.", "Chat I'm calling it — this is a W."
+13. PREDICTIONS (2-4): "He's gonna die here, watch.", "guys I'm calling it — this is a W."
 14. SELF-DEPRECATING (2-3): "I would've died there honestly.", "This is why I'm not a pro."
-15. CHAT (2-4): "Chat, you seeing this?!", "Yo chat, you believe this?"
+15. Guys (2-4): "guys, you seeing this?!", "Yo guys, you believe this?"
 16. SOUND (2-3): "Yo did you HEAR that?!", "That audio is crispy."
 17. CALLBACKS (1-2): "Remember that guy from earlier? Yeah."
+18. KNOCK EVENTS: "KNOCKED HIM!", "He's DOWN!", "One knocked, push push!", "Got him down!"
+19. HYPE VARIETY: "Let him COOK!", "Bro is COOKED!", "We eating good tonight!", "He's on fire!"
+20. CLUTCH: "CLUTCHED IT!", "One HP and he's alive!", "Bro is HIM!", "What a save!"
+21. BIG HYPE: "What a blast today!", "He's gonna wreck everyone today!", "I'm gonna wreck everyone today!", "He's gonna body everyone!", "Nobody can stop him today!"
+22. SWEARING (max 5-8 total, censor with asterisks): "Holy sh*t!", "What the f*ck!", "That's bullsh*t!", "Son of a b*tch!", "Damn!", "Hell yeah!", "Get rekt!", "You suck!", "Trash!", "Noob!", "Bot!", "Dumbass!"
+23. INSULTS/ROASTS (safe, 3-5): "Get rekt!", "Trash!", "Noob!", "Bot!", "You suck!", "What a bot!", "Delete the game!", "Uninstall!", "GG ez!"
+24. ENEMY CAMPING ROAST: "Come out, where you hiding?!", "Stop camping, you coward!", "Come fight me, bro!", "Stop hiding, you bot!", "Camping again? Trash!", "Show yourself, coward!", "Where you at, you noob?!"
 
 **🎯 CRITICAL: VISUAL CLASSIFICATION**
 Look at the frames for each slot's time range. Classify each slot:
@@ -688,12 +695,12 @@ Look at the frames for each slot's time range. Classify each slot:
 5. Roast ENEMIES and GAME MECHANICS
 6. 5-8 words per line — short, punchy
 7. Vary energy — sometimes chill, sometimes WILD
-8. Reference "chat" or "you" naturally
+8. Reference "guys" or "you" naturally
 9. Max 2-3 follow requests total
 10. Use CAPS for shouting
 
 **STORY CONTEXT:**
-{srt_content[:1200]}
+{srt_content[:2500]}
 
 **YOUR SLOTS (fill ALL {len(slots)}):**
 {chr(10).join(slot_lines)}
