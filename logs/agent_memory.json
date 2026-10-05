@@ -14,7 +14,8 @@
         "GearsOfWar": 20,
         "UkraineCovertMission": 15,
         "ghostandela": 15,
-        "mm2remastered": 15
+        "mm2remastered": 15,
+        "combatopration": 15
     },
     "title_styles": {
         "curiosity": 10,
@@ -31,7 +32,7 @@
         "unbelievable": 22,
         "crazy": 13,
         "secret": 13,
-        "shocking": 28
+        "shocking": 31
     },
     "last_used_style": "shocking",
     "last_played_game": "combatopration",

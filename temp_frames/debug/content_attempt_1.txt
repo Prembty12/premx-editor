@@ -1,1 +1,1 @@
-{"clip_duration":45,"reason":"Constant intense FPS combat action throughout","start_time":0,"status":"APPROVE","title":"Pure Shootout Chaos Unleashed 💥🔫"}
+{"clip_duration": 35, "reason": "Cinematic sniper combat with intense action shots.", "start_time": 10, "status": "APPROVE", "title": "Scope View Chaos 🎯💥"}
