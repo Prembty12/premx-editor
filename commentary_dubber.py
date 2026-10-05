@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — Multi-Key Auto-Retry + ON/OFF Switch
+🎙️ AI Commentary Dubber — Multi-Key Auto-Retry + ON/OFF Switch + Auto Voice Speed
 ===============================================================
 Called from pipeline.sh Step 8.5:
     python3 commentary_dubber.py --video X --out Y
@@ -13,6 +13,13 @@ Multi-Key Support:
 ON/OFF Switch:
   • COMMENTARY_ENABLED=true   → commentary chalegi (default)
   • COMMENTARY_ENABLED=false  → commentary skip, original clip copy
+
+🎮 Auto Voice Speed:
+  • Action slots  → 1.10 - 1.15 (hype)
+  • Dialog slots  → 1.03
+  • Calm slots    → 1.00
+  • Speed floor   = 1.0 (kabhi kam nahi)
+  • Speed ceiling = 1.15 (kabhi zyada nahi)
 """
 
 import os
@@ -92,6 +99,11 @@ GRID_COLS = 6
 GRID_ROWS = 10
 CANVAS_W = 2160
 CANVAS_H = 3840
+
+# 🎮 Voice speed limits — auto adjust, but clamped here
+VOICE_SPEED_MIN = 1.00
+VOICE_SPEED_MAX = 1.15
+ATEMPO_MAX      = 1.08   # extra fit cap (double boost rokne ke liye)
 
 os.makedirs(SEGMENTS_DIR, exist_ok=True)
 # ============================================================
@@ -392,7 +404,8 @@ def build_auto_slots(video_path, vid_duration, srt_content):
             "srt_text": slot_text,
             "scene_count": 0,
             "avg_loud": -50,
-            "sub_analysis": {}
+            "sub_analysis": {},
+            "voice_speed": 1.0
         })
         t = end
 
@@ -407,7 +420,7 @@ def build_auto_slots(video_path, vid_duration, srt_content):
 
 
 # ============================================================
-# STEP 4 — SUB-WINDOW CLASSIFY
+# STEP 4 — SUB-WINDOW CLASSIFY + AUTO VOICE SPEED
 # ============================================================
 def classify_slots_combined(video_path, slots, srt_content):
     print("🔍 [4] Classifying slots...")
@@ -496,7 +509,27 @@ def classify_slots_combined(video_path, slots, srt_content):
             "total_subs": total
         }
 
-    print(f"✅ Slots classified: {len(slots)}\n")
+        # ============================================
+        # 🎮 AUTO VOICE SPEED — 1.0 se kam NAHI, max 1.15
+        # ============================================
+        if slot["type"] == "action":
+            voice_speed = 1.10          # base action speed
+            if slot["scene_count"] >= 3:
+                voice_speed += 0.03     # fast cuts = fast voice
+            if slot["avg_loud"] > -12:
+                voice_speed += 0.02     # loud = energetic
+        elif slot["type"] == "dialog":
+            voice_speed = 1.03
+        else:  # calm
+            voice_speed = 1.0
+
+        # HARD CLAMP: min 1.0, max 1.15
+        slot["voice_speed"] = round(max(VOICE_SPEED_MIN, min(VOICE_SPEED_MAX, voice_speed)), 2)
+
+    # Summary print
+    speeds = [s["voice_speed"] for s in slots]
+    print(f"✅ Slots classified: {len(slots)}")
+    print(f"🎮 Voice speeds: min={min(speeds):.2f} max={max(speeds):.2f} avg={sum(speeds)/len(speeds):.2f}\n")
     return slots
 
 
@@ -573,6 +606,7 @@ def generate_full_script(slots, srt_content, analysis_grid_path):
             f"- Slot {i}: {s['start']:.1f}s → {s['end']:.1f}s "
             f"[{s['type'].upper()}] "
             f"(scenes={s['scene_count']}, loud={s['avg_loud']}dB, "
+            f"speed={s.get('voice_speed', 1.0)}, "
             f"action={sa.get('action_ratio', 0)}, dialog={sa.get('dialog_ratio', 0)}) "
             f"SRT: \"{s['srt_text'][:70]}\""
         )
@@ -613,6 +647,13 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 15. CHAT (2-4): "Chat, you seeing this?!", "Yo chat, you believe this?"
 16. SOUND (2-3): "Yo did you HEAR that?!", "That audio is crispy."
 17. CALLBACKS (1-2): "Remember that guy from earlier? Yeah."
+
+**PACING RULES (game ke hisab se):**
+- Slot ke saath "speed" value hai:
+  • speed ≥ 1.10 = FAST slot → VERY short punchy lines (3-5 words), high energy
+  • speed ≈ 1.03 = NORMAL dialog → 5-7 words, conversational
+  • speed = 1.0 = CALM slot → 6-8 words, chill/observational
+- Kabhi bhi slow nahi — hamesha energetic ya normal
 
 **RULES:**
 1. NATURAL — casual, slang, contractions
@@ -739,9 +780,9 @@ Return ONLY valid JSON:
 
 
 # ============================================================
-# STEP 7 — ElevenLabs TTS
+# STEP 7 — ElevenLabs TTS (with AUTO per-slot speed)
 # ============================================================
-def generate_audio(segments):
+def generate_audio(segments, slots):
     print("🔊 [7] Generating TTS...")
     url = f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID}"
     headers = {
@@ -749,6 +790,9 @@ def generate_audio(segments):
         "Content-Type": "application/json",
         "xi-api-key": ELEVENLABS_API_KEY
     }
+
+    # Slot start time → voice speed lookup
+    slot_speed_map = {round(s["start"], 2): s.get("voice_speed", 1.0) for s in slots}
 
     audio_files = []
     for idx, seg in enumerate(segments):
@@ -759,15 +803,27 @@ def generate_audio(segments):
         target_dur = seg["end"] - seg["start"]
         seg_file = f"{SEGMENTS_DIR}/seg_{idx:03d}.mp3"
 
+        # Find nearest slot speed
+        voice_speed = 1.0
+        best_diff = 999
+        for s_start, s_speed in slot_speed_map.items():
+            diff = abs(s_start - seg["start"])
+            if diff < best_diff:
+                best_diff = diff
+                voice_speed = s_speed
+
+        # Safety clamp
+        voice_speed = max(VOICE_SPEED_MIN, min(VOICE_SPEED_MAX, voice_speed))
+
         data = {
             "text": text,
             "model_id": "eleven_multilingual_v2",
             "voice_settings": {
                 "stability": 0.4,
                 "similarity_boost": 0.75,
-                "style": 0.5,      
-                "use_speaker_boost": True,    
-                "speed": 1.0
+                "style": 0.5,
+                "use_speaker_boost": True,
+                "speed": voice_speed
             }
         }
 
@@ -780,7 +836,7 @@ def generate_audio(segments):
                 actual = get_duration(seg_file)
                 if actual > 0 and target_dur > 0:
                     tempo = actual / target_dur
-                    tempo = max(1.0, min(1.2, tempo))
+                    tempo = max(1.0, min(ATEMPO_MAX, tempo))
 
                     if tempo > 1.01:
                         fit_file = f"{SEGMENTS_DIR}/seg_{idx:03d}_fit.mp3"
@@ -799,7 +855,7 @@ def generate_audio(segments):
                         "file": final, "start": seg["start"],
                         "end": seg["end"], "text": text
                     })
-                    print(f"   ✅ [{seg['start']:5.1f}s] {text[:60]}")
+                    print(f"   ✅ [{seg['start']:5.1f}s] speed={voice_speed:.2f} | {text[:50]}")
             elif r.status_code == 401:
                 print("   ❌ 401 — ElevenLabs key galat!")
                 break
@@ -905,12 +961,13 @@ def fallback_copy_original():
 # ============================================================
 def main():
     print("=" * 60)
-    print("🎙️ AI COMMENTARY DUBBER — Multi-Key + ON/OFF")
+    print("🎙️ AI COMMENTARY DUBBER — Multi-Key + ON/OFF + Auto Speed")
     print("=" * 60)
     print(f"📹 Input : {FINAL_CLIP_PATH}")
     print(f"📤 Output: {FINAL_DUBBED_VIDEO}")
     print(f"🎤 Voice : {VOICE_ID}")
     print(f"🎛️  Switch: COMMENTARY_ENABLED = {COMMENTARY_ENABLED}")
+    print(f"🎮 Speed : {VOICE_SPEED_MIN} - {VOICE_SPEED_MAX} (auto)")
     print("=" * 60 + "\n")
 
     # 🎛️ ON/OFF SWITCH
@@ -941,7 +998,7 @@ def main():
         if not segments:
             raise Exception("No segments generated")
 
-        audio_files = generate_audio(segments)
+        audio_files = generate_audio(segments, slots)
         if not audio_files:
             raise Exception("No audio files generated")
 
