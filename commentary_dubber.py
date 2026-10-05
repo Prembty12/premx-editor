@@ -14,12 +14,14 @@ ON/OFF Switch:
   • COMMENTARY_ENABLED=true   → commentary chalegi (default)
   • COMMENTARY_ENABLED=false  → commentary skip, original clip copy
 
-🎮 Auto Voice Speed:
+🎮 Auto Voice Speed (Frame-Based):
+  • GPT frames dekh ke har slot ka visual_type deta hai
   • Action slots  → 1.10 - 1.15 (hype)
   • Dialog slots  → 1.03
   • Calm slots    → 1.00
   • Speed floor   = 1.0 (kabhi kam nahi)
   • Speed ceiling = 1.15 (kabhi zyada nahi)
+  • Fallback: signal-based classifier agar GPT visual_type na de
 """
 
 import os
@@ -103,7 +105,12 @@ CANVAS_H = 3840
 # 🎮 Voice speed limits — auto adjust, but clamped here
 VOICE_SPEED_MIN = 1.00
 VOICE_SPEED_MAX = 1.15
-ATEMPO_MAX      = 1.08   # extra fit cap (double boost rokne ke liye)
+ATEMPO_MAX      = 1.08
+
+# 🎮 Speed per visual type
+SPEED_ACTION = 1.13
+SPEED_DIALOG = 1.03
+SPEED_CALM   = 1.00
 
 os.makedirs(SEGMENTS_DIR, exist_ok=True)
 # ============================================================
@@ -176,6 +183,16 @@ def parse_srt(srt_content):
                 e = int(tm.group(5))*3600 + int(tm.group(6))*60 + int(tm.group(7)) + int(tm.group(8))/1000
                 entries.append({"start": s, "end": e, "text": lines[2].strip()})
     return entries
+
+
+def speed_for_type(slot_type):
+    """Slot type se voice speed nikaalo"""
+    if slot_type == "action":
+        return SPEED_ACTION
+    elif slot_type == "dialog":
+        return SPEED_DIALOG
+    else:
+        return SPEED_CALM
 
 
 # ============================================================
@@ -401,6 +418,7 @@ def build_auto_slots(video_path, vid_duration, srt_content):
             "start": round(t, 2),
             "end": round(end, 2),
             "type": None,
+            "visual_type": None,       # ← GPT se aayega
             "srt_text": slot_text,
             "scene_count": 0,
             "avg_loud": -50,
@@ -420,10 +438,10 @@ def build_auto_slots(video_path, vid_duration, srt_content):
 
 
 # ============================================================
-# STEP 4 — SUB-WINDOW CLASSIFY + AUTO VOICE SPEED
+# STEP 4 — SUB-WINDOW CLASSIFY (Fallback) + AUTO VOICE SPEED
 # ============================================================
 def classify_slots_combined(video_path, slots, srt_content):
-    print("🔍 [4] Classifying slots...")
+    print("🔍 [4] Classifying slots (signal-based fallback)...")
 
     scene_times = get_scene_timeline(video_path)
     loud_timeline = get_loudness_timeline(video_path)
@@ -435,7 +453,9 @@ def classify_slots_combined(video_path, slots, srt_content):
 
     ACTION_WORDS = {"shoot","fire","hit","run","kill","die","attack",
                     "grenade","boom","jump","dodge","cover","reload",
-                    "go","move","watch","left","right","down","up","quick"}
+                    "go","move","watch","left","right","down","up","quick",
+                    "destroy","target","lock","bang","drop","danger",
+                    "whoa","oh","yeah","nice","sick","cook","big","fast"}
     DIALOG_WORDS = {"you","me","we","what","why","how","hey","listen",
                     "wait","okay","yeah","know","think","feel","want",
                     "need","can","will"}
@@ -467,11 +487,14 @@ def classify_slots_combined(video_path, slots, srt_content):
             has_dialog_word = len(words & DIALOG_WORDS) >= 1
             has_speech = len(sw_text.strip()) > 3
 
+            # 🎯 Scene-cut-INDEPENDENT classification
             if has_action_word and scene_cuts >= 1:
+                action_count += 1
+            elif has_action_word:                          # action word alone
                 action_count += 1
             elif scene_cuts >= 2:
                 action_count += 1
-            elif loud > -15 and scene_cuts >= 1:
+            elif loud > -15:                               # loud alone
                 action_count += 1
             elif has_speech and has_dialog_word:
                 dialog_count += 1
@@ -511,27 +534,21 @@ def classify_slots_combined(video_path, slots, srt_content):
             "total_subs": total
         }
 
-        # ============================================
-        # 🎮 AUTO VOICE SPEED — 1.0 se kam NAHI, max 1.15
-        # ============================================
-        if slot["type"] == "action":
-            voice_speed = 1.10          # base action speed
-            if slot["scene_count"] >= 3:
-                voice_speed += 0.03     # fast cuts = fast voice
-            if slot["avg_loud"] > -12:
-                voice_speed += 0.02     # loud = energetic
-        elif slot["type"] == "dialog":
-            voice_speed = 1.03
-        else:  # calm
-            voice_speed = 1.0
+        # Signal-based speed (will be overridden by GPT visual_type)
+        voice_speed = speed_for_type(slot["type"])
 
-        # HARD CLAMP: min 1.0, max 1.15
+        # Action boosts
+        if slot["type"] == "action":
+            if slot["scene_count"] >= 3:
+                voice_speed += 0.03
+            if slot["avg_loud"] > -12:
+                voice_speed += 0.02
+
         slot["voice_speed"] = round(max(VOICE_SPEED_MIN, min(VOICE_SPEED_MAX, voice_speed)), 2)
 
-    # Summary print
     speeds = [s["voice_speed"] for s in slots]
-    print(f"✅ Slots classified: {len(slots)}")
-    print(f"🎮 Voice speeds: min={min(speeds):.2f} max={max(speeds):.2f} avg={sum(speeds)/len(speeds):.2f}\n")
+    print(f"✅ Slots classified (signal-based): {len(slots)}")
+    print(f"🎮 Voice speeds (pre-GPT): min={min(speeds):.2f} max={max(speeds):.2f} avg={sum(speeds)/len(speeds):.2f}\n")
     return slots
 
 
@@ -596,10 +613,10 @@ def build_analysis_grid(video_path, vid_duration, num_frames=ANALYSIS_FRAMES):
 
 
 # ============================================================
-# STEP 6 — GPT Call (MULTI-KEY OPENROUTER)
+# STEP 6 — GPT Call (MULTI-KEY OPENROUTER) — WITH VISUAL TYPE
 # ============================================================
 def generate_full_script(slots, srt_content, analysis_grid_path):
-    print(f"🤖 [6] Generating FULL script (OpenRouter — {len(OPENROUTER_KEYS)} keys)...")
+    print(f"🤖 [6] Generating FULL script + visual classification (OpenRouter — {len(OPENROUTER_KEYS)} keys)...")
 
     slot_lines = []
     for i, s in enumerate(slots, 1):
@@ -608,7 +625,6 @@ def generate_full_script(slots, srt_content, analysis_grid_path):
             f"- Slot {i}: {s['start']:.1f}s → {s['end']:.1f}s "
             f"[{s['type'].upper()}] "
             f"(scenes={s['scene_count']}, loud={s['avg_loud']}dB, "
-            f"speed={s.get('voice_speed', 1.0)}, "
             f"action={sa.get('action_ratio', 0)}, dialog={sa.get('dialog_ratio', 0)}) "
             f"SRT: \"{s['srt_text'][:70]}\""
         )
@@ -633,7 +649,7 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 
 **REACTION PATTERNS (use 10-14 varied):**
 1. BIG ACTION: "OHHHH! He's GONE!", "BRO! That was NASTY!", "AYYYY! Dropped him!"
-2. SWEARING (max 5-8 total, censor with asterisks): "OHHH Fuckk that was CLEAN!", "Holy sh*t!"
+2. SWEARING (max 5-8 total, censor): "OHHH Fuckk that was CLEAN!", "Holy sh*t!"
 3. VIEWER QUESTIONS (2-4): "Chat, is this game worth buying?", "Yo, anyone else play this?"
 4. GRAPHICS (2-4): "Bro these graphics are CRISPY!", "Nah this lighting is too good."
 5. ENEMY ROAST: "Bro this guy's aim is worse than mine.", "Enemy NPCs look so confused lol."
@@ -650,12 +666,19 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 16. SOUND (2-3): "Yo did you HEAR that?!", "That audio is crispy."
 17. CALLBACKS (1-2): "Remember that guy from earlier? Yeah."
 
-**PACING RULES (game ke hisab se):**
-- Slot ke saath "speed" value hai:
-  • speed ≥ 1.10 = FAST slot → VERY short punchy lines (3-5 words), high energy
-  • speed ≈ 1.03 = NORMAL dialog → 5-7 words, conversational
-  • speed = 1.0 = CALM slot → 6-8 words, chill/observational
-- Kabhi bhi slow nahi — hamesha energetic ya normal
+**🎯 CRITICAL: VISUAL CLASSIFICATION**
+Look at the frames for each slot's time range. Classify each slot:
+
+- **"action"** = fast movement, fighting, shooting, explosions, chase, intense gameplay, weapons, enemies, combat
+- **"dialog"** = characters talking, cutscenes, conversation, close-up faces, dialogue moments
+- **"calm"** = walking, exploring, environment shots, scenery, menus, slow/peaceful moments
+
+**Be ACCURATE. This decides voice speed!**
+
+**PACING RULES (based on visual_type):**
+- visual_type = "action" → VERY short punchy lines (3-5 words), HIGH energy, CAPS
+- visual_type = "dialog" → 5-7 words, conversational
+- visual_type = "calm" → 6-8 words, chill/observational
 
 **RULES:**
 1. NATURAL — casual, slang, contractions
@@ -681,7 +704,13 @@ Return ONLY valid JSON:
 {{
   "story_summary": "Brief one-line summary.",
   "segments": [
-    {{"slot": 1, "start": 0.0, "end": 3.5, "text": "..."}}
+    {{
+      "slot": 1,
+      "start": 0.0,
+      "end": 3.5,
+      "text": "...",
+      "visual_type": "action"
+    }}
   ]
 }}
 """
@@ -735,7 +764,31 @@ Return ONLY valid JSON:
 
                     parsed = json.loads(raw)
                     segments = parsed.get("segments", [])
-                    print(f"   ✅ Key {key_idx} worked! {len(segments)} segments\n")
+
+                    # 🎯 GPT ke visual_type ko slots mein apply karo
+                    updated_count = 0
+                    for seg in segments:
+                        vt = (seg.get("visual_type") or "").lower().strip()
+                        if vt not in ("action", "dialog", "calm"):
+                            continue
+
+                        # Nearest slot dhundho
+                        best_slot = None
+                        best_diff = 999
+                        for slot in slots:
+                            diff = abs(slot["start"] - seg.get("start", 0))
+                            if diff < best_diff:
+                                best_diff = diff
+                                best_slot = slot
+
+                        if best_slot and best_diff < 1.0:
+                            best_slot["visual_type"] = vt
+                            best_slot["type"] = vt
+                            best_slot["voice_speed"] = speed_for_type(vt)
+                            updated_count += 1
+
+                    print(f"   ✅ Key {key_idx} worked! {len(segments)} segments")
+                    print(f"   🎯 Visual classification applied to {updated_count}/{len(slots)} slots\n")
                     return segments
 
                 elif r.status_code in (401, 403):
@@ -776,13 +829,14 @@ Return ONLY valid JSON:
     }
     return [
         {"slot": i+1, "start": s["start"], "end": s["end"],
-         "text": FALLBACK[s["type"]][i % 4]}
+         "text": FALLBACK[s["type"]][i % 4],
+         "visual_type": s["type"]}
         for i, s in enumerate(slots)
     ]
 
 
 # ============================================================
-# STEP 7 — ElevenLabs TTS (with AUTO per-slot speed)
+# STEP 7 — ElevenLabs TTS (Visual-type based speed)
 # ============================================================
 def generate_audio(segments, slots):
     print("🔊 [7] Generating TTS...")
@@ -805,14 +859,19 @@ def generate_audio(segments, slots):
         target_dur = seg["end"] - seg["start"]
         seg_file = f"{SEGMENTS_DIR}/seg_{idx:03d}.mp3"
 
-        # Find nearest slot speed
-        voice_speed = 1.0
-        best_diff = 999
-        for s_start, s_speed in slot_speed_map.items():
-            diff = abs(s_start - seg["start"])
-            if diff < best_diff:
-                best_diff = diff
-                voice_speed = s_speed
+        # 🎯 PRIORITY 1: GPT ka visual_type
+        visual_type = (seg.get("visual_type") or "").lower().strip()
+        if visual_type in ("action", "dialog", "calm"):
+            voice_speed = speed_for_type(visual_type)
+        else:
+            # 🎯 PRIORITY 2: Slot classifier ka voice_speed
+            voice_speed = 1.0
+            best_diff = 999
+            for s_start, s_speed in slot_speed_map.items():
+                diff = abs(s_start - seg["start"])
+                if diff < best_diff:
+                    best_diff = diff
+                    voice_speed = s_speed
 
         # Safety clamp
         voice_speed = max(VOICE_SPEED_MIN, min(VOICE_SPEED_MAX, voice_speed))
@@ -855,9 +914,10 @@ def generate_audio(segments, slots):
 
                     audio_files.append({
                         "file": final, "start": seg["start"],
-                        "end": seg["end"], "text": text
+                        "end": seg["end"], "text": text,
+                        "visual_type": visual_type
                     })
-                    print(f"   ✅ [{seg['start']:5.1f}s] speed={voice_speed:.2f} | {text[:50]}")
+                    print(f"   ✅ [{seg['start']:5.1f}s] speed={voice_speed:.2f} ({visual_type or 'signal'}) | {text[:50]}")
             elif r.status_code == 401:
                 print("   ❌ 401 — ElevenLabs key galat!")
                 break
@@ -963,13 +1023,13 @@ def fallback_copy_original():
 # ============================================================
 def main():
     print("=" * 60)
-    print("🎙️ AI COMMENTARY DUBBER — Multi-Key + ON/OFF + Auto Speed")
+    print("🎙️ AI COMMENTARY DUBBER — Multi-Key + ON/OFF + Frame-Based Speed")
     print("=" * 60)
     print(f"📹 Input : {FINAL_CLIP_PATH}")
     print(f"📤 Output: {FINAL_DUBBED_VIDEO}")
     print(f"🎤 Voice : {VOICE_ID}")
     print(f"🎛️  Switch: COMMENTARY_ENABLED = {COMMENTARY_ENABLED}")
-    print(f"🎮 Speed : {VOICE_SPEED_MIN} - {VOICE_SPEED_MAX} (auto)")
+    print(f"🎮 Speed : {VOICE_SPEED_MIN} - {VOICE_SPEED_MAX} (auto, frame-based)")
     print("=" * 60 + "\n")
 
     # 🎛️ ON/OFF SWITCH
@@ -999,6 +1059,11 @@ def main():
 
         if not segments:
             raise Exception("No segments generated")
+
+        # 🎯 Visual classification ke baad final speed summary
+        speeds = [s["voice_speed"] for s in slots]
+        print(f"🎮 Final voice speeds (after GPT visual): "
+              f"min={min(speeds):.2f} max={max(speeds):.2f} avg={sum(speeds)/len(speeds):.2f}\n")
 
         audio_files = generate_audio(segments, slots)
         if not audio_files:
