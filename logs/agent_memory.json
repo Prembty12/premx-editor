@@ -11,7 +11,8 @@
         "Russian_secret_missions": 15,
         "MarvelsSpiderMan2": 20,
         "RescueOperation": 15,
-        "GearsOfWar": 15
+        "GearsOfWar": 15,
+        "UkraineCovertMission": 15
     },
     "title_styles": {
         "curiosity": 10,
@@ -25,7 +26,7 @@
         "funny_roast": 10,
         "secret_hidden": 19,
         "exposed": 25,
-        "unbelievable": 19,
+        "unbelievable": 22,
         "crazy": 13,
         "secret": 10,
         "shocking": 22

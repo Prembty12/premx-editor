@@ -1,1 +1,1 @@
-{"clip_duration": 17, "reason": "Intense lightning combat and explosive action", "start_time": 14, "status": "APPROVE", "title": "Superpowered Street Beatdown 💥⚡️"}
+{"clip_duration":25,"reason":"Intense sniper scoping and stealth action","start_time":50,"status":"APPROVE","title":"Silent Sniper Takedowns 🎯🔥"}
