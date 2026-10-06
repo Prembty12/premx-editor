@@ -1,1 +1,1 @@
-{"clip_duration": 24, "reason": "Intense martial arts combat and parkour action", "start_time": 6, "status": "APPROVE", "title": "Can you survive this clash? ⚔️🔥"}
+{"clip_duration": 25, "reason": "Tense boardroom standoff and dramatic betrayal.", "start_time": 22, "status": "APPROVE", "title": "Betrayed by allies 💀"}
