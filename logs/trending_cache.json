@@ -1,31 +1,31 @@
 {
-  "last_updated": "2026-10-06 11:16:22 PM",
+  "last_updated": "2026-10-06 11:27:09 PM",
   "period_days": 7,
   "trending": [
     {
       "game": "Russian_secret_missions",
-      "views_7d": 1772,
+      "views_7d": 1773,
       "avg_per_video": 886,
       "trend": "viral",
-      "ratio": 2.2717948717948717,
+      "ratio": 2.278471711976488,
       "fb_link": "https://www.facebook.com/reel/2322876355125407/",
       "source_link": ""
     },
     {
       "game": "codBlackops6",
-      "views_7d": 3265,
-      "avg_per_video": 816,
+      "views_7d": 3276,
+      "avg_per_video": 819,
       "trend": "viral",
-      "ratio": 2.0923076923076924,
+      "ratio": 2.106171932402645,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops64.mp4"
     },
     {
       "game": "VietnamCavePrison",
-      "views_7d": 3522,
-      "avg_per_video": 704,
+      "views_7d": 3528,
+      "avg_per_video": 705,
       "trend": "trending",
-      "ratio": 1.8051282051282052,
+      "ratio": 1.8130051432770022,
       "fb_link": "https://www.facebook.com/reel/1623579349213015/",
       "source_link": ""
     },
@@ -34,7 +34,7 @@
       "views_7d": 2096,
       "avg_per_video": 698,
       "trend": "trending",
-      "ratio": 1.7897435897435898,
+      "ratio": 1.7950036737692874,
       "fb_link": "",
       "source_link": ""
     },
@@ -43,7 +43,7 @@
       "views_7d": 1870,
       "avg_per_video": 467,
       "trend": "steady",
-      "ratio": 1.1974358974358974,
+      "ratio": 1.2009551800146951,
       "fb_link": "",
       "source_link": ""
     }
@@ -51,10 +51,10 @@
   "below_avg": [
     {
       "game": "combatopration",
-      "views_7d": 742,
-      "avg_per_video": 371,
+      "views_7d": 777,
+      "avg_per_video": 388,
       "trend": "slow",
-      "ratio": 0.9512820512820512,
+      "ratio": 0.9977957384276268,
       "fb_link": "https://www.facebook.com/reel/29117808581156621/",
       "source_link": ""
     },
@@ -63,44 +63,44 @@
       "views_7d": 283,
       "avg_per_video": 283,
       "trend": "slow",
-      "ratio": 0.7256410256410256,
+      "ratio": 0.7277736958119031,
       "fb_link": "https://www.facebook.com/reel/1423098925813250/",
+      "source_link": ""
+    },
+    {
+      "game": "monkeyKing",
+      "views_7d": 268,
+      "avg_per_video": 134,
+      "trend": "below_avg",
+      "ratio": 0.34459955914768553,
+      "fb_link": "https://www.facebook.com/reel/1596514458133485/",
       "source_link": ""
     },
     {
       "game": "sifu",
       "views_7d": 468,
-      "avg_per_video": 156,
+      "avg_per_video": 117,
       "trend": "below_avg",
-      "ratio": 0.4,
+      "ratio": 0.3008817046289493,
       "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu2.mp4"
-    },
-    {
-      "game": "monkeyKing",
-      "views_7d": 264,
-      "avg_per_video": 132,
-      "trend": "below_avg",
-      "ratio": 0.3384615384615385,
-      "fb_link": "https://www.facebook.com/reel/1596514458133485/",
-      "source_link": ""
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu12.mp4"
     },
     {
       "game": "GodofWarLaufey",
       "views_7d": 461,
       "avg_per_video": 115,
       "trend": "below_avg",
-      "ratio": 0.2948717948717949,
+      "ratio": 0.29573842762674507,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_5.mp4"
     }
   ],
   "recommendation": {
     "game": "Russian_secret_missions",
-    "views_7d": 1772,
+    "views_7d": 1773,
     "avg_per_video": 886,
     "trend": "viral",
-    "ratio": 2.2717948717948717,
+    "ratio": 2.278471711976488,
     "fb_link": "https://www.facebook.com/reel/2322876355125407/",
     "source_link": ""
   }
