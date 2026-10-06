@@ -745,6 +745,9 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 12. ENVIRONMENT: "This map is beautiful ngl.", "Look at that skyline bro!"
 13. SOUND (2-3): "Yo did you HEAR that?!"
 14. CINEMATIC SHOT: "That's a movie shot right there!"
+15. FLIRTY/FUNNY "BABY" (1-2 times only): "Let's go baby!", "Oh baby, that's clean!", "Come on baby, show me something!", "Baby, that was smooth!", "Ayy baby, we cooking now!"
+16. LIKE + BELL CTA (2-3 times only): "Smash that like!", "Hit the like button!", "Ring the bell!", "Smash like and ring the bell!", "Drop a like guys!", "Tap the bell!"
+17. SWEARING (max 5-8 total, censor with asterisks): "Holy sh*t!", "What the f*ck!", "That's bullsh*t!", "Son of a b*tch!", "Damn!", "Hell yeah!", "Get rekt!", "You suck!", "Trash!", "Noob!", "Bot!", "Dumbass!", "F*cking clean!", "Sh*t that was nasty!", "B*tch please!", "What a d*ck move!"
 
 **🎯 CRITICAL: VISUAL CLASSIFICATION — HONEST RULES**
 Look at the frames for each slot's time range. Classify each slot:
