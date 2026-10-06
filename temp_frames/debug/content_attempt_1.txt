@@ -1,1 +1,1 @@
-{"clip_duration": 30, "reason": "Intense aerial combat with epic visual effects", "start_time": 20, "status": "APPROVE", "title": "Monkey King Sky War ⚔️☁️"}
+{"clip_duration": 28, "reason": "Continuous high-action martial arts combat", "start_time": 2, "status": "APPROVE", "title": "Deadly Kung Fu Mayhem 🥋💀"}
