@@ -22,6 +22,13 @@ ON/OFF Switch:
   • Speed floor   = 1.0 (kabhi kam nahi)
   • Speed ceiling = 1.15 (kabhi zyada nahi)
   • Fallback: signal-based classifier agar GPT visual_type na de
+
+🎯 PERFECT COMMENTARY FIXES:
+  • FIX #1: Tolerance 1.0 → 2.5 + Signal override (GPT galat ho toh signal jeetega)
+  • FIX #2: Prompt mein hard action rules
+  • FIX #3: Model gpt-4o-mini → gpt-4o
+  • FIX #4: 90 frames (9x10 grid) + 4K canvas
+  • Analysis image: analysis/last_analysis.jpg (purani auto-delete)
 """
 
 import os
@@ -90,14 +97,17 @@ VOICE_ID           = ARGS.voice or os.getenv("VOICE_ID", "91w4XjqhkWTX1Jr3O344")
 # Paths
 AUDIO_PATH         = "extracted_audio.mp3"
 SRT_PATH           = "final.srt"
-ANALYSIS_GRID_PATH = "analysis_grid.jpg"
+ANALYSIS_DIR       = "analysis"
+ANALYSIS_GRID_PATH = "analysis/last_analysis.jpg"
 SEGMENTS_DIR       = "segments"
 
 MIN_SLOTS_HARD = 6
 MAX_SLOTS_HARD = 20
 DUCK_VOLUME = 0.25
-ANALYSIS_FRAMES = 60
-GRID_COLS = 6
+
+# 🎯 90 frames — 4K portrait canvas (9x10 grid)
+ANALYSIS_FRAMES = 90
+GRID_COLS = 9
 GRID_ROWS = 10
 CANVAS_W = 2160
 CANVAS_H = 3840
@@ -113,6 +123,7 @@ SPEED_DIALOG = 1.03
 SPEED_CALM   = 1.00
 
 os.makedirs(SEGMENTS_DIR, exist_ok=True)
+os.makedirs(ANALYSIS_DIR, exist_ok=True)
 # ============================================================
 
 
@@ -553,10 +564,18 @@ def classify_slots_combined(video_path, slots, srt_content):
 
 
 # ============================================================
-# STEP 5 — 4K PORTRAIT ANALYSIS GRID
+# STEP 5 — 4K PORTRAIT ANALYSIS GRID (90 frames, 9x10)
 # ============================================================
 def build_analysis_grid(video_path, vid_duration, num_frames=ANALYSIS_FRAMES):
-    print(f"🖼️ [5] Building 4K PORTRAIT grid ({CANVAS_W}×{CANVAS_H})...")
+    print(f"🖼️ [5] Building 4K PORTRAIT grid ({CANVAS_W}×{CANVAS_H}) — {num_frames} frames...")
+
+    # 🗑️ Purani analysis image delete karo
+    if os.path.exists(ANALYSIS_GRID_PATH):
+        try:
+            os.remove(ANALYSIS_GRID_PATH)
+            print(f"   🗑️  Old analysis deleted: {ANALYSIS_GRID_PATH}")
+        except Exception as e:
+            print(f"   ⚠️  Could not delete old file: {e}")
 
     interval = vid_duration / num_frames
     frame_paths = []
@@ -602,14 +621,15 @@ def build_analysis_grid(video_path, vid_duration, num_frames=ANALYSIS_FRAMES):
         draw.rectangle([x + 4, y + 4, x + 85, y + 32], fill="black")
         draw.text((x + 8, y + 8), label, fill="yellow", font=font)
 
-    grid.save(ANALYSIS_GRID_PATH, quality=95, optimize=False, subsampling=0)
+    grid.save(ANALYSIS_GRID_PATH, quality=92, optimize=True, subsampling=2)
 
     for fp, _ in frame_paths:
         if os.path.exists(fp):
             os.remove(fp)
 
     size_mb = os.path.getsize(ANALYSIS_GRID_PATH) / (1024 * 1024)
-    print(f"✅ Grid: {grid.size[0]}x{grid.size[1]} ({size_mb:.2f} MB)\n")
+    print(f"✅ Grid: {grid.size[0]}x{grid.size[1]} ({size_mb:.2f} MB)")
+    print(f"💾 Saved: {ANALYSIS_GRID_PATH}\n")
 
 
 # ============================================================
@@ -633,7 +653,7 @@ def generate_full_script(slots, srt_content, analysis_grid_path):
 You shout, laugh, hype, roast. Pure energy. Zero boring lines.
 
 **YOU ARE GETTING 1 IMAGE — ANALYSIS GRID:**
-- 60 frames with timestamps
+- 90 frames with timestamps
 - Match frames to slots.
 
 **YOUR JOB:**
@@ -673,12 +693,33 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 23. INSULTS/ROASTS (safe, 3-5): "Get rekt!", "Trash!", "Noob!", "Bot!", "You suck!", "What a bot!", "Delete the game!", "Uninstall!", "GG ez!"
 24. ENEMY CAMPING ROAST: "Come out, where you hiding?!", "Stop camping, you coward!", "Come fight me, bro!", "Stop hiding, you bot!", "Camping again? Trash!", "Show yourself, coward!", "Where you at, you noob?!"
 
-**🎯 CRITICAL: VISUAL CLASSIFICATION**
+**🎯 CRITICAL: VISUAL CLASSIFICATION — HARD RULES**
 Look at the frames for each slot's time range. Classify each slot:
 
-- **"action"** = fast movement, fighting, shooting, explosions, chase, intense gameplay, weapons, enemies, combat
-- **"dialog"** = characters talking, cutscenes, conversation, close-up faces, dialogue moments
-- **"calm"** = walking, exploring, environment shots, scenery, menus, slow/peaceful moments
+**visual_type = "action" if you see ANY of these:**
+- Multiple people in a single frame
+- Any weapon (knife, gun, stick, bat)
+- Body in motion (running pose, kick, punch, jump)
+- Motion blur in the frame
+- Character facing AWAY from camera while moving
+- Stairs/doors being rushed
+- Blood, impact effects, particles
+- Character in crouched/combat stance
+- Two characters close together (fighting distance)
+
+**visual_type = "dialog" ONLY if:**
+- Close-up of face while speaking
+- Character standing still facing camera
+- Subtitles/words visible on screen
+- Two people standing still facing each other
+
+**visual_type = "calm" ONLY if:**
+- ZERO motion across 3+ consecutive frames
+- Empty environment shot
+- Menu/UI screen
+- Walking slowly with no threat
+
+**⚠️ DEFAULT TO "action" IF UNSURE — NEVER default to calm.**
 
 **Be ACCURATE. This decides voice speed!**
 
@@ -724,9 +765,9 @@ Return ONLY valid JSON:
 
     or_url = "https://openrouter.ai/api/v1/chat/completions"
     analysis_b64 = encode_image(analysis_grid_path)
-
-    payload = {
-        "model": "openai/gpt-4o-mini",
+     #openai/gpt-4o-mini
+    # 🎯 FIX #3: Model upgraded to gpt-4o    payload = {
+        "model": "openai/gpt-4o",
         "messages": [{
             "role": "user",
             "content": [
@@ -772,7 +813,7 @@ Return ONLY valid JSON:
                     parsed = json.loads(raw)
                     segments = parsed.get("segments", [])
 
-                    # 🎯 GPT ke visual_type ko slots mein apply karo
+                    # 🎯 FIX #1: Tolerance 2.5 + Signal override
                     updated_count = 0
                     for seg in segments:
                         vt = (seg.get("visual_type") or "").lower().strip()
@@ -788,10 +829,34 @@ Return ONLY valid JSON:
                                 best_diff = diff
                                 best_slot = slot
 
-                        if best_slot and best_diff < 1.0:
-                            best_slot["visual_type"] = vt
-                            best_slot["type"] = vt
-                            best_slot["voice_speed"] = speed_for_type(vt)
+                        if best_slot and best_diff < 2.5:
+                            # 🎯 Signal-based evidence check
+                            signal_type = best_slot.get("type", "calm")
+                            scene_count = best_slot.get("scene_count", 0)
+                            avg_loud = best_slot.get("avg_loud", -50)
+                            sa = best_slot.get("sub_analysis", {})
+                            action_ratio = sa.get("action_ratio", 0)
+
+                            # Signal strong ho toh signal jeetega
+                            signal_says_action = (
+                                signal_type == "action"
+                                or scene_count >= 2
+                                or avg_loud > -15
+                                or action_ratio >= 0.15
+                            )
+
+                            if vt == "calm" and signal_says_action:
+                                final_type = "action"
+                                print(f"   ⚠️  Slot @{best_slot['start']:.1f}s: GPT said CALM but signal says ACTION → using ACTION")
+                            elif vt == "action" and signal_type == "calm" and scene_count == 0 and avg_loud < -25:
+                                final_type = "calm"
+                                print(f"   ⚠️  Slot @{best_slot['start']:.1f}s: GPT said ACTION but signal says CALM → using CALM")
+                            else:
+                                final_type = vt
+
+                            best_slot["visual_type"] = final_type
+                            best_slot["type"] = final_type
+                            best_slot["voice_speed"] = speed_for_type(final_type)
                             updated_count += 1
 
                     print(f"   ✅ Key {key_idx} worked! {len(segments)} segments")
@@ -1037,6 +1102,8 @@ def main():
     print(f"🎤 Voice : {VOICE_ID}")
     print(f"🎛️  Switch: COMMENTARY_ENABLED = {COMMENTARY_ENABLED}")
     print(f"🎮 Speed : {VOICE_SPEED_MIN} - {VOICE_SPEED_MAX} (auto, frame-based)")
+    print(f"🖼️  Frames: {ANALYSIS_FRAMES} ({GRID_COLS}x{GRID_ROWS} grid, {CANVAS_W}x{CANVAS_H})")
+    print(f"🤖 Model : openai/gpt-4o")
     print("=" * 60 + "\n")
 
     # 🎛️ ON/OFF SWITCH
