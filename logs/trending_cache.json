@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-06 02:24:43 PM",
+  "last_updated": "2026-10-06 02:34:46 PM",
   "period_days": 7,
   "trending": [
     {
@@ -7,7 +7,7 @@
       "views_7d": 3058,
       "avg_per_video": 1019,
       "trend": "viral",
-      "ratio": 2.335096069099242,
+      "ratio": 2.390292313244316,
       "fb_link": "https://www.facebook.com/reel/1408783788017999/",
       "source_link": ""
     },
@@ -16,16 +16,16 @@
       "views_7d": 1955,
       "avg_per_video": 977,
       "trend": "viral",
-      "ratio": 2.2388506962806276,
+      "ratio": 2.291771923493324,
       "fb_link": "https://www.facebook.com/reel/1515180523779657/",
       "source_link": ""
     },
     {
       "game": "Russian_secret_missions",
-      "views_7d": 1699,
-      "avg_per_video": 849,
+      "views_7d": 1701,
+      "avg_per_video": 850,
       "trend": "trending",
-      "ratio": 1.9455314648334217,
+      "ratio": 1.9938650306748467,
       "fb_link": "https://www.facebook.com/reel/2322876355125407/",
       "source_link": ""
     },
@@ -34,7 +34,7 @@
       "views_7d": 1841,
       "avg_per_video": 613,
       "trend": "steady",
-      "ratio": 1.4047241318526353,
+      "ratio": 1.4379285456513893,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan231.mp4"
     },
@@ -43,27 +43,18 @@
       "views_7d": 2422,
       "avg_per_video": 605,
       "trend": "steady",
-      "ratio": 1.386391679887185,
+      "ratio": 1.4191627571273908,
       "fb_link": "https://www.facebook.com/reel/28202371762768360/",
       "source_link": ""
     }
   ],
   "below_avg": [
     {
-      "game": "mm2remastered",
-      "views_7d": 268,
-      "avg_per_video": 268,
-      "trend": "slow",
-      "ratio": 0.6141371408425877,
-      "fb_link": "https://www.facebook.com/reel/1146787337671460/",
-      "source_link": ""
-    },
-    {
       "game": "Callofdutyaw",
       "views_7d": 262,
       "avg_per_video": 262,
       "trend": "slow",
-      "ratio": 0.6003878018684999,
+      "ratio": 0.6145795741609527,
       "fb_link": "https://www.facebook.com/reel/1423098925813250/",
       "source_link": ""
     },
@@ -72,7 +63,7 @@
       "views_7d": 425,
       "avg_per_video": 212,
       "trend": "below_avg",
-      "ratio": 0.4858099770844351,
+      "ratio": 0.4972933958859617,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu11.mp4"
     },
@@ -81,8 +72,17 @@
       "views_7d": 167,
       "avg_per_video": 167,
       "trend": "below_avg",
-      "ratio": 0.38268993477877666,
+      "ratio": 0.39173583543846985,
       "fb_link": "https://www.facebook.com/reel/2736647680185540/",
+      "source_link": ""
+    },
+    {
+      "game": "mm2remastered",
+      "views_7d": 273,
+      "avg_per_video": 136,
+      "trend": "below_avg",
+      "ratio": 0.31901840490797545,
+      "fb_link": "https://www.facebook.com/reel/1461328042514444/",
       "source_link": ""
     },
     {
@@ -90,7 +90,7 @@
       "views_7d": 458,
       "avg_per_video": 114,
       "trend": "below_avg",
-      "ratio": 0.2612374405076679,
+      "ratio": 0.2674124864669794,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_5.mp4"
     }
@@ -100,7 +100,7 @@
     "views_7d": 3058,
     "avg_per_video": 1019,
     "trend": "viral",
-    "ratio": 2.335096069099242,
+    "ratio": 2.390292313244316,
     "fb_link": "https://www.facebook.com/reel/1408783788017999/",
     "source_link": ""
   }

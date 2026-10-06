@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 20 | **Last Updated:** 2026-10-06 02:24:43 PM IST
+**Total Videos:** 20 | **Last Updated:** 2026-10-06 02:34:46 PM IST
 
 ---
 
@@ -34,8 +34,8 @@
 | 9 | GodofWarLaufey 10 | [🔵 FB](https://www.facebook.com/17961323568227228) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_10.mp4) |
 | 10 | GodofWarLaufey 6 | [🔵 FB](https://www.facebook.com/18128933026756419) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_6.mp4) |
 | 11 | GodofWarLaufey 23 | [🔵 FB](https://www.facebook.com/18132622645709069) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_23.mp4) |
-| 12 | GodofWarLaufey 19 | [🔵 FB](https://www.facebook.com/18136608697648851) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_19.mp4) |
-| 13 | GodofWarLaufey 15 | [🔵 FB](https://www.facebook.com/18114765365021356) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_15.mp4) |
+| 12 | GodofWarLaufey 15 | [🔵 FB](https://www.facebook.com/18114765365021356) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_15.mp4) |
+| 13 | GodofWarLaufey 19 | [🔵 FB](https://www.facebook.com/18136608697648851) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_19.mp4) |
 | 14 | GodofWarLaufey 5 | [🔵 FB](https://www.facebook.com/18151963171546933) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_5.mp4) |
 | 15 | GodofWarLaufey_16 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_16.mp4) |
 | 16 | GodofWarLaufey_13 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_13.mp4) |
