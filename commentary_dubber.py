@@ -19,26 +19,22 @@ ON/OFF Switch:
   • Action slots  → 1.18 (hype)
   • Dialog slots  → 1.05
   • Calm slots    → 1.00
-  • Speed floor   = 1.0 (kabhi kam nahi)
-  • Speed ceiling = 1.18 (kabhi zyada nahi)
-  • Fallback: signal-based classifier agar GPT visual_type na de
 
 🔊 Dynamic Volume Boost:
-  • Action scenes → 1.7x commentary volume (chillana zor se)
-  • Other scenes  → 1.4x commentary volume (normal)
-  • Background    → 0.25x during commentary (ducked)
+  • Action scenes → 1.7x commentary volume
+  • Other scenes  → 1.4x commentary volume
+  • Background    → 0.25x during commentary
 
-🎯 PERFECT COMMENTARY FIXES:
-  • FIX #1: Tolerance 1.0 → 2.5 + Signal override (GPT galat ho toh signal jeetega)
-  • FIX #2: Prompt mein hard action rules
-  • FIX #3: Model gpt-4o-mini (Free/Cheap version)
-  • FIX #4: 90 frames (9x10 grid) + 8K canvas
-  • FIX #5: Black borders khatam (ImageOps.fit — crop fill, no bars)
-  • FIX #6: Voice speed action 1.13 → 1.18
-  • FIX #7: Dynamic volume — action 1.7x, other 1.4x
-  • FIX #8: Sirf 8K image GPT ko jaayegi (no 4K resize)
-  • Analysis image: analysis/last_analysis.jpg (8K, GPT ko bhi yahi jaayegi)
-  • Git Push: Analysis image auto-commit + push to GitHub (Python ke andar se)
+🎯 PERFECT COMMENTARY FIXES (v2 — honest classification):
+  • FIX #1: Tolerance 1.0 → 2.5 + Signal override
+  • FIX #2: Prompt honest — "BE HONEST, don't force action"
+  • FIX #3: Signal override tightened (only STRONG signal)
+  • FIX #4: Signal thresholds: action 15% → 30%, calm 60% → 50%
+  • FIX #5: Model gpt-4o-mini (Free tier)
+  • FIX #6: 90 frames (9x10 grid) + 8K canvas
+  • FIX #7: ImageOps.fit — no black borders
+  • FIX #8: Voice speed action 1.18, dynamic volume
+  • FIX #9: 8K image GPT ko direct (no 4K resize)
 """
 
 import os
@@ -108,7 +104,7 @@ VOICE_ID           = ARGS.voice or os.getenv("VOICE_ID", "91w4XjqhkWTX1Jr3O344")
 AUDIO_PATH         = "extracted_audio.mp3"
 SRT_PATH           = "final.srt"
 ANALYSIS_DIR       = "analysis"
-ANALYSIS_GRID_PATH = "analysis/last_analysis.jpg"           # 8K image (GPT ko bhi yahi jaayegi)
+ANALYSIS_GRID_PATH = "analysis/last_analysis.jpg"
 SEGMENTS_DIR       = "segments"
 
 MIN_SLOTS_HARD = 6
@@ -119,22 +115,22 @@ DUCK_VOLUME = 0.25
 ANALYSIS_FRAMES = 90
 GRID_COLS = 9
 GRID_ROWS = 10
-CANVAS_W = 4320       # 8K portrait width
-CANVAS_H = 7680       # 8K portrait height
+CANVAS_W = 4320
+CANVAS_H = 7680
 
-# 🎮 Voice speed limits — auto adjust, but clamped here
+# 🎮 Voice speed limits
 VOICE_SPEED_MIN = 1.00
 VOICE_SPEED_MAX = 1.18
 ATEMPO_MAX      = 1.10
 
-# 🎮 Speed per visual type (FIX #6: action 1.13 → 1.18)
+# 🎮 Speed per visual type
 SPEED_ACTION = 1.18
 SPEED_DIALOG = 1.05
 SPEED_CALM   = 1.00
 
-# 🔊 Dynamic commentary volume (FIX #7)
-VOL_ACTION = 1.7    # Action scenes — loud
-VOL_OTHER  = 1.4    # Dialog/calm — normal
+# 🔊 Dynamic commentary volume
+VOL_ACTION = 1.7
+VOL_OTHER  = 1.4
 
 os.makedirs(SEGMENTS_DIR, exist_ok=True)
 os.makedirs(ANALYSIS_DIR, exist_ok=True)
@@ -211,7 +207,6 @@ def parse_srt(srt_content):
 
 
 def speed_for_type(slot_type):
-    """Slot type se voice speed nikaalo"""
     if slot_type == "action":
         return SPEED_ACTION
     elif slot_type == "dialog":
@@ -221,33 +216,22 @@ def speed_for_type(slot_type):
 
 
 # ============================================================
-# 🎯 GIT PUSH — Analysis image ko GitHub par bhejo (Python version)
+# 🎯 GIT PUSH
 # ============================================================
 def commit_analysis_to_github():
     print("📤 [10] Pushing analysis image to GitHub...")
 
-    files_to_push = []
-    if os.path.exists(ANALYSIS_GRID_PATH):
-        files_to_push.append(ANALYSIS_GRID_PATH)
-
-    if not files_to_push:
+    if not os.path.exists(ANALYSIS_GRID_PATH):
         print("   ⚠️ No analysis image found, skipping git commit.")
         return
 
     try:
-        # Git config
         subprocess.run("git config --global user.name 'GitHub Action'", shell=True, check=False)
         subprocess.run("git config --global user.email 'action@github.com'", shell=True, check=False)
-
-        # Pull latest to prevent conflicts
         subprocess.run("git pull --rebase origin main || git pull --rebase origin master || true", shell=True, check=False)
+        subprocess.run(f"git add {ANALYSIS_GRID_PATH}", shell=True, check=False)
+        print(f"   📎 Staged: {ANALYSIS_GRID_PATH}")
 
-        # Add image
-        for f in files_to_push:
-            subprocess.run(f"git add {f}", shell=True, check=False)
-            print(f"   📎 Staged: {f}")
-
-        # Commit
         commit_res = subprocess.run(
             "git commit -m 'Update analysis image [skip ci]'",
             shell=True, capture_output=True, text=True
@@ -255,9 +239,8 @@ def commit_analysis_to_github():
         if commit_res.returncode == 0:
             print("   ✅ Committed analysis image.")
         else:
-            print("   ℹ️ No changes to commit (image might be identical).")
+            print("   ℹ️ No changes to commit.")
 
-        # Push
         push_res = subprocess.run("git push origin HEAD", shell=True, capture_output=True, text=True)
         if push_res.returncode == 0:
             print("   🚀 Pushed to GitHub successfully.")
@@ -282,7 +265,7 @@ def extract_audio(video_path, out_path):
 
 
 # ============================================================
-# STEP 2 — Transcribe (MULTI-KEY GROQ)
+# STEP 2 — Transcribe
 # ============================================================
 def transcribe(audio_path):
     print(f"📝 [2] Transcribing audio (Groq — {len(GROQ_KEYS)} keys available)...")
@@ -312,36 +295,30 @@ def transcribe(audio_path):
                     )
                 with open(SRT_PATH, "w", encoding="utf-8") as sf:
                     sf.write(srt_content)
-                print(f"   ✅ Key {key_idx} worked! SRT saved ({len(srt_content)} chars)\n")
+                print(f"   ✅ Key {key_idx} worked! SRT saved\n")
                 success = True
                 break
 
             elif r.status_code in (401, 403):
-                print(f"   ❌ Key {key_idx} invalid/expired (HTTP {r.status_code}) — trying next...")
+                print(f"   ❌ Key {key_idx} invalid — trying next...")
                 time.sleep(1)
                 continue
-
             elif r.status_code == 429:
-                print(f"   ⚠️ Key {key_idx} rate-limited (429) — trying next...")
+                print(f"   ⚠️ Key {key_idx} rate-limited — trying next...")
                 time.sleep(2)
                 continue
-
             else:
-                print(f"   ⚠️ Key {key_idx} error {r.status_code}: {r.text[:120]}")
+                print(f"   ⚠️ Key {key_idx} error {r.status_code}")
                 time.sleep(2)
                 continue
 
-        except requests.exceptions.Timeout:
-            print(f"   ⏱️ Key {key_idx} timeout — trying next...")
-            time.sleep(2)
-            continue
         except Exception as e:
             print(f"   ⚠️ Key {key_idx} exception: {e}")
             time.sleep(2)
             continue
 
     if not success:
-        print("   ❌ All Groq keys failed — SRT empty (commentary may be limited)\n")
+        print("   ❌ All Groq keys failed\n")
 
     return srt_content
 
@@ -512,7 +489,7 @@ def build_auto_slots(video_path, vid_duration, srt_content):
 
 
 # ============================================================
-# STEP 4 — SUB-WINDOW CLASSIFY (Fallback) + AUTO VOICE SPEED
+# STEP 4 — SIGNAL-BASED CLASSIFY (FIX #4: stricter thresholds)
 # ============================================================
 def classify_slots_combined(video_path, slots, srt_content):
     print("🔍 [4] Classifying slots (signal-based fallback)...")
@@ -581,13 +558,14 @@ def classify_slots_combined(video_path, slots, srt_content):
         dialog_ratio = dialog_count / total
         calm_ratio = calm_count / total
 
-        if action_ratio >= 0.15:
+        # 🎯 FIX #4: Stricter thresholds (action 30%, calm 50%)
+        if action_ratio >= 0.30:
             slot["type"] = "action"
-        elif dialog_ratio >= 0.4:
+        elif dialog_ratio >= 0.40:
             slot["type"] = "dialog"
-        elif calm_ratio >= 0.6:
+        elif calm_ratio >= 0.50:
             slot["type"] = "calm"
-        elif action_ratio >= 0.10:
+        elif action_ratio >= 0.20:
             slot["type"] = "action"
         elif dialog_ratio >= 0.20:
             slot["type"] = "dialog"
@@ -609,7 +587,6 @@ def classify_slots_combined(video_path, slots, srt_content):
 
         voice_speed = speed_for_type(slot["type"])
 
-        # 🎯 FIX #3: Action boost +0.05 → +0.06
         if slot["type"] == "action":
             if slot["scene_count"] >= 3:
                 voice_speed += 0.06
@@ -625,18 +602,17 @@ def classify_slots_combined(video_path, slots, srt_content):
 
 
 # ============================================================
-# STEP 5 — 8K PORTRAIT ANALYSIS GRID (90 frames, 9x10)
+# STEP 5 — 8K PORTRAIT ANALYSIS GRID
 # ============================================================
 def build_analysis_grid(video_path, vid_duration, num_frames=ANALYSIS_FRAMES):
     print(f"🖼️ [5] Building 8K PORTRAIT grid ({CANVAS_W}×{CANVAS_H}) — {num_frames} frames...")
 
-    # 🗑️ Purani analysis image delete karo
     if os.path.exists(ANALYSIS_GRID_PATH):
         try:
             os.remove(ANALYSIS_GRID_PATH)
             print(f"   🗑️  Old file deleted: {ANALYSIS_GRID_PATH}")
         except Exception as e:
-            print(f"   ⚠️  Could not delete {ANALYSIS_GRID_PATH}: {e}")
+            print(f"   ⚠️  Could not delete: {e}")
 
     interval = vid_duration / num_frames
     frame_paths = []
@@ -670,7 +646,6 @@ def build_analysis_grid(video_path, vid_duration, num_frames=ANALYSIS_FRAMES):
             break
         try:
             img = Image.open(fp)
-            # 🎯 FIX #5: ImageOps.fit — crop to fill cell, NO black borders
             img = ImageOps.fit(img, (cell_w, cell_h), method=Image.LANCZOS, centering=(0.5, 0.5))
         except:
             continue
@@ -683,15 +658,10 @@ def build_analysis_grid(video_path, vid_duration, num_frames=ANALYSIS_FRAMES):
         draw.rectangle([x + 8, y + 8, x + 160, y + 60], fill="black")
         draw.text((x + 16, y + 14), label, fill="yellow", font=font)
 
-    # ==================================================
-    # 🎯 SAVE: 8K FULL QUALITY (GPT ko bhi yahi jaayegi)
-    # ==================================================
     grid.save(ANALYSIS_GRID_PATH, quality=92, optimize=True, subsampling=2)
     size_8k = os.path.getsize(ANALYSIS_GRID_PATH) / (1024 * 1024)
     print(f"✅ 8K Full Quality: {grid.size[0]}x{grid.size[1]} ({size_8k:.2f} MB)")
-    print(f"💾 Saved: {ANALYSIS_GRID_PATH}")
-    print(f"⚠️  NOTE: 8K image GPT ko bheji ja rahi hai (no 4K resize)")
-    print(f"⚠️  Agar error aaya toh console mein status check karo\n")
+    print(f"💾 Saved: {ANALYSIS_GRID_PATH}\n")
 
     for fp, _ in frame_paths:
         if os.path.exists(fp):
@@ -699,7 +669,7 @@ def build_analysis_grid(video_path, vid_duration, num_frames=ANALYSIS_FRAMES):
 
 
 # ============================================================
-# STEP 6 — GPT Call (MULTI-KEY OPENROUTER) — WITH VISUAL TYPE
+# STEP 6 — GPT Call (FIX #2 & #3: honest prompt + tightened override)
 # ============================================================
 def generate_full_script(slots, srt_content, analysis_grid_path):
     print(f"🤖 [6] Generating FULL script + visual classification (OpenRouter — {len(OPENROUTER_KEYS)} keys)...")
@@ -731,80 +701,70 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 - Slang: "bruh", "yo", "bro", "nah", "fr", "lowkey", "bet", "cap"
 - Short sentences. Fragments OK.
 - Start with reactions: "YO!", "BRO!", "WAIT!", "NAH!", "AYY!"
-- Repeat for emphasis: "No no no no", "Wait wait wait"
 
 **REACTION PATTERNS (use 10-14 varied):**
 1. BIG ACTION: "OHHHH! He's GONE!", "BRO! That was NASTY!", "AYYYY! Dropped him!"
-2. SWEARING (max 5-8 total, censor): "OHHH Fuckk that was CLEAN!", "Holy sh*t!"
-3. VIEWER QUESTIONS (2-4): "Guys, is this game worth buying?", "Yo, anyone else play this?"
-4. GRAPHICS (2-3): "Bro these graphics are INSANE!", "Yo the visuals are FIRE!", "Nah the lighting is next level!", "These graphics look AMAZING!", "Bro the details are CRAZY!"
-5. ENEMY ROAST: "Bro this guy's aim is worse than mine.", "Enemy NPCs look so confused lol."
-6. GAME JOKES: "Bro reloading with 1 HP left, risky business.", "This map design is cursed."
-7. CINEMATIC: "Okay that was actually cinema, wow."
-8. FUNNY: "Bro's collecting stuff like it's a grocery run."
-9. FOLLOW REQUEST (2-3 total): "Ayy if you're vibing, hit that follow yo."
-10. HYPE: "Okay okay okay — something's coming!", "Wait wait WAIT!"
-11. CHILL: "Just vibing here, chilling.", "Too quiet... sus.", "Too quiet... something's off.", "Too quiet... fishy.", "Too quiet... suspicious."
-12. WEIRD: "What even is that thing?!"
-13. PREDICTIONS (2-4): "He's gonna die here, watch.", "guys I'm calling it — this is a W."
-14. SELF-DEPRECATING (2-3): "I would've died there honestly.", "This is why I'm not a pro."
-15. Guys (2-4): "guys, you seeing this?!", "Yo guys, you believe this?"
-16. SOUND (2-3): "Yo did you HEAR that?!", "That audio is crispy."
-17. CALLBACKS (1-2): "Remember that guy from earlier? Yeah."
-18. KNOCK EVENTS: "KNOCKED HIM!", "He's DOWN!", "One knocked, push push!", "Got him down!"
-19. HYPE VARIETY: "Let him COOK!", "Bro is COOKED!", "We eating good tonight!", "He's on fire!"
-20. CLUTCH: "CLUTCHED IT!", "One HP and he's alive!", "Bro is HIM!", "What a save!"
-21. BIG HYPE: "What a blast today!", "He's gonna wreck everyone today!", "I'm gonna wreck everyone today!", "He's gonna body everyone!", "Nobody can stop him today!"
-22. SWEARING (max 5-8 total, censor with asterisks): "Holy sh*t!", "What the f*ck!", "That's bullsh*t!", "Son of a b*tch!", "Damn!", "Hell yeah!", "Get rekt!", "You suck!", "Trash!", "Noob!", "Bot!", "Dumbass!"
-23. INSULTS/ROASTS (safe, 3-5): "Get rekt!", "Trash!", "Noob!", "Bot!", "You suck!", "What a bot!", "Delete the game!", "Uninstall!", "GG ez!"
-24. ENEMY CAMPING ROAST: "Come out, where you hiding?!", "Stop camping, you coward!", "Come fight me, bro!", "Stop hiding, you bot!", "Camping again? Trash!", "Show yourself, coward!", "Where you at, you noob?!"
+2. VIEWER QUESTIONS (2-4): "Guys, is this game worth buying?", "Yo, anyone else play this?"
+3. GRAPHICS (2-3): "Bro these graphics are INSANE!", "Yo the visuals are FIRE!"
+4. ENEMY ROAST: "Bro this guy's aim is worse than mine."
+5. CINEMATIC: "Okay that was actually cinema, wow."
+6. CHILL: "Just vibing here, chilling.", "Too quiet... sus.", "Just taking in the view."
+7. HYPE: "Okay okay okay — something's coming!", "Wait wait WAIT!"
+8. WEIRD: "What even is that thing?!"
+9. Guys (2-4): "guys, you seeing this?!", "Yo guys, you believe this?"
+10. FOLLOW REQUEST (2-3 total): "Ayy if you're vibing, hit that follow yo."
+11. GRAPHICS PRAISE: "Nah the lighting is next level!", "Bro the details are CRAZY!"
+12. ENVIRONMENT: "This map is beautiful ngl.", "Look at that skyline bro!"
+13. SOUND (2-3): "Yo did you HEAR that?!", "That audio is crispy."
+14. CINEMATIC SHOT: "That's a movie shot right there!"
 
-**🎯 CRITICAL: VISUAL CLASSIFICATION — HARD RULES**
+**🎯 CRITICAL: VISUAL CLASSIFICATION — HONEST RULES**
 Look at the frames for each slot's time range. Classify each slot:
 
-**visual_type = "action" if you see ANY of these:**
-- Multiple people in a single frame
-- Any weapon (knife, gun, stick, bat)
-- Body in motion (running pose, kick, punch, jump)
-- Motion blur in the frame
-- Character facing AWAY from camera while moving
-- Stairs/doors being rushed
-- Blood, impact effects, particles
-- Character in crouched/combat stance
-- Two characters close together (fighting distance)
+**visual_type = "action" ONLY if you see CLEAR physical motion:**
+- Fighting, punching, kicking
+- Running, jumping, dodging
+- Shooting, weapon being FIRED
+- Explosion, impact, blood
+- Multiple characters in COMBAT
+- Character clearly sprinting
 
 **visual_type = "dialog" ONLY if:**
 - Close-up of face while speaking
-- Character standing still facing camera
-- Subtitles/words visible on screen
-- Two people standing still facing each other
+- Character standing still, facing camera
+- Conversation scene
+- Character holding weapon but NOT fighting (aiming/idle)
 
-**visual_type = "calm" ONLY if:**
-- ZERO motion across 3+ consecutive frames
-- Empty environment shot
-- Menu/UI screen
-- Walking slowly with no threat
+**visual_type = "calm" for EVERYTHING ELSE, including:**
+- Slow camera panning
+- City skyline / scenery shots
+- Drone flying in sky
+- Character sitting / standing still
+- Menu / UI screens
+- Walking slowly
+- Character showing weapon but not using it
+- Environment only shots
+- End screen / credits
 
-**⚠️ DEFAULT TO "action" IF UNSURE — NEVER default to calm.**
+**⚠️ BE HONEST. If you see slow motion, sitting, walking, scenery, drone flying, city skyline → use "calm".**
+**Only use "action" if there is CLEAR physical motion (fight, running, jumping, weapon being used, explosion, shooting).**
+**When in doubt, use "calm" — NOT "action".**
 
-**Be ACCURATE. This decides voice speed AND volume!**
-
-**PACING RULES (based on visual_type):**
+**PACING RULES:**
 - visual_type = "action" → VERY short punchy lines (3-5 words), HIGH energy, CAPS
 - visual_type = "dialog" → 5-7 words, conversational
 - visual_type = "calm" → 6-8 words, chill/observational
 
 **RULES:**
 1. NATURAL — casual, slang, contractions
-2. REACT with emotion — hype, scream, laugh, roast
+2. REACT with emotion
 3. Focus on VISUALS
 4. UNIQUE lines based on actual frames
-5. Roast ENEMIES and GAME MECHANICS
-6. 5-8 words per line — short, punchy
-7. Vary energy — sometimes chill, sometimes WILD
-8. Reference "guys" or "you" naturally
-9. Max 2-3 follow requests total
-10. Use CAPS for shouting
+5. 5-8 words per line
+6. Vary energy — sometimes chill, sometimes WILD
+7. Reference "guys" or "you" naturally
+8. Max 2-3 follow requests total
+9. Use CAPS only for real hype
 
 **STORY CONTEXT:**
 {srt_content[:2500]}
@@ -823,7 +783,7 @@ Return ONLY valid JSON:
       "start": 0.0,
       "end": 3.5,
       "text": "...",
-      "visual_type": "action"
+      "visual_type": "calm"
     }}
   ]
 }}
@@ -879,7 +839,9 @@ Return ONLY valid JSON:
                     parsed = json.loads(raw)
                     segments = parsed.get("segments", [])
 
+                    # 🎯 FIX #3: Tightened signal override
                     updated_count = 0
+                    override_count = 0
                     for seg in segments:
                         vt = (seg.get("visual_type") or "").lower().strip()
                         if vt not in ("action", "dialog", "calm"):
@@ -900,20 +862,19 @@ Return ONLY valid JSON:
                             sa = best_slot.get("sub_analysis", {})
                             action_ratio = sa.get("action_ratio", 0)
 
-                            signal_says_action = (
-                                signal_type == "action"
-                                or scene_count >= 2
-                                or avg_loud > -15
-                                or action_ratio >= 0.15
+                            # 🎯 FIX #3: Only override if signal is VERY STRONG
+                            signal_says_action_strong = (
+                                (signal_type == "action" and action_ratio >= 0.35)
+                                or (scene_count >= 5 and avg_loud > -10)
+                                or (action_ratio >= 0.50)
                             )
 
-                            if vt == "calm" and signal_says_action:
+                            if vt == "calm" and signal_says_action_strong:
                                 final_type = "action"
-                                print(f"   ⚠️  Slot @{best_slot['start']:.1f}s: GPT said CALM but signal says ACTION → using ACTION")
-                            elif vt == "action" and signal_type == "calm" and scene_count == 0 and avg_loud < -25:
-                                final_type = "calm"
-                                print(f"   ⚠️  Slot @{best_slot['start']:.1f}s: GPT said ACTION but signal says CALM → using CALM")
+                                override_count += 1
+                                print(f"   ⚠️  Override @{best_slot['start']:.1f}s: GPT=CALM, STRONG signal=ACTION → ACTION")
                             else:
+                                # 🎯 Trust GPT in all other cases (honest prompt)
                                 final_type = vt
 
                             best_slot["visual_type"] = final_type
@@ -922,18 +883,17 @@ Return ONLY valid JSON:
                             updated_count += 1
 
                     print(f"   ✅ Key {key_idx} worked! {len(segments)} segments")
-                    print(f"   🎯 Visual classification applied to {updated_count}/{len(slots)} slots\n")
+                    print(f"   🎯 Visual classification applied to {updated_count}/{len(slots)} slots")
+                    print(f"   🔄 Signal overrides: {override_count}\n")
                     return segments
 
                 elif r.status_code in (401, 403):
-                    print(f"      ❌ Key {key_idx} invalid (HTTP {r.status_code})")
+                    print(f"      ❌ Key {key_idx} invalid")
                     break
-
                 elif r.status_code == 429:
-                    print(f"      ⚠️ Key {key_idx} rate-limited (429)")
+                    print(f"      ⚠️ Key {key_idx} rate-limited")
                     time.sleep(2)
                     continue
-
                 else:
                     print(f"      ⚠️ Error {r.status_code}: {r.text[:200]}")
                     time.sleep(2)
@@ -958,8 +918,8 @@ Return ONLY valid JSON:
                    "Chaos everywhere!", "Let him cook!"],
         "dialog": ["Wait, what did he say?", "Hmm interesting...",
                    "He's talking to someone!", "What's the plan here?"],
-        "calm":   ["Just cruising along...", "Taking in the view...",
-                   "Quiet moment...", "Chill vibes here..."]
+        "calm":   ["Just vibing here, chilling.", "Too quiet... sus.",
+                   "Taking in the view...", "Chill vibes here..."]
     }
     return [
         {"slot": i+1, "start": s["start"], "end": s["end"],
@@ -970,7 +930,7 @@ Return ONLY valid JSON:
 
 
 # ============================================================
-# STEP 7 — ElevenLabs TTS (Visual-type based speed)
+# STEP 7 — ElevenLabs TTS
 # ============================================================
 def generate_audio(segments, slots):
     print("🔊 [7] Generating TTS...")
@@ -1052,7 +1012,7 @@ def generate_audio(segments, slots):
                 print("   ❌ 401 — ElevenLabs key galat!")
                 break
             elif r.status_code == 429:
-                print("   ⚠️ 429 — rate limit, waiting 3s...")
+                print("   ⚠️ 429 — rate limit")
                 time.sleep(3)
             else:
                 print(f"   ❌ {r.status_code}: {r.text[:100]}")
@@ -1104,12 +1064,11 @@ def build_timed_audio(audio_files, vid_duration):
 
 
 # ============================================================
-# STEP 9 — Final Merge with Ducking + DYNAMIC VOLUME
+# STEP 9 — Final Merge with Ducking + Dynamic Volume
 # ============================================================
 def merge_final(video_path, commentary_audio, out_path, audio_files):
     print("🎬 [9] Merging (duck + dynamic volume)...")
 
-    # 🎯 FIX #7: Separate time conditions for ACTION vs OTHER
     action_times = []
     other_times = []
 
@@ -1120,12 +1079,10 @@ def merge_final(video_path, commentary_audio, out_path, audio_files):
         else:
             other_times.append(f"between(t,{a['start']:.2f},{a['end']:.2f})")
 
-    # 🎯 Background duck (sabhi commentary times par)
     all_times = action_times + other_times
     all_conditions = "+".join(all_times) if all_times else "0"
     volume_expr = f"if({all_conditions},{DUCK_VOLUME},1.0)"
 
-    # 🎯 Commentary volume: Action = 1.7, Others = 1.4
     if action_times:
         action_condition = "+".join(action_times)
         vo_volume_expr = f"if({action_condition},{VOL_ACTION},{VOL_OTHER})"
@@ -1150,7 +1107,7 @@ def merge_final(video_path, commentary_audio, out_path, audio_files):
 
 
 # ============================================================
-# FALLBACK — copy original clip
+# FALLBACK
 # ============================================================
 def fallback_copy_original():
     try:
@@ -1170,20 +1127,18 @@ def fallback_copy_original():
 # ============================================================
 def main():
     print("=" * 60)
-    print("🎙️ AI COMMENTARY DUBBER — Multi-Key + ON/OFF + Frame-Based Speed")
+    print("🎙️ AI COMMENTARY DUBBER — v2 (Honest Classification)")
     print("=" * 60)
     print(f"📹 Input : {FINAL_CLIP_PATH}")
     print(f"📤 Output: {FINAL_DUBBED_VIDEO}")
     print(f"🎤 Voice : {VOICE_ID}")
     print(f"🎛️  Switch: COMMENTARY_ENABLED = {COMMENTARY_ENABLED}")
-    print(f"🎮 Speed : {VOICE_SPEED_MIN} - {VOICE_SPEED_MAX} (auto, frame-based)")
+    print(f"🎮 Speed : {VOICE_SPEED_MIN} - {VOICE_SPEED_MAX}")
     print(f"🔊 Volume: Action={VOL_ACTION}x | Other={VOL_OTHER}x")
-    print(f"🖼️  Frames: {ANALYSIS_FRAMES} ({GRID_COLS}x{GRID_ROWS} grid, {CANVAS_W}x{CANVAS_H} 8K)")
-    print(f"🤖 Model : openai/gpt-4o-mini (Free tier)")
-    print(f"📷 Image : 8K direct (no 4K resize)")
+    print(f"🖼️  Frames: {ANALYSIS_FRAMES} ({GRID_COLS}x{GRID_ROWS}, {CANVAS_W}x{CANVAS_H} 8K)")
+    print(f"🤖 Model : openai/gpt-4o-mini (Free)")
     print("=" * 60 + "\n")
 
-    # 🎛️ ON/OFF SWITCH
     if not COMMENTARY_ENABLED:
         print("🚫 Commentary is OFF — copying original clip...")
         if fallback_copy_original():
@@ -1191,7 +1146,6 @@ def main():
         else:
             sys.exit(1)
 
-    # Env validation
     if not validate_env():
         print("⚠️ Falling back to original clip...")
         fallback_copy_original()
@@ -1212,7 +1166,7 @@ def main():
             raise Exception("No segments generated")
 
         speeds = [s["voice_speed"] for s in slots]
-        print(f"🎮 Final voice speeds (after GPT visual): "
+        print(f"🎮 Final voice speeds: "
               f"min={min(speeds):.2f} max={max(speeds):.2f} avg={sum(speeds)/len(speeds):.2f}\n")
 
         audio_files = generate_audio(segments, slots)
@@ -1227,18 +1181,13 @@ def main():
         print(f"📊 Slots: {len(slots)} | Segments: {len(audio_files)}")
         print("=" * 60)
 
-        # 🎯 Push analysis image to GitHub
         commit_analysis_to_github()
-
         sys.exit(0)
 
     except Exception as e:
         print(f"\n❌ Commentary pipeline failed: {e}")
         print("⚠️ Falling back to original clip...")
-
-        # Even if commentary fails, push image for debugging
         commit_analysis_to_github()
-
         if fallback_copy_original():
             sys.exit(0)
         else:
