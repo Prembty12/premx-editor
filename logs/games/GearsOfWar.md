@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 13 | **Last Updated:** 2026-10-06 08:32:39 PM IST
+**Total Videos:** 13 | **Last Updated:** 2026-10-06 09:17:37 PM IST
 
 ---
 
@@ -14,7 +14,7 @@
 | Posted (FB or IG) | 5 / 13 |
 | FB Posted | 4 / 13 |
 | IG Posted | 3 / 13 |
-| Total FB Views | **1,646** |
+| Total FB Views | **1,647** |
 | Total IG Views | **410** |
 
 ---
@@ -25,7 +25,7 @@
 |---|---|---|---|---|---|---|
 | 1 | Giant Beast Boss Combat 🔥  #videogames #gamingcommunity #gaming #gearsofwar #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeJvEc5gu53/) | 40 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar1.mp4) |
 | 2 | Giant Beast Battle 🦖💥  #videogames #gamingcommunity #gaming #gearsofwar #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1515180523779657/) | 75 | [🟣 IG](https://www.instagram.com/reel/DeHkl5RFM6F/) | 300 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar2.mp4) |
-| 3 | Monsters Rise Up 🩸🔥  #videogames #gamingcommunity #gaming #gearsofwar #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2563430397490305/) | 1,571 | [🟣 IG](https://www.instagram.com/reel/DeDxVY2mRE9/) | 70 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar4.mp4) |
+| 3 | Monsters Rise Up 🩸🔥  #videogames #gamingcommunity #gaming #gearsofwar #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2563430397490305/) | 1,572 | [🟣 IG](https://www.instagram.com/reel/DeDxVY2mRE9/) | 70 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar4.mp4) |
 | 4 | GearsOfWar9 | [🔵 FB](https://www.facebook.com/17870525709642100) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar9.mp4) |
 | 5 | GearsOfWar3 | [🔵 FB](https://www.facebook.com/18105163727360770) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar3.mp4) |
 | 6 | GearsOfWar12 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar12.mp4) |
