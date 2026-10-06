@@ -1,78 +1,78 @@
 {
-  "last_updated": "2026-10-07 12:03:19 AM",
+  "last_updated": "2026-10-07 01:54:58 AM",
   "period_days": 7,
   "trending": [
     {
-      "game": "Russian_secret_missions",
-      "views_7d": 1778,
-      "avg_per_video": 889,
-      "trend": "viral",
-      "ratio": 2.3048148148148146,
-      "fb_link": "https://www.facebook.com/reel/2322876355125407/",
-      "source_link": ""
-    },
-    {
       "game": "codBlackops6",
-      "views_7d": 3300,
-      "avg_per_video": 825,
+      "views_7d": 3392,
+      "avg_per_video": 848,
       "trend": "viral",
-      "ratio": 2.138888888888889,
+      "ratio": 2.3485657764589516,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops64.mp4"
     },
     {
       "game": "VietnamCavePrison",
-      "views_7d": 3568,
-      "avg_per_video": 713,
-      "trend": "trending",
-      "ratio": 1.8485185185185184,
+      "views_7d": 3638,
+      "avg_per_video": 727,
+      "trend": "viral",
+      "ratio": 2.0134520276953514,
       "fb_link": "https://www.facebook.com/reel/1623579349213015/",
       "source_link": ""
     },
     {
       "game": "GearsOfWar",
-      "views_7d": 2099,
-      "avg_per_video": 699,
+      "views_7d": 2112,
+      "avg_per_video": 704,
       "trend": "trending",
-      "ratio": 1.8122222222222222,
+      "ratio": 1.9497527200791296,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "MarvelsSpiderMan2",
-      "views_7d": 1870,
-      "avg_per_video": 467,
+      "views_7d": 1874,
+      "avg_per_video": 468,
       "trend": "steady",
-      "ratio": 1.2107407407407407,
+      "ratio": 1.2961424332344214,
       "fb_link": "",
+      "source_link": ""
+    },
+    {
+      "game": "Russian_secret_missions",
+      "views_7d": 456,
+      "avg_per_video": 456,
+      "trend": "steady",
+      "ratio": 1.2629080118694362,
+      "fb_link": "https://www.facebook.com/reel/2322876355125407/",
       "source_link": ""
     }
   ],
   "below_avg": [
     {
       "game": "GODOFWAR3",
-      "views_7d": 1228,
-      "avg_per_video": 307,
+      "views_7d": 1238,
+      "avg_per_video": 309,
       "trend": "slow",
-      "ratio": 0.7959259259259259,
+      "ratio": 0.855786350148368,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "Callofdutyaw",
-      "views_7d": 285,
-      "avg_per_video": 285,
+      "views_7d": 286,
+      "avg_per_video": 286,
       "trend": "slow",
-      "ratio": 0.7388888888888889,
+      "ratio": 0.7920870425321465,
       "fb_link": "https://www.facebook.com/reel/1423098925813250/",
       "source_link": ""
     },
     {
       "game": "monkeyKing",
-      "views_7d": 276,
-      "avg_per_video": 138,
+      "views_7d": 281,
+      "avg_per_video": 140,
       "trend": "below_avg",
-      "ratio": 0.35777777777777775,
+      "ratio": 0.3877349159248269,
       "fb_link": "https://www.facebook.com/reel/1596514458133485/",
       "source_link": ""
     },
@@ -81,7 +81,7 @@
       "views_7d": 478,
       "avg_per_video": 119,
       "trend": "below_avg",
-      "ratio": 0.3085185185185185,
+      "ratio": 0.3295746785361029,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu12.mp4"
     },
@@ -90,18 +90,18 @@
       "views_7d": 461,
       "avg_per_video": 115,
       "trend": "below_avg",
-      "ratio": 0.29814814814814816,
+      "ratio": 0.31849653808110784,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_5.mp4"
     }
   ],
   "recommendation": {
-    "game": "Russian_secret_missions",
-    "views_7d": 1778,
-    "avg_per_video": 889,
+    "game": "codBlackops6",
+    "views_7d": 3392,
+    "avg_per_video": 848,
     "trend": "viral",
-    "ratio": 2.3048148148148146,
-    "fb_link": "https://www.facebook.com/reel/2322876355125407/",
-    "source_link": ""
+    "ratio": 2.3485657764589516,
+    "fb_link": "",
+    "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops64.mp4"
   }
 }
