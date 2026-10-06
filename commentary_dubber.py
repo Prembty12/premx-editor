@@ -27,9 +27,10 @@ ON/OFF Switch:
   • FIX #1: Tolerance 1.0 → 2.5 + Signal override (GPT galat ho toh signal jeetega)
   • FIX #2: Prompt mein hard action rules
   • FIX #3: Model gpt-4o-mini (Free/Cheap version)
-  • FIX #4: 90 frames (9x10 grid) + 4K canvas
-  • Analysis image: analysis/last_analysis.jpg (purani auto-delete)
-  • Git Push: Analysis image auto-commit + push to GitHub (Python ke andar se)
+  • FIX #4: 90 frames (9x10 grid) + 8K canvas
+  • Analysis image: analysis/full_8k_analysis.jpg (8K, aapke liye)
+  • GPT image: analysis/last_analysis.jpg (4K resized, GPT limit ke liye)
+  • Git Push: Analysis images auto-commit + push to GitHub (Python ke andar se)
 """
 
 import os
@@ -99,19 +100,24 @@ VOICE_ID           = ARGS.voice or os.getenv("VOICE_ID", "91w4XjqhkWTX1Jr3O344")
 AUDIO_PATH         = "extracted_audio.mp3"
 SRT_PATH           = "final.srt"
 ANALYSIS_DIR       = "analysis"
-ANALYSIS_GRID_PATH = "analysis/last_analysis.jpg"
+ANALYSIS_GRID_PATH = "analysis/last_analysis.jpg"           # GPT ke liye (4K resized)
+FULL_8K_PATH       = "analysis/full_8k_analysis.jpg"        # Aapke liye (8K full)
 SEGMENTS_DIR       = "segments"
 
 MIN_SLOTS_HARD = 6
 MAX_SLOTS_HARD = 20
 DUCK_VOLUME = 0.25
 
-# 🎯 90 frames — 4K portrait canvas (9x10 grid)
+# 🎯 90 frames — 8K portrait canvas (9x10 grid)
 ANALYSIS_FRAMES = 90
 GRID_COLS = 9
 GRID_ROWS = 10
-CANVAS_W = 2160
-CANVAS_H = 3840
+CANVAS_W = 4320       # 8K portrait width
+CANVAS_H = 7680       # 8K portrait height
+
+# 🎯 GPT ke liye resize target (OpenRouter ki ~20MB limit ke liye)
+GPT_TARGET_W = 2160
+GPT_TARGET_H = 3840
 
 # 🎮 Voice speed limits — auto adjust, but clamped here
 VOICE_SPEED_MIN = 1.00
@@ -211,9 +217,16 @@ def speed_for_type(slot_type):
 # 🎯 GIT PUSH — Analysis image ko GitHub par bhejo (Python version)
 # ============================================================
 def commit_analysis_to_github():
-    print("📤 [10] Pushing analysis image to GitHub...")
-    if not os.path.exists(ANALYSIS_GRID_PATH):
-        print("   ⚠️ Analysis image not found, skipping git commit.")
+    print("📤 [10] Pushing analysis images to GitHub...")
+
+    files_to_push = []
+    if os.path.exists(ANALYSIS_GRID_PATH):
+        files_to_push.append(ANALYSIS_GRID_PATH)
+    if os.path.exists(FULL_8K_PATH):
+        files_to_push.append(FULL_8K_PATH)
+
+    if not files_to_push:
+        print("   ⚠️ No analysis images found, skipping git commit.")
         return
 
     try:
@@ -224,15 +237,20 @@ def commit_analysis_to_github():
         # Pull latest to prevent conflicts
         subprocess.run("git pull --rebase origin main || git pull --rebase origin master || true", shell=True, check=False)
 
-        # Add image
-        subprocess.run(f"git add {ANALYSIS_GRID_PATH}", shell=True, check=True)
+        # Add both images
+        for f in files_to_push:
+            subprocess.run(f"git add {f}", shell=True, check=False)
+            print(f"   📎 Staged: {f}")
 
         # Commit
-        commit_res = subprocess.run(f"git commit -m 'Update analysis image [skip ci]'", shell=True, capture_output=True, text=True)
+        commit_res = subprocess.run(
+            "git commit -m 'Update analysis images [skip ci]'",
+            shell=True, capture_output=True, text=True
+        )
         if commit_res.returncode == 0:
-            print("   ✅ Committed analysis image.")
+            print("   ✅ Committed analysis images.")
         else:
-            print("   ℹ️ No changes to commit (image might be identical).")
+            print("   ℹ️ No changes to commit (images might be identical).")
 
         # Push
         push_res = subprocess.run("git push origin HEAD", shell=True, capture_output=True, text=True)
@@ -469,7 +487,7 @@ def build_auto_slots(video_path, vid_duration, srt_content):
             "start": round(t, 2),
             "end": round(end, 2),
             "type": None,
-            "visual_type": None,       # ← GPT se aayega
+            "visual_type": None,
             "srt_text": slot_text,
             "scene_count": 0,
             "avg_loud": -50,
@@ -538,14 +556,13 @@ def classify_slots_combined(video_path, slots, srt_content):
             has_dialog_word = len(words & DIALOG_WORDS) >= 1
             has_speech = len(sw_text.strip()) > 3
 
-            # 🎯 Scene-cut-INDEPENDENT classification
             if has_action_word and scene_cuts >= 1:
                 action_count += 1
-            elif has_action_word:                          # action word alone
+            elif has_action_word:
                 action_count += 1
             elif scene_cuts >= 2:
                 action_count += 1
-            elif loud > -15:                               # loud alone
+            elif loud > -15:
                 action_count += 1
             elif has_speech and has_dialog_word:
                 dialog_count += 1
@@ -585,10 +602,8 @@ def classify_slots_combined(video_path, slots, srt_content):
             "total_subs": total
         }
 
-        # Signal-based speed (will be overridden by GPT visual_type)
         voice_speed = speed_for_type(slot["type"])
 
-        # Action boosts
         if slot["type"] == "action":
             if slot["scene_count"] >= 3:
                 voice_speed += 0.05
@@ -604,18 +619,19 @@ def classify_slots_combined(video_path, slots, srt_content):
 
 
 # ============================================================
-# STEP 5 — 4K PORTRAIT ANALYSIS GRID (90 frames, 9x10)
+# STEP 5 — 8K PORTRAIT ANALYSIS GRID (90 frames, 9x10)
 # ============================================================
 def build_analysis_grid(video_path, vid_duration, num_frames=ANALYSIS_FRAMES):
-    print(f"🖼️ [5] Building 4K PORTRAIT grid ({CANVAS_W}×{CANVAS_H}) — {num_frames} frames...")
+    print(f"🖼️ [5] Building 8K PORTRAIT grid ({CANVAS_W}×{CANVAS_H}) — {num_frames} frames...")
 
-    # 🗑️ Purani analysis image delete karo
-    if os.path.exists(ANALYSIS_GRID_PATH):
-        try:
-            os.remove(ANALYSIS_GRID_PATH)
-            print(f"   🗑️  Old analysis deleted: {ANALYSIS_GRID_PATH}")
-        except Exception as e:
-            print(f"   ⚠️  Could not delete old file: {e}")
+    # 🗑️ Purani analysis images delete karo
+    for path in [ANALYSIS_GRID_PATH, FULL_8K_PATH]:
+        if os.path.exists(path):
+            try:
+                os.remove(path)
+                print(f"   🗑️  Old file deleted: {path}")
+            except Exception as e:
+                print(f"   ⚠️  Could not delete {path}: {e}")
 
     interval = vid_duration / num_frames
     frame_paths = []
@@ -637,10 +653,10 @@ def build_analysis_grid(video_path, vid_duration, num_frames=ANALYSIS_FRAMES):
     draw = ImageDraw.Draw(grid)
 
     try:
-        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", max(16, cell_w // 18))
+        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", max(24, cell_w // 18))
     except:
         try:
-            font = ImageFont.truetype("/system/fonts/Roboto-Bold.ttf", max(16, cell_w // 18))
+            font = ImageFont.truetype("/system/fonts/Roboto-Bold.ttf", max(24, cell_w // 18))
         except:
             font = ImageFont.load_default()
 
@@ -658,18 +674,29 @@ def build_analysis_grid(video_path, vid_duration, num_frames=ANALYSIS_FRAMES):
         grid.paste(img, (x, y))
 
         label = f"{t:.1f}s"
-        draw.rectangle([x + 4, y + 4, x + 85, y + 32], fill="black")
-        draw.text((x + 8, y + 8), label, fill="yellow", font=font)
+        draw.rectangle([x + 8, y + 8, x + 160, y + 60], fill="black")
+        draw.text((x + 16, y + 14), label, fill="yellow", font=font)
 
-    grid.save(ANALYSIS_GRID_PATH, quality=92, optimize=True, subsampling=2)
+    # ==================================================
+    # 🎯 SAVE 1: 8K FULL QUALITY (aapke liye)
+    # ==================================================
+    grid.save(FULL_8K_PATH, quality=92, optimize=True, subsampling=2)
+    size_8k = os.path.getsize(FULL_8K_PATH) / (1024 * 1024)
+    print(f"✅ 8K Full Quality: {grid.size[0]}x{grid.size[1]} ({size_8k:.2f} MB)")
+    print(f"💾 Saved: {FULL_8K_PATH}")
+
+    # ==================================================
+    # 🎯 SAVE 2: GPT ke liye resize (OpenRouter limit ke liye)
+    # ==================================================
+    grid_gpt = grid.resize((GPT_TARGET_W, GPT_TARGET_H), Image.LANCZOS)
+    grid_gpt.save(ANALYSIS_GRID_PATH, quality=92, optimize=True, subsampling=2)
+    size_gpt = os.path.getsize(ANALYSIS_GRID_PATH) / (1024 * 1024)
+    print(f"✅ GPT Version: {grid_gpt.size[0]}x{grid_gpt.size[1]} ({size_gpt:.2f} MB)")
+    print(f"💾 Saved: {ANALYSIS_GRID_PATH}\n")
 
     for fp, _ in frame_paths:
         if os.path.exists(fp):
             os.remove(fp)
-
-    size_mb = os.path.getsize(ANALYSIS_GRID_PATH) / (1024 * 1024)
-    print(f"✅ Grid: {grid.size[0]}x{grid.size[1]} ({size_mb:.2f} MB)")
-    print(f"💾 Saved: {ANALYSIS_GRID_PATH}\n")
 
 
 # ============================================================
@@ -806,7 +833,7 @@ Return ONLY valid JSON:
     or_url = "https://openrouter.ai/api/v1/chat/completions"
     analysis_b64 = encode_image(analysis_grid_path)
 
-    # 🎯 FIX #3: Model reverted to gpt-4o-mini for free tier
+    # 🎯 Model: gpt-4o-mini (Free tier)
     payload = {
         "model": "openai/gpt-4o-mini",
         "messages": [{
@@ -861,7 +888,6 @@ Return ONLY valid JSON:
                         if vt not in ("action", "dialog", "calm"):
                             continue
 
-                        # Nearest slot dhundho
                         best_slot = None
                         best_diff = 999
                         for slot in slots:
@@ -871,14 +897,12 @@ Return ONLY valid JSON:
                                 best_slot = slot
 
                         if best_slot and best_diff < 2.5:
-                            # 🎯 Signal-based evidence check
                             signal_type = best_slot.get("type", "calm")
                             scene_count = best_slot.get("scene_count", 0)
                             avg_loud = best_slot.get("avg_loud", -50)
                             sa = best_slot.get("sub_analysis", {})
                             action_ratio = sa.get("action_ratio", 0)
 
-                            # Signal strong ho toh signal jeetega
                             signal_says_action = (
                                 signal_type == "action"
                                 or scene_count >= 2
@@ -960,7 +984,6 @@ def generate_audio(segments, slots):
         "xi-api-key": ELEVENLABS_API_KEY
     }
 
-    # Slot start time → voice speed lookup
     slot_speed_map = {round(s["start"], 2): s.get("voice_speed", 1.0) for s in slots}
 
     audio_files = []
@@ -972,12 +995,10 @@ def generate_audio(segments, slots):
         target_dur = seg["end"] - seg["start"]
         seg_file = f"{SEGMENTS_DIR}/seg_{idx:03d}.mp3"
 
-        # 🎯 PRIORITY 1: GPT ka visual_type
         visual_type = (seg.get("visual_type") or "").lower().strip()
         if visual_type in ("action", "dialog", "calm"):
             voice_speed = speed_for_type(visual_type)
         else:
-            # 🎯 PRIORITY 2: Slot classifier ka voice_speed
             voice_speed = 1.0
             best_diff = 999
             for s_start, s_speed in slot_speed_map.items():
@@ -986,7 +1007,6 @@ def generate_audio(segments, slots):
                     best_diff = diff
                     voice_speed = s_speed
 
-        # Safety clamp
         voice_speed = max(VOICE_SPEED_MIN, min(VOICE_SPEED_MAX, voice_speed))
 
         data = {
@@ -1143,7 +1163,7 @@ def main():
     print(f"🎤 Voice : {VOICE_ID}")
     print(f"🎛️  Switch: COMMENTARY_ENABLED = {COMMENTARY_ENABLED}")
     print(f"🎮 Speed : {VOICE_SPEED_MIN} - {VOICE_SPEED_MAX} (auto, frame-based)")
-    print(f"🖼️  Frames: {ANALYSIS_FRAMES} ({GRID_COLS}x{GRID_ROWS} grid, {CANVAS_W}x{CANVAS_H})")
+    print(f"🖼️  Frames: {ANALYSIS_FRAMES} ({GRID_COLS}x{GRID_ROWS} grid, {CANVAS_W}x{CANVAS_H} 8K)")
     print(f"🤖 Model : openai/gpt-4o-mini (Free tier)")
     print("=" * 60 + "\n")
 
@@ -1175,7 +1195,6 @@ def main():
         if not segments:
             raise Exception("No segments generated")
 
-        # 🎯 Visual classification ke baad final speed summary
         speeds = [s["voice_speed"] for s in slots]
         print(f"🎮 Final voice speeds (after GPT visual): "
               f"min={min(speeds):.2f} max={max(speeds):.2f} avg={sum(speeds)/len(speeds):.2f}\n")
@@ -1192,7 +1211,7 @@ def main():
         print(f"📊 Slots: {len(slots)} | Segments: {len(audio_files)}")
         print("=" * 60)
 
-        # 🎯 Push analysis image to GitHub (within Python script)
+        # 🎯 Push analysis images to GitHub
         commit_analysis_to_github()
 
         sys.exit(0)
@@ -1200,10 +1219,10 @@ def main():
     except Exception as e:
         print(f"\n❌ Commentary pipeline failed: {e}")
         print("⚠️ Falling back to original clip...")
-        
-        # Even if commentary fails, try to push the analysis image for debugging
+
+        # Even if commentary fails, push images for debugging
         commit_analysis_to_github()
-        
+
         if fallback_copy_original():
             sys.exit(0)
         else:
