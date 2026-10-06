@@ -1051,7 +1051,7 @@ def generate_audio(segments, slots):
 
         data = {
             "text": text,
-            "model_id": "eleven_v3",
+            "model_id": "eleven_multilingual_v2",
             "voice_settings": {
                 "stability": 0.35,
                 "similarity_boost": 0.85,
