@@ -1132,5 +1132,17 @@
             "post_link": "https://www.facebook.com/reel/2563430397490305/",
             "platform": "Facebook"
         }
+    ],
+    "CallOfDutyMW2": [
+        {
+            "timestamp": "2026-10-06 04:05:12 PM",
+            "style": "exposed",
+            "ai_title": "\ud83c\udfae CallOfDutyMW2 Gameplay | #CallOfDutyMW2",
+            "actual_posted_title": "",
+            "views": 0,
+            "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play1.mp4",
+            "post_link": "N/A",
+            "platform": "Local / Pending"
+        }
     ]
 }
