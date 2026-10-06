@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — Multi-Key Auto-Retry + ON/OFF Switch + Auto Voice Speed
+🎙️ AI Commentary Dubber — v3 (Honest Classification + Fixed Git Push)
 ===============================================================
 Called from pipeline.sh Step 8.5:
     python3 commentary_dubber.py --video X --out Y
@@ -15,8 +15,7 @@ ON/OFF Switch:
   • COMMENTARY_ENABLED=false  → commentary skip, original clip copy
 
 🎮 Auto Voice Speed (Frame-Based):
-  • GPT frames dekh ke har slot ka visual_type deta hai
-  • Action slots  → 1.18 (hype)
+  • Action slots  → 1.18
   • Dialog slots  → 1.05
   • Calm slots    → 1.00
 
@@ -25,16 +24,15 @@ ON/OFF Switch:
   • Other scenes  → 1.4x commentary volume
   • Background    → 0.25x during commentary
 
-🎯 PERFECT COMMENTARY FIXES (v2 — honest classification):
-  • FIX #1: Tolerance 1.0 → 2.5 + Signal override
-  • FIX #2: Prompt honest — "BE HONEST, don't force action"
-  • FIX #3: Signal override tightened (only STRONG signal)
-  • FIX #4: Signal thresholds: action 15% → 30%, calm 60% → 50%
-  • FIX #5: Model gpt-4o-mini (Free tier)
-  • FIX #6: 90 frames (9x10 grid) + 8K canvas
+🎯 FIXES:
+  • FIX #1: Honest prompt — "BE HONEST, don't force action"
+  • FIX #2: Signal override tightened (35%+ only)
+  • FIX #3: Thresholds: action 30%, calm 50%
+  • FIX #4: Git push — force-with-lease + autostash rebase
+  • FIX #5: gpt-4o-mini (Free)
+  • FIX #6: 90 frames, 9x10 grid, 8K canvas
   • FIX #7: ImageOps.fit — no black borders
-  • FIX #8: Voice speed action 1.18, dynamic volume
-  • FIX #9: 8K image GPT ko direct (no 4K resize)
+  • FIX #8: 8K image GPT ko direct (no 4K resize)
 """
 
 import os
@@ -75,10 +73,9 @@ COMMENTARY_ENABLED = os.getenv("COMMENTARY_ENABLED", "true").lower() == "true"
 
 
 # ============================================================
-# 🔑 MULTI-KEY CONFIG — ENV VARIABLES
+# 🔑 MULTI-KEY CONFIG
 # ============================================================
 def _collect_keys(*env_names):
-    """Collect all valid keys from env, in order."""
     return [os.getenv(name) for name in env_names if os.getenv(name)]
 
 
@@ -111,24 +108,22 @@ MIN_SLOTS_HARD = 6
 MAX_SLOTS_HARD = 20
 DUCK_VOLUME = 0.25
 
-# 🎯 90 frames — 8K portrait canvas (9x10 grid)
+# 90 frames — 8K portrait canvas (9x10 grid)
 ANALYSIS_FRAMES = 90
 GRID_COLS = 9
 GRID_ROWS = 10
 CANVAS_W = 4320
 CANVAS_H = 7680
 
-# 🎮 Voice speed limits
+# Voice speed limits
 VOICE_SPEED_MIN = 1.00
 VOICE_SPEED_MAX = 1.18
 ATEMPO_MAX      = 1.10
 
-# 🎮 Speed per visual type
 SPEED_ACTION = 1.18
 SPEED_DIALOG = 1.05
 SPEED_CALM   = 1.00
 
-# 🔊 Dynamic commentary volume
 VOL_ACTION = 1.7
 VOL_OTHER  = 1.4
 
@@ -216,7 +211,7 @@ def speed_for_type(slot_type):
 
 
 # ============================================================
-# 🎯 GIT PUSH
+# 🎯 GIT PUSH — FIXED (autostash rebase + force-with-lease)
 # ============================================================
 def commit_analysis_to_github():
     print("📤 [10] Pushing analysis image to GitHub...")
@@ -226,12 +221,32 @@ def commit_analysis_to_github():
         return
 
     try:
+        # Git config
         subprocess.run("git config --global user.name 'GitHub Action'", shell=True, check=False)
         subprocess.run("git config --global user.email 'action@github.com'", shell=True, check=False)
-        subprocess.run("git pull --rebase origin main || git pull --rebase origin master || true", shell=True, check=False)
+
+        # 🎯 FIX #4: Fetch first, then rebase with autostash
+        print("   🔄 Fetching latest from remote...")
+        subprocess.run("git fetch origin", shell=True, check=False)
+
+        print("   🔄 Rebasing with autostash...")
+        # Try main first, then master as fallback
+        rebase_res = subprocess.run(
+            "git pull --rebase --autostash origin main",
+            shell=True, capture_output=True, text=True
+        )
+        if rebase_res.returncode != 0:
+            print(f"   ⚠️ Rebase on main failed, trying master...")
+            subprocess.run(
+                "git pull --rebase --autostash origin master",
+                shell=True, check=False
+            )
+
+        # Stage image
         subprocess.run(f"git add {ANALYSIS_GRID_PATH}", shell=True, check=False)
         print(f"   📎 Staged: {ANALYSIS_GRID_PATH}")
 
+        # Commit
         commit_res = subprocess.run(
             "git commit -m 'Update analysis image [skip ci]'",
             shell=True, capture_output=True, text=True
@@ -239,13 +254,26 @@ def commit_analysis_to_github():
         if commit_res.returncode == 0:
             print("   ✅ Committed analysis image.")
         else:
-            print("   ℹ️ No changes to commit.")
+            print("   ℹ️ No changes to commit (image might be identical).")
 
-        push_res = subprocess.run("git push origin HEAD", shell=True, capture_output=True, text=True)
+        # 🎯 FIX #4: Push with force-with-lease (safe)
+        push_res = subprocess.run(
+            "git push origin HEAD --force-with-lease",
+            shell=True, capture_output=True, text=True
+        )
         if push_res.returncode == 0:
             print("   🚀 Pushed to GitHub successfully.")
         else:
-            print(f"   ⚠️ Push failed: {push_res.stderr.strip()}")
+            # Fallback: try normal push
+            print(f"   ⚠️ Force-with-lease failed, trying normal push...")
+            push_res2 = subprocess.run(
+                "git push origin HEAD",
+                shell=True, capture_output=True, text=True
+            )
+            if push_res2.returncode == 0:
+                print("   🚀 Pushed (normal) to GitHub successfully.")
+            else:
+                print(f"   ❌ Push failed: {push_res2.stderr.strip()[:200]}")
 
     except Exception as e:
         print(f"   ⚠️ Git operation failed: {e}")
@@ -489,7 +517,7 @@ def build_auto_slots(video_path, vid_duration, srt_content):
 
 
 # ============================================================
-# STEP 4 — SIGNAL-BASED CLASSIFY (FIX #4: stricter thresholds)
+# STEP 4 — SIGNAL-BASED CLASSIFY (stricter thresholds)
 # ============================================================
 def classify_slots_combined(video_path, slots, srt_content):
     print("🔍 [4] Classifying slots (signal-based fallback)...")
@@ -558,7 +586,7 @@ def classify_slots_combined(video_path, slots, srt_content):
         dialog_ratio = dialog_count / total
         calm_ratio = calm_count / total
 
-        # 🎯 FIX #4: Stricter thresholds (action 30%, calm 50%)
+        # Stricter thresholds (action 30%, calm 50%)
         if action_ratio >= 0.30:
             slot["type"] = "action"
         elif dialog_ratio >= 0.40:
@@ -669,7 +697,7 @@ def build_analysis_grid(video_path, vid_duration, num_frames=ANALYSIS_FRAMES):
 
 
 # ============================================================
-# STEP 6 — GPT Call (FIX #2 & #3: honest prompt + tightened override)
+# STEP 6 — GPT Call
 # ============================================================
 def generate_full_script(slots, srt_content, analysis_grid_path):
     print(f"🤖 [6] Generating FULL script + visual classification (OpenRouter — {len(OPENROUTER_KEYS)} keys)...")
@@ -703,19 +731,19 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 - Start with reactions: "YO!", "BRO!", "WAIT!", "NAH!", "AYY!"
 
 **REACTION PATTERNS (use 10-14 varied):**
-1. BIG ACTION: "OHHHH! He's GONE!", "BRO! That was NASTY!", "AYYYY! Dropped him!"
-2. VIEWER QUESTIONS (2-4): "Guys, is this game worth buying?", "Yo, anyone else play this?"
+1. BIG ACTION: "OHHHH! He's GONE!", "BRO! That was NASTY!"
+2. VIEWER QUESTIONS (2-4): "Guys, is this game worth buying?"
 3. GRAPHICS (2-3): "Bro these graphics are INSANE!", "Yo the visuals are FIRE!"
 4. ENEMY ROAST: "Bro this guy's aim is worse than mine."
 5. CINEMATIC: "Okay that was actually cinema, wow."
-6. CHILL: "Just vibing here, chilling.", "Too quiet... sus.", "Just taking in the view."
+6. CHILL: "Just vibing here, chilling.", "Too quiet... sus."
 7. HYPE: "Okay okay okay — something's coming!", "Wait wait WAIT!"
 8. WEIRD: "What even is that thing?!"
-9. Guys (2-4): "guys, you seeing this?!", "Yo guys, you believe this?"
+9. Guys (2-4): "guys, you seeing this?!"
 10. FOLLOW REQUEST (2-3 total): "Ayy if you're vibing, hit that follow yo."
-11. GRAPHICS PRAISE: "Nah the lighting is next level!", "Bro the details are CRAZY!"
+11. GRAPHICS PRAISE: "Nah the lighting is next level!"
 12. ENVIRONMENT: "This map is beautiful ngl.", "Look at that skyline bro!"
-13. SOUND (2-3): "Yo did you HEAR that?!", "That audio is crispy."
+13. SOUND (2-3): "Yo did you HEAR that?!"
 14. CINEMATIC SHOT: "That's a movie shot right there!"
 
 **🎯 CRITICAL: VISUAL CLASSIFICATION — HONEST RULES**
@@ -747,7 +775,7 @@ Look at the frames for each slot's time range. Classify each slot:
 - End screen / credits
 
 **⚠️ BE HONEST. If you see slow motion, sitting, walking, scenery, drone flying, city skyline → use "calm".**
-**Only use "action" if there is CLEAR physical motion (fight, running, jumping, weapon being used, explosion, shooting).**
+**Only use "action" if there is CLEAR physical motion.**
 **When in doubt, use "calm" — NOT "action".**
 
 **PACING RULES:**
@@ -761,10 +789,9 @@ Look at the frames for each slot's time range. Classify each slot:
 3. Focus on VISUALS
 4. UNIQUE lines based on actual frames
 5. 5-8 words per line
-6. Vary energy — sometimes chill, sometimes WILD
+6. Vary energy
 7. Reference "guys" or "you" naturally
 8. Max 2-3 follow requests total
-9. Use CAPS only for real hype
 
 **STORY CONTEXT:**
 {srt_content[:2500]}
@@ -839,7 +866,6 @@ Return ONLY valid JSON:
                     parsed = json.loads(raw)
                     segments = parsed.get("segments", [])
 
-                    # 🎯 FIX #3: Tightened signal override
                     updated_count = 0
                     override_count = 0
                     for seg in segments:
@@ -862,7 +888,7 @@ Return ONLY valid JSON:
                             sa = best_slot.get("sub_analysis", {})
                             action_ratio = sa.get("action_ratio", 0)
 
-                            # 🎯 FIX #3: Only override if signal is VERY STRONG
+                            # Only override if signal is VERY STRONG
                             signal_says_action_strong = (
                                 (signal_type == "action" and action_ratio >= 0.35)
                                 or (scene_count >= 5 and avg_loud > -10)
@@ -874,7 +900,6 @@ Return ONLY valid JSON:
                                 override_count += 1
                                 print(f"   ⚠️  Override @{best_slot['start']:.1f}s: GPT=CALM, STRONG signal=ACTION → ACTION")
                             else:
-                                # 🎯 Trust GPT in all other cases (honest prompt)
                                 final_type = vt
 
                             best_slot["visual_type"] = final_type
@@ -1064,7 +1089,7 @@ def build_timed_audio(audio_files, vid_duration):
 
 
 # ============================================================
-# STEP 9 — Final Merge with Ducking + Dynamic Volume
+# STEP 9 — Final Merge
 # ============================================================
 def merge_final(video_path, commentary_audio, out_path, audio_files):
     print("🎬 [9] Merging (duck + dynamic volume)...")
@@ -1123,11 +1148,11 @@ def fallback_copy_original():
 
 
 # ============================================================
-# MAIN PIPELINE
+# MAIN
 # ============================================================
 def main():
     print("=" * 60)
-    print("🎙️ AI COMMENTARY DUBBER — v2 (Honest Classification)")
+    print("🎙️ AI COMMENTARY DUBBER — v3 (Honest + Fixed Git)")
     print("=" * 60)
     print(f"📹 Input : {FINAL_CLIP_PATH}")
     print(f"📤 Output: {FINAL_DUBBED_VIDEO}")
