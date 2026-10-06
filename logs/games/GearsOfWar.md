@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 12 | **Last Updated:** 2026-10-06 04:05:12 PM IST
+**Total Videos:** 12 | **Last Updated:** 2026-10-06 04:15:12 PM IST
 
 ---
 
@@ -25,8 +25,8 @@
 |---|---|---|---|---|---|---|
 | 1 | Giant Beast Battle 🦖💥  #videogames #gamingcommunity #gaming #gearsofwar #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1515180523779657/) | 50 | [🟣 IG](https://www.instagram.com/reel/DeHkl5RFM6F/) | 300 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar1.mp4) |
 | 2 | Monsters Rise Up 🩸🔥  #videogames #gamingcommunity #gaming #gearsofwar #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2563430397490305/) | 1,564 | [🟣 IG](https://www.instagram.com/reel/DeDxVY2mRE9/) | 70 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar2.mp4) |
-| 3 | GearsOfWar9 | [🔵 FB](https://www.facebook.com/17870525709642100) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar9.mp4) |
-| 4 | GearsOfWar3 | [🔵 FB](https://www.facebook.com/18105163727360770) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar3.mp4) |
+| 3 | GearsOfWar3 | [🔵 FB](https://www.facebook.com/18105163727360770) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar3.mp4) |
+| 4 | GearsOfWar9 | [🔵 FB](https://www.facebook.com/17870525709642100) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar9.mp4) |
 | 5 | GearsOfWar12 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar12.mp4) |
 | 6 | GearsOfWar11 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar11.mp4) |
 | 7 | GearsOfWar10 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar10.mp4) |
