@@ -1,5 +1,5 @@
 {
-  "total_replies": 10,
+  "total_replies": 11,
   "total_skipped": 0,
   "replies": [
     {
@@ -181,8 +181,26 @@
       "source_link": "",
       "timestamp": "2026-10-01 10:01:33 PM",
       "status": "posted"
+    },
+    {
+      "reply_id": "1095808766639752_1149760377378923",
+      "comment_id": "1095808766639752_1573799044496442",
+      "reply_to_id": "1095808766639752_1573799044496442",
+      "post_id": "100463226188818_1095808766639752",
+      "user_name": "Facebook User",
+      "user_id": "",
+      "user_comment": "Nice shot",
+      "openrouter_reply": "Thanks, bro! 🔥 That fight was lit. What's your go-to move in the game?",
+      "type": "friendly",
+      "depth": 1,
+      "game": "Spider-Man",
+      "post_title": "Superpowered Street Beatdown 💥⚡️\n\n#videogames #gamingcommunity #gaming #marvelss",
+      "fb_post_link": "https://www.facebook.com/reel/1379906203935081/",
+      "source_link": "",
+      "timestamp": "2026-10-06 11:25:47 AM",
+      "status": "posted"
     }
   ],
   "skipped": [],
-  "last_updated": "2026-10-06 11:21:45 AM"
+  "last_updated": "2026-10-06 11:25:47 AM"
 }
