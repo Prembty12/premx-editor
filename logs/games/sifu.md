@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 21 | **Last Updated:** 2026-10-06 05:25:31 PM IST
+**Total Videos:** 21 | **Last Updated:** 2026-10-06 06:00:38 PM IST
 
 ---
 
@@ -15,7 +15,7 @@
 | FB Posted | 10 / 21 |
 | IG Posted | 4 / 21 |
 | Total FB Views | **911** |
-| Total IG Views | **120** |
+| Total IG Views | **130** |
 
 ---
 
@@ -23,15 +23,15 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | Can you survive this clash? ⚔️🔥  #videogames #gamingcommunity #gaming #sifu #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeJbgxlj8Uy/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu2.mp4) |
+| 1 | Can you survive this clash? ⚔️🔥  #videogames #gamingcommunity #gaming #sifu #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeJbgxlj8Uy/) | 30 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu2.mp4) |
 | 2 | Kitchen Beatdown Mayhem 🥊💥  #videogames #gamingcommunity #gaming #sifu #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeBJQzgAt7Z/) | 70 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu11.mp4) |
 | 3 | Hallway Beatdown 🥋🔥  #videogames #gamingcommunity #gaming #sifu #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1536392984956953/) | 326 | [🟣 IG](https://www.instagram.com/reel/DdjNjBFCvUn/) | 30 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu5.mp4) |
 | 4 | Beating Up the Whole Gang 🥋🔥  #videogames #gamingcommunity #gaming #sifu #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1635492871307578/) | 292 | [🟣 IG](https://www.instagram.com/reel/Ddzg0_6gv2H/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu6.mp4) |
 | 5 | Tiny fighter vs giant boss! 👊💥  #videogames #gamingcommunity #gaming #sifu #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1101493405643422/) | 293 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu8.mp4) |
-| 6 | sifu10 | [🔵 FB](https://www.facebook.com/18079585196705519) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu10.mp4) |
-| 7 | sifu3 | [🔵 FB](https://www.facebook.com/17955462258252297) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu3.mp4) |
-| 8 | sifu17 | [🔵 FB](https://www.facebook.com/18102462185570793) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu17.mp4) |
-| 9 | sifu2 | [🔵 FB](https://www.facebook.com/17903629215665069) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu2.mp4) |
+| 6 | sifu17 | [🔵 FB](https://www.facebook.com/18102462185570793) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu17.mp4) |
+| 7 | sifu2 | [🔵 FB](https://www.facebook.com/17903629215665069) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu2.mp4) |
+| 8 | sifu10 | [🔵 FB](https://www.facebook.com/18079585196705519) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu10.mp4) |
+| 9 | sifu3 | [🔵 FB](https://www.facebook.com/17955462258252297) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu3.mp4) |
 | 10 | sifu11 | [🔵 FB](https://www.facebook.com/18106306556615026) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu11.mp4) |
 | 11 | sifu7 | [🔵 FB](https://www.facebook.com/17960228733211678) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu7.mp4) |
 | 12 | sifu18 | [🔵 FB](https://www.facebook.com/17916710871245907) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu18.mp4) |

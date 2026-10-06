@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 46 | **Last Updated:** 2026-10-06 05:25:31 PM IST
+**Total Videos:** 46 | **Last Updated:** 2026-10-06 06:00:38 PM IST
 
 ---
 
@@ -14,7 +14,7 @@
 | Posted (FB or IG) | 9 / 46 |
 | FB Posted | 7 / 46 |
 | IG Posted | 2 / 46 |
-| Total FB Views | **1,477** |
+| Total FB Views | **1,478** |
 | Total IG Views | **10** |
 
 ---
@@ -26,7 +26,7 @@
 | 1 | Shooting lasers under fire! 🔥⚡  #videogames #gamingcommunity #gaming #ghostandela #gamingreels #reel | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeHJALcDcGB/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela42.mp4) |
 | 2 | Walking Through Pure Fire 🔥💀  #videogames #gamingcommunity #gaming #ghostandela #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdwwvaCDs7Z/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela8.mp4) |
 | 3 | I Cut The Wrong Chain 😱  #videogames #gamingcommunity #gaming #ghostandela #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1581162263212204/) | 530 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela4.mp4) |
-| 4 | Ghost's ultimate prison escape secret exposed!  #videogames #gamingcommunity #gaming #ghostandela #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/4490994824477364/) | 947 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela5.mp4) |
+| 4 | Ghost's ultimate prison escape secret exposed!  #videogames #gamingcommunity #gaming #ghostandela #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/4490994824477364/) | 948 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela5.mp4) |
 | 5 | ghostandela13 | [🔵 FB](https://www.facebook.com/18422342941150797) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela13.mp4) |
 | 6 | ghostandela24 | [🔵 FB](https://www.facebook.com/17957644143218048) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela24.mp4) |
 | 7 | ghostandela15 | [🔵 FB](https://www.facebook.com/18133617205635778) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela15.mp4) |
