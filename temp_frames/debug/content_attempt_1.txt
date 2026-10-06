@@ -1,1 +1,1 @@
-{"clip_duration": 28, "reason": "Continuous high-action martial arts combat", "start_time": 2, "status": "APPROVE", "title": "Deadly Kung Fu Mayhem 🥋💀"}
+{"clip_duration": 40, "reason": "Intense tactical combat and survival action.", "start_time": 12, "status": "APPROVE", "title": "Lethal Combat Countdown Begins 🎯🔥"}
