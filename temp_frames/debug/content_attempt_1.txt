@@ -1,1 +1,1 @@
-{"clip_duration": 42, "reason": "Dramatic cinematic cutscene with emotional dialogue", "start_time": 15, "status": "APPROVE", "title": "City's final stand 💀🏙️"}
+{"clip_duration":16,"reason":"Intense warrior combat against golden giants","start_time":21,"status":"APPROVE","title":"Fierce Warrior Clash 💥⚔️"}
