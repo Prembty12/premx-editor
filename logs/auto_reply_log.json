@@ -1,5 +1,5 @@
 {
-  "total_replies": 11,
+  "total_replies": 12,
   "total_skipped": 0,
   "replies": [
     {
@@ -199,8 +199,26 @@
       "source_link": "",
       "timestamp": "2026-10-06 11:25:47 AM",
       "status": "posted"
+    },
+    {
+      "reply_id": "1096013076619321_1592684531813992",
+      "comment_id": "1096013076619321_4636622136660507",
+      "reply_to_id": "1096013076619321_4636622136660507",
+      "post_id": "100463226188818_1096013076619321",
+      "user_name": "Facebook User",
+      "user_id": "",
+      "user_comment": "Tem esses  jogo pra Xbox série S?",
+      "openrouter_reply": "Yeah bro, it's Ukraine Covert Mission – works on Xbox Series S! 🎮🔥",
+      "type": "friendly",
+      "depth": 1,
+      "game": "Video Game",
+      "post_title": "Silent Sniper Takedowns 🎯🔥\n\n#videogames #gamingcommunity #gaming #ukrainecovertm",
+      "fb_post_link": "https://www.facebook.com/reel/1063836943354242/",
+      "source_link": "",
+      "timestamp": "2026-10-06 06:59:18 PM",
+      "status": "posted"
     }
   ],
   "skipped": [],
-  "last_updated": "2026-10-06 06:08:50 PM"
+  "last_updated": "2026-10-06 06:59:18 PM"
 }
