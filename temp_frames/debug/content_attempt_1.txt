@@ -1,1 +1,1 @@
-{"clip_duration": 25, "reason": "Helicopter drop and tactical mission start", "start_time": 20, "status": "APPROVE", "title": "Tactical mission starts now 🪖🔥"}
+{"clip_duration":40,"reason":"Intense sniper combat sequence","start_time":15,"status":"APPROVE","title":"Red Zone Sniper War 💀🔥"}
