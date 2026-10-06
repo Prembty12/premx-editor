@@ -26,7 +26,7 @@ ON/OFF Switch:
 🎯 PERFECT COMMENTARY FIXES:
   • FIX #1: Tolerance 1.0 → 2.5 + Signal override (GPT galat ho toh signal jeetega)
   • FIX #2: Prompt mein hard action rules
-  • FIX #3: Model gpt-4o-mini → gpt-4o
+  • FIX #3: Model gpt-4o-mini (Free/Cheap version)
   • FIX #4: 90 frames (9x10 grid) + 4K canvas
   • Analysis image: analysis/last_analysis.jpg (purani auto-delete)
 """
@@ -765,9 +765,10 @@ Return ONLY valid JSON:
 
     or_url = "https://openrouter.ai/api/v1/chat/completions"
     analysis_b64 = encode_image(analysis_grid_path)
-     #openai/gpt-4o-mini
-    # 🎯 FIX #3: Model upgraded to gpt-4o    payload = {
-        "model": "openai/gpt-4o",
+
+    # 🎯 FIX #3: Model reverted to gpt-4o-mini for free tier
+    payload = {
+        "model": "openai/gpt-4o-mini",
         "messages": [{
             "role": "user",
             "content": [
@@ -1103,7 +1104,7 @@ def main():
     print(f"🎛️  Switch: COMMENTARY_ENABLED = {COMMENTARY_ENABLED}")
     print(f"🎮 Speed : {VOICE_SPEED_MIN} - {VOICE_SPEED_MAX} (auto, frame-based)")
     print(f"🖼️  Frames: {ANALYSIS_FRAMES} ({GRID_COLS}x{GRID_ROWS} grid, {CANVAS_W}x{CANVAS_H})")
-    print(f"🤖 Model : openai/gpt-4o")
+    print(f"🤖 Model : openai/gpt-4o-mini (Free tier)")
     print("=" * 60 + "\n")
 
     # 🎛️ ON/OFF SWITCH
