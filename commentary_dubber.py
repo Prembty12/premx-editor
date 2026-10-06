@@ -36,9 +36,9 @@ ON/OFF Switch:
   • FIX #5: Black borders khatam (ImageOps.fit — crop fill, no bars)
   • FIX #6: Voice speed action 1.13 → 1.18
   • FIX #7: Dynamic volume — action 1.7x, other 1.4x
-  • Analysis image: analysis/full_8k_analysis.jpg (8K, aapke liye)
-  • GPT image: analysis/last_analysis.jpg (4K resized, GPT limit ke liye)
-  • Git Push: Analysis images auto-commit + push to GitHub (Python ke andar se)
+  • FIX #8: Sirf 8K image GPT ko jaayegi (no 4K resize)
+  • Analysis image: analysis/last_analysis.jpg (8K, GPT ko bhi yahi jaayegi)
+  • Git Push: Analysis image auto-commit + push to GitHub (Python ke andar se)
 """
 
 import os
@@ -108,8 +108,7 @@ VOICE_ID           = ARGS.voice or os.getenv("VOICE_ID", "91w4XjqhkWTX1Jr3O344")
 AUDIO_PATH         = "extracted_audio.mp3"
 SRT_PATH           = "final.srt"
 ANALYSIS_DIR       = "analysis"
-ANALYSIS_GRID_PATH = "analysis/last_analysis.jpg"           # GPT ke liye (4K resized)
-FULL_8K_PATH       = "analysis/full_8k_analysis.jpg"        # Aapke liye (8K full)
+ANALYSIS_GRID_PATH = "analysis/last_analysis.jpg"           # 8K image (GPT ko bhi yahi jaayegi)
 SEGMENTS_DIR       = "segments"
 
 MIN_SLOTS_HARD = 6
@@ -122,10 +121,6 @@ GRID_COLS = 9
 GRID_ROWS = 10
 CANVAS_W = 4320       # 8K portrait width
 CANVAS_H = 7680       # 8K portrait height
-
-# 🎯 GPT ke liye resize target (OpenRouter ki ~20MB limit ke liye)
-GPT_TARGET_W = 2160
-GPT_TARGET_H = 3840
 
 # 🎮 Voice speed limits — auto adjust, but clamped here
 VOICE_SPEED_MIN = 1.00
@@ -229,16 +224,14 @@ def speed_for_type(slot_type):
 # 🎯 GIT PUSH — Analysis image ko GitHub par bhejo (Python version)
 # ============================================================
 def commit_analysis_to_github():
-    print("📤 [10] Pushing analysis images to GitHub...")
+    print("📤 [10] Pushing analysis image to GitHub...")
 
     files_to_push = []
     if os.path.exists(ANALYSIS_GRID_PATH):
         files_to_push.append(ANALYSIS_GRID_PATH)
-    if os.path.exists(FULL_8K_PATH):
-        files_to_push.append(FULL_8K_PATH)
 
     if not files_to_push:
-        print("   ⚠️ No analysis images found, skipping git commit.")
+        print("   ⚠️ No analysis image found, skipping git commit.")
         return
 
     try:
@@ -249,20 +242,20 @@ def commit_analysis_to_github():
         # Pull latest to prevent conflicts
         subprocess.run("git pull --rebase origin main || git pull --rebase origin master || true", shell=True, check=False)
 
-        # Add both images
+        # Add image
         for f in files_to_push:
             subprocess.run(f"git add {f}", shell=True, check=False)
             print(f"   📎 Staged: {f}")
 
         # Commit
         commit_res = subprocess.run(
-            "git commit -m 'Update analysis images [skip ci]'",
+            "git commit -m 'Update analysis image [skip ci]'",
             shell=True, capture_output=True, text=True
         )
         if commit_res.returncode == 0:
-            print("   ✅ Committed analysis images.")
+            print("   ✅ Committed analysis image.")
         else:
-            print("   ℹ️ No changes to commit (images might be identical).")
+            print("   ℹ️ No changes to commit (image might be identical).")
 
         # Push
         push_res = subprocess.run("git push origin HEAD", shell=True, capture_output=True, text=True)
@@ -637,14 +630,13 @@ def classify_slots_combined(video_path, slots, srt_content):
 def build_analysis_grid(video_path, vid_duration, num_frames=ANALYSIS_FRAMES):
     print(f"🖼️ [5] Building 8K PORTRAIT grid ({CANVAS_W}×{CANVAS_H}) — {num_frames} frames...")
 
-    # 🗑️ Purani analysis images delete karo
-    for path in [ANALYSIS_GRID_PATH, FULL_8K_PATH]:
-        if os.path.exists(path):
-            try:
-                os.remove(path)
-                print(f"   🗑️  Old file deleted: {path}")
-            except Exception as e:
-                print(f"   ⚠️  Could not delete {path}: {e}")
+    # 🗑️ Purani analysis image delete karo
+    if os.path.exists(ANALYSIS_GRID_PATH):
+        try:
+            os.remove(ANALYSIS_GRID_PATH)
+            print(f"   🗑️  Old file deleted: {ANALYSIS_GRID_PATH}")
+        except Exception as e:
+            print(f"   ⚠️  Could not delete {ANALYSIS_GRID_PATH}: {e}")
 
     interval = vid_duration / num_frames
     frame_paths = []
@@ -692,21 +684,14 @@ def build_analysis_grid(video_path, vid_duration, num_frames=ANALYSIS_FRAMES):
         draw.text((x + 16, y + 14), label, fill="yellow", font=font)
 
     # ==================================================
-    # 🎯 SAVE 1: 8K FULL QUALITY (aapke liye)
+    # 🎯 SAVE: 8K FULL QUALITY (GPT ko bhi yahi jaayegi)
     # ==================================================
-    grid.save(FULL_8K_PATH, quality=92, optimize=True, subsampling=2)
-    size_8k = os.path.getsize(FULL_8K_PATH) / (1024 * 1024)
+    grid.save(ANALYSIS_GRID_PATH, quality=92, optimize=True, subsampling=2)
+    size_8k = os.path.getsize(ANALYSIS_GRID_PATH) / (1024 * 1024)
     print(f"✅ 8K Full Quality: {grid.size[0]}x{grid.size[1]} ({size_8k:.2f} MB)")
-    print(f"💾 Saved: {FULL_8K_PATH}")
-
-    # ==================================================
-    # 🎯 SAVE 2: GPT ke liye resize (OpenRouter limit ke liye)
-    # ==================================================
-    grid_gpt = grid.resize((GPT_TARGET_W, GPT_TARGET_H), Image.LANCZOS)
-    grid_gpt.save(ANALYSIS_GRID_PATH, quality=92, optimize=True, subsampling=2)
-    size_gpt = os.path.getsize(ANALYSIS_GRID_PATH) / (1024 * 1024)
-    print(f"✅ GPT Version: {grid_gpt.size[0]}x{grid_gpt.size[1]} ({size_gpt:.2f} MB)")
-    print(f"💾 Saved: {ANALYSIS_GRID_PATH}\n")
+    print(f"💾 Saved: {ANALYSIS_GRID_PATH}")
+    print(f"⚠️  NOTE: 8K image GPT ko bheji ja rahi hai (no 4K resize)")
+    print(f"⚠️  Agar error aaya toh console mein status check karo\n")
 
     for fp, _ in frame_paths:
         if os.path.exists(fp):
@@ -950,7 +935,7 @@ Return ONLY valid JSON:
                     continue
 
                 else:
-                    print(f"      ⚠️ Error {r.status_code}: {r.text[:120]}")
+                    print(f"      ⚠️ Error {r.status_code}: {r.text[:200]}")
                     time.sleep(2)
                     continue
 
@@ -1195,6 +1180,7 @@ def main():
     print(f"🔊 Volume: Action={VOL_ACTION}x | Other={VOL_OTHER}x")
     print(f"🖼️  Frames: {ANALYSIS_FRAMES} ({GRID_COLS}x{GRID_ROWS} grid, {CANVAS_W}x{CANVAS_H} 8K)")
     print(f"🤖 Model : openai/gpt-4o-mini (Free tier)")
+    print(f"📷 Image : 8K direct (no 4K resize)")
     print("=" * 60 + "\n")
 
     # 🎛️ ON/OFF SWITCH
@@ -1241,7 +1227,7 @@ def main():
         print(f"📊 Slots: {len(slots)} | Segments: {len(audio_files)}")
         print("=" * 60)
 
-        # 🎯 Push analysis images to GitHub
+        # 🎯 Push analysis image to GitHub
         commit_analysis_to_github()
 
         sys.exit(0)
@@ -1250,7 +1236,7 @@ def main():
         print(f"\n❌ Commentary pipeline failed: {e}")
         print("⚠️ Falling back to original clip...")
 
-        # Even if commentary fails, push images for debugging
+        # Even if commentary fails, push image for debugging
         commit_analysis_to_github()
 
         if fallback_copy_original():
