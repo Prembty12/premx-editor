@@ -1,1 +1,0 @@
-{"status": "REJECT", "title": "", "start_time": 0, "clip_duration": 15, "reason": "Mostly slow walking and aiming, no clear exciting highlight"}

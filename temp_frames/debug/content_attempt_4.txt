@@ -1,1 +1,0 @@
-{"clip_duration": 15, "reason": "Boring sniper scoping with no action", "start_time": 5, "status": "REJECT", "title": "No Action"}

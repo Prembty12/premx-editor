@@ -1,1 +1,1 @@
-{"clip_duration":40,"reason":"Intense sniper combat sequence","start_time":15,"status":"APPROVE","title":"Red Zone Sniper War 💀🔥"}
+{"clip_duration": 30, "reason": "Intense aerial combat with epic visual effects", "start_time": 20, "status": "APPROVE", "title": "Monkey King Sky War ⚔️☁️"}
