@@ -16,18 +16,26 @@ ON/OFF Switch:
 
 🎮 Auto Voice Speed (Frame-Based):
   • GPT frames dekh ke har slot ka visual_type deta hai
-  • Action slots  → 1.10 - 1.15 (hype)
-  • Dialog slots  → 1.03
+  • Action slots  → 1.18 (hype)
+  • Dialog slots  → 1.05
   • Calm slots    → 1.00
   • Speed floor   = 1.0 (kabhi kam nahi)
-  • Speed ceiling = 1.15 (kabhi zyada nahi)
+  • Speed ceiling = 1.18 (kabhi zyada nahi)
   • Fallback: signal-based classifier agar GPT visual_type na de
+
+🔊 Dynamic Volume Boost:
+  • Action scenes → 1.7x commentary volume (chillana zor se)
+  • Other scenes  → 1.4x commentary volume (normal)
+  • Background    → 0.25x during commentary (ducked)
 
 🎯 PERFECT COMMENTARY FIXES:
   • FIX #1: Tolerance 1.0 → 2.5 + Signal override (GPT galat ho toh signal jeetega)
   • FIX #2: Prompt mein hard action rules
   • FIX #3: Model gpt-4o-mini (Free/Cheap version)
   • FIX #4: 90 frames (9x10 grid) + 8K canvas
+  • FIX #5: Black borders khatam (ImageOps.fit — crop fill, no bars)
+  • FIX #6: Voice speed action 1.13 → 1.18
+  • FIX #7: Dynamic volume — action 1.7x, other 1.4x
   • Analysis image: analysis/full_8k_analysis.jpg (8K, aapke liye)
   • GPT image: analysis/last_analysis.jpg (4K resized, GPT limit ke liye)
   • Git Push: Analysis images auto-commit + push to GitHub (Python ke andar se)
@@ -121,13 +129,17 @@ GPT_TARGET_H = 3840
 
 # 🎮 Voice speed limits — auto adjust, but clamped here
 VOICE_SPEED_MIN = 1.00
-VOICE_SPEED_MAX = 1.15
-ATEMPO_MAX      = 1.08
+VOICE_SPEED_MAX = 1.18
+ATEMPO_MAX      = 1.10
 
-# 🎮 Speed per visual type
-SPEED_ACTION = 1.13
-SPEED_DIALOG = 1.03
+# 🎮 Speed per visual type (FIX #6: action 1.13 → 1.18)
+SPEED_ACTION = 1.18
+SPEED_DIALOG = 1.05
 SPEED_CALM   = 1.00
+
+# 🔊 Dynamic commentary volume (FIX #7)
+VOL_ACTION = 1.7    # Action scenes — loud
+VOL_OTHER  = 1.4    # Dialog/calm — normal
 
 os.makedirs(SEGMENTS_DIR, exist_ok=True)
 os.makedirs(ANALYSIS_DIR, exist_ok=True)
@@ -604,11 +616,12 @@ def classify_slots_combined(video_path, slots, srt_content):
 
         voice_speed = speed_for_type(slot["type"])
 
+        # 🎯 FIX #3: Action boost +0.05 → +0.06
         if slot["type"] == "action":
             if slot["scene_count"] >= 3:
-                voice_speed += 0.05
+                voice_speed += 0.06
             if slot["avg_loud"] > -12:
-                voice_speed += 0.04
+                voice_speed += 0.05
 
         slot["voice_speed"] = round(max(VOICE_SPEED_MIN, min(VOICE_SPEED_MAX, voice_speed)), 2)
 
@@ -665,7 +678,8 @@ def build_analysis_grid(video_path, vid_duration, num_frames=ANALYSIS_FRAMES):
             break
         try:
             img = Image.open(fp)
-            img = ImageOps.pad(img, (cell_w, cell_h), color=(0, 0, 0), method=Image.LANCZOS)
+            # 🎯 FIX #5: ImageOps.fit — crop to fill cell, NO black borders
+            img = ImageOps.fit(img, (cell_w, cell_h), method=Image.LANCZOS, centering=(0.5, 0.5))
         except:
             continue
 
@@ -788,7 +802,7 @@ Look at the frames for each slot's time range. Classify each slot:
 
 **⚠️ DEFAULT TO "action" IF UNSURE — NEVER default to calm.**
 
-**Be ACCURATE. This decides voice speed!**
+**Be ACCURATE. This decides voice speed AND volume!**
 
 **PACING RULES (based on visual_type):**
 - visual_type = "action" → VERY short punchy lines (3-5 words), HIGH energy, CAPS
@@ -833,7 +847,6 @@ Return ONLY valid JSON:
     or_url = "https://openrouter.ai/api/v1/chat/completions"
     analysis_b64 = encode_image(analysis_grid_path)
 
-    # 🎯 Model: gpt-4o-mini (Free tier)
     payload = {
         "model": "openai/gpt-4o-mini",
         "messages": [{
@@ -881,7 +894,6 @@ Return ONLY valid JSON:
                     parsed = json.loads(raw)
                     segments = parsed.get("segments", [])
 
-                    # 🎯 FIX #1: Tolerance 2.5 + Signal override
                     updated_count = 0
                     for seg in segments:
                         vt = (seg.get("visual_type") or "").lower().strip()
@@ -1107,21 +1119,37 @@ def build_timed_audio(audio_files, vid_duration):
 
 
 # ============================================================
-# STEP 9 — Final Merge with Ducking
+# STEP 9 — Final Merge with Ducking + DYNAMIC VOLUME
 # ============================================================
 def merge_final(video_path, commentary_audio, out_path, audio_files):
-    print("🎬 [9] Merging (duck during commentary)...")
+    print("🎬 [9] Merging (duck + dynamic volume)...")
 
-    time_conditions = "+".join([
-        f"between(t,{a['start']:.2f},{a['end']:.2f})"
-        for a in audio_files
-    ])
+    # 🎯 FIX #7: Separate time conditions for ACTION vs OTHER
+    action_times = []
+    other_times = []
 
-    volume_expr = f"if({time_conditions},{DUCK_VOLUME},1.0)"
+    for a in audio_files:
+        vt = (a.get("visual_type") or "").lower().strip()
+        if vt == "action":
+            action_times.append(f"between(t,{a['start']:.2f},{a['end']:.2f})")
+        else:
+            other_times.append(f"between(t,{a['start']:.2f},{a['end']:.2f})")
+
+    # 🎯 Background duck (sabhi commentary times par)
+    all_times = action_times + other_times
+    all_conditions = "+".join(all_times) if all_times else "0"
+    volume_expr = f"if({all_conditions},{DUCK_VOLUME},1.0)"
+
+    # 🎯 Commentary volume: Action = 1.7, Others = 1.4
+    if action_times:
+        action_condition = "+".join(action_times)
+        vo_volume_expr = f"if({action_condition},{VOL_ACTION},{VOL_OTHER})"
+    else:
+        vo_volume_expr = f"{VOL_OTHER}"
 
     filter_complex = (
         f"[0:a]volume='{volume_expr}':eval=frame[bg];"
-        f"[1:a]volume=1.4[vo];"
+        f"[1:a]volume='{vo_volume_expr}':eval=frame[vo];"
         f"[bg][vo]amix=inputs=2:duration=first:dropout_transition=0:"
         f"normalize=0,alimiter=limit=0.95[aout]"
     )
@@ -1132,7 +1160,8 @@ def merge_final(video_path, commentary_audio, out_path, audio_files):
         f'-map 0:v:0 -map "[aout]" -c:v copy -shortest {out_path}'
     )
     subprocess.run(cmd, shell=True, check=True)
-    print(f"🔥 Final video ready: {out_path}\n")
+    print(f"🔥 Final video ready: {out_path}")
+    print(f"   🔊 Action volume: {VOL_ACTION}x | Other volume: {VOL_OTHER}x\n")
 
 
 # ============================================================
@@ -1163,6 +1192,7 @@ def main():
     print(f"🎤 Voice : {VOICE_ID}")
     print(f"🎛️  Switch: COMMENTARY_ENABLED = {COMMENTARY_ENABLED}")
     print(f"🎮 Speed : {VOICE_SPEED_MIN} - {VOICE_SPEED_MAX} (auto, frame-based)")
+    print(f"🔊 Volume: Action={VOL_ACTION}x | Other={VOL_OTHER}x")
     print(f"🖼️  Frames: {ANALYSIS_FRAMES} ({GRID_COLS}x{GRID_ROWS} grid, {CANVAS_W}x{CANVAS_H} 8K)")
     print(f"🤖 Model : openai/gpt-4o-mini (Free tier)")
     print("=" * 60 + "\n")
