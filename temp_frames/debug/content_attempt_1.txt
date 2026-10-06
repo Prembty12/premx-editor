@@ -1,1 +1,1 @@
-{"clip_duration": 42, "reason": "Epic magic transformation and goddess awakening", "start_time": 5, "status": "APPROVE", "title": "Cosmic Goddess Rises 🔥✨"}
+{"clip_duration": 38, "reason": "Cinematic combat and helicopter boarding sequence", "start_time": 0, "status": "APPROVE", "title": "Helicopter Escape Under Fire 🚁🔥"}
