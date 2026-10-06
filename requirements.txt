@@ -3,4 +3,3 @@ requests
 yt-dlp
 flask
 gunicorn
-python-dotenv
