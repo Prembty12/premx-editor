@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-06 02:34:46 PM",
+  "last_updated": "2026-10-06 02:36:13 PM",
   "period_days": 7,
   "trending": [
     {
@@ -7,7 +7,7 @@
       "views_7d": 3058,
       "avg_per_video": 1019,
       "trend": "viral",
-      "ratio": 2.390292313244316,
+      "ratio": 2.3898610860544833,
       "fb_link": "https://www.facebook.com/reel/1408783788017999/",
       "source_link": ""
     },
@@ -16,7 +16,7 @@
       "views_7d": 1955,
       "avg_per_video": 977,
       "trend": "viral",
-      "ratio": 2.291771923493324,
+      "ratio": 2.291358470142522,
       "fb_link": "https://www.facebook.com/reel/1515180523779657/",
       "source_link": ""
     },
@@ -25,7 +25,7 @@
       "views_7d": 1701,
       "avg_per_video": 850,
       "trend": "trending",
-      "ratio": 1.9938650306748467,
+      "ratio": 1.993505322027783,
       "fb_link": "https://www.facebook.com/reel/2322876355125407/",
       "source_link": ""
     },
@@ -34,7 +34,7 @@
       "views_7d": 1841,
       "avg_per_video": 613,
       "trend": "steady",
-      "ratio": 1.4379285456513893,
+      "ratio": 1.43766913223886,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan231.mp4"
     },
@@ -43,7 +43,7 @@
       "views_7d": 2422,
       "avg_per_video": 605,
       "trend": "steady",
-      "ratio": 1.4191627571273908,
+      "ratio": 1.4189067292080102,
       "fb_link": "https://www.facebook.com/reel/28202371762768360/",
       "source_link": ""
     }
@@ -54,7 +54,7 @@
       "views_7d": 262,
       "avg_per_video": 262,
       "trend": "slow",
-      "ratio": 0.6145795741609527,
+      "ratio": 0.6144686992603284,
       "fb_link": "https://www.facebook.com/reel/1423098925813250/",
       "source_link": ""
     },
@@ -63,7 +63,7 @@
       "views_7d": 425,
       "avg_per_video": 212,
       "trend": "below_avg",
-      "ratio": 0.4972933958859617,
+      "ratio": 0.4972036803175176,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu11.mp4"
     },
@@ -72,16 +72,16 @@
       "views_7d": 167,
       "avg_per_video": 167,
       "trend": "below_avg",
-      "ratio": 0.39173583543846985,
+      "ratio": 0.3916651632689879,
       "fb_link": "https://www.facebook.com/reel/2736647680185540/",
       "source_link": ""
     },
     {
       "game": "mm2remastered",
-      "views_7d": 273,
-      "avg_per_video": 136,
+      "views_7d": 275,
+      "avg_per_video": 137,
       "trend": "below_avg",
-      "ratio": 0.31901840490797545,
+      "ratio": 0.3213061519033015,
       "fb_link": "https://www.facebook.com/reel/1461328042514444/",
       "source_link": ""
     },
@@ -90,7 +90,7 @@
       "views_7d": 458,
       "avg_per_video": 114,
       "trend": "below_avg",
-      "ratio": 0.2674124864669794,
+      "ratio": 0.26736424318960855,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_5.mp4"
     }
@@ -100,7 +100,7 @@
     "views_7d": 3058,
     "avg_per_video": 1019,
     "trend": "viral",
-    "ratio": 2.390292313244316,
+    "ratio": 2.3898610860544833,
     "fb_link": "https://www.facebook.com/reel/1408783788017999/",
     "source_link": ""
   }
