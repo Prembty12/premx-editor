@@ -1,1 +1,1 @@
-{"clip_duration": 35, "reason": "Cinematic sniper combat with intense action shots.", "start_time": 10, "status": "APPROVE", "title": "Scope View Chaos 🎯💥"}
+{"clip_duration": 44, "reason": "Cinematic fiery landscape with green gas and explosions.", "start_time": 12, "status": "APPROVE", "title": "Beneath the Green Burning Sky ☠️🔥"}
