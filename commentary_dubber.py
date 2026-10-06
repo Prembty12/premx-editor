@@ -801,64 +801,6 @@ Look at the frames for each slot's time range. Classify each slot:
 
 **BANNED phrases:** "insane play", "here we go", "game on"
 
-**EMOTION TAGS (IMPORTANT — TTS to understand emotions):**
-
-Start each line with an emotion tag in square brackets:
-
-**ACTION scenes:**
-  [excited]    → hype moments
-  [shouting]   → big action, screaming
-  [surprised]  → unexpected moves
-
-**DIALOG scenes:**
-  [curious]    → asking questions
-  [sarcastic]  → roasting, mocking
-  [confident]  → flexing, hype self
-  [casual]     → normal talking to guys
-
-**CALM scenes:**
-  [whispers]   → suspense, quiet moments
-  [chill]      → relaxing, vibing
-  [sighs]      → bored, tired
-  [laughs]     → funny moments
-
-**EXAMPLE segments:**
-{{
-  "slot": 1,
-  "start": 0.0,
-  "end": 3.5,
-  "text": "[shouting] OHHHH LET'S GOOOOO!",
-  "visual_type": "action"
-}}
-{{
-  "slot": 2,
-  "start": 3.5,
-  "end": 7.0,
-  "text": "[whispers] Wait wait wait... something's coming...",
-  "visual_type": "calm"
-}}
-{{
-  "slot": 3,
-  "start": 7.0,
-  "end": 10.5,
-  "text": "[curious] Yo guys, is this game actually worth it?",
-  "visual_type": "dialog"
-}}
-{{
-  "slot": 4,
-  "start": 10.5,
-  "end": 14.0,
-  "text": "[sarcastic] Bro this guy's aim is worse than mine lol",
-  "visual_type": "dialog"
-}}
-{{
-  "slot": 5,
-  "start": 14.0,
-  "end": 17.5,
-  "text": "[chill] Just vibing here, chilling",
-  "visual_type": "calm"
-}}
-
 Return ONLY valid JSON:
 {{
   "story_summary": "Brief one-line summary.",
