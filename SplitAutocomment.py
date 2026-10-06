@@ -3,7 +3,7 @@
 🎙️ AI Commentary Dubber — Multi-Key Auto-Retry + ON/OFF Switch + Auto Voice Speed
 ===============================================================
 Called from pipeline.sh Step 8.5:
-    python3 commentary_dubber.py --video X --out Y
+    python3 commentary_dubber.py
 
 Multi-Key Support:
   • OpenRouter: OPENROUTER_API_KEY, _2, _3, _4, _5  (5 keys)
