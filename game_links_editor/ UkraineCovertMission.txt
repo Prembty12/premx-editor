@@ -1,6 +1,2 @@
-<<<<<<< HEAD
-=======
 
-
->>>>>>> 73a0ab8 (Real-time add link for clip _Ukraine_Covert_Sniper_Mission2)
 
