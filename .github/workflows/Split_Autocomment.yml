@@ -27,8 +27,13 @@ jobs:
 
       - name: Install Python Packages
         run: |
-          python -m pip install --upgrade pip --quiet
-          pip install --quiet Pillow requests yt-dlp flask gunicorn python-dotenv matplotlib reportlab
+          python -m pip install --upgrade pip
+          python -m pip install Pillow requests yt-dlp flask gunicorn python-dotenv matplotlib reportlab
+
+      - name: Verify dotenv installed
+        run: |
+          python -c "import dotenv; print('dotenv OK:', dotenv.__file__)"
+          pip show python-dotenv
 
       - name: Run Split Auto-Comment & Dashboard
         env:
@@ -41,6 +46,7 @@ jobs:
           OPENROUTER_API_KEY_5: ${{ secrets.OPENROUTER_API_KEY_5 }}
           AUTO_COMMENT: 'true'
         run: |
+          python -m pip install python-dotenv --quiet
           python SplitAutocomment.py
 
       - name: Commit and Push Updated Logs & Dashboard
