@@ -1,1 +1,1 @@
-{"clip_duration": 25, "reason": "Tense boardroom standoff and dramatic betrayal.", "start_time": 22, "status": "APPROVE", "title": "Betrayed by allies 💀"}
+{"clip_duration": 26, "reason": "Intense fiery explosion and survival struggle", "start_time": 30, "status": "APPROVE", "title": "Trapped in a giant firestorm 🔥🫣"}
