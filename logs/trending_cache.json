@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-06 07:30:08 PM",
+  "last_updated": "2026-10-06 07:43:35 PM",
   "period_days": 7,
   "trending": [
     {
@@ -7,7 +7,7 @@
       "views_7d": 3135,
       "avg_per_video": 1045,
       "trend": "viral",
-      "ratio": 2.667910447761194,
+      "ratio": 2.8457498541139854,
       "fb_link": "https://www.facebook.com/reel/1408783788017999/",
       "source_link": ""
     },
@@ -16,25 +16,25 @@
       "views_7d": 1741,
       "avg_per_video": 870,
       "trend": "viral",
-      "ratio": 2.221131186174391,
+      "ratio": 2.3691888737599687,
       "fb_link": "https://www.facebook.com/reel/2322876355125407/",
       "source_link": ""
     },
     {
       "game": "GearsOfWar",
-      "views_7d": 2047,
-      "avg_per_video": 682,
+      "views_7d": 2054,
+      "avg_per_video": 684,
       "trend": "trending",
-      "ratio": 1.7411626080125688,
+      "ratio": 1.8626726317836997,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "VietnamCavePrison",
-      "views_7d": 2587,
-      "avg_per_video": 517,
-      "trend": "steady",
-      "ratio": 1.3199135899450118,
+      "views_7d": 2786,
+      "avg_per_video": 557,
+      "trend": "trending",
+      "ratio": 1.5168255203267846,
       "fb_link": "https://www.facebook.com/reel/1623579349213015/",
       "source_link": ""
     },
@@ -43,27 +43,18 @@
       "views_7d": 1863,
       "avg_per_video": 465,
       "trend": "steady",
-      "ratio": 1.1871563236449332,
+      "ratio": 1.266290604940673,
       "fb_link": "",
       "source_link": ""
     }
   ],
   "below_avg": [
     {
-      "game": "mm2remastered",
-      "views_7d": 737,
-      "avg_per_video": 368,
-      "trend": "slow",
-      "ratio": 0.9395129615082483,
-      "fb_link": "https://www.facebook.com/reel/1461328042514444/",
-      "source_link": ""
-    },
-    {
       "game": "Callofdutyaw",
       "views_7d": 278,
       "avg_per_video": 278,
       "trend": "slow",
-      "ratio": 0.7097407698350354,
+      "ratio": 0.7570511573623808,
       "fb_link": "https://www.facebook.com/reel/1423098925813250/",
       "source_link": ""
     },
@@ -71,8 +62,8 @@
       "game": "combatopration",
       "views_7d": 186,
       "avg_per_video": 186,
-      "trend": "below_avg",
-      "ratio": 0.4748625294579733,
+      "trend": "slow",
+      "ratio": 0.5065162419762692,
       "fb_link": "https://www.facebook.com/reel/2736647680185540/",
       "source_link": ""
     },
@@ -81,7 +72,7 @@
       "views_7d": 466,
       "avg_per_video": 155,
       "trend": "below_avg",
-      "ratio": 0.3957187745483111,
+      "ratio": 0.42209686831355764,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu2.mp4"
     },
@@ -90,9 +81,18 @@
       "views_7d": 459,
       "avg_per_video": 114,
       "trend": "below_avg",
-      "ratio": 0.291044776119403,
+      "ratio": 0.3104454386306166,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_5.mp4"
+    },
+    {
+      "game": "monkeyKing",
+      "views_7d": 20,
+      "avg_per_video": 20,
+      "trend": "below_avg",
+      "ratio": 0.054464112040459055,
+      "fb_link": "",
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing32.mp4"
     }
   ],
   "recommendation": {
@@ -100,7 +100,7 @@
     "views_7d": 3135,
     "avg_per_video": 1045,
     "trend": "viral",
-    "ratio": 2.667910447761194,
+    "ratio": 2.8457498541139854,
     "fb_link": "https://www.facebook.com/reel/1408783788017999/",
     "source_link": ""
   }
