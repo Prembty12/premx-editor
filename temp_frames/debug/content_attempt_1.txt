@@ -1,1 +1,1 @@
-{"clip_duration": 15, "reason": "Wolverine slices enemies with glowing blue claws", "start_time": 0, "status": "APPROVE", "title": "Blue Claws Wolverine Slices 🔥"}
+{"clip_duration": 25, "reason": "Helicopter drop and tactical mission start", "start_time": 20, "status": "APPROVE", "title": "Tactical mission starts now 🪖🔥"}
