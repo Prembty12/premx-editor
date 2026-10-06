@@ -173,8 +173,17 @@ if [ -z "$SOURCE_DURATION" ] || [ "$SOURCE_DURATION" -le 0 ] 2>/dev/null; then
     SOURCE_DURATION=60
 fi
 
-# 6. 📸 Frame Extraction & Portrait Full-Screen 90-Grid Generation (Original Ratio Extraction)
-rm -f "$FRAMES_DIR"/*.jpg
+# 6. 📸 Frame Extraction & Portrait Full-Screen 90-Grid Generation
+# 🧹 FULL CLEANUP — purana sab delete
+rm -rf temp_frames/* 2>/dev/null
+rm -rf segments/* 2>/dev/null
+rm -f extracted_audio.mp3 2>/dev/null
+rm -f final.srt 2>/dev/null
+rm -f temp_analysis_*.jpg 2>/dev/null
+rm -f logs/commentary*.json 2>/dev/null
+rm -f logs/insight_*.json 2>/dev/null
+mkdir -p temp_frames segments analysis logs
+
 echo "📸 [STEP 6] Extracting 90 frames preserving original proportions..."
 
 NUM_FRAMES=90
