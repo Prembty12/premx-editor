@@ -1053,9 +1053,9 @@ def generate_audio(segments, slots):
             "text": text,
             "model_id": "eleven_multilingual_v2",
             "voice_settings": {
-                "stability": 0.35,
-                "similarity_boost": 0.85,
-                "style": 0.75,
+                "stability": 0.4,
+                "similarity_boost": 0.75,
+                "style": 0.5,
                 "use_speaker_boost": True,
                 "speed": voice_speed
             }
