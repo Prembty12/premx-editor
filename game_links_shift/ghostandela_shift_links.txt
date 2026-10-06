@@ -1,2 +1,3 @@
 ghostandela48 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela48.mp4 | REJECT (OpenRouter): Only cinematic dialogue, no gameplay action.
 ghostandela46 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela46.mp4 | REJECT (OpenRouter): No action, only talking and walking.
+ghostandela35 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela35.mp4 | REJECT (OpenRouter): Only boring walking and scanning with no action.
