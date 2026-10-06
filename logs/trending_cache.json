@@ -1,107 +1,107 @@
 {
-  "last_updated": "2026-10-06 12:21:46 AM",
+  "last_updated": "2026-10-06 09:46:44 AM",
   "period_days": 7,
   "trending": [
     {
-      "game": "GODOFWAR3",
-      "views_7d": 4520,
-      "avg_per_video": 1506,
-      "trend": "viral",
-      "ratio": 2.596850212668123,
-      "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR313.mp4"
-    },
-    {
-      "game": "RescueOperation",
-      "views_7d": 986,
-      "avg_per_video": 986,
-      "trend": "trending",
-      "ratio": 1.700195424761467,
-      "fb_link": "https://www.facebook.com/reel/1553685666509531/",
-      "source_link": ""
-    },
-    {
       "game": "UkraineCovertMission",
-      "views_7d": 955,
-      "avg_per_video": 955,
-      "trend": "trending",
-      "ratio": 1.6467410047131856,
+      "views_7d": 1287,
+      "avg_per_video": 1287,
+      "trend": "viral",
+      "ratio": 2.4415461228361393,
       "fb_link": "https://www.facebook.com/reel/1063836943354242/",
       "source_link": ""
     },
     {
-      "game": "codBlackops6",
-      "views_7d": 2769,
-      "avg_per_video": 923,
+      "game": "RescueOperation",
+      "views_7d": 1008,
+      "avg_per_video": 1008,
       "trend": "trending",
-      "ratio": 1.5915622485343144,
+      "ratio": 1.9122599004031302,
+      "fb_link": "https://www.facebook.com/reel/1553685666509531/",
+      "source_link": ""
+    },
+    {
+      "game": "codBlackops6",
+      "views_7d": 2974,
+      "avg_per_video": 991,
+      "trend": "trending",
+      "ratio": 1.8800094854161726,
       "fb_link": "https://www.facebook.com/reel/1408783788017999/",
       "source_link": ""
     },
     {
       "game": "GearsOfWar",
-      "views_7d": 1635,
-      "avg_per_video": 817,
-      "trend": "steady",
-      "ratio": 1.4087826186918038,
-      "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar3.mp4"
+      "views_7d": 1894,
+      "avg_per_video": 947,
+      "trend": "trending",
+      "ratio": 1.7965378230969884,
+      "fb_link": "https://www.facebook.com/reel/1515180523779657/",
+      "source_link": ""
+    },
+    {
+      "game": "Russian_secret_missions",
+      "views_7d": 1674,
+      "avg_per_video": 837,
+      "trend": "trending",
+      "ratio": 1.5878586672990278,
+      "fb_link": "https://www.facebook.com/reel/2322876355125407/",
+      "source_link": ""
     }
   ],
   "below_avg": [
     {
-      "game": "MarvelsSpiderMan2",
-      "views_7d": 1731,
-      "avg_per_video": 577,
-      "trend": "slow",
-      "ratio": 0.9949419473502702,
-      "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan231.mp4"
-    },
-    {
-      "game": "SpiderMan2",
-      "views_7d": 1731,
-      "avg_per_video": 577,
-      "trend": "slow",
-      "ratio": 0.9949419473502702,
-      "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan231.mp4"
+      "game": "Callofdutyaw",
+      "views_7d": 256,
+      "avg_per_video": 256,
+      "trend": "below_avg",
+      "ratio": 0.48565330803889023,
+      "fb_link": "https://www.facebook.com/reel/1423098925813250/",
+      "source_link": ""
     },
     {
       "game": "mm2remastered",
-      "views_7d": 242,
-      "avg_per_video": 242,
+      "views_7d": 255,
+      "avg_per_video": 255,
       "trend": "below_avg",
-      "ratio": 0.41728934360271297,
+      "ratio": 0.4837562248043633,
       "fb_link": "https://www.facebook.com/reel/1146787337671460/",
       "source_link": ""
     },
     {
       "game": "sifu",
-      "views_7d": 714,
-      "avg_per_video": 238,
+      "views_7d": 423,
+      "avg_per_video": 211,
       "trend": "below_avg",
-      "ratio": 0.4103919990803541,
+      "ratio": 0.400284562485179,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu11.mp4"
     },
     {
-      "game": "Callofdutyaw",
-      "views_7d": 217,
-      "avg_per_video": 217,
+      "game": "GodofWarLaufey",
+      "views_7d": 696,
+      "avg_per_video": 139,
       "trend": "below_avg",
-      "ratio": 0.3741809403379699,
-      "fb_link": "https://www.facebook.com/reel/1423098925813250/",
+      "ratio": 0.26369456959924115,
+      "fb_link": "",
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_5.mp4"
+    },
+    {
+      "game": "combatopration",
+      "views_7d": 121,
+      "avg_per_video": 121,
+      "trend": "below_avg",
+      "ratio": 0.2295470713777567,
+      "fb_link": "https://www.facebook.com/reel/2736647680185540/",
       "source_link": ""
     }
   ],
   "recommendation": {
-    "game": "GODOFWAR3",
-    "views_7d": 4520,
-    "avg_per_video": 1506,
+    "game": "UkraineCovertMission",
+    "views_7d": 1287,
+    "avg_per_video": 1287,
     "trend": "viral",
-    "ratio": 2.596850212668123,
-    "fb_link": "",
-    "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR313.mp4"
+    "ratio": 2.4415461228361393,
+    "fb_link": "https://www.facebook.com/reel/1063836943354242/",
+    "source_link": ""
   }
 }
