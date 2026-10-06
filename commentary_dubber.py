@@ -8,7 +8,7 @@ Called from pipeline.sh Step 8.5:
 Multi-Key Support:
   • OpenRouter: OPENROUTER_API_KEY, _2, _3, _4, _5  (5 keys)
   • Groq:       GROQ_API_KEY, _2, _3                (3 keys)
-  • ElevenLabs: ELEVENLABS_API_KEY                  (1 key)
+  • ElevenLabs: ELEVENLABS_API_KEY                  (1 key) eleven_multilingual_v2
 
 ON/OFF Switch:
   • COMMENTARY_ENABLED=true   → commentary chalegi (default)
@@ -801,6 +801,64 @@ Look at the frames for each slot's time range. Classify each slot:
 
 **BANNED phrases:** "insane play", "here we go", "game on"
 
+**EMOTION TAGS (IMPORTANT — TTS to understand emotions):**
+
+Start each line with an emotion tag in square brackets:
+
+**ACTION scenes:**
+  [excited]    → hype moments
+  [shouting]   → big action, screaming
+  [surprised]  → unexpected moves
+
+**DIALOG scenes:**
+  [curious]    → asking questions
+  [sarcastic]  → roasting, mocking
+  [confident]  → flexing, hype self
+  [casual]     → normal talking to guys
+
+**CALM scenes:**
+  [whispers]   → suspense, quiet moments
+  [chill]      → relaxing, vibing
+  [sighs]      → bored, tired
+  [laughs]     → funny moments
+
+**EXAMPLE segments:**
+{{
+  "slot": 1,
+  "start": 0.0,
+  "end": 3.5,
+  "text": "[shouting] OHHHH LET'S GOOOOO!",
+  "visual_type": "action"
+}}
+{{
+  "slot": 2,
+  "start": 3.5,
+  "end": 7.0,
+  "text": "[whispers] Wait wait wait... something's coming...",
+  "visual_type": "calm"
+}}
+{{
+  "slot": 3,
+  "start": 7.0,
+  "end": 10.5,
+  "text": "[curious] Yo guys, is this game actually worth it?",
+  "visual_type": "dialog"
+}}
+{{
+  "slot": 4,
+  "start": 10.5,
+  "end": 14.0,
+  "text": "[sarcastic] Bro this guy's aim is worse than mine lol",
+  "visual_type": "dialog"
+}}
+{{
+  "slot": 5,
+  "start": 14.0,
+  "end": 17.5,
+  "text": "[chill] Just vibing here, chilling",
+  "visual_type": "calm"
+}}
+
 Return ONLY valid JSON:
 {{
   "story_summary": "Brief one-line summary.",
@@ -993,11 +1051,11 @@ def generate_audio(segments, slots):
 
         data = {
             "text": text,
-            "model_id": "eleven_multilingual_v2",
+            "model_id": "eleven_v3",
             "voice_settings": {
-                "stability": 0.4,
-                "similarity_boost": 0.75,
-                "style": 0.5,
+                "stability": 0.35,
+                "similarity_boost": 0.85,
+                "style": 0.75,
                 "use_speaker_boost": True,
                 "speed": voice_speed
             }
