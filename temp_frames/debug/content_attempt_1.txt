@@ -1,1 +1,1 @@
-{"clip_duration": 40, "reason": "Intense tactical combat and survival action.", "start_time": 12, "status": "APPROVE", "title": "Lethal Combat Countdown Begins 🎯🔥"}
+{"clip_duration": 42, "reason": "Dramatic cinematic cutscene with emotional dialogue", "start_time": 15, "status": "APPROVE", "title": "City's final stand 💀🏙️"}
