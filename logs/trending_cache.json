@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-06 06:59:18 PM",
+  "last_updated": "2026-10-06 07:04:38 PM",
   "period_days": 7,
   "trending": [
     {
@@ -7,7 +7,7 @@
       "views_7d": 3133,
       "avg_per_video": 1044,
       "trend": "viral",
-      "ratio": 2.681153694192019,
+      "ratio": 2.678507992895204,
       "fb_link": "https://www.facebook.com/reel/1408783788017999/",
       "source_link": ""
     },
@@ -16,25 +16,25 @@
       "views_7d": 1738,
       "avg_per_video": 869,
       "trend": "viral",
-      "ratio": 2.231726590280522,
+      "ratio": 2.229524373396487,
       "fb_link": "https://www.facebook.com/reel/2322876355125407/",
       "source_link": ""
     },
     {
       "game": "GearsOfWar",
-      "views_7d": 2045,
-      "avg_per_video": 681,
+      "views_7d": 2046,
+      "avg_per_video": 682,
       "trend": "trending",
-      "ratio": 1.7489134729355986,
+      "ratio": 1.7497533057035721,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "VietnamCavePrison",
-      "views_7d": 2490,
-      "avg_per_video": 498,
+      "views_7d": 2500,
+      "avg_per_video": 500,
       "trend": "steady",
-      "ratio": 1.278941129988147,
+      "ratio": 1.2828103414249061,
       "fb_link": "",
       "source_link": ""
     },
@@ -43,7 +43,7 @@
       "views_7d": 1863,
       "avg_per_video": 465,
       "trend": "steady",
-      "ratio": 1.194192018964836,
+      "ratio": 1.1930136175251629,
       "fb_link": "",
       "source_link": ""
     }
@@ -54,16 +54,16 @@
       "views_7d": 1167,
       "avg_per_video": 389,
       "trend": "slow",
-      "ratio": 0.9990122481232715,
+      "ratio": 0.998026445628577,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR312.mp4"
     },
     {
       "game": "mm2remastered",
-      "views_7d": 729,
-      "avg_per_video": 364,
+      "views_7d": 730,
+      "avg_per_video": 365,
       "trend": "slow",
-      "ratio": 0.9348083761359147,
+      "ratio": 0.9364515492401816,
       "fb_link": "https://www.facebook.com/reel/1461328042514444/",
       "source_link": ""
     },
@@ -72,16 +72,16 @@
       "views_7d": 278,
       "avg_per_video": 278,
       "trend": "slow",
-      "ratio": 0.7139470564994074,
+      "ratio": 0.7132425498322479,
       "fb_link": "https://www.facebook.com/reel/1423098925813250/",
       "source_link": ""
     },
     {
       "game": "combatopration",
-      "views_7d": 185,
-      "avg_per_video": 185,
+      "views_7d": 186,
+      "avg_per_video": 186,
       "trend": "below_avg",
-      "ratio": 0.47510865270644015,
+      "ratio": 0.4772054470100651,
       "fb_link": "https://www.facebook.com/reel/2736647680185540/",
       "source_link": ""
     },
@@ -90,7 +90,7 @@
       "views_7d": 466,
       "avg_per_video": 155,
       "trend": "below_avg",
-      "ratio": 0.39806400632161204,
+      "ratio": 0.39767120584172094,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu2.mp4"
     }
@@ -100,7 +100,7 @@
     "views_7d": 3133,
     "avg_per_video": 1044,
     "trend": "viral",
-    "ratio": 2.681153694192019,
+    "ratio": 2.678507992895204,
     "fb_link": "https://www.facebook.com/reel/1408783788017999/",
     "source_link": ""
   }
