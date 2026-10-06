@@ -29,6 +29,7 @@ ON/OFF Switch:
   • FIX #3: Model gpt-4o-mini (Free/Cheap version)
   • FIX #4: 90 frames (9x10 grid) + 4K canvas
   • Analysis image: analysis/last_analysis.jpg (purani auto-delete)
+  • Git Push: Analysis image auto-commit + push to GitHub (Python ke andar se)
 """
 
 import os
@@ -204,6 +205,45 @@ def speed_for_type(slot_type):
         return SPEED_DIALOG
     else:
         return SPEED_CALM
+
+
+# ============================================================
+# 🎯 GIT PUSH — Analysis image ko GitHub par bhejo (Python version)
+# ============================================================
+def commit_analysis_to_github():
+    print("📤 [10] Pushing analysis image to GitHub...")
+    if not os.path.exists(ANALYSIS_GRID_PATH):
+        print("   ⚠️ Analysis image not found, skipping git commit.")
+        return
+
+    try:
+        # Git config
+        subprocess.run("git config --global user.name 'GitHub Action'", shell=True, check=False)
+        subprocess.run("git config --global user.email 'action@github.com'", shell=True, check=False)
+
+        # Pull latest to prevent conflicts
+        subprocess.run("git pull --rebase origin main || git pull --rebase origin master || true", shell=True, check=False)
+
+        # Add image
+        subprocess.run(f"git add {ANALYSIS_GRID_PATH}", shell=True, check=True)
+
+        # Commit
+        commit_res = subprocess.run(f"git commit -m 'Update analysis image [skip ci]'", shell=True, capture_output=True, text=True)
+        if commit_res.returncode == 0:
+            print("   ✅ Committed analysis image.")
+        else:
+            print("   ℹ️ No changes to commit (image might be identical).")
+
+        # Push
+        push_res = subprocess.run("git push origin HEAD", shell=True, capture_output=True, text=True)
+        if push_res.returncode == 0:
+            print("   🚀 Pushed to GitHub successfully.")
+        else:
+            print(f"   ⚠️ Push failed: {push_res.stderr.strip()}")
+
+    except Exception as e:
+        print(f"   ⚠️ Git operation failed: {e}")
+    print()
 
 
 # ============================================================
@@ -1151,11 +1191,19 @@ def main():
         print(f"🔥🔥 DONE! {FINAL_DUBBED_VIDEO}")
         print(f"📊 Slots: {len(slots)} | Segments: {len(audio_files)}")
         print("=" * 60)
+
+        # 🎯 Push analysis image to GitHub (within Python script)
+        commit_analysis_to_github()
+
         sys.exit(0)
 
     except Exception as e:
         print(f"\n❌ Commentary pipeline failed: {e}")
         print("⚠️ Falling back to original clip...")
+        
+        # Even if commentary fails, try to push the analysis image for debugging
+        commit_analysis_to_github()
+        
         if fallback_copy_original():
             sys.exit(0)
         else:
