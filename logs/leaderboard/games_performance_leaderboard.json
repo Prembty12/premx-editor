@@ -2,18 +2,18 @@
     {
         "rank": 1,
         "game_name": "mm2remastered",
-        "total_views": 24660,
+        "total_views": 23868,
         "uploaded_videos": 8,
-        "avg_views_per_video": 3082,
-        "view_share_percentage": 26.75
+        "avg_views_per_video": 2983,
+        "view_share_percentage": 26.08
     },
     {
         "rank": 2,
         "game_name": "Callofdutyaw",
-        "total_views": 18029,
+        "total_views": 18031,
         "uploaded_videos": 9,
         "avg_views_per_video": 2003,
-        "view_share_percentage": 19.56
+        "view_share_percentage": 19.7
     },
     {
         "rank": 3,
@@ -21,15 +21,15 @@
         "total_views": 13588,
         "uploaded_videos": 8,
         "avg_views_per_video": 1698,
-        "view_share_percentage": 14.74
+        "view_share_percentage": 14.85
     },
     {
         "rank": 4,
         "game_name": "VietnamCavePrison",
-        "total_views": 9983,
+        "total_views": 10023,
         "uploaded_videos": 8,
-        "avg_views_per_video": 1247,
-        "view_share_percentage": 10.83
+        "avg_views_per_video": 1252,
+        "view_share_percentage": 10.95
     },
     {
         "rank": 5,
@@ -37,31 +37,31 @@
         "total_views": 7209,
         "uploaded_videos": 9,
         "avg_views_per_video": 801,
-        "view_share_percentage": 7.82
+        "view_share_percentage": 7.88
     },
     {
         "rank": 6,
         "game_name": "codBlackops6",
-        "total_views": 6487,
+        "total_views": 6501,
         "uploaded_videos": 8,
-        "avg_views_per_video": 810,
-        "view_share_percentage": 7.04
+        "avg_views_per_video": 812,
+        "view_share_percentage": 7.1
     },
     {
         "rank": 7,
         "game_name": "Russian_secret_missions",
-        "total_views": 3520,
+        "total_views": 3525,
         "uploaded_videos": 8,
         "avg_views_per_video": 440,
-        "view_share_percentage": 3.82
+        "view_share_percentage": 3.85
     },
     {
         "rank": 8,
         "game_name": "GearsOfWar",
-        "total_views": 2096,
-        "uploaded_videos": 3,
-        "avg_views_per_video": 698,
-        "view_share_percentage": 2.27
+        "total_views": 2099,
+        "uploaded_videos": 4,
+        "avg_views_per_video": 524,
+        "view_share_percentage": 2.29
     },
     {
         "rank": 9,
@@ -69,18 +69,26 @@
         "total_views": 1488,
         "uploaded_videos": 8,
         "avg_views_per_video": 186,
-        "view_share_percentage": 1.61
+        "view_share_percentage": 1.63
     },
     {
         "rank": 10,
         "game_name": "sifu",
-        "total_views": 1095,
+        "total_views": 1105,
         "uploaded_videos": 8,
-        "avg_views_per_video": 136,
-        "view_share_percentage": 1.19
+        "avg_views_per_video": 138,
+        "view_share_percentage": 1.21
     },
     {
         "rank": 11,
+        "game_name": "combatopration",
+        "total_views": 1071,
+        "uploaded_videos": 8,
+        "avg_views_per_video": 133,
+        "view_share_percentage": 1.17
+    },
+    {
+        "rank": 12,
         "game_name": "GodofWarLaufey",
         "total_views": 1057,
         "uploaded_videos": 8,
@@ -88,7 +96,7 @@
         "view_share_percentage": 1.15
     },
     {
-        "rank": 12,
+        "rank": 13,
         "game_name": "Ghost_soap_escap",
         "total_views": 1029,
         "uploaded_videos": 5,
@@ -96,20 +104,12 @@
         "view_share_percentage": 1.12
     },
     {
-        "rank": 13,
-        "game_name": "combatopration",
-        "total_views": 1015,
-        "uploaded_videos": 8,
-        "avg_views_per_video": 126,
-        "view_share_percentage": 1.1
-    },
-    {
         "rank": 14,
         "game_name": "monkeyKing",
-        "total_views": 627,
+        "total_views": 634,
         "uploaded_videos": 8,
-        "avg_views_per_video": 78,
-        "view_share_percentage": 0.68
+        "avg_views_per_video": 79,
+        "view_share_percentage": 0.69
     },
     {
         "rank": 15,
@@ -117,7 +117,7 @@
         "total_views": 289,
         "uploaded_videos": 1,
         "avg_views_per_video": 289,
-        "view_share_percentage": 0.31
+        "view_share_percentage": 0.32
     },
     {
         "rank": 16,
