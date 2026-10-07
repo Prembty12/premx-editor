@@ -1,5 +1,5 @@
 """
-💬 SPLIT AUTO-COMMENT SCRIPT (v9 — Schema + User Name Fix)
+💬 SPLIT AUTO-COMMENT SCRIPT (v9.1 — Stream Filter + Pagination Fix)
 ============================================================
 ✅ ONLY writes 2 JSON files:
    - logs/auto_reply_log.json
@@ -9,8 +9,11 @@
 ✅ Shared log with full script (no duplicate replies)
 ✅ Recursive nested replies fetch
 ✅ Last reply check FIRST — no duplicate
-✅ 🆕 JSON Schema (strict) + auto-fallback to json_object
-✅ 🆕 User Name 5-layer fallback + LAST user reply se naam
+✅ JSON Schema (strict) + auto-fallback to json_object
+✅ User Name 5-layer fallback + LAST user reply se naam
+✅ 🆕 filter=stream → SAARE comments (purane + naye)
+✅ 🆕 order=reverse_chronological → NAYE comments pehle
+✅ 🆕 Pagination → 500+ comments bhi milenge
 """
 
 import os
@@ -413,7 +416,7 @@ def is_reply_safe(reply_text, is_abuse=False):
 
 
 # ============================================================
-# 💬 AUTO-COMMENT — SHARED LOG (v9)
+# 💬 AUTO-COMMENT — SHARED LOG (v9.1)
 # ============================================================
 _page_name_cache = ""
 _user_name_cache = {}
@@ -568,45 +571,83 @@ def was_already_replied(comment_id):
     return False
 
 
+# ============================================================
+# 🔥 v9.1 FIXED: fetch_fb_comments (filter=stream + pagination)
+# ============================================================
 def fetch_fb_comments(post_id, since_timestamp=None):
+    """
+    v9.1: filter=stream → SAARE comments (purane + naye)
+    order=reverse_chronological → NAYE pehle
+    Pagination support → 500+ comments bhi milenge
+    """
+    all_comments = []
+    url = f"{FB_GRAPH_URL}/{post_id}/comments"
     params = {
         "fields": "id,message,from{name,id},created_time,can_reply",
         "access_token": FB_ACCESS_TOKEN,
-        "limit": 50,
+        "limit": 100,
+        "filter": "stream",
+        "order": "reverse_chronological",
     }
     if since_timestamp:
-        params["since"] = since_timestamp
-    try:
-        res = requests.get(f"{FB_GRAPH_URL}/{post_id}/comments",
-                           params=params, timeout=15)
-        if res.status_code == 200:
-            return res.json().get("data", [])
-        log(f"      ⚠️ comments error ({res.status_code}): {res.text[:150]}")
-    except Exception as e:
-        log(f"      ⚠️ comments exception: {e}")
-    return []
+        params["since"] = int(since_timestamp)
+
+    for page in range(5):  # max 5 pages = 500 comments
+        try:
+            res = requests.get(url, params=params, timeout=15)
+            if res.status_code != 200:
+                log(f"      ⚠️ comments error ({res.status_code}): {res.text[:150]}")
+                break
+            data = res.json()
+            all_comments.extend(data.get("data", []))
+            next_url = data.get("paging", {}).get("next")
+            if not next_url:
+                break
+            url = next_url
+            params = None
+        except Exception as e:
+            log(f"      ⚠️ comments exception: {e}")
+            break
+
+    return all_comments
 
 
+# ============================================================
+# 🔥 v9.1 FIXED: fetch_comment_replies (filter=stream + pagination)
+# ============================================================
 def fetch_comment_replies(comment_id, depth=0, max_depth=3):
+    """v9.1: filter=stream + pagination → saari replies milegi"""
     if depth >= max_depth:
         return []
+
+    all_replies = []
+    url = f"{FB_GRAPH_URL}/{comment_id}/comments"
     params = {
         "fields": "id,message,from{name,id},created_time,can_reply",
         "access_token": FB_ACCESS_TOKEN,
-        "limit": 50,
+        "limit": 100,
+        "filter": "stream",
+        "order": "reverse_chronological",
     }
-    all_replies = []
-    try:
-        res = requests.get(f"{FB_GRAPH_URL}/{comment_id}/comments",
-                           params=params, timeout=15)
-        if res.status_code == 200:
-            replies = res.json().get("data", [])
-            for r in replies:
+
+    for page in range(5):
+        try:
+            res = requests.get(url, params=params, timeout=15)
+            if res.status_code != 200:
+                break
+            data = res.json()
+            for r in data.get("data", []):
                 all_replies.append(r)
                 nested = fetch_comment_replies(r["id"], depth + 1, max_depth)
                 all_replies.extend(nested)
-    except Exception:
-        pass
+            next_url = data.get("paging", {}).get("next")
+            if not next_url:
+                break
+            url = next_url
+            params = None
+        except Exception:
+            break
+
     return all_replies
 
 
@@ -646,7 +687,7 @@ def analyze_thread(top_comment):
     - Recursive replies fetch
     - Last reply check FIRST
     - Log check SIRF fresh comment ke liye
-    - 🔥 LAST user reply ka naam use karo (top comment ka nahi)
+    - LAST user reply ka naam use karo (top comment ka nahi)
     """
     cid = top_comment.get("id", "")
 
@@ -741,7 +782,7 @@ def process_fb_comments(actual_posted_titles=None):
         log("🚫 Auto-comment disabled")
         return None
 
-    log("🤖 Auto-reply started (v9 — Schema + User Fix)...")
+    log("🤖 Auto-reply started (v9.1 — Stream Filter + Pagination Fix)...")
     log(f"📂 Shared log: {SHARED_REPLY_LOG}")
     log(f"📂 Shared IDs: {SHARED_REPLIED_IDS}")
 
@@ -1041,7 +1082,7 @@ def git_commit_and_push(file_paths, message="Auto-Reply: Update JSON logs [skip 
 # ============================================================
 def main():
     log("=" * 60)
-    log("🚀 SPLIT SCRIPT v9 — Schema + User Name Fix")
+    log("🚀 SPLIT SCRIPT v9.1 — Stream Filter + Pagination Fix")
     log("=" * 60)
     log(f"📂 Writes ONLY: {SHARED_REPLY_LOG}")
     log(f"📂 Writes ONLY: {SHARED_REPLIED_IDS}")
