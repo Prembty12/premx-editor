@@ -70,6 +70,7 @@ APPROVE IF:
 - Absolute Cinematic & Engagement Mastery Rule: Prioritize pure hype, adrenaline, emotion, comedy, and entertainment above all else. Whether it's an epic fight, a deep emotional drama, a hilarious adventure, or a high-stakes moment that is genuinely gripping, commit to the *full sequence* from its absolute beginning to its natural end. Never force an artificial cut or clip truncation on a brilliant moment—allow the entire momentum, tension, comedy, and payoff of the gameplay to breathe and play out completely so the audience gets maximum satisfaction.
 TITLE RULES (only for APPROVE):
 - Create a viral title under 6-10 words with 1-2 emojis
+- Do NOT use commas or periods or dots or any punctuation in the title Use ONLY spaces and emojis
 - BANNED EMOJIS = 💀 ☠️ 👹 🩸
 - BANNED WORDS = Epic Insane Crazy Best Battle Clash Escape Warrior Beast Mission Wait For The End You Won't Believe Watch Till End This Changed Everything No Escape Fierce Clash Tactical Mission Sniper Headshot Clutch Save
 
@@ -85,13 +86,13 @@ EVERY title MUST include at least 3 of these 5 things.
 
 GOOD TITLE EXAMPLES:
 - 1 HP 4 Enemies Left 🔥🎯
-- Knife vs Sniper... He Won 🔪🎯
+- Knife vs Sniper He Won 🔪🎯
 - Last Bullet Saved His Team 🔫🔥
 - Tank Walked Into 5 Players 💥😳
 - Bro Cooked The Whole Lobby 🍳🔥
-- He Was Hiding... Then This 👀💥
-- Sniper Missed... Big Mistake 🎯😂
-- Boss Fight... 1 HP Left 🔥😳
+- He Was Hiding Then This 👀💥
+- Sniper Missed Big Mistake 🎯😂
+- Boss Fight 1 HP Left 🔥😳
 
 BANNED TITLE STYLES:
 - Sniper Headshot
