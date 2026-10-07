@@ -1,39 +1,11 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v3 (Honest Classification + Fixed Git Push)
+🎙️ AI Commentary Dubber — v3.1 (Balanced Action Priority + Fixed Git Push)
 ===============================================================
-Called from pipeline.sh Step 8.5:
-    python3 commentary_dubber.py --video X --out Y
-
-Multi-Key Support:
-  • OpenRouter: OPENROUTER_API_KEY, _2, _3, _4, _5  (5 keys)
-  • Groq:       GROQ_API_KEY, _2, _3                (3 keys)
-  • ElevenLabs: ELEVENLABS_API_KEY                  (1 key) eleven_multilingual_v2
-
-ON/OFF Switch:
-  • COMMENTARY_ENABLED=true   → commentary chalegi (default)
-  • COMMENTARY_ENABLED=false  → commentary skip, original clip copy
-
-🎮 Auto Voice Speed (Frame-Based):
-  • Action slots  → 1.14
-  • Dialog slots  → 1.05
-  • Calm slots    → 1.00
-  • Heavy action (3+ cuts ya loud) → 1.17 (clamped)
-
-🔊 Dynamic Volume Boost:
-  • Action scenes → 1.7x commentary volume
-  • Other scenes  → 1.4x commentary volume
-  • Background    → 0.25x during commentary
-
-🎯 FIXES:
-  • FIX #1: Honest prompt — "BE HONEST, don't force action"
-  • FIX #2: Signal override tightened (35%+ only)
-  • FIX #3: Thresholds: action 30%, calm 50%
-  • FIX #4: Git push — force-with-lease + autostash rebase
-  • FIX #5: gpt-4o-mini (Free)
-  • FIX #6: 90 frames, 9x10 grid, 8K canvas
-  • FIX #7: ImageOps.fit — no black borders
-  • FIX #8: 8K image GPT ko direct (no 4K resize)
+FIX v3.1:
+  • Action override relaxed (0.30 ratio + scene/dialog safety)
+  • Dialog scenes protected from false action override
+  • Signal ko zyada trust, GPT ko kam
 """
 
 import os
@@ -212,7 +184,7 @@ def speed_for_type(slot_type):
 
 
 # ============================================================
-# 🎯 GIT PUSH — FIXED (autostash rebase + force-with-lease)
+# 🎯 GIT PUSH — FIXED
 # ============================================================
 def commit_analysis_to_github():
     print("📤 [10] Pushing analysis image to GitHub...")
@@ -222,16 +194,13 @@ def commit_analysis_to_github():
         return
 
     try:
-        # Git config
         subprocess.run("git config --global user.name 'GitHub Action'", shell=True, check=False)
         subprocess.run("git config --global user.email 'action@github.com'", shell=True, check=False)
 
-        # 🎯 FIX #4: Fetch first, then rebase with autostash
         print("   🔄 Fetching latest from remote...")
         subprocess.run("git fetch origin", shell=True, check=False)
 
         print("   🔄 Rebasing with autostash...")
-        # Try main first, then master as fallback
         rebase_res = subprocess.run(
             "git pull --rebase --autostash origin main",
             shell=True, capture_output=True, text=True
@@ -243,11 +212,9 @@ def commit_analysis_to_github():
                 shell=True, check=False
             )
 
-        # Stage image
         subprocess.run(f"git add {ANALYSIS_GRID_PATH}", shell=True, check=False)
         print(f"   📎 Staged: {ANALYSIS_GRID_PATH}")
 
-        # Commit
         commit_res = subprocess.run(
             "git commit -m 'Update analysis image [skip ci]'",
             shell=True, capture_output=True, text=True
@@ -257,7 +224,6 @@ def commit_analysis_to_github():
         else:
             print("   ℹ️ No changes to commit (image might be identical).")
 
-        # 🎯 FIX #4: Push with force-with-lease (safe)
         push_res = subprocess.run(
             "git push origin HEAD --force-with-lease",
             shell=True, capture_output=True, text=True
@@ -265,7 +231,6 @@ def commit_analysis_to_github():
         if push_res.returncode == 0:
             print("   🚀 Pushed to GitHub successfully.")
         else:
-            # Fallback: try normal push
             print(f"   ⚠️ Force-with-lease failed, trying normal push...")
             push_res2 = subprocess.run(
                 "git push origin HEAD",
@@ -518,7 +483,7 @@ def build_auto_slots(video_path, vid_duration, srt_content):
 
 
 # ============================================================
-# STEP 4 — SIGNAL-BASED CLASSIFY (stricter thresholds)
+# STEP 4 — SIGNAL-BASED CLASSIFY
 # ============================================================
 def classify_slots_combined(video_path, slots, srt_content):
     print("🔍 [4] Classifying slots (signal-based fallback)...")
@@ -587,7 +552,6 @@ def classify_slots_combined(video_path, slots, srt_content):
         dialog_ratio = dialog_count / total
         calm_ratio = calm_count / total
 
-        # Stricter thresholds (action 30%, calm 50%)
         if action_ratio >= 0.30:
             slot["type"] = "action"
         elif dialog_ratio >= 0.40:
@@ -698,7 +662,7 @@ def build_analysis_grid(video_path, vid_duration, num_frames=ANALYSIS_FRAMES):
 
 
 # ============================================================
-# STEP 6 — GPT Call
+# STEP 6 — GPT Call (BALANCED OVERRIDE)
 # ============================================================
 def generate_full_script(slots, srt_content, analysis_grid_path):
     print(f"🤖 [6] Generating FULL script + visual classification (OpenRouter — {len(OPENROUTER_KEYS)} keys)...")
@@ -737,7 +701,7 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 3. GRAPHICS (2-3): "Bro these graphics are INSANE!", "Yo the visuals are FIRE!"
 4. ENEMY ROAST: "Bro this guy's aim is worse than mine."
 5. CINEMATIC: "Okay that was actually cinema, wow."
-6. FULL FREEDOM — EXPLORE THE GAME WITH SUSPENSE: Look at what's actually on screen and talk about it naturally — where the character is going, what the map/environment looks like, what objective/mission/task is visible, what's the plan, what's interesting. Build a HOOK — tease what's coming next, create a "what happens now?" feel. Ask questions, make predictions, react to hints. React to what YOU see. NO forced "chill vibes" lines. NO generic fillers.
+6. FULL FREEDOM — EXPLORE THE GAME WITH SUSPENSE
 7. HYPE: "Okay okay okay — something's coming!", "Wait wait WAIT!"
 8. WEIRD: "What even is that thing?!"
 9. Guys (2-4): "guys, you seeing this?!"
@@ -746,76 +710,51 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 12. ENVIRONMENT: "This map is beautiful ngl.", "Look at that skyline bro!"
 13. SOUND (2-3): "Yo did you HEAR that?!"
 14. CINEMATIC SHOT: "That's a movie shot right there!"
-15. FLIRTY/FUNNY "BABY" (1-2 times only): "Let's go baby!", "Oh baby, that's clean!", "Come on baby, show me something!", "Baby, that was smooth!", "Ayy baby, we cooking now!"
-16. LIKE + BELL CTA (2-3 times only): "Smash that like!", "Hit the like button!", "Ring the bell!", "Smash like and ring the bell!", "Drop a like guys!", "Tap the bell!"
-17. SWEARING (max 5-8 total, censor with asterisks): "Holy sh*t!", "What the f*ck!", "That's bullsh*t!", "Son of a b*tch!", "Damn!", "Hell yeah!", "Get rekt!", "You suck!", "Trash!", "Noob!", "Bot!", "Dumbass!", "F*cking clean!", "Sh*t that was nasty!", "B*tch please!", "What a d*ck move!"
-18. HMM / THINKING (2-3 times, dialog/calm only): "Hmm interesting...", "Hmm okay...", "Hmm wait a sec...", "Hmm, what's this?"
-19. HYPE INTRO / CASUAL GREETINGS (2-3 times total, opening + dialog/calm scenes only): "Hey guys, welcome back!", "How you guys doing?", "AYY What's up guys!", "Yo what's good guys?", "Hope you guys are vibing!", "Alright let's get into it guys!", "New game, new vibes — today's gonna be FIRE!", "Fresh game today, this is gonna be WILD!"
+15. FLIRTY/FUNNY "BABY" (1-2 times only): "Let's go baby!", "Oh baby, that's clean!"
+16. LIKE + BELL CTA (2-3 times only): "Smash that like!", "Ring the bell!"
+17. SWEARING (max 5-8 total, censor with asterisks): "Holy sh*t!", "What the f*ck!"
+18. HMM / THINKING (2-3 times, dialog/calm only): "Hmm interesting..."
+19. HYPE INTRO / CASUAL GREETINGS (2-3 times total, opening + dialog/calm only)
 
 **🎭 SCENE-MATCHING — DIALOGUE & CALM RULE:**
-Match your energy to what you SEE in each slot:
-- ACTION (fighting, shooting, running, explosions, dodging)
-    → shout, hype, short punchy CAPS lines
-- DIALOG (characters talking, faces close-up, standing still, aiming)
-    → conversational, curious, natural tone — NO shouting
-- CALM (menus, scenery, drone shots, walking slow, camera panning)
-    → chill, relaxed, observational — NO hype
+- ACTION → shout, hype, short punchy CAPS lines
+- DIALOG → conversational, curious, natural tone — NO shouting
+- CALM → chill, relaxed, observational — NO hype
 
-**🚫 NEVER shout on non-action scenes:**
-- DON'T say "OWW!", "LET'S GO!", "WHAT A SHOT!", "HE'S GONE!" during dialog/calm
-- DON'T call a scenery shot "WHAT A SHOT!" — say something calm instead
-- If a slot has no physical motion → use chill/dialog energy, NOT hype
-- When in doubt about a scene → tone it DOWN, don't force hype
+**🚫 NEVER shout on non-action scenes.**
 
 **🎯 CRITICAL: VISUAL CLASSIFICATION — HONEST RULES**
-Look at the frames for each slot's time range. Classify each slot:
-
-**visual_type = "action" ONLY if you see CLEAR physical motion — LOOK FOR:**
-- Fighting, punching, kicking, martial arts
-- Running, jumping, dodging, sprinting
-- Shooting, weapon being FIRED
-- Explosion, blast, impact, blood
-- Multiple characters in COMBAT
-- Fist EXTENDED toward enemy (punch)
-- Leg RAISED (kick)
-- Combat stance: fists up, knees bent, body leaning forward
-- Two or more characters CLOSE together (within arm's reach)
+**visual_type = "action" ONLY if you see CLEAR physical motion:**
+- Fighting, running, jumping, shooting, explosions
+- Combat stance: fists up, legs moving, mid-attack
+- Multiple characters CLOSE together in combat
+- Health bars / damage numbers / hit sparks
 - Character being HIT or knocked back
-- Dodging, twisting, ducking
-- Multiple enemies surrounding character
-- Health bars / damage numbers / red hit markers on screen
-- Hit sparks, impact effects
-- Grabbing, throwing, wrestling
-- Character LYING on ground after being hit
-- Street fight / brawl / kung-fu / any physical combat
 
 **visual_type = "dialog" ONLY if:**
 - Close-up of face while speaking
 - Character standing still, facing camera
 - Conversation scene
-- Character holding weapon but NOT fighting (aiming/idle)
+- Character holding weapon but NOT fighting
 
-**visual_type = "calm" for EVERYTHING ELSE, including:**
+**visual_type = "calm" for EVERYTHING ELSE:**
 - Slow camera panning
 - City skyline / scenery shots
 - Drone flying in sky
 - Character sitting / standing still
 - Menu / UI screens
 - Walking slowly
-- Character showing weapon but not using it
 - Environment only shots
-- End screen / credits
 
-**⚠️ BE HONEST. If you see slow motion, sitting, walking, scenery, drone flying, city skyline → use "calm".**
+**⚠️ BE HONEST. If you see slow motion, sitting, walking, scenery → use "calm".**
 **Only use "action" if there is CLEAR physical motion.**
-**🔴 If two characters are CLOSE and bodies are ENGAGED (fists up, legs moving, mid-attack) → it's ACTION.**
+**🔴 If two characters are CLOSE and bodies are ENGAGED → it's ACTION.**
 **When in doubt about FIGHTING → use "action".**
-**When in doubt about SCENERY/MENU → use "calm".**
 
 **PACING RULES:**
-- visual_type = "action" → VERY short punchy lines (3-5 words), HIGH energy, CAPS
-- visual_type = "dialog" → 5-7 words, conversational
-- visual_type = "calm" → 6-8 words, chill/observational
+- "action" → VERY short punchy lines (3-5 words), HIGH energy, CAPS
+- "dialog" → 5-7 words, conversational
+- "calm" → 6-8 words, chill/observational
 
 **RULES:**
 1. NATURAL — casual, slang, contractions
@@ -902,11 +841,14 @@ Return ONLY valid JSON:
 
                     updated_count = 0
                     override_count = 0
+                    dialog_protected = 0
+
                     for seg in segments:
                         vt = (seg.get("visual_type") or "").lower().strip()
                         if vt not in ("action", "dialog", "calm"):
                             continue
 
+                        # Find closest slot
                         best_slot = None
                         best_diff = 999
                         for slot in slots:
@@ -921,23 +863,82 @@ Return ONLY valid JSON:
                             avg_loud = best_slot.get("avg_loud", -50)
                             sa = best_slot.get("sub_analysis", {})
                             action_ratio = sa.get("action_ratio", 0)
+                            srt_word_count = len(best_slot.get("srt_text", "").split())
 
-                            # Only override if signal is VERY STRONG
+                            # =================================================
+                            # 🎯 BALANCED ACTION OVERRIDE (v3.1)
+                            # =================================================
+                            # Trigger 1: Signal clearly says action (25%+ ratio)
+                            # Trigger 2: Multiple scene cuts + loud audio
+                            # Trigger 3: Very high action ratio (40%+)
+                            # Trigger 4: Moderate action + moderate loudness
                             signal_says_action_strong = (
-                                (signal_type == "action" and action_ratio >= 0.35)
-                                or (scene_count >= 5 and avg_loud > -10)
-                                or (action_ratio >= 0.50)
+                                (signal_type == "action" and action_ratio >= 0.30)
+                                or (scene_count >= 4 and avg_loud > -12)
+                                or (action_ratio >= 0.45)
+                                or (action_ratio > 0.30 and avg_loud > -18)
                             )
 
-                            if vt == "calm" and signal_says_action_strong:
+                            # 🛡️ DIALOG PROTECTION:
+                            # If slot has heavy speech (8+ words) AND weak action
+                            # → do NOT override calm to action (it's likely dialog)
+                            has_strong_dialog = (
+                                srt_word_count >= 8 and action_ratio < 0.45
+                            )
+
+                            # 🛡️ SCENERY PROTECTION:
+                            # If loudness is very low AND no scenes → likely calm/scenery
+                            is_likely_scenery = (
+                                avg_loud < -30 and scene_count == 0
+                            )
+
+                            if (
+                                vt == "calm"
+                                and signal_says_action_strong
+                                and not has_strong_dialog
+                                and not is_likely_scenery
+                            ):
                                 final_type = "action"
                                 override_count += 1
-                                print(f"   ⚠️  Override @{best_slot['start']:.1f}s: GPT=CALM, STRONG signal=ACTION → ACTION")
+                                print(
+                                    f"   ⚠️  Override @{best_slot['start']:.1f}s: "
+                                    f"GPT=CALM → ACTION "
+                                    f"(ratio={action_ratio}, scenes={scene_count}, "
+                                    f"loud={avg_loud})"
+                                )
+                            elif (
+                                vt == "calm"
+                                and signal_says_action_strong
+                                and has_strong_dialog
+                            ):
+                                # Protected — dialog detected
+                                final_type = "dialog"
+                                dialog_protected += 1
+                                print(
+                                    f"   🛡️  Dialog protected @{best_slot['start']:.1f}s: "
+                                    f"CALM→DIALOG (words={srt_word_count})"
+                                )
                             else:
                                 final_type = vt
 
-                            # Preserve boost if type unchanged; recompute only if changed
-                            if final_type != best_slot.get("type"):
+                            # Preserve action speed boost if already set by signal
+                            if (
+                                final_type != best_slot.get("type")
+                                and final_type == "action"
+                            ):
+                                best_slot["voice_speed"] = speed_for_type("action")
+                                # Re-apply action boosts
+                                if scene_count >= 3:
+                                    best_slot["voice_speed"] = min(
+                                        VOICE_SPEED_MAX,
+                                        best_slot["voice_speed"] + 0.03
+                                    )
+                                if avg_loud > -12:
+                                    best_slot["voice_speed"] = min(
+                                        VOICE_SPEED_MAX,
+                                        best_slot["voice_speed"] + 0.03
+                                    )
+                            elif final_type != best_slot.get("type"):
                                 best_slot["voice_speed"] = speed_for_type(final_type)
 
                             best_slot["visual_type"] = final_type
@@ -946,7 +947,8 @@ Return ONLY valid JSON:
 
                     print(f"   ✅ Key {key_idx} worked! {len(segments)} segments")
                     print(f"   🎯 Visual classification applied to {updated_count}/{len(slots)} slots")
-                    print(f"   🔄 Signal overrides: {override_count}\n")
+                    print(f"   🔄 Signal overrides: {override_count}")
+                    print(f"   🛡️  Dialog protected: {dialog_protected}\n")
                     return segments
 
                 elif r.status_code in (401, 403):
@@ -1015,7 +1017,6 @@ def generate_audio(segments, slots):
         visual_type = (seg.get("visual_type") or "").lower().strip()
         voice_speed = speed_for_type(visual_type) if visual_type in ("action", "dialog", "calm") else 1.0
 
-        # Use closest slot's voice_speed (includes action boost)
         best_diff = 999
         for s in slots:
             diff = abs(s["start"] - seg["start"])
@@ -1186,7 +1187,7 @@ def fallback_copy_original():
 # ============================================================
 def main():
     print("=" * 60)
-    print("🎙️ AI COMMENTARY DUBBER — v3 (Honest + Fixed Git)")
+    print("🎙️ AI COMMENTARY DUBBER — v3.1 (Balanced Action Priority)")
     print("=" * 60)
     print(f"📹 Input : {FINAL_CLIP_PATH}")
     print(f"📤 Output: {FINAL_DUBBED_VIDEO}")
