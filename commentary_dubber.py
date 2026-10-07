@@ -737,7 +737,7 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 3. GRAPHICS (2-3): "Bro these graphics are INSANE!", "Yo the visuals are FIRE!"
 4. ENEMY ROAST: "Bro this guy's aim is worse than mine."
 5. CINEMATIC: "Okay that was actually cinema, wow."
-6. CHILL: "Just vibing here, chilling.", "Too quiet... sus."
+6. FULL FREEDOM — EXPLORE THE GAME WITH SUSPENSE: Look at what's actually on screen and talk about it naturally — where the character is going, what the map/environment looks like, what objective/mission/task is visible, what's the plan, what's interesting. Build a HOOK — tease what's coming next, create a "what happens now?" feel. Ask questions, make predictions, react to hints. React to what YOU see. NO forced "chill vibes" lines. NO generic fillers.
 7. HYPE: "Okay okay okay — something's coming!", "Wait wait WAIT!"
 8. WEIRD: "What even is that thing?!"
 9. Guys (2-4): "guys, you seeing this?!"
@@ -749,6 +749,8 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 15. FLIRTY/FUNNY "BABY" (1-2 times only): "Let's go baby!", "Oh baby, that's clean!", "Come on baby, show me something!", "Baby, that was smooth!", "Ayy baby, we cooking now!"
 16. LIKE + BELL CTA (2-3 times only): "Smash that like!", "Hit the like button!", "Ring the bell!", "Smash like and ring the bell!", "Drop a like guys!", "Tap the bell!"
 17. SWEARING (max 5-8 total, censor with asterisks): "Holy sh*t!", "What the f*ck!", "That's bullsh*t!", "Son of a b*tch!", "Damn!", "Hell yeah!", "Get rekt!", "You suck!", "Trash!", "Noob!", "Bot!", "Dumbass!", "F*cking clean!", "Sh*t that was nasty!", "B*tch please!", "What a d*ck move!"
+18. HMM / THINKING (2-3 times, dialog/calm only): "Hmm interesting...", "Hmm okay...", "Hmm wait a sec...", "Hmm, what's this?"
+19. HYPE INTRO / CASUAL GREETINGS (2-3 times total, opening + dialog/calm scenes only): "Hey guys, welcome back!", "How you guys doing?", "AYY What's up guys!", "Yo what's good guys?", "Hope you guys are vibing!", "Alright let's get into it guys!", "New game, new vibes — today's gonna be FIRE!", "Fresh game today, this is gonna be WILD!"
 
 **🎭 SCENE-MATCHING — DIALOGUE & CALM RULE:**
 Match your energy to what you SEE in each slot:
