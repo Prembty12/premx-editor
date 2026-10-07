@@ -26,7 +26,7 @@ ON/OFF Switch:
   • Background    → 0.25x during commentary
 
 🎯 FIXES:
-  • FIX #1: Honest prompt — "BE HONEST, don't force action"
+  • FIX #1: Honest prompt — energy MATCHES scene, no forced hype
   • FIX #2: Signal override tightened (35%+ only)
   • FIX #3: Thresholds: action 30%, calm 50%
   • FIX #4: Git push — force-with-lease + autostash rebase
@@ -222,16 +222,13 @@ def commit_analysis_to_github():
         return
 
     try:
-        # Git config
         subprocess.run("git config --global user.name 'GitHub Action'", shell=True, check=False)
         subprocess.run("git config --global user.email 'action@github.com'", shell=True, check=False)
 
-        # 🎯 FIX #4: Fetch first, then rebase with autostash
         print("   🔄 Fetching latest from remote...")
         subprocess.run("git fetch origin", shell=True, check=False)
 
         print("   🔄 Rebasing with autostash...")
-        # Try main first, then master as fallback
         rebase_res = subprocess.run(
             "git pull --rebase --autostash origin main",
             shell=True, capture_output=True, text=True
@@ -243,11 +240,9 @@ def commit_analysis_to_github():
                 shell=True, check=False
             )
 
-        # Stage image
         subprocess.run(f"git add {ANALYSIS_GRID_PATH}", shell=True, check=False)
         print(f"   📎 Staged: {ANALYSIS_GRID_PATH}")
 
-        # Commit
         commit_res = subprocess.run(
             "git commit -m 'Update analysis image [skip ci]'",
             shell=True, capture_output=True, text=True
@@ -257,7 +252,6 @@ def commit_analysis_to_github():
         else:
             print("   ℹ️ No changes to commit (image might be identical).")
 
-        # 🎯 FIX #4: Push with force-with-lease (safe)
         push_res = subprocess.run(
             "git push origin HEAD --force-with-lease",
             shell=True, capture_output=True, text=True
@@ -265,7 +259,6 @@ def commit_analysis_to_github():
         if push_res.returncode == 0:
             print("   🚀 Pushed to GitHub successfully.")
         else:
-            # Fallback: try normal push
             print(f"   ⚠️ Force-with-lease failed, trying normal push...")
             push_res2 = subprocess.run(
                 "git push origin HEAD",
@@ -587,7 +580,6 @@ def classify_slots_combined(video_path, slots, srt_content):
         dialog_ratio = dialog_count / total
         calm_ratio = calm_count / total
 
-        # Stricter thresholds (action 30%, calm 50%)
         if action_ratio >= 0.30:
             slot["type"] = "action"
         elif dialog_ratio >= 0.40:
@@ -714,73 +706,90 @@ def generate_full_script(slots, srt_content, analysis_grid_path):
             f"SRT: \"{s['srt_text'][:70]}\""
         )
 
-    prompt = f"""You are a HYPED-UP gaming YouTuber — like a streamer going CRAZY on stream.
-You shout, laugh, hype, roast. Pure energy. Zero boring lines.
+    prompt = f"""You are a natural gaming YouTuber. Your energy MATCHES the scene.
+- Intense combat  → hype, loud, punchy
+- Dialogue scenes → conversational, curious
+- Calm scenes     → chill, observational, relaxed
+
+Match the scene. DON'T fake hype. If nothing is happening, DON'T pretend.
 
 **YOU ARE GETTING 1 IMAGE — ANALYSIS GRID:**
 - 90 frames with timestamps
 - Match frames to slots.
 
 **YOUR JOB:**
-Look at the frames. React LOUDLY like a real streamer watching live gameplay.
+Look at the frames. React like a real streamer watching live gameplay.
 Focus on VISUALS — characters, screens, action, environment, weapons, enemies, faces, graphics.
 
 **HOW TO TALK — NATURAL CASUAL ENGLISH:**
 - Contractions: "he's", "ain't", "gonna", "wanna", "kinda"
 - Slang: "bruh", "yo", "bro", "nah", "fr", "lowkey", "bet", "cap"
 - Short sentences. Fragments OK.
-- Start with reactions: "YO!", "BRO!", "WAIT!", "NAH!", "AYY!"
+- Start with reactions when suitable: "YO!", "BRO!", "WAIT!", "NAH!", "AYY!"
 
-**REACTION PATTERNS (use 10-14 varied):**
-1. BIG ACTION: "OHHHH! He's GONE!", "BRO! That was NASTY!"
-2. VIEWER QUESTIONS (2-4): "Guys, is this game worth buying?"
-3. GRAPHICS (2-3): "Bro these graphics are INSANE!", "Yo the visuals are FIRE!"
-4. ENEMY ROAST: "Bro this guy's aim is worse than mine."
-5. CINEMATIC: "Okay that was actually cinema, wow."
-6. CHILL: "Just vibing here, chilling.", "Too quiet... sus."
-7. HYPE: "Okay okay okay — something's coming!", "Wait wait WAIT!"
-8. WEIRD: "What even is that thing?!"
-9. Guys (2-4): "guys, you seeing this?!"
-10. FOLLOW REQUEST (2-3 total): "Ayy if you're vibing, hit that follow yo."
-11. GRAPHICS PRAISE: "Nah the lighting is next level!"
-12. ENVIRONMENT: "This map is beautiful ngl.", "Look at that skyline bro!"
-13. SOUND (2-3): "Yo did you HEAR that?!"
-14. CINEMATIC SHOT: "That's a movie shot right there!"
-15. FLIRTY/FUNNY "BABY" (1-2 times only): "Let's go baby!", "Oh baby, that's clean!", "Come on baby, show me something!", "Baby, that was smooth!", "Ayy baby, we cooking now!"
-16. LIKE + BELL CTA (2-3 times only): "Smash that like!", "Hit the like button!", "Ring the bell!", "Smash like and ring the bell!", "Drop a like guys!", "Tap the bell!"
-17. SWEARING (max 5-8 total, censor with asterisks): "Holy sh*t!", "What the f*ck!", "That's bullsh*t!", "Son of a b*tch!", "Damn!", "Hell yeah!", "Get rekt!", "You suck!", "Trash!", "Noob!", "Bot!", "Dumbass!", "F*cking clean!", "Sh*t that was nasty!", "B*tch please!", "What a d*ck move!"
+**REACTION PATTERNS — MATCH THE SCENE TYPE:**
 
-**🎯 CRITICAL: VISUAL CLASSIFICATION — HONEST RULES**
-Look at the frames for each slot's time range. Classify each slot:
+For ACTION slots (only):
+  1. "OHHHH! He's GONE!", "BRO! That was NASTY!"
+  2. "Wait wait WAIT!", "Let him cook!"
+  3. "Get rekt!", "F*cking clean!", "That was SICK!"
+  4. "Yo did you HEAR that?!", "He's in the middle of it!"
 
-**visual_type = "action" ONLY if you see CLEAR physical motion:**
-- Fighting, punching, kicking
-- Running, jumping, dodging
-- Shooting, weapon being FIRED
-- Explosion, impact, blood
-- Multiple characters in COMBAT
-- Character clearly sprinting
+For DIALOG slots (only):
+  5. "Wait, what did he say?"
+  6. "Hmm interesting...", "Okay so what's the plan?"
+  7. "Guys is this game worth buying?"
+  8. "He's talking to someone...", "What's he planning?"
 
-**visual_type = "dialog" ONLY if:**
-- Close-up of face while speaking
-- Character standing still, facing camera
-- Conversation scene
-- Character holding weapon but NOT fighting (aiming/idle)
+For CALM slots (only):
+  9. "Just vibing here, chilling.", "Too quiet... sus."
+  10. "Look at that skyline bro!", "This map is beautiful ngl."
+  11. "Nah the lighting is next level!", "Bro these graphics!"
+  12. "Taking in the view...", "Chill vibes here..."
 
-**visual_type = "calm" for EVERYTHING ELSE, including:**
-- Slow camera panning
-- City skyline / scenery shots
-- Drone flying in sky
-- Character sitting / standing still
-- Menu / UI screens
-- Walking slowly
-- Character showing weapon but not using it
-- Environment only shots
-- End screen / credits
+For ALL types (2-3 times total):
+  13. "Ayy if you're vibing, hit that follow yo."
+  14. "Smash that like!", "Ring the bell!", "Hit the like button!"
 
-**⚠️ BE HONEST. If you see slow motion, sitting, walking, scenery, drone flying, city skyline → use "calm".**
-**Only use "action" if there is CLEAR physical motion.**
-**When in doubt, use "calm" — NOT "action".**
+Optional flair (1-2 times only): "Let's go baby!", "Oh baby that's clean!"
+Swearing (max 5-8 total, censor): "Holy sh*t!", "What the f*ck!", "Get rekt!", "Damn!"
+
+**⚠️ FULL VISUAL CLASSIFICATION & DIALOGUE RULE:**
+
+1. CLASSIFY AS "action":
+   - Conditions: Clear physical motion like combat, shooting, running,
+     jumping, dodging, or high-intensity gameplay is visible.
+   - Commentary Style: Very short, punchy, high-energy lines matching fast pace.
+   - EXAMPLES: "OHHH he's GONE!", "BRO that was NASTY!", "Let him cook!"
+
+2. CLASSIFY AS "dialog":
+   - Conditions: Characters are speaking, interacting, or moving casually
+     WITHOUT combat/fights. Close-up faces, conversation scenes,
+     character aiming/idle with weapon.
+   - Commentary Style: Conversational, balanced, contextual lines.
+     DO NOT generate high-intensity action commentary here.
+   - EXAMPLES: "Wait, what's he saying?", "Hmm, interesting move.",
+     "Okay so what's the plan here?"
+
+3. CLASSIFY AS "calm":
+   - Conditions: Inactive scenes, menu screens, slow navigation,
+     environmental footage, city skylines, drone shots, walking slowly,
+     slow camera panning, character sitting/standing still,
+     or ANY scene WITHOUT physical motion.
+   - Commentary Style: Chill, relaxed, observational lines.
+   - EXAMPLES: "Just vibing here...", "Look at that view ngl.",
+     "Too quiet... sus.", "This map is beautiful bro."
+
+**🚫 BANNED:**
+- DO NOT use "action" label for non-combat or static sequences.
+- DO NOT say "what a shot!", "let's go!", "ohhh!", "he's gone!" on calm scenes.
+- DO NOT force hype on scenery, menus, or dialogue.
+- When in doubt → ALWAYS choose "calm" or "dialog", NEVER "action".
+- BANNED phrases: "insane play", "here we go", "game on".
+
+**⚠️ SELF-CHECK before writing each line:**
+"If this slot is calm/dialog, does my line sound like something a streamer
+would say while watching a sunset or a conversation? If not, rewrite it."
 
 **PACING RULES:**
 - visual_type = "action" → VERY short punchy lines (3-5 words), HIGH energy, CAPS
@@ -789,11 +798,11 @@ Look at the frames for each slot's time range. Classify each slot:
 
 **RULES:**
 1. NATURAL — casual, slang, contractions
-2. REACT with emotion
+2. MATCH the scene type — don't fake emotion
 3. Focus on VISUALS
 4. UNIQUE lines based on actual frames
 5. 5-8 words per line
-6. Vary energy
+6. Vary energy across slots
 7. Reference "guys" or "you" naturally
 8. Max 2-3 follow requests total
 
@@ -802,8 +811,6 @@ Look at the frames for each slot's time range. Classify each slot:
 
 **YOUR SLOTS (fill ALL {len(slots)}):**
 {chr(10).join(slot_lines)}
-
-**BANNED phrases:** "insane play", "here we go", "game on"
 
 Return ONLY valid JSON:
 {{
@@ -814,10 +821,15 @@ Return ONLY valid JSON:
       "start": 0.0,
       "end": 3.5,
       "text": "...",
-      "visual_type": "calm"
+      "visual_type": "calm",
+      "reason": "slow drone shot of city, no character motion"
     }}
   ]
 }}
+
+IMPORTANT: Include a "reason" field for each segment explaining WHY you chose
+that visual_type. Be specific about what you SEE — "character walking" not
+just "calm". This keeps classification honest.
 """
 
     or_url = "https://openrouter.ai/api/v1/chat/completions"
@@ -892,7 +904,6 @@ Return ONLY valid JSON:
                             sa = best_slot.get("sub_analysis", {})
                             action_ratio = sa.get("action_ratio", 0)
 
-                            # Only override if signal is VERY STRONG
                             signal_says_action_strong = (
                                 (signal_type == "action" and action_ratio >= 0.35)
                                 or (scene_count >= 5 and avg_loud > -10)
@@ -906,7 +917,6 @@ Return ONLY valid JSON:
                             else:
                                 final_type = vt
 
-                            # Preserve boost if type unchanged; recompute only if changed
                             if final_type != best_slot.get("type"):
                                 best_slot["voice_speed"] = speed_for_type(final_type)
 
@@ -985,7 +995,6 @@ def generate_audio(segments, slots):
         visual_type = (seg.get("visual_type") or "").lower().strip()
         voice_speed = speed_for_type(visual_type) if visual_type in ("action", "dialog", "calm") else 1.0
 
-        # Use closest slot's voice_speed (includes action boost)
         best_diff = 999
         for s in slots:
             diff = abs(s["start"] - seg["start"])
