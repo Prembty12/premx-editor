@@ -76,10 +76,10 @@ MIN_COMMENT_AGE_MIN = 0
 # 60 din = 60 * 24 = 1440 hours
 # 90 din = 90 * 24 = 2160 hours
 # 7 din  = 7 * 24  = 168 hours
-MAX_COMMENT_AGE_HOURS = 30 * 24    # 👈 CHANGE THIS (30 days default)
+MAX_COMMENT_AGE_HOURS = 60 * 24    # 👈 CHANGE THIS (30 days default)
 # ============================================================
 
-POSTS_TO_SCAN = 40
+POSTS_TO_SCAN = 100
 COMMENT_FETCH_WORKERS = 5
 MAX_JSON_RETRIES = 12
 MAX_COMMENT_PAGES = 20    # 🔥 20 pages * 100 = 2000 comments per post
