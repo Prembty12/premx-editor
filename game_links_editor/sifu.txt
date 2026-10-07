@@ -1,6 +1,3 @@
-sifu1 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu1.mp4
-
-
 sifu4 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu4.mp4
 sifu5 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu5.mp4
 sifu6 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu6.mp4
