@@ -1,1 +1,1 @@
-{"clip_duration":44,"reason":"Intense fiery Capitol battle action","start_time":12,"status":"APPROVE","title":"Last Bullet At The Capitol 🔥🎯"}
+{"clip_duration":35,"reason":"Intense boss fight with lightning strikes","start_time":5,"status":"APPROVE","title":"1 HP Monkey King vs Giant Boss 🔥⚡"}
