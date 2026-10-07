@@ -1,1 +1,1 @@
-{"clip_duration": 35, "reason": "Sci-fi hangar battle with massive explosions", "start_time": 10, "status": "APPROVE", "title": "Hangar Battle 3 Cars On Fire 🔥💥"}
+{"clip_duration": 45, "reason": "Intense boss combat and chainsaw executions", "start_time": 10, "status": "APPROVE", "title": "1 HP Boss Fight Last Stand 🔥🎯"}
