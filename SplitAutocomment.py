@@ -1,10 +1,13 @@
 """
-💬 SPLIT AUTO-COMMENT SCRIPT (v13.1 — JSON + Schema FIXED)
+💬 SPLIT AUTO-COMMENT SCRIPT (v13.2 — FIXED 404 + 400 ERRORS)
 ============================================================
 ✅ Direct FB se SAARE comments fetch (pagination + nested replies)
 ✅ SCHEMA har attempt pe try, fail hone pe auto JSON_OBJ fallback
 ✅ 5-layer JSON parser — broken JSON bhi recover
-✅ response-healing plugin ALWAYS on
+✅ FIXED: provider block hataya (404 fix)
+✅ FIXED: top_p/frequency_penalty/presence_penalty hataye (400 fix)
+✅ FIXED: strict:False schema (free models support)
+✅ FIXED_MODEL = working chat model
 ✅ ONLY writes 2 JSON files:
    - logs/auto_reply_log.json
    - logs/replied_comment_ids.json
@@ -55,7 +58,8 @@ OPENROUTER_KEYS = [
     os.environ.get("OPENROUTER_API_KEY_5"),
 ]
 
-FIXED_MODEL = "dots-studio/dots-3-note-preview:free"
+# 🔥 FIXED — working chat model
+FIXED_MODEL = "meta-llama/llama-3.3-70b-instruct:free"
 FALLBACK_MODEL = "openrouter/free"
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
@@ -72,13 +76,13 @@ MIN_COMMENT_AGE_MIN = 0
 # ============================================================
 # 🔥 YAHAN APNA TIME WINDOW SET KARO
 # ============================================================
-MAX_COMMENT_AGE_HOURS = 60 * 24    # 👈 CHANGE THIS (60 days default)
+MAX_COMMENT_AGE_HOURS = 60 * 24    # 👈 CHANGE THIS (60 days)
 # ============================================================
 
 POSTS_TO_SCAN = 100
 COMMENT_FETCH_WORKERS = 5
 MAX_JSON_RETRIES = 12
-MAX_COMMENT_PAGES = 20    # 🔥 20 pages * 100 = 2000 comments per post
+MAX_COMMENT_PAGES = 20
 
 SHARED_REPLY_LOG = "logs/auto_reply_log.json"
 SHARED_REPLIED_IDS = "logs/replied_comment_ids.json"
@@ -105,15 +109,15 @@ KNOWN_GAMES = [
 
 
 # ============================================================
-# 🤖 OPENROUTER CLIENT (FIXED — Bash Jaisa Strict)
+# 🤖 OPENROUTER CLIENT (FIXED — Simple params only)
 # ============================================================
 def _build_json_schema():
-    """Bash script jaisa STRICT schema — strict=True + additionalProperties:False."""
+    """Simple schema — strict=False taaki free models accept kare."""
     return {
         "type": "json_schema",
         "json_schema": {
             "name": "batch_replies",
-            "strict": True,
+            "strict": False,
             "schema": {
                 "type": "object",
                 "properties": {
@@ -122,8 +126,7 @@ def _build_json_schema():
                         "additionalProperties": {"type": "string"}
                     }
                 },
-                "required": ["replies"],
-                "additionalProperties": False
+                "required": ["replies"]
             }
         }
     }
@@ -131,7 +134,7 @@ def _build_json_schema():
 
 def _call_openrouter_single(model_name, api_key, prompt,
                              max_tokens=1500, use_schema=True):
-    """Bash script jaisa strict call — SCHEMA try, fail hone pe JSON_OBJ fallback."""
+    """Simple call — sirf basic parameters, free models ke liye."""
     if not api_key:
         return None
 
@@ -154,16 +157,8 @@ def _call_openrouter_single(model_name, api_key, prompt,
             },
             {"role": "user", "content": prompt}
         ],
-        "temperature": 0.1,
+        "temperature": 0.7,
         "max_tokens": max_tokens,
-        "top_p": 0.9,
-        "frequency_penalty": 0.3,
-        "presence_penalty": 0.2,
-        "plugins": [{"id": "response-healing"}],
-        "provider": {
-            "require_parameters": True,
-            "ignore": ["nvidia/nemotron-3.5-content-safety:free"]
-        },
     }
 
     if use_schema:
@@ -214,23 +209,28 @@ def _call_openrouter_single(model_name, api_key, prompt,
                 )
             return None
 
-        if res.status_code == 400 and use_schema:
+        if res.status_code == 404 and use_schema:
+            log(f"   🔄 [{mode_tag}] 404 — JSON_OBJ retry")
+            return _call_openrouter_single(
+                model_name, api_key, prompt,
+                max_tokens=max_tokens, use_schema=False
+            )
+
+        if res.status_code == 400:
             err = res.text.lower()
-            fallback_keywords = (
+            if use_schema and any(k in err for k in (
                 "json_schema", "response_format", "schema",
                 "not supported", "unsupported", "invalid",
-                "unknown", "does not support", "not available",
-                "strict", "additionalproperties"
-            )
-            if any(k in err for k in fallback_keywords):
-                log(f"   🔄 [{mode_tag}] Not supported — JSON_OBJ")
+                "top_p", "parameter", "provider"
+            )):
+                log(f"   🔄 [{mode_tag}] 400 — JSON_OBJ retry")
                 return _call_openrouter_single(
                     model_name, api_key, prompt,
                     max_tokens=max_tokens, use_schema=False
                 )
 
-        if res.status_code in (422, 404) and use_schema:
-            log(f"   🔄 [{mode_tag}] {res.status_code} — JSON_OBJ")
+        if res.status_code == 422 and use_schema:
+            log(f"   🔄 [{mode_tag}] 422 — JSON_OBJ retry")
             return _call_openrouter_single(
                 model_name, api_key, prompt,
                 max_tokens=max_tokens, use_schema=False
@@ -343,7 +343,7 @@ def generate_batch_replies(comments_batch, max_retries=MAX_JSON_RETRIES):
     if not comments_batch:
         return {}
 
-    # 🔥 SIMPLER PROMPT — chhota = better JSON compliance
+    # 🔥 SIMPLER PROMPT
     formatted = ""
     for c in comments_batch:
         tone = "SAVAGE" if c["is_abuse"] else "FRIENDLY"
@@ -393,6 +393,7 @@ JSON:"""
         key_index = (attempt - 1) % len(valid_keys)
         current_key = valid_keys[key_index]
 
+        # 🔥 Attempt 1-3 → FIXED, Attempt 4-12 → FALLBACK
         model_to_use = FIXED_MODEL if attempt <= 3 else FALLBACK_MODEL
         tag = "FIXED" if attempt <= 3 else "FALLBACK"
 
@@ -838,7 +839,7 @@ def get_effective_reply_time(comment, replies_sorted, page_name_lower):
 
 
 def analyze_thread(top_comment):
-    """v13: Embedded nested replies use karo (fast), warna alag fetch."""
+    """v13.2: Embedded nested replies use karo (fast), warna alag fetch."""
     cid = top_comment.get("id", "")
 
     embedded = []
@@ -997,7 +998,7 @@ def process_fb_comments(actual_posted_titles=None):
         return None
 
     window_days = MAX_COMMENT_AGE_HOURS // 24
-    log(f"🤖 Auto-reply started (v13.1 — JSON + Schema FIXED: "
+    log(f"🤖 Auto-reply started (v13.2 — FIXED 404+400: "
         f"{window_days} days / {MAX_COMMENT_AGE_HOURS} hours)...")
     log(f"📂 Shared log: {SHARED_REPLY_LOG}")
     log(f"📂 Shared IDs: {SHARED_REPLIED_IDS}")
@@ -1293,13 +1294,15 @@ def git_commit_and_push(file_paths, message="Auto-Reply: Update JSON logs [skip 
 def main():
     window_days = MAX_COMMENT_AGE_HOURS // 24
     log("=" * 60)
-    log("🚀 SPLIT SCRIPT v13.1 — JSON + Schema FIXED")
+    log("🚀 SPLIT SCRIPT v13.2 — FIXED 404 + 400")
     log("=" * 60)
     log(f"📂 Writes ONLY: {SHARED_REPLY_LOG}")
     log(f"📂 Writes ONLY: {SHARED_REPLIED_IDS}")
     log(f"⏰ Time window: {MAX_COMMENT_AGE_HOURS}h ({window_days} days)")
     log(f"📊 Posts to scan: {POSTS_TO_SCAN} | Workers: {COMMENT_FETCH_WORKERS}")
     log(f"📄 Max comment pages: {MAX_COMMENT_PAGES} (100/page)")
+    log(f"🤖 FIXED: {FIXED_MODEL}")
+    log(f"🤖 FALLBACK: {FALLBACK_MODEL}")
     log("=" * 60)
 
     if AUTO_COMMENT_ENABLED:
