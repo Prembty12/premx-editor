@@ -1,1 +1,1 @@
-{"clip_duration": 25, "reason": "Intense container yard combat and multi-kills", "start_time": 0, "status": "APPROVE", "title": "Container Yard Trap... 4 Enemies Wrecked 🔥🎯"}
+{"clip_duration": 30, "reason": "Constant action with heavy shooting and helicopter combat", "start_time": 2, "status": "APPROVE", "title": "1 Life Jungle Helicopter Strike 🔥🎯"}
