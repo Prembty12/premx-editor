@@ -1,16 +1,13 @@
 """
-💬 SPLIT AUTO-COMMENT SCRIPT (v9 — Schema + User Name Fix)
+💬 SPLIT AUTO-COMMENT SCRIPT (v11 — Simple Time Window)
 ============================================================
 ✅ ONLY writes 2 JSON files:
    - logs/auto_reply_log.json
    - logs/replied_comment_ids.json
-✅ NO dashboard / NO trending / NO best_time / NO games/ folder
-✅ Full script handles ALL dashboard writing
-✅ Shared log with full script (no duplicate replies)
-✅ Recursive nested replies fetch
-✅ Last reply check FIRST — no duplicate
-✅ 🆕 JSON Schema (strict) + auto-fallback to json_object
-✅ 🆕 User Name 5-layer fallback + LAST user reply se naam
+✅ NO dashboard / NO trending / NO games/ folder
+✅ Simple time window — tum khud age set karo
+✅ Last 30 days (720h) ke andar ke saare fresh comments reply honge
+✅ No auto-expand — jo tumne set kiya, wahi use hoga
 """
 
 import os
@@ -71,14 +68,24 @@ FB_GRAPH_URL = f"https://graph.facebook.com/{FB_API_VERSION}"
 MAX_REPLIES_PER_RUN = 10
 MAX_CONVERSATION_DEPTH = 3
 MIN_COMMENT_AGE_MIN = 0
-MAX_COMMENT_AGE_HOURS = 720
-POSTS_TO_SCAN = 25
-COMMENT_FETCH_WORKERS = 10
+
+# ============================================================
+# 🔥 YAHAN APNA TIME WINDOW SET KARO
+# ============================================================
+# 30 din = 30 * 24 = 720 hours
+# 60 din = 60 * 24 = 1440 hours
+# 90 din = 90 * 24 = 2160 hours
+# 7 din  = 7 * 24  = 168 hours
+MAX_COMMENT_AGE_HOURS = 30 * 24    # 👈 CHANGE THIS (30 days default)
+# ============================================================
+
+POSTS_TO_SCAN = 40
+COMMENT_FETCH_WORKERS = 5
 MAX_JSON_RETRIES = 12
 
-# 🔥 ONLY THESE 2 FILES WILL BE WRITTEN
 SHARED_REPLY_LOG = "logs/auto_reply_log.json"
 SHARED_REPLIED_IDS = "logs/replied_comment_ids.json"
+BAD_POSTS_FILE = "logs/bad_posts.json"
 
 AUTO_COMMENT_ENABLED = os.environ.get("AUTO_COMMENT", "true").lower() == "true"
 
@@ -101,10 +108,9 @@ KNOWN_GAMES = [
 
 
 # ============================================================
-# 🤖 OPENROUTER CLIENT (v9 — JSON Schema + Fallback)
+# 🤖 OPENROUTER CLIENT
 # ============================================================
 def _build_json_schema():
-    """Strict JSON schema for batch replies."""
     return {
         "type": "json_schema",
         "json_schema": {
@@ -128,10 +134,6 @@ def _build_json_schema():
 
 def _call_openrouter_single(model_name, api_key, prompt,
                              max_tokens=150, use_schema=False):
-    """
-    v9: Agar use_schema=True → strict json_schema try kare.
-    Fail ho jaye (400/schema not supported) → auto fallback to json_object.
-    """
     if not api_key:
         return None
 
@@ -157,7 +159,6 @@ def _call_openrouter_single(model_name, api_key, prompt,
         payload["response_format"] = {"type": "json_object"}
         mode_tag = "JSON_OBJ"
 
-    # ✅ response-healing plugin (only for json_object)
     if not use_schema:
         payload["plugins"] = [{"id": "response-healing"}]
 
@@ -175,12 +176,11 @@ def _call_openrouter_single(model_name, api_key, prompt,
             log(f"   ⚠️ [{mode_tag}] Empty choices")
             return None
 
-        # 🔥 Auto-fallback: schema not supported
         if res.status_code == 400 and use_schema:
             err = res.text.lower()
             if ("json_schema" in err or "response_format" in err
                     or "schema" in err or "not supported" in err):
-                log(f"   ⚠️ [{mode_tag}] Not supported — falling back to json_object")
+                log(f"   ⚠️ [{mode_tag}] Not supported — falling back")
                 return _call_openrouter_single(
                     model_name, api_key, prompt,
                     max_tokens=max_tokens, use_schema=False
@@ -227,12 +227,6 @@ def _extract_json(response):
 
 
 def _normalize_parsed_replies(parsed):
-    """
-    v9: Handle BOTH output shapes:
-      Format A (schema):  {"replies": {"id1": "text1"}}
-      Format B (old):     {"id1": "text1"}
-    Returns flat dict {comment_id: reply_text}
-    """
     if not isinstance(parsed, dict):
         return {}
     inner = parsed.get("replies")
@@ -314,7 +308,6 @@ YOUR JSON RESPONSE:"""
         model_to_use = FIXED_MODEL if attempt == 1 else FALLBACK_MODEL
         tag = "FIXED" if attempt == 1 else "FALLBACK"
 
-        # 🔥 First 2 attempts → SCHEMA, then JSON_OBJ
         use_schema = attempt <= 2
         schema_tag = "SCHEMA" if use_schema else "JSON_OBJ"
 
@@ -342,7 +335,6 @@ YOUR JSON RESPONSE:"""
             time.sleep(1)
             continue
 
-        # 🔥 Normalize (schema-nested OR flat)
         flat_replies = _normalize_parsed_replies(parsed)
 
         result = {}
@@ -413,7 +405,57 @@ def is_reply_safe(reply_text, is_abuse=False):
 
 
 # ============================================================
-# 💬 AUTO-COMMENT — SHARED LOG (v9)
+# ⏰ AGE CHECK — SIMPLE
+# ============================================================
+def is_within_time_window(timestamp_str):
+    """
+    Simple: check if timestamp falls within MAX_COMMENT_AGE_HOURS window.
+    Tumne jo set kiya (720h = 30 days), wahi use hoga.
+    """
+    if not timestamp_str:
+        return True
+    try:
+        dt = datetime.fromisoformat(timestamp_str.replace("+0000", "+00:00"))
+        ts = dt.timestamp()
+        cutoff = (now_ist() - timedelta(hours=MAX_COMMENT_AGE_HOURS)).timestamp()
+        max_allowed = (now_ist() - timedelta(minutes=MIN_COMMENT_AGE_MIN)).timestamp()
+        return cutoff <= ts <= max_allowed
+    except Exception:
+        return True
+
+
+# ============================================================
+# 🚫 BAD POSTS CACHE
+# ============================================================
+def load_bad_posts():
+    if os.path.exists(BAD_POSTS_FILE):
+        try:
+            with open(BAD_POSTS_FILE, 'r', encoding='utf-8') as f:
+                return set(json.load(f).get("bad", []))
+        except Exception:
+            pass
+    return set()
+
+
+def mark_bad_post(post_id):
+    if not post_id:
+        return
+    bad = load_bad_posts()
+    if post_id in bad:
+        return
+    bad.add(post_id)
+    os.makedirs("logs", exist_ok=True)
+    try:
+        with open(BAD_POSTS_FILE, 'w', encoding='utf-8') as f:
+            json.dump({"bad": list(bad)[-500:],
+                       "updated": now_ist_ampm()}, f, indent=2)
+        log(f"      📝 Marked bad post: {post_id}")
+    except Exception:
+        pass
+
+
+# ============================================================
+# 💬 FB HELPERS
 # ============================================================
 _page_name_cache = ""
 _user_name_cache = {}
@@ -441,7 +483,6 @@ def get_page_name():
 
 
 def fetch_comment_author(comment_id):
-    """v9: Specific comment_id se from{name,id,username} fetch karo."""
     if not comment_id:
         return {}
     try:
@@ -458,17 +499,8 @@ def fetch_comment_author(comment_id):
 
 
 def get_user_name(user_id, fallback_from_field=None, comment_obj=None):
-    """
-    v9: 5-layer user name fetch:
-      1. fallback_from_field
-      2. cache (skip User_XXXX placeholder)
-      3. comment_obj.from.name
-      4. API with multiple field combos (name/first_name/last_name/username)
-      5. User_XXXXXX placeholder
-    """
     global _user_name_cache
 
-    # Layer 1: fallback from field
     if fallback_from_field and str(fallback_from_field).strip():
         name = str(fallback_from_field).strip()
         if name and name.lower() != "facebook user":
@@ -476,14 +508,12 @@ def get_user_name(user_id, fallback_from_field=None, comment_obj=None):
                 _user_name_cache[str(user_id)] = name
             return name
 
-    # Layer 2: cache (skip placeholder)
     if user_id:
         user_id = str(user_id).strip()
         cached = _user_name_cache.get(user_id, "")
         if cached and not cached.startswith("User_"):
             return cached
 
-    # Layer 3: from comment_obj
     if comment_obj:
         cfrom = comment_obj.get("from", {}) or {}
         cname = (cfrom.get("name") or "").strip()
@@ -492,7 +522,6 @@ def get_user_name(user_id, fallback_from_field=None, comment_obj=None):
                 _user_name_cache[str(user_id)] = cname
             return cname
 
-    # Layer 4: API — multiple field combos
     if user_id:
         user_id = str(user_id).strip()
         for fields in ["name,first_name,last_name,username",
@@ -520,7 +549,6 @@ def get_user_name(user_id, fallback_from_field=None, comment_obj=None):
             except Exception:
                 continue
 
-    # Layer 5: placeholder
     if user_id:
         short = user_id[-6:] if len(user_id) > 6 else user_id
         name = f"User_{short}"
@@ -568,22 +596,51 @@ def was_already_replied(comment_id):
     return False
 
 
-def fetch_fb_comments(post_id, since_timestamp=None):
+def fetch_fb_comments(post_id, retries=2):
     params = {
         "fields": "id,message,from{name,id},created_time,can_reply",
         "access_token": FB_ACCESS_TOKEN,
         "limit": 50,
     }
-    if since_timestamp:
-        params["since"] = since_timestamp
-    try:
-        res = requests.get(f"{FB_GRAPH_URL}/{post_id}/comments",
-                           params=params, timeout=15)
-        if res.status_code == 200:
-            return res.json().get("data", [])
-        log(f"      ⚠️ comments error ({res.status_code}): {res.text[:150]}")
-    except Exception as e:
-        log(f"      ⚠️ comments exception: {e}")
+
+    for attempt in range(retries + 1):
+        try:
+            res = requests.get(f"{FB_GRAPH_URL}/{post_id}/comments",
+                               params=params, timeout=15)
+
+            if res.status_code == 200:
+                data = res.json()
+                if "error" in data:
+                    err_msg = data.get("error", {}).get("message", "")[:120]
+                    err_code = data.get("error", {}).get("code", 0)
+                    log(f"      ⚠️ API error in 200 post={post_id}: {err_msg}")
+                    if err_code == 100:
+                        mark_bad_post(post_id)
+                    return []
+                return data.get("data", [])
+
+            if res.status_code == 400 and '"code":100' in res.text.replace(" ", ""):
+                log(f"      🚫 Post {post_id} inaccessible (#100) — skip")
+                mark_bad_post(post_id)
+                return []
+
+            if res.status_code in (429, 500, 502, 503):
+                wait = (2 ** attempt) + random.uniform(0, 1)
+                log(f"      ⏳ Transient {res.status_code} — retry in {wait:.1f}s")
+                time.sleep(wait)
+                continue
+
+            log(f"      ⚠️ comments error ({res.status_code}) post={post_id}: {res.text[:150]}")
+            return []
+
+        except requests.exceptions.Timeout:
+            log(f"      ⚠️ Timeout post={post_id} (attempt {attempt+1})")
+            if attempt < retries:
+                time.sleep(1)
+        except Exception as e:
+            log(f"      ⚠️ comments exception post={post_id}: {e}")
+            return []
+
     return []
 
 
@@ -600,7 +657,10 @@ def fetch_comment_replies(comment_id, depth=0, max_depth=3):
         res = requests.get(f"{FB_GRAPH_URL}/{comment_id}/comments",
                            params=params, timeout=15)
         if res.status_code == 200:
-            replies = res.json().get("data", [])
+            data = res.json()
+            if "error" in data:
+                return []
+            replies = data.get("data", [])
             for r in replies:
                 all_replies.append(r)
                 nested = fetch_comment_replies(r["id"], depth + 1, max_depth)
@@ -640,13 +700,24 @@ def _is_our_reply(reply_obj, page_name_lower):
             or (page_name_lower and r_name == page_name_lower))
 
 
+def get_effective_reply_time(comment, replies_sorted, page_name_lower):
+    """
+    Agar koi user reply hai → last user reply ka time use karo.
+    Warna top comment ka time use karo.
+    """
+    user_replies = [r for r in replies_sorted
+                    if not _is_our_reply(r, page_name_lower)]
+
+    if user_replies:
+        last_user = max(user_replies, key=lambda x: x.get("created_time", ""))
+        return last_user.get("created_time", ""), "last_user_reply"
+
+    return comment.get("created_time", ""), "top_comment"
+
+
 def analyze_thread(top_comment):
     """
-    v9: Analyze thread with user name fix.
-    - Recursive replies fetch
-    - Last reply check FIRST
-    - Log check SIRF fresh comment ke liye
-    - 🔥 LAST user reply ka naam use karo (top comment ka nahi)
+    v11: Simple thread analysis with single time window.
     """
     cid = top_comment.get("id", "")
 
@@ -668,9 +739,24 @@ def analyze_thread(top_comment):
     if our_count >= MAX_CONVERSATION_DEPTH:
         return {"should_reply": False, "depth": our_count, "reason": "max_depth"}
 
+    # 🔥 Time window check (single window)
+    effective_time, time_source = get_effective_reply_time(
+        top_comment, replies_sorted, page_name_lower
+    )
+
+    if not is_within_time_window(effective_time):
+        log(f"      ⏰ Outside {MAX_COMMENT_AGE_HOURS}h window "
+            f"({time_source}={effective_time[:10]})")
+        return {
+            "should_reply": False,
+            "depth": our_count,
+            "reason": "outside_time_window"
+        }
+
+    # Freshness check
     if len(replies_sorted) == 0:
         if was_already_replied(cid):
-            log(f"      ⏭️ Fresh on FB but IN SHARED LOG — skip")
+            log(f"      ⏭️ Fresh on FB but IN LOG — skip")
             return {"should_reply": False, "depth": 0, "reason": "already_replied_log"}
         log(f"      🆕 Fresh comment — WILL REPLY")
     else:
@@ -685,8 +771,9 @@ def analyze_thread(top_comment):
             return {"should_reply": False, "depth": our_count,
                     "reason": "already_replied_this_reply"}
 
-        log(f"      💬 NEW user reply — continuing (depth {our_count})")
+        log(f"      💬 NEW user reply (depth {our_count}) — WILL REPLY")
 
+    # Thread context
     thread_ctx = ""
     for r in replies_sorted[-6:]:
         who = "US" if _is_our_reply(r, page_name_lower) else "USER"
@@ -697,7 +784,6 @@ def analyze_thread(top_comment):
     if not user_msgs:
         return {"should_reply": False, "depth": our_count, "reason": "no_user_msg"}
 
-    # 🔥 FIX: LAST user reply ka from use karo
     last_user = user_msgs[-1]
     last_text = (last_user.get("message") or "").strip()
     if not last_text:
@@ -707,22 +793,19 @@ def analyze_thread(top_comment):
     user_id = last_from.get("id", "")
     user_name_raw = last_from.get("name", "")
 
-    # Agar last_user me from missing → direct fetch
     if not user_name_raw and not user_id:
         fetched = fetch_comment_author(last_user.get("id", ""))
         if fetched:
             user_id = fetched.get("id", "")
             user_name_raw = fetched.get("name", "")
 
-    # Agar abhi bhi missing → top comment se try
     if not user_name_raw and not user_id:
         top_from = top_comment.get("from", {}) or {}
         user_id = top_from.get("id", "")
         user_name_raw = top_from.get("name", "")
 
     user_name = get_user_name(user_id, user_name_raw, comment_obj=last_user)
-
-    log(f"      👤 User resolved: {user_name}")
+    log(f"      👤 User: {user_name} | effective_time={effective_time[:10]} ({time_source})")
 
     return {
         "should_reply": True,
@@ -733,15 +816,54 @@ def analyze_thread(top_comment):
         "user_id": user_id,
         "user_name": user_name,
         "thread_context": thread_ctx,
+        "effective_time": effective_time,
     }
 
 
+def fetch_posts_with_fallback():
+    candidates = [POSTS_TO_SCAN]
+    for n in (40, 35, 30, 25):
+        if n < POSTS_TO_SCAN and n not in candidates:
+            candidates.append(n)
+
+    for scan_count in candidates:
+        log(f"📥 Trying to fetch {scan_count} posts...")
+        try:
+            res = requests.get(
+                f"{FB_GRAPH_URL}/{FB_PAGE_ID}/posts",
+                params={"fields": "id,message,created_time,permalink_url",
+                        "access_token": FB_ACCESS_TOKEN,
+                        "limit": scan_count},
+                timeout=20)
+            if res.status_code == 200:
+                data = res.json()
+                if "error" in data:
+                    log(f"⚠️ API error: {data['error'].get('message','')[:150]}")
+                else:
+                    posts = data.get("data", [])
+                    log(f"✅ Got {len(posts)} posts (requested {scan_count})")
+                    return posts
+            else:
+                log(f"⚠️ HTTP {res.status_code}: {res.text[:150]}")
+        except Exception as e:
+            log(f"⚠️ Exception: {e}")
+        time.sleep(2)
+
+    log("❌ All post-fetch attempts failed")
+    return []
+
+
+# ============================================================
+# 🚀 MAIN PROCESS
+# ============================================================
 def process_fb_comments(actual_posted_titles=None):
     if not AUTO_COMMENT_ENABLED:
         log("🚫 Auto-comment disabled")
         return None
 
-    log("🤖 Auto-reply started (v9 — Schema + User Fix)...")
+    window_days = MAX_COMMENT_AGE_HOURS // 24
+    log(f"🤖 Auto-reply started (v11 — Simple Time Window: {window_days} days / "
+        f"{MAX_COMMENT_AGE_HOURS} hours)...")
     log(f"📂 Shared log: {SHARED_REPLY_LOG}")
     log(f"📂 Shared IDs: {SHARED_REPLIED_IDS}")
 
@@ -757,12 +879,13 @@ def process_fb_comments(actual_posted_titles=None):
             pass
     replied_ids = set(replied_data.get("replied", []))
 
-    reply_log = {"total_replies": 0, "total_skipped": 0, "replies": [], "skipped": []}
+    reply_log = {"total_replies": 0, "total_skipped": 0,
+                 "replies": [], "skipped": []}
     if os.path.exists(SHARED_REPLY_LOG):
         try:
             with open(SHARED_REPLY_LOG, 'r', encoding='utf-8') as f:
                 reply_log = json.load(f)
-            log(f"📂 Existing history: {len(reply_log.get('replies', []))} replies (SHARED)")
+            log(f"📂 Existing history: {len(reply_log.get('replies', []))} replies")
         except Exception:
             pass
 
@@ -771,29 +894,23 @@ def process_fb_comments(actual_posted_titles=None):
         replied_ids.add(hid)
     log(f"📂 Replied history cache: {len(history)} IDs")
 
-    cutoff_time = (now_ist() - timedelta(hours=MAX_COMMENT_AGE_HOURS)).timestamp()
-    min_age_time = (now_ist() - timedelta(minutes=MIN_COMMENT_AGE_MIN)).timestamp()
-
-    log(f"📥 Fetching latest {POSTS_TO_SCAN} posts")
-    try:
-        res = requests.get(
-            f"{FB_GRAPH_URL}/{FB_PAGE_ID}/posts",
-            params={"fields": "id,message,created_time,permalink_url",
-                    "access_token": FB_ACCESS_TOKEN,
-                    "limit": POSTS_TO_SCAN},
-            timeout=20)
-        if res.status_code != 200:
-            log(f"❌ FB posts error ({res.status_code}): {res.text[:300]}")
-            return None
-        posts = res.json().get("data", [])
-        log(f"✅ {len(posts)} posts")
-    except Exception as e:
-        log(f"❌ FB posts exception: {e}")
-        return None
-
+    # Fetch posts
+    posts = fetch_posts_with_fallback()
     if not posts:
         return None
 
+    # Filter bad posts
+    bad_posts = load_bad_posts()
+    if bad_posts:
+        before = len(posts)
+        posts = [p for p in posts if p.get("id") not in bad_posts]
+        log(f"🧹 Filtered bad posts: {before} → {len(posts)}")
+
+    if not posts:
+        log("ℹ️ No posts after filtering")
+        return None
+
+    # Parallel comment fetch
     post_comments_map = {}
 
     def fetch_post_comments(post):
@@ -816,14 +933,18 @@ def process_fb_comments(actual_posted_titles=None):
                 log(f"⚠️ Parallel error: {e}")
 
     total_comments = sum(len(c) for c in post_comments_map.values())
-    log(f"✅ {total_comments} comments fetched")
+    log(f"✅ {total_comments} comments fetched from {len(posts)} posts")
 
+    # ============================================================
+    # 🔥 PROCESS COMMENTS WITH SINGLE TIME WINDOW
+    # ============================================================
     valid_comments = []
     skipped_logs = []
 
     for post in posts:
         if len(valid_comments) >= MAX_REPLIES_PER_RUN:
             break
+
         post_id = post.get("id", "")
         post_message_full = post.get("message", "") or ""
         post_message = post_message_full[:80]
@@ -848,12 +969,12 @@ def process_fb_comments(actual_posted_titles=None):
                     game_name = g
                     break
 
-        log(f"🔍 Post {post_id} | {post_message} | {len(comments)} comments")
-        log(f"      🎮 Game: {game_name}")
+        log(f"🔍 Post {post_id} | {post_message} | {len(comments)} comments | 🎮 {game_name}")
 
         for comment in comments:
             if len(valid_comments) >= MAX_REPLIES_PER_RUN:
                 break
+
             comment_id = comment.get("id", "")
             comment_text = (comment.get("message") or "").strip()
             comment_time = comment.get("created_time", "")
@@ -863,17 +984,14 @@ def process_fb_comments(actual_posted_titles=None):
                 continue
             if not can_reply:
                 continue
+
             from_data = comment.get("from", {}) or {}
             if from_data.get("id") == FB_PAGE_ID:
                 continue
 
-            try:
-                dt = datetime.fromisoformat(comment_time.replace("+0000", "+00:00"))
-                ts = dt.timestamp()
-                if ts < cutoff_time or ts > min_age_time:
-                    continue
-            except Exception:
-                pass
+            # 🔥 Time window pre-filter
+            if not is_within_time_window(comment_time):
+                continue
 
             abuse_type = detect_abuse(comment_text)
             if abuse_type == "family_abuse":
@@ -885,6 +1003,7 @@ def process_fb_comments(actual_posted_titles=None):
                 })
                 replied_ids.add(comment_id)
                 continue
+
             if is_spam(comment_text):
                 skipped_logs.append({
                     "comment_id": comment_id,
@@ -895,7 +1014,9 @@ def process_fb_comments(actual_posted_titles=None):
                 replied_ids.add(comment_id)
                 continue
 
+            # Full thread analysis
             state = analyze_thread(comment)
+
             if not state["should_reply"]:
                 if state["reason"] in ("max_depth", "waiting_user",
                                         "already_replied_log",
@@ -924,13 +1045,15 @@ def process_fb_comments(actual_posted_titles=None):
                 "user_id": state["user_id"],
             })
 
+    log(f"\n📊 Total valid comments: {len(valid_comments)}")
+
     if not valid_comments:
-        log("ℹ️ No valid comments")
         replies_map = {}
     else:
-        log(f"📦 Batch: {len(valid_comments)} comments → 12-retry loop (SCHEMA → JSON_OBJ)")
+        log(f"📦 Batch: {len(valid_comments)} comments")
         replies_map = generate_batch_replies(valid_comments)
 
+    # Post replies
     replies_count = 0
     for c in valid_comments:
         cid = c["comment_id"]
@@ -938,6 +1061,7 @@ def process_fb_comments(actual_posted_titles=None):
         if not reply_text:
             log(f"⚠️ No reply for {cid} — skip")
             continue
+
         safe, reason = is_reply_safe(reply_text, is_abuse=c["is_abuse"])
         if not safe:
             log(f"⚠️ Unsafe ({reason}) for {cid}")
@@ -967,6 +1091,7 @@ def process_fb_comments(actual_posted_titles=None):
                 "post_title": c["post_title"][:100],
                 "fb_post_link": c["fb_link"],
                 "source_link": c["source_link"],
+                "time_window_hours": MAX_COMMENT_AGE_HOURS,
                 "timestamp": now_ist_ampm(),
                 "status": "posted",
             })
@@ -982,6 +1107,7 @@ def process_fb_comments(actual_posted_titles=None):
         else:
             log(f"❌ Failed to post for {cid}")
 
+    # Save
     reply_log["skipped"].extend(skipped_logs)
     reply_log["total_skipped"] = reply_log.get("total_skipped", 0) + len(skipped_logs)
 
@@ -992,27 +1118,27 @@ def process_fb_comments(actual_posted_titles=None):
     try:
         with open(SHARED_REPLIED_IDS, 'w', encoding='utf-8') as f:
             json.dump(replied_data, f, indent=2)
-        log(f"💾 Saved {len(replied_data['replied'])} IDs to {SHARED_REPLIED_IDS}")
+        log(f"💾 Saved {len(replied_data['replied'])} IDs")
     except Exception as e:
         log(f"⚠️ replied_file save error: {e}")
 
     reply_log["replies"] = reply_log.get("replies", [])[-500:]
     reply_log["skipped"] = reply_log.get("skipped", [])[-200:]
     reply_log["last_updated"] = now_ist_ampm()
+    reply_log["time_window_hours"] = MAX_COMMENT_AGE_HOURS
     try:
         with open(SHARED_REPLY_LOG, 'w', encoding='utf-8') as f:
             json.dump(reply_log, f, indent=2, ensure_ascii=False)
-        log(f"💾 Shared log updated: {SHARED_REPLY_LOG}")
+        log(f"💾 Shared log updated")
     except Exception as e:
         log(f"⚠️ reply_log save error: {e}")
 
-    log(f"🤖 FB Auto-reply done. {replies_count} new replies. "
-        f"Total in SHARED history: {len(reply_log.get('replies', []))}")
+    log(f"🤖 Done. {replies_count} new replies | window={window_days}d")
     return reply_log
 
 
 # ============================================================
-# 🔄 GIT PUSH — ONLY 2 JSON FILES
+# 🔄 GIT PUSH
 # ============================================================
 def git_commit_and_push(file_paths, message="Auto-Reply: Update JSON logs [skip ci]"):
     try:
@@ -1040,12 +1166,14 @@ def git_commit_and_push(file_paths, message="Auto-Reply: Update JSON logs [skip 
 # 🚀 MAIN
 # ============================================================
 def main():
+    window_days = MAX_COMMENT_AGE_HOURS // 24
     log("=" * 60)
-    log("🚀 SPLIT SCRIPT v9 — Schema + User Name Fix")
+    log("🚀 SPLIT SCRIPT v11 — Simple Time Window")
     log("=" * 60)
     log(f"📂 Writes ONLY: {SHARED_REPLY_LOG}")
     log(f"📂 Writes ONLY: {SHARED_REPLIED_IDS}")
-    log(f"🚫 NO dashboard / NO trending / NO games/ folder")
+    log(f"⏰ Time window: {MAX_COMMENT_AGE_HOURS}h ({window_days} days)")
+    log(f"📊 Posts to scan: {POSTS_TO_SCAN} | Workers: {COMMENT_FETCH_WORKERS}")
     log("=" * 60)
 
     if AUTO_COMMENT_ENABLED:
@@ -1058,8 +1186,12 @@ def main():
     else:
         log("🚫 Auto-comment disabled")
 
+    files_to_push = [SHARED_REPLY_LOG, SHARED_REPLIED_IDS]
+    if os.path.exists(BAD_POSTS_FILE):
+        files_to_push.append(BAD_POSTS_FILE)
+
     try:
-        git_commit_and_push([SHARED_REPLY_LOG, SHARED_REPLIED_IDS])
+        git_commit_and_push(files_to_push)
     except Exception as e:
         log(f"⚠️ Git push error: {e}")
 
