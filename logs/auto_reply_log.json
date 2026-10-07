@@ -1,5 +1,5 @@
 {
-  "total_replies": 22,
+  "total_replies": 23,
   "total_skipped": 0,
   "replies": [
     {
@@ -407,9 +407,28 @@
       "time_window_hours": 1440,
       "timestamp": "2026-10-07 10:18:45 PM",
       "status": "posted"
+    },
+    {
+      "reply_id": "1081103761443586_1876561437053323",
+      "comment_id": "1081103761443586_1805443207254768",
+      "reply_to_id": "1081103761443586_1805443207254768",
+      "post_id": "100463226188818_1081103761443586",
+      "user_name": "Facebook User",
+      "user_id": "",
+      "user_comment": "Hi bro",
+      "openrouter_reply": "Hey yaar! Ready to swing into action? 🕷️",
+      "type": "friendly",
+      "depth": 1,
+      "game": "Spider-Man",
+      "post_title": "Can I beat this elite squad? 🤔⚔️\n\n#videogames #gamingcommunity #gaming #spiderma",
+      "fb_post_link": "https://www.facebook.com/reel/1776708160307603/",
+      "source_link": "",
+      "time_window_hours": 1440,
+      "timestamp": "2026-10-07 10:37:16 PM",
+      "status": "posted"
     }
   ],
   "skipped": [],
-  "last_updated": "2026-10-07 10:22:16 PM",
+  "last_updated": "2026-10-07 10:37:16 PM",
   "time_window_hours": 1440
 }
