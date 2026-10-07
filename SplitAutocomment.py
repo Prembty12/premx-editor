@@ -781,7 +781,7 @@ def fetch_comment_replies(comment_id, depth=0, max_depth=3):
     all_replies = []
     try:
         res = requests.get(f"{FB_GRAPH_URL}/{comment_id}/comments",
-                           params=params, timeout=15)
+                           params=params, timeout=30)
         if res.status_code == 200:
             data = res.json()
             if "error" in data:
