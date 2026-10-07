@@ -5,15 +5,15 @@
         "total_views": 24764,
         "uploaded_videos": 9,
         "avg_views_per_video": 2751,
-        "view_share_percentage": 26.47
+        "view_share_percentage": 26.46
     },
     {
         "rank": 2,
         "game_name": "Callofdutyaw",
-        "total_views": 17355,
+        "total_views": 17365,
         "uploaded_videos": 10,
-        "avg_views_per_video": 1735,
-        "view_share_percentage": 18.55
+        "avg_views_per_video": 1736,
+        "view_share_percentage": 18.56
     },
     {
         "rank": 3,
@@ -21,7 +21,7 @@
         "total_views": 13628,
         "uploaded_videos": 9,
         "avg_views_per_video": 1514,
-        "view_share_percentage": 14.57
+        "view_share_percentage": 14.56
     },
     {
         "rank": 4,
@@ -29,7 +29,7 @@
         "total_views": 10483,
         "uploaded_videos": 9,
         "avg_views_per_video": 1164,
-        "view_share_percentage": 11.21
+        "view_share_percentage": 11.2
     },
     {
         "rank": 5,
@@ -37,7 +37,7 @@
         "total_views": 7283,
         "uploaded_videos": 10,
         "avg_views_per_video": 728,
-        "view_share_percentage": 7.79
+        "view_share_percentage": 7.78
     },
     {
         "rank": 6,
@@ -58,10 +58,10 @@
     {
         "rank": 8,
         "game_name": "GearsOfWar",
-        "total_views": 2180,
+        "total_views": 2200,
         "uploaded_videos": 5,
-        "avg_views_per_video": 436,
-        "view_share_percentage": 2.33
+        "avg_views_per_video": 440,
+        "view_share_percentage": 2.35
     },
     {
         "rank": 9,
@@ -91,8 +91,8 @@
         "rank": 12,
         "game_name": "GodofWarLaufey",
         "total_views": 1094,
-        "uploaded_videos": 9,
-        "avg_views_per_video": 121,
+        "uploaded_videos": 10,
+        "avg_views_per_video": 109,
         "view_share_percentage": 1.17
     },
     {
