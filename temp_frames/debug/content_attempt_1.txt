@@ -1,1 +1,1 @@
-{"clip_duration": 20, "reason": "Intense martial arts combat against multiple enemies", "start_time": 10, "status": "APPROVE", "title": "Cooked 5 Enemies On The Street 🥋🔥"}
+{"clip_duration": 35, "reason": "Sci-fi hangar battle with massive explosions", "start_time": 10, "status": "APPROVE", "title": "Hangar Battle 3 Cars On Fire 🔥💥"}
