@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v3.1 (Balanced Action Priority + Fixed Git Push)
+🎙️ AI Commentary Dubber — v3.3 (FULL DEBUG MODE)
 ===============================================================
-FIX v3.1:
-  • Action override relaxed (0.30 ratio + scene/dialog safety)
-  • Dialog scenes protected from false action override
-  • Signal ko zyada trust, GPT ko kam
+NEW in v3.3:
+  • Slot-by-slot detailed debug table
+  • Speed decision trace (1.14x vs 1.17x kyun)
+  • Scene cut timestamps per slot
+  • GPT vs Signal vs Final classification log
+  • Speed boost trace (scene_count, loud, motion)
+  • debug_report.txt auto-save
+  • Sab kuch console + file mein print
 """
 
 import os
@@ -37,6 +41,33 @@ def parse_args():
 ARGS = parse_args()
 FINAL_CLIP_PATH    = ARGS.video
 FINAL_DUBBED_VIDEO = ARGS.out
+
+
+# ============================================================
+# 🐛 DEBUG MODE
+# ============================================================
+DEBUG_MODE = os.getenv("DEBUG_MODE", "true").lower() == "true"
+DEBUG_LOG_FILE = "debug_report.txt"
+_debug_buffer = []
+
+
+def dprint(msg, force=False):
+    """Debug print — console + file"""
+    if DEBUG_MODE or force:
+        print(msg)
+        _debug_buffer.append(msg)
+
+
+def save_debug_report():
+    """Debug report file mein save karo"""
+    if not DEBUG_MODE:
+        return
+    try:
+        with open(DEBUG_LOG_FILE, "w", encoding="utf-8") as f:
+            f.write("\n".join(_debug_buffer))
+        print(f"\n📄 Debug report saved: {DEBUG_LOG_FILE}")
+    except Exception as e:
+        print(f"⚠️ Could not save debug report: {e}")
 
 
 # ============================================================
@@ -184,7 +215,25 @@ def speed_for_type(slot_type):
 
 
 # ============================================================
-# 🎯 GIT PUSH — FIXED
+# 🆕 MOTION SCORE — Frame Difference Based Action Detection
+# ============================================================
+def get_motion_score(video_path, start, end):
+    try:
+        duration = max(end - start, 0.5)
+        cmd = (
+            f'ffmpeg -ss {start:.2f} -t {duration:.2f} -i {video_path} '
+            f'-vf "select=\'gt(scene,0.1)\',metadata=print" '
+            f'-f null - 2>&1'
+        )
+        out = subprocess.run(cmd, shell=True, capture_output=True, text=True).stderr
+        motion_events = len(re.findall(r"pts_time", out))
+        return motion_events
+    except Exception:
+        return 0
+
+
+# ============================================================
+# GIT PUSH
 # ============================================================
 def commit_analysis_to_github():
     print("📤 [10] Pushing analysis image to GitHub...")
@@ -222,7 +271,7 @@ def commit_analysis_to_github():
         if commit_res.returncode == 0:
             print("   ✅ Committed analysis image.")
         else:
-            print("   ℹ️ No changes to commit (image might be identical).")
+            print("   ℹ️ No changes to commit.")
 
         push_res = subprocess.run(
             "git push origin HEAD --force-with-lease",
@@ -387,6 +436,18 @@ def build_auto_slots(video_path, vid_duration, srt_content):
     print(f"   🔊 Audio peaks: {len(audio_peaks)}")
     print(f"   🗣️  Speech ratio: {speech_ratio*100:.0f}%")
 
+    # 🐛 DEBUG: Scene cut timestamps print karo
+    if DEBUG_MODE:
+        dprint(f"\n   🐛 DEBUG — Scene cut timestamps:")
+        if scene_times:
+            for i, st in enumerate(scene_times[:20], 1):  # first 20
+                dprint(f"      Cut #{i}: {st:.2f}s")
+            if len(scene_times) > 20:
+                dprint(f"      ... +{len(scene_times)-20} more")
+        else:
+            dprint(f"      ⚠️ Koi scene cut nahi mila!")
+        dprint("")
+
     if vid_duration <= 20:
         base = 2.5
     elif vid_duration <= 40:
@@ -468,7 +529,11 @@ def build_auto_slots(video_path, vid_duration, srt_content):
             "scene_count": 0,
             "avg_loud": -50,
             "sub_analysis": {},
-            "voice_speed": 1.0
+            "voice_speed": 1.0,
+            "motion_score": 0,
+            "gpt_type": None,          # 🆕
+            "final_type": None,        # 🆕
+            "speed_boost_log": []      # 🆕
         })
         t = end
 
@@ -483,10 +548,10 @@ def build_auto_slots(video_path, vid_duration, srt_content):
 
 
 # ============================================================
-# STEP 4 — SIGNAL-BASED CLASSIFY
+# STEP 4 — SIGNAL-BASED CLASSIFY (with debug)
 # ============================================================
 def classify_slots_combined(video_path, slots, srt_content):
-    print("🔍 [4] Classifying slots (signal-based fallback)...")
+    print("🔍 [4] Classifying slots (signal + motion score)...")
 
     scene_times = get_scene_timeline(video_path)
     loud_timeline = get_loudness_timeline(video_path)
@@ -494,7 +559,7 @@ def classify_slots_combined(video_path, slots, srt_content):
 
     print(f"   🎬 Scene cuts: {len(scene_times)}")
     print(f"   🔊 Loudness samples: {len(loud_timeline)}")
-    print(f"   📝 SRT entries: {len(srt_entries)}")
+    print(f"   📝 SRT entries: {len(srt_entries)}\n")
 
     ACTION_WORDS = {"shoot","fire","hit","run","kill","die","attack",
                     "grenade","boom","jump","dodge","cover","reload",
@@ -505,7 +570,19 @@ def classify_slots_combined(video_path, slots, srt_content):
                     "wait","okay","yeah","know","think","feel","want",
                     "need","can","will"}
 
-    for slot in slots:
+    # 🐛 DEBUG HEADER
+    if DEBUG_MODE:
+        dprint("=" * 100)
+        dprint("🐛 DEBUG — STEP 4: SIGNAL CLASSIFICATION")
+        dprint("=" * 100)
+        dprint(f"{'Slot':<5} {'Time Range':<18} {'Motion':<8} {'Action%':<9} {'Dialog%':<9} "
+               f"{'Calm%':<8} {'Scenes':<8} {'Loud':<8} {'Type':<8}")
+        dprint("-" * 100)
+
+    for idx, slot in enumerate(slots, 1):
+        motion = get_motion_score(video_path, slot["start"], slot["end"])
+        slot["motion_score"] = motion
+
         sub_windows = []
         t = slot["start"]
         while t < slot["end"]:
@@ -552,13 +629,27 @@ def classify_slots_combined(video_path, slots, srt_content):
         dialog_ratio = dialog_count / total
         calm_ratio = calm_count / total
 
-        if action_ratio >= 0.30:
+        # Motion boost
+        orig_action_ratio = action_ratio
+        orig_calm_ratio = calm_ratio
+        if motion >= 5:
+            action_ratio = min(1.0, action_ratio + 0.40)
+        elif motion >= 3:
+            action_ratio = min(1.0, action_ratio + 0.25)
+        elif motion >= 2:
+            action_ratio = min(1.0, action_ratio + 0.15)
+
+        if motion >= 3:
+            calm_ratio = max(0.0, calm_ratio - 0.30)
+
+        # Classification
+        if action_ratio >= 0.30 or motion >= 5:
             slot["type"] = "action"
         elif dialog_ratio >= 0.40:
             slot["type"] = "dialog"
-        elif calm_ratio >= 0.50:
+        elif calm_ratio >= 0.50 and motion < 2:
             slot["type"] = "calm"
-        elif action_ratio >= 0.20:
+        elif action_ratio >= 0.20 or motion >= 3:
             slot["type"] = "action"
         elif dialog_ratio >= 0.20:
             slot["type"] = "dialog"
@@ -573,24 +664,55 @@ def classify_slots_combined(video_path, slots, srt_content):
         )
         slot["sub_analysis"] = {
             "action_ratio": round(action_ratio, 2),
+            "action_ratio_raw": round(orig_action_ratio, 2),
             "dialog_ratio": round(dialog_ratio, 2),
             "calm_ratio": round(calm_ratio, 2),
-            "total_subs": total
+            "calm_ratio_raw": round(orig_calm_ratio, 2),
+            "total_subs": total,
+            "motion_score": motion
         }
 
+        # Voice speed
         voice_speed = speed_for_type(slot["type"])
+        slot["speed_boost_log"] = [f"base_{slot['type']}={voice_speed:.2f}"]
 
         if slot["type"] == "action":
             if slot["scene_count"] >= 3:
                 voice_speed += 0.03
+                slot["speed_boost_log"].append("+0.03 (scenes>=3)")
             if slot["avg_loud"] > -12:
                 voice_speed += 0.03
+                slot["speed_boost_log"].append("+0.03 (loud>-12)")
+            if motion >= 5:
+                voice_speed += 0.02
+                slot["speed_boost_log"].append("+0.02 (motion>=5)")
 
-        slot["voice_speed"] = round(max(VOICE_SPEED_MIN, min(VOICE_SPEED_MAX, voice_speed)), 2)
+        final_speed = round(max(VOICE_SPEED_MIN, min(VOICE_SPEED_MAX, voice_speed)), 2)
+        if final_speed != round(voice_speed, 2):
+            slot["speed_boost_log"].append(f"capped_to_{final_speed}")
+        slot["voice_speed"] = final_speed
+
+        # 🐛 DEBUG ROW
+        if DEBUG_MODE:
+            dprint(
+                f"{idx:<5} {slot['start']:6.1f}-{slot['end']:6.1f}s  "
+                f"{motion:<8} "
+                f"{orig_action_ratio:.2f}→{action_ratio:.2f}  "
+                f"{dialog_ratio:<9.2f} "
+                f"{orig_calm_ratio:.2f}→{calm_ratio:.2f}  "
+                f"{slot['scene_count']:<8} "
+                f"{slot['avg_loud']:<8} "
+                f"{slot['type']:<8}"
+            )
+
+    if DEBUG_MODE:
+        dprint("-" * 100)
+        dprint("")
 
     speeds = [s["voice_speed"] for s in slots]
-    print(f"✅ Slots classified (signal-based): {len(slots)}")
-    print(f"🎮 Voice speeds (pre-GPT): min={min(speeds):.2f} max={max(speeds):.2f} avg={sum(speeds)/len(speeds):.2f}\n")
+    print(f"✅ Slots classified: {len(slots)}")
+    print(f"🎮 Voice speeds: min={min(speeds):.2f} max={max(speeds):.2f} "
+          f"avg={sum(speeds)/len(speeds):.2f}\n")
     return slots
 
 
@@ -662,10 +784,10 @@ def build_analysis_grid(video_path, vid_duration, num_frames=ANALYSIS_FRAMES):
 
 
 # ============================================================
-# STEP 6 — GPT Call (BALANCED OVERRIDE)
+# STEP 6 — GPT Call (with debug logging)
 # ============================================================
 def generate_full_script(slots, srt_content, analysis_grid_path):
-    print(f"🤖 [6] Generating FULL script + visual classification (OpenRouter — {len(OPENROUTER_KEYS)} keys)...")
+    print(f"🤖 [6] Generating FULL script (OpenRouter — {len(OPENROUTER_KEYS)} keys)...")
 
     slot_lines = []
     for i, s in enumerate(slots, 1):
@@ -674,7 +796,8 @@ def generate_full_script(slots, srt_content, analysis_grid_path):
             f"- Slot {i}: {s['start']:.1f}s → {s['end']:.1f}s "
             f"[{s['type'].upper()}] "
             f"(scenes={s['scene_count']}, loud={s['avg_loud']}dB, "
-            f"action={sa.get('action_ratio', 0)}, dialog={sa.get('dialog_ratio', 0)}) "
+            f"action={sa.get('action_ratio', 0)}, dialog={sa.get('dialog_ratio', 0)}, "
+            f"motion={sa.get('motion_score', 0)}) "
             f"SRT: \"{s['srt_text'][:70]}\""
         )
 
@@ -698,63 +821,69 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 **REACTION PATTERNS (use 10-14 varied):**
 1. BIG ACTION: "OHHHH! He's GONE!", "BRO! That was NASTY!"
 2. VIEWER QUESTIONS (2-4): "Guys, is this game worth buying?"
-3. GRAPHICS (2-3): "Bro these graphics are INSANE!", "Yo the visuals are FIRE!"
+3. GRAPHICS (2-3): "Bro these graphics are INSANE!"
 4. ENEMY ROAST: "Bro this guy's aim is worse than mine."
 5. CINEMATIC: "Okay that was actually cinema, wow."
 6. FULL FREEDOM — EXPLORE THE GAME WITH SUSPENSE
-7. HYPE: "Okay okay okay — something's coming!", "Wait wait WAIT!"
+7. HYPE: "Okay okay okay — something's coming!"
 8. WEIRD: "What even is that thing?!"
 9. Guys (2-4): "guys, you seeing this?!"
 10. FOLLOW REQUEST (2-3 total): "Ayy if you're vibing, hit that follow yo."
 11. GRAPHICS PRAISE: "Nah the lighting is next level!"
-12. ENVIRONMENT: "This map is beautiful ngl.", "Look at that skyline bro!"
+12. ENVIRONMENT: "This map is beautiful ngl."
 13. SOUND (2-3): "Yo did you HEAR that?!"
 14. CINEMATIC SHOT: "That's a movie shot right there!"
-15. FLIRTY/FUNNY "BABY" (1-2 times only): "Let's go baby!", "Oh baby, that's clean!"
-16. LIKE + BELL CTA (2-3 times only): "Smash that like!", "Ring the bell!"
-17. SWEARING (max 5-8 total, censor with asterisks): "Holy sh*t!", "What the f*ck!"
+15. FLIRTY/FUNNY "BABY" (1-2 times only): "Let's go baby!"
+16. LIKE + BELL CTA (2-3 times only): "Smash that like!"
+17. SWEARING (max 5-8, censor with asterisks): "Holy sh*t!"
 18. HMM / THINKING (2-3 times, dialog/calm only): "Hmm interesting..."
-19. HYPE INTRO / CASUAL GREETINGS (2-3 times total, opening + dialog/calm only)
+19. HYPE INTRO (2-3 times, opening + dialog/calm only)
 
-**🎭 SCENE-MATCHING — DIALOGUE & CALM RULE:**
-- ACTION → shout, hype, short punchy CAPS lines
-- DIALOG → conversational, curious, natural tone — NO shouting
-- CALM → chill, relaxed, observational — NO hype
+**🎭 SCENE-MATCHING:**
+- ACTION → shout, hype, CAPS lines
+- DIALOG → conversational, NO shouting
+- CALM → chill, relaxed, NO hype
 
 **🚫 NEVER shout on non-action scenes.**
 
-**🎯 CRITICAL: VISUAL CLASSIFICATION — HONEST RULES**
-**visual_type = "action" ONLY if you see CLEAR physical motion:**
-- Fighting, running, jumping, shooting, explosions
-- Combat stance: fists up, legs moving, mid-attack
-- Multiple characters CLOSE together in combat
-- Health bars / damage numbers / hit sparks
-- Character being HIT or knocked back
+**🎯 VISUAL CLASSIFICATION RULES**
+
+**⚠️⚠️⚠️ AGGRESSIVE ACTION DETECTION ⚠️⚠️⚠️**
+If you see ANY of these → visual_type = "action":
+- 🔥 FIRE, FLAMES, EXPLOSIONS, BLAST
+- 💥 SMOKE, SPARKS, DUST
+- 🩸 BLOOD, GORE, DAMAGE
+- 🔫 WEAPONS FIRING, MUZZLE FLASH
+- ⚔️ COMBAT STANCE, FISTS UP, MID-ATTACK
+- 👥 MULTIPLE CHARACTERS CLOSE
+- 🏃 RUNNING, JUMPING, DODGING
+- 💢 CHARACTER BEING HIT, KNOCKED BACK
+- 📊 HEALTH BARS, HIT MARKERS
+- 🎯 AIMING DOWN SIGHTS
+- 🎬 CINEMATIC ACTION, SHAKY CAM
+- 3+ CONSECUTIVE frames show above → ACTION
 
 **visual_type = "dialog" ONLY if:**
 - Close-up of face while speaking
 - Character standing still, facing camera
 - Conversation scene
-- Character holding weapon but NOT fighting
 
 **visual_type = "calm" for EVERYTHING ELSE:**
 - Slow camera panning
-- City skyline / scenery shots
+- City skyline / scenery
 - Drone flying in sky
-- Character sitting / standing still
 - Menu / UI screens
 - Walking slowly
 - Environment only shots
 
-**⚠️ BE HONEST. If you see slow motion, sitting, walking, scenery → use "calm".**
-**Only use "action" if there is CLEAR physical motion.**
-**🔴 If two characters are CLOSE and bodies are ENGAGED → it's ACTION.**
-**When in doubt about FIGHTING → use "action".**
+**⚠️ BE HONEST. If slow motion/sitting/walking/scenery → "calm".**
+**🔴 Two characters CLOSE and ENGAGED → ACTION.**
+**🔥 FIRE/EXPLOSIONS/MANY ENEMIES → ACTION.**
 
-**PACING RULES:**
-- "action" → VERY short punchy lines (3-5 words), HIGH energy, CAPS
+**PACING:**
+- "action" → 3-5 words, HIGH energy, CAPS
 - "dialog" → 5-7 words, conversational
-- "calm" → 6-8 words, chill/observational
+- "calm" → 6-8 words, chill
 
 **RULES:**
 1. NATURAL — casual, slang, contractions
@@ -762,9 +891,8 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 3. Focus on VISUALS
 4. UNIQUE lines based on actual frames
 5. 5-8 words per line
-6. Vary energy
-7. Reference "guys" or "you" naturally
-8. Max 2-3 follow requests total
+6. Reference "guys" or "you" naturally
+7. Max 2-3 follow requests
 
 **STORY CONTEXT:**
 {srt_content[:2500]}
@@ -772,7 +900,7 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 **YOUR SLOTS (fill ALL {len(slots)}):**
 {chr(10).join(slot_lines)}
 
-**BANNED phrases:** "insane play", "here we go", "game on"
+**BANNED:** "insane play", "here we go", "game on"
 
 Return ONLY valid JSON:
 {{
@@ -843,12 +971,22 @@ Return ONLY valid JSON:
                     override_count = 0
                     dialog_protected = 0
 
+                    # 🐛 DEBUG HEADER
+                    if DEBUG_MODE:
+                        dprint("")
+                        dprint("=" * 100)
+                        dprint("🐛 DEBUG — STEP 6: GPT vs SIGNAL vs FINAL")
+                        dprint("=" * 100)
+                        dprint(f"{'Slot':<5} {'Time':<15} {'GPT':<10} {'Signal':<10} "
+                               f"{'Motion':<8} {'Action%':<9} {'Words':<7} "
+                               f"{'Final':<10} {'Action':<8} {'Speed':<7}")
+                        dprint("-" * 100)
+
                     for seg in segments:
                         vt = (seg.get("visual_type") or "").lower().strip()
                         if vt not in ("action", "dialog", "calm"):
                             continue
 
-                        # Find closest slot
                         best_slot = None
                         best_diff = 999
                         for slot in slots:
@@ -863,34 +1001,28 @@ Return ONLY valid JSON:
                             avg_loud = best_slot.get("avg_loud", -50)
                             sa = best_slot.get("sub_analysis", {})
                             action_ratio = sa.get("action_ratio", 0)
+                            motion = sa.get("motion_score", 0)
                             srt_word_count = len(best_slot.get("srt_text", "").split())
 
-                            # =================================================
-                            # 🎯 BALANCED ACTION OVERRIDE (v3.1)
-                            # =================================================
-                            # Trigger 1: Signal clearly says action (25%+ ratio)
-                            # Trigger 2: Multiple scene cuts + loud audio
-                            # Trigger 3: Very high action ratio (40%+)
-                            # Trigger 4: Moderate action + moderate loudness
+                            best_slot["gpt_type"] = vt
+
                             signal_says_action_strong = (
-                                (signal_type == "action" and action_ratio >= 0.30)
-                                or (scene_count >= 4 and avg_loud > -12)
-                                or (action_ratio >= 0.45)
-                                or (action_ratio > 0.30 and avg_loud > -18)
+                                (signal_type == "action" and action_ratio >= 0.25)
+                                or (motion >= 3)
+                                or (action_ratio >= 0.30)
+                                or (scene_count >= 3 and avg_loud > -18)
+                                or (action_ratio > 0.20 and avg_loud > -20)
                             )
 
-                            # 🛡️ DIALOG PROTECTION:
-                            # If slot has heavy speech (8+ words) AND weak action
-                            # → do NOT override calm to action (it's likely dialog)
                             has_strong_dialog = (
-                                srt_word_count >= 8 and action_ratio < 0.45
+                                srt_word_count >= 8 and action_ratio < 0.40 and motion < 3
                             )
 
-                            # 🛡️ SCENERY PROTECTION:
-                            # If loudness is very low AND no scenes → likely calm/scenery
                             is_likely_scenery = (
-                                avg_loud < -30 and scene_count == 0
+                                avg_loud < -30 and scene_count == 0 and motion < 2
                             )
+
+                            override_reason = ""
 
                             if (
                                 vt == "calm"
@@ -900,53 +1032,74 @@ Return ONLY valid JSON:
                             ):
                                 final_type = "action"
                                 override_count += 1
-                                print(
-                                    f"   ⚠️  Override @{best_slot['start']:.1f}s: "
-                                    f"GPT=CALM → ACTION "
-                                    f"(ratio={action_ratio}, scenes={scene_count}, "
-                                    f"loud={avg_loud})"
-                                )
+                                override_reason = f"signal_override(ratio={action_ratio:.2f},motion={motion})"
                             elif (
                                 vt == "calm"
                                 and signal_says_action_strong
                                 and has_strong_dialog
                             ):
-                                # Protected — dialog detected
                                 final_type = "dialog"
                                 dialog_protected += 1
-                                print(
-                                    f"   🛡️  Dialog protected @{best_slot['start']:.1f}s: "
-                                    f"CALM→DIALOG (words={srt_word_count})"
-                                )
+                                override_reason = f"dialog_protect(words={srt_word_count})"
                             else:
                                 final_type = vt
 
-                            # Preserve action speed boost if already set by signal
+                            # Speed recalculation
                             if (
                                 final_type != best_slot.get("type")
                                 and final_type == "action"
                             ):
+                                best_slot["speed_boost_log"] = ["override_reset"]
                                 best_slot["voice_speed"] = speed_for_type("action")
-                                # Re-apply action boosts
+                                best_slot["speed_boost_log"].append(f"base_action={SPEED_ACTION}")
                                 if scene_count >= 3:
                                     best_slot["voice_speed"] = min(
                                         VOICE_SPEED_MAX,
                                         best_slot["voice_speed"] + 0.03
                                     )
+                                    best_slot["speed_boost_log"].append("+0.03(scenes>=3)")
                                 if avg_loud > -12:
                                     best_slot["voice_speed"] = min(
                                         VOICE_SPEED_MAX,
                                         best_slot["voice_speed"] + 0.03
                                     )
+                                    best_slot["speed_boost_log"].append("+0.03(loud>-12)")
+                                if motion >= 5:
+                                    best_slot["voice_speed"] = min(
+                                        VOICE_SPEED_MAX,
+                                        best_slot["voice_speed"] + 0.02
+                                    )
+                                    best_slot["speed_boost_log"].append("+0.02(motion>=5)")
                             elif final_type != best_slot.get("type"):
                                 best_slot["voice_speed"] = speed_for_type(final_type)
+                                best_slot["speed_boost_log"] = [f"reset_to_{final_type}={best_slot['voice_speed']}"]
 
                             best_slot["visual_type"] = final_type
                             best_slot["type"] = final_type
+                            best_slot["final_type"] = final_type
+                            if override_reason:
+                                best_slot["speed_boost_log"].append(override_reason)
                             updated_count += 1
 
+                            # 🐛 DEBUG ROW
+                            if DEBUG_MODE:
+                                dprint(
+                                    f"{best_slot.get('slot_num', updated_count):<5} "
+                                    f"{best_slot['start']:5.1f}-{best_slot['end']:5.1f}  "
+                                    f"{vt:<10} {signal_type:<10} "
+                                    f"{motion:<8} "
+                                    f"{action_ratio:<9.2f} "
+                                    f"{srt_word_count:<7} "
+                                    f"{final_type:<10} "
+                                    f"{'✅' if final_type=='action' else '❌':<8} "
+                                    f"{best_slot['voice_speed']:<7}"
+                                )
+
+                    if DEBUG_MODE:
+                        dprint("-" * 100)
+
                     print(f"   ✅ Key {key_idx} worked! {len(segments)} segments")
-                    print(f"   🎯 Visual classification applied to {updated_count}/{len(slots)} slots")
+                    print(f"   🎯 Applied to {updated_count}/{len(slots)} slots")
                     print(f"   🔄 Signal overrides: {override_count}")
                     print(f"   🛡️  Dialog protected: {dialog_protected}\n")
                     return segments
@@ -958,6 +1111,9 @@ Return ONLY valid JSON:
                     print(f"      ⚠️ Key {key_idx} rate-limited")
                     time.sleep(2)
                     continue
+                elif r.status_code == 402:
+                    print(f"      💰 Key {key_idx} — credits khatam")
+                    break
                 else:
                     print(f"      ⚠️ Error {r.status_code}: {r.text[:200]}")
                     time.sleep(2)
@@ -976,7 +1132,7 @@ Return ONLY valid JSON:
                 time.sleep(2)
                 continue
 
-    print("⚠️ All OpenRouter keys failed — using fallback lines\n")
+    print("⚠️ All OpenRouter keys failed — using fallback\n")
     FALLBACK = {
         "action": ["Ohh things are heating up!", "He's in the middle of it!",
                    "Chaos everywhere!", "Let him cook!"],
@@ -994,7 +1150,7 @@ Return ONLY valid JSON:
 
 
 # ============================================================
-# STEP 7 — ElevenLabs TTS
+# STEP 7 — ElevenLabs TTS (with debug)
 # ============================================================
 def generate_audio(segments, slots):
     print("🔊 [7] Generating TTS...")
@@ -1004,6 +1160,16 @@ def generate_audio(segments, slots):
         "Content-Type": "application/json",
         "xi-api-key": ELEVENLABS_API_KEY
     }
+
+    # 🐛 DEBUG HEADER
+    if DEBUG_MODE:
+        dprint("")
+        dprint("=" * 100)
+        dprint("🐛 DEBUG — STEP 7: VOICE SPEED & VOLUME PER SEGMENT")
+        dprint("=" * 100)
+        dprint(f"{'Seg':<5} {'Start':<8} {'End':<8} {'Type':<10} "
+               f"{'Speed':<8} {'Volume':<8} {'Boost Log':<40}")
+        dprint("-" * 100)
 
     audio_files = []
     for idx, seg in enumerate(segments):
@@ -1018,13 +1184,32 @@ def generate_audio(segments, slots):
         voice_speed = speed_for_type(visual_type) if visual_type in ("action", "dialog", "calm") else 1.0
 
         best_diff = 999
+        best_slot = None
         for s in slots:
             diff = abs(s["start"] - seg["start"])
             if diff < best_diff:
                 best_diff = diff
+                best_slot = s
                 voice_speed = s.get("voice_speed", voice_speed)
 
         voice_speed = max(VOICE_SPEED_MIN, min(VOICE_SPEED_MAX, voice_speed))
+
+        # Volume decision
+        if visual_type == "action":
+            volume_used = VOL_ACTION
+        else:
+            volume_used = VOL_OTHER
+
+        # 🐛 DEBUG ROW
+        if DEBUG_MODE:
+            boost_log = " → ".join(best_slot.get("speed_boost_log", [])) if best_slot else "n/a"
+            dprint(
+                f"{idx:<5} {seg['start']:6.1f}s  {seg['end']:6.1f}s  "
+                f"{visual_type:<10} "
+                f"{voice_speed:<8.2f} "
+                f"{volume_used:<8.2f} "
+                f"{boost_log:<40}"
+            )
 
         data = {
             "text": text,
@@ -1065,9 +1250,10 @@ def generate_audio(segments, slots):
                     audio_files.append({
                         "file": final, "start": seg["start"],
                         "end": seg["end"], "text": text,
-                        "visual_type": visual_type
+                        "visual_type": visual_type,
+                        "voice_speed": voice_speed,
+                        "volume": volume_used
                     })
-                    print(f"   ✅ [{seg['start']:5.1f}s] speed={voice_speed:.2f} ({visual_type or 'signal'}) | {text[:50]}")
             elif r.status_code == 401:
                 print("   ❌ 401 — ElevenLabs key galat!")
                 break
@@ -1078,6 +1264,10 @@ def generate_audio(segments, slots):
                 print(f"   ❌ {r.status_code}: {r.text[:100]}")
         except Exception as e:
             print(f"   ⚠️ seg {idx}: {e}")
+
+    if DEBUG_MODE:
+        dprint("-" * 100)
+        dprint("")
 
     print(f"✅ {len(audio_files)} audio segments\n")
     return audio_files
@@ -1124,7 +1314,7 @@ def build_timed_audio(audio_files, vid_duration):
 
 
 # ============================================================
-# STEP 9 — Final Merge
+# STEP 9 — Final Merge (with debug)
 # ============================================================
 def merge_final(video_path, commentary_audio, out_path, audio_files):
     print("🎬 [9] Merging (duck + dynamic volume)...")
@@ -1148,6 +1338,19 @@ def merge_final(video_path, commentary_audio, out_path, audio_files):
         vo_volume_expr = f"if({action_condition},{VOL_ACTION},{VOL_OTHER})"
     else:
         vo_volume_expr = f"{VOL_OTHER}"
+
+    # 🐛 DEBUG
+    if DEBUG_MODE:
+        dprint("")
+        dprint("=" * 100)
+        dprint("🐛 DEBUG — STEP 9: VOLUME MIX")
+        dprint("=" * 100)
+        dprint(f"Action segments: {len(action_times)}")
+        dprint(f"Other segments:  {len(other_times)}")
+        dprint(f"Action volume:   {VOL_ACTION}x")
+        dprint(f"Other volume:    {VOL_OTHER}x")
+        dprint(f"Background duck: {DUCK_VOLUME}x")
+        dprint("")
 
     filter_complex = (
         f"[0:a]volume='{volume_expr}':eval=frame[bg];"
@@ -1183,16 +1386,88 @@ def fallback_copy_original():
 
 
 # ============================================================
+# 🐛 FINAL DEBUG SUMMARY
+# ============================================================
+def print_final_debug_summary(slots):
+    if not DEBUG_MODE:
+        return
+
+    dprint("")
+    dprint("=" * 100)
+    dprint("🐛 FINAL DEBUG SUMMARY — HAR SLOT KA FULL BREAKDOWN")
+    dprint("=" * 100)
+
+    action_count = 0
+    dialog_count = 0
+    calm_count = 0
+    speed_117_count = 0
+    speed_114_count = 0
+    speed_105_count = 0
+    speed_100_count = 0
+
+    for idx, s in enumerate(slots, 1):
+        sa = s.get("sub_analysis", {})
+        dprint(f"\n📍 Slot {idx}: {s['start']:.2f}s → {s['end']:.2f}s")
+        dprint(f"   🎯 GPT type:     {s.get('gpt_type', 'n/a')}")
+        dprint(f"   📡 Signal type:  {s.get('type', 'n/a')}")
+        dprint(f"   ✅ Final type:   {s.get('final_type', s.get('type', 'n/a'))}")
+        dprint(f"   🎬 Scene count:  {s['scene_count']}")
+        dprint(f"   📊 Motion score: {s.get('motion_score', 0)}")
+        dprint(f"   🔇 Avg loud:     {s['avg_loud']} dB")
+        dprint(f"   📈 Action ratio: {sa.get('action_ratio_raw', 0):.2f} → {sa.get('action_ratio', 0):.2f} (with motion boost)")
+        dprint(f"   💬 Dialog ratio: {sa.get('dialog_ratio', 0):.2f}")
+        dprint(f"   😴 Calm ratio:   {sa.get('calm_ratio_raw', 0):.2f} → {sa.get('calm_ratio', 0):.2f}")
+        dprint(f"   📝 SRT text:     \"{s.get('srt_text', '')[:60]}\"")
+        dprint(f"   🎮 Voice speed:  {s['voice_speed']:.2f}x")
+        dprint(f"   📋 Speed log:    {' → '.join(s.get('speed_boost_log', []))}")
+
+        # Count
+        final_t = s.get('final_type', s.get('type'))
+        if final_t == "action":
+            action_count += 1
+        elif final_t == "dialog":
+            dialog_count += 1
+        else:
+            calm_count += 1
+
+        if s['voice_speed'] >= 1.17:
+            speed_117_count += 1
+        elif s['voice_speed'] >= 1.14:
+            speed_114_count += 1
+        elif s['voice_speed'] >= 1.05:
+            speed_105_count += 1
+        else:
+            speed_100_count += 1
+
+    dprint("")
+    dprint("=" * 100)
+    dprint("📊 TOTALS")
+    dprint("=" * 100)
+    dprint(f"   🎬 Total slots:     {len(slots)}")
+    dprint(f"   ⚡ Action slots:    {action_count}")
+    dprint(f"   💬 Dialog slots:    {dialog_count}")
+    dprint(f"   😴 Calm slots:      {calm_count}")
+    dprint("")
+    dprint(f"   🎮 Speed 1.17x:     {speed_117_count} slots (guaranteed 1.7x volume)")
+    dprint(f"   🎮 Speed 1.14x:     {speed_114_count} slots (1.7x volume)")
+    dprint(f"   🎮 Speed 1.05x:     {speed_105_count} slots (1.4x volume)")
+    dprint(f"   🎮 Speed 1.00x:     {speed_100_count} slots (1.4x volume)")
+    dprint("=" * 100)
+    dprint("")
+
+
+# ============================================================
 # MAIN
 # ============================================================
 def main():
     print("=" * 60)
-    print("🎙️ AI COMMENTARY DUBBER — v3.1 (Balanced Action Priority)")
+    print("🎙️ AI COMMENTARY DUBBER — v3.3 (FULL DEBUG MODE)")
     print("=" * 60)
     print(f"📹 Input : {FINAL_CLIP_PATH}")
     print(f"📤 Output: {FINAL_DUBBED_VIDEO}")
     print(f"🎤 Voice : {VOICE_ID}")
     print(f"🎛️  Switch: COMMENTARY_ENABLED = {COMMENTARY_ENABLED}")
+    print(f"🐛 Debug : {DEBUG_MODE} (log file: {DEBUG_LOG_FILE})")
     print(f"🎮 Speed : {VOICE_SPEED_MIN} - {VOICE_SPEED_MAX}")
     print(f"🔊 Volume: Action={VOL_ACTION}x | Other={VOL_OTHER}x")
     print(f"🖼️  Frames: {ANALYSIS_FRAMES} ({GRID_COLS}x{GRID_ROWS}, {CANVAS_W}x{CANVAS_H} 8K)")
@@ -1227,7 +1502,8 @@ def main():
 
         speeds = [s["voice_speed"] for s in slots]
         print(f"🎮 Final voice speeds: "
-              f"min={min(speeds):.2f} max={max(speeds):.2f} avg={sum(speeds)/len(speeds):.2f}\n")
+              f"min={min(speeds):.2f} max={max(speeds):.2f} "
+              f"avg={sum(speeds)/len(speeds):.2f}\n")
 
         audio_files = generate_audio(segments, slots)
         if not audio_files:
@@ -1236,17 +1512,24 @@ def main():
         final_audio = build_timed_audio(audio_files, vid_dur)
         merge_final(FINAL_CLIP_PATH, final_audio, FINAL_DUBBED_VIDEO, audio_files)
 
+        # 🐛 FINAL DEBUG SUMMARY
+        print_final_debug_summary(slots)
+
         print("=" * 60)
         print(f"🔥🔥 DONE! {FINAL_DUBBED_VIDEO}")
         print(f"📊 Slots: {len(slots)} | Segments: {len(audio_files)}")
         print("=" * 60)
 
+        save_debug_report()
         commit_analysis_to_github()
         sys.exit(0)
 
     except Exception as e:
         print(f"\n❌ Commentary pipeline failed: {e}")
+        import traceback
+        traceback.print_exc()
         print("⚠️ Falling back to original clip...")
+        save_debug_report()
         commit_analysis_to_github()
         if fallback_copy_original():
             sys.exit(0)
