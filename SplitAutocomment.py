@@ -59,7 +59,7 @@ OPENROUTER_KEYS = [
 ]
 
 # 🔥 FIXED — working chat model
-FIXED_MODEL = "meta-llama/llama-3.3-70b-instruct:free"
+FIXED_MODEL = "openai/gpt-4o-mini"
 FALLBACK_MODEL = "openrouter/free"
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
