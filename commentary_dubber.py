@@ -15,9 +15,10 @@ ON/OFF Switch:
   • COMMENTARY_ENABLED=false  → commentary skip, original clip copy
 
 🎮 Auto Voice Speed (Frame-Based):
-  • Action slots  → 1.18
+  • Action slots  → 1.14
   • Dialog slots  → 1.05
   • Calm slots    → 1.00
+  • Heavy action (3+ cuts ya loud) → 1.17 (clamped)
 
 🔊 Dynamic Volume Boost:
   • Action scenes → 1.7x commentary volume
@@ -117,10 +118,10 @@ CANVAS_H = 7680
 
 # Voice speed limits
 VOICE_SPEED_MIN = 1.00
-VOICE_SPEED_MAX = 1.18
+VOICE_SPEED_MAX = 1.17
 ATEMPO_MAX      = 1.10
 
-SPEED_ACTION = 1.18
+SPEED_ACTION = 1.14
 SPEED_DIALOG = 1.05
 SPEED_CALM   = 1.00
 
@@ -617,9 +618,9 @@ def classify_slots_combined(video_path, slots, srt_content):
 
         if slot["type"] == "action":
             if slot["scene_count"] >= 3:
-                voice_speed += 0.06
+                voice_speed += 0.03
             if slot["avg_loud"] > -12:
-                voice_speed += 0.05
+                voice_speed += 0.03
 
         slot["voice_speed"] = round(max(VOICE_SPEED_MIN, min(VOICE_SPEED_MAX, voice_speed)), 2)
 
@@ -905,9 +906,12 @@ Return ONLY valid JSON:
                             else:
                                 final_type = vt
 
+                            # Preserve boost if type unchanged; recompute only if changed
+                            if final_type != best_slot.get("type"):
+                                best_slot["voice_speed"] = speed_for_type(final_type)
+
                             best_slot["visual_type"] = final_type
                             best_slot["type"] = final_type
-                            best_slot["voice_speed"] = speed_for_type(final_type)
                             updated_count += 1
 
                     print(f"   ✅ Key {key_idx} worked! {len(segments)} segments")
@@ -969,8 +973,6 @@ def generate_audio(segments, slots):
         "xi-api-key": ELEVENLABS_API_KEY
     }
 
-    slot_speed_map = {round(s["start"], 2): s.get("voice_speed", 1.0) for s in slots}
-
     audio_files = []
     for idx, seg in enumerate(segments):
         text = seg.get("text", "").strip()
@@ -981,16 +983,15 @@ def generate_audio(segments, slots):
         seg_file = f"{SEGMENTS_DIR}/seg_{idx:03d}.mp3"
 
         visual_type = (seg.get("visual_type") or "").lower().strip()
-        if visual_type in ("action", "dialog", "calm"):
-            voice_speed = speed_for_type(visual_type)
-        else:
-            voice_speed = 1.0
-            best_diff = 999
-            for s_start, s_speed in slot_speed_map.items():
-                diff = abs(s_start - seg["start"])
-                if diff < best_diff:
-                    best_diff = diff
-                    voice_speed = s_speed
+        voice_speed = speed_for_type(visual_type) if visual_type in ("action", "dialog", "calm") else 1.0
+
+        # Use closest slot's voice_speed (includes action boost)
+        best_diff = 999
+        for s in slots:
+            diff = abs(s["start"] - seg["start"])
+            if diff < best_diff:
+                best_diff = diff
+                voice_speed = s.get("voice_speed", voice_speed)
 
         voice_speed = max(VOICE_SPEED_MIN, min(VOICE_SPEED_MAX, voice_speed))
 
