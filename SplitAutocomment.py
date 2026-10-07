@@ -1,14 +1,14 @@
 """
-💬 SPLIT AUTO-COMMENT SCRIPT (v11.1 — Retry Fix + Better Logging)
+💬 SPLIT AUTO-COMMENT SCRIPT (v12 — Schema Everywhere + JSON Fix)
 ============================================================
 ✅ ONLY writes 2 JSON files:
    - logs/auto_reply_log.json
    - logs/replied_comment_ids.json
+✅ NO dashboard / NO trending / NO games/ folder
 ✅ Simple time window — tum khud age set karo
-✅ Last 60 days (1440h) ke andar ke saare fresh comments reply honge
-✅ 🆕 OpenRouter empty-choices retry (same model)
-✅ 🆕 Facebook reply timeout 15 → 30
-✅ 🆕 Better logging (model name visible)
+✅ SCHEMA har attempt pe try karega, fail hone pe auto JSON_OBJ fallback
+✅ 5-layer JSON parser — broken JSON bhi recover
+✅ response-healing plugin ALWAYS on
 """
 
 import os
@@ -76,10 +76,11 @@ MIN_COMMENT_AGE_MIN = 0
 # 30 din = 30 * 24 = 720 hours
 # 60 din = 60 * 24 = 1440 hours
 # 90 din = 90 * 24 = 2160 hours
-MAX_COMMENT_AGE_HOURS = 60 * 24    # 👈 CHANGE THIS (60 days)
+# 7 din  = 7 * 24  = 168 hours
+MAX_COMMENT_AGE_HOURS = 30 * 24    # 👈 CHANGE THIS (30 days default)
 # ============================================================
 
-POSTS_TO_SCAN = 100
+POSTS_TO_SCAN = 40
 COMMENT_FETCH_WORKERS = 5
 MAX_JSON_RETRIES = 12
 
@@ -108,14 +109,17 @@ KNOWN_GAMES = [
 
 
 # ============================================================
-# 🤖 OPENROUTER CLIENT — v11.1 with retry
+# 🤖 OPENROUTER CLIENT (v12 — Schema Everywhere + Auto Fallback)
 # ============================================================
 def _build_json_schema():
+    """
+    Universal schema — strict=False taaki free models bhi accept kare.
+    """
     return {
         "type": "json_schema",
         "json_schema": {
             "name": "batch_replies",
-            "strict": True,
+            "strict": False,   # 👈 free models ke liye zaroori
             "schema": {
                 "type": "object",
                 "properties": {
@@ -133,10 +137,10 @@ def _build_json_schema():
 
 
 def _call_openrouter_single(model_name, api_key, prompt,
-                             max_tokens=150, use_schema=False, retries=2):
+                             max_tokens=150, use_schema=True):
     """
-    v11.1: Retry on empty choices (OpenRouter free tier hiccup).
-    Same model, better retry logic.
+    SCHEMA try karega pehle.
+    Agar model support nahi karta → automatically JSON_OBJ + healing pe fallback.
     """
     if not api_key:
         return None
@@ -148,14 +152,17 @@ def _call_openrouter_single(model_name, api_key, prompt,
         "X-Title": "Gaming Auto-Agent",
     }
 
+    # 🔥 Base payload — healing plugin ALWAYS on
     payload = {
         "model": model_name,
         "messages": [{"role": "user", "content": prompt}],
         "temperature": 0.9,
         "max_tokens": max_tokens,
         "top_p": 0.95,
+        "plugins": [{"id": "response-healing"}],
     }
 
+    # 🔥 SCHEMA vs JSON_OBJ
     if use_schema:
         payload["response_format"] = _build_json_schema()
         mode_tag = "SCHEMA"
@@ -163,92 +170,88 @@ def _call_openrouter_single(model_name, api_key, prompt,
         payload["response_format"] = {"type": "json_object"}
         mode_tag = "JSON_OBJ"
 
-    if not use_schema:
-        payload["plugins"] = [{"id": "response-healing"}]
+    try:
+        res = requests.post(OPENROUTER_URL, headers=headers,
+                            json=payload, timeout=40)
 
-    model_short = model_name.split('/')[-1][:25]
-
-    for attempt in range(retries + 1):
-        try:
-            res = requests.post(OPENROUTER_URL, headers=headers,
-                                json=payload, timeout=40)
-
-            if res.status_code == 200:
-                data = res.json()
-                choices = data.get("choices", [])
-                if choices:
-                    content = choices[0].get("message", {}).get("content", "")
-                    if content:
-                        return content.strip()
-
-                # 🔥 Empty choices = upstream hiccup → retry
-                if attempt < retries:
-                    log(f"   ⚠️ [{mode_tag}] Empty choices ({model_short}) "
-                        f"— retry {attempt+2}/{retries+1}")
-                    time.sleep(1.5)
-                    continue
-                log(f"   ⚠️ [{mode_tag}] Empty choices ({model_short}) "
-                    f"after {retries+1} tries")
-                return None
-
-            # Auto-fallback: schema not supported
-            if res.status_code == 400 and use_schema:
-                err = res.text.lower()
-                if ("json_schema" in err or "response_format" in err
-                        or "schema" in err or "not supported" in err):
-                    log(f"   ⚠️ [{mode_tag}] Not supported — falling back")
-                    return _call_openrouter_single(
-                        model_name, api_key, prompt,
-                        max_tokens=max_tokens, use_schema=False, retries=retries
-                    )
-
-            log(f"   ⚠️ [{mode_tag}] HTTP {res.status_code}: {res.text[:150]}")
+        # ✅ Success
+        if res.status_code == 200:
+            data = res.json()
+            choices = data.get("choices", [])
+            if choices:
+                content = choices[0].get("message", {}).get("content", "")
+                if content:
+                    return content.strip()
+            log(f"   ⚠️ [{mode_tag}] Empty choices")
+            # agar schema mode tha → JSON_OBJ try karo
+            if use_schema:
+                log(f"   🔄 [{mode_tag}] Empty — retry with JSON_OBJ")
+                return _call_openrouter_single(
+                    model_name, api_key, prompt,
+                    max_tokens=max_tokens, use_schema=False
+                )
             return None
 
-        except requests.exceptions.Timeout:
-            log(f"   ⚠️ [{mode_tag}] Timeout ({model_short}) "
-                f"(attempt {attempt+1}/{retries+1})")
-            if attempt < retries:
-                time.sleep(1.5)
-                continue
-            return None
-        except Exception as e:
-            log(f"   ⚠️ [{mode_tag}] Exception: {e}")
-            if attempt < retries:
-                time.sleep(1.5)
-                continue
-            return None
+        # 🔥 SCHEMA not supported → auto fallback to JSON_OBJ
+        if res.status_code == 400 and use_schema:
+            err = res.text.lower()
+            fallback_keywords = (
+                "json_schema", "response_format", "schema",
+                "not supported", "unsupported", "invalid",
+                "unknown", "does not support", "not available"
+            )
+            if any(k in err for k in fallback_keywords):
+                log(f"   🔄 [{mode_tag}] Not supported — falling back to JSON_OBJ")
+                return _call_openrouter_single(
+                    model_name, api_key, prompt,
+                    max_tokens=max_tokens, use_schema=False
+                )
 
-    return None
+        # 🔥 422 bhi schema issue ho sakta hai
+        if res.status_code == 422 and use_schema:
+            log(f"   🔄 [{mode_tag}] 422 — falling back to JSON_OBJ")
+            return _call_openrouter_single(
+                model_name, api_key, prompt,
+                max_tokens=max_tokens, use_schema=False
+            )
+
+        # 🔥 404 model not found → JSON_OBJ try karo ek baar
+        if res.status_code == 404 and use_schema:
+            log(f"   🔄 [{mode_tag}] 404 — retry JSON_OBJ")
+            return _call_openrouter_single(
+                model_name, api_key, prompt,
+                max_tokens=max_tokens, use_schema=False
+            )
+
+        log(f"   ⚠️ [{mode_tag}] HTTP {res.status_code}: {res.text[:150]}")
+        return None
+
+    except Exception as e:
+        log(f"   ⚠️ [{mode_tag}] Exception: {e}")
+        return None
 
 
 def _extract_json(response):
+    """5-layer JSON extraction — handles almost every broken response."""
     if not response:
         return None
 
-    # 🔥 Skip thinking/reasoning outputs
-    lower_resp = response.lower()[:200]
-    thinking_indicators = [
-        "here's a thinking",
-        "here is a thinking",
-        "let me think",
-        "i'll analyze",
-        "thinking process",
-        "step by step",
-    ]
-    if any(ind in lower_resp for ind in thinking_indicators):
-        return None
-
     cleaned = response.strip()
+
+    # Layer 0: strip markdown fences
     if "```" in cleaned:
-        cleaned = re.sub(r'^```(?:json)?\s*', '', cleaned)
+        cleaned = re.sub(r'^```(?:json)?\s*', '', cleaned, flags=re.IGNORECASE)
         cleaned = re.sub(r'\s*```$', '', cleaned).strip()
+
+    # Layer 1: direct parse
     try:
         r = json.loads(cleaned)
         if isinstance(r, dict):
             return r
     except Exception:
         pass
+
+    # Layer 2: find first { to last }
     s, e = cleaned.find("{"), cleaned.rfind("}")
     if s != -1 and e != -1 and e > s:
         try:
@@ -257,6 +260,8 @@ def _extract_json(response):
                 return r
         except Exception:
             pass
+
+    # Layer 3: regex greedy match
     m = re.search(r'\{[\s\S]*\}', cleaned)
     if m:
         try:
@@ -265,20 +270,56 @@ def _extract_json(response):
                 return r
         except Exception:
             pass
+
+    # Layer 4: fix common issues — trailing commas, single quotes
+    try:
+        fixed = cleaned
+        fixed = re.sub(r',\s*}', '}', fixed)
+        fixed = re.sub(r',\s*]', ']', fixed)
+        fixed = fixed.replace("'", '"')
+        s, e = fixed.find("{"), fixed.rfind("}")
+        if s != -1 and e != -1 and e > s:
+            r = json.loads(fixed[s:e + 1])
+            if isinstance(r, dict):
+                return r
+    except Exception:
+        pass
+
+    # Layer 5: ast.literal_eval (Python dict style)
+    try:
+        import ast
+        s, e = cleaned.find("{"), cleaned.rfind("}")
+        if s != -1 and e != -1 and e > s:
+            r = ast.literal_eval(cleaned[s:e + 1])
+            if isinstance(r, dict):
+                return r
+    except Exception:
+        pass
+
     return None
 
 
 def _normalize_parsed_replies(parsed):
+    """Normalize both nested {replies:{...}} and flat {id:reply} formats."""
     if not isinstance(parsed, dict):
         return {}
+
+    # Nested format
     inner = parsed.get("replies")
     if isinstance(inner, dict):
-        return {str(k): str(v) for k, v in inner.items() if v}
-    skip = {"user safety: safe", "safe", "unsafe", "none"}
+        return {str(k): str(v) for k, v in inner.items() if v and str(v).strip()}
+
+    # Flat format
+    skip = {"user safety: safe", "safe", "unsafe", "none", "null", ""}
     flat = {}
     for k, v in parsed.items():
-        if isinstance(v, str) and v.strip().lower() not in skip:
-            flat[str(k)] = v
+        if not isinstance(v, str):
+            continue
+        if v.strip().lower() in skip:
+            continue
+        if k.lower() in ("replies", "response", "data", "result"):
+            continue
+        flat[str(k)] = v
     return flat
 
 
@@ -305,13 +346,16 @@ def generate_batch_replies(comments_batch, max_retries=MAX_JSON_RETRIES):
             f'Comment: "{safe_text}"\n'
         )
 
+    # 🔥 ID list prompt me — model ko clear rahe
+    ids_list = ", ".join(f'"{c["comment_id"]}"' for c in comments_batch)
+
     prompt = f"""You are a real gaming content creator replying to comments on your social media page.
 
 Your replies should feel like a real human texting — casual, warm, funny, confident.
 
 RULES:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. Reply in the SAME language as the comment.
+1. Reply in the SAME language as the comment (English/Hinglish only).
 2. Keep it SHORT — maximum 25 words.
 3. Use natural slang — bhai, bro, yaar, lol, chill, OP, fire, lit.
 4. Use 1-2 emojis max.
@@ -324,10 +368,10 @@ RULES:
 
 Never share links. Never insult family/religion/caste.
 
-CRITICAL: Return ONLY valid JSON. Keys = comment IDs. Values = reply text.
-DO NOT include any thinking, reasoning, or explanation. ONLY JSON.
+CRITICAL: Return ONLY valid JSON. No markdown. No explanation.
+You MUST reply to ALL these IDs: [{ids_list}]
 
-Example:
+Format:
 {{
   "replies": {{
     "COMMENT_ID_1": "reply 1",
@@ -348,35 +392,33 @@ YOUR JSON RESPONSE:"""
     for attempt in range(1, max_retries + 1):
         key_index = (attempt - 1) % len(valid_keys)
         current_key = valid_keys[key_index]
-        model_to_use = FIXED_MODEL if attempt == 1 else FALLBACK_MODEL
-        tag = "FIXED" if attempt == 1 else "FALLBACK"
-        model_short = model_to_use.split('/')[-1][:25]
 
-        use_schema = attempt <= 2
-        schema_tag = "SCHEMA" if use_schema else "JSON_OBJ"
+        # 🔥 Model rotation: pehle 3 attempts FIXED, baaki FALLBACK
+        model_to_use = FIXED_MODEL if attempt <= 3 else FALLBACK_MODEL
+        tag = "FIXED" if attempt <= 3 else "FALLBACK"
 
-        log(f"🔄 Attempt {attempt}/{max_retries} | {tag} ({model_short}) | "
-            f"{schema_tag} | Key {key_index + 1}")
+        # 🔥 HAR ATTEMPT PE SCHEMA — fallback automatic hai _call_openrouter_single me
+        log(f"🔄 Attempt {attempt}/{max_retries} | {tag} | SCHEMA | Key {key_index + 1}")
 
         response = _call_openrouter_single(
             model_to_use, current_key, prompt,
             max_tokens=1800,
-            use_schema=use_schema
+            use_schema=True   # 👈 always schema
         )
 
         if not response:
-            log("   ⚠️ Empty response — next attempt")
+            log("   ⚠️ Empty response — retry")
             time.sleep(1)
             continue
 
         if response.strip().lower() in ["user safety: safe", "safe", "unsafe", "none"]:
-            log("   ⚠️ Safety model response — next attempt")
+            log("   ⚠️ Safety model response — retry")
             time.sleep(1)
             continue
 
         parsed = _extract_json(response)
         if parsed is None:
-            log(f"   ⚠️ Invalid JSON — next attempt. Preview: {response[:100]}")
+            log(f"   ⚠️ Invalid JSON — retry. Preview: {response[:120]}")
             time.sleep(1)
             continue
 
@@ -387,14 +429,15 @@ YOUR JSON RESPONSE:"""
             cid = c["comment_id"]
             if cid in flat_replies:
                 reply = str(flat_replies[cid]).strip().strip('"').strip("'")
-                if reply and reply.lower() not in ["user safety: safe", "safe", "unsafe", "none"]:
+                if reply and reply.lower() not in ["user safety: safe", "safe",
+                                                     "unsafe", "none", "null"]:
                     result[cid] = reply
 
         if result:
             log(f"   ✅ Valid JSON on attempt {attempt}: {len(result)}/{len(comments_batch)} replies")
             return result
 
-        log("   ⚠️ Parsed but no valid replies — next attempt")
+        log("   ⚠️ Parsed but no valid replies — retry")
         time.sleep(1)
 
     log(f"❌ Failed to get valid JSON after {max_retries} attempts.")
@@ -453,6 +496,10 @@ def is_reply_safe(reply_text, is_abuse=False):
 # ⏰ AGE CHECK — SIMPLE
 # ============================================================
 def is_within_time_window(timestamp_str):
+    """
+    Simple: check if timestamp falls within MAX_COMMENT_AGE_HOURS window.
+    Tumne jo set kiya (720h = 30 days), wahi use hoga.
+    """
     if not timestamp_str:
         return True
     try:
@@ -712,16 +759,15 @@ def fetch_comment_replies(comment_id, depth=0, max_depth=3):
 
 
 def post_fb_reply(comment_id, reply_text):
-    """v11.1: timeout 15 → 30, sleep 3-6s"""
     if not AUTO_COMMENT_ENABLED:
         log(f"🚫 [AUTO_COMMENT OFF] Would post: {reply_text[:80]}")
         return f"disabled_{comment_id}"
     try:
-        time.sleep(random.uniform(3, 6))
+        time.sleep(random.uniform(2, 5))
         res = requests.post(
             f"{FB_GRAPH_URL}/{comment_id}/comments",
             data={"message": reply_text, "access_token": FB_ACCESS_TOKEN},
-            timeout=30)   # 🔥 15 → 30
+            timeout=15)
         if res.status_code == 200:
             data = res.json()
             reply_id = data.get("id")
@@ -729,8 +775,6 @@ def post_fb_reply(comment_id, reply_text):
                 return reply_id
             return f"synth_{comment_id}_{int(time.time())}"
         log(f"⚠️ Reply post error ({res.status_code}): {res.text[:200]}")
-    except requests.exceptions.Timeout:
-        log(f"⚠️ Reply post timeout for {comment_id} (30s exceeded)")
     except Exception as e:
         log(f"⚠️ Reply post exception: {e}")
     return None
@@ -745,6 +789,10 @@ def _is_our_reply(reply_obj, page_name_lower):
 
 
 def get_effective_reply_time(comment, replies_sorted, page_name_lower):
+    """
+    Agar koi user reply hai → last user reply ka time use karo.
+    Warna top comment ka time use karo.
+    """
     user_replies = [r for r in replies_sorted
                     if not _is_our_reply(r, page_name_lower)]
 
@@ -756,6 +804,9 @@ def get_effective_reply_time(comment, replies_sorted, page_name_lower):
 
 
 def analyze_thread(top_comment):
+    """
+    v12: Simple thread analysis with single time window.
+    """
     cid = top_comment.get("id", "")
 
     replies = fetch_comment_replies(cid)
@@ -776,6 +827,7 @@ def analyze_thread(top_comment):
     if our_count >= MAX_CONVERSATION_DEPTH:
         return {"should_reply": False, "depth": our_count, "reason": "max_depth"}
 
+    # 🔥 Time window check (single window)
     effective_time, time_source = get_effective_reply_time(
         top_comment, replies_sorted, page_name_lower
     )
@@ -789,6 +841,7 @@ def analyze_thread(top_comment):
             "reason": "outside_time_window"
         }
 
+    # Freshness check
     if len(replies_sorted) == 0:
         if was_already_replied(cid):
             log(f"      ⏭️ Fresh on FB but IN LOG — skip")
@@ -808,6 +861,7 @@ def analyze_thread(top_comment):
 
         log(f"      💬 NEW user reply (depth {our_count}) — WILL REPLY")
 
+    # Thread context
     thread_ctx = ""
     for r in replies_sorted[-6:]:
         who = "US" if _is_our_reply(r, page_name_lower) else "USER"
@@ -896,7 +950,7 @@ def process_fb_comments(actual_posted_titles=None):
         return None
 
     window_days = MAX_COMMENT_AGE_HOURS // 24
-    log(f"🤖 Auto-reply started (v11.1 — Time Window: {window_days} days / "
+    log(f"🤖 Auto-reply started (v12 — Schema Everywhere: {window_days} days / "
         f"{MAX_COMMENT_AGE_HOURS} hours)...")
     log(f"📂 Shared log: {SHARED_REPLY_LOG}")
     log(f"📂 Shared IDs: {SHARED_REPLIED_IDS}")
@@ -928,10 +982,12 @@ def process_fb_comments(actual_posted_titles=None):
         replied_ids.add(hid)
     log(f"📂 Replied history cache: {len(history)} IDs")
 
+    # Fetch posts
     posts = fetch_posts_with_fallback()
     if not posts:
         return None
 
+    # Filter bad posts
     bad_posts = load_bad_posts()
     if bad_posts:
         before = len(posts)
@@ -942,6 +998,7 @@ def process_fb_comments(actual_posted_titles=None):
         log("ℹ️ No posts after filtering")
         return None
 
+    # Parallel comment fetch
     post_comments_map = {}
 
     def fetch_post_comments(post):
@@ -966,6 +1023,9 @@ def process_fb_comments(actual_posted_titles=None):
     total_comments = sum(len(c) for c in post_comments_map.values())
     log(f"✅ {total_comments} comments fetched from {len(posts)} posts")
 
+    # ============================================================
+    # 🔥 PROCESS COMMENTS WITH SINGLE TIME WINDOW
+    # ============================================================
     valid_comments = []
     skipped_logs = []
 
@@ -1017,6 +1077,7 @@ def process_fb_comments(actual_posted_titles=None):
             if from_data.get("id") == FB_PAGE_ID:
                 continue
 
+            # 🔥 Time window pre-filter
             if not is_within_time_window(comment_time):
                 continue
 
@@ -1041,6 +1102,7 @@ def process_fb_comments(actual_posted_titles=None):
                 replied_ids.add(comment_id)
                 continue
 
+            # Full thread analysis
             state = analyze_thread(comment)
 
             if not state["should_reply"]:
@@ -1079,6 +1141,7 @@ def process_fb_comments(actual_posted_titles=None):
         log(f"📦 Batch: {len(valid_comments)} comments")
         replies_map = generate_batch_replies(valid_comments)
 
+    # Post replies
     replies_count = 0
     for c in valid_comments:
         cid = c["comment_id"]
@@ -1132,6 +1195,7 @@ def process_fb_comments(actual_posted_titles=None):
         else:
             log(f"❌ Failed to post for {cid}")
 
+    # Save
     reply_log["skipped"].extend(skipped_logs)
     reply_log["total_skipped"] = reply_log.get("total_skipped", 0) + len(skipped_logs)
 
@@ -1192,7 +1256,7 @@ def git_commit_and_push(file_paths, message="Auto-Reply: Update JSON logs [skip 
 def main():
     window_days = MAX_COMMENT_AGE_HOURS // 24
     log("=" * 60)
-    log("🚀 SPLIT SCRIPT v11.1 — Retry Fix + Better Logging")
+    log("🚀 SPLIT SCRIPT v12 — Schema Everywhere + JSON Fix")
     log("=" * 60)
     log(f"📂 Writes ONLY: {SHARED_REPLY_LOG}")
     log(f"📂 Writes ONLY: {SHARED_REPLIED_IDS}")
