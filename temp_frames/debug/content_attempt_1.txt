@@ -1,1 +1,1 @@
-{"clip_duration": 32, "reason": "Dramatic fiery soldier combat sequence", "start_time": 20, "status": "APPROVE", "title": "4 Soldiers Walked Into Hell 🔥😱"}
+{"clip_duration":44,"reason":"Intense fiery Capitol battle action","start_time":12,"status":"APPROVE","title":"Last Bullet At The Capitol 🔥🎯"}
