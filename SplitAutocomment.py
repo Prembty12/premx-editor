@@ -1,5 +1,5 @@
 """
-💬 SPLIT AUTO-COMMENT SCRIPT (v13 — Full FB Comments + Pagination + Schema)
+💬 SPLIT AUTO-COMMENT SCRIPT (v13.1 — JSON + Schema FIXED)
 ============================================================
 ✅ Direct FB se SAARE comments fetch (pagination + nested replies)
 ✅ SCHEMA har attempt pe try, fail hone pe auto JSON_OBJ fallback
@@ -72,11 +72,7 @@ MIN_COMMENT_AGE_MIN = 0
 # ============================================================
 # 🔥 YAHAN APNA TIME WINDOW SET KARO
 # ============================================================
-# 30 din = 30 * 24 = 720 hours
-# 60 din = 60 * 24 = 1440 hours
-# 90 din = 90 * 24 = 2160 hours
-# 7 din  = 7 * 24  = 168 hours
-MAX_COMMENT_AGE_HOURS = 60 * 24    # 👈 CHANGE THIS (30 days default)
+MAX_COMMENT_AGE_HOURS = 60 * 24    # 👈 CHANGE THIS (60 days default)
 # ============================================================
 
 POSTS_TO_SCAN = 100
@@ -109,21 +105,20 @@ KNOWN_GAMES = [
 
 
 # ============================================================
-# 🤖 OPENROUTER CLIENT (Schema Everywhere + Auto Fallback)
+# 🤖 OPENROUTER CLIENT (FIXED — Bash Jaisa Strict)
 # ============================================================
 def _build_json_schema():
-    """Universal schema — strict=False taaki free models bhi accept kare."""
+    """Bash script jaisa STRICT schema — strict=True + additionalProperties:False."""
     return {
         "type": "json_schema",
         "json_schema": {
             "name": "batch_replies",
-            "strict": False,
+            "strict": True,
             "schema": {
                 "type": "object",
                 "properties": {
                     "replies": {
                         "type": "object",
-                        "description": "Map of comment_id to reply text",
                         "additionalProperties": {"type": "string"}
                     }
                 },
@@ -135,8 +130,8 @@ def _build_json_schema():
 
 
 def _call_openrouter_single(model_name, api_key, prompt,
-                             max_tokens=150, use_schema=True):
-    """SCHEMA try karega, fail hone pe auto JSON_OBJ fallback."""
+                             max_tokens=1500, use_schema=True):
+    """Bash script jaisa strict call — SCHEMA try, fail hone pe JSON_OBJ fallback."""
     if not api_key:
         return None
 
@@ -149,11 +144,26 @@ def _call_openrouter_single(model_name, api_key, prompt,
 
     payload = {
         "model": model_name,
-        "messages": [{"role": "user", "content": prompt}],
-        "temperature": 0.9,
+        "messages": [
+            {
+                "role": "system",
+                "content": (
+                    "You are a JSON-only API. You MUST respond with valid JSON. "
+                    "No markdown, no explanations, no text outside JSON."
+                )
+            },
+            {"role": "user", "content": prompt}
+        ],
+        "temperature": 0.1,
         "max_tokens": max_tokens,
-        "top_p": 0.95,
+        "top_p": 0.9,
+        "frequency_penalty": 0.3,
+        "presence_penalty": 0.2,
         "plugins": [{"id": "response-healing"}],
+        "provider": {
+            "require_parameters": True,
+            "ignore": ["nvidia/nemotron-3.5-content-safety:free"]
+        },
     }
 
     if use_schema:
@@ -165,16 +175,37 @@ def _call_openrouter_single(model_name, api_key, prompt,
 
     try:
         res = requests.post(OPENROUTER_URL, headers=headers,
-                            json=payload, timeout=40)
+                            json=payload, timeout=60)
 
         if res.status_code == 200:
             data = res.json()
+
+            if "error" in data:
+                err = data.get("error", {})
+                log(f"   ⚠️ [{mode_tag}] API error in 200: {err.get('message', '')[:120]}")
+                if use_schema:
+                    return _call_openrouter_single(
+                        model_name, api_key, prompt,
+                        max_tokens=max_tokens, use_schema=False
+                    )
+                return None
+
             choices = data.get("choices", [])
             if choices:
-                content = choices[0].get("message", {}).get("content", "")
-                if content:
+                msg = choices[0].get("message", {})
+                content = msg.get("content", "")
+                finish_reason = choices[0].get("finish_reason", "")
+
+                if not content:
+                    content = msg.get("reasoning", "") or ""
+
+                if content and content.strip():
                     return content.strip()
-            log(f"   ⚠️ [{mode_tag}] Empty choices")
+
+                log(f"   ⚠️ [{mode_tag}] Empty content (finish={finish_reason})")
+            else:
+                log(f"   ⚠️ [{mode_tag}] No choices in response")
+
             if use_schema:
                 log(f"   🔄 [{mode_tag}] Empty — retry with JSON_OBJ")
                 return _call_openrouter_single(
@@ -188,32 +219,37 @@ def _call_openrouter_single(model_name, api_key, prompt,
             fallback_keywords = (
                 "json_schema", "response_format", "schema",
                 "not supported", "unsupported", "invalid",
-                "unknown", "does not support", "not available"
+                "unknown", "does not support", "not available",
+                "strict", "additionalproperties"
             )
             if any(k in err for k in fallback_keywords):
-                log(f"   🔄 [{mode_tag}] Not supported — falling back to JSON_OBJ")
+                log(f"   🔄 [{mode_tag}] Not supported — JSON_OBJ")
                 return _call_openrouter_single(
                     model_name, api_key, prompt,
                     max_tokens=max_tokens, use_schema=False
                 )
 
-        if res.status_code == 422 and use_schema:
-            log(f"   🔄 [{mode_tag}] 422 — falling back to JSON_OBJ")
+        if res.status_code in (422, 404) and use_schema:
+            log(f"   🔄 [{mode_tag}] {res.status_code} — JSON_OBJ")
             return _call_openrouter_single(
                 model_name, api_key, prompt,
                 max_tokens=max_tokens, use_schema=False
             )
 
-        if res.status_code == 404 and use_schema:
-            log(f"   🔄 [{mode_tag}] 404 — retry JSON_OBJ")
-            return _call_openrouter_single(
-                model_name, api_key, prompt,
-                max_tokens=max_tokens, use_schema=False
-            )
+        if res.status_code == 402:
+            log(f"   💰 [{mode_tag}] 402 — No credits")
+            return None
+
+        if res.status_code == 429:
+            log(f"   ⏳ [{mode_tag}] 429 — Rate limited")
+            return None
 
         log(f"   ⚠️ [{mode_tag}] HTTP {res.status_code}: {res.text[:150]}")
         return None
 
+    except requests.exceptions.Timeout:
+        log(f"   ⚠️ [{mode_tag}] Timeout")
+        return None
     except Exception as e:
         log(f"   ⚠️ [{mode_tag}] Exception: {e}")
         return None
@@ -307,61 +343,46 @@ def generate_batch_replies(comments_batch, max_retries=MAX_JSON_RETRIES):
     if not comments_batch:
         return {}
 
+    # 🔥 SIMPLER PROMPT — chhota = better JSON compliance
     formatted = ""
     for c in comments_batch:
         tone = "SAVAGE" if c["is_abuse"] else "FRIENDLY"
-        safe_text = c["comment_text"].replace('"', "'").replace("\n", " ")[:300]
-        caption_safe = c.get("post_title", "").replace('"', "'").replace("\n", " ")[:150]
-        hashtags_safe = ", ".join(c.get("post_hashtags", []))[:100]
-        thread_ctx = c.get("thread_context", "")
-        context_line = ""
-        if thread_ctx:
-            context_line = f'Conversation So Far:\n{thread_ctx}\n'
+        safe_text = c["comment_text"].replace('"', "'").replace("\n", " ")[:200]
+        caption_safe = c.get("post_title", "").replace('"', "'").replace("\n", " ")[:100]
+        hashtags_safe = ", ".join(c.get("post_hashtags", []))[:80]
+
         formatted += (
-            f'[{tone}] ID: "{c["comment_id"]}" | '
-            f'Game: "{c["game_name"]}" | '
-            f'Hashtags: [{hashtags_safe}] | '
-            f'Caption: "{caption_safe}" | '
-            f'{context_line}'
-            f'Comment: "{safe_text}"\n'
+            f'ID: "{c["comment_id"]}"\n'
+            f'  Game: {c["game_name"]}\n'
+            f'  Caption: "{caption_safe}"\n'
+            f'  Comment: "{safe_text}"\n'
+            f'  Tone: {tone}\n\n'
         )
 
     ids_list = ", ".join(f'"{c["comment_id"]}"' for c in comments_batch)
 
-    prompt = f"""You are a real gaming content creator replying to comments on your social media page.
+    prompt = f"""Reply to each Facebook comment as a gaming creator.
 
-Your replies should feel like a real human texting — casual, warm, funny, confident.
+LANGUAGE: Same as comment (English/Hinglish).
+LENGTH: Max 20 words.
+TONE: Casual, funny, human. Use bhai/bro/yaar/lol/OP/fire.
+EMOJI: 1-2 max.
+If comment is abusive → savage comeback (no abuse back).
+If asks game name → mention it.
 
-RULES:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. Reply in the SAME language as the comment (English/Hinglish only).
-2. Keep it SHORT — maximum 25 words.
-3. Use natural slang — bhai, bro, yaar, lol, chill, OP, fire, lit.
-4. Use 1-2 emojis max.
-5. Sound like a real person, not a robot.
-6. Match the vibe of the comment.
-7. Make them WANT to reply back.
-8. If comment asks game name → tell the game name.
-9. If comment is abusive → savage witty comeback, no abuse back.
-10. If there's a "Conversation So Far" — continue naturally, don't repeat.
-
-Never share links. Never insult family/religion/caste.
-
-CRITICAL: Return ONLY valid JSON. No markdown. No explanation.
-You MUST reply to ALL these IDs: [{ids_list}]
-
-Format:
+Output JSON only:
 {{
   "replies": {{
-    "COMMENT_ID_1": "reply 1",
-    "COMMENT_ID_2": "reply 2"
+    "COMMENT_ID": "reply text"
   }}
 }}
 
-COMMENTS TO REPLY:
+Reply to ALL these IDs: [{ids_list}]
+
+COMMENTS:
 {formatted}
 
-YOUR JSON RESPONSE:"""
+JSON:"""
 
     valid_keys = [k for k in OPENROUTER_KEYS if k]
     if not valid_keys:
@@ -375,17 +396,18 @@ YOUR JSON RESPONSE:"""
         model_to_use = FIXED_MODEL if attempt <= 3 else FALLBACK_MODEL
         tag = "FIXED" if attempt <= 3 else "FALLBACK"
 
-        log(f"🔄 Attempt {attempt}/{max_retries} | {tag} | SCHEMA | Key {key_index + 1}")
+        log(f"🔄 Attempt {attempt}/{max_retries} | {tag} | "
+            f"{model_to_use.split('/')[0]} | SCHEMA | Key {key_index + 1}")
 
         response = _call_openrouter_single(
             model_to_use, current_key, prompt,
-            max_tokens=1800,
+            max_tokens=1500,
             use_schema=True
         )
 
         if not response:
             log("   ⚠️ Empty response — retry")
-            time.sleep(1)
+            time.sleep(1.5)
             continue
 
         if response.strip().lower() in ["user safety: safe", "safe", "unsafe", "none"]:
@@ -411,7 +433,8 @@ YOUR JSON RESPONSE:"""
                     result[cid] = reply
 
         if result:
-            log(f"   ✅ Valid JSON on attempt {attempt}: {len(result)}/{len(comments_batch)} replies")
+            log(f"   ✅ Valid JSON on attempt {attempt} ({tag}): "
+                f"{len(result)}/{len(comments_batch)} replies")
             return result
 
         log("   ⚠️ Parsed but no valid replies — retry")
@@ -661,13 +684,7 @@ def was_already_replied(comment_id):
 # 🔥 FETCH POST COMMENTS — FULL WITH PAGINATION + NESTED
 # ============================================================
 def fetch_fb_comments(post_id, retries=2, max_pages=MAX_COMMENT_PAGES):
-    """
-    Direct FB se SAARE comments fetch karo with pagination + nested replies.
-    - filter=stream → saare comments (spam bhi)
-    - order=chronological → purane se naye
-    - pagination → 100 per page, max_pages tak
-    - nested replies 3-level embedded
-    """
+    """Direct FB se SAARE comments fetch with pagination + nested replies."""
     all_comments = []
     url = f"{FB_GRAPH_URL}/{post_id}/comments"
     params = {
@@ -821,12 +838,9 @@ def get_effective_reply_time(comment, replies_sorted, page_name_lower):
 
 
 def analyze_thread(top_comment):
-    """
-    v13: Embedded nested replies use karo (fast), warna alag fetch.
-    """
+    """v13: Embedded nested replies use karo (fast), warna alag fetch."""
     cid = top_comment.get("id", "")
 
-    # 🔥 Embedded replies check (fast path)
     embedded = []
     embedded_raw = top_comment.get("comments")
     if embedded_raw and isinstance(embedded_raw, dict):
@@ -983,7 +997,7 @@ def process_fb_comments(actual_posted_titles=None):
         return None
 
     window_days = MAX_COMMENT_AGE_HOURS // 24
-    log(f"🤖 Auto-reply started (v13 — Full FB Comments + Pagination: "
+    log(f"🤖 Auto-reply started (v13.1 — JSON + Schema FIXED: "
         f"{window_days} days / {MAX_COMMENT_AGE_HOURS} hours)...")
     log(f"📂 Shared log: {SHARED_REPLY_LOG}")
     log(f"📂 Shared IDs: {SHARED_REPLIED_IDS}")
@@ -1029,7 +1043,6 @@ def process_fb_comments(actual_posted_titles=None):
         log("ℹ️ No posts after filtering")
         return None
 
-    # Parallel comment fetch
     post_comments_map = {}
 
     def fetch_post_comments(post):
@@ -1054,7 +1067,6 @@ def process_fb_comments(actual_posted_titles=None):
     total_comments = sum(len(c) for c in post_comments_map.values())
     log(f"✅ {total_comments} comments fetched from {len(posts)} posts")
 
-    # Process comments
     valid_comments = []
     skipped_logs = []
 
@@ -1168,7 +1180,6 @@ def process_fb_comments(actual_posted_titles=None):
         log(f"📦 Batch: {len(valid_comments)} comments")
         replies_map = generate_batch_replies(valid_comments)
 
-    # Post replies
     replies_count = 0
     for c in valid_comments:
         cid = c["comment_id"]
@@ -1222,7 +1233,6 @@ def process_fb_comments(actual_posted_titles=None):
         else:
             log(f"❌ Failed to post for {cid}")
 
-    # Save
     reply_log["skipped"].extend(skipped_logs)
     reply_log["total_skipped"] = reply_log.get("total_skipped", 0) + len(skipped_logs)
 
@@ -1283,7 +1293,7 @@ def git_commit_and_push(file_paths, message="Auto-Reply: Update JSON logs [skip 
 def main():
     window_days = MAX_COMMENT_AGE_HOURS // 24
     log("=" * 60)
-    log("🚀 SPLIT SCRIPT v13 — Full FB Comments + Pagination + Schema")
+    log("🚀 SPLIT SCRIPT v13.1 — JSON + Schema FIXED")
     log("=" * 60)
     log(f"📂 Writes ONLY: {SHARED_REPLY_LOG}")
     log(f"📂 Writes ONLY: {SHARED_REPLIED_IDS}")
