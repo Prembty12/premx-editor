@@ -69,8 +69,34 @@ APPROVE IF:
 - The moment has a clear start and end point in the timestamps.
 - Absolute Cinematic & Engagement Mastery Rule: Prioritize pure hype, adrenaline, emotion, comedy, and entertainment above all else. Whether it's an epic fight, a deep emotional drama, a hilarious adventure, or a high-stakes moment that is genuinely gripping, commit to the *full sequence* from its absolute beginning to its natural end. Never force an artificial cut or clip truncation on a brilliant moment—allow the entire momentum, tension, comedy, and payoff of the gameplay to breathe and play out completely so the audience gets maximum satisfaction.
 TITLE RULES (only for APPROVE):
-- Create a short, viral title under 6 words with 1-3 emojis
-- NO generic boring words like Epic, Insane, Crazy, Best, Gameplay
+- Create a viral title under 6-10 words, 1-2 emojis
+- BANNED EMOJIS: 💀 ☠️  👹 🩸
+- BANNED words: Epic, Insane, Crazy, Best, Battle, Clash, Escape, Warrior, Beast, Mission, Wait For The End, You Won't Believe, Watch Till End, This Changed Everything, No Escape, Fierce Clash, Tactical Mission, Sniper Headshot, Clutch Save
+
+5 THINGS THAT MATTER FOR A VIRAL TITLE:
+  1. SPECIFIC — real thing, not vague (Knife vs Sniper, Diamond, Car, Boss)
+  2. SUSPENSE — curiosity (dots "...", what happens next?)
+  3. HYPE — strong verb (cooked, wrecked, clutched, survived, escaped)
+  4. NUMBER — numbers attract clicks (1 HP, 4 Enemies, 100 Days, 3 Laps, 5 Tries)
+  5. EMOTION — tension, surprise, shock (Last Bullet, Betrayal, Crash, Near Miss)
+
+EVERY title MUST include at least 3 of these 5 things.
+
+GOOD EXAMPLES (specific + suspense + hype MIXED):
+
+✅ "1 HP, 4 Enemies Left 🔥🎯"
+✅ "Knife vs Sniper... He Won 🔪🎯"
+✅ "Last Bullet Saved His Team 🔫🔥"
+✅ "Tank Walked Into 5 Players 💥😳"
+✅ "Bro Cooked The Whole Lobby 🍳🔥"
+✅ "He Was Hiding... Then This 👀💥"
+✅ "Sniper Missed... Big Mistake 🎯😂"
+✅ "Boss Fight... 1 HP Left 🔥😳"
+
+BANNED TITLE STYLES:
+❌ "Sniper Headshot"
+❌ "Wait For The End"
+❌ "He Destroyed Everyone"
 
 STRICT JSON OUTPUT — ALL FIELDS MANDATORY:
 
