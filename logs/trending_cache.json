@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-07 11:12:37 PM",
+  "last_updated": "2026-10-07 11:59:05 PM",
   "period_days": 7,
   "trending": [
     {
@@ -7,43 +7,43 @@
       "views_7d": 2179,
       "avg_per_video": 726,
       "trend": "viral",
-      "ratio": 2.2566607460035524,
+      "ratio": 2.280457706977788,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "VietnamCavePrison",
-      "views_7d": 4021,
+      "views_7d": 4022,
       "avg_per_video": 670,
       "trend": "viral",
-      "ratio": 2.0825932504440496,
+      "ratio": 2.1045546331613196,
       "fb_link": "https://www.facebook.com/reel/1433778538856569/",
       "source_link": ""
     },
     {
       "game": "MarvelsSpiderMan2",
-      "views_7d": 1905,
+      "views_7d": 1906,
       "avg_per_video": 476,
       "trend": "steady",
-      "ratio": 1.4795737122557726,
+      "ratio": 1.4951761274399822,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "mm2remastered",
-      "views_7d": 1332,
-      "avg_per_video": 444,
+      "views_7d": 1344,
+      "avg_per_video": 448,
       "trend": "steady",
-      "ratio": 1.3801065719360568,
+      "ratio": 1.407224590531748,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_3.mp4"
     },
     {
       "game": "combatopration",
-      "views_7d": 1296,
-      "avg_per_video": 432,
+      "views_7d": 1306,
+      "avg_per_video": 435,
       "trend": "steady",
-      "ratio": 1.3428063943161634,
+      "ratio": 1.366389948395782,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_12.mp4"
     }
@@ -51,19 +51,19 @@
   "below_avg": [
     {
       "game": "Callofdutyaw",
-      "views_7d": 295,
-      "avg_per_video": 295,
+      "views_7d": 483,
+      "avg_per_video": 241,
       "trend": "slow",
-      "ratio": 0.9169626998223801,
-      "fb_link": "https://www.facebook.com/reel/1423098925813250/",
+      "ratio": 0.7570114426744448,
+      "fb_link": "https://www.facebook.com/reel/1148043704554627/",
       "source_link": ""
     },
     {
       "game": "monkeyKing",
-      "views_7d": 384,
+      "views_7d": 386,
       "avg_per_video": 128,
       "trend": "below_avg",
-      "ratio": 0.3978685612788632,
+      "ratio": 0.40206416872335654,
       "fb_link": "https://www.facebook.com/reel/2448225372254380/",
       "source_link": ""
     },
@@ -72,7 +72,7 @@
       "views_7d": 579,
       "avg_per_video": 115,
       "trend": "below_avg",
-      "ratio": 0.3574600355239787,
+      "ratio": 0.36122952658739066,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu1.mp4"
     },
@@ -81,7 +81,7 @@
       "views_7d": 497,
       "avg_per_video": 99,
       "trend": "below_avg",
-      "ratio": 0.3077264653641208,
+      "ratio": 0.31097150549697106,
       "fb_link": "https://www.facebook.com/reel/1079863571475835/",
       "source_link": ""
     },
@@ -90,7 +90,7 @@
       "views_7d": 30,
       "avg_per_video": 15,
       "trend": "below_avg",
-      "ratio": 0.04662522202486678,
+      "ratio": 0.047116894772268346,
       "fb_link": "",
       "source_link": ""
     }
@@ -100,7 +100,7 @@
     "views_7d": 2179,
     "avg_per_video": 726,
     "trend": "viral",
-    "ratio": 2.2566607460035524,
+    "ratio": 2.280457706977788,
     "fb_link": "",
     "source_link": ""
   }
