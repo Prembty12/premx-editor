@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-07 12:26:07 PM",
+  "last_updated": "2026-10-07 12:54:47 PM",
   "period_days": 7,
   "trending": [
     {
@@ -7,7 +7,7 @@
       "views_7d": 2156,
       "avg_per_video": 718,
       "trend": "viral",
-      "ratio": 2.158007728638901,
+      "ratio": 2.2268498006202924,
       "fb_link": "",
       "source_link": ""
     },
@@ -16,16 +16,16 @@
       "views_7d": 3500,
       "avg_per_video": 700,
       "trend": "viral",
-      "ratio": 2.10390725633319,
+      "ratio": 2.1710234824988923,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops63.mp4"
     },
     {
       "game": "VietnamCavePrison",
-      "views_7d": 3826,
-      "avg_per_video": 637,
+      "views_7d": 3828,
+      "avg_per_video": 638,
       "trend": "trending",
-      "ratio": 1.914555603263203,
+      "ratio": 1.9787328311918475,
       "fb_link": "https://www.facebook.com/reel/1433778538856569/",
       "source_link": ""
     },
@@ -34,18 +34,18 @@
       "views_7d": 1891,
       "avg_per_video": 472,
       "trend": "steady",
-      "ratio": 1.4186346071275224,
+      "ratio": 1.4638901196278244,
       "fb_link": "",
       "source_link": ""
     },
     {
-      "game": "mm2remastered",
-      "views_7d": 906,
-      "avg_per_video": 453,
+      "game": "combatopration",
+      "views_7d": 1105,
+      "avg_per_video": 368,
       "trend": "steady",
-      "ratio": 1.3615285530270502,
-      "fb_link": "https://www.facebook.com/reel/1461328042514444/",
-      "source_link": ""
+      "ratio": 1.1413380593708462,
+      "fb_link": "",
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.89/combatopration_12.mp4"
     }
   ],
   "below_avg": [
@@ -54,25 +54,34 @@
       "views_7d": 1278,
       "avg_per_video": 319,
       "trend": "slow",
-      "ratio": 0.9587805925289824,
+      "ratio": 0.9893664155959238,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "Russian_secret_missions",
-      "views_7d": 633,
-      "avg_per_video": 316,
+      "views_7d": 638,
+      "avg_per_video": 319,
       "trend": "slow",
-      "ratio": 0.9497638471446973,
+      "ratio": 0.9893664155959238,
       "fb_link": "https://www.facebook.com/reel/1139912458719689/",
       "source_link": ""
+    },
+    {
+      "game": "mm2remastered",
+      "views_7d": 908,
+      "avg_per_video": 302,
+      "trend": "slow",
+      "ratio": 0.9366415595923793,
+      "fb_link": "",
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_3.mp4"
     },
     {
       "game": "Callofdutyaw",
       "views_7d": 290,
       "avg_per_video": 290,
       "trend": "slow",
-      "ratio": 0.8716187204808931,
+      "ratio": 0.8994240141781125,
       "fb_link": "https://www.facebook.com/reel/1423098925813250/",
       "source_link": ""
     },
@@ -81,18 +90,9 @@
       "views_7d": 303,
       "avg_per_video": 151,
       "trend": "below_avg",
-      "ratio": 0.4538428510090167,
+      "ratio": 0.46832077979618963,
       "fb_link": "https://www.facebook.com/reel/1596514458133485/",
       "source_link": ""
-    },
-    {
-      "game": "sifu",
-      "views_7d": 508,
-      "avg_per_video": 127,
-      "trend": "below_avg",
-      "ratio": 0.38170888793473595,
-      "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu12.mp4"
     }
   ],
   "recommendation": {
@@ -100,7 +100,7 @@
     "views_7d": 2156,
     "avg_per_video": 718,
     "trend": "viral",
-    "ratio": 2.158007728638901,
+    "ratio": 2.2268498006202924,
     "fb_link": "",
     "source_link": ""
   }

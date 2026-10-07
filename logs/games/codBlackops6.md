@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 35 | **Last Updated:** 2026-10-07 12:26:07 PM IST
+**Total Videos:** 35 | **Last Updated:** 2026-10-07 12:54:47 PM IST
 
 ---
 
@@ -23,8 +23,8 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | He Held 1 Photo Then Flew 🔥👀  #videogames #gamingcommunity #gaming #codblackops6 #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeLlJotk8n2/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops63.mp4) |
-| 2 | Tactical mission starts now 🪖🔥  #videogames #gamingcommunity #gaming #codblackops6 #gamingreels #ree | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeJ-49UgJE-/) | 300 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops64.mp4) |
+| 1 | He Held 1 Photo Then Flew 🔥👀  #videogames #gamingcommunity #gaming #codblackops6 #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeLlJotk8n2/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops63.mp4) |
+| 2 | Tactical mission starts now 🪖🔥  #videogames #gamingcommunity #gaming #codblackops6 #gamingreels #ree | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeJ-49UgJE-/) | 310 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops64.mp4) |
 | 3 | Pure Shootout Chaos Unleashed 💥🔫  #videogames #gamingcommunity #gaming #codblackops6 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1408783788017999/) | 263 | [🟣 IG](https://www.instagram.com/reel/DeH2mNCD9W8/) | 210 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops627.mp4) |
 | 4 | Orange Arcs Combat Rush 🟠🔫  #videogames #gamingcommunity #gaming #codblackops6 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/887791697632800/) | 504 | [🟣 IG](https://www.instagram.com/reel/Dd-l-_oj9_V/) | 250 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops617.mp4) |
 | 5 | Corridor Gunfight Chaos 💥💀  #videogames #gamingcommunity #gaming #codblackops6 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1975717633099736/) | 1,793 | [🟣 IG](https://www.instagram.com/reel/Dd241O9DMXF/) | 160 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops621.mp4) |
@@ -39,21 +39,21 @@
 | 14 | codBlackops617 | [🔵 FB](https://www.facebook.com/17943805995305645) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops617.mp4) |
 | 15 | codBlackops621 | [🔵 FB](https://www.facebook.com/18101060453249022) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops621.mp4) |
 | 16 | codBlackops628 | [🔵 FB](https://www.facebook.com/18373953856226464) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops628.mp4) |
-| 17 | codBlackops624 | [🔵 FB](https://www.facebook.com/18203904874365425) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops624.mp4) |
-| 18 | codBlackops68 | [🔵 FB](https://www.facebook.com/18073605320450412) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops68.mp4) |
+| 17 | codBlackops615 | [🔵 FB](https://www.facebook.com/18617854660057043) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops615.mp4) |
+| 18 | codBlackops624 | [🔵 FB](https://www.facebook.com/18203904874365425) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops624.mp4) |
 | 19 | codBlackops66 | [🔵 FB](https://www.facebook.com/18110464076167519) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops66.mp4) |
-| 20 | codBlackops622 | [🔵 FB](https://www.facebook.com/18094463807563905) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops622.mp4) |
-| 21 | codBlackops619 | [🔵 FB](https://www.facebook.com/18365290822240176) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops619.mp4) |
+| 20 | codBlackops68 | [🔵 FB](https://www.facebook.com/18073605320450412) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops68.mp4) |
+| 21 | codBlackops622 | [🔵 FB](https://www.facebook.com/18094463807563905) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops622.mp4) |
 | 22 | codBlackops612 | [🔵 FB](https://www.facebook.com/17905804827546375) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops612.mp4) |
-| 23 | codBlackops625 | [🔵 FB](https://www.facebook.com/17901721884565459) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops625.mp4) |
-| 24 | codBlackops69 | [🔵 FB](https://www.facebook.com/18374438512214942) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops69.mp4) |
-| 25 | codBlackops613 | [🔵 FB](https://www.facebook.com/18181180012425014) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops613.mp4) |
-| 26 | codBlackops615 | [🔵 FB](https://www.facebook.com/18617854660057043) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops615.mp4) |
+| 23 | codBlackops619 | [🔵 FB](https://www.facebook.com/18365290822240176) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops619.mp4) |
+| 24 | codBlackops625 | [🔵 FB](https://www.facebook.com/17901721884565459) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops625.mp4) |
+| 25 | codBlackops69 | [🔵 FB](https://www.facebook.com/18374438512214942) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops69.mp4) |
+| 26 | codBlackops613 | [🔵 FB](https://www.facebook.com/18181180012425014) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops613.mp4) |
 | 27 | codBlackops67 | [🔵 FB](https://www.facebook.com/18144788179561056) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops67.mp4) |
 | 28 | codBlackops623 | [🔵 FB](https://www.facebook.com/18082147463701896) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops623.mp4) |
-| 29 | codBlackops618 | [🔵 FB](https://www.facebook.com/17914636953269043) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops618.mp4) |
-| 30 | codBlackops614 | [🔵 FB](https://www.facebook.com/18113567900277310) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops614.mp4) |
-| 31 | codBlackops616 | [🔵 FB](https://www.facebook.com/18117358642988366) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops616.mp4) |
+| 29 | codBlackops614 | [🔵 FB](https://www.facebook.com/18113567900277310) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops614.mp4) |
+| 30 | codBlackops616 | [🔵 FB](https://www.facebook.com/18117358642988366) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops616.mp4) |
+| 31 | codBlackops618 | [🔵 FB](https://www.facebook.com/17914636953269043) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops618.mp4) |
 | 32 | codBlackops64 | [🔵 FB](https://www.facebook.com/17963324100216436) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops64.mp4) |
 | 33 | codBlackops611 | [🔵 FB](https://www.facebook.com/17888955375654164) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops611.mp4) |
 | 34 | codBlackops63 | [🔵 FB](https://www.facebook.com/17871644364639532) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops63.mp4) |
