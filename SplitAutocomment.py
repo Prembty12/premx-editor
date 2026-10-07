@@ -1,13 +1,13 @@
 """
-💬 SPLIT AUTO-COMMENT SCRIPT (v13.2 — FIXED 404 + 400 ERRORS)
+💬 SPLIT AUTO-COMMENT SCRIPT (v13.3 — FIXED Double Reply)
 ============================================================
 ✅ Direct FB se SAARE comments fetch (pagination + nested replies)
 ✅ SCHEMA har attempt pe try, fail hone pe auto JSON_OBJ fallback
 ✅ 5-layer JSON parser — broken JSON bhi recover
-✅ FIXED: provider block hataya (404 fix)
-✅ FIXED: top_p/frequency_penalty/presence_penalty hataye (400 fix)
-✅ FIXED: strict:False schema (free models support)
-✅ FIXED_MODEL = working chat model
+✅ FIXED: provider/top_p/etc hataye (404+400 fix)
+✅ FIXED: User ko ek hi baar reply — dobara nahi
+✅ FIXED: 4-layer check in analyze_thread
+✅ FIXED: 3-layer check in _is_our_reply
 ✅ ONLY writes 2 JSON files:
    - logs/auto_reply_log.json
    - logs/replied_comment_ids.json
@@ -343,7 +343,6 @@ def generate_batch_replies(comments_batch, max_retries=MAX_JSON_RETRIES):
     if not comments_batch:
         return {}
 
-    # 🔥 SIMPLER PROMPT
     formatted = ""
     for c in comments_batch:
         tone = "SAVAGE" if c["is_abuse"] else "FRIENDLY"
@@ -393,7 +392,6 @@ JSON:"""
         key_index = (attempt - 1) % len(valid_keys)
         current_key = valid_keys[key_index]
 
-        # 🔥 Attempt 1-3 → FIXED, Attempt 4-12 → FALLBACK
         model_to_use = FIXED_MODEL if attempt <= 3 else FALLBACK_MODEL
         tag = "FIXED" if attempt <= 3 else "FALLBACK"
 
@@ -818,12 +816,31 @@ def post_fb_reply(comment_id, reply_text):
     return None
 
 
+# ============================================================
+# 🔥 _is_our_reply — 3-LAYER CHECK (FIXED)
+# ============================================================
 def _is_our_reply(reply_obj, page_name_lower):
+    """
+    3-layer check — page id, page name, aur comment ID match.
+    """
     r_from = reply_obj.get("from", {}) or {}
-    r_id = r_from.get("id", "")
+    r_id = str(r_from.get("id", "")).strip()
     r_name = (r_from.get("name") or "").strip().lower()
-    return (r_id == FB_PAGE_ID
-            or (page_name_lower and r_name == page_name_lower))
+
+    # Layer 1: Page ID match
+    if FB_PAGE_ID and r_id == str(FB_PAGE_ID).strip():
+        return True
+
+    # Layer 2: Page name match
+    if page_name_lower and r_name and r_name == page_name_lower:
+        return True
+
+    # Layer 3: Comment ID check — agar yeh comment humne already reply kiya
+    comment_id = reply_obj.get("id", "")
+    if comment_id and was_already_replied(comment_id):
+        return True
+
+    return False
 
 
 def get_effective_reply_time(comment, replies_sorted, page_name_lower):
@@ -838,8 +855,11 @@ def get_effective_reply_time(comment, replies_sorted, page_name_lower):
     return comment.get("created_time", ""), "top_comment"
 
 
+# ============================================================
+# 🔥 analyze_thread — 4-LAYER CHECK (FIXED)
+# ============================================================
 def analyze_thread(top_comment):
-    """v13.2: Embedded nested replies use karo (fast), warna alag fetch."""
+    """v13.3: 4-layer check — dobara reply nahi dega."""
     cid = top_comment.get("id", "")
 
     embedded = []
@@ -890,6 +910,7 @@ def analyze_thread(top_comment):
                 "reason": "outside_time_window"}
 
     if len(replies_sorted) == 0:
+        # Fresh comment
         if was_already_replied(cid):
             log(f"      ⏭️ Fresh on FB but IN LOG — skip")
             return {"should_reply": False, "depth": 0,
@@ -897,16 +918,31 @@ def analyze_thread(top_comment):
         log(f"      🆕 Fresh comment — WILL REPLY")
     else:
         last = replies_sorted[-1]
+
+        # 🔥 LAYER 1: Last reply OURS hai → user ka wait karo
         if _is_our_reply(last, page_name_lower):
             log(f"      ⏭️ Last reply is OURS — waiting for user")
             return {"should_reply": False, "depth": our_count,
                     "reason": "waiting_user"}
 
+        # 🔥 LAYER 2: Top comment ka ID already replied hai → skip
+        if was_already_replied(cid):
+            log(f"      ⏭️ Top comment already replied — skip")
+            return {"should_reply": False, "depth": our_count,
+                    "reason": "already_replied_log"}
+
+        # 🔥 LAYER 3: Last user reply already replied hai → skip
         last_user_id = last.get("id", "")
         if last_user_id and was_already_replied(last_user_id):
             log(f"      ⏭️ Already replied to this user reply — skip")
             return {"should_reply": False, "depth": our_count,
                     "reason": "already_replied_this_reply"}
+
+        # 🔥 LAYER 4: Safety check — agar our_count 0 hai but replies exist
+        if our_count == 0:
+            log(f"      ⚠️ our_count=0 but replies exist — safety skip")
+            return {"should_reply": False, "depth": 0,
+                    "reason": "safety_skip"}
 
         log(f"      💬 NEW user reply (depth {our_count}) — WILL REPLY")
 
@@ -998,13 +1034,16 @@ def process_fb_comments(actual_posted_titles=None):
         return None
 
     window_days = MAX_COMMENT_AGE_HOURS // 24
-    log(f"🤖 Auto-reply started (v13.2 — FIXED 404+400: "
+    log(f"🤖 Auto-reply started (v13.3 — No Double Reply: "
         f"{window_days} days / {MAX_COMMENT_AGE_HOURS} hours)...")
     log(f"📂 Shared log: {SHARED_REPLY_LOG}")
     log(f"📂 Shared IDs: {SHARED_REPLIED_IDS}")
 
     page_name = get_page_name()
     log(f"📄 Page name: {page_name or 'N/A'}")
+    if not page_name:
+        log(f"⚠️ WARNING: Page name empty! Check PAGE_ID and PAGE_ACCESS_TOKEN")
+        log(f"⚠️ PAGE_ID set: {bool(FB_PAGE_ID)} | TOKEN set: {bool(FB_ACCESS_TOKEN)}")
 
     replied_data = {"replied": [], "last_updated": ""}
     if os.path.exists(SHARED_REPLIED_IDS):
@@ -1148,7 +1187,8 @@ def process_fb_comments(actual_posted_titles=None):
             if not state["should_reply"]:
                 if state["reason"] in ("max_depth", "waiting_user",
                                         "already_replied_log",
-                                        "already_replied_this_reply"):
+                                        "already_replied_this_reply",
+                                        "safety_skip"):
                     log(f"      ⏭️ Skip ({state['reason']}) — {comment_id[:20]}")
                 continue
 
@@ -1294,7 +1334,7 @@ def git_commit_and_push(file_paths, message="Auto-Reply: Update JSON logs [skip 
 def main():
     window_days = MAX_COMMENT_AGE_HOURS // 24
     log("=" * 60)
-    log("🚀 SPLIT SCRIPT v13.2 — FIXED 404 + 400")
+    log("🚀 SPLIT SCRIPT v13.3 — No Double Reply")
     log("=" * 60)
     log(f"📂 Writes ONLY: {SHARED_REPLY_LOG}")
     log(f"📂 Writes ONLY: {SHARED_REPLIED_IDS}")
