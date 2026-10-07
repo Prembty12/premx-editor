@@ -1,40 +1,40 @@
 {
-  "last_updated": "2026-10-07 10:36:57 AM",
+  "last_updated": "2026-10-07 11:23:19 AM",
   "period_days": 7,
   "trending": [
     {
-      "game": "codBlackops6",
-      "views_7d": 3470,
-      "avg_per_video": 867,
-      "trend": "viral",
-      "ratio": 2.455593768966215,
-      "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops64.mp4"
-    },
-    {
       "game": "GearsOfWar",
-      "views_7d": 2153,
-      "avg_per_video": 717,
+      "views_7d": 2155,
+      "avg_per_video": 718,
       "trend": "viral",
-      "ratio": 2.0307505563423023,
+      "ratio": 2.0946030423004793,
       "fb_link": "",
       "source_link": ""
     },
     {
-      "game": "VietnamCavePrison",
-      "views_7d": 3756,
-      "avg_per_video": 626,
-      "trend": "trending",
-      "ratio": 1.7730123406837954,
+      "game": "codBlackops6",
+      "views_7d": 3490,
+      "avg_per_video": 698,
+      "trend": "viral",
+      "ratio": 2.0362575536570118,
       "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison8.mp4"
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops63.mp4"
+    },
+    {
+      "game": "VietnamCavePrison",
+      "views_7d": 3791,
+      "avg_per_video": 631,
+      "trend": "trending",
+      "ratio": 1.8408001667013962,
+      "fb_link": "https://www.facebook.com/reel/1433778538856569/",
+      "source_link": ""
     },
     {
       "game": "combatopration",
-      "views_7d": 1053,
-      "avg_per_video": 526,
-      "trend": "steady",
-      "ratio": 1.4897835322678536,
+      "views_7d": 1066,
+      "avg_per_video": 533,
+      "trend": "trending",
+      "ratio": 1.5549072723484059,
       "fb_link": "https://www.facebook.com/reel/29117808581156621/",
       "source_link": ""
     },
@@ -43,7 +43,7 @@
       "views_7d": 1890,
       "avg_per_video": 472,
       "trend": "steady",
-      "ratio": 1.336839975723245,
+      "ratio": 1.3769535319858304,
       "fb_link": "",
       "source_link": ""
     }
@@ -54,16 +54,16 @@
       "views_7d": 1258,
       "avg_per_video": 314,
       "trend": "slow",
-      "ratio": 0.8893384584260571,
+      "ratio": 0.916024171702438,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "Russian_secret_missions",
-      "views_7d": 615,
-      "avg_per_video": 307,
+      "views_7d": 623,
+      "avg_per_video": 311,
       "trend": "slow",
-      "ratio": 0.8695124418369412,
+      "ratio": 0.907272348405918,
       "fb_link": "https://www.facebook.com/reel/1139912458719689/",
       "source_link": ""
     },
@@ -72,16 +72,16 @@
       "views_7d": 290,
       "avg_per_video": 290,
       "trend": "slow",
-      "ratio": 0.821363544406231,
+      "ratio": 0.8460095853302771,
       "fb_link": "https://www.facebook.com/reel/1423098925813250/",
       "source_link": ""
     },
     {
       "game": "monkeyKing",
-      "views_7d": 297,
-      "avg_per_video": 148,
+      "views_7d": 301,
+      "avg_per_video": 150,
       "trend": "below_avg",
-      "ratio": 0.4191786364555938,
+      "ratio": 0.4375911648260054,
       "fb_link": "https://www.facebook.com/reel/1596514458133485/",
       "source_link": ""
     },
@@ -90,18 +90,18 @@
       "views_7d": 508,
       "avg_per_video": 127,
       "trend": "below_avg",
-      "ratio": 0.359700586688246,
+      "ratio": 0.37049385288601794,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu12.mp4"
     }
   ],
   "recommendation": {
-    "game": "codBlackops6",
-    "views_7d": 3470,
-    "avg_per_video": 867,
+    "game": "GearsOfWar",
+    "views_7d": 2155,
+    "avg_per_video": 718,
     "trend": "viral",
-    "ratio": 2.455593768966215,
+    "ratio": 2.0946030423004793,
     "fb_link": "",
-    "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops64.mp4"
+    "source_link": ""
   }
 }

@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 27 | **Last Updated:** 2026-10-07 10:36:57 AM IST
+**Total Videos:** 27 | **Last Updated:** 2026-10-07 11:23:19 AM IST
 
 ---
 
@@ -15,7 +15,7 @@
 | FB Posted | 2 / 27 |
 | IG Posted | 2 / 27 |
 | Total FB Views | **279** |
-| Total IG Views | **20** |
+| Total IG Views | **30** |
 
 ---
 
@@ -23,7 +23,7 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | Logan Trapped In 1 Collar Screamed 😱🔥  #videogames #gamingcommunity #gaming #wolverine #gamingreels  | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeLjn1DDl43/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine10.mp4) |
+| 1 | Logan Trapped In 1 Collar Screamed 😱🔥  #videogames #gamingcommunity #gaming #wolverine #gamingreels  | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeLjn1DDl43/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine10.mp4) |
 | 2 | Blue Claws Wolverine Slices 🔥  #videogames #gamingcommunity #gaming #wolverine #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeJ9XOnDIjq/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine29.mp4) |
 | 3 | He Has The Ultimate Power 🔥  #videogames #gamingcommunity #gaming #wolverine #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/3809681729172403/) | 279 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine12.mp4) |
 | 4 | Wolverine29 | [🔵 FB](https://www.facebook.com/18103557227120627) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine29.mp4) |

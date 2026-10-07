@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 11 | **Last Updated:** 2026-10-07 10:36:57 AM IST
+**Total Videos:** 11 | **Last Updated:** 2026-10-07 11:23:19 AM IST
 
 ---
 
@@ -14,7 +14,7 @@
 | Posted (FB or IG) | 10 / 11 |
 | FB Posted | 8 / 11 |
 | IG Posted | 3 / 11 |
-| Total FB Views | **505** |
+| Total FB Views | **509** |
 | Total IG Views | **30** |
 
 ---
@@ -23,7 +23,7 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | Monkey King Sky War ⚔️☁️  #videogames #gamingcommunity #gaming #monkeyking #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1596514458133485/) | 277 | [🟣 IG](https://www.instagram.com/reel/DeKKMf6j9dh/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing9.mp4) |
+| 1 | Monkey King Sky War ⚔️☁️  #videogames #gamingcommunity #gaming #monkeyking #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1596514458133485/) | 281 | [🟣 IG](https://www.instagram.com/reel/DeKKMf6j9dh/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing9.mp4) |
 | 2 | Boss Melts in Flames 🔥💀  #videogames #gamingcommunity #gaming #monkeyking #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Dd6IDhzDy6r/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing32.mp4) |
 | 3 | Red Staff Combat Slash ⚡⚔️  #videogames #gamingcommunity #gaming #monkeyking #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DdzaCUfjLsh/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing41.mp4) |
 | 4 | This Fire Boss Fight Goes Totally Insane 🔥😱  #videogames #gamingcommunity #gaming #monkeyking #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1407808034823324/) | 228 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.103/monkeyKing41.mp4) |
