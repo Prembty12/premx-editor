@@ -770,13 +770,24 @@ Match your energy to what you SEE in each slot:
 **🎯 CRITICAL: VISUAL CLASSIFICATION — HONEST RULES**
 Look at the frames for each slot's time range. Classify each slot:
 
-**visual_type = "action" ONLY if you see CLEAR physical motion:**
-- Fighting, punching, kicking
-- Running, jumping, dodging
+**visual_type = "action" ONLY if you see CLEAR physical motion — LOOK FOR:**
+- Fighting, punching, kicking, martial arts
+- Running, jumping, dodging, sprinting
 - Shooting, weapon being FIRED
-- Explosion, impact, blood
+- Explosion, blast, impact, blood
 - Multiple characters in COMBAT
-- Character clearly sprinting
+- Fist EXTENDED toward enemy (punch)
+- Leg RAISED (kick)
+- Combat stance: fists up, knees bent, body leaning forward
+- Two or more characters CLOSE together (within arm's reach)
+- Character being HIT or knocked back
+- Dodging, twisting, ducking
+- Multiple enemies surrounding character
+- Health bars / damage numbers / red hit markers on screen
+- Hit sparks, impact effects
+- Grabbing, throwing, wrestling
+- Character LYING on ground after being hit
+- Street fight / brawl / kung-fu / any physical combat
 
 **visual_type = "dialog" ONLY if:**
 - Close-up of face while speaking
@@ -797,7 +808,9 @@ Look at the frames for each slot's time range. Classify each slot:
 
 **⚠️ BE HONEST. If you see slow motion, sitting, walking, scenery, drone flying, city skyline → use "calm".**
 **Only use "action" if there is CLEAR physical motion.**
-**When in doubt, use "calm" — NOT "action".**
+**🔴 If two characters are CLOSE and bodies are ENGAGED (fists up, legs moving, mid-attack) → it's ACTION.**
+**When in doubt about FIGHTING → use "action".**
+**When in doubt about SCENERY/MENU → use "calm".**
 
 **PACING RULES:**
 - visual_type = "action" → VERY short punchy lines (3-5 words), HIGH energy, CAPS
