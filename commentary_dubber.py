@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v3.5 (2 Images + Purana Prompt)
+🎙️ AI Commentary Dubber — v3.4 (Simple Debug)
 ===============================================================
 Simple debug format:
   [timestamp] speed=X.XX (type) | AI Commentary
@@ -72,17 +72,15 @@ VOICE_ID           = ARGS.voice or os.getenv("VOICE_ID", "91w4XjqhkWTX1Jr3O344")
 AUDIO_PATH         = "extracted_audio.mp3"
 SRT_PATH           = "final.srt"
 ANALYSIS_DIR       = "analysis"
-ANALYSIS_GRID_PATH_1 = "analysis/last_analysis_1.jpg"
-ANALYSIS_GRID_PATH_2 = "analysis/last_analysis_2.jpg"
+ANALYSIS_GRID_PATH = "analysis/last_analysis.jpg"
 SEGMENTS_DIR       = "segments"
 
 MIN_SLOTS_HARD = 6
 MAX_SLOTS_HARD = 20
 DUCK_VOLUME = 0.25
 
-# 180 frames — 2 images × 90 frames (9x10 grid each) — 8K portrait
-ANALYSIS_FRAMES = 180
-FRAMES_PER_IMAGE = 90
+# 90 frames — 8K portrait canvas (9x10 grid)
+ANALYSIS_FRAMES = 90
 GRID_COLS = 9
 GRID_ROWS = 10
 CANVAS_W = 4320
@@ -205,14 +203,9 @@ def get_motion_score(video_path, start, end):
 # GIT PUSH
 # ============================================================
 def commit_analysis_to_github():
-    print("📤 [10] Pushing analysis images to GitHub...")
+    print("📤 [10] Pushing analysis image to GitHub...")
 
-    files_to_add = []
-    for p in [ANALYSIS_GRID_PATH_1, ANALYSIS_GRID_PATH_2]:
-        if os.path.exists(p):
-            files_to_add.append(p)
-
-    if not files_to_add:
+    if not os.path.exists(ANALYSIS_GRID_PATH):
         print("   ⚠️ No analysis image found, skipping git commit.")
         return
 
@@ -235,16 +228,15 @@ def commit_analysis_to_github():
                 shell=True, check=False
             )
 
-        for f in files_to_add:
-            subprocess.run(f"git add {f}", shell=True, check=False)
-            print(f"   📎 Staged: {f}")
+        subprocess.run(f"git add {ANALYSIS_GRID_PATH}", shell=True, check=False)
+        print(f"   📎 Staged: {ANALYSIS_GRID_PATH}")
 
         commit_res = subprocess.run(
-            "git commit -m 'Update analysis images [skip ci]'",
+            "git commit -m 'Update analysis image [skip ci]'",
             shell=True, capture_output=True, text=True
         )
         if commit_res.returncode == 0:
-            print("   ✅ Committed analysis images.")
+            print("   ✅ Committed analysis image.")
         else:
             print("   ℹ️ No changes to commit.")
 
@@ -359,7 +351,7 @@ def get_loudness_timeline(video_path):
         f'ametadata=print:key=lavfi.astats.Overall.RMS_level:file=-" '
         f'-f null - 2>&1'
     )
-    out = subprocess.run(cmd, shell=True, capture_output=True, text=True).stderr
+    out = subprocess.run(cmd, shell=True, capture_output=True, text=True).stderr  # ✅ FIX
     timeline = []
     t = 0.0
     for line in out.split("\n"):
@@ -651,104 +643,76 @@ def classify_slots_combined(video_path, slots, srt_content):
 
 
 # ============================================================
-# STEP 5 — 2× 8K PORTRAIT ANALYSIS GRIDS (90 frames each)
+# STEP 5 — 8K PORTRAIT ANALYSIS GRID
 # ============================================================
-def build_analysis_grids(video_path, vid_duration):
-    print(f"🖼️ [5] Building 2× 8K PORTRAIT grids ({CANVAS_W}×{CANVAS_H}) — "
-          f"{FRAMES_PER_IMAGE} frames each (total {ANALYSIS_FRAMES})...")
+def build_analysis_grid(video_path, vid_duration, num_frames=ANALYSIS_FRAMES):
+    print(f"🖼️ [5] Building 8K PORTRAIT grid ({CANVAS_W}×{CANVAS_H}) — {num_frames} frames...")
 
-    for p in [ANALYSIS_GRID_PATH_1, ANALYSIS_GRID_PATH_2]:
-        if os.path.exists(p):
-            try:
-                os.remove(p)
-            except Exception as e:
-                print(f"   ⚠️  Could not delete {p}: {e}")
+    if os.path.exists(ANALYSIS_GRID_PATH):
+        try:
+            os.remove(ANALYSIS_GRID_PATH)
+        except Exception as e:
+            print(f"   ⚠️  Could not delete: {e}")
 
-    interval = vid_duration / ANALYSIS_FRAMES
-    print(f"   ⏱️  Frame gap: {interval:.3f}s (≈ {1/interval:.1f} FPS)")
-
+    interval = vid_duration / num_frames
     frame_paths = []
-    for i in range(ANALYSIS_FRAMES):
+
+    for i in range(num_frames):
         t = i * interval
         fp = f"temp_analysis_{i:03d}.jpg"
         subprocess.run(
-            f"ffmpeg -y -ss {t:.3f} -i {video_path} -vframes 1 -q:v 1 {fp}",
+            f"ffmpeg -y -ss {t:.2f} -i {video_path} -vframes 1 -q:v 1 {fp}",
             shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
         )
         if os.path.exists(fp):
             frame_paths.append((fp, t))
 
-    print(f"   📸 Extracted {len(frame_paths)} frames")
-
-    try:
-        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-                                  max(24, (CANVAS_W // GRID_COLS) // 18))
-    except:
-        try:
-            font = ImageFont.truetype("/system/fonts/Roboto-Bold.ttf",
-                                      max(24, (CANVAS_W // GRID_COLS) // 18))
-        except:
-            font = ImageFont.load_default()
-
     cell_w = CANVAS_W // GRID_COLS
     cell_h = CANVAS_H // GRID_ROWS
 
-    halves = [
-        (frame_paths[:FRAMES_PER_IMAGE], ANALYSIS_GRID_PATH_1, "Part 1", 0),
-        (frame_paths[FRAMES_PER_IMAGE:], ANALYSIS_GRID_PATH_2, "Part 2", FRAMES_PER_IMAGE),
-    ]
+    grid = Image.new("RGB", (CANVAS_W, CANVAS_H), (0, 0, 0))
+    draw = ImageDraw.Draw(grid)
 
-    for half_frames, save_path, label, frame_offset in halves:
-        print(f"   🎨 Building {label} ({len(half_frames)} frames)...")
+    try:
+        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", max(24, cell_w // 18))
+    except:
+        try:
+            font = ImageFont.truetype("/system/fonts/Roboto-Bold.ttf", max(24, cell_w // 18))
+        except:
+            font = ImageFont.load_default()
 
-        grid = Image.new("RGB", (CANVAS_W, CANVAS_H), (0, 0, 0))
-        draw = ImageDraw.Draw(grid)
+    for idx, (fp, t) in enumerate(frame_paths):
+        if idx >= GRID_COLS * GRID_ROWS:
+            break
+        try:
+            img = Image.open(fp)
+            img = ImageOps.fit(img, (cell_w, cell_h), method=Image.LANCZOS, centering=(0.5, 0.5))
+        except:
+            continue
 
-        for idx, (fp, t) in enumerate(half_frames):
-            if idx >= GRID_COLS * GRID_ROWS:
-                break
-            try:
-                img = Image.open(fp)
-                img = ImageOps.fit(img, (cell_w, cell_h),
-                                   method=Image.LANCZOS, centering=(0.5, 0.5))
-            except:
-                continue
+        x = (idx % GRID_COLS) * cell_w
+        y = (idx // GRID_COLS) * cell_h
+        grid.paste(img, (x, y))
 
-            x = (idx % GRID_COLS) * cell_w
-            y = (idx // GRID_COLS) * cell_h
-            grid.paste(img, (x, y))
+        label = f"{t:.1f}s"
+        draw.rectangle([x + 8, y + 8, x + 160, y + 60], fill="black")
+        draw.text((x + 16, y + 14), label, fill="yellow", font=font)
 
-            label_ts = f"{t:.1f}s"
-            draw.rectangle([x + 8, y + 8, x + 160, y + 60], fill="black")
-            draw.text((x + 16, y + 14), label_ts, fill="yellow", font=font)
-
-            frame_num = f"#{idx + frame_offset}"
-            draw.rectangle(
-                [x + cell_w - 140, y + cell_h - 60, x + cell_w - 10, y + cell_h - 10],
-                fill="black"
-            )
-            draw.text((x + cell_w - 130, y + cell_h - 52), frame_num, fill="cyan", font=font)
-
-        grid.save(save_path, quality=92, optimize=True, subsampling=2)
-        size_mb = os.path.getsize(save_path) / (1024 * 1024)
-        print(f"   ✅ {label}: {grid.size[0]}x{grid.size[1]} ({size_mb:.2f} MB)")
-        print(f"      💾 {save_path}")
+    grid.save(ANALYSIS_GRID_PATH, quality=92, optimize=True, subsampling=2)
+    size_8k = os.path.getsize(ANALYSIS_GRID_PATH) / (1024 * 1024)
+    print(f"✅ 8K Full Quality: {grid.size[0]}x{grid.size[1]} ({size_8k:.2f} MB)")
+    print(f"💾 Saved: {ANALYSIS_GRID_PATH}\n")
 
     for fp, _ in frame_paths:
         if os.path.exists(fp):
             os.remove(fp)
 
-    print()
-    return ANALYSIS_GRID_PATH_1, ANALYSIS_GRID_PATH_2
-
 
 # ============================================================
-# STEP 6 — GPT Call (Purana Prompt + 2 Images)
+# STEP 6 — GPT Call
 # ============================================================
-def generate_full_script(slots, srt_content, analysis_grid_path_1,
-                         analysis_grid_path_2, vid_duration):
+def generate_full_script(slots, srt_content, analysis_grid_path):
     print(f"🤖 [6] Generating FULL script (OpenRouter — {len(OPENROUTER_KEYS)} keys)...")
-    print(f"   📸 Sending 2 images × {FRAMES_PER_IMAGE} frames = {ANALYSIS_FRAMES} total")
 
     slot_lines = []
     for i, s in enumerate(slots, 1):
@@ -762,62 +726,83 @@ def generate_full_script(slots, srt_content, analysis_grid_path_1,
             f"SRT: \"{s['srt_text'][:70]}\""
         )
 
-    half_time = vid_duration / 2
-
-    prompt = f"""You are a HYPED-UP gaming YouTuber — like a streamer going CRAZY on stream.
+        prompt = f"""You are a HYPED-UP gaming YouTuber — like a streamer going CRAZY on stream.
 You shout, laugh, hype, roast. Pure energy. Zero boring lines.
 
-**YOU ARE GETTING 2 IMAGES — ANALYSIS GRIDS ({ANALYSIS_FRAMES} frames total):**
-
-**IMAGE 1 (Part 1):**
-- Frames 0 → {FRAMES_PER_IMAGE - 1} ({FRAMES_PER_IMAGE} frames)
-- Time: 0.0s → {half_time:.1f}s
-- Grid: {GRID_COLS} × {GRID_ROWS}
-- Yellow labels = timestamps, Cyan = frame numbers
-
-**IMAGE 2 (Part 2):**
-- Frames {FRAMES_PER_IMAGE} → {ANALYSIS_FRAMES - 1} ({FRAMES_PER_IMAGE} frames)
-- Time: {half_time:.1f}s → {vid_duration:.1f}s
-- Grid: {GRID_COLS} × {GRID_ROWS}
-- Yellow labels = timestamps, Cyan = frame numbers
-
-**Match frames to slots.**
+**YOU ARE GETTING 1 IMAGE — ANALYSIS GRID:**
+- 90 frames with timestamps
+- Match frames to slots.
 
 **YOUR JOB:**
 Look at the frames. React LOUDLY like a real streamer watching live gameplay.
 Focus on VISUALS — characters, screens, action, environment, weapons, enemies, faces, graphics.
 
-**🎙️ HOW TO TALK — NATURAL STREAMER VIBE:**
+**⚠️ CHARACTER NAMES — ONLY WHEN NEEDED ⚠️**
 
-Talk like a real streamer — energetic but natural. Don't force slang.
-Use slang ONLY occasionally (1 in every 3-4 lines). Most lines should be plain, natural English.
+Don't mention character names in every line.
+- ONLY use a name when it's IMPORTANT (action, reveal, dialogue)
+- Normal commentary → NO names needed
+- If you don't know the name → don't guess, say what you SEE
+- NEVER use: "creature", "someone", "thing"
 
-**SLANG WORDS (use SPARINGLY — max 3-4 times total):**
-- "bro", "yo", "nah", "fr", "lowkey", "fire", "insane", "nasty", "cooked", "clapped"
+**WHEN TO USE NAME:**
+- Character does something important
+- Character speaks (subtitle)
+- Character is the focus of the shot
 
-**DON'T:**
-- ❌ Use slang in every line
-- ❌ Force slang where it doesn't fit
-- ❌ Repeat same slang word
+**WHEN NOT TO USE NAME:**
+- Just general action
+- Background characters
+- When it's not necessary
 
-**DO:**
-- ✅ Use slang naturally, only when it fits
-- ✅ Mix slang with plain English
-- ✅ Keep it conversational
+**🎙️ HOW TO TALK — REAL STREAMER VIBE:**
+
+Talk like a REAL streamer — not a hype machine.
+Mix hype with REAL observations. Notice details.
+
+**GOOD EXAMPLES:**
+- "Look at that face, bro. He's getting emotional."
+- "Wait, did you see that? That was clean."
+- "He's not gonna make it. Look at his health."
+
+**BAD EXAMPLES (don't do this):**
+- "YO BRO! LET'S GO! YO YO YO!" (too hype, no substance)
+- "BRO! He's COOKED! FR FR!" (repetitive slang)
+- "OHHHH! THAT WAS NASTY!" (no observation)
+
+**SLANG RULE:**
+- Use slang MAX 2-3 times in the WHOLE video
+- Most lines (90%) should be plain English
+- Only use slang when it fits naturally
+- Don't start every line with "Yo" or "Bro"
+- Don't end every line with "bro" or "fr"
+
+**LINE LENGTH:**
+- 6-10 words per line (not 3-5)
+- Complete sentences, not just hype words
+- Real observations, not just reactions
+
+**SLANG WORDS (use SPARINGLY — max 2-3 times total):**
+- "bro", "bruh", "yo", "nah", "fr", "lowkey", "highkey", "bet", "cap", "no cap"
+- "sick", "fire", "insane", "nasty", "goated", "cooked", "clapped", "cracked"
+- "deadass", "ong", "say less", "let him cook", "it's giving", "iykyk"
+- "yeet", "rizz", "sus", "mid", "W", "L", "GG", "POV"
 
 **HOW TO START LINES (rotate these — don't repeat):**
-- "Yo...", "Bro...", "Bruh...", "Nah...", "Wait...", "Ayy...", "Okay..."
-- "Hold up...", "Yo yo yo...", "Wait wait wait...", "Okay okay okay..."
-- "Look...", "Check it...", "See this...", "Watch this..."
+- "Wait...", "Okay...", "Look...", "Check it...", "See this...", "Watch this..."
+- "Hold up...", "Wait wait wait...", "Okay okay okay..."
+- "So...", "Alright...", "Now...", "Oh..."
+- Occasionally: "Yo...", "Bro..." (only if it fits)
 
 **HOW TO END LINES (rotate these):**
-- "...bro", "...yo", "...fr", "...ngl", "...lowkey", "...deadass", "...no cap", "...man"
+- Natural full stops. No forced endings.
+- Occasionally: "...man", "...yo", "...fr" (only if it fits)
 
 **NATURAL SPEECH RULES:**
 - Contractions always: "he's", "ain't", "gonna", "wanna", "kinda", "gotta"
 - Fragments OK: "Nah. That's cooked." (not "That is cooked.")
-- Self-interrupt: "Wait — wait — hold up — YO what?!"
-- Repeat for hype: "Okay okay okay", "Wait wait wait", "Yo yo yo"
+- Self-interrupt: "Wait — wait — hold up — what?!"
+- Repeat for hype: "Okay okay okay", "Wait wait wait"
 - 5-8 words max per line. Short. Punchy. Snappy.
 
 **⚠️⚠️⚠️ VIEWER RETENTION RULES — MOST IMPORTANT ⚠️⚠️⚠️**
@@ -832,22 +817,21 @@ The FIRST line of commentary is the MOST CRITICAL. It decides if viewer stays or
 
 **🎯 RULE #2: NEVER REPEAT SAME STARTER TWICE IN A ROW**
 - Don't start 2 lines with "Yo" back-to-back
-- Rotate: "Yo" → "Bro" → "Wait" → "Nah" → "Okay" → "Ayy"
-- Don't use "bro" more than 3-4 times TOTAL
+- Rotate: "Wait" → "Look" → "Okay" → "Nah" → "Hold up" → "See this"
+- Don't use "bro" more than 2-3 times TOTAL
 - Don't use "fr" or "lowkey" every line
 
 **🎯 RULE #3: REACT, DON'T DESCRIBE**
 - ✅ "BRO! HE'S COOKED!" (reaction)
 - ❌ "The enemy was defeated" (description)
-- ✅ "OHHH! That was FILTHY!" (reaction)
+- ✅ "OH! That was insane!" (reaction)
 - ❌ "That was a good shot" (description)
 
 **🎯 RULE #4: ADD 2-3 QUESTIONS TO VIEWER**
-- "You seeing this bro?"
+- "You seeing this?"
 - "Should I try this?"
 - "What is happening?!"
 - "Is this real?!"
-- These create engagement — viewers comment
 
 **🎯 RULE #5: ENERGY CURVE (mix high/low)**
 - Don't keep same energy entire video
@@ -857,20 +841,18 @@ The FIRST line of commentary is the MOST CRITICAL. It decides if viewer stays or
 - Calm scene = LOW energy (chill, observational)
 
 **🎯 RULE #6: CTA 2-3 TIMES (spread out)**
-- "Ayy if you're vibing, hit that follow yo."
+- "Ayy if you're vibing, hit that follow."
 - "Smash that like!"
 - "Ring the bell!"
-- "Follow for more chaos fr."
-- Don't spam — spread across the video
+- "Follow for more chaos."
 
 **🎯 RULE #7: VARY LINE LENGTHS**
-- Some 3-word lines: "BRO! HE'S GONE!"
-- Some 5-word lines: "Yo that was lowkey fire"
-- Some 8-word lines: "Wait wait wait — you seeing this bro?!"
-- Don't make every line same length
+- Some 3-word lines
+- Some 5-word lines
+- Some 8-word lines
 
 **REACTION PATTERNS (use 10-14 varied):**
-1. BIG ACTION: "OHHHH! He's GONE!", "BRO! That was NASTY!", "Yo he's COOKED!", "That was actually crazy!"
+1. BIG ACTION: "OHHHH! He's GONE!", "BRO! That was NASTY!", "Yo he's COOKED!"
 2. VIEWER QUESTIONS (2-4): "Guys, is this game worth buying?", "Yo should I try this fr?"
 3. GRAPHICS (2-3): "Bro these graphics are INSANE!", "Yo the visuals are FIRE no cap!"
 4. ENEMY ROAST: "Bro this guy's aim is worse than mine.", "Nah bro you're trash fr."
@@ -895,7 +877,7 @@ The FIRST line of commentary is the MOST CRITICAL. It decides if viewer stays or
 ❌ BAD (repetitive):
 "Yo bro! Yo bro! YO! Look at this bro! Yo!"
 ✅ GOOD (varied):
-"Yo this is crazy — wait — BRO! Look at that!"
+"Wait — BRO! Look at that! Okay okay — nah that's crazy."
 
 ❌ BAD (too formal):
 "The character is now engaging in combat with the enemy."
@@ -904,23 +886,23 @@ The FIRST line of commentary is the MOST CRITICAL. It decides if viewer stays or
 
 ❌ BAD (over-hyped on calm):
 "OHHHH! WOW! THE SKYLINE IS AMAZING YO!"
-✅ GOOD (chill with slang):
-"Yo this view is lowkey goated ngl."
+✅ GOOD (chill):
+"This view is actually beautiful."
 
 ❌ BAD (no hook at start):
 "So in this clip, we're going to look at..."
 ✅ GOOD (hook at start):
-"YO! You GOTTA see this bro!"
+"YO! You GOTTA see this!"
 
 ❌ BAD (no variety):
 "Bro bro bro bro bro"
 ✅ GOOD (variety):
-"Yo — wait — BRO! Okay okay — nah that's crazy."
+"Wait — BRO! Okay okay — nah that's crazy."
 
 **🎭 SCENE-MATCHING:**
 - ACTION → shout, hype, CAPS lines, short bursts
-- DIALOG → conversational slang, curious, natural — NO shouting
-- CALM → chill slang, relaxed, observational — NO hype
+- DIALOG → conversational, curious, natural — NO shouting
+- CALM → chill, relaxed, observational — NO hype
 
 **🚫 NEVER shout on non-action scenes.**
 **🚫 NEVER be boring on action scenes.**
@@ -960,21 +942,19 @@ If you see ANY of these → visual_type = "action":
 **🔥 FIRE/EXPLOSIONS/MANY ENEMIES → ACTION.**
 
 **PACING:**
-- "action" → 3-5 words, HIGH energy, CAPS, slang
-- "dialog" → 5-7 words, conversational slang
-- "calm" → 6-8 words, chill slang
+- "action" → 3-5 words, HIGH energy, CAPS
+- "dialog" → 5-7 words, conversational
+- "calm" → 6-8 words, chill
 
 **RULES:**
 1. NATURAL LANGUAGE — slang SPARINGLY (max 2-3 times total)
-2. NATURAL — casual, contractions
-3. FIRST LINE = HOOK (most important)
-4. NEVER REPEAT STARTERS
-5. REACT, DON'T DESCRIBE
-6. ADD 2-3 QUESTIONS TO VIEWER
-7. ENERGY CURVE — mix high/low
-8. CTA 2-3 TIMES
-9. VARY LINE LENGTHS
-10. Max 2-3 follow requests total
+2. FIRST LINE = HOOK (most important)
+3. NEVER REPEAT STARTERS
+4. REACT, DON'T DESCRIBE
+5. ADD 2-3 QUESTIONS TO VIEWER
+6. ENERGY CURVE — mix high/low
+7. CTA 2-3 TIMES
+8. VARY LINE LENGTHS
 
 **STORY CONTEXT:**
 {srt_content[:2500]}
@@ -1000,11 +980,7 @@ Return ONLY valid JSON:
 """
 
     or_url = "https://openrouter.ai/api/v1/chat/completions"
-    b64_1 = encode_image(analysis_grid_path_1)
-    b64_2 = encode_image(analysis_grid_path_2)
-
-    print(f"   📦 Image 1 size: {len(b64_1)/1024/1024:.2f} MB (base64)")
-    print(f"   📦 Image 2 size: {len(b64_2)/1024/1024:.2f} MB (base64)")
+    analysis_b64 = encode_image(analysis_grid_path)
 
     payload = {
         "model": "openai/gpt-4o-mini",
@@ -1014,12 +990,7 @@ Return ONLY valid JSON:
                 {"type": "text", "text": prompt},
                 {"type": "image_url",
                  "image_url": {
-                     "url": f"data:image/jpeg;base64,{b64_1}",
-                     "detail": "high"
-                 }},
-                {"type": "image_url",
-                 "image_url": {
-                     "url": f"data:image/jpeg;base64,{b64_2}",
+                     "url": f"data:image/jpeg;base64,{analysis_b64}",
                      "detail": "high"
                  }}
             ]
@@ -1042,7 +1013,7 @@ Return ONLY valid JSON:
         for attempt in range(2):
             try:
                 print(f"      Attempt {attempt+1}/2...")
-                r = requests.post(or_url, headers=headers, json=payload, timeout=300)
+                r = requests.post(or_url, headers=headers, json=payload, timeout=240)
                 print(f"      Status: {r.status_code}")
 
                 if r.status_code == 200:
@@ -1163,9 +1134,6 @@ Return ONLY valid JSON:
                     continue
                 elif r.status_code == 402:
                     print(f"      💰 Key {key_idx} — credits khatam")
-                    break
-                elif r.status_code == 413:
-                    print(f"      📦 Payload too large! Sizes: {len(b64_1)/1024/1024:.1f}MB + {len(b64_2)/1024/1024:.1f}MB")
                     break
                 else:
                     print(f"      ⚠️ Error {r.status_code}: {r.text[:200]}")
@@ -1397,7 +1365,7 @@ def fallback_copy_original():
 # ============================================================
 def main():
     print("=" * 60)
-    print("🎙️ AI COMMENTARY DUBBER — v3.5 (2 Images + Purana Prompt)")
+    print("🎙️ AI COMMENTARY DUBBER — v3.4 (Simple Debug)")
     print("=" * 60)
     print(f"📹 Input : {FINAL_CLIP_PATH}")
     print(f"📤 Output: {FINAL_DUBBED_VIDEO}")
@@ -1405,7 +1373,7 @@ def main():
     print(f"🎛️  Switch: COMMENTARY_ENABLED = {COMMENTARY_ENABLED}")
     print(f"🎮 Speed : {VOICE_SPEED_MIN} - {VOICE_SPEED_MAX}")
     print(f"🔊 Volume: Action={VOL_ACTION}x | Other={VOL_OTHER}x")
-    print(f"🖼️  Frames: {ANALYSIS_FRAMES} ({FRAMES_PER_IMAGE} × 2 images, {GRID_COLS}x{GRID_ROWS}, {CANVAS_W}x{CANVAS_H} 8K)")
+    print(f"🖼️  Frames: {ANALYSIS_FRAMES} ({GRID_COLS}x{GRID_ROWS}, {CANVAS_W}x{CANVAS_H} 8K)")
     print(f"🤖 Model : openai/gpt-4o-mini (Free)")
     print("=" * 60 + "\n")
 
@@ -1429,8 +1397,8 @@ def main():
         srt_content = transcribe(AUDIO_PATH)
         slots = build_auto_slots(FINAL_CLIP_PATH, vid_dur, srt_content)
         slots = classify_slots_combined(FINAL_CLIP_PATH, slots, srt_content)
-        grid_path_1, grid_path_2 = build_analysis_grids(FINAL_CLIP_PATH, vid_dur)
-        segments = generate_full_script(slots, srt_content, grid_path_1, grid_path_2, vid_dur)
+        build_analysis_grid(FINAL_CLIP_PATH, vid_dur, num_frames=ANALYSIS_FRAMES)
+        segments = generate_full_script(slots, srt_content, ANALYSIS_GRID_PATH)
 
         if not segments:
             raise Exception("No segments generated")
