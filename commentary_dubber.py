@@ -885,7 +885,7 @@ Roast the ACTION, not the person. Make fun of the gameplay.
 8. WEIRD: "What even is that thing?!", "Bro what am I looking at?", "That's sus."
 9. Guys (2-4): "guys, you seeing this?!", "guys look at this bro!"
 10. FOLLOW REQUEST (2-3 total): "Ayy if you're vibing, hit that follow yo.", "Follow for more chaos fr."
-11. GRAPHICS PRAISE: "Nah the lighting is next level!", "Yo this engine is goated!"
+11. DON'T TALK ABOUT GRAPHICS EVERY TIME — Max 1 time in whole video. Only mention if it's truly amazing.
 12. ENVIRONMENT: "This map is beautiful ngl.", "Look at that skyline bro!"
 13. SOUND (2-3): "Yo did you HEAR that?!", "That sound effect is nasty bro."
 14. CINEMATIC SHOT: "That's a movie shot right there!", "Okay I'm saving this clip fr."
