@@ -351,7 +351,7 @@ def get_loudness_timeline(video_path):
         f'ametadata=print:key=lavfi.astats.Overall.RMS_level:file=-" '
         f'-f null - 2>&1'
     )
-    out = subprocess.run(cmd, shell=True, capture_output=True, text=True).stderr  # ✅ FIX
+    out = subprocess.run(cmd, shell=True, capture_output=True, text=True).stdout
     timeline = []
     t = 0.0
     for line in out.split("\n"):
@@ -742,8 +742,7 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 Don't mention character names in every line.
 - ONLY use a name when it's IMPORTANT (action, reveal, dialogue)
 - Normal commentary → NO names needed
-- If you don't know the name → don't guess, say what you SEE
-- NEVER use: "creature", "someone", "thing"
+- If you don't know the name → don't guess, say what you see
 
 **WHEN TO USE NAME:**
 - Character does something important
@@ -764,6 +763,11 @@ Mix hype with REAL observations. Notice details.
 - "Look at that face, bro. He's getting emotional."
 - "Wait, did you see that? That was clean."
 - "He's not gonna make it. Look at his health."
+- "Okay, that was actually a smart play."
+- "Bro, the graphics on this are insane."
+- "He's just standing there. What's he doing?"
+- "That was a close one, not gonna lie."
+- "Look at the way he's moving. He knows what he's doing."
 
 **BAD EXAMPLES (don't do this):**
 - "YO BRO! LET'S GO! YO YO YO!" (too hype, no substance)
@@ -782,28 +786,24 @@ Mix hype with REAL observations. Notice details.
 - Complete sentences, not just hype words
 - Real observations, not just reactions
 
-**SLANG WORDS (use SPARINGLY — max 2-3 times total):**
+**SLANG WORDS (use freely):**
 - "bro", "bruh", "yo", "nah", "fr", "lowkey", "highkey", "bet", "cap", "no cap"
 - "sick", "fire", "insane", "nasty", "goated", "cooked", "clapped", "cracked"
 - "deadass", "ong", "say less", "let him cook", "it's giving", "iykyk"
 - "yeet", "rizz", "sus", "mid", "W", "L", "GG", "POV"
 
+**⚠️ SLANG RULE — DON'T USE EVERY LINE ⚠️**
+- Use slang MAX 2-3 times in the WHOLE video
+- Most lines (90%) should be PLAIN English
+- Only use slang when it feels NATURAL
+
 **HOW TO START LINES (rotate these — don't repeat):**
-- "Wait...", "Okay...", "Look...", "Check it...", "See this...", "Watch this..."
-- "Hold up...", "Wait wait wait...", "Okay okay okay..."
-- "So...", "Alright...", "Now...", "Oh..."
-- Occasionally: "Yo...", "Bro..." (only if it fits)
+- "Yo...", "Bro...", "Bruh...", "Nah...", "Wait...", "Ayy...", "Okay..."
+- "Hold up...", "Yo yo yo...", "Wait wait wait...", "Okay okay okay..."
+- "Look...", "Check it...", "See this...", "Watch this..."
 
 **HOW TO END LINES (rotate these):**
-- Natural full stops. No forced endings.
-- Occasionally: "...man", "...yo", "...fr" (only if it fits)
-
-**NATURAL SPEECH RULES:**
-- Contractions always: "he's", "ain't", "gonna", "wanna", "kinda", "gotta"
-- Fragments OK: "Nah. That's cooked." (not "That is cooked.")
-- Self-interrupt: "Wait — wait — hold up — what?!"
-- Repeat for hype: "Okay okay okay", "Wait wait wait"
-- 5-8 words max per line. Short. Punchy. Snappy.
+- "...bro", "...yo", "...fr", "...ngl", "...lowkey", "...deadass", "...no cap", "...man"
 
 **⚠️⚠️⚠️ VIEWER RETENTION RULES — MOST IMPORTANT ⚠️⚠️⚠️**
 
@@ -817,21 +817,22 @@ The FIRST line of commentary is the MOST CRITICAL. It decides if viewer stays or
 
 **🎯 RULE #2: NEVER REPEAT SAME STARTER TWICE IN A ROW**
 - Don't start 2 lines with "Yo" back-to-back
-- Rotate: "Wait" → "Look" → "Okay" → "Nah" → "Hold up" → "See this"
-- Don't use "bro" more than 2-3 times TOTAL
+- Rotate: "Yo" → "Bro" → "Wait" → "Nah" → "Okay" → "Ayy"
+- Don't use "bro" more than 3-4 times TOTAL
 - Don't use "fr" or "lowkey" every line
 
 **🎯 RULE #3: REACT, DON'T DESCRIBE**
 - ✅ "BRO! HE'S COOKED!" (reaction)
 - ❌ "The enemy was defeated" (description)
-- ✅ "OH! That was insane!" (reaction)
+- ✅ "OHHH! That was FILTHY!" (reaction)
 - ❌ "That was a good shot" (description)
 
 **🎯 RULE #4: ADD 2-3 QUESTIONS TO VIEWER**
-- "You seeing this?"
+- "You seeing this bro?"
 - "Should I try this?"
 - "What is happening?!"
 - "Is this real?!"
+- These create engagement — viewers comment
 
 **🎯 RULE #5: ENERGY CURVE (mix high/low)**
 - Don't keep same energy entire video
@@ -841,15 +842,37 @@ The FIRST line of commentary is the MOST CRITICAL. It decides if viewer stays or
 - Calm scene = LOW energy (chill, observational)
 
 **🎯 RULE #6: CTA 2-3 TIMES (spread out)**
-- "Ayy if you're vibing, hit that follow."
+- "Ayy if you're vibing, hit that follow yo."
 - "Smash that like!"
 - "Ring the bell!"
-- "Follow for more chaos."
+- "Follow for more chaos fr."
+- Don't spam — spread across the video
 
 **🎯 RULE #7: VARY LINE LENGTHS**
-- Some 3-word lines
-- Some 5-word lines
-- Some 8-word lines
+- Some 3-word lines: "BRO! HE'S GONE!"
+- Some 5-word lines: "Yo that was lowkey fire"
+- Some 8-word lines: "Wait wait wait — you seeing this bro?!"
+- Don't make every line same length
+
+**🎯 ROAST RULE — ROAST MANDATORY (2-3 TIMES) ⚠️**
+
+You MUST roast when you see:
+- Enemy misses a shot or has bad aim
+- Enemy dies in a stupid way
+- Player makes a funny mistake
+
+**HOW TO ROAST (light, funny, not offensive):**
+Roast the ACTION, not the person. Make fun of the gameplay.
+
+**EXAMPLES OF ROAST STYLE (DO NOT COPY EXACTLY, JUST MATCH THE TONE):**
+- Bad aim: "Bro is aiming with his feet."
+- Stupid death: "He really just walked into that."
+- Bad play: "What was the plan there?"
+
+**ROAST FREQUENCY:**
+- At least 2-3 times in the WHOLE video
+- Spread them out
+- Only when the moment fits
 
 **REACTION PATTERNS (use 10-14 varied):**
 1. BIG ACTION: "OHHHH! He's GONE!", "BRO! That was NASTY!", "Yo he's COOKED!"
@@ -877,7 +900,7 @@ The FIRST line of commentary is the MOST CRITICAL. It decides if viewer stays or
 ❌ BAD (repetitive):
 "Yo bro! Yo bro! YO! Look at this bro! Yo!"
 ✅ GOOD (varied):
-"Wait — BRO! Look at that! Okay okay — nah that's crazy."
+"Yo this is crazy — wait — BRO! Look at that!"
 
 ❌ BAD (too formal):
 "The character is now engaging in combat with the enemy."
@@ -886,23 +909,23 @@ The FIRST line of commentary is the MOST CRITICAL. It decides if viewer stays or
 
 ❌ BAD (over-hyped on calm):
 "OHHHH! WOW! THE SKYLINE IS AMAZING YO!"
-✅ GOOD (chill):
-"This view is actually beautiful."
+✅ GOOD (chill with slang):
+"Yo this view is lowkey goated ngl."
 
 ❌ BAD (no hook at start):
 "So in this clip, we're going to look at..."
 ✅ GOOD (hook at start):
-"YO! You GOTTA see this!"
+"YO! You GOTTA see this bro!"
 
 ❌ BAD (no variety):
 "Bro bro bro bro bro"
 ✅ GOOD (variety):
-"Wait — BRO! Okay okay — nah that's crazy."
+"Yo — wait — BRO! Okay okay — nah that's crazy."
 
 **🎭 SCENE-MATCHING:**
 - ACTION → shout, hype, CAPS lines, short bursts
-- DIALOG → conversational, curious, natural — NO shouting
-- CALM → chill, relaxed, observational — NO hype
+- DIALOG → conversational slang, curious, natural — NO shouting
+- CALM → chill slang, relaxed, observational — NO hype
 
 **🚫 NEVER shout on non-action scenes.**
 **🚫 NEVER be boring on action scenes.**
@@ -942,19 +965,21 @@ If you see ANY of these → visual_type = "action":
 **🔥 FIRE/EXPLOSIONS/MANY ENEMIES → ACTION.**
 
 **PACING:**
-- "action" → 3-5 words, HIGH energy, CAPS
-- "dialog" → 5-7 words, conversational
-- "calm" → 6-8 words, chill
+- "action" → 3-5 words, HIGH energy, CAPS, slang
+- "dialog" → 5-7 words, conversational slang
+- "calm" → 6-8 words, chill slang
 
 **RULES:**
-1. NATURAL LANGUAGE — slang SPARINGLY (max 2-3 times total)
-2. FIRST LINE = HOOK (most important)
-3. NEVER REPEAT STARTERS
-4. REACT, DON'T DESCRIBE
-5. ADD 2-3 QUESTIONS TO VIEWER
-6. ENERGY CURVE — mix high/low
-7. CTA 2-3 TIMES
-8. VARY LINE LENGTHS
+1. SLANG MANDATORY — bro, yo, nah, fr, lowkey, bet, cap, deadass
+2. NATURAL — casual, contractions
+3. FIRST LINE = HOOK (most important)
+4. NEVER REPEAT STARTERS
+5. REACT, DON'T DESCRIBE
+6. ADD 2-3 QUESTIONS TO VIEWER
+7. ENERGY CURVE — mix high/low
+8. CTA 2-3 TIMES
+9. VARY LINE LENGTHS
+10. Max 2-3 follow requests total
 
 **STORY CONTEXT:**
 {srt_content[:2500]}
@@ -1245,6 +1270,7 @@ def generate_audio(segments, slots):
                         "visual_type": visual_type
                     })
 
+                    # ✅ SIMPLE DEBUG — ek line mein
                     print(f"   ✅ [{seg['start']:5.1f}s] speed={voice_speed:.2f} ({visual_type or 'signal'}) | {text}")
             elif r.status_code == 401:
                 print("   ❌ 401 — ElevenLabs key galat!")
