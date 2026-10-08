@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v3.7 (Adaptive Frames)
+🎙️ AI Commentary Dubber — v3.8 (Purana Prompt + Slang Rule)
 ===============================================================
-FEATURES:
+FIXES:
   ✅ Loudness: stderr read
   ✅ Motion: frame-difference (tblend)
   ✅ Dynamic thresholds based on video profile
   ✅ Strong calm protection
   ✅ Adaptive frame count based on video duration
-  ✅ Original prompt preserved + dynamic image descriptions
+  ✅ AI has FINAL authority on visual_type
+  ✅ Slang ONLY for action scenes
+  ✅ Calm/Dialog: simple English, NO slang
 """
 
 import os
@@ -187,49 +189,29 @@ def speed_for_type(slot_type):
 # ADAPTIVE FRAME CONFIG
 # ============================================================
 def get_optimal_frame_config(vid_duration):
-    """
-    Video duration ke hisaab se optimal frame count aur images.
-    Returns: (total_frames, num_images, frames_per_image, grid_cols, grid_rows)
-    """
     if vid_duration <= 15:
-        total_frames = 120
-        num_images = 2
-        frames_per_image = 60
+        total_frames, num_images, frames_per_image = 120, 2, 60
         grid_cols, grid_rows = 10, 6
     elif vid_duration <= 30:
-        total_frames = 180
-        num_images = 2
-        frames_per_image = 90
+        total_frames, num_images, frames_per_image = 180, 2, 90
         grid_cols, grid_rows = 9, 10
     elif vid_duration <= 45:
-        total_frames = 180
-        num_images = 2
-        frames_per_image = 90
+        total_frames, num_images, frames_per_image = 180, 2, 90
         grid_cols, grid_rows = 9, 10
     elif vid_duration <= 60:
-        total_frames = 180
-        num_images = 2
-        frames_per_image = 90
+        total_frames, num_images, frames_per_image = 180, 2, 90
         grid_cols, grid_rows = 9, 10
     elif vid_duration <= 90:
-        total_frames = 240
-        num_images = 3
-        frames_per_image = 80
+        total_frames, num_images, frames_per_image = 240, 3, 80
         grid_cols, grid_rows = 10, 8
     elif vid_duration <= 120:
-        total_frames = 300
-        num_images = 4
-        frames_per_image = 75
+        total_frames, num_images, frames_per_image = 300, 4, 75
         grid_cols, grid_rows = 15, 5
     elif vid_duration <= 180:
-        total_frames = 360
-        num_images = 4
-        frames_per_image = 90
+        total_frames, num_images, frames_per_image = 360, 4, 90
         grid_cols, grid_rows = 10, 9
     else:
-        total_frames = 450
-        num_images = 5
-        frames_per_image = 90
+        total_frames, num_images, frames_per_image = 450, 5, 90
         grid_cols, grid_rows = 10, 9
 
     frame_gap = vid_duration / total_frames
@@ -297,20 +279,8 @@ def commit_analysis_to_github(grid_paths):
         subprocess.run("git config --global user.name 'GitHub Action'", shell=True, check=False)
         subprocess.run("git config --global user.email 'action@github.com'", shell=True, check=False)
 
-        print("   🔄 Fetching latest from remote...")
         subprocess.run("git fetch origin", shell=True, check=False)
-
-        print("   🔄 Rebasing with autostash...")
-        rebase_res = subprocess.run(
-            "git pull --rebase --autostash origin main",
-            shell=True, capture_output=True, text=True
-        )
-        if rebase_res.returncode != 0:
-            print(f"   ⚠️ Rebase on main failed, trying master...")
-            subprocess.run(
-                "git pull --rebase --autostash origin master",
-                shell=True, check=False
-            )
+        subprocess.run("git pull --rebase --autostash origin main", shell=True, check=False)
 
         for f in files_to_add:
             subprocess.run(f"git add {f}", shell=True, check=False)
@@ -321,7 +291,7 @@ def commit_analysis_to_github(grid_paths):
             shell=True, capture_output=True, text=True
         )
         if commit_res.returncode == 0:
-            print("   ✅ Committed analysis images.")
+            print("   ✅ Committed.")
         else:
             print("   ℹ️ No changes to commit.")
 
@@ -330,20 +300,12 @@ def commit_analysis_to_github(grid_paths):
             shell=True, capture_output=True, text=True
         )
         if push_res.returncode == 0:
-            print("   🚀 Pushed to GitHub successfully.")
+            print("   🚀 Pushed to GitHub.")
         else:
-            print(f"   ⚠️ Force-with-lease failed, trying normal push...")
-            push_res2 = subprocess.run(
-                "git push origin HEAD",
-                shell=True, capture_output=True, text=True
-            )
-            if push_res2.returncode == 0:
-                print("   🚀 Pushed (normal) to GitHub successfully.")
-            else:
-                print(f"   ❌ Push failed: {push_res2.stderr.strip()[:200]}")
+            subprocess.run("git push origin HEAD", shell=True, check=False)
 
     except Exception as e:
-        print(f"   ⚠️ Git operation failed: {e}")
+        print(f"   ⚠️ Git failed: {e}")
     print()
 
 
@@ -648,7 +610,8 @@ def classify_slots_combined(video_path, slots, srt_content):
                     "bang","drop","danger","whoa","oh","yeah","nice","sick",
                     "cook","big","fast"}
     DIALOG_WORDS = {"you","me","we","what","why","how","hey","listen","wait",
-                    "okay","yeah","know","think","feel","want","need","can","will"}
+                    "okay","yeah","know","think","feel","want","need","can","will",
+                    "gideon","kingpin","on your feet","copy that","roger"}
 
     for idx, slot in enumerate(slots, 1):
         md = get_motion_score(video_path, slot["start"], slot["end"])
@@ -777,16 +740,12 @@ def classify_slots_combined(video_path, slots, srt_content):
 # STEP 5 — BUILD ADAPTIVE ANALYSIS GRIDS
 # ============================================================
 def build_analysis_grids(video_path, vid_duration):
-    """
-    Adaptive: video duration ke hisaab se frames aur images banata hai.
-    """
     total_frames, num_images, frames_per_image, grid_cols, grid_rows = \
         get_optimal_frame_config(vid_duration)
 
     print(f"🖼️ [5] Building {num_images}× Analysis Grids ({CANVAS_W}×{CANVAS_H}) — "
           f"{frames_per_image} frames each (total {total_frames})...")
 
-    # Clean old files
     grid_paths = []
     for i in range(num_images):
         path = f"analysis/grid_part{i+1}.jpg"
@@ -797,7 +756,6 @@ def build_analysis_grids(video_path, vid_duration):
             except Exception as e:
                 print(f"   ⚠️  Could not delete {path}: {e}")
 
-    # Extract frames
     interval = vid_duration / total_frames
     frame_paths = []
     for i in range(total_frames):
@@ -812,7 +770,6 @@ def build_analysis_grids(video_path, vid_duration):
 
     print(f"   📸 Extracted {len(frame_paths)} frames")
 
-    # Font
     try:
         font = ImageFont.truetype(
             "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
@@ -830,7 +787,6 @@ def build_analysis_grids(video_path, vid_duration):
     cell_w = CANVAS_W // grid_cols
     cell_h = CANVAS_H // grid_rows
 
-    # Build N images
     for img_idx in range(num_images):
         start_i = img_idx * frames_per_image
         end_i = start_i + frames_per_image
@@ -877,7 +833,6 @@ def build_analysis_grids(video_path, vid_duration):
         print(f"   ✅ Part {img_idx+1}: {grid.size[0]}x{grid.size[1]} ({size_mb:.2f} MB)")
         print(f"      💾 {save_path}")
 
-    # Cleanup
     for fp, _ in frame_paths:
         if os.path.exists(fp):
             os.remove(fp)
@@ -887,7 +842,7 @@ def build_analysis_grids(video_path, vid_duration):
 
 
 # ============================================================
-# STEP 6 — GPT Call
+# STEP 6 — GPT Call (PURANA PROMPT + SLANG RULE)
 # ============================================================
 def generate_full_script(slots, srt_content, grid_paths, vid_duration,
                          total_frames, num_images, frames_per_image):
@@ -899,7 +854,7 @@ def generate_full_script(slots, srt_content, grid_paths, vid_duration,
         sa = s.get("sub_analysis", {})
         slot_lines.append(
             f"- Slot {i}: {s['start']:.1f}s → {s['end']:.1f}s "
-            f"[{s['type'].upper()}] "
+            f"[SIGNAL={s['type'].upper()}] "
             f"(scenes={s['scene_count']}, loud={s['avg_loud']}dB, "
             f"action={sa.get('action_ratio', 0)}, dialog={sa.get('dialog_ratio', 0)}, "
             f"motion={sa.get('motion_per_sec', 0)}) "
@@ -934,15 +889,46 @@ You shout, laugh, hype, roast. Pure energy. Zero boring lines.
 Look at the frames. React LOUDLY like a real streamer watching live gameplay.
 Focus on VISUALS — characters, screens, action, environment, weapons, enemies, faces, graphics.
 
+**⚠️⚠️⚠️ YOU HAVE FINAL AUTHORITY ON visual_type ⚠️⚠️⚠️**
+
+The slot's `[SIGNAL=...]` is just a HINT from audio/motion analysis.
+**YOU decide the final visual_type based on what you SEE in the frames.**
+
+**PRIORITY:**
+1. **YOUR VISUAL ANALYSIS** — what you see in frames → FINAL
+2. **SIGNAL HINT** — only if you're unsure
+
+**EXAMPLES:**
+- Signal says ACTION but frames show black screen → YOU say "calm"
+- Signal says ACTION but frames show dialogue → YOU say "dialog"
+- Signal says CALM but frames show explosion → YOU say "action"
+- Signal says ACTION and frames show firing → YOU say "action" ✅
+
+**TRUST YOUR EYES. The signal is just a helper.**
+
 **🎙️ HOW TO TALK — SLANG-FILLED STREAMER VIBE:**
 
-Talk like a real Gen-Z streamer. Slang is MANDATORY. Use it naturally — not forced.
+Talk like a real Gen-Z streamer. Slang is MANDATORY for ACTION scenes.
 
-**SLANG WORDS (use freely):**
-- "bro", "bruh", "yo", "nah", "fr", "lowkey", "highkey", "bet", "cap", "no cap"
-- "sick", "fire", "insane", "nasty", "goated", "cooked", "clapped", "cracked"
-- "deadass", "ong", "say less", "let him cook", "it's giving", "iykyk"
-- "yeet", "rizz", "sus", "mid", "W", "L", "GG", "POV"
+**⚠️ SLANG RULE — ONLY FOR ACTION SCENES ⚠️**
+
+**If type = "action":**
+- SLANG MANDATORY — use freely
+- Slang words: "bro", "bruh", "yo", "nah", "fr", "lowkey", "bet", "cap", "no cap", "sick", "fire", "insane", "nasty", "goated", "cooked", "clapped", "cracked", "deadass", "say less", "let him cook", "W", "L", "GG"
+- HIGH energy, CAPS allowed
+- Example: "BRO! He's COOKED!", "Yo that was NASTY fr!"
+
+**If type = "dialog":**
+- ❌ NO SLANG — Use simple, natural, conversational English
+- Contractions OK: "he's", "ain't", "gonna"
+- Example: "Wait, what did he say?", "Hmm interesting...", "What's the plan here?"
+
+**If type = "calm":**
+- ❌ NO SLANG — Use simple, observational English
+- Example: "This view is beautiful.", "Just taking it all in.", "Nice and quiet here."
+
+**⚠️ NEVER use slang on calm or dialog scenes.**
+**⚠️ NEVER use formal language on action scenes.**
 
 **HOW TO START LINES (rotate these — don't repeat):**
 - "Yo...", "Bro...", "Bruh...", "Nah...", "Wait...", "Ayy...", "Okay..."
@@ -1082,6 +1068,7 @@ If you see ANY of these → visual_type = "action":
 - Close-up of face while speaking
 - Character standing still, facing camera
 - Conversation scene
+- Subtitle text on screen
 
 **visual_type = "calm" for EVERYTHING ELSE:**
 - Slow camera panning
@@ -1090,8 +1077,9 @@ If you see ANY of these → visual_type = "action":
 - Menu / UI screens
 - Walking slowly
 - Environment only shots
+- Black screen / dark frame
 
-**⚠️ BE HONEST. If slow motion/sitting/walking/scenery → "calm".**
+**⚠️ BE HONEST. If slow motion/sitting/walking/scenery/black → "calm".**
 **🔴 Two characters CLOSE and ENGAGED → ACTION.**
 **🔥 FIRE/EXPLOSIONS/MANY ENEMIES → ACTION.**
 
@@ -1111,6 +1099,7 @@ If you see ANY of these → visual_type = "action":
 8. CTA 2-3 TIMES
 9. VARY LINE LENGTHS
 10. Max 2-3 follow requests total
+11. **TRUST YOUR EYES OVER SIGNAL HINT**
 
 **STORY CONTEXT:**
 {srt_content[:2500]}
@@ -1187,7 +1176,53 @@ Return ONLY valid JSON:
                     parsed = json.loads(raw)
                     segments = parsed.get("segments", [])
 
-                    print(f"   ✅ Key {key_idx} worked! {len(segments)} segments\n")
+                    print(f"   ✅ Key {key_idx} worked! {len(segments)} segments")
+                    
+                    updated = 0
+                    override_count = 0
+                    
+                    for seg in segments:
+                        vt = (seg.get("visual_type") or "").lower().strip()
+                        if vt not in ("action", "dialog", "calm"):
+                            continue
+                        
+                        best_slot = None
+                        best_diff = 999
+                        for slot in slots:
+                            diff = abs(slot["start"] - seg.get("start", 0))
+                            if diff < best_diff:
+                                best_diff = diff
+                                best_slot = slot
+                        
+                        if best_slot and best_diff < 2.5:
+                            signal_type = best_slot.get("type", "calm")
+                            motion_per_sec = best_slot.get("motion_per_sec", 0)
+                            slot_loud = best_slot.get("avg_loud", -50)
+                            
+                            best_slot["gpt_type"] = vt
+                            final_type = vt  # AI decision is FINAL
+                            
+                            # Light override — only absolute extreme cases
+                            if vt == "calm" and motion_per_sec >= 25 and slot_loud > -10:
+                                final_type = "action"
+                                override_count += 1
+                            elif vt == "action" and motion_per_sec < 1 and slot_loud < -50:
+                                final_type = "calm"
+                                override_count += 1
+                            
+                            best_slot["final_type"] = final_type
+                            best_slot["visual_type"] = final_type
+                            best_slot["type"] = final_type
+                            
+                            if final_type != signal_type:
+                                best_slot["voice_speed"] = speed_for_type(final_type)
+                            
+                            updated += 1
+                    
+                    print(f"   🎯 Applied to {updated} slots")
+                    print(f"   🔄 Extreme overrides: {override_count}")
+                    print(f"   🤖 AI decisions respected: {updated - override_count}\n")
+                    
                     return segments
 
                 elif r.status_code in (401, 403):
@@ -1433,15 +1468,16 @@ def fallback_copy_original():
 # ============================================================
 def main():
     print("=" * 60)
-    print("🎙️ AI COMMENTARY DUBBER — v3.7 (Adaptive Frames)")
+    print("🎙️ AI COMMENTARY DUBBER — v3.8 (Purana Prompt + Slang Rule)")
     print("=" * 60)
     print(f"📹 Input : {FINAL_CLIP_PATH}")
     print(f"📤 Output: {FINAL_DUBBED_VIDEO}")
     print(f"🎤 Voice : {VOICE_ID}")
     print(f"🎛️  Switch: COMMENTARY_ENABLED = {COMMENTARY_ENABLED}")
     print(f"🎮 Speed : {VOICE_SPEED_MIN} - {VOICE_SPEED_MAX}")
-    print(f"🔊 Volume: Action={VOL_ACTION}x | Other={VOL_OTHER}x")
+    print(f"🔊 Volume: Action={VOL_ACTION}x | Other={VOL_OTHER}x | Duck={DUCK_VOLUME}")
     print(f"🤖 Model : openai/gpt-4o-mini (Free)")
+    print(f"🎭 Slang : Action only (Calm/Dialog use simple English)")
     print("=" * 60 + "\n")
 
     if not COMMENTARY_ENABLED:
