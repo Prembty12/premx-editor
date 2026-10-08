@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 27 | **Last Updated:** 2026-10-08 10:04:55 AM IST
+**Total Videos:** 26 | **Last Updated:** 2026-10-08 10:07:07 AM IST
 
 ---
 
@@ -10,10 +10,10 @@
 
 | Metric | Value |
 |---|---|
-| Total Videos | **27** |
-| Posted (FB or IG) | 4 / 27 |
-| FB Posted | 2 / 27 |
-| IG Posted | 2 / 27 |
+| Total Videos | **26** |
+| Posted (FB or IG) | 4 / 26 |
+| FB Posted | 2 / 26 |
+| IG Posted | 2 / 26 |
 | Total FB Views | **280** |
 | Total IG Views | **30** |
 
@@ -36,17 +36,16 @@
 | 11 | Wolverine23 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine23.mp4) |
 | 12 | Wolverine22 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine22.mp4) |
 | 13 | Wolverine21 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine21.mp4) |
-| 14 | Wolverine16 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine16.mp4) |
-| 15 | Wolverine15 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine15.mp4) |
-| 16 | Wolverine14 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine14.mp4) |
-| 17 | Wolverine13 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine13.mp4) |
-| 18 | Wolverine12 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine12.mp4) |
-| 19 | Wolverine11 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine11.mp4) |
-| 20 | Wolverine10 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine10.mp4) |
-| 21 | Wolverine9 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine9.mp4) |
-| 22 | Wolverine8 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine8.mp4) |
-| 23 | Wolverine7 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine7.mp4) |
-| 24 | Wolverine6 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine6.mp4) |
-| 25 | Wolverine5 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine5.mp4) |
-| 26 | Wolverine4 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine4.mp4) |
-| 27 | Wolverine3 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine3.mp4) |
+| 14 | Wolverine15 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine15.mp4) |
+| 15 | Wolverine14 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine14.mp4) |
+| 16 | Wolverine13 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine13.mp4) |
+| 17 | Wolverine12 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine12.mp4) |
+| 18 | Wolverine11 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine11.mp4) |
+| 19 | Wolverine10 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine10.mp4) |
+| 20 | Wolverine9 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine9.mp4) |
+| 21 | Wolverine8 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine8.mp4) |
+| 22 | Wolverine7 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine7.mp4) |
+| 23 | Wolverine6 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine6.mp4) |
+| 24 | Wolverine5 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine5.mp4) |
+| 25 | Wolverine4 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine4.mp4) |
+| 26 | Wolverine3 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine3.mp4) |
