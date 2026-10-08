@@ -4,6 +4,5 @@
 GearsOfWar7 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar7.mp4
 GearsOfWar8 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar8.mp4
 
-GearsOfWar10 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar10.mp4
 GearsOfWar11 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar11.mp4
 
