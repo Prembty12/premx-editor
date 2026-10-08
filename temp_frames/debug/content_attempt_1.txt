@@ -1,1 +1,1 @@
-{"clip_duration": 20, "reason": "Intense combat with scanner and explosions", "start_time": 10, "status": "APPROVE", "title": "4 Enemies Cooked Scanner 🎯🔥"}
+{"clip_duration": 24, "reason": "Intense warehouse brawl with multiple enemies", "start_time": 6, "status": "APPROVE", "title": "He Cooked 5 Enemies Alone 🔥"}
