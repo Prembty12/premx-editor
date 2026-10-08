@@ -1,10 +1,10 @@
 {
-  "last_updated": "2026-10-08 10:46:57 AM",
+  "last_updated": "2026-10-08 10:51:58 AM",
   "period_days": 7,
   "trending": [
     {
       "game": "GearsOfWar",
-      "views_7d": 2500,
+      "views_7d": 2501,
       "avg_per_video": 625,
       "trend": "viral",
       "ratio": 2.056887635166902,
@@ -13,7 +13,7 @@
     },
     {
       "game": "VietnamCavePrison",
-      "views_7d": 4127,
+      "views_7d": 4128,
       "avg_per_video": 589,
       "trend": "trending",
       "ratio": 1.9384109073812883,
@@ -97,7 +97,7 @@
   ],
   "recommendation": {
     "game": "GearsOfWar",
-    "views_7d": 2500,
+    "views_7d": 2501,
     "avg_per_video": 625,
     "trend": "viral",
     "ratio": 2.056887635166902,
