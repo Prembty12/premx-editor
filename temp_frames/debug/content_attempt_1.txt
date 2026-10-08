@@ -1,1 +1,1 @@
-{"clip_duration": 33, "reason": "Crash explosion and survivor walkout sequence", "start_time": 12, "status": "APPROVE", "title": "5 Brave Survivors Walk After Crash 💥"}
+{"clip_duration": 28, "reason": "Titan giant hand combat and magic fight", "start_time": 10, "status": "APPROVE", "title": "Giant Hand Combat 5 Enemies 🔥🎯"}
