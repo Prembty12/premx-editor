@@ -1,1 +1,7 @@
-{"clip_duration": 40, "reason": "Cinematic jet strike with massive explosions", "start_time": 0, "status": "APPROVE", "title": "5 Jets Strike Massive Desert Base 💥🔥"}
+{
+  "clip_duration": 15,
+  "reason": "Gory monster attack and cinematic tension",
+  "start_time": 0,
+  "status": "APPROVE",
+  "title": "Soldier Ripped In Half By Monster 🔥😳"
+}
