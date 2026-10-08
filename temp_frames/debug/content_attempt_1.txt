@@ -1,7 +1,1 @@
-{
-  "clip_duration": 15,
-  "reason": "Gory monster attack and cinematic tension",
-  "start_time": 0,
-  "status": "APPROVE",
-  "title": "Soldier Ripped In Half By Monster 🔥😳"
-}
+{"clip_duration":44,"reason":"Intense fiery battlefield shootout action","start_time":10,"status":"APPROVE","title":"1 Gun Vs Fiery Storm 🔥🎯"}
