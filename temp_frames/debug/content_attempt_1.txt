@@ -1,1 +1,1 @@
-{"clip_duration": 40, "reason": "Intense indoor CQB shootout with continuous firing", "start_time": 5, "status": "APPROVE", "title": "Room Breach 5 Enemies Down Fast 🔥🎯"}
+{"clip_duration": 33, "reason": "Crash explosion and survivor walkout sequence", "start_time": 12, "status": "APPROVE", "title": "5 Brave Survivors Walk After Crash 💥"}
