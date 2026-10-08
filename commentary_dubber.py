@@ -1,16 +1,9 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v3.8 (Purana Prompt + Slang Rule)
+🎙️ AI Commentary Dubber — v3.5 (2 Images + Purana Prompt)
 ===============================================================
-FIXES:
-  ✅ Loudness: stderr read
-  ✅ Motion: frame-difference (tblend)
-  ✅ Dynamic thresholds based on video profile
-  ✅ Strong calm protection
-  ✅ Adaptive frame count based on video duration
-  ✅ AI has FINAL authority on visual_type
-  ✅ Slang ONLY for action scenes
-  ✅ Calm/Dialog: simple English, NO slang
+Simple debug format:
+  [timestamp] speed=X.XX (type) | AI Commentary
 """
 
 import os
@@ -79,16 +72,21 @@ VOICE_ID           = ARGS.voice or os.getenv("VOICE_ID", "91w4XjqhkWTX1Jr3O344")
 AUDIO_PATH         = "extracted_audio.mp3"
 SRT_PATH           = "final.srt"
 ANALYSIS_DIR       = "analysis"
+ANALYSIS_GRID_PATH_1 = "analysis/last_analysis_1.jpg"
+ANALYSIS_GRID_PATH_2 = "analysis/last_analysis_2.jpg"
 SEGMENTS_DIR       = "segments"
 
 MIN_SLOTS_HARD = 6
 MAX_SLOTS_HARD = 20
 DUCK_VOLUME = 0.25
 
-# Canvas (fixed)
+# 180 frames — 2 images × 90 frames (9x10 grid each) — 8K portrait
+ANALYSIS_FRAMES = 180
+FRAMES_PER_IMAGE = 90
+GRID_COLS = 9
+GRID_ROWS = 10
 CANVAS_W = 4320
 CANVAS_H = 7680
-JPEG_QUALITY = 92
 
 # Voice speed limits
 VOICE_SPEED_MIN = 1.00
@@ -186,101 +184,56 @@ def speed_for_type(slot_type):
 
 
 # ============================================================
-# ADAPTIVE FRAME CONFIG
-# ============================================================
-def get_optimal_frame_config(vid_duration):
-    if vid_duration <= 15:
-        total_frames, num_images, frames_per_image = 120, 2, 60
-        grid_cols, grid_rows = 10, 6
-    elif vid_duration <= 30:
-        total_frames, num_images, frames_per_image = 180, 2, 90
-        grid_cols, grid_rows = 9, 10
-    elif vid_duration <= 45:
-        total_frames, num_images, frames_per_image = 180, 2, 90
-        grid_cols, grid_rows = 9, 10
-    elif vid_duration <= 60:
-        total_frames, num_images, frames_per_image = 180, 2, 90
-        grid_cols, grid_rows = 9, 10
-    elif vid_duration <= 90:
-        total_frames, num_images, frames_per_image = 240, 3, 80
-        grid_cols, grid_rows = 10, 8
-    elif vid_duration <= 120:
-        total_frames, num_images, frames_per_image = 300, 4, 75
-        grid_cols, grid_rows = 15, 5
-    elif vid_duration <= 180:
-        total_frames, num_images, frames_per_image = 360, 4, 90
-        grid_cols, grid_rows = 10, 9
-    else:
-        total_frames, num_images, frames_per_image = 450, 5, 90
-        grid_cols, grid_rows = 10, 9
-
-    frame_gap = vid_duration / total_frames
-
-    print(f"📐 [Frame Config] Duration: {vid_duration:.1f}s")
-    print(f"   → Total frames: {total_frames}")
-    print(f"   → Images: {num_images} × {frames_per_image} frames")
-    print(f"   → Grid: {grid_cols}×{grid_rows}")
-    print(f"   → Frame gap: {frame_gap:.3f}s ({1/frame_gap:.1f} FPS)")
-    print()
-
-    return total_frames, num_images, frames_per_image, grid_cols, grid_rows
-
-
-# ============================================================
-# MOTION SCORE — frame difference (tblend + blackframe)
+# MOTION SCORE — Frame Difference Based Action Detection
 # ============================================================
 def get_motion_score(video_path, start, end):
     try:
         duration = max(end - start, 0.5)
         cmd = (
             f'ffmpeg -ss {start:.2f} -t {duration:.2f} -i {video_path} '
-            f'-vf "tblend=all_mode=difference,blackframe=99:32" '
+            f'-vf "select=\'gt(scene,0.1)\',metadata=print" '
             f'-f null - 2>&1'
         )
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-        out = result.stderr
-
-        black_frames = len(re.findall(r"blackframe", out))
-
-        fps_match = re.search(r"(\d+\.?\d*)\s*fps", out)
-        fps = float(fps_match.group(1)) if fps_match else 30.0
-        total_frames = int(fps * duration)
-
-        motion_score = max(0, total_frames - black_frames)
-        motion_per_sec = motion_score / duration if duration > 0 else 0
-
-        return {
-            "motion_score": motion_score,
-            "black_frames": black_frames,
-            "total_frames": total_frames,
-            "motion_per_sec": round(motion_per_sec, 2),
-            "fps": fps
-        }
-    except Exception as e:
-        print(f"   ⚠️ motion fail: {e}")
-        return {
-            "motion_score": 0, "black_frames": 0,
-            "total_frames": 0, "motion_per_sec": 0, "fps": 30.0
-        }
+        out = subprocess.run(cmd, shell=True, capture_output=True, text=True).stderr
+        motion_events = len(re.findall(r"pts_time", out))
+        return motion_events
+    except Exception:
+        return 0
 
 
 # ============================================================
 # GIT PUSH
 # ============================================================
-def commit_analysis_to_github(grid_paths):
+def commit_analysis_to_github():
     print("📤 [10] Pushing analysis images to GitHub...")
 
-    files_to_add = [f for f in grid_paths if os.path.exists(f)]
+    files_to_add = []
+    for p in [ANALYSIS_GRID_PATH_1, ANALYSIS_GRID_PATH_2]:
+        if os.path.exists(p):
+            files_to_add.append(p)
+
     if not files_to_add:
-        print("   ⚠️ No analysis images found, skipping git commit.")
+        print("   ⚠️ No analysis image found, skipping git commit.")
         return
 
     try:
         subprocess.run("git config --global user.name 'GitHub Action'", shell=True, check=False)
         subprocess.run("git config --global user.email 'action@github.com'", shell=True, check=False)
 
+        print("   🔄 Fetching latest from remote...")
         subprocess.run("git fetch origin", shell=True, check=False)
-        subprocess.run("git pull --rebase --autostash origin main", shell=True, check=False)
+
+        print("   🔄 Rebasing with autostash...")
+        rebase_res = subprocess.run(
+            "git pull --rebase --autostash origin main",
+            shell=True, capture_output=True, text=True
+        )
+        if rebase_res.returncode != 0:
+            print(f"   ⚠️ Rebase on main failed, trying master...")
+            subprocess.run(
+                "git pull --rebase --autostash origin master",
+                shell=True, check=False
+            )
 
         for f in files_to_add:
             subprocess.run(f"git add {f}", shell=True, check=False)
@@ -291,7 +244,7 @@ def commit_analysis_to_github(grid_paths):
             shell=True, capture_output=True, text=True
         )
         if commit_res.returncode == 0:
-            print("   ✅ Committed.")
+            print("   ✅ Committed analysis images.")
         else:
             print("   ℹ️ No changes to commit.")
 
@@ -300,12 +253,20 @@ def commit_analysis_to_github(grid_paths):
             shell=True, capture_output=True, text=True
         )
         if push_res.returncode == 0:
-            print("   🚀 Pushed to GitHub.")
+            print("   🚀 Pushed to GitHub successfully.")
         else:
-            subprocess.run("git push origin HEAD", shell=True, check=False)
+            print(f"   ⚠️ Force-with-lease failed, trying normal push...")
+            push_res2 = subprocess.run(
+                "git push origin HEAD",
+                shell=True, capture_output=True, text=True
+            )
+            if push_res2.returncode == 0:
+                print("   🚀 Pushed (normal) to GitHub successfully.")
+            else:
+                print(f"   ❌ Push failed: {push_res2.stderr.strip()[:200]}")
 
     except Exception as e:
-        print(f"   ⚠️ Git failed: {e}")
+        print(f"   ⚠️ Git operation failed: {e}")
     print()
 
 
@@ -393,37 +354,22 @@ def get_scene_timeline(video_path):
 
 
 def get_loudness_timeline(video_path):
-    print("🔊 [Loudness] Extracting RMS timeline...")
     cmd = (
         f'ffmpeg -i {video_path} -af "astats=metadata=1:reset=1,'
         f'ametadata=print:key=lavfi.astats.Overall.RMS_level:file=-" '
         f'-f null - 2>&1'
     )
-    result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-    out = result.stderr
-
+    out = subprocess.run(cmd, shell=True, capture_output=True, text=True).stderr
     timeline = []
     t = 0.0
     for line in out.split("\n"):
         m = re.search(r"RMS_level=(-?[\d.]+|inf)", line)
-        if m:
-            val = m.group(1)
-            if val == "-inf":
-                timeline.append((round(t, 2), -60.0))
-            else:
-                try:
-                    timeline.append((round(t, 2), float(val)))
-                except:
-                    pass
+        if m and m.group(1) != "-inf":
+            try:
+                timeline.append((t, float(m.group(1))))
+            except:
+                pass
             t += 0.1
-
-    if timeline:
-        vals = [v for _, v in timeline]
-        print(f"   ✅ Samples: {len(timeline)}")
-        print(f"   📊 dB range: {min(vals):.1f} → {max(vals):.1f} | avg={sum(vals)/len(vals):.1f}")
-        print(f"   ⏱️  Covers: 0.0s → {timeline[-1][0]:.1f}s")
-    else:
-        print("   ❌ EMPTY — ffmpeg astats fail!")
     return timeline
 
 
@@ -548,7 +494,6 @@ def build_auto_slots(video_path, vid_duration, srt_content):
             "sub_analysis": {},
             "voice_speed": 1.0,
             "motion_score": 0,
-            "motion_per_sec": 0,
             "gpt_type": None,
             "final_type": None,
             "speed_boost_log": []
@@ -566,59 +511,31 @@ def build_auto_slots(video_path, vid_duration, srt_content):
 
 
 # ============================================================
-# STEP 4 — CLASSIFY SLOTS
+# STEP 4 — SIGNAL-BASED CLASSIFY
 # ============================================================
 def classify_slots_combined(video_path, slots, srt_content):
-    print("🔍 [4] Classifying slots...")
-    print("=" * 70)
+    print("🔍 [4] Classifying slots (signal + motion score)...")
 
     scene_times = get_scene_timeline(video_path)
     loud_timeline = get_loudness_timeline(video_path)
     srt_entries = parse_srt(srt_content)
 
-    global_motions = []
-    for s in slots[:3]:
-        md = get_motion_score(video_path, s["start"], s["end"])
-        global_motions.append(md["motion_per_sec"])
-    global_avg = sum(global_motions) / max(len(global_motions), 1)
+    print(f"   🎬 Scene cuts: {len(scene_times)}")
+    print(f"   🔊 Loudness samples: {len(loud_timeline)}")
+    print(f"   📝 SRT entries: {len(srt_entries)}\n")
 
-    if global_avg > 15:
-        MOTION_CALM_MAX = 5
-        MOTION_ACTION_MIN = 15
-        LOUD_CALM_MAX = -25
-        profile = "HIGH_MOTION (FPS/Action)"
-    elif global_avg > 5:
-        MOTION_CALM_MAX = 3
-        MOTION_ACTION_MIN = 8
-        LOUD_CALM_MAX = -30
-        profile = "MIXED (Gameplay)"
-    else:
-        MOTION_CALM_MAX = 2
-        MOTION_ACTION_MIN = 5
-        LOUD_CALM_MAX = -35
-        profile = "LOW_MOTION (Cinematic/Walking)"
+    ACTION_WORDS = {"shoot","fire","hit","run","kill","die","attack",
+                    "grenade","boom","jump","dodge","cover","reload",
+                    "go","move","watch","left","right","down","up","quick",
+                    "destroy","target","lock","bang","drop","danger",
+                    "whoa","oh","yeah","nice","sick","cook","big","fast"}
+    DIALOG_WORDS = {"you","me","we","what","why","how","hey","listen",
+                    "wait","okay","yeah","know","think","feel","want",
+                    "need","can","will"}
 
-    print(f"\n🎬 PROFILE: {profile}")
-    print(f"   Global motion: {global_avg:.2f}/s")
-    print(f"   Calm if: motion<{MOTION_CALM_MAX} AND loud<{LOUD_CALM_MAX} AND scenes=0")
-    print(f"   Action if: motion>{MOTION_ACTION_MIN} OR action_ratio>0.35")
-    print("=" * 70 + "\n")
-
-    ACTION_WORDS = {"shoot","fire","hit","run","kill","die","attack","grenade",
-                    "boom","jump","dodge","cover","reload","go","move","watch",
-                    "left","right","down","up","quick","destroy","target","lock",
-                    "bang","drop","danger","whoa","oh","yeah","nice","sick",
-                    "cook","big","fast"}
-    DIALOG_WORDS = {"you","me","we","what","why","how","hey","listen","wait",
-                    "okay","yeah","know","think","feel","want","need","can","will",
-                    "gideon","kingpin","on your feet","copy that","roger"}
-
-    for idx, slot in enumerate(slots, 1):
-        md = get_motion_score(video_path, slot["start"], slot["end"])
-        motion = md["motion_score"]
-        motion_per_sec = md["motion_per_sec"]
+    for slot in slots:
+        motion = get_motion_score(video_path, slot["start"], slot["end"])
         slot["motion_score"] = motion
-        slot["motion_per_sec"] = motion_per_sec
 
         sub_windows = []
         t = slot["start"]
@@ -627,27 +544,32 @@ def classify_slots_combined(video_path, slots, srt_content):
             sub_windows.append({"start": t, "end": sw_end})
             t = sw_end
 
-        action_count = dialog_count = calm_count = 0
+        action_count = 0
+        dialog_count = 0
+        calm_count = 0
 
         for sw in sub_windows:
-            scene_cuts = sum(1 for st in scene_times if sw["start"] <= st < sw["end"])
+            scene_cuts = sum(
+                1 for st in scene_times if sw["start"] <= st < sw["end"]
+            )
             loud = slot_loudness(loud_timeline, sw["start"], sw["end"])
             sw_text = " ".join(
                 e["text"] for e in srt_entries
                 if e["start"] >= sw["start"] and e["end"] <= sw["end"]
             ).lower()
             words = set(sw_text.split())
+
             has_action_word = len(words & ACTION_WORDS) >= 1
             has_dialog_word = len(words & DIALOG_WORDS) >= 1
             has_speech = len(sw_text.strip()) > 3
 
             if has_action_word and scene_cuts >= 1:
                 action_count += 1
-            elif scene_cuts >= 2 and loud > LOUD_CALM_MAX:
+            elif has_action_word:
                 action_count += 1
-            elif loud > -15 and scene_cuts >= 1:
+            elif scene_cuts >= 2:
                 action_count += 1
-            elif has_action_word and loud > -20:
+            elif loud > -15:
                 action_count += 1
             elif has_speech and has_dialog_word:
                 dialog_count += 1
@@ -661,104 +583,92 @@ def classify_slots_combined(video_path, slots, srt_content):
         dialog_ratio = dialog_count / total
         calm_ratio = calm_count / total
 
-        if motion_per_sec >= MOTION_ACTION_MIN:
-            action_ratio = min(1.0, action_ratio + 0.50)
-        elif motion_per_sec >= MOTION_ACTION_MIN * 0.7:
-            action_ratio = min(1.0, action_ratio + 0.30)
-        elif motion_per_sec >= MOTION_ACTION_MIN * 0.5:
+        orig_action_ratio = action_ratio
+        orig_calm_ratio = calm_ratio
+        if motion >= 5:
+            action_ratio = min(1.0, action_ratio + 0.40)
+        elif motion >= 3:
+            action_ratio = min(1.0, action_ratio + 0.25)
+        elif motion >= 2:
             action_ratio = min(1.0, action_ratio + 0.15)
 
-        slot_loud = slot_loudness(loud_timeline, slot["start"], slot["end"])
-        slot_scenes = sum(1 for st in scene_times if slot["start"] <= st < slot["end"])
-        is_low_motion = motion_per_sec < MOTION_CALM_MAX
-        is_quiet = slot_loud < LOUD_CALM_MAX
-        is_static = slot_scenes == 0
+        if motion >= 3:
+            calm_ratio = max(0.0, calm_ratio - 0.30)
 
-        force_calm = is_low_motion and is_quiet and is_static
-
-        if force_calm:
-            calm_ratio = min(1.0, calm_ratio + 0.40)
-            action_ratio = max(0.0, action_ratio - 0.30)
-
-        if force_calm:
-            slot["type"] = "calm"
-        elif action_ratio >= 0.35 or motion_per_sec >= MOTION_ACTION_MIN:
+        if action_ratio >= 0.30 or motion >= 5:
             slot["type"] = "action"
-        elif calm_ratio >= 0.55 and is_low_motion and is_quiet:
-            slot["type"] = "calm"
         elif dialog_ratio >= 0.40:
             slot["type"] = "dialog"
-        elif calm_ratio >= 0.50 and is_low_motion:
+        elif calm_ratio >= 0.50 and motion < 2:
             slot["type"] = "calm"
-        elif action_ratio >= 0.20 or motion_per_sec >= MOTION_ACTION_MIN * 0.7:
+        elif action_ratio >= 0.20 or motion >= 3:
             slot["type"] = "action"
         elif dialog_ratio >= 0.20:
             slot["type"] = "dialog"
         else:
             slot["type"] = "calm"
 
-        slot["scene_count"] = slot_scenes
-        slot["avg_loud"] = round(slot_loud, 1)
+        slot["scene_count"] = sum(
+            1 for st in scene_times if slot["start"] <= st < slot["end"]
+        )
+        slot["avg_loud"] = round(
+            slot_loudness(loud_timeline, slot["start"], slot["end"]), 1
+        )
         slot["sub_analysis"] = {
             "action_ratio": round(action_ratio, 2),
+            "action_ratio_raw": round(orig_action_ratio, 2),
             "dialog_ratio": round(dialog_ratio, 2),
             "calm_ratio": round(calm_ratio, 2),
-            "motion_per_sec": motion_per_sec
+            "calm_ratio_raw": round(orig_calm_ratio, 2),
+            "total_subs": total,
+            "motion_score": motion
         }
 
         voice_speed = speed_for_type(slot["type"])
+        slot["speed_boost_log"] = [f"base_{slot['type']}={voice_speed:.2f}"]
+
         if slot["type"] == "action":
-            if slot_scenes >= 3:
+            if slot["scene_count"] >= 3:
                 voice_speed += 0.03
-            if slot_loud > -12:
+                slot["speed_boost_log"].append("+0.03 (scenes>=3)")
+            if slot["avg_loud"] > -12:
                 voice_speed += 0.03
-            if motion_per_sec >= 15:
+                slot["speed_boost_log"].append("+0.03 (loud>-12)")
+            if motion >= 5:
                 voice_speed += 0.02
+                slot["speed_boost_log"].append("+0.02 (motion>=5)")
 
-        slot["voice_speed"] = round(max(VOICE_SPEED_MIN, min(VOICE_SPEED_MAX, voice_speed)), 2)
+        final_speed = round(max(VOICE_SPEED_MIN, min(VOICE_SPEED_MAX, voice_speed)), 2)
+        if final_speed != round(voice_speed, 2):
+            slot["speed_boost_log"].append(f"capped_to_{final_speed}")
+        slot["voice_speed"] = final_speed
 
-        loud_icon = "🔊" if slot_loud > -20 else ("🔉" if slot_loud > LOUD_CALM_MAX else "🔇")
-        motion_icon = "🏃" if motion_per_sec >= MOTION_ACTION_MIN else ("🚶" if motion_per_sec >= MOTION_CALM_MAX else "🧘")
-        print(f"   Slot {idx:2d} [{slot['start']:5.1f}→{slot['end']:5.1f}s] "
-              f"{slot['type']:6s} | motion={motion_per_sec:5.1f}/s{motion_icon} | "
-              f"loud={slot_loud:6.1f}dB{loud_icon} | scenes={slot_scenes} | "
-              f"speed={slot['voice_speed']:.2f}")
-
-    type_counts = {}
-    for s in slots:
-        type_counts[s["type"]] = type_counts.get(s["type"], 0) + 1
-
-    print("\n" + "=" * 70)
-    print(f"📊 Distribution: {type_counts}")
-    print(f"🎬 Profile: {profile}")
-    print("=" * 70 + "\n")
-
+    speeds = [s["voice_speed"] for s in slots]
+    print(f"✅ Slots classified: {len(slots)}")
+    print(f"🎮 Voice speeds: min={min(speeds):.2f} max={max(speeds):.2f} "
+          f"avg={sum(speeds)/len(speeds):.2f}\n")
     return slots
 
 
 # ============================================================
-# STEP 5 — BUILD ADAPTIVE ANALYSIS GRIDS
+# STEP 5 — 2× 8K PORTRAIT ANALYSIS GRIDS (90 frames each)
 # ============================================================
 def build_analysis_grids(video_path, vid_duration):
-    total_frames, num_images, frames_per_image, grid_cols, grid_rows = \
-        get_optimal_frame_config(vid_duration)
+    print(f"🖼️ [5] Building 2× 8K PORTRAIT grids ({CANVAS_W}×{CANVAS_H}) — "
+          f"{FRAMES_PER_IMAGE} frames each (total {ANALYSIS_FRAMES})...")
 
-    print(f"🖼️ [5] Building {num_images}× Analysis Grids ({CANVAS_W}×{CANVAS_H}) — "
-          f"{frames_per_image} frames each (total {total_frames})...")
-
-    grid_paths = []
-    for i in range(num_images):
-        path = f"analysis/grid_part{i+1}.jpg"
-        grid_paths.append(path)
-        if os.path.exists(path):
+    for p in [ANALYSIS_GRID_PATH_1, ANALYSIS_GRID_PATH_2]:
+        if os.path.exists(p):
             try:
-                os.remove(path)
+                os.remove(p)
             except Exception as e:
-                print(f"   ⚠️  Could not delete {path}: {e}")
+                print(f"   ⚠️  Could not delete {p}: {e}")
 
-    interval = vid_duration / total_frames
+    interval = vid_duration / ANALYSIS_FRAMES
+    print(f"   ⏱️  Frame gap: {interval:.3f}s (≈ {1/interval:.1f} FPS)")
+
     frame_paths = []
-    for i in range(total_frames):
+    for i in range(ANALYSIS_FRAMES):
         t = i * interval
         fp = f"temp_analysis_{i:03d}.jpg"
         subprocess.run(
@@ -771,66 +681,57 @@ def build_analysis_grids(video_path, vid_duration):
     print(f"   📸 Extracted {len(frame_paths)} frames")
 
     try:
-        font = ImageFont.truetype(
-            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-            max(24, (CANVAS_W // grid_cols) // 18)
-        )
+        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+                                  max(24, (CANVAS_W // GRID_COLS) // 18))
     except:
         try:
-            font = ImageFont.truetype(
-                "/system/fonts/Roboto-Bold.ttf",
-                max(24, (CANVAS_W // grid_cols) // 18)
-            )
+            font = ImageFont.truetype("/system/fonts/Roboto-Bold.ttf",
+                                      max(24, (CANVAS_W // GRID_COLS) // 18))
         except:
             font = ImageFont.load_default()
 
-    cell_w = CANVAS_W // grid_cols
-    cell_h = CANVAS_H // grid_rows
+    cell_w = CANVAS_W // GRID_COLS
+    cell_h = CANVAS_H // GRID_ROWS
 
-    for img_idx in range(num_images):
-        start_i = img_idx * frames_per_image
-        end_i = start_i + frames_per_image
-        chunk = frame_paths[start_i:end_i]
-        save_path = grid_paths[img_idx]
+    halves = [
+        (frame_paths[:FRAMES_PER_IMAGE], ANALYSIS_GRID_PATH_1, "Part 1", 0),
+        (frame_paths[FRAMES_PER_IMAGE:], ANALYSIS_GRID_PATH_2, "Part 2", FRAMES_PER_IMAGE),
+    ]
 
-        if not chunk:
-            continue
-
-        print(f"   🎨 Building Part {img_idx+1}/{num_images} ({len(chunk)} frames)...")
+    for half_frames, save_path, label, frame_offset in halves:
+        print(f"   🎨 Building {label} ({len(half_frames)} frames)...")
 
         grid = Image.new("RGB", (CANVAS_W, CANVAS_H), (0, 0, 0))
         draw = ImageDraw.Draw(grid)
 
-        for idx, (fp, t) in enumerate(chunk):
-            if idx >= grid_cols * grid_rows:
+        for idx, (fp, t) in enumerate(half_frames):
+            if idx >= GRID_COLS * GRID_ROWS:
                 break
             try:
                 img = Image.open(fp)
-                img = ImageOps.fit(
-                    img, (cell_w, cell_h),
-                    method=Image.LANCZOS, centering=(0.5, 0.5)
-                )
+                img = ImageOps.fit(img, (cell_w, cell_h),
+                                   method=Image.LANCZOS, centering=(0.5, 0.5))
             except:
                 continue
 
-            x = (idx % grid_cols) * cell_w
-            y = (idx // grid_cols) * cell_h
+            x = (idx % GRID_COLS) * cell_w
+            y = (idx // GRID_COLS) * cell_h
             grid.paste(img, (x, y))
 
             label_ts = f"{t:.1f}s"
             draw.rectangle([x + 8, y + 8, x + 160, y + 60], fill="black")
             draw.text((x + 16, y + 14), label_ts, fill="yellow", font=font)
 
-            frame_num = f"#{idx + start_i}"
+            frame_num = f"#{idx + frame_offset}"
             draw.rectangle(
                 [x + cell_w - 140, y + cell_h - 60, x + cell_w - 10, y + cell_h - 10],
                 fill="black"
             )
             draw.text((x + cell_w - 130, y + cell_h - 52), frame_num, fill="cyan", font=font)
 
-        grid.save(save_path, quality=JPEG_QUALITY, optimize=True, subsampling=2)
+        grid.save(save_path, quality=92, optimize=True, subsampling=2)
         size_mb = os.path.getsize(save_path) / (1024 * 1024)
-        print(f"   ✅ Part {img_idx+1}: {grid.size[0]}x{grid.size[1]} ({size_mb:.2f} MB)")
+        print(f"   ✅ {label}: {grid.size[0]}x{grid.size[1]} ({size_mb:.2f} MB)")
         print(f"      💾 {save_path}")
 
     for fp, _ in frame_paths:
@@ -838,97 +739,71 @@ def build_analysis_grids(video_path, vid_duration):
             os.remove(fp)
 
     print()
-    return grid_paths, total_frames, num_images, frames_per_image
+    return ANALYSIS_GRID_PATH_1, ANALYSIS_GRID_PATH_2
 
 
 # ============================================================
-# STEP 6 — GPT Call (PURANA PROMPT + SLANG RULE)
+# STEP 6 — GPT Call (Purana Prompt + 2 Images)
 # ============================================================
-def generate_full_script(slots, srt_content, grid_paths, vid_duration,
-                         total_frames, num_images, frames_per_image):
+def generate_full_script(slots, srt_content, analysis_grid_path_1,
+                         analysis_grid_path_2, vid_duration):
     print(f"🤖 [6] Generating FULL script (OpenRouter — {len(OPENROUTER_KEYS)} keys)...")
-    print(f"   📸 Sending {num_images} images × {frames_per_image} frames = {total_frames} total")
+    print(f"   📸 Sending 2 images × {FRAMES_PER_IMAGE} frames = {ANALYSIS_FRAMES} total")
 
     slot_lines = []
     for i, s in enumerate(slots, 1):
         sa = s.get("sub_analysis", {})
         slot_lines.append(
             f"- Slot {i}: {s['start']:.1f}s → {s['end']:.1f}s "
-            f"[SIGNAL={s['type'].upper()}] "
+            f"[{s['type'].upper()}] "
             f"(scenes={s['scene_count']}, loud={s['avg_loud']}dB, "
             f"action={sa.get('action_ratio', 0)}, dialog={sa.get('dialog_ratio', 0)}, "
-            f"motion={sa.get('motion_per_sec', 0)}) "
+            f"motion={sa.get('motion_score', 0)}) "
             f"SRT: \"{s['srt_text'][:70]}\""
         )
 
-    img_descriptions = []
-    for i in range(num_images):
-        start_frame = i * frames_per_image
-        end_frame = start_frame + frames_per_image - 1
-        start_t = start_frame * (vid_duration / total_frames)
-        end_t = end_frame * (vid_duration / total_frames)
-        img_descriptions.append(
-            f"**IMAGE {i+1}:** Part {i+1}/{num_images}\n"
-            f"- Frames: {start_frame} → {end_frame} ({frames_per_image} frames)\n"
-            f"- Time: {start_t:.1f}s → {end_t:.1f}s\n"
-            f"- Yellow labels = timestamps, Cyan = frame numbers"
-        )
-
-    images_block = "\n\n".join(img_descriptions)
+    half_time = vid_duration / 2
 
     prompt = f"""You are a HYPED-UP gaming YouTuber — like a streamer going CRAZY on stream.
 You shout, laugh, hype, roast. Pure energy. Zero boring lines.
 
-**YOU ARE GETTING {num_images} IMAGES — ANALYSIS GRIDS ({total_frames} frames total):**
+**YOU ARE GETTING 2 IMAGES — ANALYSIS GRIDS ({ANALYSIS_FRAMES} frames total):**
 
-{images_block}
+**IMAGE 1 (Part 1):**
+- Frames 0 → {FRAMES_PER_IMAGE - 1} ({FRAMES_PER_IMAGE} frames)
+- Time: 0.0s → {half_time:.1f}s
+- Grid: {GRID_COLS} × {GRID_ROWS}
+- Yellow labels = timestamps, Cyan = frame numbers
 
-**Match frames to slots using timestamps.**
+**IMAGE 2 (Part 2):**
+- Frames {FRAMES_PER_IMAGE} → {ANALYSIS_FRAMES - 1} ({FRAMES_PER_IMAGE} frames)
+- Time: {half_time:.1f}s → {vid_duration:.1f}s
+- Grid: {GRID_COLS} × {GRID_ROWS}
+- Yellow labels = timestamps, Cyan = frame numbers
+
+**Match frames to slots.**
 
 **YOUR JOB:**
 Look at the frames. React LOUDLY like a real streamer watching live gameplay.
 Focus on VISUALS — characters, screens, action, environment, weapons, enemies, faces, graphics.
 
-**⚠️⚠️⚠️ YOU HAVE FINAL AUTHORITY ON visual_type ⚠️⚠️⚠️**
+**🎙️ HOW TO TALK — NATURAL STREAMER VIBE:**
 
-The slot's `[SIGNAL=...]` is just a HINT from audio/motion analysis.
-**YOU decide the final visual_type based on what you SEE in the frames.**
+Talk like a real streamer — energetic but natural. Don't force slang.
+Use slang ONLY occasionally (1 in every 3-4 lines). Most lines should be plain, natural English.
 
-**PRIORITY:**
-1. **YOUR VISUAL ANALYSIS** — what you see in frames → FINAL
-2. **SIGNAL HINT** — only if you're unsure
+**SLANG WORDS (use SPARINGLY — max 3-4 times total):**
+- "bro", "yo", "nah", "fr", "lowkey", "fire", "insane", "nasty", "cooked", "clapped"
 
-**EXAMPLES:**
-- Signal says ACTION but frames show black screen → YOU say "calm"
-- Signal says ACTION but frames show dialogue → YOU say "dialog"
-- Signal says CALM but frames show explosion → YOU say "action"
-- Signal says ACTION and frames show firing → YOU say "action" ✅
+**DON'T:**
+- ❌ Use slang in every line
+- ❌ Force slang where it doesn't fit
+- ❌ Repeat same slang word
 
-**TRUST YOUR EYES. The signal is just a helper.**
-
-**🎙️ HOW TO TALK — SLANG-FILLED STREAMER VIBE:**
-
-Talk like a real Gen-Z streamer. Slang is MANDATORY for ACTION scenes.
-
-**⚠️ SLANG RULE — ONLY FOR ACTION SCENES ⚠️**
-
-**If type = "action":**
-- SLANG MANDATORY — use freely
-- Slang words: "bro", "bruh", "yo", "nah", "fr", "lowkey", "bet", "cap", "no cap", "sick", "fire", "insane", "nasty", "goated", "cooked", "clapped", "cracked", "deadass", "say less", "let him cook", "W", "L", "GG"
-- HIGH energy, CAPS allowed
-- Example: "BRO! He's COOKED!", "Yo that was NASTY fr!"
-
-**If type = "dialog":**
-- ❌ NO SLANG — Use simple, natural, conversational English
-- Contractions OK: "he's", "ain't", "gonna"
-- Example: "Wait, what did he say?", "Hmm interesting...", "What's the plan here?"
-
-**If type = "calm":**
-- ❌ NO SLANG — Use simple, observational English
-- Example: "This view is beautiful.", "Just taking it all in.", "Nice and quiet here."
-
-**⚠️ NEVER use slang on calm or dialog scenes.**
-**⚠️ NEVER use formal language on action scenes.**
+**DO:**
+- ✅ Use slang naturally, only when it fits
+- ✅ Mix slang with plain English
+- ✅ Keep it conversational
 
 **HOW TO START LINES (rotate these — don't repeat):**
 - "Yo...", "Bro...", "Bruh...", "Nah...", "Wait...", "Ayy...", "Okay..."
@@ -972,6 +847,7 @@ The FIRST line of commentary is the MOST CRITICAL. It decides if viewer stays or
 - "Should I try this?"
 - "What is happening?!"
 - "Is this real?!"
+- These create engagement — viewers comment
 
 **🎯 RULE #5: ENERGY CURVE (mix high/low)**
 - Don't keep same energy entire video
@@ -985,14 +861,16 @@ The FIRST line of commentary is the MOST CRITICAL. It decides if viewer stays or
 - "Smash that like!"
 - "Ring the bell!"
 - "Follow for more chaos fr."
+- Don't spam — spread across the video
 
 **🎯 RULE #7: VARY LINE LENGTHS**
 - Some 3-word lines: "BRO! HE'S GONE!"
 - Some 5-word lines: "Yo that was lowkey fire"
 - Some 8-word lines: "Wait wait wait — you seeing this bro?!"
+- Don't make every line same length
 
 **REACTION PATTERNS (use 10-14 varied):**
-1. BIG ACTION: "OHHHH! He's GONE!", "BRO! That was NASTY!", "Yo he's COOKED!"
+1. BIG ACTION: "OHHHH! He's GONE!", "BRO! That was NASTY!", "Yo he's COOKED!", "That was actually crazy!"
 2. VIEWER QUESTIONS (2-4): "Guys, is this game worth buying?", "Yo should I try this fr?"
 3. GRAPHICS (2-3): "Bro these graphics are INSANE!", "Yo the visuals are FIRE no cap!"
 4. ENEMY ROAST: "Bro this guy's aim is worse than mine.", "Nah bro you're trash fr."
@@ -1068,7 +946,6 @@ If you see ANY of these → visual_type = "action":
 - Close-up of face while speaking
 - Character standing still, facing camera
 - Conversation scene
-- Subtitle text on screen
 
 **visual_type = "calm" for EVERYTHING ELSE:**
 - Slow camera panning
@@ -1077,9 +954,8 @@ If you see ANY of these → visual_type = "action":
 - Menu / UI screens
 - Walking slowly
 - Environment only shots
-- Black screen / dark frame
 
-**⚠️ BE HONEST. If slow motion/sitting/walking/scenery/black → "calm".**
+**⚠️ BE HONEST. If slow motion/sitting/walking/scenery → "calm".**
 **🔴 Two characters CLOSE and ENGAGED → ACTION.**
 **🔥 FIRE/EXPLOSIONS/MANY ENEMIES → ACTION.**
 
@@ -1089,7 +965,7 @@ If you see ANY of these → visual_type = "action":
 - "calm" → 6-8 words, chill slang
 
 **RULES:**
-1. SLANG MANDATORY — bro, yo, nah, fr, lowkey, bet, cap, deadass
+1. NATURAL LANGUAGE — slang SPARINGLY (max 2-3 times total)
 2. NATURAL — casual, contractions
 3. FIRST LINE = HOOK (most important)
 4. NEVER REPEAT STARTERS
@@ -1099,7 +975,6 @@ If you see ANY of these → visual_type = "action":
 8. CTA 2-3 TIMES
 9. VARY LINE LENGTHS
 10. Max 2-3 follow requests total
-11. **TRUST YOUR EYES OVER SIGNAL HINT**
 
 **STORY CONTEXT:**
 {srt_content[:2500]}
@@ -1125,23 +1000,30 @@ Return ONLY valid JSON:
 """
 
     or_url = "https://openrouter.ai/api/v1/chat/completions"
+    b64_1 = encode_image(analysis_grid_path_1)
+    b64_2 = encode_image(analysis_grid_path_2)
 
-    content = [{"type": "text", "text": prompt}]
-    for path in grid_paths:
-        b64 = encode_image(path)
-        size_mb = len(b64) / 1024 / 1024
-        print(f"   📦 {os.path.basename(path)}: {size_mb:.2f} MB (base64)")
-        content.append({
-            "type": "image_url",
-            "image_url": {
-                "url": f"data:image/jpeg;base64,{b64}",
-                "detail": "high"
-            }
-        })
+    print(f"   📦 Image 1 size: {len(b64_1)/1024/1024:.2f} MB (base64)")
+    print(f"   📦 Image 2 size: {len(b64_2)/1024/1024:.2f} MB (base64)")
 
     payload = {
         "model": "openai/gpt-4o-mini",
-        "messages": [{"role": "user", "content": content}],
+        "messages": [{
+            "role": "user",
+            "content": [
+                {"type": "text", "text": prompt},
+                {"type": "image_url",
+                 "image_url": {
+                     "url": f"data:image/jpeg;base64,{b64_1}",
+                     "detail": "high"
+                 }},
+                {"type": "image_url",
+                 "image_url": {
+                     "url": f"data:image/jpeg;base64,{b64_2}",
+                     "detail": "high"
+                 }}
+            ]
+        }],
         "max_tokens": 4000,
         "temperature": 0.9,
         "response_format": {"type": "json_object"}
@@ -1176,16 +1058,15 @@ Return ONLY valid JSON:
                     parsed = json.loads(raw)
                     segments = parsed.get("segments", [])
 
-                    print(f"   ✅ Key {key_idx} worked! {len(segments)} segments")
-                    
-                    updated = 0
+                    updated_count = 0
                     override_count = 0
-                    
+                    dialog_protected = 0
+
                     for seg in segments:
                         vt = (seg.get("visual_type") or "").lower().strip()
                         if vt not in ("action", "dialog", "calm"):
                             continue
-                        
+
                         best_slot = None
                         best_diff = 999
                         for slot in slots:
@@ -1193,36 +1074,84 @@ Return ONLY valid JSON:
                             if diff < best_diff:
                                 best_diff = diff
                                 best_slot = slot
-                        
+
                         if best_slot and best_diff < 2.5:
                             signal_type = best_slot.get("type", "calm")
-                            motion_per_sec = best_slot.get("motion_per_sec", 0)
-                            slot_loud = best_slot.get("avg_loud", -50)
-                            
+                            scene_count = best_slot.get("scene_count", 0)
+                            avg_loud = best_slot.get("avg_loud", -50)
+                            sa = best_slot.get("sub_analysis", {})
+                            action_ratio = sa.get("action_ratio", 0)
+                            motion = sa.get("motion_score", 0)
+                            srt_word_count = len(best_slot.get("srt_text", "").split())
+
                             best_slot["gpt_type"] = vt
-                            final_type = vt  # AI decision is FINAL
-                            
-                            # Light override — only absolute extreme cases
-                            if vt == "calm" and motion_per_sec >= 25 and slot_loud > -10:
+
+                            signal_says_action_strong = (
+                                (signal_type == "action" and action_ratio >= 0.25)
+                                or (motion >= 3)
+                                or (action_ratio >= 0.30)
+                                or (scene_count >= 3 and avg_loud > -18)
+                                or (action_ratio > 0.20 and avg_loud > -20)
+                            )
+
+                            has_strong_dialog = (
+                                srt_word_count >= 8 and action_ratio < 0.40 and motion < 3
+                            )
+
+                            is_likely_scenery = (
+                                avg_loud < -30 and scene_count == 0 and motion < 2
+                            )
+
+                            if (
+                                vt == "calm"
+                                and signal_says_action_strong
+                                and not has_strong_dialog
+                                and not is_likely_scenery
+                            ):
                                 final_type = "action"
                                 override_count += 1
-                            elif vt == "action" and motion_per_sec < 1 and slot_loud < -50:
-                                final_type = "calm"
-                                override_count += 1
-                            
-                            best_slot["final_type"] = final_type
+                            elif (
+                                vt == "calm"
+                                and signal_says_action_strong
+                                and has_strong_dialog
+                            ):
+                                final_type = "dialog"
+                                dialog_protected += 1
+                            else:
+                                final_type = vt
+
+                            if (
+                                final_type != best_slot.get("type")
+                                and final_type == "action"
+                            ):
+                                best_slot["voice_speed"] = speed_for_type("action")
+                                if scene_count >= 3:
+                                    best_slot["voice_speed"] = min(
+                                        VOICE_SPEED_MAX,
+                                        best_slot["voice_speed"] + 0.03
+                                    )
+                                if avg_loud > -12:
+                                    best_slot["voice_speed"] = min(
+                                        VOICE_SPEED_MAX,
+                                        best_slot["voice_speed"] + 0.03
+                                    )
+                                if motion >= 5:
+                                    best_slot["voice_speed"] = min(
+                                        VOICE_SPEED_MAX,
+                                        best_slot["voice_speed"] + 0.02
+                                    )
+                            elif final_type != best_slot.get("type"):
+                                best_slot["voice_speed"] = speed_for_type(final_type)
+
                             best_slot["visual_type"] = final_type
                             best_slot["type"] = final_type
-                            
-                            if final_type != signal_type:
-                                best_slot["voice_speed"] = speed_for_type(final_type)
-                            
-                            updated += 1
-                    
-                    print(f"   🎯 Applied to {updated} slots")
-                    print(f"   🔄 Extreme overrides: {override_count}")
-                    print(f"   🤖 AI decisions respected: {updated - override_count}\n")
-                    
+                            best_slot["final_type"] = final_type
+                            updated_count += 1
+
+                    print(f"   ✅ Key {key_idx} worked! {len(segments)} segments")
+                    print(f"   🎯 Applied to {updated_count}/{len(slots)} slots")
+                    print(f"   🔄 Signal overrides: {override_count}")
+                    print(f"   🛡️  Dialog protected: {dialog_protected}\n")
                     return segments
 
                 elif r.status_code in (401, 403):
@@ -1236,7 +1165,7 @@ Return ONLY valid JSON:
                     print(f"      💰 Key {key_idx} — credits khatam")
                     break
                 elif r.status_code == 413:
-                    print(f"      📦 Payload too large!")
+                    print(f"      📦 Payload too large! Sizes: {len(b64_1)/1024/1024:.1f}MB + {len(b64_2)/1024/1024:.1f}MB")
                     break
                 else:
                     print(f"      ⚠️ Error {r.status_code}: {r.text[:200]}")
@@ -1274,7 +1203,7 @@ Return ONLY valid JSON:
 
 
 # ============================================================
-# STEP 7 — ElevenLabs TTS
+# STEP 7 — ElevenLabs TTS (SIMPLE DEBUG — ek line mein)
 # ============================================================
 def generate_audio(segments, slots):
     print("🔊 [7] Generating TTS...")
@@ -1468,16 +1397,16 @@ def fallback_copy_original():
 # ============================================================
 def main():
     print("=" * 60)
-    print("🎙️ AI COMMENTARY DUBBER — v3.8 (Purana Prompt + Slang Rule)")
+    print("🎙️ AI COMMENTARY DUBBER — v3.5 (2 Images + Purana Prompt)")
     print("=" * 60)
     print(f"📹 Input : {FINAL_CLIP_PATH}")
     print(f"📤 Output: {FINAL_DUBBED_VIDEO}")
     print(f"🎤 Voice : {VOICE_ID}")
     print(f"🎛️  Switch: COMMENTARY_ENABLED = {COMMENTARY_ENABLED}")
     print(f"🎮 Speed : {VOICE_SPEED_MIN} - {VOICE_SPEED_MAX}")
-    print(f"🔊 Volume: Action={VOL_ACTION}x | Other={VOL_OTHER}x | Duck={DUCK_VOLUME}")
+    print(f"🔊 Volume: Action={VOL_ACTION}x | Other={VOL_OTHER}x")
+    print(f"🖼️  Frames: {ANALYSIS_FRAMES} ({FRAMES_PER_IMAGE} × 2 images, {GRID_COLS}x{GRID_ROWS}, {CANVAS_W}x{CANVAS_H} 8K)")
     print(f"🤖 Model : openai/gpt-4o-mini (Free)")
-    print(f"🎭 Slang : Action only (Calm/Dialog use simple English)")
     print("=" * 60 + "\n")
 
     if not COMMENTARY_ENABLED:
@@ -1500,14 +1429,8 @@ def main():
         srt_content = transcribe(AUDIO_PATH)
         slots = build_auto_slots(FINAL_CLIP_PATH, vid_dur, srt_content)
         slots = classify_slots_combined(FINAL_CLIP_PATH, slots, srt_content)
-
-        grid_paths, total_frames, num_images, frames_per_image = \
-            build_analysis_grids(FINAL_CLIP_PATH, vid_dur)
-
-        segments = generate_full_script(
-            slots, srt_content, grid_paths, vid_dur,
-            total_frames, num_images, frames_per_image
-        )
+        grid_path_1, grid_path_2 = build_analysis_grids(FINAL_CLIP_PATH, vid_dur)
+        segments = generate_full_script(slots, srt_content, grid_path_1, grid_path_2, vid_dur)
 
         if not segments:
             raise Exception("No segments generated")
@@ -1529,13 +1452,13 @@ def main():
         print(f"📊 Slots: {len(slots)} | Segments: {len(audio_files)}")
         print("=" * 60)
 
-        commit_analysis_to_github(grid_paths)
+        commit_analysis_to_github()
         sys.exit(0)
 
     except Exception as e:
         print(f"\n❌ Commentary pipeline failed: {e}")
         print("⚠️ Falling back to original clip...")
-        commit_analysis_to_github([])
+        commit_analysis_to_github()
         if fallback_copy_original():
             sys.exit(0)
         else:
