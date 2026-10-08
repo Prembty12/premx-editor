@@ -1,1 +1,1 @@
-{"clip_duration": 24, "reason": "Intense warehouse brawl with multiple enemies", "start_time": 6, "status": "APPROVE", "title": "He Cooked 5 Enemies Alone 🔥"}
+{"clip_duration": 40, "reason": "Intense indoor CQB shootout with continuous firing", "start_time": 5, "status": "APPROVE", "title": "Room Breach 5 Enemies Down Fast 🔥🎯"}
