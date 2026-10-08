@@ -1,22 +1,22 @@
 {
-  "last_updated": "2026-10-08 03:05:47 PM",
+  "last_updated": "2026-10-08 04:42:04 PM",
   "period_days": 7,
   "trending": [
     {
       "game": "GearsOfWar",
-      "views_7d": 2682,
-      "avg_per_video": 670,
+      "views_7d": 2767,
+      "avg_per_video": 691,
       "trend": "viral",
-      "ratio": 2.1623634558093343,
+      "ratio": 2.2065831491034147,
       "fb_link": "https://www.facebook.com/reel/2977424322612880/",
       "source_link": ""
     },
     {
       "game": "VietnamCavePrison",
-      "views_7d": 4326,
-      "avg_per_video": 618,
-      "trend": "trending",
-      "ratio": 1.9945382323733862,
+      "views_7d": 4437,
+      "avg_per_video": 633,
+      "trend": "viral",
+      "ratio": 2.0213706705969052,
       "fb_link": "https://www.facebook.com/reel/1089058007444948/",
       "source_link": ""
     },
@@ -25,54 +25,63 @@
       "views_7d": 1912,
       "avg_per_video": 478,
       "trend": "trending",
-      "ratio": 1.5427010923535251,
+      "ratio": 1.5264062883812333,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "mm2remastered",
-      "views_7d": 1404,
-      "avg_per_video": 468,
+      "views_7d": 1416,
+      "avg_per_video": 472,
       "trend": "trending",
-      "ratio": 1.5104270109235352,
+      "ratio": 1.5072463768115942,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_3.mp4"
     },
     {
-      "game": "Russian_secret_missions",
-      "views_7d": 792,
-      "avg_per_video": 396,
+      "game": "CallOfDutyMW2",
+      "views_7d": 421,
+      "avg_per_video": 421,
       "trend": "steady",
-      "ratio": 1.2780536246276066,
-      "fb_link": "https://www.facebook.com/reel/1139912458719689/",
+      "ratio": 1.3443871284696636,
+      "fb_link": "https://www.facebook.com/reel/2233604814166332/",
       "source_link": ""
     }
   ],
   "below_avg": [
     {
+      "game": "GODOFWAR3",
+      "views_7d": 1338,
+      "avg_per_video": 267,
+      "trend": "slow",
+      "ratio": 0.8526160648489315,
+      "fb_link": "",
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR33.mp4"
+    },
+    {
       "game": "Callofdutyaw",
-      "views_7d": 576,
+      "views_7d": 578,
       "avg_per_video": 192,
       "trend": "slow",
-      "ratio": 0.6196623634558093,
+      "ratio": 0.6131171702284451,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison17.mp4"
     },
     {
       "game": "sifu",
-      "views_7d": 629,
-      "avg_per_video": 104,
+      "views_7d": 639,
+      "avg_per_video": 106,
       "trend": "below_avg",
-      "ratio": 0.3356504468718967,
+      "ratio": 0.33849177106362077,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu15.mp4"
     },
     {
       "game": "GodofWarLaufey",
-      "views_7d": 373,
+      "views_7d": 374,
       "avg_per_video": 74,
       "trend": "below_avg",
-      "ratio": 0.2388282025819265,
+      "ratio": 0.23630557602554655,
       "fb_link": "https://www.facebook.com/reel/1416365153322444/",
       "source_link": ""
     },
@@ -81,26 +90,17 @@
       "views_7d": 30,
       "avg_per_video": 15,
       "trend": "below_avg",
-      "ratio": 0.0484111221449851,
+      "ratio": 0.047899778924097275,
       "fb_link": "",
       "source_link": ""
-    },
-    {
-      "game": "ghostandela",
-      "views_7d": 0,
-      "avg_per_video": 0,
-      "trend": "below_avg",
-      "ratio": 0.0,
-      "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela42.mp4"
     }
   ],
   "recommendation": {
     "game": "GearsOfWar",
-    "views_7d": 2682,
-    "avg_per_video": 670,
+    "views_7d": 2767,
+    "avg_per_video": 691,
     "trend": "viral",
-    "ratio": 2.1623634558093343,
+    "ratio": 2.2065831491034147,
     "fb_link": "https://www.facebook.com/reel/2977424322612880/",
     "source_link": ""
   }

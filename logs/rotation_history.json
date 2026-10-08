@@ -16,12 +16,12 @@
         "mm2remastered",
         "sifu"
     ],
-    "current_index": 2,
-    "current_game": "GODOFWAR3",
-    "next_game": "GearsOfWar",
-    "next_game_position": 4,
-    "last_updated": "2026-10-08 03:05:47 PM",
-    "total_runs": 149,
+    "current_index": 3,
+    "current_game": "GearsOfWar",
+    "next_game": "Ghost_soap_escap",
+    "next_game_position": 5,
+    "last_updated": "2026-10-08 04:42:04 PM",
+    "total_runs": 150,
     "rotation_log": [
         {
             "run": 1,
@@ -767,6 +767,11 @@
             "run": 149,
             "game": "GODOFWAR3",
             "timestamp": "2026-10-08 03:05:47 PM"
+        },
+        {
+            "run": 150,
+            "game": "GearsOfWar",
+            "timestamp": "2026-10-08 04:42:04 PM"
         }
     ],
     "all_games": [
@@ -775,7 +780,7 @@
             "game": "CallOfDutyMW2",
             "uploaded": 4,
             "last_run": 147,
-            "next_turn_in": 12,
+            "next_turn_in": 11,
             "status": "waiting"
         },
         {
@@ -783,7 +788,7 @@
             "game": "Callofdutyaw",
             "uploaded": 11,
             "last_run": 148,
-            "next_turn_in": 13,
+            "next_turn_in": 12,
             "status": "waiting"
         },
         {
@@ -791,31 +796,31 @@
             "game": "GODOFWAR3",
             "uploaded": 11,
             "last_run": 149,
-            "next_turn_in": 0,
-            "status": "current"
+            "next_turn_in": 13,
+            "status": "waiting"
         },
         {
             "position": 4,
             "game": "GearsOfWar",
-            "uploaded": 5,
-            "last_run": 137,
-            "next_turn_in": 1,
-            "status": "next_up"
+            "uploaded": 6,
+            "last_run": 150,
+            "next_turn_in": 0,
+            "status": "current"
         },
         {
             "position": 5,
             "game": "Ghost_soap_escap",
             "uploaded": 5,
             "last_run": 64,
-            "next_turn_in": 2,
-            "status": "waiting"
+            "next_turn_in": 1,
+            "status": "next_up"
         },
         {
             "position": 6,
             "game": "GodofWarLaufey",
             "uploaded": 10,
             "last_run": 138,
-            "next_turn_in": 3,
+            "next_turn_in": 2,
             "status": "waiting"
         },
         {
@@ -823,7 +828,7 @@
             "game": "MarvelsSpiderMan2",
             "uploaded": 10,
             "last_run": 139,
-            "next_turn_in": 4,
+            "next_turn_in": 3,
             "status": "waiting"
         },
         {
@@ -831,7 +836,7 @@
             "game": "Russian_secret_missions",
             "uploaded": 10,
             "last_run": 140,
-            "next_turn_in": 5,
+            "next_turn_in": 4,
             "status": "waiting"
         },
         {
@@ -839,7 +844,7 @@
             "game": "VietnamCavePrison",
             "uploaded": 10,
             "last_run": 141,
-            "next_turn_in": 6,
+            "next_turn_in": 5,
             "status": "waiting"
         },
         {
@@ -847,7 +852,7 @@
             "game": "Wolverine",
             "uploaded": 3,
             "last_run": 142,
-            "next_turn_in": 7,
+            "next_turn_in": 6,
             "status": "waiting"
         },
         {
@@ -855,7 +860,7 @@
             "game": "codBlackops6",
             "uploaded": 10,
             "last_run": 143,
-            "next_turn_in": 8,
+            "next_turn_in": 7,
             "status": "waiting"
         },
         {
@@ -863,7 +868,7 @@
             "game": "ghostandela",
             "uploaded": 10,
             "last_run": 144,
-            "next_turn_in": 9,
+            "next_turn_in": 8,
             "status": "waiting"
         },
         {
@@ -871,7 +876,7 @@
             "game": "mm2remastered",
             "uploaded": 10,
             "last_run": 145,
-            "next_turn_in": 10,
+            "next_turn_in": 9,
             "status": "waiting"
         },
         {
@@ -879,7 +884,7 @@
             "game": "sifu",
             "uploaded": 10,
             "last_run": 146,
-            "next_turn_in": 11,
+            "next_turn_in": 10,
             "status": "waiting"
         }
     ]
