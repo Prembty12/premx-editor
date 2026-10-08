@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v3.3 (FULL DEBUG MODE)
+🎙️ AI Commentary Dubber — v3.3 (FULL DEBUG MODE + AI Commentary in Single Place)
 ===============================================================
 NEW in v3.3:
   • Slot-by-slot detailed debug table
@@ -9,7 +9,7 @@ NEW in v3.3:
   • GPT vs Signal vs Final classification log
   • Speed boost trace (scene_count, loud, motion)
   • debug_report.txt auto-save
-  • Sab kuch console + file mein print
+  • AI Commentary ek hi jagah — timestamp + speed + volume + text
 """
 
 import os
@@ -531,9 +531,9 @@ def build_auto_slots(video_path, vid_duration, srt_content):
             "sub_analysis": {},
             "voice_speed": 1.0,
             "motion_score": 0,
-            "gpt_type": None,          # 🆕
-            "final_type": None,        # 🆕
-            "speed_boost_log": []      # 🆕
+            "gpt_type": None,
+            "final_type": None,
+            "speed_boost_log": []
         })
         t = end
 
@@ -1386,16 +1386,26 @@ def fallback_copy_original():
 
 
 # ============================================================
-# 🐛 FINAL DEBUG SUMMARY
+# 🐛 FINAL DEBUG SUMMARY — AI COMMENTARY EK HI JAGAH
 # ============================================================
-def print_final_debug_summary(slots):
+def print_final_debug_summary(slots, segments=None, audio_files=None):
+    """Final debug — commentary + speed + type ek line mein"""
     if not DEBUG_MODE:
         return
 
     dprint("")
-    dprint("=" * 100)
+    dprint("=" * 130)
     dprint("🐛 FINAL DEBUG SUMMARY — HAR SLOT KA FULL BREAKDOWN")
-    dprint("=" * 100)
+    dprint("=" * 130)
+
+    # ============================================================
+    # SECTION 1 — COMMENTARY TABLE (ek line mein sab)
+    # ============================================================
+    dprint("")
+    dprint("🎤 COMMENTARY + SPEED + VOLUME (TIMESTAMP KE SAATH)")
+    dprint("-" * 130)
+    dprint(f"{'Time':<8} {'Speed':<8} {'Volume':<8} {'Type':<10} {'GPT':<10} {'Signal':<10} {'Commentary':<55}")
+    dprint("-" * 130)
 
     action_count = 0
     dialog_count = 0
@@ -1407,22 +1417,35 @@ def print_final_debug_summary(slots):
 
     for idx, s in enumerate(slots, 1):
         sa = s.get("sub_analysis", {})
-        dprint(f"\n📍 Slot {idx}: {s['start']:.2f}s → {s['end']:.2f}s")
-        dprint(f"   🎯 GPT type:     {s.get('gpt_type', 'n/a')}")
-        dprint(f"   📡 Signal type:  {s.get('type', 'n/a')}")
-        dprint(f"   ✅ Final type:   {s.get('final_type', s.get('type', 'n/a'))}")
-        dprint(f"   🎬 Scene count:  {s['scene_count']}")
-        dprint(f"   📊 Motion score: {s.get('motion_score', 0)}")
-        dprint(f"   🔇 Avg loud:     {s['avg_loud']} dB")
-        dprint(f"   📈 Action ratio: {sa.get('action_ratio_raw', 0):.2f} → {sa.get('action_ratio', 0):.2f} (with motion boost)")
-        dprint(f"   💬 Dialog ratio: {sa.get('dialog_ratio', 0):.2f}")
-        dprint(f"   😴 Calm ratio:   {sa.get('calm_ratio_raw', 0):.2f} → {sa.get('calm_ratio', 0):.2f}")
-        dprint(f"   📝 SRT text:     \"{s.get('srt_text', '')[:60]}\"")
-        dprint(f"   🎮 Voice speed:  {s['voice_speed']:.2f}x")
-        dprint(f"   📋 Speed log:    {' → '.join(s.get('speed_boost_log', []))}")
-
-        # Count
         final_t = s.get('final_type', s.get('type'))
+
+        # AI commentary dhundo
+        ai_text = "❌ NO COMMENTARY"
+        vol_used = VOL_OTHER
+        if segments:
+            best_seg = None
+            best_diff = 999
+            for seg in segments:
+                diff = abs(seg.get("start", 0) - s["start"])
+                if diff < best_diff:
+                    best_diff = diff
+                    best_seg = seg
+            if best_seg and best_diff < 2.5:
+                ai_text = best_seg.get("text", "❌ Empty")
+                if (best_seg.get("visual_type") or "").lower() == "action":
+                    vol_used = VOL_ACTION
+
+        # Ek line mein sab kuch
+        dprint(
+            f"[{s['start']:5.1f}s] "
+            f"speed={s['voice_speed']:.2f}  "
+            f"vol={vol_used:.2f}x  "
+            f"({final_t:<6}) "
+            f"| GPT={s.get('gpt_type', 'n/a'):<8} "
+            f"| Sig={s.get('type', 'n/a'):<8} "
+            f"| {ai_text}"
+        )
+
         if final_t == "action":
             action_count += 1
         elif final_t == "dialog":
@@ -1439,20 +1462,69 @@ def print_final_debug_summary(slots):
         else:
             speed_100_count += 1
 
+    dprint("-" * 130)
+
+    # ============================================================
+    # SECTION 2 — DETAILED SLOT BREAKDOWN
+    # ============================================================
     dprint("")
-    dprint("=" * 100)
+    dprint("=" * 130)
+    dprint("📋 DETAILED SLOT BREAKDOWN")
+    dprint("=" * 130)
+
+    for idx, s in enumerate(slots, 1):
+        sa = s.get("sub_analysis", {})
+        final_t = s.get('final_type', s.get('type'))
+
+        ai_text = "❌ NO COMMENTARY"
+        vol_used = VOL_OTHER
+        if segments:
+            best_seg = None
+            best_diff = 999
+            for seg in segments:
+                diff = abs(seg.get("start", 0) - s["start"])
+                if diff < best_diff:
+                    best_diff = diff
+                    best_seg = seg
+            if best_seg and best_diff < 2.5:
+                ai_text = best_seg.get("text", "❌ Empty")
+                if (best_seg.get("visual_type") or "").lower() == "action":
+                    vol_used = VOL_ACTION
+
+        dprint("")
+        dprint(f"📍 Slot {idx}: {s['start']:.2f}s → {s['end']:.2f}s")
+        dprint(f"   🎤 Commentary:  \"{ai_text}\"")
+        dprint(f"   🎮 Speed:        {s['voice_speed']:.2f}x")
+        dprint(f"   🔊 Volume:       {vol_used}x")
+        dprint(f"   🎯 GPT:          {s.get('gpt_type', 'n/a')}")
+        dprint(f"   📡 Signal:       {s.get('type', 'n/a')}")
+        dprint(f"   ✅ Final:        {final_t}")
+        dprint(f"   🎬 Scenes:       {s['scene_count']}")
+        dprint(f"   📊 Motion:       {s.get('motion_score', 0)}")
+        dprint(f"   🔇 Loud:         {s['avg_loud']} dB")
+        dprint(f"   📈 Action:       {sa.get('action_ratio_raw', 0):.2f} → {sa.get('action_ratio', 0):.2f}")
+        dprint(f"   💬 Dialog:       {sa.get('dialog_ratio', 0):.2f}")
+        dprint(f"   😴 Calm:         {sa.get('calm_ratio_raw', 0):.2f} → {sa.get('calm_ratio', 0):.2f}")
+        dprint(f"   📝 SRT:          \"{s.get('srt_text', '')[:60]}\"")
+        dprint(f"   📋 Speed log:    {' → '.join(s.get('speed_boost_log', []))}")
+
+    # ============================================================
+    # SECTION 3 — TOTALS
+    # ============================================================
+    dprint("")
+    dprint("=" * 130)
     dprint("📊 TOTALS")
-    dprint("=" * 100)
+    dprint("=" * 130)
     dprint(f"   🎬 Total slots:     {len(slots)}")
     dprint(f"   ⚡ Action slots:    {action_count}")
     dprint(f"   💬 Dialog slots:    {dialog_count}")
     dprint(f"   😴 Calm slots:      {calm_count}")
     dprint("")
-    dprint(f"   🎮 Speed 1.17x:     {speed_117_count} slots (guaranteed 1.7x volume)")
+    dprint(f"   🎮 Speed 1.17x:     {speed_117_count} slots (1.7x volume)")
     dprint(f"   🎮 Speed 1.14x:     {speed_114_count} slots (1.7x volume)")
     dprint(f"   🎮 Speed 1.05x:     {speed_105_count} slots (1.4x volume)")
     dprint(f"   🎮 Speed 1.00x:     {speed_100_count} slots (1.4x volume)")
-    dprint("=" * 100)
+    dprint("=" * 130)
     dprint("")
 
 
@@ -1512,8 +1584,8 @@ def main():
         final_audio = build_timed_audio(audio_files, vid_dur)
         merge_final(FINAL_CLIP_PATH, final_audio, FINAL_DUBBED_VIDEO, audio_files)
 
-        # 🐛 FINAL DEBUG SUMMARY
-        print_final_debug_summary(slots)
+        # 🐛 FINAL DEBUG SUMMARY — AI commentary ke saath
+        print_final_debug_summary(slots, segments, audio_files)
 
         print("=" * 60)
         print(f"🔥🔥 DONE! {FINAL_DUBBED_VIDEO}")
