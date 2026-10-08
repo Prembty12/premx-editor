@@ -1,31 +1,31 @@
 {
-  "last_updated": "2026-10-08 06:13:33 PM",
+  "last_updated": "2026-10-08 06:52:33 PM",
   "period_days": 7,
   "trending": [
     {
       "game": "VietnamCavePrison",
-      "views_7d": 4567,
-      "avg_per_video": 652,
+      "views_7d": 4653,
+      "avg_per_video": 664,
       "trend": "viral",
-      "ratio": 2.08974358974359,
+      "ratio": 2.105879482800683,
       "fb_link": "https://www.facebook.com/reel/1089058007444948/",
       "source_link": ""
     },
     {
       "game": "GearsOfWar",
-      "views_7d": 2782,
-      "avg_per_video": 556,
+      "views_7d": 2798,
+      "avg_per_video": 559,
       "trend": "trending",
-      "ratio": 1.7820512820512822,
+      "ratio": 1.772871432056599,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar4.mp4"
     },
     {
       "game": "CallOfDutyMW2",
-      "views_7d": 507,
-      "avg_per_video": 507,
+      "views_7d": 546,
+      "avg_per_video": 546,
       "trend": "trending",
-      "ratio": 1.625,
+      "ratio": 1.7316418638692364,
       "fb_link": "https://www.facebook.com/reel/2233604814166332/",
       "source_link": ""
     },
@@ -34,16 +34,16 @@
       "views_7d": 1912,
       "avg_per_video": 478,
       "trend": "trending",
-      "ratio": 1.5320512820512822,
+      "ratio": 1.5159795071968771,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "mm2remastered",
-      "views_7d": 1431,
+      "views_7d": 1433,
       "avg_per_video": 477,
       "trend": "trending",
-      "ratio": 1.5288461538461537,
+      "ratio": 1.5128080019516954,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_3.mp4"
     }
@@ -54,16 +54,16 @@
       "views_7d": 1348,
       "avg_per_video": 269,
       "trend": "slow",
-      "ratio": 0.8621794871794872,
+      "ratio": 0.8531349109538912,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR33.mp4"
     },
     {
       "game": "Callofdutyaw",
-      "views_7d": 590,
-      "avg_per_video": 196,
+      "views_7d": 591,
+      "avg_per_video": 197,
       "trend": "slow",
-      "ratio": 0.6282051282051282,
+      "ratio": 0.624786533300805,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison17.mp4"
     },
@@ -72,35 +72,35 @@
       "views_7d": 639,
       "avg_per_video": 106,
       "trend": "below_avg",
-      "ratio": 0.33974358974358976,
+      "ratio": 0.3361795559892657,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu15.mp4"
     },
     {
       "game": "GodofWarLaufey",
-      "views_7d": 376,
-      "avg_per_video": 75,
+      "views_7d": 378,
+      "avg_per_video": 63,
       "trend": "below_avg",
-      "ratio": 0.2403846153846154,
-      "fb_link": "https://www.facebook.com/reel/1416365153322444/",
-      "source_link": ""
+      "ratio": 0.19980483044645034,
+      "fb_link": "",
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_12.mp4"
     },
     {
       "game": "Wolverine",
       "views_7d": 30,
       "avg_per_video": 15,
       "trend": "below_avg",
-      "ratio": 0.04807692307692308,
+      "ratio": 0.047572578677726275,
       "fb_link": "",
       "source_link": ""
     }
   ],
   "recommendation": {
     "game": "VietnamCavePrison",
-    "views_7d": 4567,
-    "avg_per_video": 652,
+    "views_7d": 4653,
+    "avg_per_video": 664,
     "trend": "viral",
-    "ratio": 2.08974358974359,
+    "ratio": 2.105879482800683,
     "fb_link": "https://www.facebook.com/reel/1089058007444948/",
     "source_link": ""
   }
