@@ -1,1 +1,1 @@
-{"clip_duration": 20, "reason": "Intense close-quarters gunfight with red splatters", "start_time": 12, "status": "APPROVE", "title": "3 Enemies Close Range Fight 🔥"}
+{"clip_duration": 33, "reason": "Scan then heavy combat action", "start_time": 15, "status": "APPROVE", "title": "Scan Detected 5 Targets Then War 💥👀"}
