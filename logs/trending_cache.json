@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-10 02:05:17 AM",
+  "last_updated": "2026-10-10 02:09:04 AM",
   "period_days": 7,
   "trending": [
     {
@@ -7,7 +7,7 @@
       "views_7d": 1983,
       "avg_per_video": 991,
       "trend": "viral",
-      "ratio": 2.520641753081589,
+      "ratio": 2.51817826426896,
       "fb_link": "https://www.facebook.com/reel/1413510794250292/",
       "source_link": ""
     },
@@ -16,7 +16,7 @@
       "views_7d": 4557,
       "avg_per_video": 651,
       "trend": "trending",
-      "ratio": 1.6558403443553122,
+      "ratio": 1.6542220484753714,
       "fb_link": "https://www.facebook.com/reel/3708969699252321/",
       "source_link": ""
     },
@@ -25,16 +25,16 @@
       "views_7d": 1896,
       "avg_per_video": 632,
       "trend": "trending",
-      "ratio": 1.6075132068088438,
+      "ratio": 1.6059421422986708,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "GearsOfWar",
-      "views_7d": 3741,
+      "views_7d": 3742,
       "avg_per_video": 623,
       "trend": "trending",
-      "ratio": 1.5846214048131482,
+      "ratio": 1.5830727130570759,
       "fb_link": "https://www.facebook.com/reel/1977642476247722/",
       "source_link": ""
     },
@@ -42,8 +42,8 @@
       "game": "codBlackops6",
       "views_7d": 3542,
       "avg_per_video": 590,
-      "trend": "trending",
-      "ratio": 1.500684797495598,
+      "trend": "steady",
+      "ratio": 1.4992181391712276,
       "fb_link": "https://www.facebook.com/reel/1086858517283105/",
       "source_link": ""
     }
@@ -51,10 +51,10 @@
   "below_avg": [
     {
       "game": "Callofdutyaw",
-      "views_7d": 1324,
+      "views_7d": 1325,
       "avg_per_video": 331,
       "trend": "slow",
-      "ratio": 0.8419096067305811,
+      "ratio": 0.8410867865519938,
       "fb_link": "https://www.facebook.com/reel/2307188453374784/",
       "source_link": ""
     },
@@ -63,7 +63,7 @@
       "views_7d": 500,
       "avg_per_video": 100,
       "trend": "below_avg",
-      "ratio": 0.2543533555077284,
+      "ratio": 0.2541047693510555,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR315.mp4"
     },
@@ -72,27 +72,27 @@
       "views_7d": 408,
       "avg_per_video": 81,
       "trend": "below_avg",
-      "ratio": 0.20602621796126003,
+      "ratio": 0.20582486317435497,
       "fb_link": "https://www.facebook.com/reel/861579953646168/",
       "source_link": ""
+    },
+    {
+      "game": "ghostandela",
+      "views_7d": 110,
+      "avg_per_video": 55,
+      "trend": "below_avg",
+      "ratio": 0.13975762314308052,
+      "fb_link": "",
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela20.mp4"
     },
     {
       "game": "sifu",
       "views_7d": 270,
       "avg_per_video": 54,
       "trend": "below_avg",
-      "ratio": 0.13735081197417337,
+      "ratio": 0.13721657544956997,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu15.mp4"
-    },
-    {
-      "game": "ghostandela",
-      "views_7d": 100,
-      "avg_per_video": 50,
-      "trend": "below_avg",
-      "ratio": 0.1271766777538642,
-      "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela20.mp4"
     }
   ],
   "recommendation": {
@@ -100,7 +100,7 @@
     "views_7d": 1983,
     "avg_per_video": 991,
     "trend": "viral",
-    "ratio": 2.520641753081589,
+    "ratio": 2.51817826426896,
     "fb_link": "https://www.facebook.com/reel/1413510794250292/",
     "source_link": ""
   }
