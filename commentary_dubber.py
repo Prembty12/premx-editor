@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v4.0 (Merged Slot Verification)
+🎙️ AI Commentary Dubber — v4.2 (Slot-wise Reason Display)
 ===============================================================
 FEATURES:
   ✅ Loudness: stderr read
@@ -11,9 +11,11 @@ FEATURES:
        - 1 min tak    → 90 frames  → 2 images (45 + 45)
        - 1 min se upar → 180 frames → 4 images (45 + 45 + 45 + 45)
        - 2 min se upar → 180 frames (MAX CAP) → 4 images
-  ✅ Slot verification MERGED into commentary call (sirf 2/4 images)
+  ✅ Slot verification MERGED into commentary call
+  ✅ REASON MANDATORY (AI ko reason dena padega)
+  ✅ NO REJECT (chhota reason bhi chalega)
+  ✅ Slot-wise reason shown in terminal
   ✅ ACTION / DIALOG / CALM word sets
-  ✅ Original prompt preserved
 """
 
 import os
@@ -192,12 +194,6 @@ def speed_for_type(slot_type):
 # ADAPTIVE FRAME CONFIG (v3.8 — Final Rule)
 # ============================================================
 def get_optimal_frame_config(vid_duration):
-    """
-    Final Rule:
-      - 1 min tak    → 90 frames  → 2 images (45 + 45)
-      - 1 min se upar → 180 frames → 4 images (45 + 45 + 45 + 45)
-      - 2 min se upar → 180 frames (MAX CAP) → 4 images
-    """
     if vid_duration <= 60:
         total_frames = 90
         num_images = 2
@@ -555,6 +551,7 @@ def build_auto_slots(video_path, vid_duration, srt_content):
             "start": round(t, 2),
             "end": round(end, 2),
             "type": None,
+            "original_type": None,
             "visual_type": None,
             "srt_text": slot_text,
             "scene_count": 0,
@@ -566,6 +563,7 @@ def build_auto_slots(video_path, vid_duration, srt_content):
             "gpt_type": None,
             "final_type": None,
             "ai_verified": False,
+            "ai_reason": None,
             "speed_boost_log": []
         })
         t = end
@@ -619,9 +617,6 @@ def classify_slots_combined(video_path, slots, srt_content):
     print(f"   Action if: motion>{MOTION_ACTION_MIN} OR action_ratio>0.35")
     print("=" * 70 + "\n")
 
-    # ═══════════════════════════════════════════════════════════
-    # ACTION WORDS
-    # ═══════════════════════════════════════════════════════════
     ACTION_WORDS = {
         "shoot", "fire", "hit", "run", "kill", "die", "attack",
         "grenade", "boom", "jump", "dodge", "cover", "reload",
@@ -629,19 +624,11 @@ def classify_slots_combined(video_path, slots, srt_content):
         "destroy", "target", "lock", "bang", "drop", "danger",
         "whoa", "oh", "yeah", "nice", "sick", "cook", "big", "fast"
     }
-
-    # ═══════════════════════════════════════════════════════════
-    # DIALOG WORDS
-    # ═══════════════════════════════════════════════════════════
     DIALOG_WORDS = {
         "you", "me", "we", "what", "why", "how", "hey", "listen",
         "wait", "okay", "yeah", "know", "think", "feel", "want",
         "need", "can", "will"
     }
-
-    # ═══════════════════════════════════════════════════════════
-    # CALM WORDS
-    # ═══════════════════════════════════════════════════════════
     CALM_WORDS = {
         "chill", "relax", "vibe", "vibing", "cool", "nice",
         "beautiful", "pretty", "view", "scenery", "quiet",
@@ -681,7 +668,6 @@ def classify_slots_combined(video_path, slots, srt_content):
             has_calm_word = len(words & CALM_WORDS) >= 1
             has_speech = len(sw_text.strip()) > 3
 
-            # ─── ACTION detection (priority) ───
             if has_action_word and scene_cuts >= 1:
                 action_count += 1
             elif scene_cuts >= 2 and loud > LOUD_CALM_MAX:
@@ -690,10 +676,8 @@ def classify_slots_combined(video_path, slots, srt_content):
                 action_count += 1
             elif has_action_word and loud > -20:
                 action_count += 1
-            # ─── CALM detection (quiet + no scenes + calm words) ───
             elif has_calm_word and scene_cuts == 0 and loud < LOUD_CALM_MAX:
                 calm_count += 1
-            # ─── DIALOG detection ───
             elif has_speech and has_dialog_word:
                 dialog_count += 1
             elif has_speech:
@@ -742,6 +726,7 @@ def classify_slots_combined(video_path, slots, srt_content):
         else:
             slot["type"] = "calm"
 
+        slot["original_type"] = slot["type"]
         slot["scene_count"] = slot_scenes
         slot["avg_loud"] = round(slot_loud, 1)
         slot["sub_analysis"] = {
@@ -946,6 +931,14 @@ Pehle har slot ka type VERIFY karo based on FRAMES:
 - Look at the ACTUAL FRAMES, don't just trust metadata.
 - BE HONEST and VARIED. Don't classify everything as one type.
 
+**REASON MANDATORY:**
+For each slot, give a SHORT reason (2-6 words is fine):
+- ✅ "Player hiding behind wall"
+- ✅ "Firing visible, enemy attacking"
+- ✅ "Empty scene, no combat"
+- ✅ "Face close-up while speaking"
+- ❌ Don't leave reason empty.
+
 **🔥🔥🔥 STEP 2: COMMENTARY LIKHO 🔥🔥🔥**
 
 Ab verified types ke hisaab se commentary likho:
@@ -1054,7 +1047,7 @@ If you see ANY of these → visual_type = "action":
 Return ONLY valid JSON:
 {{
   "verified_slots": [
-    {{"slot": 1, "type": "calm", "reason": "Player standing still"}},
+    {{"slot": 1, "type": "calm", "reason": "Player hiding"}},
     {{"slot": 2, "type": "action", "reason": "Firing visible"}}
   ],
   "segments": [
@@ -1120,32 +1113,49 @@ Return ONLY valid JSON:
 
                     parsed = json.loads(raw)
 
-                    # ✅ verified_slots nikalo
                     verified_slots = parsed.get("verified_slots", [])
                     segments = parsed.get("segments", [])
 
-                    # ✅ Slots ke types update karo (verification se)
+                    # ✅ Slot-wise verification print karo
                     if verified_slots:
+                        print(f"\n   🔄 SLOT VERIFICATION (AI):")
+                        print(f"   ┌{'─'*65}┐")
+                        print(f"   │ {'Slot':<5} {'Old':<8} {'New':<8} {'Reason':<40} │")
+                        print(f"   ├{'─'*65}┤")
+
                         for vs in verified_slots:
                             slot_num = vs.get("slot")
                             new_type = vs.get("type")
+                            reason = vs.get("reason", "No reason").strip()
+
                             if slot_num and new_type in ("action", "dialog", "calm"):
                                 idx = slot_num - 1
                                 if 0 <= idx < len(slots):
                                     old_type = slots[idx]["type"]
+
+                                    # ✅ Slot update karo
                                     slots[idx]["type"] = new_type
                                     slots[idx]["ai_verified"] = True
+                                    slots[idx]["ai_reason"] = reason
                                     slots[idx]["voice_speed"] = speed_for_type(new_type)
+
                                     # Action boost
                                     if new_type == "action":
                                         if slots[idx].get("scene_count", 0) >= 3:
                                             slots[idx]["voice_speed"] = min(VOICE_SPEED_MAX, slots[idx]["voice_speed"] + 0.03)
                                         if slots[idx].get("avg_loud", -50) > -12:
                                             slots[idx]["voice_speed"] = min(VOICE_SPEED_MAX, slots[idx]["voice_speed"] + 0.03)
-                                    slots[idx]["voice_speed"] = round(slots[idx]["voice_speed"], 2)
-                                    print(f"   🔄 Slot {slot_num}: {old_type} → {new_type} (AI verified) | speed={slots[idx]['voice_speed']}")
 
-                    print(f"   ✅ Key {key_idx} worked! {len(segments)} segments, {len(verified_slots)} verified\n")
+                                    slots[idx]["voice_speed"] = round(slots[idx]["voice_speed"], 2)
+
+                                    # ✅ Print with reason (shortened)
+                                    reason_short = reason[:38] + ".." if len(reason) > 40 else reason
+                                    change_icon = "🎯" if old_type != new_type else "  "
+                                    print(f"   │ {change_icon} {slot_num:<3} {old_type:<8} {new_type:<8} {reason_short:<40} │")
+
+                        print(f"   └{'─'*65}┘")
+
+                    print(f"\n   ✅ Key {key_idx} worked! {len(segments)} segments, {len(verified_slots)} verified\n")
                     return segments, slots
 
                 elif r.status_code in (401, 403):
@@ -1392,7 +1402,7 @@ def fallback_copy_original():
 # ============================================================
 def main():
     print("=" * 60)
-    print("🎙️ AI COMMENTARY DUBBER — v4.0 (Merged Verification)")
+    print("🎙️ AI COMMENTARY DUBBER — v4.2 (Slot-wise Reason Display)")
     print("=" * 60)
     print(f"📹 Input : {FINAL_CLIP_PATH}")
     print(f"📤 Output: {FINAL_DUBBED_VIDEO}")
@@ -1424,13 +1434,9 @@ def main():
         slots = build_auto_slots(FINAL_CLIP_PATH, vid_dur, srt_content)
         slots = classify_slots_combined(FINAL_CLIP_PATH, slots, srt_content)
 
-        # ✅ NAYA: Slot verification merged into commentary call
-        # (verify_slots_with_ai call hata diya — ab commentary call mein hogi)
-
         grid_paths, total_frames, num_images, frames_per_image = \
             build_analysis_grids(FINAL_CLIP_PATH, vid_dur)
 
-        # ✅ Ab yeh 2 cheezein return karega
         segments, slots = generate_full_script(
             slots, srt_content, grid_paths, vid_dur,
             total_frames, num_images, frames_per_image
