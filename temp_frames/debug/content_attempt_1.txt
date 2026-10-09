@@ -1,1 +1,1 @@
-{"clip_duration": 33, "reason": "Scan then heavy combat action", "start_time": 15, "status": "APPROVE", "title": "Scan Detected 5 Targets Then War 💥👀"}
+{"clip_duration": 34, "reason": "Visceral giant boss execution with blue blade", "start_time": 4, "status": "APPROVE", "title": "Blue Blade Tore 1 Giant Apart 🔥⚔️"}
