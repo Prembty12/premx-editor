@@ -1,1 +1,1 @@
-{"clip_duration": 35, "reason": "Intense combat with fiery explosions and green beam", "start_time": 10, "status": "APPROVE", "title": "Slashed 5 Enemies At 1 HP 🔥🗡️"}
+{"clip_duration": 30, "reason": "Kraven boss fight and massive explosion", "start_time": 0, "status": "APPROVE", "title": "Black Suit vs Kraven 5 Hunters 🔥"}
