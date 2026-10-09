@@ -1,1 +1,1 @@
-{"clip_duration": 19, "reason": "Intense cinematic giant battle sequence", "start_time": 28, "status": "APPROVE", "title": "She Fights Giant With 1 HP 🔥⚔️"}
+{"clip_duration": 15, "reason": "Active cave combat shooting sequence", "start_time": 0, "status": "APPROVE", "title": "He survived 4 enemies cave shootout 🔥🎯"}
