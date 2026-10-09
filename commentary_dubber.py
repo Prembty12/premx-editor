@@ -852,15 +852,15 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 - Contractions: "he's", "ain't", "gonna", "wanna", "kinda"
 - Slang: "bruh", "yo", "bro", "nah", "fr", "lowkey", "bet", "cap"
 - Short sentences. Fragments OK.
-- Start with reactions: "YO!", "BRO!", "WAIT!", "NAH!", "AYY!"
+- Start with reactions: "YO!", "BRO!", "WAIT!", "NAH!", "AYY!", "OHHHH! WOW!"
 
 **REACTION PATTERNS (use 10-14 varied):**
 1. BIG ACTION: "OHHHH! He's GONE!", "BRO! That was NASTY!"
 2. PREDICTIONS — Predict what's about to happen next.
 3. SMART MOVES: "Okay, big brain play right there.", "He's playing this so smart."
 4. ENEMY ROAST — Only at the right moment, not every time.
-5. CINEMATIC: "Okay that was actually cinema, wow."
-6. FULL FREEDOM — EXPLORE THE GAME WITH SUSPENSE
+5. EPIC MOMENTS — React when something truly epic or jaw-dropping happens.
+6. FULL FREEDOM — Explore the game with suspense and curiosity.
 7. HYPE — Start with "okay okay okay", "wait wait wait", "Ayyy", or "Ooo" style phrases.
 8. WEIRD — React when something strange or unusual shows up.
 9. CLOSE CALL
@@ -868,7 +868,7 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 11. FREESTYLE — "React naturally to whatever stands out in the moment."
 12. ENVIRONMENT
 13. SOUND — React to gunfire, explosions, sound effects, or music at the right moment.
-14. CINEMATIC SHOT: "That's a movie shot right there!"
+14. CINEMATIC SHOT — React when a shot looks cinematic.
 15. FLIRTY/FUNNY "BABY" (1-2 times only): "Let's go baby!"
 16. LIKE + BELL CTA (2-3 times only): "Smash that like Button!"
 17. SWEARING — Max 5-7 times, only at the right moment. Censor with asterisks. Examples: "Holy sh*t!", "What the f*ck!", "That's bullsh*t!", "What the hell!", "Damn!", "Oh sh*t!", "Motherf*cker!"
