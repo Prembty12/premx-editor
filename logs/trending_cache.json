@@ -1,106 +1,106 @@
 {
-  "last_updated": "2026-10-09 10:08:12 AM",
+  "last_updated": "2026-10-09 02:52:14 PM",
   "period_days": 7,
   "trending": [
     {
       "game": "CallOfDutyMW2",
-      "views_7d": 1497,
-      "avg_per_video": 748,
+      "views_7d": 1753,
+      "avg_per_video": 876,
       "trend": "viral",
-      "ratio": 2.1522797698096503,
+      "ratio": 2.377453027139875,
       "fb_link": "https://www.facebook.com/reel/1413510794250292/",
       "source_link": ""
     },
     {
       "game": "Russian_secret_missions",
-      "views_7d": 1949,
-      "avg_per_video": 649,
+      "views_7d": 2096,
+      "avg_per_video": 698,
       "trend": "trending",
-      "ratio": 1.867419212040726,
+      "ratio": 1.8943632567849686,
       "fb_link": "https://www.facebook.com/reel/26623339340696588/",
       "source_link": ""
     },
     {
       "game": "MarvelsSpiderMan2",
-      "views_7d": 1893,
+      "views_7d": 1894,
       "avg_per_video": 631,
       "trend": "trending",
-      "ratio": 1.8156263833554669,
+      "ratio": 1.712526096033403,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "VietnamCavePrison",
-      "views_7d": 5022,
-      "avg_per_video": 627,
+      "views_7d": 4237,
+      "avg_per_video": 605,
       "trend": "trending",
-      "ratio": 1.8041168658698539,
+      "ratio": 1.6419624217118998,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison22.mp4"
     },
     {
-      "game": "GearsOfWar",
-      "views_7d": 2868,
-      "avg_per_video": 478,
+      "game": "codBlackops6",
+      "views_7d": 3041,
+      "avg_per_video": 506,
       "trend": "steady",
-      "ratio": 1.3753873395307659,
-      "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar7.mp4"
+      "ratio": 1.3732776617954072,
+      "fb_link": "https://www.facebook.com/reel/1086858517283105/",
+      "source_link": ""
     }
   ],
   "below_avg": [
     {
       "game": "Callofdutyaw",
-      "views_7d": 767,
-      "avg_per_video": 191,
+      "views_7d": 1018,
+      "avg_per_video": 254,
       "trend": "slow",
-      "ratio": 0.5495794599380257,
+      "ratio": 0.6893528183716076,
       "fb_link": "https://www.facebook.com/reel/2307188453374784/",
       "source_link": ""
     },
     {
-      "game": "sifu",
-      "views_7d": 639,
-      "avg_per_video": 106,
-      "trend": "below_avg",
-      "ratio": 0.3050022133687472,
-      "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu15.mp4"
-    },
-    {
       "game": "GodofWarLaufey",
-      "views_7d": 393,
-      "avg_per_video": 78,
+      "views_7d": 396,
+      "avg_per_video": 79,
       "trend": "below_avg",
-      "ratio": 0.2244355909694555,
+      "ratio": 0.21440501043841337,
       "fb_link": "https://www.facebook.com/reel/861579953646168/",
       "source_link": ""
     },
     {
       "game": "GODOFWAR3",
-      "views_7d": 320,
-      "avg_per_video": 64,
+      "views_7d": 390,
+      "avg_per_video": 78,
       "trend": "below_avg",
-      "ratio": 0.18415227976980963,
+      "ratio": 0.2116910229645094,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR315.mp4"
     },
     {
-      "game": "Wolverine",
-      "views_7d": 70,
-      "avg_per_video": 23,
+      "game": "sifu",
+      "views_7d": 270,
+      "avg_per_video": 54,
       "trend": "below_avg",
-      "ratio": 0.06617972554227534,
+      "ratio": 0.1465553235908142,
       "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine24.mp4"
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu15.mp4"
+    },
+    {
+      "game": "ghostandela",
+      "views_7d": 60,
+      "avg_per_video": 30,
+      "trend": "below_avg",
+      "ratio": 0.081419624217119,
+      "fb_link": "",
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela20.mp4"
     }
   ],
   "recommendation": {
     "game": "CallOfDutyMW2",
-    "views_7d": 1497,
-    "avg_per_video": 748,
+    "views_7d": 1753,
+    "avg_per_video": 876,
     "trend": "viral",
-    "ratio": 2.1522797698096503,
+    "ratio": 2.377453027139875,
     "fb_link": "https://www.facebook.com/reel/1413510794250292/",
     "source_link": ""
   }

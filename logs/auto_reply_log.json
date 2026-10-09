@@ -1,5 +1,5 @@
 {
-  "total_replies": 25,
+  "total_replies": 27,
   "total_skipped": 0,
   "replies": [
     {
@@ -463,9 +463,45 @@
       "time_window_hours": 1440,
       "timestamp": "2026-10-08 11:34:55 PM",
       "status": "posted"
+    },
+    {
+      "reply_id": "1099257689628193_1417612663849747",
+      "comment_id": "1099257689628193_1590647169425539",
+      "reply_to_id": "1099257689628193_1590647169425539",
+      "post_id": "100463226188818_1099257689628193",
+      "user_name": "Facebook User",
+      "user_id": "",
+      "user_comment": "the shot gun looks nice what weapon is this",
+      "openrouter_reply": "That's the shotgun from MW2, bro. Fire weapon! 😎",
+      "type": "friendly",
+      "depth": 1,
+      "game": "Call of Duty",
+      "post_title": "3 Enemies Close Range Fight 🔥\n\n#videogames #gamingcommunity #gaming #callofdutym",
+      "fb_post_link": "https://www.facebook.com/reel/1413510794250292/",
+      "source_link": "",
+      "timestamp": "2026-10-09 02:52:07 PM",
+      "status": "posted"
+    },
+    {
+      "reply_id": "1099185116302117_1725095765252869",
+      "comment_id": "1099185116302117_1637849044671561",
+      "reply_to_id": "1099185116302117_1637849044671561",
+      "post_id": "100463226188818_1099185116302117",
+      "user_name": "Facebook User",
+      "user_id": "",
+      "user_comment": "Please writ down full game play name and pc",
+      "openrouter_reply": "It's Call of Duty: Black Ops 6, bhai, and yes, it's on PC. Chill! 🎮",
+      "type": "friendly",
+      "depth": 1,
+      "game": "Black Ops 6",
+      "post_title": "4 Enemies Cooked Scanner 🎯🔥\n\n#videogames #gamingcommunity #gaming #codblackops6 ",
+      "fb_post_link": "https://www.facebook.com/reel/1768651854427402/",
+      "source_link": "",
+      "timestamp": "2026-10-09 02:52:14 PM",
+      "status": "posted"
     }
   ],
   "skipped": [],
-  "last_updated": "2026-10-09 10:08:12 AM",
+  "last_updated": "2026-10-09 02:52:14 PM",
   "time_window_hours": 1440
 }
