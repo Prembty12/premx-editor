@@ -87,9 +87,7 @@ REJECT IF (Strictly reject if content is boring, empty, or lacks engagement):
 
 APPROVE IF:
 - Real gameplay has a clear, powerful \"Engaging Highlight Window\" (combat, intense fights, epic boss battles, explosions, emotional cutscenes, hilarious fails, or high-stakes clutch moments).
-- Flexible Duration Control The clip duration should match the available engagement window up to the full source length of ${SOURCE_DURATION} seconds
-- Full Source Adaptation If the entire source video contains continuous gameplay up to ${SOURCE_DURATION} seconds allow the duration to cover the complete source naturally
-- Natural Ending Capture Always match the clip duration to the actual length of the gameplay moment up to ${SOURCE_DURATION} seconds without forcing artificial limits
+- Precise Entry Point Detection Always set start_time at the absolute earliest frame where the action or tension begins rather than delaying or skipping the initial build-up
 - The moment has a clear start and end point in the timestamps.
 - Absolute Cinematic & Engagement Mastery Rule: Prioritize pure hype, adrenaline, emotion, comedy, and entertainment above all else. Whether it's an epic fight, a deep emotional drama, a hilarious adventure, or a high-stakes moment that is genuinely gripping, commit to the *full sequence* from its absolute beginning to its natural end. Never force an artificial cut or clip truncation on a brilliant moment—allow the entire momentum, tension, comedy, and payoff of the gameplay to breathe and play out completely so the audience gets maximum satisfaction.
 TITLE RULES (only for APPROVE):
@@ -133,7 +131,7 @@ If APPROVE, ALL 5 FIELDS ARE MANDATORY:
   \"status\": \"APPROVE\",
   \"title\": \"<viral title 6 words max with 1-3 emojis>\",
   \"start_time\": <integer seconds, exact second where the engaging moment starts>,
-  \"clip_duration\": <integer seconds, minimum 15 seconds. Capture the FULL fight or highlight completely from start to finish, do not cut it short!>,
+  \"clip_duration\": <integer seconds, minimum 12 seconds. Capture the FULL fight or highlight completely from start to finish, do not cut it short!>,
   \"reason\": \"<short explanation MAX 10 words>\"
 }
 
@@ -153,7 +151,7 @@ CRITICAL - HOW TO CALCULATE START_TIME AND CLIP_DURATION (Total Video Length = $
 5. NO null values, NO empty values
 6. STOP GENERATING immediately after the closing curly bracket 'J'. DO NOT TRUNCATE.
 7. KEEP YOUR RESPONSE AS SHORT AS POSSIBLE. Do not write long explanations.
-
+8. STRICT OUTPUT RULE: Do not output markdown code blocks or conversational text. Output ONLY the raw JSON object starting with { and ending with }.
 VALID EXAMPLE (REJECT):
 {\"status\": \"REJECT\", \"reason\": \"Only menu navigation and boring running\"}
 
