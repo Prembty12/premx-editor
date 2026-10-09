@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v3.4 (Simple Debug)
+🎙️ AI Commentary Dubber — v3.7 (Variable atempo 1.0-1.20)
+===============================================================
+FEATURES:
+  ✅ Timing LOCK — GPT segment = SLOT time (no drift)
+  ✅ Slot-locked audio delay (exact match)
+  ✅ Variable atempo — 1.0 se 1.20 ke beech (zaroorat ke hisaab se)
+  ✅ Voice natural (VOICE_SPEED_MAX = 1.17)
 ===============================================================
 Simple debug format:
-  [timestamp] speed=X.XX (type) | AI Commentary
+  [timestamp] speed=X.XX atempo=Y.YYY (type) | AI Commentary
 """
 
 import os
@@ -86,10 +92,13 @@ GRID_ROWS = 10
 CANVAS_W = 4320
 CANVAS_H = 7680
 
-# Voice speed limits
+# Voice speed limits — NATURAL
 VOICE_SPEED_MIN = 1.00
 VOICE_SPEED_MAX = 1.17
-ATEMPO_MAX      = 1.10
+
+# ✅ Variable atempo — 1.0 se 1.20 ke beech (zaroorat ke hisaab se)
+ATEMPO_MIN = 1.00
+ATEMPO_MAX = 1.20
 
 SPEED_ACTION = 1.14
 SPEED_DIALOG = 1.05
@@ -709,7 +718,7 @@ def build_analysis_grid(video_path, vid_duration, num_frames=ANALYSIS_FRAMES):
 
 
 # ============================================================
-# STEP 6 — GPT Call
+# STEP 6 — GPT Call (TIMING LOCK)
 # ============================================================
 def generate_full_script(slots, srt_content, analysis_grid_path):
     print(f"🤖 [6] Generating FULL script (OpenRouter — {len(OPENROUTER_KEYS)} keys)...")
@@ -898,6 +907,39 @@ Return ONLY valid JSON:
                     parsed = json.loads(raw)
                     segments = parsed.get("segments", [])
 
+                    # ✅✅✅ TIMING LOCK — GPT ka start/end ko SLOT se force match karo
+                    print(f"   🔒 Locking segment timing to slots...")
+                    locked_count = 0
+                    for seg in segments:
+                        slot_num = seg.get("slot")
+
+                        if slot_num and 1 <= slot_num <= len(slots):
+                            exact_slot = slots[slot_num - 1]
+                            old_start = seg.get("start")
+                            old_end = seg.get("end")
+                            if old_start != exact_slot["start"] or old_end != exact_slot["end"]:
+                                print(f"      🔒 Slot {slot_num}: {old_start}→{old_end} "
+                                      f"⇒ {exact_slot['start']}→{exact_slot['end']}")
+                                locked_count += 1
+                            seg["start"] = exact_slot["start"]
+                            seg["end"] = exact_slot["end"]
+                            seg["slot"] = slot_num
+                        else:
+                            best_slot = None
+                            best_diff = 999
+                            for s in slots:
+                                diff = abs(s["start"] - seg.get("start", 0))
+                                if diff < best_diff:
+                                    best_diff = diff
+                                    best_slot = s
+                            if best_slot and best_diff < 3.0:
+                                seg["start"] = best_slot["start"]
+                                seg["end"] = best_slot["end"]
+                                seg["slot"] = slots.index(best_slot) + 1
+                                locked_count += 1
+
+                    print(f"   ✅ Locked {locked_count} segments to slot timing")
+
                     updated_count = 0
                     override_count = 0
                     dialog_protected = 0
@@ -1040,10 +1082,10 @@ Return ONLY valid JSON:
 
 
 # ============================================================
-# STEP 7 — ElevenLabs TTS (SIMPLE DEBUG — ek line mein)
+# STEP 7 — ElevenLabs TTS (SLOT-LOCKED + VARIABLE ATEMPO) ✅
 # ============================================================
 def generate_audio(segments, slots):
-    print("🔊 [7] Generating TTS...")
+    print("🔊 [7] Generating TTS (slot-locked + variable atempo 1.0-1.20)...")
     url = f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID}"
     headers = {
         "Accept": "audio/mpeg",
@@ -1057,19 +1099,32 @@ def generate_audio(segments, slots):
         if not text:
             continue
 
-        target_dur = seg["end"] - seg["start"]
+        # ✅ SLOT-LOCKED: slot number se EXACT slot uthao
+        slot_num = seg.get("slot")
+        matched_slot = None
+
+        if slot_num and 1 <= slot_num <= len(slots):
+            matched_slot = slots[slot_num - 1]
+        else:
+            best_diff = 999
+            for s in slots:
+                diff = abs(s["start"] - seg.get("start", 0))
+                if diff < best_diff:
+                    best_diff = diff
+                    matched_slot = s
+
+        if not matched_slot:
+            print(f"   ⚠️ seg {idx}: no slot match, skipping")
+            continue
+
+        # ✅ EXACT slot timing
+        slot_start = matched_slot["start"]
+        slot_end = matched_slot["end"]
+        target_dur = slot_end - slot_start
+        voice_speed = matched_slot.get("voice_speed", 1.0)
+        visual_type = (matched_slot.get("type") or "calm").lower().strip()
+
         seg_file = f"{SEGMENTS_DIR}/seg_{idx:03d}.mp3"
-
-        visual_type = (seg.get("visual_type") or "").lower().strip()
-        voice_speed = speed_for_type(visual_type) if visual_type in ("action", "dialog", "calm") else 1.0
-
-        best_diff = 999
-        for s in slots:
-            diff = abs(s["start"] - seg["start"])
-            if diff < best_diff:
-                best_diff = diff
-                voice_speed = s.get("voice_speed", voice_speed)
-
         voice_speed = max(VOICE_SPEED_MIN, min(VOICE_SPEED_MAX, voice_speed))
 
         data = {
@@ -1091,9 +1146,12 @@ def generate_audio(segments, slots):
                     af.write(r.content)
 
                 actual = get_duration(seg_file)
+                atempo_used = "none"
+
                 if actual > 0 and target_dur > 0:
-                    tempo = actual / target_dur
-                    tempo = max(1.0, min(ATEMPO_MAX, tempo))
+                    # ✅ VARIABLE ATEMPO — 1.0 se 1.20 ke beech (zaroorat ke hisaab se)
+                    needed_tempo = actual / target_dur
+                    tempo = max(ATEMPO_MIN, min(ATEMPO_MAX, needed_tempo))
 
                     if tempo > 1.01:
                         fit_file = f"{SEGMENTS_DIR}/seg_{idx:03d}_fit.mp3"
@@ -1105,17 +1163,24 @@ def generate_audio(segments, slots):
                             stderr=subprocess.DEVNULL
                         )
                         final = fit_file if os.path.exists(fit_file) else seg_file
+                        atempo_used = f"{tempo:.3f}"
                     else:
                         final = seg_file
+                else:
+                    final = seg_file
 
-                    audio_files.append({
-                        "file": final, "start": seg["start"],
-                        "end": seg["end"], "text": text,
-                        "visual_type": visual_type
-                    })
+                audio_files.append({
+                    "file": final,
+                    "start": slot_start,      # ✅ SLOT ka exact start
+                    "end": slot_end,          # ✅ SLOT ka exact end
+                    "text": text,
+                    "visual_type": visual_type
+                })
 
-                    # ✅ SIMPLE DEBUG — ek line mein
-                    print(f"   ✅ [{seg['start']:5.1f}s] speed={voice_speed:.2f} ({visual_type or 'signal'}) | {text}")
+                # ✅ SIMPLE DEBUG — ek line mein (atempo info ke saath)
+                print(f"   ✅ [{slot_start:5.1f}s] speed={voice_speed:.2f} "
+                      f"atempo={atempo_used} ({visual_type or 'signal'}) | {text}")
+
             elif r.status_code == 401:
                 print("   ❌ 401 — ElevenLabs key galat!")
                 break
@@ -1235,13 +1300,14 @@ def fallback_copy_original():
 # ============================================================
 def main():
     print("=" * 60)
-    print("🎙️ AI COMMENTARY DUBBER — v3.4 (Simple Debug)")
+    print("🎙️ AI COMMENTARY DUBBER — v3.7 (Variable atempo 1.0-1.20)")
     print("=" * 60)
     print(f"📹 Input : {FINAL_CLIP_PATH}")
     print(f"📤 Output: {FINAL_DUBBED_VIDEO}")
     print(f"🎤 Voice : {VOICE_ID}")
     print(f"🎛️  Switch: COMMENTARY_ENABLED = {COMMENTARY_ENABLED}")
     print(f"🎮 Speed : {VOICE_SPEED_MIN} - {VOICE_SPEED_MAX}")
+    print(f"🎵 atempo: {ATEMPO_MIN} - {ATEMPO_MAX} (variable)")
     print(f"🔊 Volume: Action={VOL_ACTION}x | Other={VOL_OTHER}x")
     print(f"🖼️  Frames: {ANALYSIS_FRAMES} ({GRID_COLS}x{GRID_ROWS}, {CANVAS_W}x{CANVAS_H} 8K)")
     print(f"🤖 Model : openai/gpt-4o-mini (Free)")
@@ -1272,6 +1338,15 @@ def main():
 
         if not segments:
             raise Exception("No segments generated")
+
+        # ✅ DEBUG: Timing verification
+        print("🔍 TIMING VERIFICATION:")
+        print(f"   Slots: {len(slots)} | Segments: {len(segments)}")
+        for i, seg in enumerate(segments, 1):
+            slot_num = seg.get("slot", "?")
+            print(f"   Seg {i}: slot={slot_num} | "
+                  f"start={seg.get('start'):.2f}s end={seg.get('end'):.2f}s")
+        print()
 
         speeds = [s["voice_speed"] for s in slots]
         print(f"🎮 Final voice speeds: "
