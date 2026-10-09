@@ -1,1 +1,1 @@
-{"clip_duration": 38, "reason": "Intense corridor combat vs red monster", "start_time": 16, "status": "APPROVE", "title": "Soldier Slays Red Monster 1 HP 🔥😳"}
+{"clip_duration": 23, "reason": "Intense fiery street combat with heavy shooting", "start_time": 20, "status": "APPROVE", "title": "Survived 5 Enemies On Fiery Street 🔥🎯"}
