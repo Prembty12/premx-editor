@@ -1,22 +1,22 @@
 {
-  "last_updated": "2026-10-10 01:57:44 AM",
+  "last_updated": "2026-10-10 02:05:17 AM",
   "period_days": 7,
   "trending": [
     {
       "game": "CallOfDutyMW2",
-      "views_7d": 1982,
+      "views_7d": 1983,
       "avg_per_video": 991,
       "trend": "viral",
-      "ratio": 2.5240987460815045,
+      "ratio": 2.520641753081589,
       "fb_link": "https://www.facebook.com/reel/1413510794250292/",
       "source_link": ""
     },
     {
       "game": "VietnamCavePrison",
-      "views_7d": 4546,
-      "avg_per_video": 649,
+      "views_7d": 4557,
+      "avg_per_video": 651,
       "trend": "trending",
-      "ratio": 1.6530172413793103,
+      "ratio": 1.6558403443553122,
       "fb_link": "https://www.facebook.com/reel/3708969699252321/",
       "source_link": ""
     },
@@ -25,16 +25,16 @@
       "views_7d": 1896,
       "avg_per_video": 632,
       "trend": "trending",
-      "ratio": 1.6097178683385578,
+      "ratio": 1.6075132068088438,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "GearsOfWar",
-      "views_7d": 3739,
+      "views_7d": 3741,
       "avg_per_video": 623,
       "trend": "trending",
-      "ratio": 1.586794670846395,
+      "ratio": 1.5846214048131482,
       "fb_link": "https://www.facebook.com/reel/1977642476247722/",
       "source_link": ""
     },
@@ -43,7 +43,7 @@
       "views_7d": 3542,
       "avg_per_video": 590,
       "trend": "trending",
-      "ratio": 1.5027429467084639,
+      "ratio": 1.500684797495598,
       "fb_link": "https://www.facebook.com/reel/1086858517283105/",
       "source_link": ""
     }
@@ -54,7 +54,7 @@
       "views_7d": 1324,
       "avg_per_video": 331,
       "trend": "slow",
-      "ratio": 0.843064263322884,
+      "ratio": 0.8419096067305811,
       "fb_link": "https://www.facebook.com/reel/2307188453374784/",
       "source_link": ""
     },
@@ -63,7 +63,7 @@
       "views_7d": 500,
       "avg_per_video": 100,
       "trend": "below_avg",
-      "ratio": 0.25470219435736674,
+      "ratio": 0.2543533555077284,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR315.mp4"
     },
@@ -72,7 +72,7 @@
       "views_7d": 408,
       "avg_per_video": 81,
       "trend": "below_avg",
-      "ratio": 0.20630877742946707,
+      "ratio": 0.20602621796126003,
       "fb_link": "https://www.facebook.com/reel/861579953646168/",
       "source_link": ""
     },
@@ -81,26 +81,26 @@
       "views_7d": 270,
       "avg_per_video": 54,
       "trend": "below_avg",
-      "ratio": 0.13753918495297804,
+      "ratio": 0.13735081197417337,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu15.mp4"
     },
     {
       "game": "ghostandela",
-      "views_7d": 90,
-      "avg_per_video": 45,
+      "views_7d": 100,
+      "avg_per_video": 50,
       "trend": "below_avg",
-      "ratio": 0.11461598746081504,
+      "ratio": 0.1271766777538642,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela20.mp4"
     }
   ],
   "recommendation": {
     "game": "CallOfDutyMW2",
-    "views_7d": 1982,
+    "views_7d": 1983,
     "avg_per_video": 991,
     "trend": "viral",
-    "ratio": 2.5240987460815045,
+    "ratio": 2.520641753081589,
     "fb_link": "https://www.facebook.com/reel/1413510794250292/",
     "source_link": ""
   }
