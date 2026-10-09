@@ -1,69 +1,60 @@
 {
-  "last_updated": "2026-10-09 05:42:26 AM",
+  "last_updated": "2026-10-09 08:41:11 AM",
   "period_days": 7,
   "trending": [
     {
-      "game": "CallOfDutyMW2",
-      "views_7d": 777,
-      "avg_per_video": 777,
-      "trend": "viral",
-      "ratio": 2.2471635150166853,
-      "fb_link": "https://www.facebook.com/reel/2233604814166332/",
-      "source_link": ""
-    },
-    {
       "game": "Russian_secret_missions",
-      "views_7d": 1868,
-      "avg_per_video": 622,
+      "views_7d": 1910,
+      "avg_per_video": 636,
       "trend": "trending",
-      "ratio": 1.7988876529477196,
+      "ratio": 1.9227906976744187,
       "fb_link": "https://www.facebook.com/reel/26623339340696588/",
       "source_link": ""
     },
     {
       "game": "VietnamCavePrison",
-      "views_7d": 4978,
-      "avg_per_video": 622,
+      "views_7d": 5000,
+      "avg_per_video": 625,
       "trend": "trending",
-      "ratio": 1.7988876529477196,
+      "ratio": 1.8895348837209303,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison22.mp4"
     },
     {
-      "game": "GearsOfWar",
-      "views_7d": 2862,
-      "avg_per_video": 572,
+      "game": "CallOfDutyMW2",
+      "views_7d": 1189,
+      "avg_per_video": 594,
       "trend": "trending",
-      "ratio": 1.6542825361512792,
+      "ratio": 1.7958139534883721,
+      "fb_link": "https://www.facebook.com/reel/1413510794250292/",
+      "source_link": ""
+    },
+    {
+      "game": "GearsOfWar",
+      "views_7d": 2868,
+      "avg_per_video": 573,
+      "trend": "trending",
+      "ratio": 1.7323255813953489,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar4.mp4"
     },
     {
       "game": "MarvelsSpiderMan2",
-      "views_7d": 1912,
+      "views_7d": 1913,
       "avg_per_video": 478,
       "trend": "steady",
-      "ratio": 1.382424916573971,
+      "ratio": 1.4451162790697674,
       "fb_link": "",
       "source_link": ""
     }
   ],
   "below_avg": [
     {
-      "game": "GODOFWAR3",
-      "views_7d": 1378,
-      "avg_per_video": 275,
-      "trend": "slow",
-      "ratio": 0.7953281423804227,
-      "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR33.mp4"
-    },
-    {
       "game": "Callofdutyaw",
-      "views_7d": 617,
-      "avg_per_video": 205,
+      "views_7d": 620,
+      "avg_per_video": 206,
       "trend": "slow",
-      "ratio": 0.592880978865406,
+      "ratio": 0.6227906976744186,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison17.mp4"
     },
@@ -72,36 +63,45 @@
       "views_7d": 639,
       "avg_per_video": 106,
       "trend": "below_avg",
-      "ratio": 0.3065628476084538,
+      "ratio": 0.32046511627906976,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu15.mp4"
     },
     {
       "game": "GodofWarLaufey",
-      "views_7d": 379,
-      "avg_per_video": 75,
+      "views_7d": 392,
+      "avg_per_video": 78,
       "trend": "below_avg",
-      "ratio": 0.21690767519466073,
+      "ratio": 0.23581395348837209,
       "fb_link": "https://www.facebook.com/reel/861579953646168/",
       "source_link": ""
+    },
+    {
+      "game": "GODOFWAR3",
+      "views_7d": 300,
+      "avg_per_video": 75,
+      "trend": "below_avg",
+      "ratio": 0.22674418604651161,
+      "fb_link": "",
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR33.mp4"
     },
     {
       "game": "Wolverine",
       "views_7d": 70,
       "avg_per_video": 23,
       "trend": "below_avg",
-      "ratio": 0.06651835372636263,
+      "ratio": 0.06953488372093024,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine24.mp4"
     }
   ],
   "recommendation": {
-    "game": "CallOfDutyMW2",
-    "views_7d": 777,
-    "avg_per_video": 777,
-    "trend": "viral",
-    "ratio": 2.2471635150166853,
-    "fb_link": "https://www.facebook.com/reel/2233604814166332/",
+    "game": "Russian_secret_missions",
+    "views_7d": 1910,
+    "avg_per_video": 636,
+    "trend": "trending",
+    "ratio": 1.9227906976744187,
+    "fb_link": "https://www.facebook.com/reel/26623339340696588/",
     "source_link": ""
   }
 }
