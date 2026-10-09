@@ -882,7 +882,7 @@ If you see ANY of these → visual_type = "action":
 **PACING:**
 - "action" → 3-5 words, HIGH energy, CAPS
 - "dialog" → 5-7 words, conversational
-- "calm" → 6-8 words, chill
+- "calm" → 6-7 words, chill
 
 **RULES:**
 1. NATURAL — casual, slang, contractions
