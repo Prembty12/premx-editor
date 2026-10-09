@@ -89,7 +89,7 @@ SEGMENTS_DIR       = "segments"
 
 MIN_SLOTS_HARD = 6
 MAX_SLOTS_HARD = 20
-DUCK_VOLUME = 0.25
+DUCK_VOLUME = 0.20
 
 # Canvas (dynamic based on video ratio)
 CANVAS_W = 4320
