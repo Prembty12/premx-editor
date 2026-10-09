@@ -1,1 +1,1 @@
-{"clip_duration":44,"reason":"Intense fiery battlefield shootout action","start_time":10,"status":"APPROVE","title":"1 Gun Vs Fiery Storm 🔥🎯"}
+{"clip_duration": 20, "reason": "Intense close-quarters gunfight with red splatters", "start_time": 12, "status": "APPROVE", "title": "3 Enemies Close Range Fight 🔥"}
