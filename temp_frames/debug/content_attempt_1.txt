@@ -1,1 +1,1 @@
-{"clip_duration": 29, "reason": "Full combat corridor and epic explosion", "start_time": 28, "status": "APPROVE", "title": "Survived 5 Enemies With 1 HP Big Explosion 💥🔥"}
+{"clip_duration":26,"reason":"Intense helicopter crash survival sequence with fire","start_time":12,"status":"APPROVE","title":"Helicopter Crash Survival 1 HP Left 🔥😳"}
