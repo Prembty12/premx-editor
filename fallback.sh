@@ -72,17 +72,14 @@ REJECT IF (Strictly reject if content is boring, empty, or lacks engagement):
 - Filler Content: The segment represents transitional downtime, empty corridor running, or repetitive travel that fails to hook the audience within the first few seconds.
 - Unresponsive Gameplay Loop: The player character is caught in loops of repetitive actions, minor item farming, or unengaging exploration without facing any real threats or obstacles.
 - Zero Stakes and Consequences: The gameplay sequence shows no risk of failure, low health pressure, or urgent time limits, leaving the audience completely detached from the outcome.
-- Predictable and Monotonous Movement: The visual frames display predictable pacing with zero surprise elements, sudden twists, or climatic build-ups to hold attention.
 - Filler Transitions: Unnecessary map transitions, lengthy animations, or character respawns that add no entertainment value and kill audience retention.
 - Empty World Wandering: The player is just roaming around empty terrain, corridors, or environments with zero enemies, objectives, or items of interest.
 - Passive Spectating: The character is trapped in a scripted cinematic or passive NPC conversation where the user has no direct gameplay input or control.
 - Clueless Aimless Movement: The player runs in circles, hits walls, or backtracks repeatedly without understanding where to go or what to do.
-- Low Intensity Routine Farming: The gameplay consists purely of tedious grinding, resource collecting, or minor task repetition that lacks any threat or excitement.
 - Bland Visual Monotony: The entire sequence suffers from a single flat color palette, unchanging scenery, and zero dynamic camera movement or action cues.
 - Artificial Excitement Fake-Out: The scene plays loud audio or dramatic music, but visually nothing of consequence or danger is actually happening on screen.
 - Punishingly Slow Progression: The video drags on with slow-paced navigation, prolonged stealth walking, or waiting mechanics that instantly kill audience retention.
 - Zero Defensive Reactions: The player character absorbs enemy fire or hazards passively without dodging, returning fire, or showing any tactical evasion.
-- Disconnected Audio Visuals: Gunshot sounds or explosions play out in the background, but the action is completely off-screen and invisible to the viewer.
 - Anti-Climactic Drift: A potential combat encounter starts but immediately Fizzles out as the player runs away or enemies despawn without any payoff.
 
 APPROVE IF:
