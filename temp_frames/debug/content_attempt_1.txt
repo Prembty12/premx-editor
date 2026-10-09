@@ -1,1 +1,30 @@
-{"clip_duration": 23, "reason": "Intense fiery street combat with heavy shooting", "start_time": 20, "status": "APPROVE", "title": "Survived 5 Enemies On Fiery Street 🔥🎯"}
+Thinking Process:
+
+1.  **Analyze the Request:**
+    *   Image provided: A 9x16 grid representing frames of a video (total 144 frames, but represented as a grid). Let's count the rows/columns or just look at the visual flow.
+    *   Total video duration: EXACTLY 56 seconds.
+    *   Task: Decide APPROVE or REJECT based on the criteria.
+    *   If APPROVE: Generate a high-curiosity viral Facebook/Instagram Reels hook title (6-10 words preferred, max 6 words in JSON template but says "6 words max with 1-3 emojis" in the template example, but standard is 6-10 words preferred). Let's stick strictly to the template instructions: `"title": "<viral title 6 words max with 1-3 emojis>"` (Wait, the prompt says "viral title 6 words max with 1-3 emojis" in the JSON template placeholder, but in the text says "6-10 words preferred" and "Create a viral title under 6-10 words with 1-2 emojis ... Do NOT use commas or periods"). Let's write a title around 6-8 words, no punctuation except spaces and emojis.
+    *   Let's check the criteria for REJECT vs APPROVE.
+
+2.  **Analyze the Image Grid (Visual Content):**
+    *   Row 1: Looks like soldiers walking in a corridor, some green goo/laser stuff. Soldier talking: "Soldier: I don't like it. Soldier: Move out, we have a mission." -> Pure walking, dialogue, no active combat.
+    *   Row 2: Soldiers walking in a corridor, jumping, running. "Soldier: Out of the way, MOV!" -> Walking/exploring, no combat.
+    *   Row 3: Walking in corridors, ATLAS logo visible, soldiers walking past. -> Walking, corridor, menu-like text overlays but mostly cinematic movement.
+    *   Row 4: Corridor with yellow posts, walking, no enemies in sight. -> Walking.
+    *   Row 5: Train-like interior, looking out window, some red blood splatters maybe, but mostly looking around. "114 / 45" text. -> Exploring, looking.
+    *   Row 6: Some red lighting, maybe some combat starting? A soldier with a gun, some red blood on screen, but looks like a close-up melee or just a quick takedown. "ENCORE EXTEND" text. Let's look closer: row 6 has some red lighting, a soldier falling, maybe some combat but very brief and mostly looks like a scripted corridor scene.
+    *   Row 7: Soldiers lying dead on the floor, player shooting or walking over them. Some blue smoke. -> Looks like aftermath of a fight, but mostly walking over corpses.
+    *   Row 8: Blue gas/energy in some rooms, player looking at it, some shooting? Looks like sci-fi corridor, maybe some shooting but mostly looking at blue gas.
+    *   Row 9: Corridors, some blue light, text "Hold to sweep Atlas... Atlas Extend". -> Menu/holding prompt, walking around.
+
+    *   Overall assessment of gameplay: This looks like a Call of Duty campaign mission (specifically, the ATLAS corp facility, maybe the mission "Atlas Fallen" or similar, where you walk through corridors, some scripted events happen, but mostly it's corridor walking, talking, and very low-intensity exploration).
+    *   Is there active combat in >= 3 consecutive frames showing active shooting, ability usage, striking, boss interactions, or direct high-stakes combat?
+        *   Row 6 has some red splatters and a soldier falling, but it looks very brief, maybe a single scripted takedown.
+        *   Row 7 has some dead bodies, but player is just walking over them.
+        *   Row 8 has some blue gas, maybe some shooting but very static.
+        *   Mostly, the video shows soldiers walking in corridors, talking, looking at windows, walking past ATLAS logos, holding prompts. This is extremely typical of "boring walking simulator" / corridor runner campaign gameplay with low action density.
+    *   Let's check the REJECT criteria:
+        *   "Grid shows ONLY menus, map screens, inventory checking, shopping, upgrade screens, or loading screens" - No, but mostly corridor walking.
+        *   "No actual gameplay or action visible in ANY frame" - There is gameplay, but it's just walking.
+        *   "Ambient Lighting Trap:
