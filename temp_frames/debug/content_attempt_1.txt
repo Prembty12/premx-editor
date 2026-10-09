@@ -1,7 +1,1 @@
-{
-  "clip_duration": 42,
-  "reason": "Intense mutant combat with epic slashes",
-  "start_time": 3,
-  "status": "APPROVE",
-  "title": "Wolverine Slashed Huge Vampire 1 HP 🔥🎯"
-}
+{"clip_duration": 38, "reason": "Intense corridor combat vs red monster", "start_time": 16, "status": "APPROVE", "title": "Soldier Slays Red Monster 1 HP 🔥😳"}
