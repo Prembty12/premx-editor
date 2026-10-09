@@ -1,1 +1,7 @@
-{"clip_duration":26,"reason":"Intense helicopter crash survival sequence with fire","start_time":12,"status":"APPROVE","title":"Helicopter Crash Survival 1 HP Left 🔥😳"}
+{
+  "clip_duration": 42,
+  "reason": "Intense mutant combat with epic slashes",
+  "start_time": 3,
+  "status": "APPROVE",
+  "title": "Wolverine Slashed Huge Vampire 1 HP 🔥🎯"
+}
