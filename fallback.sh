@@ -58,14 +58,38 @@ Style Directive: ${STYLE_PROMPT}
 YOUR TASK: Decide APPROVE or REJECT for this video.
 
 REJECT IF (Strictly reject if content is boring, empty, or lacks engagement):
-- Grid shows ONLY menus, map screens, inventory checking, shopping, or loading screens
+- Grid shows ONLY menus, map screens, inventory checking, shopping, upgrade screens, or loading screens
 - No actual gameplay or action visible in ANY frame
-- All frames look identical, frozen, or useless (boring walking/running without anything happening)
+- Ambient Lighting Trap: Background fire, burning cars, explosions, or dramatic lighting are visible, but the player is only walking, running, exploring, or idle without active combat or high-retention engagement
+- Low Retention & Engagement Value: The moment lacks strong viewer hook, pacing, or adrenaline, resulting in dead air or low engagement (even if characters are talking or joking, if it feels boring or lacks high retention value, REJECT IT)
+- Low Action Density: Fewer than 3 consecutive frames show active shooting, ability usage, striking, boss interactions, or direct high-stakes combat
+- All frames look identical, frozen, or useless (boring running/traveling without anything happening)
 - Crash screen, error, black frames, or dead/idle moments dominate
-- Absolutely NO exciting, thrilling, or engaging moment (agar video bekar ya faltu lage toh turant REJECT karo)
+- Absolutely NO exciting, thrilling, or high-retention engaging moment
+- Zero Pacing & Stagnant Motion: The camera pans aimlessly or the player wanders without objective, lacking any momentum or excitement across consecutive shots.
+- Fake Tension Illusion: The scene attempts to look dramatic through weather effects, fog, or audio cues, but zero meaningful player interaction, combat, or objective progression occurs.
+- Static Standstill: Multiple frames capture the player standing completely still or repeating the exact same idle animation without advancing gameplay.
+- Filler Content: The segment represents transitional downtime, empty corridor running, or repetitive travel that fails to hook the audience within the first few seconds.
+- Unresponsive Gameplay Loop: The player character is caught in loops of repetitive actions, minor item farming, or unengaging exploration without facing any real threats or obstacles.
+- Zero Stakes and Consequences: The gameplay sequence shows no risk of failure, low health pressure, or urgent time limits, leaving the audience completely detached from the outcome.
+- Predictable and Monotonous Movement: The visual frames display predictable pacing with zero surprise elements, sudden twists, or climatic build-ups to hold attention.
+- Filler Transitions: Unnecessary map transitions, lengthy animations, or character respawns that add no entertainment value and kill audience retention.
+- Empty World Wandering: The player is just roaming around empty terrain, corridors, or environments with zero enemies, objectives, or items of interest.
+- Passive Spectating: The character is trapped in a scripted cinematic or passive NPC conversation where the user has no direct gameplay input or control.
+- Clueless Aimless Movement: The player runs in circles, hits walls, or backtracks repeatedly without understanding where to go or what to do.
+- Low Intensity Routine Farming: The gameplay consists purely of tedious grinding, resource collecting, or minor task repetition that lacks any threat or excitement.
+- Bland Visual Monotony: The entire sequence suffers from a single flat color palette, unchanging scenery, and zero dynamic camera movement or action cues.
+- Artificial Excitement Fake-Out: The scene plays loud audio or dramatic music, but visually nothing of consequence or danger is actually happening on screen.
+- Punishingly Slow Progression: The video drags on with slow-paced navigation, prolonged stealth walking, or waiting mechanics that instantly kill audience retention.
+- Zero Defensive Reactions: The player character absorbs enemy fire or hazards passively without dodging, returning fire, or showing any tactical evasion.
+- Disconnected Audio Visuals: Gunshot sounds or explosions play out in the background, but the action is completely off-screen and invisible to the viewer.
+- Anti-Climactic Drift: A potential combat encounter starts but immediately Fizzles out as the player runs away or enemies despawn without any payoff.
 
 APPROVE IF:
 - Real gameplay has a clear, powerful \"Engaging Highlight Window\" (combat, intense fights, epic boss battles, explosions, emotional cutscenes, hilarious fails, or high-stakes clutch moments).
+- Flexible Duration Control The clip duration should match the available engagement window up to the full source length of ${SOURCE_DURATION} seconds
+- Full Source Adaptation If the entire source video contains continuous gameplay up to ${SOURCE_DURATION} seconds allow the duration to cover the complete source naturally
+- Natural Ending Capture Always match the clip duration to the actual length of the gameplay moment up to ${SOURCE_DURATION} seconds without forcing artificial limits
 - The moment has a clear start and end point in the timestamps.
 - Absolute Cinematic & Engagement Mastery Rule: Prioritize pure hype, adrenaline, emotion, comedy, and entertainment above all else. Whether it's an epic fight, a deep emotional drama, a hilarious adventure, or a high-stakes moment that is genuinely gripping, commit to the *full sequence* from its absolute beginning to its natural end. Never force an artificial cut or clip truncation on a brilliant moment—allow the entire momentum, tension, comedy, and payoff of the gameplay to breathe and play out completely so the audience gets maximum satisfaction.
 TITLE RULES (only for APPROVE):
@@ -109,7 +133,7 @@ If APPROVE, ALL 5 FIELDS ARE MANDATORY:
   \"status\": \"APPROVE\",
   \"title\": \"<viral title 6 words max with 1-3 emojis>\",
   \"start_time\": <integer seconds, exact second where the engaging moment starts>,
-  \"clip_duration\": <integer seconds, minimum 12 seconds. Capture the FULL fight or highlight completely from start to finish, do not cut it short!>,
+  \"clip_duration\": <integer seconds, minimum 15 seconds. Capture the FULL fight or highlight completely from start to finish, do not cut it short!>,
   \"reason\": \"<short explanation MAX 10 words>\"
 }
 
