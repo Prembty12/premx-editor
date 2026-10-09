@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v3.9 (Slot Range Fix)
+🎙️ AI Commentary Dubber — v5.0 (Hybrid: Slot + Audio Adjust)
 ===============================================================
-FIXES:
-  ✅ Timing LOCK — GPT segment = SLOT time (no drift)
-  ✅ Slot-locked audio delay (exact match)
-  ✅ Variable atempo — 1.0 se 1.20 ke beech
-  ✅ Voice natural (VOICE_SPEED_MAX = 1.17)
-  ✅ SLOT-ALIGNED GRID — frames slot ke range se match (FIXED)
+FEATURES:
+  ✅ Timing LOCK — GPT segment = SLOT time
+  ✅ SLOT-ALIGNED GRID — frames slot ke range se match
+  ✅ Action pe atempo BAND (voice natural)
+  ✅ Calm/Dialog pe atempo 1.00-1.10
+  ✅ Slot EXTEND (max 0.5s) agar audio bahut lamba
+  ✅ No MAX_WORDS
 ===============================================================
 """
 
@@ -95,11 +96,14 @@ CANVAS_H = 7680
 VOICE_SPEED_MIN = 1.00
 VOICE_SPEED_MAX = 1.17
 
-# ✅ Variable atempo — 1.0 se 1.20 ke beech
+# ✅ atempo — 1.00 se 1.10 (calm/dialog only)
 ATEMPO_MIN = 1.00
-ATEMPO_MAX = 1.17
+ATEMPO_MAX = 1.10
 
-SPEED_ACTION = 1.17
+# ✅ Slot extend — agar audio bahut lamba (action pe)
+MAX_SLOT_EXTEND = 0.5   # 0.5s max
+
+SPEED_ACTION = 1.14
 SPEED_DIALOG = 1.05
 SPEED_CALM   = 1.00
 
@@ -651,7 +655,7 @@ def classify_slots_combined(video_path, slots, srt_content):
 
 
 # ============================================================
-# STEP 5 — 8K PORTRAIT ANALYSIS GRID (SLOT-ALIGNED — FIXED) ✅
+# STEP 5 — 8K PORTRAIT ANALYSIS GRID (SLOT-ALIGNED)
 # ============================================================
 def build_analysis_grid(video_path, vid_duration, slots, num_frames=ANALYSIS_FRAMES):
     print(f"🖼️ [5] Building 8K PORTRAIT grid (SLOT-ALIGNED) — {num_frames} frames...")
@@ -662,12 +666,9 @@ def build_analysis_grid(video_path, vid_duration, slots, num_frames=ANALYSIS_FRA
         except Exception as e:
             print(f"   ⚠️  Could not delete: {e}")
 
-    # ✅ SLOT-ALIGNED FRAME TIMES
-    # Har slot ke andar evenly frames distribute karo
-    frame_specs = []  # list of (frame_time, slot_start, slot_end, slot_idx)
+    frame_specs = []
 
     if slots:
-        # Har slot ko kitne frames milenge (proportional to duration)
         total_dur = sum(s["end"] - s["start"] for s in slots)
         for slot_idx, slot in enumerate(slots):
             slot_dur = slot["end"] - slot["start"]
@@ -677,15 +678,12 @@ def build_analysis_grid(video_path, vid_duration, slots, num_frames=ANALYSIS_FRA
                 t = slot["start"] + (slot_dur * frac)
                 frame_specs.append((t, slot["start"], slot["end"], slot_idx))
 
-    # ✅ Agar num_frames se kam bane toh extra frames add karo
-    # ✅ FIX: Frame time ko slot ke RANGE se match karo (nearest nahi)
     if len(frame_specs) < num_frames and slots:
         interval = vid_duration / num_frames
         existing_times = [f[0] for f in frame_specs]
         for i in range(num_frames):
             t = i * interval
             if not any(abs(t - et) < 0.3 for et in existing_times):
-                # ✅ FIX: Frame time ko slot ke range se check karo
                 matched_slot = None
                 matched_idx = None
                 for si, s in enumerate(slots):
@@ -697,7 +695,6 @@ def build_analysis_grid(video_path, vid_duration, slots, num_frames=ANALYSIS_FRA
                 if matched_slot is not None:
                     frame_specs.append((t, matched_slot["start"], matched_slot["end"], matched_idx))
                 else:
-                    # Fallback: nearest slot by center
                     nearest_slot = min(
                         slots,
                         key=lambda s: abs((s["start"] + s["end"]) / 2 - t)
@@ -705,17 +702,14 @@ def build_analysis_grid(video_path, vid_duration, slots, num_frames=ANALYSIS_FRA
                     nearest_idx = slots.index(nearest_slot)
                     frame_specs.append((t, nearest_slot["start"], nearest_slot["end"], nearest_idx))
 
-    # Sort by frame time
     frame_specs = sorted(frame_specs, key=lambda x: x[0])
 
-    # Trim to exact num_frames
     if len(frame_specs) > num_frames:
         step = len(frame_specs) / num_frames
         frame_specs = [frame_specs[int(i * step)] for i in range(num_frames)]
 
     print(f"   📋 Slot-aligned frames: {len(frame_specs)}")
 
-    # Extract frames
     frame_paths = []
     for i, (t, slot_start, slot_end, slot_idx) in enumerate(frame_specs):
         fp = f"temp_analysis_{i:03d}.jpg"
@@ -756,11 +750,9 @@ def build_analysis_grid(video_path, vid_duration, slots, num_frames=ANALYSIS_FRA
         y = (idx // GRID_COLS) * cell_h
         grid.paste(img, (x, y))
 
-        # ✅ SLOT time label (yellow) + frame time (cyan)
         slot_label = f"SLOT {slot_idx+1}: {slot_start:.1f}-{slot_end:.1f}s"
         frame_label = f"frame@{t:.2f}s"
 
-        # Black background for readability
         draw.rectangle([x + 6, y + 6, x + 420, y + 100], fill="black")
         draw.text((x + 14, y + 12), slot_label, fill="yellow", font=font)
         draw.text((x + 14, y + 58), frame_label, fill="cyan", font=small_font)
@@ -785,7 +777,7 @@ def generate_full_script(slots, srt_content, analysis_grid_path):
     for i, s in enumerate(slots, 1):
         sa = s.get("sub_analysis", {})
         slot_lines.append(
-            f"- Slot {i}: {s['start']:.1f}s → {s['end']:.1f}s "
+            f"- Slot {i}: {s['start']:.2f}s → {s['end']:.2f}s "
             f"[{s['type'].upper()}] "
             f"(scenes={s['scene_count']}, loud={s['avg_loud']}dB, "
             f"action={sa.get('action_ratio', 0)}, dialog={sa.get('dialog_ratio', 0)}, "
@@ -845,6 +837,11 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 
 **🚫 NEVER shout on non-action scenes.**
 
+**PACING:**
+- "action" → 3-5 words, HIGH energy, CAPS
+- "dialog" → 5-7 words, conversational
+- "calm" → 6-8 words, chill
+
 **🎯 VISUAL CLASSIFICATION RULES**
 
 **⚠️⚠️⚠️ AGGRESSIVE ACTION DETECTION ⚠️⚠️⚠️**
@@ -878,11 +875,6 @@ If you see ANY of these → visual_type = "action":
 **⚠️ BE HONEST. If slow motion/sitting/walking/scenery → "calm".**
 **🔴 Two characters CLOSE and ENGAGED → ACTION.**
 **🔥 FIRE/EXPLOSIONS/MANY ENEMIES → ACTION.**
-
-**PACING:**
-- "action" → 3-5 words, HIGH energy, CAPS
-- "dialog" → 5-7 words, conversational
-- "calm" → 6-7 words, chill
 
 **RULES:**
 1. NATURAL — casual, slang, contractions
@@ -966,7 +958,7 @@ Return ONLY valid JSON:
                     parsed = json.loads(raw)
                     segments = parsed.get("segments", [])
 
-                    # ✅✅✅ TIMING LOCK — GPT ka start/end ko SLOT se force match karo
+                    # ✅ TIMING LOCK
                     print(f"   🔒 Locking segment timing to slots...")
                     locked_count = 0
                     for seg in segments:
@@ -1141,10 +1133,10 @@ Return ONLY valid JSON:
 
 
 # ============================================================
-# STEP 7 — ElevenLabs TTS (SLOT-LOCKED + VARIABLE ATEMPO)
+# STEP 7 — ElevenLabs TTS (HYBRID: atempo + slot extend) ✅
 # ============================================================
 def generate_audio(segments, slots):
-    print("🔊 [7] Generating TTS (slot-locked + variable atempo 1.0-1.20)...")
+    print("🔊 [7] Generating TTS (HYBRID: action atempo band, slot extend max 0.5s)...")
     url = f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID}"
     headers = {
         "Accept": "audio/mpeg",
@@ -1204,38 +1196,65 @@ def generate_audio(segments, slots):
 
                 actual = get_duration(seg_file)
                 atempo_used = "none"
+                slot_extended = 0.0
 
-                if actual > 0 and target_dur > 0:
-                    # ✅ VARIABLE ATEMPO — 1.0 se 1.20 ke beech
-                    needed_tempo = actual / target_dur
-                    tempo = max(ATEMPO_MIN, min(ATEMPO_MAX, needed_tempo))
+                # ✅ HYBRID LOGIC
+                if visual_type == "action":
+                    # Action pe atempo BAND
+                    over = actual - target_dur
+                    if over > MAX_SLOT_EXTEND:
+                        # Bahut lamba — slot extend karo
+                        slot_extended = min(over, MAX_SLOT_EXTEND)
+                        atempo_used = f"none (slot+{slot_extended:.2f}s)"
+                    else:
+                        # Chhota over — accept karo (natural)
+                        atempo_used = "none"
+                    final = seg_file
+                else:
+                    # Calm/Dialog pe atempo 1.10 tak
+                    if actual > 0 and target_dur > 0:
+                        needed_tempo = actual / target_dur
+                        tempo = max(ATEMPO_MIN, min(ATEMPO_MAX, needed_tempo))
 
-                    if tempo > 1.01:
-                        fit_file = f"{SEGMENTS_DIR}/seg_{idx:03d}_fit.mp3"
-                        subprocess.run(
-                            f"ffmpeg -y -i {seg_file} "
-                            f"-filter:a atempo={tempo:.3f} {fit_file}",
-                            shell=True,
-                            stdout=subprocess.DEVNULL,
-                            stderr=subprocess.DEVNULL
-                        )
-                        final = fit_file if os.path.exists(fit_file) else seg_file
-                        atempo_used = f"{tempo:.3f}"
+                        if tempo > 1.01:
+                            fit_file = f"{SEGMENTS_DIR}/seg_{idx:03d}_fit.mp3"
+                            subprocess.run(
+                                f"ffmpeg -y -i {seg_file} "
+                                f"-filter:a atempo={tempo:.3f} {fit_file}",
+                                shell=True,
+                                stdout=subprocess.DEVNULL,
+                                stderr=subprocess.DEVNULL
+                            )
+                            final = fit_file if os.path.exists(fit_file) else seg_file
+                            atempo_used = f"{tempo:.3f}"
+                        else:
+                            final = seg_file
                     else:
                         final = seg_file
-                else:
-                    final = seg_file
+
+                # ✅ Slot extend — agli slot ko shift karo
+                new_slot_end = slot_end + slot_extended
 
                 audio_files.append({
                     "file": final,
                     "start": slot_start,
-                    "end": slot_end,
+                    "end": new_slot_end,
+                    "actual_dur": actual,
                     "text": text,
-                    "visual_type": visual_type
+                    "visual_type": visual_type,
+                    "slot_extended": slot_extended
                 })
 
-                print(f"   ✅ [{slot_start:5.1f}s] speed={voice_speed:.2f} "
-                      f"atempo={atempo_used} ({visual_type or 'signal'}) | {text}")
+                # Debug
+                if slot_extended > 0:
+                    print(f"   ⚠️ [{slot_start:5.1f}s] {actual:.2f}s/{target_dur:.2f}s "
+                          f"slot+{slot_extended:.2f}s (speed={voice_speed:.2f}, {visual_type}) | {text}")
+                elif actual > target_dur + 0.1:
+                    print(f"   ⚠️ [{slot_start:5.1f}s] {actual:.2f}s/{target_dur:.2f}s "
+                          f"(speed={voice_speed:.2f}, {visual_type}) | {text}")
+                else:
+                    print(f"   ✅ [{slot_start:5.1f}s] {actual:.2f}s/{target_dur:.2f}s "
+                          f"atempo={atempo_used} (speed={voice_speed:.2f}, {visual_type}) | {text}")
 
             elif r.status_code == 401:
                 print("   ❌ 401 — ElevenLabs key galat!")
@@ -1253,10 +1272,10 @@ def generate_audio(segments, slots):
 
 
 # ============================================================
-# STEP 8 — Timed Audio
+# STEP 8 — Timed Audio (with slot extend shifts)
 # ============================================================
 def build_timed_audio(audio_files, vid_duration):
-    print("🎼 [8] Building timed audio...")
+    print("🎼 [8] Building timed audio (with slot extend shifts)...")
     silent = f"{SEGMENTS_DIR}/silent_base.mp3"
     subprocess.run(
         f"ffmpeg -y -f lavfi -i anullsrc=r=44100:cl=stereo -t {vid_duration} "
@@ -1356,14 +1375,15 @@ def fallback_copy_original():
 # ============================================================
 def main():
     print("=" * 60)
-    print("🎙️ AI COMMENTARY DUBBER — v3.9 (Slot Range Fix)")
+    print("🎙️ AI COMMENTARY DUBBER — v5.0 (HYBRID)")
     print("=" * 60)
     print(f"📹 Input : {FINAL_CLIP_PATH}")
     print(f"📤 Output: {FINAL_DUBBED_VIDEO}")
     print(f"🎤 Voice : {VOICE_ID}")
     print(f"🎛️  Switch: COMMENTARY_ENABLED = {COMMENTARY_ENABLED}")
     print(f"🎮 Speed : {VOICE_SPEED_MIN} - {VOICE_SPEED_MAX}")
-    print(f"🎵 atempo: {ATEMPO_MIN} - {ATEMPO_MAX} (variable)")
+    print(f"🎵 atempo: {ATEMPO_MIN} - {ATEMPO_MAX} (action pe BAND)")
+    print(f"📏 Slot extend: max {MAX_SLOT_EXTEND}s")
     print(f"🔊 Volume: Action={VOL_ACTION}x | Other={VOL_OTHER}x")
     print(f"🖼️  Frames: {ANALYSIS_FRAMES} ({GRID_COLS}x{GRID_ROWS}, {CANVAS_W}x{CANVAS_H} 8K)")
     print(f"🤖 Model : openai/gpt-4o-mini (Free)")
@@ -1389,16 +1409,12 @@ def main():
         srt_content = transcribe(AUDIO_PATH)
         slots = build_auto_slots(FINAL_CLIP_PATH, vid_dur, srt_content)
         slots = classify_slots_combined(FINAL_CLIP_PATH, slots, srt_content)
-
-        # ✅ SLOT-ALIGNED GRID
         build_analysis_grid(FINAL_CLIP_PATH, vid_dur, slots, num_frames=ANALYSIS_FRAMES)
-
         segments = generate_full_script(slots, srt_content, ANALYSIS_GRID_PATH)
 
         if not segments:
             raise Exception("No segments generated")
 
-        # ✅ DEBUG: Timing verification
         print("🔍 TIMING VERIFICATION:")
         print(f"   Slots: {len(slots)} | Segments: {len(segments)}")
         for i, seg in enumerate(segments, 1):
