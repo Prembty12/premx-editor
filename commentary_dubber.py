@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v3.7 (Variable atempo 1.0-1.20)
+🎙️ AI Commentary Dubber — v3.8 (Slot-Aligned Grid)
 ===============================================================
 FEATURES:
   ✅ Timing LOCK — GPT segment = SLOT time (no drift)
   ✅ Slot-locked audio delay (exact match)
   ✅ Variable atempo — 1.0 se 1.20 ke beech (zaroorat ke hisaab se)
   ✅ Voice natural (VOICE_SPEED_MAX = 1.17)
+  ✅ SLOT-ALIGNED GRID — frames slot ke andar (frame time = slot time)
 ===============================================================
 Simple debug format:
   [timestamp] speed=X.XX atempo=Y.YYY (type) | AI Commentary
@@ -652,10 +653,10 @@ def classify_slots_combined(video_path, slots, srt_content):
 
 
 # ============================================================
-# STEP 5 — 8K PORTRAIT ANALYSIS GRID
+# STEP 5 — 8K PORTRAIT ANALYSIS GRID (SLOT-ALIGNED) ✅
 # ============================================================
-def build_analysis_grid(video_path, vid_duration, num_frames=ANALYSIS_FRAMES):
-    print(f"🖼️ [5] Building 8K PORTRAIT grid ({CANVAS_W}×{CANVAS_H}) — {num_frames} frames...")
+def build_analysis_grid(video_path, vid_duration, slots, num_frames=ANALYSIS_FRAMES):
+    print(f"🖼️ [5] Building 8K PORTRAIT grid (SLOT-ALIGNED) — {num_frames} frames...")
 
     if os.path.exists(ANALYSIS_GRID_PATH):
         try:
@@ -663,18 +664,54 @@ def build_analysis_grid(video_path, vid_duration, num_frames=ANALYSIS_FRAMES):
         except Exception as e:
             print(f"   ⚠️  Could not delete: {e}")
 
-    interval = vid_duration / num_frames
-    frame_paths = []
+    # ✅ SLOT-ALIGNED FRAME TIMES
+    # Har slot ke andar evenly frames distribute karo
+    frame_specs = []  # list of (frame_time, slot_start, slot_end, slot_idx)
 
-    for i in range(num_frames):
-        t = i * interval
+    if slots:
+        # Har slot ko kitne frames milenge (proportional to duration)
+        total_dur = sum(s["end"] - s["start"] for s in slots)
+        for slot_idx, slot in enumerate(slots):
+            slot_dur = slot["end"] - slot["start"]
+            # Proportional frames
+            n_frames = max(1, round(num_frames * (slot_dur / total_dur)))
+            for k in range(n_frames):
+                # Slot ke andar evenly distribute
+                frac = (k + 0.5) / n_frames
+                t = slot["start"] + (slot_dur * frac)
+                frame_specs.append((t, slot["start"], slot["end"], slot_idx))
+
+    # Agar num_frames se kam bane toh extra frames add karo
+    if len(frame_specs) < num_frames and slots:
+        interval = vid_duration / num_frames
+        existing_times = [f[0] for f in frame_specs]
+        for i in range(num_frames):
+            t = i * interval
+            if not any(abs(t - et) < 0.3 for et in existing_times):
+                nearest_slot = min(slots, key=lambda s: abs(s["start"] - t))
+                nearest_idx = slots.index(nearest_slot)
+                frame_specs.append((t, nearest_slot["start"], nearest_slot["end"], nearest_idx))
+
+    # Sort by frame time
+    frame_specs = sorted(frame_specs, key=lambda x: x[0])
+
+    # Trim to exact num_frames
+    if len(frame_specs) > num_frames:
+        step = len(frame_specs) / num_frames
+        frame_specs = [frame_specs[int(i * step)] for i in range(num_frames)]
+
+    print(f"   📋 Slot-aligned frames: {len(frame_specs)}")
+
+    # Extract frames
+    frame_paths = []
+    for i, (t, slot_start, slot_end, slot_idx) in enumerate(frame_specs):
         fp = f"temp_analysis_{i:03d}.jpg"
         subprocess.run(
             f"ffmpeg -y -ss {t:.2f} -i {video_path} -vframes 1 -q:v 1 {fp}",
             shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
         )
         if os.path.exists(fp):
-            frame_paths.append((fp, t))
+            frame_paths.append((fp, t, slot_start, slot_end, slot_idx))
 
     cell_w = CANVAS_W // GRID_COLS
     cell_h = CANVAS_H // GRID_ROWS
@@ -683,14 +720,17 @@ def build_analysis_grid(video_path, vid_duration, num_frames=ANALYSIS_FRAMES):
     draw = ImageDraw.Draw(grid)
 
     try:
-        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", max(24, cell_w // 18))
+        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", max(28, cell_w // 16))
+        small_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", max(20, cell_w // 24))
     except:
         try:
-            font = ImageFont.truetype("/system/fonts/Roboto-Bold.ttf", max(24, cell_w // 18))
+            font = ImageFont.truetype("/system/fonts/Roboto-Bold.ttf", max(28, cell_w // 16))
+            small_font = ImageFont.truetype("/system/fonts/Roboto-Bold.ttf", max(20, cell_w // 24))
         except:
             font = ImageFont.load_default()
+            small_font = font
 
-    for idx, (fp, t) in enumerate(frame_paths):
+    for idx, (fp, t, slot_start, slot_end, slot_idx) in enumerate(frame_paths):
         if idx >= GRID_COLS * GRID_ROWS:
             break
         try:
@@ -703,16 +743,21 @@ def build_analysis_grid(video_path, vid_duration, num_frames=ANALYSIS_FRAMES):
         y = (idx // GRID_COLS) * cell_h
         grid.paste(img, (x, y))
 
-        label = f"{t:.1f}s"
-        draw.rectangle([x + 8, y + 8, x + 160, y + 60], fill="black")
-        draw.text((x + 16, y + 14), label, fill="yellow", font=font)
+        # ✅ SLOT time label (yeh GPT ko exact timing batayega)
+        slot_label = f"SLOT {slot_idx+1}: {slot_start:.1f}-{slot_end:.1f}s"
+        frame_label = f"frame@{t:.2f}s"
+
+        # Black background for readability
+        draw.rectangle([x + 6, y + 6, x + 420, y + 100], fill="black")
+        draw.text((x + 14, y + 12), slot_label, fill="yellow", font=font)
+        draw.text((x + 14, y + 58), frame_label, fill="cyan", font=small_font)
 
     grid.save(ANALYSIS_GRID_PATH, quality=92, optimize=True, subsampling=2)
     size_8k = os.path.getsize(ANALYSIS_GRID_PATH) / (1024 * 1024)
     print(f"✅ 8K Full Quality: {grid.size[0]}x{grid.size[1]} ({size_8k:.2f} MB)")
     print(f"💾 Saved: {ANALYSIS_GRID_PATH}\n")
 
-    for fp, _ in frame_paths:
+    for fp, _, _, _, _ in frame_paths:
         if os.path.exists(fp):
             os.remove(fp)
 
@@ -739,8 +784,9 @@ def generate_full_script(slots, srt_content, analysis_grid_path):
 You shout, laugh, hype, roast. Pure energy. Zero boring lines.
 
 **YOU ARE GETTING 1 IMAGE — ANALYSIS GRID:**
-- 90 frames with timestamps
-- Match frames to slots.
+- Each cell shows: "SLOT X: A.A-B.Bs" (yellow) + "frame@T.TTs" (cyan)
+- ⚠️ USE THE SLOT TIME (yellow label) — NOT the frame time
+- Match frames to slots by SLOT number
 
 **YOUR JOB:**
 Look at the frames. React LOUDLY like a real streamer watching live gameplay.
@@ -1082,7 +1128,7 @@ Return ONLY valid JSON:
 
 
 # ============================================================
-# STEP 7 — ElevenLabs TTS (SLOT-LOCKED + VARIABLE ATEMPO) ✅
+# STEP 7 — ElevenLabs TTS (SLOT-LOCKED + VARIABLE ATEMPO)
 # ============================================================
 def generate_audio(segments, slots):
     print("🔊 [7] Generating TTS (slot-locked + variable atempo 1.0-1.20)...")
@@ -1300,7 +1346,7 @@ def fallback_copy_original():
 # ============================================================
 def main():
     print("=" * 60)
-    print("🎙️ AI COMMENTARY DUBBER — v3.7 (Variable atempo 1.0-1.20)")
+    print("🎙️ AI COMMENTARY DUBBER — v3.8 (Slot-Aligned Grid)")
     print("=" * 60)
     print(f"📹 Input : {FINAL_CLIP_PATH}")
     print(f"📤 Output: {FINAL_DUBBED_VIDEO}")
@@ -1333,7 +1379,10 @@ def main():
         srt_content = transcribe(AUDIO_PATH)
         slots = build_auto_slots(FINAL_CLIP_PATH, vid_dur, srt_content)
         slots = classify_slots_combined(FINAL_CLIP_PATH, slots, srt_content)
-        build_analysis_grid(FINAL_CLIP_PATH, vid_dur, num_frames=ANALYSIS_FRAMES)
+
+        # ✅ SLOT-ALIGNED GRID — slots pass karo
+        build_analysis_grid(FINAL_CLIP_PATH, vid_dur, slots, num_frames=ANALYSIS_FRAMES)
+
         segments = generate_full_script(slots, srt_content, ANALYSIS_GRID_PATH)
 
         if not segments:
