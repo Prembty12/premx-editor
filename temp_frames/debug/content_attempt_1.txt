@@ -1,1 +1,1 @@
-{"clip_duration": 30, "reason": "Non-stop corridor combat action", "start_time": 0, "status": "APPROVE", "title": "Corridor Fight 1 vs 10 🔥💪"}
+{"clip_duration": 56, "reason": "Cinematic explosion and dramatic soldier screaming", "start_time": 0, "status": "APPROVE", "title": "Soldier Screams Last Words Before Blast 💥😭"}
