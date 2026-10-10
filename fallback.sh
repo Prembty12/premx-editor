@@ -135,10 +135,10 @@ If APPROVE, ALL 5 FIELDS ARE MANDATORY:
 CRITICAL - HOW TO CALCULATE START_TIME AND CLIP_DURATION (Total Video Length = ${SOURCE_DURATION} seconds):
 1. The video starts at 0s and ends at EXACTLY ${SOURCE_DURATION}s.
 2. Look at the timestamps on the grid carefully. Identify the exact second the ENGAGING MOMENT STARTS and the exact second it ENDS. 
-3. Set 'start_time' to when this moment begins.
+3. FIRST-FRAME RULE: Your 'start_time' MUST be the absolute earliest frame where the first combat action, enemy appearance, weapon engagement, or sudden gameplay movement happens. NEVER delay to peak fights or heavy explosions later in the sequence. Capture the earliest trigger!
 4. Calculate 'clip_duration' by subtracting start_time from end_time to cover the **entire** action sequence. Do not leave out the middle or end of a good fight.
 5. STRICT MATH RULE: Your 'start_time' + 'clip_duration' MUST NOT exceed the total video length of ${SOURCE_DURATION} seconds.
-6. MINIMUM DURATION: The clip must be at least 12 seconds. 
+6. MINIMUM DURATION: The clip must be at least 15 seconds. 
 
 ⚠️ CRITICAL — MISSING ANY FIELD = INVALID RESPONSE:
 1. 'status' is MANDATORY (APPROVE or REJECT)
