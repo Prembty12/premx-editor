@@ -1,69 +1,60 @@
 {
-  "last_updated": "2026-10-10 01:54:46 PM",
+  "last_updated": "2026-10-10 07:41:01 PM",
   "period_days": 7,
   "trending": [
     {
       "game": "CallOfDutyMW2",
-      "views_7d": 2046,
-      "avg_per_video": 1023,
+      "views_7d": 2087,
+      "avg_per_video": 1043,
       "trend": "viral",
-      "ratio": 2.38276397515528,
+      "ratio": 2.4027644461508926,
       "fb_link": "https://www.facebook.com/reel/1413510794250292/",
       "source_link": ""
     },
     {
-      "game": "MarvelsSpiderMan2",
-      "views_7d": 1898,
-      "avg_per_video": 632,
-      "trend": "steady",
-      "ratio": 1.4720496894409938,
-      "fb_link": "",
-      "source_link": ""
-    },
-    {
       "game": "Russian_secret_missions",
-      "views_7d": 2483,
-      "avg_per_video": 620,
+      "views_7d": 2516,
+      "avg_per_video": 629,
       "trend": "steady",
-      "ratio": 1.4440993788819876,
+      "ratio": 1.4490305240929162,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions14.mp4"
     },
     {
       "game": "VietnamCavePrison",
-      "views_7d": 4113,
-      "avg_per_video": 587,
+      "views_7d": 4277,
+      "avg_per_video": 611,
       "trend": "steady",
-      "ratio": 1.3672360248447206,
+      "ratio": 1.4075638318295258,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison19.mp4"
     },
     {
       "game": "codBlackops6",
-      "views_7d": 2810,
-      "avg_per_video": 562,
+      "views_7d": 2846,
+      "avg_per_video": 569,
       "trend": "steady",
-      "ratio": 1.3090062111801244,
+      "ratio": 1.310808216548282,
       "fb_link": "https://www.facebook.com/reel/1086858517283105/",
+      "source_link": ""
+    },
+    {
+      "game": "GearsOfWar",
+      "views_7d": 3964,
+      "avg_per_video": 566,
+      "trend": "steady",
+      "ratio": 1.30389710117105,
+      "fb_link": "https://www.facebook.com/reel/1597076448073123/",
       "source_link": ""
     }
   ],
   "below_avg": [
     {
-      "game": "Callofdutyaw",
-      "views_7d": 2076,
-      "avg_per_video": 415,
-      "trend": "slow",
-      "ratio": 0.9666149068322982,
-      "fb_link": "https://www.facebook.com/reel/4933637443514344/",
-      "source_link": ""
-    },
-    {
       "game": "GodofWarLaufey",
-      "views_7d": 412,
-      "avg_per_video": 82,
+      "views_7d": 416,
+      "avg_per_video": 83,
       "trend": "below_avg",
-      "ratio": 0.19099378881987578,
+      "ratio": 0.1912075254367441,
       "fb_link": "https://www.facebook.com/reel/861579953646168/",
       "source_link": ""
     },
@@ -72,7 +63,7 @@
       "views_7d": 130,
       "avg_per_video": 65,
       "trend": "below_avg",
-      "ratio": 0.1513975155279503,
+      "ratio": 0.14974083317335382,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela20.mp4"
     },
@@ -81,26 +72,26 @@
       "views_7d": 280,
       "avg_per_video": 46,
       "trend": "below_avg",
-      "ratio": 0.10714285714285715,
+      "ratio": 0.10597043578421962,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu4.mp4"
     },
     {
       "game": "Wolverine",
-      "views_7d": 141,
-      "avg_per_video": 28,
+      "views_7d": 151,
+      "avg_per_video": 30,
       "trend": "below_avg",
-      "ratio": 0.06521739130434782,
+      "ratio": 0.06911115377231715,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine11.mp4"
     }
   ],
   "recommendation": {
     "game": "CallOfDutyMW2",
-    "views_7d": 2046,
-    "avg_per_video": 1023,
+    "views_7d": 2087,
+    "avg_per_video": 1043,
     "trend": "viral",
-    "ratio": 2.38276397515528,
+    "ratio": 2.4027644461508926,
     "fb_link": "https://www.facebook.com/reel/1413510794250292/",
     "source_link": ""
   }
