@@ -62,7 +62,6 @@ REJECT IF (Strictly reject if content is boring, empty, or lacks engagement):
 - No actual gameplay or action visible in ANY frame
 - Ambient Lighting Trap: Background fire, burning cars, explosions, or dramatic lighting are visible, but the player is only walking, running, exploring, or idle without active combat or high-retention engagement
 - Low Retention & Engagement Value: The moment lacks strong viewer hook, pacing, or adrenaline, resulting in dead air or low engagement (even if characters are talking or joking, if it feels boring or lacks high retention value, REJECT IT)
-- Low Action Density: Fewer than 3 consecutive frames show active shooting, ability usage, striking, boss interactions, or direct high-stakes combat
 - All frames look identical, frozen, or useless (boring running/traveling without anything happening)
 - Crash screen, error, black frames, or dead/idle moments dominate
 - Absolutely NO exciting, thrilling, or high-retention engaging moment
