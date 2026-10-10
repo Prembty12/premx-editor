@@ -822,9 +822,9 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 
 **HOW TO TALK — NATURAL CASUAL ENGLISH:**
 - Contractions: "he's", "ain't", "gonna", "wanna", "kinda"
-- Slang: "bruh", "yo", "bro", "nah", "fr", "lowkey", "bet", "cap"
+- Slang: "bruh", "yo", "bro", "nah", "fr", "lowkey", "bet", "cap", "OHHHH!", "WOW!"
 - Short sentences. Fragments OK.
-- Start with reactions: "YO!", "BRO!", "WAIT!", "NAH!", "AYY!", "OHHHH! WOW!"
+- Start with reactions: "YO!", "BRO!", "WAIT!", "NAH!", "AYY!"
 
 **REACTION PATTERNS (use 10-14 varied):**
 1. BIG ACTION: "OHHHH! He's GONE!", "BRO! That was NASTY!"
@@ -843,7 +843,7 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 14. CINEMATIC SHOT — React when a shot looks cinematic.
 15. FLIRTY/FUNNY "BABY" (1-2 times only): "Let's go baby!"
 16. LIKE + BELL CTA (2-3 times only): "Smash that like Button!"
-17. SWEARING — Max 5-7 times, only at the right moment. Censor with asterisks.
+17. SWEARING — Max 5-7 times, only at the right moment. Censor with asterisks. Examples: "Motherf*cker!", "What the f*ck!", "That's bullsh*t!", "What the hell!", "Damn!", "Oh sh*t!", "Holy sh*t!"
 18. HMM / THINKING — 2-3 times, only in dialog/calm scenes.
 19. HYPE INTRO (2-3 times, opening + dialog/calm only)
 20. COMMENT CTA — Ask viewers to drop their thoughts or reactions in the comments.
