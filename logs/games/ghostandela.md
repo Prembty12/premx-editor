@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 44 | **Last Updated:** 2026-10-10 09:53:54 AM IST
+**Total Videos:** 43 | **Last Updated:** 2026-10-10 09:55:29 AM IST
 
 ---
 
@@ -10,10 +10,10 @@
 
 | Metric | Value |
 |---|---|
-| Total Videos | **44** |
-| Posted (FB or IG) | 12 / 44 |
-| FB Posted | 9 / 44 |
-| IG Posted | 3 / 44 |
+| Total Videos | **43** |
+| Posted (FB or IG) | 12 / 43 |
+| FB Posted | 9 / 43 |
+| IG Posted | 3 / 43 |
 | Total FB Views | **1,480** |
 | Total IG Views | **140** |
 
@@ -33,37 +33,36 @@
 | 8 | ghostandela15 | [🔵 FB](https://www.facebook.com/18133617205635778) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela15.mp4) |
 | 9 | ghostandela8 | [🔵 FB](https://www.facebook.com/18093261095413863) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela8.mp4) |
 | 10 | ghostandela42 | [🔵 FB](https://www.facebook.com/18177772753447081) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela42.mp4) |
-| 11 | ghostandela20 | [🔵 FB](https://www.facebook.com/18101262323333745) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela20.mp4) |
-| 12 | ghostandela19 | [🔵 FB](https://www.facebook.com/18010219137004213) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela19.mp4) |
+| 11 | ghostandela19 | [🔵 FB](https://www.facebook.com/18010219137004213) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela19.mp4) |
+| 12 | ghostandela20 | [🔵 FB](https://www.facebook.com/18101262323333745) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela20.mp4) |
 | 13 | ghostandela51 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela51.mp4) |
 | 14 | ghostandela49 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela49.mp4) |
-| 15 | ghostandela47 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela47.mp4) |
-| 16 | ghostandela45 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela45.mp4) |
-| 17 | ghostandela43 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela43.mp4) |
-| 18 | ghostandela41 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela41.mp4) |
-| 19 | ghostandela40 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela40.mp4) |
-| 20 | ghostandela39 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela39.mp4) |
-| 21 | ghostandela38 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela38.mp4) |
-| 22 | ghostandela37 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela37.mp4) |
-| 23 | ghostandela36 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela36.mp4) |
-| 24 | ghostandela34 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela34.mp4) |
-| 25 | ghostandela32 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela32.mp4) |
-| 26 | ghostandela31 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela31.mp4) |
-| 27 | ghostandela30 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela30.mp4) |
-| 28 | ghostandela29 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela29.mp4) |
-| 29 | ghostandela28 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela28.mp4) |
-| 30 | ghostandela27 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela27.mp4) |
-| 31 | ghostandela26 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela26.mp4) |
-| 32 | ghostandela25 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela25.mp4) |
-| 33 | ghostandela23 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela23.mp4) |
-| 34 | ghostandela22 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela22.mp4) |
-| 35 | ghostandela18 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela18.mp4) |
-| 36 | ghostandela17 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela17.mp4) |
-| 37 | ghostandela16 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela16.mp4) |
-| 38 | ghostandela14 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela14.mp4) |
-| 39 | ghostandela11 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela11.mp4) |
-| 40 | ghostandela9 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela9.mp4) |
-| 41 | ghostandela7 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela7.mp4) |
-| 42 | ghostandela6 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela6.mp4) |
-| 43 | ghostandela5 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela5.mp4) |
-| 44 | ghostandela3 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela3.mp4) |
+| 15 | ghostandela45 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela45.mp4) |
+| 16 | ghostandela43 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela43.mp4) |
+| 17 | ghostandela41 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela41.mp4) |
+| 18 | ghostandela40 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela40.mp4) |
+| 19 | ghostandela39 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela39.mp4) |
+| 20 | ghostandela38 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela38.mp4) |
+| 21 | ghostandela37 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela37.mp4) |
+| 22 | ghostandela36 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela36.mp4) |
+| 23 | ghostandela34 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela34.mp4) |
+| 24 | ghostandela32 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela32.mp4) |
+| 25 | ghostandela31 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela31.mp4) |
+| 26 | ghostandela30 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela30.mp4) |
+| 27 | ghostandela29 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela29.mp4) |
+| 28 | ghostandela28 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela28.mp4) |
+| 29 | ghostandela27 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela27.mp4) |
+| 30 | ghostandela26 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela26.mp4) |
+| 31 | ghostandela25 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela25.mp4) |
+| 32 | ghostandela23 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela23.mp4) |
+| 33 | ghostandela22 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela22.mp4) |
+| 34 | ghostandela18 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela18.mp4) |
+| 35 | ghostandela17 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela17.mp4) |
+| 36 | ghostandela16 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela16.mp4) |
+| 37 | ghostandela14 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela14.mp4) |
+| 38 | ghostandela11 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela11.mp4) |
+| 39 | ghostandela9 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela9.mp4) |
+| 40 | ghostandela7 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela7.mp4) |
+| 41 | ghostandela6 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela6.mp4) |
+| 42 | ghostandela5 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela5.mp4) |
+| 43 | ghostandela3 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela3.mp4) |
