@@ -4,3 +4,4 @@ mm2remastered_18 | Link: https://github.com/Prembty12/premx-editor/releases/down
 mm2remastered_8 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_8.mp4 | REJECT (OpenRouter): Mostly slow walking and aiming, no clear exciting highlight
 mm2remastered_2 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_2.mp4 | REJECT (OpenRouter): No action, only dark corridor exploration.
 mm2remastered_21 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_21.mp4 | REJECT (OpenRouter): Only dark walking, no exciting combat.
+mm2remastered_13 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_13.mp4 | REJECT (OpenRouter): Ambient fire scenery, no active combat
