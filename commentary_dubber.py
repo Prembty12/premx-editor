@@ -111,7 +111,7 @@ SPEED_DIALOG = 1.05
 SPEED_CALM   = 1.00
 
 VOL_ACTION = 1.9
-VOL_OTHER  = 1.6
+VOL_OTHER  = 1.4
 
 os.makedirs(SEGMENTS_DIR, exist_ok=True)
 os.makedirs(ANALYSIS_DIR, exist_ok=True)
