@@ -84,8 +84,6 @@ REJECT IF (Strictly reject if content is boring, empty, or lacks engagement):
 
 APPROVE IF:
 - Real gameplay has a clear, powerful \"Engaging Highlight Window\" (combat, intense fights, epic boss battles, explosions, emotional cutscenes, hilarious fails, or high-stakes clutch moments).
-- Zero-Delay Entry Enforcement: Scan the grid from top-left (Frame 1) to bottom-right. The moment any hostile action, gun firing, enemy appearance, or high-stakes tension appears (e.g., around Frame 90), that EXACT second MUST be your start_time. Never delay or skip to later frames where the action is already underway.
-- The moment has a clear start and end point in the timestamps.
 - Absolute Cinematic & Engagement Mastery Rule: Prioritize pure hype, adrenaline, emotion, comedy, and entertainment above all else. Whether it's an epic fight, a deep emotional drama, a hilarious adventure, or a high-stakes moment that is genuinely gripping, commit to the *full sequence* from its absolute beginning to its natural end. Never force an artificial cut or clip truncation on a brilliant moment—allow the entire momentum, tension, comedy, and payoff of the gameplay to breathe and play out completely so the audience gets maximum satisfaction.
 TITLE RULES (only for APPROVE):
 - Create a viral title under 6-10 words with 1-2 emojis
@@ -139,6 +137,11 @@ CRITICAL - HOW TO CALCULATE START_TIME AND CLIP_DURATION (Total Video Length = $
 4. Calculate 'clip_duration' by subtracting start_time from end_time to cover the **entire** action sequence. Do not leave out the middle or end of a good fight.
 5. STRICT MATH RULE: Your 'start_time' + 'clip_duration' MUST NOT exceed the total video length of ${SOURCE_DURATION} seconds.
 6. MINIMUM DURATION: The clip must be at least 15 seconds. 
+7. FLEXIBLE DURATION CONTROL: The clip duration should match the available engagement window up to the full source length of ${SOURCE_DURATION} seconds.
+8. FULL SOURCE ADAPTATION: If the entire source video contains continuous gameplay up to ${SOURCE_DURATION} seconds, allow the duration to cover the complete source naturally.
+9. NATURAL ENDING CAPTURE: Always match the clip duration to the actual length of the gameplay moment up to ${SOURCE_DURATION} seconds without forcing artificial limits.
+10. Zero-Delay Entry Enforcement: Scan the grid from top-left (Frame 1) to bottom-right. The moment any hostile action, gun firing, enemy appearance, or high-stakes tension appears (e.g., around Frame 90), that EXACT second MUST be your start_time. Never delay or skip to later frames where the action is already underway.
+11. The moment has a clear start and end point in the timestamps.
 
 ⚠️ CRITICAL — MISSING ANY FIELD = INVALID RESPONSE:
 1. 'status' is MANDATORY (APPROVE or REJECT)
