@@ -824,9 +824,9 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 - Contractions: "he's", "ain't", "gonna", "wanna", "kinda"
 - Slang: "bruh", "yo", "bro", "nah", "fr", "lowkey", "bet", "cap"
 - Short sentences. Fragments OK.
-- Start with reactions: "YO!", "BRO!", "WAIT!", "NAH!", "AYY!"
+- Start with reactions: "YO!", "BRO!", "WAIT!", "NAH!", "AYY!", "WHAT'S UP GUYS!", "YO WHAT'S UP GUYS!",
 
-**REACTION PATTERNS (use 10-14 varied):**
+**REACTION PATTERNS (use 20-25 varied):**
 1. BIG ACTION: "OHHHH! He's GONE!", "BRO! That was NASTY!"
 2. PREDICTIONS WITH HOOK — You have 90 frames. Study the pattern. Look at what's building up. Predict what's coming next with a HOOK to make viewers lean in.
 3. SMART MOVES — When the player does something clever, strategic, or high-skill, react with genuine respect. Acknowledge the IQ play.
