@@ -1,1 +1,1 @@
-{"clip_duration": 15, "reason": "Active cave combat shooting sequence", "start_time": 0, "status": "APPROVE", "title": "He survived 4 enemies cave shootout 🔥🎯"}
+{"clip_duration": 25, "reason": "Intense Wolverine boss combat with fire and lightning effects", "start_time": 5, "status": "APPROVE", "title": "Wolverine Survives 1 HP Boss Fight 🔥"}
