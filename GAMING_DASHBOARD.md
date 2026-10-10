@@ -1,6 +1,6 @@
 # 🚀 GAMING AGENT COMMAND & ANALYTICS DASHBOARD
 
-> **Last Updated:** 2026-10-10 10:29:16 PM IST | **Status:** All Systems Active & Synchronized
+> **Last Updated:** 2026-10-10 10:30:49 PM IST | **Status:** All Systems Active & Synchronized
 
 --- 
 
@@ -8,7 +8,7 @@
 
 | Rank | Game Name | Total Videos | Total Views | Avg Views / Video | Performance Tier |
 | :---: | :--- | :---: | :---: | :---: | :---: |
-| 🥇 | **mm2remastered** | 13 | 28,966 | 2,228 | 📈 Stable |
+| 🥇 | **mm2remastered** | 14 | 28,966 | 2,069 | 📈 Stable |
 | 🥈 | **VietnamCavePrison** | 14 | 12,628 | 902 | 📈 Stable |
 | 🥉 | **Callofdutyaw** | 14 | 9,540 | 681 | 📈 Stable |
 | 4️⃣ | **codBlackops6** | 11 | 6,796 | 617 | 📈 Stable |
@@ -31,7 +31,7 @@
 |---|---|---|---|---|---|---|---|---|---|
 | **Wolverine** | 2026-10-10 08:29 PM | Wolverine Survives 1 HP Boss Fight 🔥  #videogames #gamingcommunity #gaming #wolv | [🔵 FB](https://www.facebook.com/reel/1789742062294500/) | 62 | [🟣 IG](https://www.instagram.com/reel/DeTKRiAibUX/) | 10 | **22** / 29 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine29.mp4) | **[📜 View 29](logs/games/Wolverine.md)** |
 | **MarvelsSpiderMan2** | 2026-10-10 02:04 PM | Spider Man vs 5 Mercs 💥🎯  #videogames #gamingcommunity #gaming #marvelsspiderman | [🔵 FB](https://www.facebook.com/reel/1480647083999255/) | 513 | [🟣 IG](https://www.instagram.com/reel/DeTqPmGkdsH/) | 10 | **29** / 43 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan230.mp4) | **[📜 View 43](logs/games/MarvelsSpiderMan2.md)** |
-| **mm2remastered** | 2026-10-10 12:41 PM | 1 Gun Vs Fiery Storm 🔥🎯  #videogames #gamingcommunity #gaming #mm2remastered #ga | [🔵 FB](https://www.facebook.com/reel/1798800707831375/) | 541 | [🟣 IG](https://www.instagram.com/reel/DeP8-j0gBia/) | 460 | **10** / 23 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_19.mp4) | **[📜 View 23](logs/games/mm2remastered.md)** |
+| **mm2remastered** | 2026-10-10 12:41 PM | 1 Gun Vs Fiery Storm 🔥🎯  #videogames #gamingcommunity #gaming #mm2remastered #ga | [🔵 FB](https://www.facebook.com/reel/1798800707831375/) | 541 | [🟣 IG](https://www.instagram.com/reel/DeP8-j0gBia/) | 460 | **9** / 23 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_19.mp4) | **[📜 View 23](logs/games/mm2remastered.md)** |
 | **GearsOfWar** | 2026-10-10 12:38 PM | He Fought Giant Monster Last HP 🔥🎯  #videogames #gamingcommunity #gaming #gearso | [🔵 FB](https://www.facebook.com/reel/1597076448073123/) | 24 | [🟣 IG](https://www.instagram.com/reel/DeTaQ4rj0-d/) | 30 | **5** / 14 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar9.mp4) | **[📜 View 14](logs/games/GearsOfWar.md)** |
 | **sifu** | 2026-10-10 10:05 AM | Corridor Fight 1 vs 10 🔥💪  #videogames #gamingcommunity #gaming #sifu #gamingree | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeTPRJuEyAF/) | 10 | **13** / 26 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu4.mp4) | **[📜 View 26](logs/games/sifu.md)** |
 | **VietnamCavePrison** | 2026-10-10 04:37 AM | He survived 4 enemies cave shootout 🔥🎯  #videogames #gamingcommunity #gaming #vi | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeSprOAjd94/) | 170 | **23** / 37 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison19.mp4) | **[📜 View 37](logs/games/VietnamCavePrison.md)** |
@@ -39,14 +39,14 @@
 | **Russian_secret_missions** | 2026-10-09 08:06 PM | Survived 5 Enemies With 1 HP Big Explosion 💥🔥  #videogames #gamingcommunity #gam | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeRvLAkCfkz/) | 90 | **17** / 31 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions14.mp4) | **[📜 View 31](logs/games/Russian_secret_missions.md)** |
 | **codBlackops6** | 2026-10-09 06:37 AM | 5 Jets Strike Massive Desert Base 💥🔥  #videogames #gamingcommunity #gaming #codb | [🔵 FB](https://www.facebook.com/reel/1086858517283105/) | 583 | [🟣 IG](https://www.instagram.com/reel/DePleq2kq8X/) | 620 | **26** / 37 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops62.mp4) | **[📜 View 37](logs/games/codBlackops6.md)** |
 | **CallOfDutyMW2** | 2026-10-09 05:53 AM | 3 Enemies Close Range Fight 🔥  #videogames #gamingcommunity #gaming #callofdutym | [🔵 FB](https://www.facebook.com/reel/1413510794250292/) | 991 | [🟣 IG](https://www.instagram.com/reel/DeQNAr8FWgj/) | 130 | ✅ 6 / 6 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play8.mp4) | **[📜 View 5](logs/games/CallOfDutyMW2.md)** |
-| **ghostandela** | 2026-10-09 03:11 AM | Soldier Ripped In Half By Monster 🔥😳  #videogames #gamingcommunity #gaming #ghos | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeP7FjNCF7e/) | 130 | **29** / 43 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela20.mp4) | **[📜 View 43](logs/games/ghostandela.md)** |
+| **ghostandela** | 2026-10-09 03:11 AM | Soldier Ripped In Half By Monster 🔥😳  #videogames #gamingcommunity #gaming #ghos | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeP7FjNCF7e/) | 130 | **28** / 42 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela20.mp4) | **[📜 View 42](logs/games/ghostandela.md)** |
 | **GodofWarLaufey** | 2026-10-08 06:54 PM | 1 Hero Faces The Red Demon King 👑🔥  #videogames #gamingcommunity #gaming #godofw | [🔵 FB](https://www.facebook.com/reel/861579953646168/) | 52 | [🟣 IG](https://www.instagram.com/reel/DeO-aF3gp6A/) | 0 | **6** / 19 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.105/GodofWarLaufey_10.mp4) | **[📜 View 19](logs/games/GodofWarLaufey.md)** |
 
 --- 
 
 ## 📈 Trending Games (Last 7 Days)
 
-> Auto-detected based on views performance | Last Updated: 2026-10-10 10:29:16 PM
+> Auto-detected based on views performance | Last Updated: 2026-10-10 10:30:49 PM
 
 | Rank | Game Name | Views (7d) | Avg / Video | Trend | FB Post | Source |
 |:---:|---|---|---|---|---|---|
@@ -73,7 +73,7 @@
 
 ## 🎯 Best Time to Post (IST)
 
-> Analysis from 197 posts | Last Updated: 2026-10-10 10:29:16 PM
+> Analysis from 198 posts | Last Updated: 2026-10-10 10:30:49 PM
 
 | Rank | Time (IST) | Posts | Avg Views | Recommendation |
 |:---:|---|:---:|:---:|---|
@@ -96,14 +96,14 @@
 | Wednesday | 32 | 413 |
 | Thursday | 25 | 259 |
 | Friday | 17 | 352 |
-| Saturday | 25 | 342 |
+| Saturday | 26 | 334 |
 | Sunday | 28 | 228 |
 
 --- 
 
 ## 🤖 Auto-Reply Log (v6 Timeout-Safe)
 
-> Auto-Comment Status: ✅ **ACTIVE** | Last Updated: 2026-10-10 10:29:16 PM | Total Replies: 27 | Skipped: 0
+> Auto-Comment Status: ✅ **ACTIVE** | Last Updated: 2026-10-10 10:30:49 PM | Total Replies: 27 | Skipped: 0
 
 ### 📊 Stats
 
@@ -155,38 +155,38 @@
 - **🎮 Russian_secret_missions** — [📜 View All 31 Videos](logs/games/Russian_secret_missions.md)
 - **🎮 codBlackops6** — [📜 View All 37 Videos](logs/games/codBlackops6.md)
 - **🎮 CallOfDutyMW2** — [📜 View All 5 Videos](logs/games/CallOfDutyMW2.md)
-- **🎮 ghostandela** — [📜 View All 43 Videos](logs/games/ghostandela.md)
+- **🎮 ghostandela** — [📜 View All 42 Videos](logs/games/ghostandela.md)
 - **🎮 GodofWarLaufey** — [📜 View All 19 Videos](logs/games/GodofWarLaufey.md)
 
 --- 
 
 ## 🔄 Game Rotation Queue
 
-**📊 Total Games:** 12 | **🎯 Current:** `ghostandela` | **⏭️ Next Game:** `mm2remastered` (Position #11) | **🔢 Total Runs:** 191
+**📊 Total Games:** 12 | **🎯 Current:** `mm2remastered` | **⏭️ Next Game:** `sifu` (Position #12) | **🔢 Total Runs:** 192
 
-**Last Updated:** 2026-10-10 10:29:16 PM IST
+**Last Updated:** 2026-10-10 10:30:49 PM IST
 
 | # | Game Name | Uploaded | Last Run # | Next Turn In | Status |
 |:---:|---|:---:|:---:|:---:|:---:|
-| 1 | **CallOfDutyMW2** | 7 | 184 | 3 | ⏳ Wait 3 |
-| 2 | **Callofdutyaw** | 14 | 185 | 4 | ⏳ Wait 4 |
-| 3 | **GearsOfWar** | 9 | 186 | 5 | ⏳ Wait 5 |
-| 4 | **GodofWarLaufey** | 13 | 176 | 6 | ⏳ Wait 6 |
-| 5 | **MarvelsSpiderMan2** | 14 | 187 | 7 | ⏳ Wait 7 |
-| 6 | **Russian_secret_missions** | 14 | 188 | 8 | ⏳ Wait 8 |
-| 7 | **VietnamCavePrison** | 14 | 189 | 9 | ⏳ Wait 9 |
-| 8 | **Wolverine** | 7 | 190 | 10 | ⏳ Wait 10 |
-| 9 | **codBlackops6** | 11 | 156 | 11 | ⏳ Wait 11 |
-| 10 | **ghostandela** | 14 | 191 | 0 | 🎯 **CURRENT** |
-| 11 | **mm2remastered** | 13 | 182 | 1 | ⏭️ **NEXT UP** |
-| 12 | **sifu** | 13 | 183 | 2 | ⏳ Wait 2 |
+| 1 | **CallOfDutyMW2** | 7 | 184 | 2 | ⏳ Wait 2 |
+| 2 | **Callofdutyaw** | 14 | 185 | 3 | ⏳ Wait 3 |
+| 3 | **GearsOfWar** | 9 | 186 | 4 | ⏳ Wait 4 |
+| 4 | **GodofWarLaufey** | 13 | 176 | 5 | ⏳ Wait 5 |
+| 5 | **MarvelsSpiderMan2** | 14 | 187 | 6 | ⏳ Wait 6 |
+| 6 | **Russian_secret_missions** | 14 | 188 | 7 | ⏳ Wait 7 |
+| 7 | **VietnamCavePrison** | 14 | 189 | 8 | ⏳ Wait 8 |
+| 8 | **Wolverine** | 7 | 190 | 9 | ⏳ Wait 9 |
+| 9 | **codBlackops6** | 11 | 156 | 10 | ⏳ Wait 10 |
+| 10 | **ghostandela** | 14 | 191 | 11 | ⏳ Wait 11 |
+| 11 | **mm2remastered** | 14 | 192 | 0 | 🎯 **CURRENT** |
+| 12 | **sifu** | 13 | 183 | 1 | ⏭️ **NEXT UP** |
 
 ### 📜 Recent Runs (Last 5)
 
 | Run # | Game | Timestamp (IST) |
 |:---:|---|---|
+| 192 | mm2remastered | 2026-10-10 10:30:49 PM |
 | 191 | ghostandela | 2026-10-10 10:29:16 PM |
 | 190 | Wolverine | 2026-10-10 07:48:51 PM |
 | 189 | VietnamCavePrison | 2026-10-10 07:43:45 PM |
 | 188 | Russian_secret_missions | 2026-10-10 07:41:01 PM |
-| 187 | MarvelsSpiderMan2 | 2026-10-10 01:54:46 PM |
