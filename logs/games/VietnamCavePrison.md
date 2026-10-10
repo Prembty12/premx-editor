@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 38 | **Last Updated:** 2026-10-10 10:13:52 AM IST
+**Total Videos:** 38 | **Last Updated:** 2026-10-10 10:17:57 AM IST
 
 ---
 
@@ -14,7 +14,7 @@
 | Posted (FB or IG) | 35 / 38 |
 | FB Posted | 32 / 38 |
 | IG Posted | 13 / 38 |
-| Total FB Views | **10,089** |
+| Total FB Views | **10,090** |
 | Total IG Views | **2,170** |
 
 ---
@@ -24,7 +24,7 @@
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
 | 1 | He survived 4 enemies cave shootout 🔥🎯  #videogames #gamingcommunity #gaming #vietnamcaveprison #gam | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeSprOAjd94/) | 110 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison19.mp4) |
-| 2 | Helicopter Crash Survival 1 HP Left 🔥😳  #videogames #gamingcommunity #gaming #vietnamcaveprison #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/3708969699252321/) | 540 | [🟣 IG](https://www.instagram.com/reel/DeSCiimCRyB/) | 100 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison11.mp4) |
+| 2 | Helicopter Crash Survival 1 HP Left 🔥😳  #videogames #gamingcommunity #gaming #vietnamcaveprison #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/3708969699252321/) | 541 | [🟣 IG](https://www.instagram.com/reel/DeSCiimCRyB/) | 100 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison11.mp4) |
 | 3 | Red Dot Spray 3 Kills 🔥🎯  #videogames #gamingcommunity #gaming #vietnamcaveprison #gamingreels #reel | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DePLdwDFOGw/) | 150 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison22.mp4) |
 | 4 | He Shot 3 Targets Brutal 🔥🎯 Gameplay  #videogames #gamingcommunity #gaming #vietnamcaveprison #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1089058007444948/) | 636 | [🟣 IG](https://www.instagram.com/reel/DeODMTmFeU4/) | 220 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison4.mp4) |
 | 5 | 1 Life Jungle Helicopter Strike 🔥🎯  #videogames #gamingcommunity #gaming #vietnamcaveprison #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1433778538856569/) | 86 | [🟣 IG](https://www.instagram.com/reel/DeLgIkzldc8/) | 100 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison15.mp4) |
@@ -49,13 +49,13 @@
 | 24 | VietnamCavePrison12 | [🔵 FB](https://www.facebook.com/17956613277015660) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison12.mp4) |
 | 25 | VietnamCavePrison14 | [🔵 FB](https://www.facebook.com/18125286611313030) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison14.mp4) |
 | 26 | VietnamCavePrison6 | [🔵 FB](https://www.facebook.com/17909177241490523) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison6.mp4) |
-| 27 | VietnamCavePrison17 | [🔵 FB](https://www.facebook.com/18151212637536585) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison17.mp4) |
-| 28 | VietnamCavePrison1 | [🔵 FB](https://www.facebook.com/18626719651018294) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison1.mp4) |
-| 29 | VietnamCavePrison9 | [🔵 FB](https://www.facebook.com/18116557478012883) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison9.mp4) |
-| 30 | VietnamCavePrison18 | [🔵 FB](https://www.facebook.com/18115891318814804) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison18.mp4) |
-| 31 | VietnamCavePrison3 | [🔵 FB](https://www.facebook.com/17911559118510133) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison3.mp4) |
-| 32 | VietnamCavePrison22 | [🔵 FB](https://www.facebook.com/18129216142836375) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison22.mp4) |
-| 33 | VietnamCavePrison8 | [🔵 FB](https://www.facebook.com/17964928703982957) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison8.mp4) |
+| 27 | VietnamCavePrison1 | [🔵 FB](https://www.facebook.com/18626719651018294) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison1.mp4) |
+| 28 | VietnamCavePrison17 | [🔵 FB](https://www.facebook.com/18151212637536585) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison17.mp4) |
+| 29 | VietnamCavePrison18 | [🔵 FB](https://www.facebook.com/18115891318814804) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison18.mp4) |
+| 30 | VietnamCavePrison9 | [🔵 FB](https://www.facebook.com/18116557478012883) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison9.mp4) |
+| 31 | VietnamCavePrison8 | [🔵 FB](https://www.facebook.com/17964928703982957) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison8.mp4) |
+| 32 | VietnamCavePrison3 | [🔵 FB](https://www.facebook.com/17911559118510133) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison3.mp4) |
+| 33 | VietnamCavePrison22 | [🔵 FB](https://www.facebook.com/18129216142836375) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison22.mp4) |
 | 34 | VietnamCavePrison10 | [🔵 FB](https://www.facebook.com/18118945675947969) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison10.mp4) |
 | 35 | VietnamCavePrison19 | [🔵 FB](https://www.facebook.com/18021886751927977) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison19.mp4) |
 | 36 | VietnamCavePrison25 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison25.mp4) |
