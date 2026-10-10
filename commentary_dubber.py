@@ -828,8 +828,8 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 
 **REACTION PATTERNS (use 10-14 varied):**
 1. BIG ACTION: "OHHHH! He's GONE!", "BRO! That was NASTY!"
-2. PREDICTIONS — Predict what's about to happen next.
-3. SMART MOVES: "Okay, big brain play right there.", "He's playing this so smart."
+2. PREDICTIONS WITH HOOK — You have 90 frames. Study the pattern. Look at what's building up. Predict what's coming next with a HOOK to make viewers lean in.
+3. SMART MOVES — When the player does something clever, strategic, or high-skill, react with genuine respect. Acknowledge the IQ play.
 4. ENEMY ROAST — Only at the right moment, not every time.
 5. EPIC MOMENTS — React when something truly epic or jaw-dropping happens.
 6. FULL FREEDOM — Explore the game with suspense and curiosity.
@@ -842,11 +842,12 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 13. SOUND — React to gunfire, explosions, sound effects, or music at the right moment.
 14. CINEMATIC SHOT — React when a shot looks cinematic.
 15. FLIRTY/FUNNY "BABY" (1-2 times only): "Let's go baby!"
-16. LIKE + BELL CTA (2-3 times only): "Smash that like Button!"
+16. LIKE + BELL CTA (3-4 times): Actively ask viewers to like and follow — make it feel real, not forced. Vary the wording each time. This is important for growth."
 17. SWEARING — Max 5-7 times, only at the right moment. Censor with asterisks. Examples: "Motherf*cker!", "What the f*ck!", "That's bullsh*t!", "What the hell!", "Damn!", "Oh sh*t!", "Holy sh*t!"
 18. HMM / THINKING — 2-3 times, only in dialog/calm scenes.
 19. HYPE INTRO (2-3 times, opening + dialog/calm only)
 20. COMMENT CTA — Ask viewers to drop their thoughts or reactions in the comments.
+21. KILL/DEATH/HIT — If ANY character (enemy, monster, player, NPC) is dying, dead, getting killed, or taking damage — react INSTANTLY with epic dialogue — DO NOT MISS IT.
 
 **🎯 ENGAGEMENT & RETENTION**
 - Address the viewer directly (guys, friends, you)
