@@ -1,22 +1,22 @@
 {
-  "last_updated": "2026-10-10 09:15:21 AM",
+  "last_updated": "2026-10-10 09:53:54 AM",
   "period_days": 7,
   "trending": [
     {
       "game": "CallOfDutyMW2",
-      "views_7d": 2019,
-      "avg_per_video": 1009,
+      "views_7d": 2022,
+      "avg_per_video": 1011,
       "trend": "viral",
-      "ratio": 2.5051566080977845,
+      "ratio": 2.5048599199542596,
       "fb_link": "https://www.facebook.com/reel/1413510794250292/",
       "source_link": ""
     },
     {
       "game": "GearsOfWar",
-      "views_7d": 3847,
-      "avg_per_video": 641,
+      "views_7d": 3860,
+      "avg_per_video": 643,
       "trend": "trending",
-      "ratio": 1.5914820473644002,
+      "ratio": 1.5931008195159138,
       "fb_link": "https://www.facebook.com/reel/1977642476247722/",
       "source_link": ""
     },
@@ -25,25 +25,25 @@
       "views_7d": 1897,
       "avg_per_video": 632,
       "trend": "trending",
-      "ratio": 1.5691367456073337,
+      "ratio": 1.5658471507528111,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "VietnamCavePrison",
-      "views_7d": 4908,
-      "avg_per_video": 613,
+      "views_7d": 4917,
+      "avg_per_video": 614,
       "trend": "trending",
-      "ratio": 1.52196333078686,
+      "ratio": 1.5212502382313702,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison19.mp4"
     },
     {
       "game": "Russian_secret_missions",
-      "views_7d": 2433,
-      "avg_per_video": 608,
+      "views_7d": 2438,
+      "avg_per_video": 609,
       "trend": "trending",
-      "ratio": 1.5095492742551566,
+      "ratio": 1.5088622069754145,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions14.mp4"
     }
@@ -51,10 +51,10 @@
   "below_avg": [
     {
       "game": "Callofdutyaw",
-      "views_7d": 1802,
-      "avg_per_video": 360,
+      "views_7d": 1841,
+      "avg_per_video": 368,
       "trend": "slow",
-      "ratio": 0.8938120702826585,
+      "ratio": 0.9117591004383456,
       "fb_link": "https://www.facebook.com/reel/4933637443514344/",
       "source_link": ""
     },
@@ -63,7 +63,7 @@
       "views_7d": 500,
       "avg_per_video": 100,
       "trend": "below_avg",
-      "ratio": 0.2482811306340718,
+      "ratio": 0.24776062511911567,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.104/GODOFWAR315.mp4"
     },
@@ -72,7 +72,7 @@
       "views_7d": 408,
       "avg_per_video": 81,
       "trend": "below_avg",
-      "ratio": 0.20110771581359815,
+      "ratio": 0.20068610634648368,
       "fb_link": "https://www.facebook.com/reel/861579953646168/",
       "source_link": ""
     },
@@ -81,7 +81,7 @@
       "views_7d": 130,
       "avg_per_video": 65,
       "trend": "below_avg",
-      "ratio": 0.16138273491214666,
+      "ratio": 0.16104440632742517,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela20.mp4"
     },
@@ -90,17 +90,17 @@
       "views_7d": 270,
       "avg_per_video": 54,
       "trend": "below_avg",
-      "ratio": 0.13407181054239878,
+      "ratio": 0.13379073756432247,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu15.mp4"
     }
   ],
   "recommendation": {
     "game": "CallOfDutyMW2",
-    "views_7d": 2019,
-    "avg_per_video": 1009,
+    "views_7d": 2022,
+    "avg_per_video": 1011,
     "trend": "viral",
-    "ratio": 2.5051566080977845,
+    "ratio": 2.5048599199542596,
     "fb_link": "https://www.facebook.com/reel/1413510794250292/",
     "source_link": ""
   }
