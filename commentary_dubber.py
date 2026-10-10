@@ -85,7 +85,7 @@ SEGMENTS_DIR       = "segments"
 
 MIN_SLOTS_HARD = 6
 MAX_SLOTS_HARD = 20
-DUCK_VOLUME = 0.25
+DUCK_VOLUME = 0.35
 
 # 90 frames — 8K portrait canvas (9x10 grid)
 ANALYSIS_FRAMES = 90
@@ -110,8 +110,8 @@ SPEED_ACTION = 1.14
 SPEED_DIALOG = 1.05
 SPEED_CALM   = 1.00
 
-VOL_ACTION = 1.7
-VOL_OTHER  = 1.4
+VOL_ACTION = 1.9
+VOL_OTHER  = 1.6
 
 os.makedirs(SEGMENTS_DIR, exist_ok=True)
 os.makedirs(ANALYSIS_DIR, exist_ok=True)
