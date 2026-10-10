@@ -1,1 +1,1 @@
-{"clip_duration": 25, "reason": "Intense Wolverine boss combat with fire and lightning effects", "start_time": 5, "status": "APPROVE", "title": "Wolverine Survives 1 HP Boss Fight 🔥"}
+{"clip_duration": 30, "reason": "Non-stop corridor combat action", "start_time": 0, "status": "APPROVE", "title": "Corridor Fight 1 vs 10 🔥💪"}
