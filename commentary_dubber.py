@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v5.0 (Hybrid: Slot + Audio Adjust)
+🎙️ AI Commentary Dubber — v6.0 (4-No Match: Frame + SRT + Slot + GPT)
 ===============================================================
 FEATURES:
   ✅ Timing LOCK — GPT segment = SLOT time
-  ✅ SLOT-ALIGNED GRID — frames slot ke range se match
-  ✅ Action pe atempo BAND (voice natural)
+  ✅ SRT time = SLOT time (FORCED)
+  ✅ Slot-aligned grid — frame = slot time
+  ✅ Audio delay = slot start
+  ✅ Action pe atempo band (voice natural)
   ✅ Calm/Dialog pe atempo 1.00-1.10
-  ✅ Slot EXTEND (max 0.5s) agar audio bahut lamba
-  ✅ No MAX_WORDS
+  ✅ Last slot atempo 1.20 (no cut)
+  ✅ Slot extend max 0.5s
 ===============================================================
 """
 
@@ -96,12 +98,13 @@ CANVAS_H = 7680
 VOICE_SPEED_MIN = 1.00
 VOICE_SPEED_MAX = 1.17
 
-# ✅ atempo — 1.00 se 1.10 (calm/dialog only)
+# ✅ atempo — normal slots pe 1.10, last slot pe 1.20
 ATEMPO_MIN = 1.00
 ATEMPO_MAX = 1.10
+ATEMPO_MAX_LAST = 1.20
 
-# ✅ Slot extend — agar audio bahut lamba (action pe)
-MAX_SLOT_EXTEND = 0.5   # 0.5s max
+# ✅ Slot extend — max 0.5s
+MAX_SLOT_EXTEND = 0.5
 
 SPEED_ACTION = 1.14
 SPEED_DIALOG = 1.05
@@ -383,7 +386,7 @@ def slot_loudness(timeline, start, end):
 
 
 # ============================================================
-# STEP 3 — AUTO SLOTS
+# STEP 3 — AUTO SLOTS (SRT TIME = SLOT TIME) ✅
 # ============================================================
 def build_auto_slots(video_path, vid_duration, srt_content):
     print("📐 [3] Building AUTO slots...")
@@ -510,7 +513,27 @@ def build_auto_slots(video_path, vid_duration, srt_content):
     if slots and slots[-1]["end"] < vid_duration - 0.1:
         slots[-1]["end"] = round(vid_duration, 2)
 
-    print(f"   ✅ Built {len(slots)} slots\n")
+    # ✅✅✅ SRT TIME = SLOT TIME (FORCED)
+    for slot in slots:
+        slot_srt = [
+            e for e in srt_entries
+            if e["start"] >= slot["start"] - 0.15 and e["end"] <= slot["end"] + 0.15
+        ]
+        slot["srt_text"] = " ".join(e["text"] for e in slot_srt)
+        
+        # ✅ SRT entries ka time = slot time
+        for e in slot_srt:
+            e["start"] = slot["start"]
+            e["end"] = slot["end"]
+
+    # ✅ Debug: 4-No Match Verification
+    print(f"   ✅ Built {len(slots)} slots")
+    print(f"   📋 4-No Match Verification:")
+    for i, slot in enumerate(slots, 1):
+        print(f"      Slot {i}: {slot['start']:.2f}s - {slot['end']:.2f}s "
+              f"| SRT: \"{slot['srt_text'][:45]}\"")
+    print()
+
     return slots
 
 
@@ -820,10 +843,11 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 14. CINEMATIC SHOT — React when a shot looks cinematic.
 15. FLIRTY/FUNNY "BABY" (1-2 times only): "Let's go baby!"
 16. LIKE + BELL CTA (2-3 times only): "Smash that like Button!"
-17. SWEARING — Max 5-7 times, only at the right moment. Censor with asterisks. Examples: "Holy sh*t!", "What the f*ck!", "That's bullsh*t!", "What the hell!", "Damn!", "Oh sh*t!", "Motherf*cker!"
-18. HMM / THINKING — 2-3 times, only in dialog/calm scenes. Examples: "Hmm interesting...", "Hmm okay...", "Wait a sec...", "Let me think...", "Something's off...", "That's strange..."
+17. SWEARING — Max 5-7 times, only at the right moment. Censor with asterisks.
+18. HMM / THINKING — 2-3 times, only in dialog/calm scenes.
 19. HYPE INTRO (2-3 times, opening + dialog/calm only)
 20. COMMENT CTA — Ask viewers to drop their thoughts or reactions in the comments.
+
 **🎯 ENGAGEMENT & RETENTION**
 - Address the viewer directly (guys, friends, you)
 - Ask natural questions
@@ -1133,10 +1157,10 @@ Return ONLY valid JSON:
 
 
 # ============================================================
-# STEP 7 — ElevenLabs TTS (HYBRID: atempo + slot extend) ✅
+# STEP 7 — ElevenLabs TTS (Action band, last slot 1.20) ✅
 # ============================================================
-def generate_audio(segments, slots):
-    print("🔊 [7] Generating TTS (HYBRID: action atempo band, slot extend max 0.5s)...")
+def generate_audio(segments, slots, vid_duration):
+    print("🔊 [7] Generating TTS (action band, last slot atempo 1.20)...")
     url = f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID}"
     headers = {
         "Accept": "audio/mpeg",
@@ -1198,23 +1222,22 @@ def generate_audio(segments, slots):
                 atempo_used = "none"
                 slot_extended = 0.0
 
-                # ✅ HYBRID LOGIC
-                if visual_type == "action":
-                    # Action pe atempo BAND
+                # ✅ Last slot check
+                is_last = (idx == len(segments) - 1)
+                atempo_max = ATEMPO_MAX_LAST if is_last else ATEMPO_MAX
+
+                if visual_type == "action" and not is_last:
+                    # Action (non-last) — atempo band
                     over = actual - target_dur
                     if over > MAX_SLOT_EXTEND:
-                        # Bahut lamba — slot extend karo
                         slot_extended = min(over, MAX_SLOT_EXTEND)
                         atempo_used = f"none (slot+{slot_extended:.2f}s)"
-                    else:
-                        # Chhota over — accept karo (natural)
-                        atempo_used = "none"
                     final = seg_file
                 else:
-                    # Calm/Dialog pe atempo 1.10 tak
+                    # Calm/Dialog ya last slot — atempo lagao
                     if actual > 0 and target_dur > 0:
                         needed_tempo = actual / target_dur
-                        tempo = max(ATEMPO_MIN, min(ATEMPO_MAX, needed_tempo))
+                        tempo = max(ATEMPO_MIN, min(atempo_max, needed_tempo))
 
                         if tempo > 1.01:
                             fit_file = f"{SEGMENTS_DIR}/seg_{idx:03d}_fit.mp3"
@@ -1226,13 +1249,12 @@ def generate_audio(segments, slots):
                                 stderr=subprocess.DEVNULL
                             )
                             final = fit_file if os.path.exists(fit_file) else seg_file
-                            atempo_used = f"{tempo:.3f}"
+                            atempo_used = f"{tempo:.3f}" + (" (last)" if is_last else "")
                         else:
                             final = seg_file
                     else:
                         final = seg_file
 
-                # ✅ Slot extend — agli slot ko shift karo
                 new_slot_end = slot_end + slot_extended
 
                 audio_files.append({
@@ -1272,10 +1294,10 @@ def generate_audio(segments, slots):
 
 
 # ============================================================
-# STEP 8 — Timed Audio (with slot extend shifts)
+# STEP 8 — Timed Audio
 # ============================================================
 def build_timed_audio(audio_files, vid_duration):
-    print("🎼 [8] Building timed audio (with slot extend shifts)...")
+    print("🎼 [8] Building timed audio...")
     silent = f"{SEGMENTS_DIR}/silent_base.mp3"
     subprocess.run(
         f"ffmpeg -y -f lavfi -i anullsrc=r=44100:cl=stereo -t {vid_duration} "
@@ -1375,14 +1397,14 @@ def fallback_copy_original():
 # ============================================================
 def main():
     print("=" * 60)
-    print("🎙️ AI COMMENTARY DUBBER — v5.0 (HYBRID)")
+    print("🎙️ AI COMMENTARY DUBBER — v6.0 (4-No Match)")
     print("=" * 60)
     print(f"📹 Input : {FINAL_CLIP_PATH}")
     print(f"📤 Output: {FINAL_DUBBED_VIDEO}")
     print(f"🎤 Voice : {VOICE_ID}")
     print(f"🎛️  Switch: COMMENTARY_ENABLED = {COMMENTARY_ENABLED}")
     print(f"🎮 Speed : {VOICE_SPEED_MIN} - {VOICE_SPEED_MAX}")
-    print(f"🎵 atempo: {ATEMPO_MIN} - {ATEMPO_MAX} (action pe BAND)")
+    print(f"🎵 atempo: {ATEMPO_MIN} - {ATEMPO_MAX} (last: {ATEMPO_MAX_LAST})")
     print(f"📏 Slot extend: max {MAX_SLOT_EXTEND}s")
     print(f"🔊 Volume: Action={VOL_ACTION}x | Other={VOL_OTHER}x")
     print(f"🖼️  Frames: {ANALYSIS_FRAMES} ({GRID_COLS}x{GRID_ROWS}, {CANVAS_W}x{CANVAS_H} 8K)")
@@ -1428,7 +1450,7 @@ def main():
               f"min={min(speeds):.2f} max={max(speeds):.2f} "
               f"avg={sum(speeds)/len(speeds):.2f}\n")
 
-        audio_files = generate_audio(segments, slots)
+        audio_files = generate_audio(segments, slots, vid_dur)
         if not audio_files:
             raise Exception("No audio files generated")
 
