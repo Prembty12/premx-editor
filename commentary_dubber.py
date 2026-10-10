@@ -85,7 +85,7 @@ SEGMENTS_DIR       = "segments"
 
 MIN_SLOTS_HARD = 6
 MAX_SLOTS_HARD = 20
-DUCK_VOLUME = 0.35
+DUCK_VOLUME = 0.50
 
 # 90 frames — 8K portrait canvas (9x10 grid)
 ANALYSIS_FRAMES = 90
