@@ -31,3 +31,6 @@ Video id : 17955279579260431
 mm2remastered_20 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_20.mp4
 Video id : 18104812832148135
 
+mm2remastered_22 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_22.mp4
+Video id : 18134723860640924
+
