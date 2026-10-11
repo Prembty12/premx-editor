@@ -15,6 +15,7 @@ FEATURES:
   ✅ Custom Font (.ttf) & ASS Subtitles Burn-in
   ✅ 100% Subtitle-Audio SYNC (actual audio timing)
   ✅ Smart Re-encode (only when subtitles ON)
+  ✅ Progressive Word-by-Word Reveal (6 equal colors)
 ===============================================================
 """
 
@@ -27,6 +28,7 @@ import json
 import base64
 import re
 import time
+import hashlib
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 from dotenv import load_dotenv
 
@@ -134,6 +136,25 @@ os.makedirs(FONTS_DIR, exist_ok=True)
 
 
 # ============================================================
+# WORD COLORS (6 EQUAL COLORS) ✅
+# ============================================================
+WORD_COLORS = [
+    "&H00FFFFFF",   # White
+    "&H0000FFFF",   # Yellow
+    "&H00FFFF00",   # Cyan
+    "&H0000FF00",   # Green
+    "&H00FF00FF",   # Magenta
+    "&H0080FFFF",   # Orange
+]
+
+
+def get_word_color(word):
+    """Same word = same color (consistent look). 6 colors equal chance."""
+    hash_val = int(hashlib.md5(word.lower().encode()).hexdigest(), 16)
+    return WORD_COLORS[hash_val % len(WORD_COLORS)]
+
+
+# ============================================================
 # ENV VALIDATION
 # ============================================================
 def validate_env():
@@ -220,12 +241,12 @@ def speed_for_type(slot_type):
 
 
 # ============================================================
-# ASS SUBTITLE GENERATOR (100% SYNC WITH ACTUAL AUDIO) ✅
+# ASS SUBTITLE GENERATOR — PROGRESSIVE WORD-BY-WORD ✅
 # ============================================================
 def generate_full_ass_script(audio_files, font_name="Arial", font_size=60,
                               alignment=2, vertical_margin=40,
                               outline_size=3, shadow_size=2):
-    print("🎨 Generating ASS Subtitles file (SYNCED with actual audio timing)...")
+    print("🎨 Generating ASS Subtitles (PROGRESSIVE word-by-word, 6 colors)...")
 
     ass_content = f"""[Script Info]
 ScriptType: v4.00+
@@ -236,41 +257,65 @@ ScaledBorderAndShadow: yes
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
 Style: Default,{font_name},{font_size},&H00FFFFFF,&H000000FF,&H00000000,&H00000000,1,0,0,0,100,100,0,0,1,{outline_size},{shadow_size},{alignment},10,10,{vertical_margin},1
-Style: Red,{font_name},{font_size},&H000000FF,&H000000FF,&H00000000,&H00000000,1,0,0,0,100,100,0,0,1,{outline_size},{shadow_size},{alignment},10,10,{vertical_margin},1
-Style: Yellow,{font_name},{font_size},&H0000FFFF,&H000000FF,&H00000000,&H00000000,1,0,0,0,100,100,0,0,1,{outline_size},{shadow_size},{alignment},10,10,{vertical_margin},1
-Style: Blue,{font_name},{font_size},&H00FF0000,&H000000FF,&H00000000,&H00000000,1,0,0,0,100,100,0,0,1,{outline_size},{shadow_size},{alignment},10,10,{vertical_margin},1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
 
-    # ✅ audio_files se ACTUAL start/end/text use karo — 100% sync
     written = 0
-    for item in audio_files:
-        start_t = seconds_to_ass_time(item.get("start", 0))
-        # ✅ ACTUAL audio end use karo (subtitle 100% sync)
-        end_t   = seconds_to_ass_time(item.get("actual_end", item.get("end", 3)))
 
-        v_type = (item.get("visual_type") or "calm").lower().strip()
-        if v_type == "action":
-            style = "Red"
-        elif v_type == "dialog":
-            style = "Yellow"
-        else:
-            style = "Default"
+    for item in audio_files:
+        start = item.get("start", 0)
+        end = item.get("actual_end", item.get("end", 3))
 
         text = item.get("text", "").strip()
         if not text:
             continue
 
-        ass_content += f"Dialogue: 0,{start_t},{end_t},{style},,0,0,0,,{text}\n"
-        written += 1
+        words = text.split()
+        if not words:
+            continue
+
+        total_dur = end - start
+        if total_dur <= 0:
+            total_dur = 1.0
+
+        # ✅ Progressive reveal — timing proportional to word length
+        total_chars = sum(len(w) for w in words)
+        if total_chars == 0:
+            total_chars = 1
+
+        current_time = start
+        cumulative_chars = 0
+
+        for i, w in enumerate(words):
+            cumulative_chars += len(w)
+            frac = cumulative_chars / total_chars
+            seg_end = start + (total_dur * frac)
+
+            # Sirf pehle i+1 words dikhao (progressive build-up)
+            visible_words = words[:i+1]
+            colored_words = []
+            for vw in visible_words:
+                color = get_word_color(vw)
+                # ✅ Har word ka apna color, reset ke baad
+                colored_words.append(f"{{\\c{color}}}{vw}{{\\c&H00FFFFFF&}}")
+            colored_text = " ".join(colored_words)
+
+            start_t = seconds_to_ass_time(current_time)
+            end_t = seconds_to_ass_time(seg_end)
+
+            ass_content += f"Dialogue: 0,{start_t},{end_t},Default,,0,0,0,,{colored_text}\n"
+            written += 1
+            current_time = seg_end
 
     with open(ASS_PATH, "w", encoding="utf-8") as f:
         f.write(ass_content)
 
-    print(f"✅ ASS Subtitles saved (100% synced): {ASS_PATH}")
-    print(f"   📊 Total subtitle entries: {written}\n")
+    print(f"✅ ASS Subtitles saved: {ASS_PATH}")
+    print(f"   📊 Total subtitle lines: {written}")
+    print(f"   🎨 Style: Progressive word-by-word (6 equal colors)")
+    print(f"   ⏱️  Timing: Proportional to word length\n")
 
 
 # ============================================================
@@ -1339,8 +1384,8 @@ def generate_audio(segments, slots, vid_duration):
                 audio_files.append({
                     "file": final,
                     "start": slot_start,
-                    "end": new_slot_end,          # slot-based end (ducking/merge ke liye)
-                    "actual_end": actual_end,      # ✅ audio-based end (subtitle ke liye)
+                    "end": new_slot_end,
+                    "actual_end": actual_end,
                     "actual_dur": actual,
                     "text": text,
                     "visual_type": visual_type,
@@ -1446,9 +1491,7 @@ def merge_final(video_path, commentary_audio, out_path, audio_files, enable_subt
         f"normalize=0,alimiter=limit=0.95[aout]"
     )
 
-    # ✅ Smart codec selection:
-    # - Subtitles ON  → re-encode video (libx264) for burn-in
-    # - Subtitles OFF → copy video (fast, no quality loss)
+    # ✅ Smart codec selection
     subtitles_active = enable_subtitles and os.path.exists(ASS_PATH)
 
     if subtitles_active:
@@ -1508,6 +1551,7 @@ def main():
     print(f"🔊 Volume: Action={VOL_ACTION}x | Other={VOL_OTHER}x")
     print(f"🖼️  Frames: {ANALYSIS_FRAMES} ({GRID_COLS}x{GRID_ROWS}, {CANVAS_W}x{CANVAS_H} 8K)")
     print(f"🤖 Model : openai/gpt-4o-mini (Free)")
+    print(f"🎨 Subtitle: Progressive word-by-word (6 colors)")
     print("=" * 60 + "\n")
 
     if not COMMENTARY_ENABLED:
@@ -1549,17 +1593,17 @@ def main():
               f"min={min(speeds):.2f} max={max(speeds):.2f} "
               f"avg={sum(speeds)/len(speeds):.2f}\n")
 
-        # ✅ Audio PEHLE generate karo (actual duration milega)
+        # ✅ Audio PEHLE generate karo
         audio_files = generate_audio(segments, slots, vid_dur)
         if not audio_files:
             raise Exception("No audio files generated")
 
-        # ✅ ASS Subtitles AB banao — ACTUAL audio timing ke saath (100% SYNC)
+        # ✅ ASS Subtitles AB banao — PROGRESSIVE WORD-BY-WORD
         if SUBTITLES_ENABLED:
             generate_full_ass_script(
                 audio_files=audio_files,
                 font_name="BebasNeue-Regular",           # 👈 apna font naam daalo
-                font_size=65,
+                font_size=55,
                 alignment=2,
                 vertical_margin=50
             )
@@ -1573,7 +1617,7 @@ def main():
         print("=" * 60)
         print(f"🔥🔥 DONE! {FINAL_DUBBED_VIDEO}")
         print(f"📊 Slots: {len(slots)} | Segments: {len(audio_files)}")
-        print(f"💬 Subtitles: {'ON' if SUBTITLES_ENABLED else 'OFF'} (100% SYNCED)")
+        print(f"💬 Subtitles: {'ON' if SUBTITLES_ENABLED else 'OFF'} (WORD-BY-WORD)")
         print("=" * 60)
 
         commit_analysis_to_github()
