@@ -1,70 +1,70 @@
 {
-  "last_updated": "2026-10-10 10:30:49 PM",
+  "last_updated": "2026-10-11 09:34:55 AM",
   "period_days": 7,
   "trending": [
     {
       "game": "CallOfDutyMW2",
-      "views_7d": 2099,
-      "avg_per_video": 1049,
+      "views_7d": 2137,
+      "avg_per_video": 1068,
       "trend": "viral",
-      "ratio": 2.355538922155689,
+      "ratio": 2.3096053342944676,
       "fb_link": "https://www.facebook.com/reel/1413510794250292/",
       "source_link": ""
     },
     {
       "game": "Russian_secret_missions",
-      "views_7d": 2534,
-      "avg_per_video": 633,
+      "views_7d": 2597,
+      "avg_per_video": 649,
       "trend": "steady",
-      "ratio": 1.4214071856287425,
+      "ratio": 1.403496125428005,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions14.mp4"
     },
     {
-      "game": "VietnamCavePrison",
-      "views_7d": 4293,
-      "avg_per_video": 613,
-      "trend": "steady",
-      "ratio": 1.376497005988024,
-      "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison19.mp4"
-    },
-    {
       "game": "MarvelsSpiderMan2",
-      "views_7d": 2422,
-      "avg_per_video": 605,
+      "views_7d": 2592,
+      "avg_per_video": 648,
       "trend": "steady",
-      "ratio": 1.3585329341317365,
+      "ratio": 1.401333573616868,
       "fb_link": "https://www.facebook.com/reel/1480647083999255/",
       "source_link": ""
     },
     {
-      "game": "mm2remastered",
-      "views_7d": 2891,
-      "avg_per_video": 578,
+      "game": "VietnamCavePrison",
+      "views_7d": 4366,
+      "avg_per_video": 623,
       "trend": "steady",
-      "ratio": 1.2979041916167666,
-      "fb_link": "https://www.facebook.com/reel/1798800707831375/",
+      "ratio": 1.3472697783384393,
+      "fb_link": "",
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison19.mp4"
+    },
+    {
+      "game": "mm2remastered",
+      "views_7d": 3664,
+      "avg_per_video": 610,
+      "trend": "steady",
+      "ratio": 1.3191566047936565,
+      "fb_link": "https://www.facebook.com/reel/4395441457385128/",
       "source_link": ""
     }
   ],
   "below_avg": [
     {
-      "game": "GodofWarLaufey",
-      "views_7d": 416,
-      "avg_per_video": 83,
+      "game": "Wolverine",
+      "views_7d": 798,
+      "avg_per_video": 133,
       "trend": "below_avg",
-      "ratio": 0.18637724550898205,
-      "fb_link": "https://www.facebook.com/reel/861579953646168/",
+      "ratio": 0.28761939088123983,
+      "fb_link": "https://www.facebook.com/reel/1789742062294500/",
       "source_link": ""
     },
     {
-      "game": "Wolverine",
-      "views_7d": 426,
-      "avg_per_video": 71,
+      "game": "GodofWarLaufey",
+      "views_7d": 418,
+      "avg_per_video": 83,
       "trend": "below_avg",
-      "ratio": 0.1594311377245509,
-      "fb_link": "https://www.facebook.com/reel/1789742062294500/",
+      "ratio": 0.17949180032438278,
+      "fb_link": "https://www.facebook.com/reel/861579953646168/",
       "source_link": ""
     },
     {
@@ -72,26 +72,26 @@
       "views_7d": 130,
       "avg_per_video": 65,
       "trend": "below_avg",
-      "ratio": 0.14595808383233533,
+      "ratio": 0.14056586772391422,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela20.mp4"
     },
     {
       "game": "sifu",
-      "views_7d": 280,
-      "avg_per_video": 46,
+      "views_7d": 210,
+      "avg_per_video": 42,
       "trend": "below_avg",
-      "ratio": 0.1032934131736527,
+      "ratio": 0.09082717606775996,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu4.mp4"
     }
   ],
   "recommendation": {
     "game": "CallOfDutyMW2",
-    "views_7d": 2099,
-    "avg_per_video": 1049,
+    "views_7d": 2137,
+    "avg_per_video": 1068,
     "trend": "viral",
-    "ratio": 2.355538922155689,
+    "ratio": 2.3096053342944676,
     "fb_link": "https://www.facebook.com/reel/1413510794250292/",
     "source_link": ""
   }
