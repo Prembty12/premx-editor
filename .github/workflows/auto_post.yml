@@ -80,7 +80,7 @@ jobs:
           DEBUG: '1'                       # 🐛 Verbose logs
 
         run: |
-          bash run.sh
+          bash commentary_dubber.py
 
       - name: Commit and Push Updated Memory & Posted Logs
         env:
