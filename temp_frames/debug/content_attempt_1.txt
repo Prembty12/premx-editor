@@ -1,1 +1,1 @@
-{"clip_duration":21,"reason":"Full corridor combat sequence against multiple enemies","start_time":0,"status":"APPROVE","title":"5 Enemies Cooked In Corridor 🔥"}
+{"clip_duration": 47, "reason": "Active FPS combat with multiple kills throughout", "start_time": 0, "status": "APPROVE", "title": "4 Soldiers Walked Straight Into My Trap 🎯🔥"}
