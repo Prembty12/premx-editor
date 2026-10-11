@@ -14,6 +14,7 @@ FEATURES:
   ✅ Subtitles Switch (ON/OFF) via CLI or ENV
   ✅ Custom Font (.ttf) & ASS Subtitles Burn-in
   ✅ 100% Subtitle-Audio SYNC (actual audio timing)
+  ✅ Smart Re-encode (only when subtitles ON)
 ===============================================================
 """
 
@@ -247,7 +248,8 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     written = 0
     for item in audio_files:
         start_t = seconds_to_ass_time(item.get("start", 0))
-        end_t = seconds_to_ass_time(item.get("actual_end", item.get("end", 3)))
+        # ✅ ACTUAL audio end use karo (subtitle 100% sync)
+        end_t   = seconds_to_ass_time(item.get("actual_end", item.get("end", 3)))
 
         v_type = (item.get("visual_type") or "calm").lower().strip()
         if v_type == "action":
@@ -1444,20 +1446,29 @@ def merge_final(video_path, commentary_audio, out_path, audio_files, enable_subt
         f"normalize=0,alimiter=limit=0.95[aout]"
     )
 
-    # ✅ Subtitles burn-in check
-    vf_flag = ""
-    if enable_subtitles and os.path.exists(ASS_PATH):
+    # ✅ Smart codec selection:
+    # - Subtitles ON  → re-encode video (libx264) for burn-in
+    # - Subtitles OFF → copy video (fast, no quality loss)
+    subtitles_active = enable_subtitles and os.path.exists(ASS_PATH)
+
+    if subtitles_active:
         print("   🎨 Burning-in ASS subtitles with custom fonts...")
         vf_flag = f'-vf "subtitles={ASS_PATH}:fontsdir={FONTS_DIR}"'
+        video_codec = "-c:v libx264 -preset fast -crf 23 -pix_fmt yuv420p"
     else:
-        print("   🚫 Subtitles disabled or ASS file missing — skipping burn-in.")
+        print("   🚫 Subtitles disabled or ASS file missing — skipping burn-in (copy video).")
+        vf_flag = ""
+        video_codec = "-c:v copy"
 
     cmd = (
         f'ffmpeg -y -i {video_path} -i {commentary_audio} '
         f'-filter_complex "{filter_complex}" '
         f'{vf_flag} '
-        f'-map 0:v:0 -map "[aout]" -c:v copy -shortest {out_path}'
+        f'-map 0:v:0 -map "[aout]" '
+        f'{video_codec} -c:a aac -b:a 192k -shortest {out_path}'
     )
+
+    print(f"   🎬 Video codec: {'libx264 (re-encode)' if subtitles_active else 'copy (no re-encode)'}")
     subprocess.run(cmd, shell=True, check=True)
     print(f"🔥 Final video ready: {out_path}")
     print(f"   🔊 Action volume: {VOL_ACTION}x | Other volume: {VOL_OTHER}x\n")
@@ -1547,7 +1558,7 @@ def main():
         if SUBTITLES_ENABLED:
             generate_full_ass_script(
                 audio_files=audio_files,
-                font_name="Impact",           # 👈 apna font naam daalo
+                font_name="BebasNeue-Regular",           # 👈 apna font naam daalo
                 font_size=65,
                 alignment=2,
                 vertical_margin=50
