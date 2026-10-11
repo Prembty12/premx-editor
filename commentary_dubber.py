@@ -3,11 +3,16 @@
 🎙️ AI Commentary Dubber — v6.0 (Painting + Action Atempo 1.15)
 ===============================================================
 FEATURES:
-  ✅ Progressive Word-by-Word Reveal
-  ✅ Painting Colour Finishing
+  ✅ Timing LOCK — GPT segment = SLOT time
+  ✅ SRT time = SLOT time (FORCED)
+  ✅ Slot-aligned grid — frame = slot time
+  ✅ Audio delay = slot start
+  ✅ Action pe atempo 1.15 tak
+  ✅ Calm/Dialog pe atempo 1.10
+  ✅ Last slot atempo 1.20
   ✅ 100% Subtitle-Audio SYNC
   ✅ Smart Re-encode
-  ✅ Action me atempo 1.15 tak (jab slot me jagah kam)
+  ✅ Terminal Timing Verification
 ===============================================================
 """
 
@@ -99,7 +104,6 @@ ATEMPO_MAX = 1.10
 ATEMPO_MAX_LAST = 1.20
 ATEMPO_MAX_ACTION = 1.15    # ✅ Action me max 1.15
 
-# ✅ Slot extend (rare case me)
 MAX_SLOT_EXTEND = 0.2
 
 SPEED_ACTION = 1.14
@@ -484,7 +488,7 @@ def slot_loudness(timeline, start, end):
 
 
 # ============================================================
-# STEP 3 — AUTO SLOTS
+# STEP 3 — AUTO SLOTS (SRT TIME = SLOT TIME ✅)
 # ============================================================
 def build_auto_slots(video_path, vid_duration, srt_content):
     print("📐 [3] Building AUTO slots...")
@@ -611,6 +615,7 @@ def build_auto_slots(video_path, vid_duration, srt_content):
     if slots and slots[-1]["end"] < vid_duration - 0.1:
         slots[-1]["end"] = round(vid_duration, 2)
 
+    # ✅✅✅ SRT TIME = SLOT TIME (FORCED)
     for slot in slots:
         slot_srt = [
             e for e in srt_entries
@@ -622,7 +627,14 @@ def build_auto_slots(video_path, vid_duration, srt_content):
             e["start"] = slot["start"]
             e["end"] = slot["end"]
 
-    print(f"   ✅ Built {len(slots)} slots\n")
+    # ✅ TIMING VERIFICATION
+    print(f"   ✅ Built {len(slots)} slots")
+    print(f"   📋 4-No Match Verification:")
+    for i, slot in enumerate(slots, 1):
+        print(f"      Slot {i}: {slot['start']:.2f}s - {slot['end']:.2f}s "
+              f"| SRT: \"{slot['srt_text'][:45]}\"")
+    print()
+
     return slots
 
 
@@ -922,7 +934,7 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 4. ENEMY ROAST
 5. EPIC MOMENTS
 6. FULL FREEDOM
-7. HYPE — "okay okay okay", "wait wait wait", "Ayyy", "OHHHH!", "WOW!"
+7. HYPE — "okay okay okay", "wait wait wait", "Ayyy", "OHHHH!"
 8. WEIRD
 9. CLOSE CALL
 10. FOLLOW REQUEST (2-3 total)
@@ -937,11 +949,6 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 19. HYPE INTRO (2-3 times)
 20. COMMENT CTA
 21. KILL/DEATH/HIT — React INSTANTLY
-
-**🎯 ENGAGEMENT & RETENTION**
-- Address the viewer directly (guys, friends, you)
-- Ask natural questions
-- Hype them up
 
 **🎭 SCENE-MATCHING:**
 - ACTION → shout, hype, CAPS
@@ -1043,17 +1050,22 @@ Return ONLY valid JSON:
                     parsed = json.loads(raw)
                     segments = parsed.get("segments", [])
 
-                    print(f"   🔒 Locking segment timing to slots...")
+                    # ✅ TIMING LOCK — VERIFICATION
+                    print(f"   🔒 TIMING LOCK — Verifying GPT segments vs Slots...")
                     locked_count = 0
                     for seg in segments:
                         slot_num = seg.get("slot")
 
                         if slot_num and 1 <= slot_num <= len(slots):
                             exact_slot = slots[slot_num - 1]
+                            old_start = seg.get("start")
+                            old_end = seg.get("end")
+                            if old_start != exact_slot["start"] or old_end != exact_slot["end"]:
+                                print(f"      🔒 Slot {slot_num}: GPT({old_start}→{old_end}) ⇒ LOCKED({exact_slot['start']}→{exact_slot['end']})")
+                                locked_count += 1
                             seg["start"] = exact_slot["start"]
                             seg["end"] = exact_slot["end"]
                             seg["slot"] = slot_num
-                            locked_count += 1
                         else:
                             best_slot = None
                             best_diff = 999
@@ -1068,7 +1080,13 @@ Return ONLY valid JSON:
                                 seg["slot"] = slots.index(best_slot) + 1
                                 locked_count += 1
 
-                    print(f"   ✅ Locked {locked_count} segments to slot timing")
+                    print(f"   ✅ TIMING LOCKED: {locked_count} segments → slot time")
+
+                    # ✅ Show final timing
+                    print(f"   📋 FINAL TIMING (GPT segment = SLOT time):")
+                    for seg in segments:
+                        print(f"      Slot {seg.get('slot')}: {seg.get('start'):.2f}s → {seg.get('end'):.2f}s | {seg.get('text', '')[:50]}")
+                    print()
 
                     updated_count = 0
                     override_count = 0
@@ -1277,9 +1295,7 @@ def generate_audio(segments, slots, vid_duration):
                 is_last = (idx == len(segments) - 1)
                 atempo_max = ATEMPO_MAX_LAST if is_last else ATEMPO_MAX
 
-                # ============================================
                 # ✅ ACTION: atempo 1.15 tak (jab slot me jagah kam)
-                # ============================================
                 if visual_type == "action" and not is_last:
                     if actual > target_dur + 0.05:
                         needed_tempo = actual / target_dur
@@ -1300,13 +1316,12 @@ def generate_audio(segments, slots, vid_duration):
                     else:
                         final = seg_file
 
-                    # Atempo ke baad bhi agar 0.2s+ zyada hai toh extend
                     final_dur = get_duration(final)
                     if final_dur > target_dur + 0.2:
                         slot_extended = min(final_dur - target_dur, MAX_SLOT_EXTEND)
                         atempo_used += f" + slot+{slot_extended:.2f}s"
                 else:
-                    # Calm/Dialog ya last slot — atempo (max 1.10)
+                    # Calm/Dialog ya last slot — atempo (max 1.10 / 1.20)
                     if actual > 0 and target_dur > 0:
                         needed_tempo = actual / target_dur
                         tempo = max(ATEMPO_MIN, min(atempo_max, needed_tempo))
@@ -1340,15 +1355,11 @@ def generate_audio(segments, slots, vid_duration):
                     "slot_extended": slot_extended
                 })
 
-                if slot_extended > 0:
-                    print(f"   ⚠️ [{slot_start:5.1f}s] {actual:.2f}s/{target_dur:.2f}s "
-                          f"slot+{slot_extended:.2f}s (speed={voice_speed:.2f}, {visual_type}) | {text}")
-                elif actual > target_dur + 0.1:
-                    print(f"   ⚠️ [{slot_start:5.1f}s] {actual:.2f}s/{target_dur:.2f}s "
-                          f"atempo={atempo_used} (speed={voice_speed:.2f}, {visual_type}) | {text}")
-                else:
-                    print(f"   ✅ [{slot_start:5.1f}s] {actual:.2f}s/{target_dur:.2f}s "
-                          f"atempo={atempo_used} (speed={voice_speed:.2f}, {visual_type}) | {text}")
+                # ✅ TIMING VERIFICATION per segment
+                final_dur = get_duration(final)
+                status = "✅ FIT" if final_dur <= target_dur + 0.01 else ("⚠️ OVERLAP" if slot_extended > 0 else "⚠️ OVER")
+                print(f"   {status} [Slot {slot_num}] Slot={slot_start:.2f}-{slot_end:.2f}s | "
+                      f"Audio={actual:.2f}s → {final_dur:.2f}s | atempo={atempo_used} | \"{text[:40]}\"")
 
             elif r.status_code == 401:
                 print("   ❌ 401 — ElevenLabs key galat!")
@@ -1361,7 +1372,7 @@ def generate_audio(segments, slots, vid_duration):
         except Exception as e:
             print(f"   ⚠️ seg {idx}: {e}")
 
-    print(f"✅ {len(audio_files)} audio segments\n")
+    print(f"\n✅ {len(audio_files)} audio segments generated\n")
     return audio_files
 
 
@@ -1484,7 +1495,7 @@ def fallback_copy_original():
 # ============================================================
 def main():
     print("=" * 60)
-    print("🎙️ AI COMMENTARY DUBBER — v6.0 (ACTION ATEMPO 1.15)")
+    print("🎙️ AI COMMENTARY DUBBER — v6.0 (Painting + Action 1.15)")
     print("=" * 60)
     print(f"📹 Input : {FINAL_CLIP_PATH}")
     print(f"📤 Output: {FINAL_DUBBED_VIDEO}")
@@ -1523,17 +1534,35 @@ def main():
         if not segments:
             raise Exception("No segments generated")
 
+        print("=" * 60)
+        print("🔍 TIMING VERIFICATION (GPT = Slot = Audio = Subtitle)")
+        print("=" * 60)
+        print(f"   Slots: {len(slots)} | Segments: {len(segments)}")
+        print()
+        for i, seg in enumerate(segments, 1):
+            slot_num = seg.get("slot", "?")
+            print(f"   Seg {i}: Slot={slot_num} | "
+                  f"GPT time={seg.get('start'):.2f}s → {seg.get('end'):.2f}s")
+        print()
+
+        speeds = [s["voice_speed"] for s in slots]
+        print(f"🎮 Final voice speeds: "
+              f"min={min(speeds):.2f} max={max(speeds):.2f} "
+              f"avg={sum(speeds)/len(speeds):.2f}\n")
+
+        # ✅ Audio PEHLE
         audio_files = generate_audio(segments, slots, vid_dur)
         if not audio_files:
             raise Exception("No audio files generated")
 
+        # ✅ ASS Subtitles AB
         if SUBTITLES_ENABLED:
             generate_full_ass_script(
                 audio_files=audio_files,
                 font_name="BebasNeue-Regular",
                 font_size=55,
                 alignment=2,
-                vertical_margin=75
+                vertical_margin=65
             )
 
         final_audio = build_timed_audio(audio_files, vid_dur)
