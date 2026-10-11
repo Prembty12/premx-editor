@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v6.0 (Painting + Action Atempo 1.15)
+🎙️ AI Commentary Dubber — v6.0 (Painting + Action 1.15 + Real-Time Mode)
 ===============================================================
 FEATURES:
   ✅ Timing LOCK — GPT segment = SLOT time
@@ -12,6 +12,7 @@ FEATURES:
   ✅ Last slot atempo 1.20
   ✅ 100% Subtitle-Audio SYNC
   ✅ Smart Re-encode
+  ✅ Real-Time Gameplay Mode (18 rules)
   ✅ Terminal Timing Verification
 ===============================================================
 """
@@ -102,7 +103,7 @@ VOICE_SPEED_MAX = 1.17
 ATEMPO_MIN = 1.00
 ATEMPO_MAX = 1.10
 ATEMPO_MAX_LAST = 1.20
-ATEMPO_MAX_ACTION = 1.15    # ✅ Action me max 1.15
+ATEMPO_MAX_ACTION = 1.15
 
 MAX_SLOT_EXTEND = 0.2
 
@@ -615,7 +616,7 @@ def build_auto_slots(video_path, vid_duration, srt_content):
     if slots and slots[-1]["end"] < vid_duration - 0.1:
         slots[-1]["end"] = round(vid_duration, 2)
 
-    # ✅✅✅ SRT TIME = SLOT TIME (FORCED)
+    # ✅ SRT TIME = SLOT TIME (FORCED)
     for slot in slots:
         slot_srt = [
             e for e in srt_entries
@@ -627,7 +628,6 @@ def build_auto_slots(video_path, vid_duration, srt_content):
             e["start"] = slot["start"]
             e["end"] = slot["end"]
 
-    # ✅ TIMING VERIFICATION
     print(f"   ✅ Built {len(slots)} slots")
     print(f"   📋 4-No Match Verification:")
     for i, slot in enumerate(slots, 1):
@@ -892,7 +892,7 @@ def build_analysis_grid(video_path, vid_duration, slots, num_frames=ANALYSIS_FRA
 
 
 # ============================================================
-# STEP 6 — GPT Call (TIMING LOCK)
+# STEP 6 — GPT Call (TIMING LOCK + REAL-TIME MODE)
 # ============================================================
 def generate_full_script(slots, srt_content, analysis_grid_path):
     print(f"🤖 [6] Generating FULL script (OpenRouter — {len(OPENROUTER_KEYS)} keys)...")
@@ -925,57 +925,111 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 - Contractions: "he's", "ain't", "gonna", "wanna", "kinda"
 - Slang: "bruh", "yo", "bro", "nah", "fr", "lowkey", "bet", "cap"
 - Short sentences. Fragments OK.
-- Start with reactions: "YO!", "BRO!", "WAIT!", "NAH!", "AYY!", "WHAT'S UP GUYS!"
+- Start with reactions: "YO!", "BRO!", "WAIT!", "NAH!", "AYY!", "WHAT'S UP GUYS!", "YO WHAT'S UP GUYS!",
 
 **REACTION PATTERNS (use 20-25 varied):**
-1. BIG ACTION
-2. PREDICTIONS WITH HOOK
-3. SMART MOVES
-4. ENEMY ROAST
-5. EPIC MOMENTS
-6. FULL FREEDOM
-7. HYPE — "okay okay okay", "wait wait wait", "Ayyy", "OHHHH!"
-8. WEIRD
+1. BIG ACTION: "OHHHH! He's GONE!", "BRO! That was NASTY!"
+2. PREDICTIONS WITH HOOK — You have 90 frames. Study the pattern. Look at what's building up. Predict what's coming next with a HOOK to make viewers lean in.
+3. SMART MOVES — When the player does something clever, strategic, or high-skill, react with genuine respect. Acknowledge the IQ play.
+4. ENEMY ROAST — Only at the right moment, not every time.
+5. EPIC MOMENTS — React when something truly epic or jaw-dropping happens.
+6. FULL FREEDOM — Explore the game with suspense and curiosity.
+7. HYPE — Start with "okay okay okay", "wait wait wait", "Ayyy", "OHHHH!", "WOW!" or "Ooo" style phrases.
+8. WEIRD — React when something strange or unusual shows up.
 9. CLOSE CALL
-10. FOLLOW REQUEST (2-3 total)
-11. FREESTYLE
+10. FOLLOW REQUEST (2-3 total): "Ayy if you're vibing, hit that follow yo."
+11. FREESTYLE — "React naturally to whatever stands out in the moment."
 12. ENVIRONMENT
-13. SOUND
-14. CINEMATIC SHOT
-15. FLIRTY/FUNNY "BABY" (1-2 times only)
-16. LIKE + BELL CTA (3-4 times)
-17. SWEARING (Max 5-7 times, censored)
-18. HMM / THINKING (2-3 times, dialog/calm only)
-19. HYPE INTRO (2-3 times)
-20. COMMENT CTA
-21. KILL/DEATH/HIT — React INSTANTLY
+13. SOUND — React to gunfire, explosions, sound effects, or music at the right moment.
+14. CINEMATIC SHOT — React when a shot looks cinematic.
+15. FLIRTY/FUNNY "BABY" (1-2 times only): "Let's go baby!"
+16. LIKE + BELL CTA (3-4 times): Actively ask viewers to like and follow — make it feel real, not forced. Vary the wording each time. This is important for growth."
+17. SWEARING — Max 5-7 times, only at the right moment. Censor with asterisks. Examples: "Motherf*cker!", "What the f*ck!", "That's bullsh*t!", "What the hell!", "Damn!", "Oh sh*t!", "Holy sh*t!"
+18. HMM / THINKING — 2-3 times, only in dialog/calm scenes.
+19. HYPE INTRO (2-3 times, opening + dialog/calm only)
+20. COMMENT CTA — Ask viewers to drop their thoughts or reactions in the comments.
+21. KILL/DEATH/HIT — If ANY character (enemy, monster, player, NPC) is dying, dead, getting killed, or taking damage — react INSTANTLY with epic dialogue — DO NOT MISS IT.
+
+**🎮 REAL-TIME GAMEPLAY MODE:**
+- You ARE the player. Not watching. React LIVE like you're in the fight RIGHT NOW.
+- Always PRESENT TENSE — happening this second, not after.
+- Every enemy death, every hit, every dodge, every shot fired — react INSTANTLY. Never miss a moment.
+- Use SHORT, EXPLOSIVE reactions when killing or destroying. Full sentences only for calm moments.
+- NEVER repeat the same reaction twice in a row. Every moment deserves a UNIQUE response.
+- VARY your reaction LENGTH — some words, some fragments, some full sentences.
+- Match VOICE TONE to the moment — whisper for tension, SHOUT for action, calm for chill.
+- If you see KILLING, DYING, DESTROYING, or DAMAGE — react FIRST, describe LATER. Reaction > description.
+- Add SUSPENSE before big moments when you sense buildup — hold the tension.
+- NEVER say what you SEE — say what you FEEL. Emotion over description.
+- When multiple enemies die at once — react with ESCALATING hype, not the same tone.
+- When YOU take damage — react with PAIN or PANIC, not calm.
+- When YOU dodge or survive — react with RELIEF or COCKY confidence.
+- When YOU win a fight — react with DOMINANCE, not just happiness.
+- ALWAYS address the viewer naturally — make them feel part of the fight.
+- Keep reactions SHORTER when action is FAST, LONGER when action is SLOW.
+- NEVER narrate like a documentary. YOU are IN the moment, not outside it.
+- If nothing big happens — build ANTICIPATION, don't fill silence with boring lines.
+
+**🎯 ENGAGEMENT & RETENTION**
+- Address the viewer directly (guys, friends, you)
+- Ask natural questions
+- Hype them up
+- Keep them watching till the end
 
 **🎭 SCENE-MATCHING:**
-- ACTION → shout, hype, CAPS
-- DIALOG → conversational
-- CALM → chill
+- ACTION → shout, hype, CAPS lines
+- DIALOG → conversational, NO shouting
+- CALM → chill, relaxed, NO hype
 
 **🚫 NEVER shout on non-action scenes.**
 
-**PACING (STRICT — KEEP LINES SHORT):**
-- "action" → 2-4 words MAX, HIGH energy, CAPS
-- "dialog" → 4-5 words MAX
-- "calm" → 5-6 words MAX
+**PACING:**
+- "action" → 3-5 words, HIGH energy, CAPS
+- "dialog" → 5-7 words, conversational
+- "calm" → 6-8 words, chill
 
-⚠️ CRITICAL: SHORT lines. Long lines = voice overlap.
+**🎯 VISUAL CLASSIFICATION RULES**
 
-**🎯 VISUAL CLASSIFICATION**
-**action** if: FIRE, EXPLOSIONS, WEAPONS FIRING, COMBAT, RUNNING, JUMPING, BLOOD, DAMAGE, MULTIPLE CHARACTERS CLOSE
-**dialog** if: face close-up, talking, standing still
-**calm** for: scenery, menus, walking slowly
+**⚠️⚠️⚠️ AGGRESSIVE ACTION DETECTION ⚠️⚠️⚠️**
+If you see ANY of these → visual_type = "action":
+- 🔥 FIRE, FLAMES, EXPLOSIONS, BLAST
+- 💥 SMOKE, SPARKS, DUST
+- 🩸 BLOOD, GORE, DAMAGE
+- 🔫 WEAPONS FIRING, MUZZLE FLASH
+- ⚔️ COMBAT STANCE, FISTS UP, MID-ATTACK
+- 👥 MULTIPLE CHARACTERS CLOSE
+- 🏃 RUNNING, JUMPING, DODGING
+- 💢 CHARACTER BEING HIT, KNOCKED BACK
+- 📊 HEALTH BARS, HIT MARKERS
+- 🎯 AIMING DOWN SIGHTS
+- 🎬 CINEMATIC ACTION, SHAKY CAM
+- 3+ CONSECUTIVE frames show above → ACTION
+
+**visual_type = "dialog" ONLY if:**
+- Close-up of face while speaking
+- Character standing still, facing camera
+- Conversation scene
+
+**visual_type = "calm" for EVERYTHING ELSE:**
+- Slow camera panning
+- City skyline / scenery
+- Drone flying in sky
+- Menu / UI screens
+- Walking slowly
+- Environment only shots
+
+**⚠️ BE HONEST. If slow motion/sitting/walking/scenery → "calm".**
+**🔴 Two characters CLOSE and ENGAGED → ACTION.**
+**🔥 FIRE/EXPLOSIONS/MANY ENEMIES → ACTION.**
 
 **RULES:**
-1. NATURAL — casual, slang
+1. NATURAL — casual, slang, contractions
 2. REACT with emotion
 3. Focus on VISUALS
-4. UNIQUE lines
+4. UNIQUE lines based on actual frames
 5. 5-8 words per line
-6. "guys" or "you" naturally
+6. Reference "guys" or "you" naturally
+7. Max 2-3 follow requests
 
 **STORY CONTEXT:**
 {srt_content[:2500]}
@@ -1050,7 +1104,7 @@ Return ONLY valid JSON:
                     parsed = json.loads(raw)
                     segments = parsed.get("segments", [])
 
-                    # ✅ TIMING LOCK — VERIFICATION
+                    # ✅ TIMING LOCK
                     print(f"   🔒 TIMING LOCK — Verifying GPT segments vs Slots...")
                     locked_count = 0
                     for seg in segments:
@@ -1081,8 +1135,6 @@ Return ONLY valid JSON:
                                 locked_count += 1
 
                     print(f"   ✅ TIMING LOCKED: {locked_count} segments → slot time")
-
-                    # ✅ Show final timing
                     print(f"   📋 FINAL TIMING (GPT segment = SLOT time):")
                     for seg in segments:
                         print(f"      Slot {seg.get('slot')}: {seg.get('start'):.2f}s → {seg.get('end'):.2f}s | {seg.get('text', '')[:50]}")
@@ -1121,6 +1173,7 @@ Return ONLY valid JSON:
                                 or (motion >= 3)
                                 or (action_ratio >= 0.30)
                                 or (scene_count >= 3 and avg_loud > -18)
+                                or (action_ratio > 0.20 and avg_loud > -20)
                             )
 
                             has_strong_dialog = (
@@ -1227,7 +1280,7 @@ Return ONLY valid JSON:
 
 
 # ============================================================
-# STEP 7 — ElevenLabs TTS (Action me atempo 1.15 tak) ✅
+# STEP 7 — ElevenLabs TTS (Action me atempo 1.15 tak)
 # ============================================================
 def generate_audio(segments, slots, vid_duration):
     print("🔊 [7] Generating TTS (action me atempo 1.15 tak)...")
@@ -1295,7 +1348,7 @@ def generate_audio(segments, slots, vid_duration):
                 is_last = (idx == len(segments) - 1)
                 atempo_max = ATEMPO_MAX_LAST if is_last else ATEMPO_MAX
 
-                # ✅ ACTION: atempo 1.15 tak (jab slot me jagah kam)
+                # ✅ ACTION: atempo 1.15 tak
                 if visual_type == "action" and not is_last:
                     if actual > target_dur + 0.05:
                         needed_tempo = actual / target_dur
@@ -1321,7 +1374,7 @@ def generate_audio(segments, slots, vid_duration):
                         slot_extended = min(final_dur - target_dur, MAX_SLOT_EXTEND)
                         atempo_used += f" + slot+{slot_extended:.2f}s"
                 else:
-                    # Calm/Dialog ya last slot — atempo (max 1.10 / 1.20)
+                    # Calm/Dialog ya last slot
                     if actual > 0 and target_dur > 0:
                         needed_tempo = actual / target_dur
                         tempo = max(ATEMPO_MIN, min(atempo_max, needed_tempo))
@@ -1355,7 +1408,6 @@ def generate_audio(segments, slots, vid_duration):
                     "slot_extended": slot_extended
                 })
 
-                # ✅ TIMING VERIFICATION per segment
                 final_dur = get_duration(final)
                 status = "✅ FIT" if final_dur <= target_dur + 0.01 else ("⚠️ OVERLAP" if slot_extended > 0 else "⚠️ OVER")
                 print(f"   {status} [Slot {slot_num}] Slot={slot_start:.2f}-{slot_end:.2f}s | "
@@ -1495,7 +1547,7 @@ def fallback_copy_original():
 # ============================================================
 def main():
     print("=" * 60)
-    print("🎙️ AI COMMENTARY DUBBER — v6.0 (Painting + Action 1.15)")
+    print("🎙️ AI COMMENTARY DUBBER — v6.0 (Real-Time Mode)")
     print("=" * 60)
     print(f"📹 Input : {FINAL_CLIP_PATH}")
     print(f"📤 Output: {FINAL_DUBBED_VIDEO}")
@@ -1506,6 +1558,7 @@ def main():
     print(f"📏 Slot extend: max {MAX_SLOT_EXTEND}s")
     print(f"🔊 Volume: Action={VOL_ACTION}x | Other={VOL_OTHER}x")
     print(f"🎨 Subtitle: Painting Colour Finishing")
+    print(f"🎮 Mode: REAL-TIME GAMEPLAY (18 rules)")
     print("=" * 60 + "\n")
 
     if not COMMENTARY_ENABLED:
@@ -1550,12 +1603,10 @@ def main():
               f"min={min(speeds):.2f} max={max(speeds):.2f} "
               f"avg={sum(speeds)/len(speeds):.2f}\n")
 
-        # ✅ Audio PEHLE
         audio_files = generate_audio(segments, slots, vid_dur)
         if not audio_files:
             raise Exception("No audio files generated")
 
-        # ✅ ASS Subtitles AB
         if SUBTITLES_ENABLED:
             generate_full_ass_script(
                 audio_files=audio_files,
