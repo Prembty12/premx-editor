@@ -1,1 +1,1 @@
-{"clip_duration": 57,"reason": "Sniping and epic cruise missile strike gameplay","start_time": 0,"status": "APPROVE", "title": "Cruise Missile Strike Hit 5 Targets 💥🎯"}
+{"clip_duration": 36, "reason": "Helicopter missile combat with massive explosions", "start_time": 2, "status": "APPROVE", "title": "Helicopter River Strike 4 Targets Hit 🔥🎯"}
