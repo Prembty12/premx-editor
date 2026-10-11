@@ -1,1 +1,1 @@
-{"clip_duration": 47, "reason": "Active FPS combat with multiple kills throughout", "start_time": 0, "status": "APPROVE", "title": "4 Soldiers Walked Straight Into My Trap 🎯🔥"}
+{"clip_duration": 56, "reason": "Continuous intense combat with explosions and shooting", "start_time": 0, "status": "APPROVE", "title": "Survived 4 Enemies On Last Bullet 🔥🎯"}
