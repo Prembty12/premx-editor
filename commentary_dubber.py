@@ -7,6 +7,7 @@ FEATURES:
   ✅ Painting Colour Finishing (White → Yellow → White → ... → Blue last)
   ✅ 100% Subtitle-Audio SYNC
   ✅ Smart Re-encode
+  ✅ MAX_SLOT_EXTEND = 0.0 (No extend)
 ===============================================================
 """
 
@@ -97,7 +98,8 @@ ATEMPO_MIN = 1.00
 ATEMPO_MAX = 1.10
 ATEMPO_MAX_LAST = 1.20
 
-MAX_SLOT_EXTEND = 0.5
+# ✅ No slot extend
+MAX_SLOT_EXTEND = 0.0
 
 SPEED_ACTION = 1.14
 SPEED_DIALOG = 1.05
@@ -113,25 +115,17 @@ os.makedirs(FONTS_DIR, exist_ok=True)
 
 
 # ============================================================
-# 🎨 PAINTING COLOUR FINISHING (Screenshot Style) ✅
+# 🎨 PAINTING COLOUR FINISHING
 # ============================================================
-COLOR_WHITE  = "&H00FFFFFF"   # White
-COLOR_YELLOW = "&H0000FFFF"   # Yellow
-COLOR_BLUE   = "&H00FF0000"   # Blue
-COLOR_RESET  = "&H00FFFFFF"   # Reset to White
+COLOR_WHITE  = "&H00FFFFFF"
+COLOR_YELLOW = "&H0000FFFF"
+COLOR_BLUE   = "&H00FF0000"
+COLOR_RESET  = "&H00FFFFFF"
 
 
 def get_pattern_color(word_index, total_words):
-    """
-    Screenshot-style painting pattern:
-    - Alternate: White, Yellow, White, Yellow...
-    - Last word = Blue (highlight)
-    """
-    # Last word — Blue (highlight)
     if word_index == total_words - 1:
         return COLOR_BLUE
-
-    # Alternate White / Yellow
     if word_index % 2 == 0:
         return COLOR_WHITE
     else:
@@ -272,13 +266,11 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         current_time = start
         cumulative_chars = 0
 
-        # ✅ Progressive reveal + Painting pattern colours
         for i, w in enumerate(words):
             cumulative_chars += len(w)
             frac = cumulative_chars / total_chars
             seg_end = start + (total_dur * frac)
 
-            # Visible words (progressive build-up)
             visible_words = words[:i+1]
             colored_words = []
             for j, vw in enumerate(visible_words):
@@ -1560,7 +1552,7 @@ def main():
         if SUBTITLES_ENABLED:
             generate_full_ass_script(
                 audio_files=audio_files,
-                font_name="BebasNeue-Regular",   # 👈 apna font naam
+                font_name="BebasNeue-Regular",
                 font_size=55,
                 alignment=2,
                 vertical_margin=65
