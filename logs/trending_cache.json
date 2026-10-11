@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-11 04:53:04 PM",
+  "last_updated": "2026-10-11 04:55:43 PM",
   "period_days": 7,
   "trending": [
     {
@@ -7,7 +7,7 @@
       "views_7d": 2250,
       "avg_per_video": 750,
       "trend": "trending",
-      "ratio": 1.8507094386181369,
+      "ratio": 1.8503289473684212,
       "fb_link": "https://www.facebook.com/reel/1044648048624733/",
       "source_link": ""
     },
@@ -16,16 +16,16 @@
       "views_7d": 3765,
       "avg_per_video": 627,
       "trend": "trending",
-      "ratio": 1.5471930906847624,
+      "ratio": 1.546875,
       "fb_link": "https://www.facebook.com/reel/4395441457385128/",
       "source_link": ""
     },
     {
       "game": "Russian_secret_missions",
-      "views_7d": 2964,
-      "avg_per_video": 592,
+      "views_7d": 2967,
+      "avg_per_video": 593,
       "trend": "steady",
-      "ratio": 1.4608266502159162,
+      "ratio": 1.4629934210526316,
       "fb_link": "https://www.facebook.com/reel/1473620611250267/",
       "source_link": ""
     },
@@ -34,7 +34,7 @@
       "views_7d": 2885,
       "avg_per_video": 577,
       "trend": "steady",
-      "ratio": 1.4238124614435534,
+      "ratio": 1.4235197368421053,
       "fb_link": "https://www.facebook.com/reel/1086858517283105/",
       "source_link": ""
     },
@@ -43,7 +43,7 @@
       "views_7d": 4429,
       "avg_per_video": 553,
       "trend": "steady",
-      "ratio": 1.364589759407773,
+      "ratio": 1.364309210526316,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison11.mp4"
     }
@@ -54,7 +54,7 @@
       "views_7d": 837,
       "avg_per_video": 139,
       "trend": "below_avg",
-      "ratio": 0.3429981492905614,
+      "ratio": 0.3429276315789474,
       "fb_link": "https://www.facebook.com/reel/1789742062294500/",
       "source_link": ""
     },
@@ -63,7 +63,7 @@
       "views_7d": 421,
       "avg_per_video": 84,
       "trend": "below_avg",
-      "ratio": 0.20727945712523133,
+      "ratio": 0.20723684210526316,
       "fb_link": "https://www.facebook.com/reel/861579953646168/",
       "source_link": ""
     },
@@ -72,7 +72,7 @@
       "views_7d": 130,
       "avg_per_video": 65,
       "trend": "below_avg",
-      "ratio": 0.16039481801357186,
+      "ratio": 0.16036184210526316,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela20.mp4"
     },
@@ -81,7 +81,7 @@
       "views_7d": 220,
       "avg_per_video": 36,
       "trend": "below_avg",
-      "ratio": 0.08883405305367058,
+      "ratio": 0.08881578947368421,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu5.mp4"
     }
@@ -91,7 +91,7 @@
     "views_7d": 2250,
     "avg_per_video": 750,
     "trend": "trending",
-    "ratio": 1.8507094386181369,
+    "ratio": 1.8503289473684212,
     "fb_link": "https://www.facebook.com/reel/1044648048624733/",
     "source_link": ""
   }
