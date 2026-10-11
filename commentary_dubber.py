@@ -1563,7 +1563,7 @@ def main():
                 font_name="BebasNeue-Regular",   # 👈 apna font naam
                 font_size=55,
                 alignment=2,
-                vertical_margin=50
+                vertical_margin=65
             )
 
         final_audio = build_timed_audio(audio_files, vid_dur)
