@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v6.0 (Painting Colour Finishing)
+🎙️ AI Commentary Dubber — v6.0 (Painting + Action Atempo 1.15)
 ===============================================================
 FEATURES:
   ✅ Progressive Word-by-Word Reveal
-  ✅ Painting Colour Finishing (White → Yellow → White → ... → Blue last)
+  ✅ Painting Colour Finishing
   ✅ 100% Subtitle-Audio SYNC
   ✅ Smart Re-encode
-  ✅ MAX_SLOT_EXTEND = 0.0 (No extend)
+  ✅ Action me atempo 1.15 tak (jab slot me jagah kam)
 ===============================================================
 """
 
@@ -35,7 +35,7 @@ def parse_args():
     p.add_argument("--out", required=True, help="Output dubbed clip path")
     p.add_argument("--voice", default=None, help="ElevenLabs voice ID (optional)")
     p.add_argument("--subtitles", choices=["true", "false"], default=None,
-                   help="Enable or disable ASS subtitles (default: from SUBTITLES_ENABLED env or true)")
+                   help="Enable or disable ASS subtitles")
     return p.parse_args()
 
 
@@ -97,9 +97,10 @@ VOICE_SPEED_MAX = 1.17
 ATEMPO_MIN = 1.00
 ATEMPO_MAX = 1.10
 ATEMPO_MAX_LAST = 1.20
+ATEMPO_MAX_ACTION = 1.15    # ✅ Action me max 1.15
 
-# ✅ No slot extend
-MAX_SLOT_EXTEND = 0.0
+# ✅ Slot extend (rare case me)
+MAX_SLOT_EXTEND = 0.2
 
 SPEED_ACTION = 1.14
 SPEED_DIALOG = 1.05
@@ -219,7 +220,7 @@ def speed_for_type(slot_type):
 
 
 # ============================================================
-# ASS SUBTITLE GENERATOR — PAINTING COLOUR FINISHING 🎨
+# ASS SUBTITLE GENERATOR
 # ============================================================
 def generate_full_ass_script(audio_files, font_name="Arial", font_size=60,
                               alignment=2, vertical_margin=40,
@@ -290,8 +291,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
     print(f"✅ ASS Subtitles saved: {ASS_PATH}")
     print(f"   📊 Total subtitle lines: {written}")
-    print(f"   🎨 Style: Painting Colour Finishing (White/Yellow/Blue)")
-    print(f"   ⏱️  Timing: Proportional to word length\n")
+    print(f"   🎨 Style: Painting Colour Finishing\n")
 
 
 # ============================================================
@@ -622,13 +622,7 @@ def build_auto_slots(video_path, vid_duration, srt_content):
             e["start"] = slot["start"]
             e["end"] = slot["end"]
 
-    print(f"   ✅ Built {len(slots)} slots")
-    print(f"   📋 4-No Match Verification:")
-    for i, slot in enumerate(slots, 1):
-        print(f"      Slot {i}: {slot['start']:.2f}s - {slot['end']:.2f}s "
-              f"| SRT: \"{slot['srt_text'][:45]}\"")
-    print()
-
+    print(f"   ✅ Built {len(slots)} slots\n")
     return slots
 
 
@@ -919,30 +913,30 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 - Contractions: "he's", "ain't", "gonna", "wanna", "kinda"
 - Slang: "bruh", "yo", "bro", "nah", "fr", "lowkey", "bet", "cap"
 - Short sentences. Fragments OK.
-- Start with reactions: "YO!", "BRO!", "WAIT!", "NAH!", "AYY!", "WHAT'S UP GUYS!", "YO WHAT'S UP GUYS!",
+- Start with reactions: "YO!", "BRO!", "WAIT!", "NAH!", "AYY!", "WHAT'S UP GUYS!"
 
 **REACTION PATTERNS (use 20-25 varied):**
-1. BIG ACTION: "OHHHH! He's GONE!", "BRO! That was NASTY!"
-2. PREDICTIONS WITH HOOK — Study the pattern. Predict what's coming next.
-3. SMART MOVES — Acknowledge the IQ play.
-4. ENEMY ROAST — Only at the right moment.
-5. EPIC MOMENTS — React when something truly epic happens.
-6. FULL FREEDOM — Explore with suspense.
+1. BIG ACTION
+2. PREDICTIONS WITH HOOK
+3. SMART MOVES
+4. ENEMY ROAST
+5. EPIC MOMENTS
+6. FULL FREEDOM
 7. HYPE — "okay okay okay", "wait wait wait", "Ayyy", "OHHHH!", "WOW!"
-8. WEIRD — React when something strange shows up.
+8. WEIRD
 9. CLOSE CALL
-10. FOLLOW REQUEST (2-3 total): "Ayy if you're vibing, hit that follow yo."
-11. FREESTYLE — React naturally to whatever stands out.
+10. FOLLOW REQUEST (2-3 total)
+11. FREESTYLE
 12. ENVIRONMENT
-13. SOUND — React to gunfire, explosions, music.
-14. CINEMATIC SHOT — React when a shot looks cinematic.
-15. FLIRTY/FUNNY "BABY" (1-2 times only): "Let's go baby!"
-16. LIKE + BELL CTA (3-4 times): Ask viewers to like and follow — natural, varied.
-17. SWEARING — Max 5-7 times, censored with asterisks.
-18. HMM / THINKING — 2-3 times, dialog/calm only.
-19. HYPE INTRO (2-3 times, opening + dialog/calm only)
-20. COMMENT CTA — Ask viewers to drop their thoughts.
-21. KILL/DEATH/HIT — React INSTANTLY with epic dialogue.
+13. SOUND
+14. CINEMATIC SHOT
+15. FLIRTY/FUNNY "BABY" (1-2 times only)
+16. LIKE + BELL CTA (3-4 times)
+17. SWEARING (Max 5-7 times, censored)
+18. HMM / THINKING (2-3 times, dialog/calm only)
+19. HYPE INTRO (2-3 times)
+20. COMMENT CTA
+21. KILL/DEATH/HIT — React INSTANTLY
 
 **🎯 ENGAGEMENT & RETENTION**
 - Address the viewer directly (guys, friends, you)
@@ -950,48 +944,31 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 - Hype them up
 
 **🎭 SCENE-MATCHING:**
-- ACTION → shout, hype, CAPS lines
-- DIALOG → conversational, NO shouting
-- CALM → chill, relaxed, NO hype
+- ACTION → shout, hype, CAPS
+- DIALOG → conversational
+- CALM → chill
 
 **🚫 NEVER shout on non-action scenes.**
 
-**PACING:**
-- "action" → 3-5 words, HIGH energy, CAPS
-- "dialog" → 5-7 words, conversational
-- "calm" → 6-8 words, chill
+**PACING (STRICT — KEEP LINES SHORT):**
+- "action" → 2-4 words MAX, HIGH energy, CAPS
+- "dialog" → 4-5 words MAX
+- "calm" → 5-6 words MAX
 
-**🎯 VISUAL CLASSIFICATION RULES**
+⚠️ CRITICAL: SHORT lines. Long lines = voice overlap.
 
-**⚠️⚠️⚠️ AGGRESSIVE ACTION DETECTION ⚠️⚠️⚠️**
-If you see ANY of these → visual_type = "action":
-- 🔥 FIRE, FLAMES, EXPLOSIONS, BLAST
-- 💥 SMOKE, SPARKS, DUST
-- 🩸 BLOOD, GORE, DAMAGE
-- 🔫 WEAPONS FIRING, MUZZLE FLASH
-- ⚔️ COMBAT STANCE, FISTS UP, MID-ATTACK
-- 👥 MULTIPLE CHARACTERS CLOSE
-- 🏃 RUNNING, JUMPING, DODGING
-- 💢 CHARACTER BEING HIT, KNOCKED BACK
-- 📊 HEALTH BARS, HIT MARKERS
-- 🎯 AIMING DOWN SIGHTS
-- 🎬 CINEMATIC ACTION, SHAKY CAM
-
-**visual_type = "dialog" ONLY if:**
-- Close-up of face while speaking
-- Character standing still, facing camera
-
-**visual_type = "calm" for EVERYTHING ELSE:**
-- Slow camera panning, scenery, menus, walking slowly
+**🎯 VISUAL CLASSIFICATION**
+**action** if: FIRE, EXPLOSIONS, WEAPONS FIRING, COMBAT, RUNNING, JUMPING, BLOOD, DAMAGE, MULTIPLE CHARACTERS CLOSE
+**dialog** if: face close-up, talking, standing still
+**calm** for: scenery, menus, walking slowly
 
 **RULES:**
-1. NATURAL — casual, slang, contractions
+1. NATURAL — casual, slang
 2. REACT with emotion
 3. Focus on VISUALS
-4. UNIQUE lines based on actual frames
+4. UNIQUE lines
 5. 5-8 words per line
-6. Reference "guys" or "you" naturally
-7. Max 2-3 follow requests
+6. "guys" or "you" naturally
 
 **STORY CONTEXT:**
 {srt_content[:2500]}
@@ -1126,7 +1103,6 @@ Return ONLY valid JSON:
                                 or (motion >= 3)
                                 or (action_ratio >= 0.30)
                                 or (scene_count >= 3 and avg_loud > -18)
-                                or (action_ratio > 0.20 and avg_loud > -20)
                             )
 
                             has_strong_dialog = (
@@ -1184,9 +1160,7 @@ Return ONLY valid JSON:
                             updated_count += 1
 
                     print(f"   ✅ Key {key_idx} worked! {len(segments)} segments")
-                    print(f"   🎯 Applied to {updated_count}/{len(slots)} slots")
-                    print(f"   🔄 Signal overrides: {override_count}")
-                    print(f"   🛡️  Dialog protected: {dialog_protected}\n")
+                    print(f"   🎯 Applied to {updated_count}/{len(slots)} slots\n")
                     return segments
 
                 elif r.status_code in (401, 403):
@@ -1235,10 +1209,10 @@ Return ONLY valid JSON:
 
 
 # ============================================================
-# STEP 7 — ElevenLabs TTS
+# STEP 7 — ElevenLabs TTS (Action me atempo 1.15 tak) ✅
 # ============================================================
 def generate_audio(segments, slots, vid_duration):
-    print("🔊 [7] Generating TTS (action band, last slot atempo 1.20)...")
+    print("🔊 [7] Generating TTS (action me atempo 1.15 tak)...")
     url = f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID}"
     headers = {
         "Accept": "audio/mpeg",
@@ -1303,17 +1277,39 @@ def generate_audio(segments, slots, vid_duration):
                 is_last = (idx == len(segments) - 1)
                 atempo_max = ATEMPO_MAX_LAST if is_last else ATEMPO_MAX
 
+                # ============================================
+                # ✅ ACTION: atempo 1.15 tak (jab slot me jagah kam)
+                # ============================================
                 if visual_type == "action" and not is_last:
-                    over = actual - target_dur
-                    if over > MAX_SLOT_EXTEND:
-                        slot_extended = min(over, MAX_SLOT_EXTEND)
-                        atempo_used = f"none (slot+{slot_extended:.2f}s)"
-                    final = seg_file
+                    if actual > target_dur + 0.05:
+                        needed_tempo = actual / target_dur
+                        tempo = max(ATEMPO_MIN, min(ATEMPO_MAX_ACTION, needed_tempo))
+                        if tempo > 1.01:
+                            fit_file = f"{SEGMENTS_DIR}/seg_{idx:03d}_fit.mp3"
+                            subprocess.run(
+                                f"ffmpeg -y -i {seg_file} "
+                                f"-filter:a atempo={tempo:.3f} {fit_file}",
+                                shell=True,
+                                stdout=subprocess.DEVNULL,
+                                stderr=subprocess.DEVNULL
+                            )
+                            final = fit_file if os.path.exists(fit_file) else seg_file
+                            atempo_used = f"{tempo:.3f} (action)"
+                        else:
+                            final = seg_file
+                    else:
+                        final = seg_file
+
+                    # Atempo ke baad bhi agar 0.2s+ zyada hai toh extend
+                    final_dur = get_duration(final)
+                    if final_dur > target_dur + 0.2:
+                        slot_extended = min(final_dur - target_dur, MAX_SLOT_EXTEND)
+                        atempo_used += f" + slot+{slot_extended:.2f}s"
                 else:
+                    # Calm/Dialog ya last slot — atempo (max 1.10)
                     if actual > 0 and target_dur > 0:
                         needed_tempo = actual / target_dur
                         tempo = max(ATEMPO_MIN, min(atempo_max, needed_tempo))
-
                         if tempo > 1.01:
                             fit_file = f"{SEGMENTS_DIR}/seg_{idx:03d}_fit.mp3"
                             subprocess.run(
@@ -1349,7 +1345,7 @@ def generate_audio(segments, slots, vid_duration):
                           f"slot+{slot_extended:.2f}s (speed={voice_speed:.2f}, {visual_type}) | {text}")
                 elif actual > target_dur + 0.1:
                     print(f"   ⚠️ [{slot_start:5.1f}s] {actual:.2f}s/{target_dur:.2f}s "
-                          f"(speed={voice_speed:.2f}, {visual_type}) | {text}")
+                          f"atempo={atempo_used} (speed={voice_speed:.2f}, {visual_type}) | {text}")
                 else:
                     print(f"   ✅ [{slot_start:5.1f}s] {actual:.2f}s/{target_dur:.2f}s "
                           f"atempo={atempo_used} (speed={voice_speed:.2f}, {visual_type}) | {text}")
@@ -1488,20 +1484,17 @@ def fallback_copy_original():
 # ============================================================
 def main():
     print("=" * 60)
-    print("🎙️ AI COMMENTARY DUBBER — v6.0 (PAINTING COLOUR FINISHING)")
+    print("🎙️ AI COMMENTARY DUBBER — v6.0 (ACTION ATEMPO 1.15)")
     print("=" * 60)
     print(f"📹 Input : {FINAL_CLIP_PATH}")
     print(f"📤 Output: {FINAL_DUBBED_VIDEO}")
     print(f"🎤 Voice : {VOICE_ID}")
     print(f"🎛️  Switch: COMMENTARY_ENABLED = {COMMENTARY_ENABLED}")
     print(f"🎛️  Subtitles: {'ON' if SUBTITLES_ENABLED else 'OFF'}")
-    print(f"🎮 Speed : {VOICE_SPEED_MIN} - {VOICE_SPEED_MAX}")
-    print(f"🎵 atempo: {ATEMPO_MIN} - {ATEMPO_MAX} (last: {ATEMPO_MAX_LAST})")
+    print(f"🎵 atempo: normal={ATEMPO_MAX} | last={ATEMPO_MAX_LAST} | action={ATEMPO_MAX_ACTION}")
     print(f"📏 Slot extend: max {MAX_SLOT_EXTEND}s")
     print(f"🔊 Volume: Action={VOL_ACTION}x | Other={VOL_OTHER}x")
-    print(f"🖼️  Frames: {ANALYSIS_FRAMES} ({GRID_COLS}x{GRID_ROWS}, {CANVAS_W}x{CANVAS_H} 8K)")
-    print(f"🤖 Model : openai/gpt-4o-mini (Free)")
-    print(f"🎨 Subtitle: Painting Colour Finishing (White/Yellow/Blue)")
+    print(f"🎨 Subtitle: Painting Colour Finishing")
     print("=" * 60 + "\n")
 
     if not COMMENTARY_ENABLED:
@@ -1530,25 +1523,10 @@ def main():
         if not segments:
             raise Exception("No segments generated")
 
-        print("🔍 TIMING VERIFICATION:")
-        print(f"   Slots: {len(slots)} | Segments: {len(segments)}")
-        for i, seg in enumerate(segments, 1):
-            slot_num = seg.get("slot", "?")
-            print(f"   Seg {i}: slot={slot_num} | "
-                  f"start={seg.get('start'):.2f}s end={seg.get('end'):.2f}s")
-        print()
-
-        speeds = [s["voice_speed"] for s in slots]
-        print(f"🎮 Final voice speeds: "
-              f"min={min(speeds):.2f} max={max(speeds):.2f} "
-              f"avg={sum(speeds)/len(speeds):.2f}\n")
-
-        # ✅ Audio PEHLE
         audio_files = generate_audio(segments, slots, vid_dur)
         if not audio_files:
             raise Exception("No audio files generated")
 
-        # ✅ ASS Subtitles AB — PAINTING COLOUR FINISHING
         if SUBTITLES_ENABLED:
             generate_full_ass_script(
                 audio_files=audio_files,
@@ -1567,7 +1545,7 @@ def main():
         print("=" * 60)
         print(f"🔥🔥 DONE! {FINAL_DUBBED_VIDEO}")
         print(f"📊 Slots: {len(slots)} | Segments: {len(audio_files)}")
-        print(f"💬 Subtitles: {'ON' if SUBTITLES_ENABLED else 'OFF'} (PAINTING)")
+        print(f"💬 Subtitles: {'ON' if SUBTITLES_ENABLED else 'OFF'}")
         print("=" * 60)
 
         commit_analysis_to_github()
