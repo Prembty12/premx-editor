@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 7 | **Last Updated:** 2026-10-11 01:18:44 PM IST
+**Total Videos:** 7 | **Last Updated:** 2026-10-11 03:12:27 PM IST
 
 ---
 
@@ -14,8 +14,8 @@
 | Posted (FB or IG) | 7 / 7 |
 | FB Posted | 7 / 7 |
 | IG Posted | 3 / 7 |
-| Total FB Views | **1,838** |
-| Total IG Views | **340** |
+| Total FB Views | **1,858** |
+| Total IG Views | **370** |
 
 ---
 
@@ -23,10 +23,10 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | 4 Soldiers Walked Straight Into My Trap 🎯🔥  #videogames #gamingcommunity #gaming #callofdutymw2 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1044648048624733/) | 15 | [🟣 IG](https://www.instagram.com/reel/DeV5-_XFV4L/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play11.mp4) |
-| 2 | 3 Enemies Close Range Fight 🔥  #videogames #gamingcommunity #gaming #callofdutymw2 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1413510794250292/) | 1,021 | [🟣 IG](https://www.instagram.com/reel/DeQNAr8FWgj/) | 130 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play15.mp4) |
-| 3 | Room Breach 5 Enemies Down Fast 🔥🎯  #videogames #gamingcommunity #gaming #callofdutymw2 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2233604814166332/) | 802 | [🟣 IG](https://www.instagram.com/reel/DeOTP_2jZtj/) | 200 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play20.mp4) |
+| 1 | 4 Soldiers Walked Straight Into My Trap 🎯🔥  #videogames #gamingcommunity #gaming #callofdutymw2 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1044648048624733/) | 19 | [🟣 IG](https://www.instagram.com/reel/DeV5-_XFV4L/) | 40 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play11.mp4) |
+| 2 | 3 Enemies Close Range Fight 🔥  #videogames #gamingcommunity #gaming #callofdutymw2 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1413510794250292/) | 1,030 | [🟣 IG](https://www.instagram.com/reel/DeQNAr8FWgj/) | 130 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play15.mp4) |
+| 3 | Room Breach 5 Enemies Down Fast 🔥🎯  #videogames #gamingcommunity #gaming #callofdutymw2 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2233604814166332/) | 809 | [🟣 IG](https://www.instagram.com/reel/DeOTP_2jZtj/) | 200 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play20.mp4) |
 | 4 | The.Most.Unexpected.Play8 | [🔵 FB](https://www.facebook.com/17916697872460249) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play8.mp4) |
 | 5 | The.Most.Unexpected.Play18 | [🔵 FB](https://www.facebook.com/18130135780808491) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play18.mp4) |
-| 6 | The.Most.Unexpected.Play17 | [🔵 FB](https://www.facebook.com/18090874199666010) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play17.mp4) |
-| 7 | The.Most.Unexpected.Play19 | [🔵 FB](https://www.facebook.com/17958399873014051) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play19.mp4) |
+| 6 | The.Most.Unexpected.Play19 | [🔵 FB](https://www.facebook.com/17958399873014051) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play19.mp4) |
+| 7 | The.Most.Unexpected.Play17 | [🔵 FB](https://www.facebook.com/18090874199666010) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play17.mp4) |
