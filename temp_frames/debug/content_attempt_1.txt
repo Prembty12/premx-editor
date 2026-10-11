@@ -1,1 +1,1 @@
-{"clip_duration": 22, "reason": "Intense red container explosion sequence", "start_time": 9, "status": "APPROVE", "title": "Spider Survives Big Red Container Fire 🔥🕷️"}
+{"clip_duration": 57,"reason": "Sniping and epic cruise missile strike gameplay","start_time": 0,"status": "APPROVE", "title": "Cruise Missile Strike Hit 5 Targets 💥🎯"}
