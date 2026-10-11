@@ -1,1 +1,1 @@
-{"clip_duration": 46, "reason": "Intense tactical breach and room clearing", "start_time": 10, "status": "APPROVE", "title": "4 Soldiers Breached The Dark Room 🎯🔥"}
+{"clip_duration":21,"reason":"Full corridor combat sequence against multiple enemies","start_time":0,"status":"APPROVE","title":"5 Enemies Cooked In Corridor 🔥"}
