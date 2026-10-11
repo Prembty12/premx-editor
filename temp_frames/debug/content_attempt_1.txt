@@ -1,1 +1,1 @@
-{"clip_duration": 56, "reason": "Continuous intense combat with explosions and shooting", "start_time": 0, "status": "APPROVE", "title": "Survived 4 Enemies On Last Bullet 🔥🎯"}
+{"clip_duration": 22, "reason": "Intense red container explosion sequence", "start_time": 9, "status": "APPROVE", "title": "Spider Survives Big Red Container Fire 🔥🕷️"}
