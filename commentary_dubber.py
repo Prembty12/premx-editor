@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v6.0 (4-No Match: Frame + SRT + Slot + GPT)
+🎙️ AI Commentary Dubber — v6.0 (4-No Match: Frame + SRT + Slot + GPT) + ASS Subtitles Toggle
 ===============================================================
 FEATURES:
   ✅ Timing LOCK — GPT segment = SLOT time
@@ -11,6 +11,9 @@ FEATURES:
   ✅ Calm/Dialog pe atempo 1.00-1.10
   ✅ Last slot atempo 1.20 (no cut)
   ✅ Slot extend max 0.5s
+  ✅ Subtitles Switch (ON/OFF) via CLI or ENV
+  ✅ Custom Font (.ttf) & ASS Subtitles Burn-in
+  ✅ 100% Subtitle-Audio SYNC (actual audio timing)
 ===============================================================
 """
 
@@ -37,6 +40,8 @@ def parse_args():
     p.add_argument("--video", required=True, help="Input clip path")
     p.add_argument("--out", required=True, help="Output dubbed clip path")
     p.add_argument("--voice", default=None, help="ElevenLabs voice ID (optional)")
+    p.add_argument("--subtitles", choices=["true", "false"], default=None,
+                   help="Enable or disable ASS subtitles (default: from SUBTITLES_ENABLED env or true)")
     return p.parse_args()
 
 
@@ -46,9 +51,15 @@ FINAL_DUBBED_VIDEO = ARGS.out
 
 
 # ============================================================
-# 🎛️ COMMENTARY ON/OFF SWITCH
+# 🎛️ ON/OFF SWITCHES (Commentary & Subtitles)
 # ============================================================
 COMMENTARY_ENABLED = os.getenv("COMMENTARY_ENABLED", "true").lower() == "true"
+
+# Subtitles Switch (CLI flag > ENV variable > default True)
+if ARGS.subtitles is not None:
+    SUBTITLES_ENABLED = ARGS.subtitles.lower() == "true"
+else:
+    SUBTITLES_ENABLED = os.getenv("SUBTITLES_ENABLED", "true").lower() == "true"
 
 
 # ============================================================
@@ -79,6 +90,8 @@ VOICE_ID           = ARGS.voice or os.getenv("VOICE_ID", "91w4XjqhkWTX1Jr3O344")
 # Paths
 AUDIO_PATH         = "extracted_audio.mp3"
 SRT_PATH           = "final.srt"
+ASS_PATH           = "subtitles.ass"
+FONTS_DIR          = "fonts"
 ANALYSIS_DIR       = "analysis"
 ANALYSIS_GRID_PATH = "analysis/last_analysis.jpg"
 SEGMENTS_DIR       = "segments"
@@ -115,6 +128,7 @@ VOL_OTHER  = 1.4
 
 os.makedirs(SEGMENTS_DIR, exist_ok=True)
 os.makedirs(ANALYSIS_DIR, exist_ok=True)
+os.makedirs(FONTS_DIR, exist_ok=True)
 # ============================================================
 
 
@@ -151,6 +165,14 @@ def seconds_to_srt_time(seconds):
     s = int(seconds % 60)
     ms = int((seconds - int(seconds)) * 1000)
     return f"{h:02d}:{m:02d}:{s:02d},{ms:03d}"
+
+
+def seconds_to_ass_time(seconds):
+    h = int(seconds // 3600)
+    m = int((seconds % 3600) // 60)
+    s = int(seconds % 60)
+    cs = int(((seconds - int(seconds)) * 100))
+    return f"{h}:{m:02d}:{s:02d}.{cs:02d}"
 
 
 def encode_image(path):
@@ -194,6 +216,59 @@ def speed_for_type(slot_type):
         return SPEED_DIALOG
     else:
         return SPEED_CALM
+
+
+# ============================================================
+# ASS SUBTITLE GENERATOR (100% SYNC WITH ACTUAL AUDIO) ✅
+# ============================================================
+def generate_full_ass_script(audio_files, font_name="Arial", font_size=60,
+                              alignment=2, vertical_margin=40,
+                              outline_size=3, shadow_size=2):
+    print("🎨 Generating ASS Subtitles file (SYNCED with actual audio timing)...")
+
+    ass_content = f"""[Script Info]
+ScriptType: v4.00+
+PlayResX: 1920
+PlayResY: 1080
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,{font_name},{font_size},&H00FFFFFF,&H000000FF,&H00000000,&H00000000,1,0,0,0,100,100,0,0,1,{outline_size},{shadow_size},{alignment},10,10,{vertical_margin},1
+Style: Red,{font_name},{font_size},&H000000FF,&H000000FF,&H00000000,&H00000000,1,0,0,0,100,100,0,0,1,{outline_size},{shadow_size},{alignment},10,10,{vertical_margin},1
+Style: Yellow,{font_name},{font_size},&H0000FFFF,&H000000FF,&H00000000,&H00000000,1,0,0,0,100,100,0,0,1,{outline_size},{shadow_size},{alignment},10,10,{vertical_margin},1
+Style: Blue,{font_name},{font_size},&H00FF0000,&H000000FF,&H00000000,&H00000000,1,0,0,0,100,100,0,0,1,{outline_size},{shadow_size},{alignment},10,10,{vertical_margin},1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+"""
+
+    # ✅ audio_files se ACTUAL start/end/text use karo — 100% sync
+    written = 0
+    for item in audio_files:
+        start_t = seconds_to_ass_time(item.get("start", 0))
+        end_t = seconds_to_ass_time(item.get("actual_end", item.get("end", 3)))
+
+        v_type = (item.get("visual_type") or "calm").lower().strip()
+        if v_type == "action":
+            style = "Red"
+        elif v_type == "dialog":
+            style = "Yellow"
+        else:
+            style = "Default"
+
+        text = item.get("text", "").strip()
+        if not text:
+            continue
+
+        ass_content += f"Dialogue: 0,{start_t},{end_t},{style},,0,0,0,,{text}\n"
+        written += 1
+
+    with open(ASS_PATH, "w", encoding="utf-8") as f:
+        f.write(ass_content)
+
+    print(f"✅ ASS Subtitles saved (100% synced): {ASS_PATH}")
+    print(f"   📊 Total subtitle entries: {written}\n")
 
 
 # ============================================================
@@ -520,13 +595,11 @@ def build_auto_slots(video_path, vid_duration, srt_content):
             if e["start"] >= slot["start"] - 0.15 and e["end"] <= slot["end"] + 0.15
         ]
         slot["srt_text"] = " ".join(e["text"] for e in slot_srt)
-        
-        # ✅ SRT entries ka time = slot time
+
         for e in slot_srt:
             e["start"] = slot["start"]
             e["end"] = slot["end"]
 
-    # ✅ Debug: 4-No Match Verification
     print(f"   ✅ Built {len(slots)} slots")
     print(f"   📋 4-No Match Verification:")
     for i, slot in enumerate(slots, 1):
@@ -1258,10 +1331,14 @@ def generate_audio(segments, slots, vid_duration):
 
                 new_slot_end = slot_end + slot_extended
 
+                # ✅ ACTUAL audio end — subtitle 100% sync ke liye
+                actual_end = slot_start + get_duration(final)
+
                 audio_files.append({
                     "file": final,
                     "start": slot_start,
-                    "end": new_slot_end,
+                    "end": new_slot_end,          # slot-based end (ducking/merge ke liye)
+                    "actual_end": actual_end,      # ✅ audio-based end (subtitle ke liye)
                     "actual_dur": actual,
                     "text": text,
                     "visual_type": visual_type,
@@ -1335,9 +1412,9 @@ def build_timed_audio(audio_files, vid_duration):
 
 
 # ============================================================
-# STEP 9 — Final Merge
+# STEP 9 — Final Merge (WITH Optional ASS Subtitles Burn-in) ✅
 # ============================================================
-def merge_final(video_path, commentary_audio, out_path, audio_files):
+def merge_final(video_path, commentary_audio, out_path, audio_files, enable_subtitles=True):
     print("🎬 [9] Merging (duck + dynamic volume)...")
 
     action_times = []
@@ -1367,9 +1444,18 @@ def merge_final(video_path, commentary_audio, out_path, audio_files):
         f"normalize=0,alimiter=limit=0.95[aout]"
     )
 
+    # ✅ Subtitles burn-in check
+    vf_flag = ""
+    if enable_subtitles and os.path.exists(ASS_PATH):
+        print("   🎨 Burning-in ASS subtitles with custom fonts...")
+        vf_flag = f'-vf "subtitles={ASS_PATH}:fontsdir={FONTS_DIR}"'
+    else:
+        print("   🚫 Subtitles disabled or ASS file missing — skipping burn-in.")
+
     cmd = (
         f'ffmpeg -y -i {video_path} -i {commentary_audio} '
         f'-filter_complex "{filter_complex}" '
+        f'{vf_flag} '
         f'-map 0:v:0 -map "[aout]" -c:v copy -shortest {out_path}'
     )
     subprocess.run(cmd, shell=True, check=True)
@@ -1404,6 +1490,7 @@ def main():
     print(f"📤 Output: {FINAL_DUBBED_VIDEO}")
     print(f"🎤 Voice : {VOICE_ID}")
     print(f"🎛️  Switch: COMMENTARY_ENABLED = {COMMENTARY_ENABLED}")
+    print(f"🎛️  Subtitles: {'ON' if SUBTITLES_ENABLED else 'OFF'}")
     print(f"🎮 Speed : {VOICE_SPEED_MIN} - {VOICE_SPEED_MAX}")
     print(f"🎵 atempo: {ATEMPO_MIN} - {ATEMPO_MAX} (last: {ATEMPO_MAX_LAST})")
     print(f"📏 Slot extend: max {MAX_SLOT_EXTEND}s")
@@ -1451,16 +1538,31 @@ def main():
               f"min={min(speeds):.2f} max={max(speeds):.2f} "
               f"avg={sum(speeds)/len(speeds):.2f}\n")
 
+        # ✅ Audio PEHLE generate karo (actual duration milega)
         audio_files = generate_audio(segments, slots, vid_dur)
         if not audio_files:
             raise Exception("No audio files generated")
 
+        # ✅ ASS Subtitles AB banao — ACTUAL audio timing ke saath (100% SYNC)
+        if SUBTITLES_ENABLED:
+            generate_full_ass_script(
+                audio_files=audio_files,
+                font_name="Impact",           # 👈 apna font naam daalo
+                font_size=65,
+                alignment=2,
+                vertical_margin=50
+            )
+
         final_audio = build_timed_audio(audio_files, vid_dur)
-        merge_final(FINAL_CLIP_PATH, final_audio, FINAL_DUBBED_VIDEO, audio_files)
+        merge_final(
+            FINAL_CLIP_PATH, final_audio, FINAL_DUBBED_VIDEO, audio_files,
+            enable_subtitles=SUBTITLES_ENABLED
+        )
 
         print("=" * 60)
         print(f"🔥🔥 DONE! {FINAL_DUBBED_VIDEO}")
         print(f"📊 Slots: {len(slots)} | Segments: {len(audio_files)}")
+        print(f"💬 Subtitles: {'ON' if SUBTITLES_ENABLED else 'OFF'} (100% SYNCED)")
         print("=" * 60)
 
         commit_analysis_to_github()
