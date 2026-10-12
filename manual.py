@@ -2,14 +2,14 @@
 """
 🎮 AI GAMING AGENT v7 — Complete Final Script
 ====================================================
-✅ Manual + Auto mode
+✅ Interactive prompt (Manual Link / Auto Pick)
 ✅ Title generation (OpenRouter + Gemini fallback)
-✅ AI Commentary (ElevenLabs + ASS subtitles)
+✅ AI Commentary ON/OFF (ElevenLabs + ASS subtitles)
 ✅ Clean filename (emoji-free)
-✅ NO video retention limit (unlimited videos)
 ✅ Log: SIRF "Title | Video Link" (unlimited)
 ✅ Auto mode me link used_links/ me move
 ✅ NO Facebook
+✅ GitHub-ready
 ====================================================
 """
 
@@ -189,10 +189,6 @@ def speed_for_type(slot_type):
 # 📝 LOG — Sirf "Title | Video Link" (Unlimited)
 # ============================================================
 def save_video_log(title, edited_video_link):
-    """
-    Log me sirf: Title | Video Link
-    Unlimited entries. Koi limit nahi.
-    """
     os.makedirs(LOGS_DIR, exist_ok=True)
 
     entries = []
@@ -304,15 +300,6 @@ def resolve_video_source(args):
                 "raw": "",
                 "mode": "manual_url",
             }
-    if args.video and os.path.exists(args.video):
-        return {
-            "game": args.game or "Local",
-            "file": "",
-            "title": args.title or os.path.basename(args.video),
-            "url": os.path.abspath(args.video),
-            "raw": "",
-            "mode": "manual_file",
-        }
     log("🔄 Auto mode — picking from game_links_editor/...")
     return pick_next_game()
 
@@ -360,6 +347,64 @@ def move_link_to_used_folder(current_file, used_line, current_game):
     except Exception as e:
         log(f"   ⚠️ Paste error: {e}")
         return False
+
+# ============================================================
+# 🎯 INTERACTIVE PROMPT (2 Options)
+# ============================================================
+def ask_user_choice():
+    """
+    Interactive prompt — 2 options.
+    1. Manual Link
+    2. Auto Pick
+    """
+    print()
+    print("=" * 60)
+    print("🎬 AI VIDEO EDITOR v7")
+    print("=" * 60)
+    print()
+    print("📥 Video source kya chahiye?")
+    print()
+    print("   1. 🔗 Manual Link  (URL daalna hai)")
+    print("   2. 🎲 Auto Pick    (game_links_editor/ se)")
+    print()
+
+    while True:
+        try:
+            choice = input("Select option (1/2): ").strip()
+            if choice in ("1", "2"):
+                break
+            print("   ⚠️ Invalid — 1 ya 2 daalo")
+        except (KeyboardInterrupt, EOFError):
+            print("\n❌ Cancelled")
+            sys.exit(0)
+
+    result = {"mode": choice, "value": "", "game": "", "title": ""}
+
+    # Manual URL
+    if choice == "1":
+        while True:
+            url = input("🔗 URL daalo: ").strip()
+            if url.startswith("http://") or url.startswith("https://"):
+                result["value"] = url
+                break
+            print("   ⚠️ URL 'http://' ya 'https://' se start hona chahiye")
+
+        game = input("🎮 Game name (optional, Enter = skip): ").strip()
+        result["game"] = game
+
+        title = input("📝 Custom title (optional, Enter = AI banayega): ").strip()
+        result["title"] = title
+
+    # Auto pick
+    elif choice == "2":
+        games = get_all_games()
+        if not games:
+            print("❌ game_links_editor/ folder me koi game file nahi mili")
+            print("   Pehle links daalo, phir chalao")
+            sys.exit(1)
+        print(f"✅ {len(games)} games mili — auto pick kar raha hu...")
+
+    return result
 
 # ============================================================
 # 🎯 TITLE GENERATION
@@ -1355,13 +1400,13 @@ def process_commentary(clip_path, output_path):
 # ============================================================
 def main():
     parser = argparse.ArgumentParser(description="AI Video Editor (Manual + Auto)")
-    parser.add_argument("--video", help="Local video file")
     parser.add_argument("--link", help="Direct video URL")
     parser.add_argument("--title", help="Force custom title")
     parser.add_argument("--out", default="", help="Output path")
     parser.add_argument("--game", help="Game name")
     parser.add_argument("--list-games", action="store_true", help="List games")
     parser.add_argument("--reset-rotation", action="store_true", help="Reset rotation")
+    parser.add_argument("--no-prompt", action="store_true", help="Skip interactive prompt")
     args = parser.parse_args()
 
     ensure_dirs()
@@ -1384,6 +1429,20 @@ def main():
         print("✅ Rotation reset")
         return
 
+    # 🆕 Interactive prompt (agar args nahi diye)
+    if not args.link and not args.no_prompt:
+        user_choice = ask_user_choice()
+
+        if user_choice["mode"] == "1":
+            args.link = user_choice["value"]
+            if user_choice["game"]:
+                args.game = user_choice["game"]
+            if user_choice["title"]:
+                args.title = user_choice["title"]
+
+        elif user_choice["mode"] == "2":
+            pass  # Auto mode — resolve_video_source handle karega
+
     log("=" * 60)
     log("🎬 AI VIDEO EDITOR v7")
     log("=" * 60)
@@ -1394,7 +1453,7 @@ def main():
     source = resolve_video_source(args)
     if not source:
         log("❌ No source — exiting")
-        log("   Use: --link URL | --video FILE | add to game_links_editor/")
+        log("   Use: --link URL | add to game_links_editor/")
         sys.exit(1)
 
     source_url = source["url"]
@@ -1470,7 +1529,7 @@ def main():
         subprocess.run(f'cp "{final_video}" "{output_path}"', shell=True)
     log(f"📁 Saved: {output_path}")
 
-    # Log (no limit)
+    # Log
     save_video_log(title=ai_title, edited_video_link=output_path)
 
     # Move link to used (auto mode only)
