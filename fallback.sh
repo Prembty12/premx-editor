@@ -59,9 +59,7 @@ YOUR TASK: Decide APPROVE or REJECT for this video.
 
 REJECT IF (Strictly reject if content is boring, empty, or lacks engagement):
 - Grid shows ONLY menus, map screens, inventory checking, shopping, upgrade screens, or loading screens
-- No actual gameplay or action visible in ANY frame
 - Ambient Lighting Trap: Background fire, burning cars, explosions, or dramatic lighting are visible, but the player is only walking, running, exploring, or idle without active combat or high-retention engagement
-- Low Retention & Engagement Value: The moment lacks strong viewer hook, pacing, or adrenaline, resulting in dead air or low engagement (even if characters are talking or joking, if it feels boring or lacks high retention value, REJECT IT)
 - All frames look identical, frozen, or useless (boring running/traveling without anything happening)
 - Crash screen, error, black frames, or dead/idle moments dominate
 - Absolutely NO exciting, thrilling, or high-retention engaging moment
@@ -73,7 +71,6 @@ REJECT IF (Strictly reject if content is boring, empty, or lacks engagement):
 - Zero Stakes and Consequences: The gameplay sequence shows no risk of failure, low health pressure, or urgent time limits, leaving the audience completely detached from the outcome.
 - Filler Transitions: Unnecessary map transitions, lengthy animations, or character respawns that add no entertainment value and kill audience retention.
 - Empty World Wandering: The player is just roaming around empty terrain, corridors, or environments with zero enemies, objectives, or items of interest.
-- Passive Spectating: The character is trapped in a scripted cinematic or passive NPC conversation where the user has no direct gameplay input or control.
 - Clueless Aimless Movement: The player runs in circles, hits walls, or backtracks repeatedly without understanding where to go or what to do.
 - Bland Visual Monotony: The entire sequence suffers from a single flat color palette, unchanging scenery, and zero dynamic camera movement or action cues.
 - Artificial Excitement Fake-Out: The scene plays loud audio or dramatic music, but visually nothing of consequence or danger is actually happening on screen.
@@ -84,6 +81,8 @@ REJECT IF (Strictly reject if content is boring, empty, or lacks engagement):
 APPROVE IF:
 - Real gameplay has a clear, powerful \"Engaging Highlight Window\" (combat, intense fights, epic boss battles, explosions, emotional cutscenes, hilarious fails, or high-stakes clutch moments).
 - Absolute Cinematic & Engagement Mastery Rule: Prioritize pure hype, adrenaline, emotion, comedy, and entertainment above all else. Whether it's an epic fight, a deep emotional drama, a hilarious adventure, or a high-stakes moment that is genuinely gripping, commit to the *full sequence* from its absolute beginning to its natural end. Never force an artificial cut or clip truncation on a brilliant moment—allow the entire momentum, tension, comedy, and payoff of the gameplay to breathe and play out completely so the audience gets maximum satisfaction.
+- Engaging Dialogue & Story Moments: Compelling character dialogue, dramatic cinematics, emotional storytelling, or intense narrative build-ups that keep the viewer hooked from start to finish.
+- Absolute Cinematic & Engagement Mastery Rule: Prioritize pure hype, adrenaline, emotion, comedy, and entertainment above all else...
 TITLE RULES (only for APPROVE):
 - Create a viral title under 6-10 words with 1-2 emojis
 - Do NOT use commas or periods or dots or any punctuation in the title Use ONLY spaces and emojis
