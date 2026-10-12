@@ -1,1 +1,1 @@
-{"clip_duration":45,"reason":"High-stakes survival amidst massive fiery explosion","start_time":0,"status":"APPROVE","title":"Survived The Massive Firestorm 🔥😱"}
+{"clip_duration": 20, "reason": "Epic red power helipad combat sequence", "start_time": 11, "status": "APPROVE", "title": "Red Power Wrecked 5 Enemies 🔥🎯"}
