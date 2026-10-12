@@ -1,1 +1,1 @@
-{"clip_duration": 47, "reason": "Active rooftop combat with explosions and funny ending", "start_time": 0, "status": "APPROVE", "title": "Roof Fight 1 HP vs 4 🔥🎯"}
+{"clip_duration":45,"reason":"High-stakes survival amidst massive fiery explosion","start_time":0,"status":"APPROVE","title":"Survived The Massive Firestorm 🔥😱"}
