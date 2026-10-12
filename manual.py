@@ -4,12 +4,12 @@
 ====================================================
 ✅ Interactive prompt (Manual Link / Auto Pick)
 ✅ Title generation (OpenRouter + Gemini fallback)
-✅ AI Commentary ON/OFF (ElevenLabs + ASS subtitles)
+✅ AI Commentary ON/OFF
 ✅ Clean filename (emoji-free)
-✅ Log: SIRF "Title | Video Link" (unlimited)
-✅ Auto mode me link used_links/ me move
+✅ Log: "Title | Video Link" (unlimited)
+✅ Auto mode: Success → used_links/
+✅ Auto mode: Reject → rejected_links/
 ✅ NO Facebook
-✅ GitHub-ready
 ====================================================
 """
 
@@ -56,6 +56,9 @@ GEMINI_KEYS = [k for k in [
     os.environ.get("GEMINI_API_KEY_1"),
     os.environ.get("GEMINI_API_KEY_2"),
     os.environ.get("GEMINI_API_KEY_3"),
+    os.environ.get("GEMINI_API_KEY_4"),
+    os.environ.get("GEMINI_API_KEY_5"),
+    os.environ.get("GEMINI_API_KEY_6"),
 ] if k]
 
 GROQ_KEYS = [k for k in [
@@ -72,6 +75,7 @@ VOICE_ID = os.environ.get("VOICE_ID", "91w4XjqhkWTX1Jr3O344")
 # ============================================================
 LINKS_DIR = "game_links_editor"
 USED_LINKS_DIR = "used_links"
+REJECTED_LINKS_DIR = "rejected_links"
 FRAMES_DIR = "temp_frames"
 SEGMENTS_DIR = "segments"
 ANALYSIS_DIR = "analysis"
@@ -125,8 +129,8 @@ def log(msg, also_print=True):
         print(msg, flush=True)
 
 def ensure_dirs():
-    for d in [LINKS_DIR, USED_LINKS_DIR, FRAMES_DIR, SEGMENTS_DIR,
-              ANALYSIS_DIR, LOGS_DIR, FONTS_DIR, OUTPUT_DIR]:
+    for d in [LINKS_DIR, USED_LINKS_DIR, REJECTED_LINKS_DIR, FRAMES_DIR,
+              SEGMENTS_DIR, ANALYSIS_DIR, LOGS_DIR, FONTS_DIR, OUTPUT_DIR]:
         os.makedirs(d, exist_ok=True)
 
 def get_duration(path):
@@ -303,6 +307,9 @@ def resolve_video_source(args):
     log("🔄 Auto mode — picking from game_links_editor/...")
     return pick_next_game()
 
+# ============================================================
+# 📦 MOVE LINK TO USED FOLDER (Success)
+# ============================================================
 def move_link_to_used_folder(current_file, used_line, current_game):
     if not current_file or not os.path.exists(current_file):
         return False
@@ -349,14 +356,63 @@ def move_link_to_used_folder(current_file, used_line, current_game):
         return False
 
 # ============================================================
+# 🚫 MOVE LINK TO REJECTED FOLDER (AI Reject)
+# ============================================================
+def move_link_to_rejected_folder(current_file, used_line, current_game, reason=""):
+    if not current_file or not os.path.exists(current_file):
+        return False
+    if not used_line:
+        return False
+    os.makedirs(REJECTED_LINKS_DIR, exist_ok=True)
+
+    try:
+        with open(current_file, 'r', encoding='utf-8', errors='ignore') as f:
+            content = f.read()
+        lines = content.split('\n')
+        new_lines = []
+        removed = False
+        for line in lines:
+            if line.strip() == used_line.strip() and not removed:
+                removed = True
+                continue
+            new_lines.append(line)
+        if not removed:
+            log(f"   ⚠️ Line not found")
+            return False
+        while new_lines and not new_lines[-1].strip():
+            new_lines.pop()
+        with open(current_file, 'w', encoding='utf-8') as f:
+            f.write('\n'.join(new_lines).rstrip() + '\n')
+        log(f"   🗑️ Removed from: {os.path.basename(current_file)}")
+    except Exception as e:
+        log(f"   ⚠️ Remove error: {e}")
+        return False
+
+    try:
+        safe_game = re.sub(r'[^\w\-]', '_', current_game)
+        rejected_file = os.path.join(REJECTED_LINKS_DIR, f"{safe_game}_rejected_links.txt")
+        if os.path.exists(rejected_file):
+            with open(rejected_file, 'r', encoding='utf-8', errors='ignore') as f:
+                if used_line.strip() in f.read():
+                    return True
+        with open(rejected_file, 'a', encoding='utf-8') as f:
+            f.write(f"\n{used_line.strip()}\n")
+            f.write(f"# REJECTED at: {now_ist_ampm()}\n")
+            if reason:
+                f.write(f"# Reason: {reason}\n")
+        log(f"   📥 Moved to : {os.path.basename(rejected_file)}")
+        log(f"   📁 Folder   : {REJECTED_LINKS_DIR}/")
+        if reason:
+            log(f"   📝 Reason   : {reason[:80]}")
+        return True
+    except Exception as e:
+        log(f"   ⚠️ Paste error: {e}")
+        return False
+
+# ============================================================
 # 🎯 INTERACTIVE PROMPT (2 Options)
 # ============================================================
 def ask_user_choice():
-    """
-    Interactive prompt — 2 options.
-    1. Manual Link
-    2. Auto Pick
-    """
     print()
     print("=" * 60)
     print("🎬 AI VIDEO EDITOR v7")
@@ -380,7 +436,6 @@ def ask_user_choice():
 
     result = {"mode": choice, "value": "", "game": "", "title": ""}
 
-    # Manual URL
     if choice == "1":
         while True:
             url = input("🔗 URL daalo: ").strip()
@@ -395,7 +450,6 @@ def ask_user_choice():
         title = input("📝 Custom title (optional, Enter = AI banayega): ").strip()
         result["title"] = title
 
-    # Auto pick
     elif choice == "2":
         games = get_all_games()
         if not games:
@@ -1429,7 +1483,7 @@ def main():
         print("✅ Rotation reset")
         return
 
-    # 🆕 Interactive prompt (agar args nahi diye)
+    # Interactive prompt
     if not args.link and not args.no_prompt:
         user_choice = ask_user_choice()
 
@@ -1441,7 +1495,7 @@ def main():
                 args.title = user_choice["title"]
 
         elif user_choice["mode"] == "2":
-            pass  # Auto mode — resolve_video_source handle karega
+            pass  # Auto mode
 
     log("=" * 60)
     log("🎬 AI VIDEO EDITOR v7")
@@ -1480,10 +1534,38 @@ def main():
     style = random.choice(["curiosity", "aggressive", "question", "emoji_heavy"])
     title_result = generate_title(game_name, source_duration, style, GRID_PATH)
 
+    # 🚫 REJECT HANDLER
     if title_result.get("status") == "reject":
-        log(f"🚫 AI Rejected: {title_result.get('reason', '')}")
+        reject_reason = title_result.get("reason", "No reason given")
+        log(f"🚫 AI Rejected: {reject_reason}")
+
+        if mode == "auto" and game_file_path and used_line:
+            log("=" * 60)
+            log("🚫 MOVING REJECTED LINK")
+            log("=" * 60)
+
+            moved = move_link_to_rejected_folder(
+                current_file=game_file_path,
+                used_line=used_line,
+                current_game=game_name,
+                reason=reject_reason,
+            )
+
+            if moved:
+                save_rotation(game_name)
+                log(f"   ✅ Rejected link moved")
+                log(f"   🔄 Next run me dusra link")
+            else:
+                log(f"   ⚠️ Move failed")
+        else:
+            log("📦 Manual mode — reject link not moved")
+
+        log("=" * 60)
+        log("❌ PIPELINE STOPPED (AI Rejected)")
+        log("=" * 60)
         sys.exit(0)
 
+    # SUCCESS — continue
     ai_title = args.title or title_result.get("title", f"{game_name} Clip 🔥")
     start_time = title_result.get("start_time", 0)
     clip_duration = title_result.get("duration", 15)
