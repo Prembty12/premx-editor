@@ -1,5 +1,5 @@
 {
-  "total_replies": 27,
+  "total_replies": 28,
   "total_skipped": 0,
   "replies": [
     {
@@ -499,9 +499,28 @@
       "source_link": "",
       "timestamp": "2026-10-09 02:52:14 PM",
       "status": "posted"
+    },
+    {
+      "reply_id": "1102657225954906_2405109150245876",
+      "comment_id": "1102657225954906_1629156078873948",
+      "reply_to_id": "1102657225954906_1629156078873948",
+      "post_id": "100463226188818_1102657225954906",
+      "user_name": "Facebook User",
+      "user_id": "",
+      "user_comment": "Komputer andrex",
+      "openrouter_reply": "Bhai, computer se khelna toh OP hai! 😂 Game ka naam hai Helicopter River Strike!",
+      "type": "friendly",
+      "depth": 1,
+      "game": "Video Game",
+      "post_title": "Helicopter River Strike 4 Targets Hit",
+      "fb_post_link": "https://www.facebook.com/reel/1452885310067027/",
+      "source_link": "",
+      "time_window_hours": 1440,
+      "timestamp": "2026-10-13 02:00:32 AM",
+      "status": "posted"
     }
   ],
   "skipped": [],
-  "last_updated": "2026-10-12 03:26:45 PM",
+  "last_updated": "2026-10-13 02:00:32 AM",
   "time_window_hours": 1440
 }
