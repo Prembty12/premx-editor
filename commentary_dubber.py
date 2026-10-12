@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v6.0 (Painting + Action 1.15 + Real-Time Mode)
+🎙️ AI Commentary Dubber — v6.0 (Painting + Action 1.15 + Real-Time + Full Logging)
 ===============================================================
 FEATURES:
   ✅ Timing LOCK — GPT segment = SLOT time
@@ -13,7 +13,7 @@ FEATURES:
   ✅ 100% Subtitle-Audio SYNC
   ✅ Smart Re-encode
   ✅ Real-Time Gameplay Mode (18 rules)
-  ✅ Terminal Timing Verification
+  ✅ Full Terminal Logging (type + speed)
 ===============================================================
 """
 
@@ -771,10 +771,17 @@ def classify_slots_combined(video_path, slots, srt_content):
             slot["speed_boost_log"].append(f"capped_to_{final_speed}")
         slot["voice_speed"] = final_speed
 
+    # ✅ VOICE SPEED SUMMARY + BREAKDOWN
     speeds = [s["voice_speed"] for s in slots]
     print(f"✅ Slots classified: {len(slots)}")
     print(f"🎮 Voice speeds: min={min(speeds):.2f} max={max(speeds):.2f} "
-          f"avg={sum(speeds)/len(speeds):.2f}\n")
+          f"avg={sum(speeds)/len(speeds):.2f}")
+    print(f"   📊 Speed breakdown (per slot):")
+    for i, s in enumerate(slots, 1):
+        log = " | ".join(s.get("speed_boost_log", []))
+        print(f"      Slot {i} [{s['type'].upper()}] speed={s['voice_speed']:.2f} | {log}")
+    print()
+
     return slots
 
 
@@ -928,27 +935,27 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 - Start with reactions: "YO!", "BRO!", "WAIT!", "NAH!", "AYY!", "WHAT'S UP GUYS!", "YO WHAT'S UP GUYS!",
 
 **REACTION PATTERNS (use 20-25 varied):**
-1. BIG ACTION: "OHHHH! He's GONE!", "BRO! That was NASTY!"
-2. PREDICTIONS WITH HOOK — You have 90 frames. Study the pattern. Look at what's building up. Predict what's coming next with a HOOK to make viewers lean in.
-3. SMART MOVES — When the player does something clever, strategic, or high-skill, react with genuine respect. Acknowledge the IQ play.
-4. ENEMY ROAST — Only at the right moment, not every time.
-5. EPIC MOMENTS — React when something truly epic or jaw-dropping happens.
-6. FULL FREEDOM — Explore the game with suspense and curiosity.
-7. HYPE — Start with "okay okay okay", "wait wait wait", "Ayyy", "OHHHH!", "WOW!" or "Ooo" style phrases.
-8. WEIRD — React when something strange or unusual shows up.
+1. BIG ACTION
+2. PREDICTIONS WITH HOOK
+3. SMART MOVES
+4. ENEMY ROAST
+5. EPIC MOMENTS
+6. FULL FREEDOM
+7. HYPE
+8. WEIRD
 9. CLOSE CALL
-10. FOLLOW REQUEST (2-3 total): "Ayy if you're vibing, hit that follow yo."
-11. FREESTYLE — "React naturally to whatever stands out in the moment."
+10. FOLLOW REQUEST (2-3 total)
+11. FREESTYLE
 12. ENVIRONMENT
-13. SOUND — React to gunfire, explosions, sound effects, or music at the right moment.
-14. CINEMATIC SHOT — React when a shot looks cinematic.
-15. FLIRTY/FUNNY "BABY" (1-2 times only): "Let's go baby!"
-16. LIKE + BELL CTA (3-4 times): Actively ask viewers to like and follow — make it feel real, not forced. Vary the wording each time. This is important for growth."
-17. SWEARING — Max 5-7 times, only at the right moment. Censor with asterisks. Examples: "Motherf*cker!", "What the f*ck!", "That's bullsh*t!", "What the hell!", "Damn!", "Oh sh*t!", "Holy sh*t!"
-18. HMM / THINKING — 2-3 times, only in dialog/calm scenes.
-19. HYPE INTRO (2-3 times, opening + dialog/calm only)
-20. COMMENT CTA — Ask viewers to drop their thoughts or reactions in the comments.
-21. KILL/DEATH/HIT — If ANY character (enemy, monster, player, NPC) is dying, dead, getting killed, or taking damage — react INSTANTLY with epic dialogue — DO NOT MISS IT.
+13. SOUND
+14. CINEMATIC SHOT
+15. FLIRTY/FUNNY "BABY" (1-2 times only)
+16. LIKE + BELL CTA (3-4 times)
+17. SWEARING (Max 5-7 times, censored)
+18. HMM / THINKING (2-3 times, dialog/calm only)
+19. HYPE INTRO (2-3 times)
+20. COMMENT CTA
+21. KILL/DEATH/HIT — React INSTANTLY
 
 **🎮 REAL-TIME GAMEPLAY MODE:**
 - You ARE the player. Not watching. React LIVE like you're in the fight RIGHT NOW.
@@ -1003,24 +1010,13 @@ If you see ANY of these → visual_type = "action":
 - 📊 HEALTH BARS, HIT MARKERS
 - 🎯 AIMING DOWN SIGHTS
 - 🎬 CINEMATIC ACTION, SHAKY CAM
-- 3+ CONSECUTIVE frames show above → ACTION
 
 **visual_type = "dialog" ONLY if:**
 - Close-up of face while speaking
 - Character standing still, facing camera
-- Conversation scene
 
 **visual_type = "calm" for EVERYTHING ELSE:**
-- Slow camera panning
-- City skyline / scenery
-- Drone flying in sky
-- Menu / UI screens
-- Walking slowly
-- Environment only shots
-
-**⚠️ BE HONEST. If slow motion/sitting/walking/scenery → "calm".**
-**🔴 Two characters CLOSE and ENGAGED → ACTION.**
-**🔥 FIRE/EXPLOSIONS/MANY ENEMIES → ACTION.**
+- Slow camera panning, scenery, menus, walking slowly
 
 **RULES:**
 1. NATURAL — casual, slang, contractions
@@ -1135,9 +1131,16 @@ Return ONLY valid JSON:
                                 locked_count += 1
 
                     print(f"   ✅ TIMING LOCKED: {locked_count} segments → slot time")
+
+                    # ✅ FINAL TIMING with TYPE + SPEED
                     print(f"   📋 FINAL TIMING (GPT segment = SLOT time):")
                     for seg in segments:
-                        print(f"      Slot {seg.get('slot')}: {seg.get('start'):.2f}s → {seg.get('end'):.2f}s | {seg.get('text', '')[:50]}")
+                        s_num = seg.get("slot")
+                        slot_info = slots[s_num - 1] if s_num and 1 <= s_num <= len(slots) else {}
+                        vtype = (seg.get('visual_type') or slot_info.get('type') or 'calm').upper()
+                        vspeed = slot_info.get('voice_speed', 1.0)
+                        print(f"      Slot {s_num}: {seg.get('start'):.2f}s → {seg.get('end'):.2f}s "
+                              f"[{vtype}] [speed={vspeed:.2f}] | {seg.get('text', '')[:50]}")
                     print()
 
                     updated_count = 0
@@ -1173,7 +1176,6 @@ Return ONLY valid JSON:
                                 or (motion >= 3)
                                 or (action_ratio >= 0.30)
                                 or (scene_count >= 3 and avg_loud > -18)
-                                or (action_ratio > 0.20 and avg_loud > -20)
                             )
 
                             has_strong_dialog = (
@@ -1348,7 +1350,6 @@ def generate_audio(segments, slots, vid_duration):
                 is_last = (idx == len(segments) - 1)
                 atempo_max = ATEMPO_MAX_LAST if is_last else ATEMPO_MAX
 
-                # ✅ ACTION: atempo 1.15 tak
                 if visual_type == "action" and not is_last:
                     if actual > target_dur + 0.05:
                         needed_tempo = actual / target_dur
@@ -1374,7 +1375,6 @@ def generate_audio(segments, slots, vid_duration):
                         slot_extended = min(final_dur - target_dur, MAX_SLOT_EXTEND)
                         atempo_used += f" + slot+{slot_extended:.2f}s"
                 else:
-                    # Calm/Dialog ya last slot
                     if actual > 0 and target_dur > 0:
                         needed_tempo = actual / target_dur
                         tempo = max(ATEMPO_MIN, min(atempo_max, needed_tempo))
@@ -1410,7 +1410,8 @@ def generate_audio(segments, slots, vid_duration):
 
                 final_dur = get_duration(final)
                 status = "✅ FIT" if final_dur <= target_dur + 0.01 else ("⚠️ OVERLAP" if slot_extended > 0 else "⚠️ OVER")
-                print(f"   {status} [Slot {slot_num}] Slot={slot_start:.2f}-{slot_end:.2f}s | "
+                print(f"   {status} [Slot {slot_num}] [{visual_type.upper()}] [speed={voice_speed:.2f}] "
+                      f"Slot={slot_start:.2f}-{slot_end:.2f}s | "
                       f"Audio={actual:.2f}s → {final_dur:.2f}s | atempo={atempo_used} | \"{text[:40]}\"")
 
             elif r.status_code == 401:
@@ -1547,7 +1548,7 @@ def fallback_copy_original():
 # ============================================================
 def main():
     print("=" * 60)
-    print("🎙️ AI COMMENTARY DUBBER — v6.0 (Real-Time Mode)")
+    print("🎙️ AI COMMENTARY DUBBER — v6.0 (Real-Time + Full Logging)")
     print("=" * 60)
     print(f"📹 Input : {FINAL_CLIP_PATH}")
     print(f"📤 Output: {FINAL_DUBBED_VIDEO}")
@@ -1587,6 +1588,7 @@ def main():
         if not segments:
             raise Exception("No segments generated")
 
+        # ✅ FINAL TIMING VERIFICATION with TYPE + SPEED
         print("=" * 60)
         print("🔍 TIMING VERIFICATION (GPT = Slot = Audio = Subtitle)")
         print("=" * 60)
@@ -1594,7 +1596,10 @@ def main():
         print()
         for i, seg in enumerate(segments, 1):
             slot_num = seg.get("slot", "?")
-            print(f"   Seg {i}: Slot={slot_num} | "
+            slot_info = slots[slot_num - 1] if isinstance(slot_num, int) and 1 <= slot_num <= len(slots) else {}
+            vtype = (seg.get('visual_type') or slot_info.get('type') or 'calm').upper()
+            vspeed = slot_info.get('voice_speed', 1.0)
+            print(f"   Seg {i}: Slot={slot_num} [{vtype}] [speed={vspeed:.2f}] | "
                   f"GPT time={seg.get('start'):.2f}s → {seg.get('end'):.2f}s")
         print()
 
