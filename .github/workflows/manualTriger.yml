@@ -1,4 +1,4 @@
-name: AI Video Editor Workflow
+name: manualTriger
 
 on:
   schedule:
