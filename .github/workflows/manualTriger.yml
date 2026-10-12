@@ -1,4 +1,4 @@
-name: AI Video Editor Workflow
+name: manualTriger.yml
 
 on:
   schedule:
@@ -73,9 +73,9 @@ jobs:
 
         run: |
           if [ -n "$MANUAL_LINK" ]; then
-            python ai_agent_v7.py --link "$MANUAL_LINK"
+            python manual.py --link "$MANUAL_LINK"
           else
-            python ai_agent_v7.py --no-prompt
+            python manual.py --no-prompt
           fi
 
       - name: Commit and Push Updated Files
