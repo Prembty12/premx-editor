@@ -1,4 +1,4 @@
-name: manualTriger.yml
+name: AI Video Editor Workflow
 
 on:
   schedule:
@@ -15,7 +15,6 @@ permissions:
 
 jobs:
   run-ai-agent:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -28,7 +27,7 @@ jobs:
           python-version: '3.10'
           cache: 'pip'
 
-      - name: Install System Dependencies (FFmpeg)
+      - name: Install System Dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y ffmpeg jq curl
@@ -40,7 +39,6 @@ jobs:
 
       - name: Run AI Video Editor
         env:
-          # ── 🤖 GEMINI KEYS (1-6)
           GEMINI_API_KEY_1: ${{ secrets.GEMINI_API_KEY_1 }}
           GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}
           GEMINI_API_KEY_3: ${{ secrets.GEMINI_API_KEY_3 }}
@@ -48,29 +46,23 @@ jobs:
           GEMINI_API_KEY_5: ${{ secrets.GEMINI_API_KEY_5 }}
           GEMINI_API_KEY_6: ${{ secrets.GEMINI_API_KEY_6 }}
 
-          # ── 🧠 OPENROUTER KEYS (1-5)
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           OPENROUTER_API_KEY_2: ${{ secrets.OPENROUTER_API_KEY_2 }}
           OPENROUTER_API_KEY_3: ${{ secrets.OPENROUTER_API_KEY_3 }}
           OPENROUTER_API_KEY_4: ${{ secrets.OPENROUTER_API_KEY_4 }}
           OPENROUTER_API_KEY_5: ${{ secrets.OPENROUTER_API_KEY_5 }}
 
-          # ── 🎙️ GROQ KEYS (Transcription)
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GROQ_API_KEY_2: ${{ secrets.GROQ_API_KEY_2 }}
           GROQ_API_KEY_3: ${{ secrets.GROQ_API_KEY_3 }}
 
-          # ── 🎤 ELEVENLABS (Voice)
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           VOICE_ID: ${{ secrets.VOICE_ID }}
 
-          # ── 🎚️ MASTER SWITCHES
-          COMMENTARY_ENABLED: 'true'       # 🎙️ AI Commentary ON/OFF
-          SUBTITLES_ENABLED: 'true'        # 🎨 Subtitles ON/OFF
+          COMMENTARY_ENABLED: 'true'
+          SUBTITLES_ENABLED: 'true'
 
-          # ── 🔗 Manual URL (agar diya)
           MANUAL_LINK: ${{ github.event.inputs.link }}
-
         run: |
           if [ -n "$MANUAL_LINK" ]; then
             python manual.py --link "$MANUAL_LINK"
@@ -84,6 +76,6 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add output/ logs/ used_links/ game_links_editor/ || true
+          git add output/ logs/ used_links/ rejected_links/ game_links_editor/ || true
           git commit -m "🎬 Auto: video generated [skip ci]" || echo "No changes"
           git push || echo "Nothing to push"
