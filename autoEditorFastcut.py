@@ -1,6 +1,6 @@
 """
-AUTO EDITOR — OpenRouter Version
-PERMANENTLY FIXED: pkg_resources at top
+AUTO EDITOR - OpenRouter Version
+FIXED: pkg_resources auto-install at top
 """
 
 # ===== STEP 1: Ensure setuptools installed (SABSE PEHLE) =====
@@ -63,7 +63,7 @@ def ensure_folders():
     ]
     for f in folders:
         os.makedirs(f, exist_ok=True)
-    print("✅ Folders ready")
+    print("Folders ready")
 
 
 # ==========================================
@@ -72,7 +72,7 @@ def ensure_folders():
 def get_video_info(video_path):
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
-        raise Exception(f"❌ Video open nahi hua: {video_path}")
+        raise Exception(f"Video open nahi hua: {video_path}")
     fps = cap.get(cv2.CAP_PROP_FPS)
     total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     duration = total / fps
@@ -113,11 +113,11 @@ def create_grids(video_path, frame_index, output_dir="grids", max_images=6):
     rows = math.ceil(frames_per_grid / cols)
     thumb_size = min(2000 // cols, 300)
     
-    print(f"\n📊 GRID PLAN")
+    print(f"\nGRID PLAN")
     print(f"   Total frames: {total_frames}")
     print(f"   Grids: {num_grids}")
     print(f"   Frames/grid: {frames_per_grid}")
-    print(f"   Layout: {cols}×{rows}")
+    print(f"   Layout: {cols}x{rows}")
     print(f"   Thumb: {thumb_size}px")
     
     cap = cv2.VideoCapture(video_path)
@@ -163,30 +163,30 @@ def create_grids(video_path, frame_index, output_dir="grids", max_images=6):
         out = os.path.join(output_dir, f"grid_{g+1}.jpg")
         Image.fromarray(grid).save(out, quality=92)
         paths.append(out)
-        print(f"   ✅ {out} ({grid.shape[1]}×{grid.shape[0]}px)")
+        print(f"   OK {out} ({grid.shape[1]}x{grid.shape[0]}px)")
     cap.release()
     return paths
 
 
 # ==========================================
-# 4. TRANSCRIPT — faster-whisper
+# 4. TRANSCRIPT - faster-whisper
 # ==========================================
 def get_transcript(video_path, use_whisper=True):
     if not use_whisper:
-        print("\n⏭️  Whisper skipped")
+        print("\nWhisper skipped")
         return "No transcript"
     try:
         from faster_whisper import WhisperModel
-        print("\n🎙️ Transcribing with faster-whisper...")
+        print("\nTranscribing with faster-whisper...")
         model = WhisperModel("base", device="cpu", compute_type="int8")
         segments, info = model.transcribe(video_path)
         lines = [f"[{s.start:6.1f}s] {s.text.strip()}" for s in segments if s.text.strip()]
         if not lines:
             return "No speech"
-        print(f"   ✅ {len(lines)} segments (lang: {info.language})")
+        print(f"   OK {len(lines)} segments (lang: {info.language})")
         return "\n".join(lines)
     except Exception as e:
-        print(f"   ⚠️ Whisper error: {e}")
+        print(f"   Whisper error: {e}")
         return "No transcript"
 
 
@@ -194,7 +194,7 @@ def get_transcript(video_path, use_whisper=True):
 # 5. SPIKES
 # ==========================================
 def get_spikes(video_path):
-    print("\n🔊 Detecting spikes...")
+    print("\nDetecting spikes...")
     try:
         y, sr = librosa.load(video_path, sr=16000, mono=True)
         rms = librosa.feature.rms(y=y, frame_length=2048, hop_length=512)[0]
@@ -203,11 +203,11 @@ def get_spikes(video_path):
                    for i in range(0, len(rms), int(1/hop_sec))
                    if len(rms[i:i+int(1/hop_sec)]) > 0]
         threshold = np.percentile(per_sec, 80)
-        spikes = [f"[{i:6.1f}s] 🔊 RMS={v:.3f}"
+        spikes = [f"[{i:6.1f}s] RMS={v:.3f}"
                   for i, v in enumerate(per_sec) if v > threshold]
         return "\n".join(spikes) if spikes else "No spikes"
     except Exception as e:
-        print(f"   ⚠️ Spike error: {e}")
+        print(f"   Spike error: {e}")
         return "No spikes"
 
 
@@ -239,10 +239,10 @@ def get_available_moods():
 
 
 # ==========================================
-# 7. AI ANALYSIS — OPENROUTER
+# 7. AI ANALYSIS - OPENROUTER
 # ==========================================
 def ai_analyze(frame_index, grid_paths, transcript, spikes, memes, sfx, music):
-    print(f"\n🤖 Sending to OpenRouter ({OPENROUTER_MODEL})...")
+    print(f"\nSending to OpenRouter ({OPENROUTER_MODEL})...")
     
     client = OpenAI(
         api_key=OPENROUTER_API_KEY,
@@ -266,7 +266,7 @@ def ai_analyze(frame_index, grid_paths, transcript, spikes, memes, sfx, music):
     frame_list = "\n".join(frame_lines)
     
     prompt = f"""You are a PROFESSIONAL viral gaming editor with FULL CREATIVE FREEDOM.
-Game doesn't matter — works with ANY game.
+Game doesn't matter - works with ANY game.
 
 VIDEO: {frame_index['video_duration']:.1f}s | Sampling: {frame_index['fps_sampling']}fps | Total: {frame_index['total_frames']}
 
@@ -328,7 +328,7 @@ Return ONLY valid JSON (no markdown):
         text = text.strip()
     
     result = json.loads(text)
-    print("   ✅ OpenRouter responded")
+    print("   OpenRouter responded")
     return result
 
 
@@ -336,7 +336,7 @@ Return ONLY valid JSON (no markdown):
 # 8. VERIFY + CONVERT
 # ==========================================
 def verify_and_convert(ai_json, frame_index):
-    print("\n🔍 Verifying...")
+    print("\nVerifying...")
     fps_sampling = frame_index["fps_sampling"]
     total_frames = frame_index["total_frames"]
     valid_frames = set(range(total_frames))
@@ -362,7 +362,7 @@ def verify_and_convert(ai_json, frame_index):
             edit["end"] = round(ef / fps_sampling, 3)
         verified.append(edit)
     ai_json["edits"] = verified
-    print(f"   ✅ {len(verified)} edits verified")
+    print(f"   OK {len(verified)} edits verified")
     return ai_json
 
 
@@ -375,7 +375,7 @@ def save_debug_log(ai_json, frame_index):
     with open(json_path, "w") as f:
         json.dump(ai_json, f, indent=2)
     
-    lines = ["=" * 70, f"AI DECISIONS — {timestamp}", "=" * 70]
+    lines = ["=" * 70, f"AI DECISIONS - {timestamp}", "=" * 70]
     lines.append(f"Video: {frame_index['video_duration']:.1f}s | Frames: {frame_index['total_frames']}")
     lines.append(f"Target: {ai_json.get('target_duration')}s | Aspect: {ai_json.get('aspect_ratio')}")
     lines.append("")
@@ -392,7 +392,7 @@ def save_debug_log(ai_json, frame_index):
     with open(log_path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
     print("\n" + "\n".join(lines))
-    print(f"\n💾 Debug: {log_path}")
+    print(f"\nDebug: {log_path}")
     return log_path
 
 
@@ -469,7 +469,7 @@ def apply_filter(clip, name):
 # 12. BUILD REEL
 # ==========================================
 def build_reel(video_path, ai_json, output_path):
-    print("\n🎬 Building reel...")
+    print("\nBuilding reel...")
     main = VideoFileClip(video_path)
     aspect = ai_json.get("aspect_ratio", "9:16")
     clips = []
@@ -486,13 +486,13 @@ def build_reel(video_path, ai_json, output_path):
                     meme = apply_aspect(meme, aspect)
                     clips.append(meme)
                     current_time += meme.duration
-                    print(f"   ✅ Meme ({mood})")
+                    print(f"   Meme ({mood})")
                 except Exception as e:
-                    print(f"   ⚠️ Meme error: {e}")
+                    print(f"   Meme error: {e}")
             continue
         
         if edit.get("remove", False):
-            print(f"   ✂️ Cut: {edit.get('start_frame')}-{edit.get('end_frame')}")
+            print(f"   Cut: {edit.get('start_frame')}-{edit.get('end_frame')}")
             continue
         
         start = edit.get("start")
@@ -520,7 +520,7 @@ def build_reel(video_path, ai_json, output_path):
                     ).set_position(("center", "top")).set_duration(seg.duration)
                     seg = CompositeVideoClip([seg, txt])
                 except Exception as e:
-                    print(f"   ⚠️ Text error: {e}")
+                    print(f"   Text error: {e}")
             sfx_mood = edit.get("sfx_mood")
             if sfx_mood:
                 sfx_path = pick_sfx(sfx_mood)
@@ -528,17 +528,17 @@ def build_reel(video_path, ai_json, output_path):
                     try:
                         sfx = AudioFileClip(sfx_path).set_start(current_time)
                         sfx_tracks.append(sfx)
-                        print(f"   🔊 SFX ({sfx_mood})")
+                        print(f"   SFX ({sfx_mood})")
                     except Exception as e:
-                        print(f"   ⚠️ SFX error: {e}")
+                        print(f"   SFX error: {e}")
             clips.append(seg)
             current_time += seg.duration
-            print(f"   ✅ Keep: {start}-{end}s @ {speed}x")
+            print(f"   Keep: {start}-{end}s @ {speed}x")
         except Exception as e:
-            print(f"   ⚠️ Clip error: {e}")
+            print(f"   Clip error: {e}")
     
     if not clips:
-        print("❌ No clips!")
+        print("No clips!")
         return None
     
     final = concatenate_videoclips(clips, method="compose")
@@ -558,9 +558,9 @@ def build_reel(video_path, ai_json, output_path):
                 else:
                     music = music.loop(duration=final.duration)
                 audio.append(music)
-                print(f"   🎵 Music: {ai_json['bg_music']}")
+                print(f"   Music: {ai_json['bg_music']}")
             except Exception as e:
-                print(f"   ⚠️ Music error: {e}")
+                print(f"   Music error: {e}")
     
     if audio:
         final = final.set_audio(CompositeAudioClip(audio))
@@ -570,7 +570,7 @@ def build_reel(video_path, ai_json, output_path):
         fps=30, preset="medium", threads=4,
         verbose=False, logger=None
     )
-    print(f"\n🎬 Final: {output_path} ({final.duration:.1f}s)")
+    print(f"\nFinal: {output_path} ({final.duration:.1f}s)")
     return output_path
 
 
@@ -588,34 +588,34 @@ def main():
     ensure_folders()
     
     print("=" * 70)
-    print("🎬 AUTO EDITOR — OpenRouter Version")
+    print("AUTO EDITOR - OpenRouter Version")
     print("=" * 70)
     
     if not os.path.exists(args.video):
-        print(f"❌ Video nahi mila: {args.video}")
+        print(f"Video nahi mila: {args.video}")
         sys.exit(1)
     
     if not OPENROUTER_API_KEY:
-        print("❌ OPENROUTER_API_KEY set nahi hai!")
+        print("OPENROUTER_API_KEY set nahi hai!")
         sys.exit(1)
     
     use_whisper = str(args.whisper).lower() == "true"
     
-    print(f"\n📹 Video: {args.video}")
+    print(f"\nVideo: {args.video}")
     info = get_video_info(args.video)
     print(f"   Duration: {info['duration']:.1f}s")
-    print(f"   Resolution: {info['width']}×{info['height']}")
+    print(f"   Resolution: {info['width']}x{info['height']}")
     
     frame_index = create_frame_index(args.video, args.fps)
-    print(f"\n📊 Frames: {frame_index['total_frames']}")
+    print(f"\nFrames: {frame_index['total_frames']}")
     
     grids = create_grids(args.video, frame_index, GRID_DIR, args.grids)
     transcript = get_transcript(args.video, use_whisper)
     spikes = get_spikes(args.video)
     memes, sfx, music = get_available_moods()
-    print(f"\n📦 Memes: {list(memes.keys())}")
-    print(f"📦 SFX: {list(sfx.keys())}")
-    print(f"📦 Music: {len(music)}")
+    print(f"\nMemes: {list(memes.keys())}")
+    print(f"SFX: {list(sfx.keys())}")
+    print(f"Music: {len(music)}")
     
     ai_json = ai_analyze(frame_index, grids, transcript, spikes, memes, sfx, music)
     ai_json = verify_and_convert(ai_json, frame_index)
@@ -625,7 +625,7 @@ def main():
     build_reel(args.video, ai_json, output)
     
     print("\n" + "=" * 70)
-    print("✅ DONE!")
+    print("DONE!")
     print("=" * 70)
 
 
