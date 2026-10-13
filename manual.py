@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 """
-🎮 AI GAMING AGENT v7 — Complete Final Script
+🎮 AI GAMING AGENT v7 — GitHub Release Direct Upload
 ====================================================
-✅ Interactive prompt (Manual Link / Auto Pick)
-✅ Title generation (OpenRouter + Gemini fallback)
+✅ Video → GitHub Release (no local save)
+✅ Log me: Title | Release Download Link
+✅ Title generation (OpenRouter + Gemini)
 ✅ AI Commentary ON/OFF
-✅ Clean filename (emoji-free)
-✅ Log: "Title | Video Link" (unlimited)
-✅ Auto mode: Success → used_links/
-✅ Auto mode: Reject → rejected_links/
+✅ Reject → rejected_links/
+✅ Success → used_links/
 ✅ NO Facebook
 ====================================================
 """
@@ -41,6 +40,9 @@ def now_ist():
 def now_ist_ampm():
     return datetime.now(IST).strftime("%Y-%m-%d %I:%M:%S %p")
 
+def now_ist_slug():
+    return datetime.now(IST).strftime("%Y%m%d_%H%M%S")
+
 # ============================================================
 # 🔑 API KEYS
 # ============================================================
@@ -70,6 +72,11 @@ GROQ_KEYS = [k for k in [
 ELEVENLABS_API_KEY = os.environ.get("ELEVENLABS_API_KEY")
 VOICE_ID = os.environ.get("VOICE_ID", "91w4XjqhkWTX1Jr3O344")
 
+# GitHub
+GITHUB_REPO = os.environ.get("GITHUB_REPOSITORY", "")
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "") or os.environ.get("GH_PAT", "")
+RELEASE_TAG = os.environ.get("RELEASE_TAG", "v6.0")
+
 # ============================================================
 # 📁 PATHS
 # ============================================================
@@ -81,7 +88,6 @@ SEGMENTS_DIR = "segments"
 ANALYSIS_DIR = "analysis"
 LOGS_DIR = "logs"
 FONTS_DIR = "fonts"
-OUTPUT_DIR = "output"
 
 GRID_PATH = f"{FRAMES_DIR}/merged_90_grid_portrait.jpg"
 VIDEO_LOG = f"{LOGS_DIR}/video_log.json"
@@ -102,7 +108,6 @@ MAX_CLIP_DURATION = 60
 COMMENTARY_ENABLED = os.environ.get("COMMENTARY_ENABLED", "true").lower() == "true"
 SUBTITLES_ENABLED = os.environ.get("SUBTITLES_ENABLED", "true").lower() == "true"
 
-# Commentary config
 MIN_SLOTS_HARD = 6
 MAX_SLOTS_HARD = 20
 DUCK_VOLUME = 0.50
@@ -130,7 +135,7 @@ def log(msg, also_print=True):
 
 def ensure_dirs():
     for d in [LINKS_DIR, USED_LINKS_DIR, REJECTED_LINKS_DIR, FRAMES_DIR,
-              SEGMENTS_DIR, ANALYSIS_DIR, LOGS_DIR, FONTS_DIR, OUTPUT_DIR]:
+              SEGMENTS_DIR, ANALYSIS_DIR, LOGS_DIR, FONTS_DIR]:
         os.makedirs(d, exist_ok=True)
 
 def get_duration(path):
@@ -190,9 +195,104 @@ def speed_for_type(slot_type):
     return SPEED_CALM
 
 # ============================================================
-# 📝 LOG — Sirf "Title | Video Link" (Unlimited)
+# 📤 GITHUB RELEASE UPLOAD
 # ============================================================
-def save_video_log(title, edited_video_link):
+def upload_to_github_release(video_path, tag=None):
+    """
+    Video ko GitHub Release me upload karo.
+    Returns: browser_download_url (public link) ya None
+    """
+    if not GITHUB_REPO or not GITHUB_TOKEN:
+        log("   ⚠️ GITHUB_REPOSITORY ya GITHUB_TOKEN missing")
+        return None
+
+    if not os.path.exists(video_path):
+        log(f"   ⚠️ Video not found: {video_path}")
+        return None
+
+    tag = tag or RELEASE_TAG
+    filename = os.path.basename(video_path)
+    file_size = os.path.getsize(video_path)
+
+    headers = {
+        "Authorization": f"token {GITHUB_TOKEN}",
+        "Accept": "application/vnd.github+json",
+    }
+
+    # Step 1: Check if release exists
+    log(f"   🔍 Checking release: {tag}")
+    release_url = f"https://api.github.com/repos/{GITHUB_REPO}/releases/tags/{tag}"
+    r = requests.get(release_url, headers=headers, timeout=15)
+
+    if r.status_code == 404:
+        # Create release
+        log(f"   📦 Creating release: {tag}")
+        create_url = f"https://api.github.com/repos/{GITHUB_REPO}/releases"
+        data = {
+            "tag_name": tag,
+            "name": f"AI Videos {tag}",
+            "draft": False,
+            "prerelease": False,
+            "body": f"Auto-generated videos by AI Agent\n\nLast updated: {now_ist_ampm()}",
+        }
+        r = requests.post(create_url, headers=headers, json=data, timeout=20)
+        if r.status_code not in (200, 201):
+            log(f"   ❌ Release create failed: {r.status_code} — {r.text[:200]}")
+            return None
+        log(f"   ✅ Release created: {tag}")
+    elif r.status_code != 200:
+        log(f"   ❌ Release check failed: {r.status_code}")
+        return None
+
+    release = r.json()
+    upload_url = release.get("upload_url", "")
+    if not upload_url:
+        log("   ❌ No upload_url in release")
+        return None
+
+    # Step 2: Delete existing asset with same name (if any)
+    for asset in release.get("assets", []):
+        if asset.get("name") == filename:
+            log(f"   🗑️ Deleting existing asset: {filename}")
+            del_url = asset.get("url", "")
+            if del_url:
+                requests.delete(del_url, headers=headers, timeout=15)
+
+    # Step 3: Upload video
+    upload_endpoint = upload_url.replace("{?name,label}", f"?name={filename}")
+    log(f"   📤 Uploading: {filename} ({file_size / 1024 / 1024:.2f} MB)...")
+
+    upload_headers = {
+        "Authorization": f"token {GITHUB_TOKEN}",
+        "Content-Type": "video/mp4",
+        "Content-Length": str(file_size),
+    }
+
+    try:
+        with open(video_path, "rb") as f:
+            r = requests.post(upload_endpoint, headers=upload_headers, data=f, timeout=600)
+    except Exception as e:
+        log(f"   ❌ Upload exception: {e}")
+        return None
+
+    if r.status_code not in (200, 201):
+        log(f"   ❌ Upload failed: {r.status_code} — {r.text[:200]}")
+        return None
+
+    asset = r.json()
+    public_url = asset.get("browser_download_url", "")
+
+    if public_url:
+        log(f"   ✅ Uploaded: {public_url}")
+        return public_url
+
+    log("   ❌ No browser_download_url in response")
+    return None
+
+# ============================================================
+# 📝 LOG — Title | Release URL (Unlimited)
+# ============================================================
+def save_video_log(title, video_url):
     os.makedirs(LOGS_DIR, exist_ok=True)
 
     entries = []
@@ -205,9 +305,7 @@ def save_video_log(title, edited_video_link):
         except Exception:
             entries = []
 
-    video_link = os.path.abspath(edited_video_link)
-    line = f"{title} | {video_link}"
-
+    line = f"{title} | {video_url}"
     entries.append(line)
 
     with open(VIDEO_LOG, 'w', encoding='utf-8') as f:
@@ -307,9 +405,6 @@ def resolve_video_source(args):
     log("🔄 Auto mode — picking from game_links_editor/...")
     return pick_next_game()
 
-# ============================================================
-# 📦 MOVE LINK TO USED FOLDER (Success)
-# ============================================================
 def move_link_to_used_folder(current_file, used_line, current_game):
     if not current_file or not os.path.exists(current_file):
         return False
@@ -355,9 +450,6 @@ def move_link_to_used_folder(current_file, used_line, current_game):
         log(f"   ⚠️ Paste error: {e}")
         return False
 
-# ============================================================
-# 🚫 MOVE LINK TO REJECTED FOLDER (AI Reject)
-# ============================================================
 def move_link_to_rejected_folder(current_file, used_line, current_game, reason=""):
     if not current_file or not os.path.exists(current_file):
         return False
@@ -377,7 +469,6 @@ def move_link_to_rejected_folder(current_file, used_line, current_game, reason="
                 continue
             new_lines.append(line)
         if not removed:
-            log(f"   ⚠️ Line not found")
             return False
         while new_lines and not new_lines[-1].strip():
             new_lines.pop()
@@ -401,16 +492,13 @@ def move_link_to_rejected_folder(current_file, used_line, current_game, reason="
             if reason:
                 f.write(f"# Reason: {reason}\n")
         log(f"   📥 Moved to : {os.path.basename(rejected_file)}")
-        log(f"   📁 Folder   : {REJECTED_LINKS_DIR}/")
-        if reason:
-            log(f"   📝 Reason   : {reason[:80]}")
         return True
     except Exception as e:
         log(f"   ⚠️ Paste error: {e}")
         return False
 
 # ============================================================
-# 🎯 INTERACTIVE PROMPT (2 Options)
+# 🎯 INTERACTIVE PROMPT
 # ============================================================
 def ask_user_choice():
     print()
@@ -454,7 +542,6 @@ def ask_user_choice():
         games = get_all_games()
         if not games:
             print("❌ game_links_editor/ folder me koi game file nahi mili")
-            print("   Pehle links daalo, phir chalao")
             sys.exit(1)
         print(f"✅ {len(games)} games mili — auto pick kar raha hu...")
 
@@ -775,7 +862,7 @@ def cut_clip(video_path, start_time, duration, output_path):
     return False
 
 # ============================================================
-# 🎙️ COMMENTARY
+# 🎙️ COMMENTARY (unchanged logic)
 # ============================================================
 def extract_audio(video_path, out_path):
     log("🎧 Extracting audio...")
@@ -1041,7 +1128,6 @@ def classify_slots(video_path, slots, srt_content):
         }
 
         voice_speed = speed_for_type(slot["type"])
-        slot["speed_boost_log"] = [f"base_{slot['type']}={voice_speed:.2f}"]
         if slot["type"] == "action":
             if slot["scene_count"] >= 3:
                 voice_speed += 0.03
@@ -1056,7 +1142,7 @@ def classify_slots(video_path, slots, srt_content):
     return slots
 
 def generate_commentary_script(slots, srt_content, grid_path):
-    log(f"🤖 Generating commentary ({len(OPENROUTER_KEYS)} keys)...")
+    log(f"🤖 Generating commentary...")
     slot_lines = []
     for i, s in enumerate(slots, 1):
         sa = s.get("sub_analysis", {})
@@ -1078,7 +1164,6 @@ RULES:
 - CALM → chill, relaxed, NO hype
 - NEVER shout on non-action scenes
 - 5-8 words per line
-- Address "guys" or "you" naturally
 
 SLOTS (fill ALL {len(slots)}):
 {chr(10).join(slot_lines)}
@@ -1094,7 +1179,6 @@ Return ONLY valid JSON:
     response = call_openrouter(prompt, image_b64, max_tokens=4000, timeout=180)
 
     if not response:
-        log("   ⚠️ Using fallback")
         fallback = {
             "action": ["Ohh things are heating up!", "He's in the middle of it!", "Chaos everywhere!"],
             "dialog": ["Wait what did he say?", "Hmm interesting...", "What's the plan here?"],
@@ -1223,7 +1307,7 @@ def generate_tts(segments, slots, vid_duration):
                     "actual_end": actual_end, "text": text,
                     "visual_type": visual_type, "slot_extended": slot_extended
                 })
-                log(f"   [{visual_type.upper()}] {slot_start:.2f}-{slot_end:.2f}s | audio={actual:.2f}s | atempo={atempo_used}")
+                log(f"   [{visual_type.upper()}] {slot_start:.2f}-{slot_end:.2f}s | audio={actual:.2f}s")
             elif r.status_code == 401:
                 log("   ❌ ElevenLabs 401")
                 break
@@ -1405,7 +1489,6 @@ def process_commentary(clip_path, output_path):
         slots = classify_slots(clip_path, slots, srt_content)
 
         comm_grid = f"{ANALYSIS_DIR}/comm_grid.jpg"
-        log("🖼️ Building commentary grid...")
         cell_w = 480
         cell_h = 854
         cols = 3
@@ -1443,7 +1526,7 @@ def process_commentary(clip_path, output_path):
         final_audio = build_timed_audio(audio_files, vid_dur)
         success = merge_final(clip_path, final_audio, output_path, audio_files, ass_path, SUBTITLES_ENABLED)
         if success:
-            log(f"🔥 Commentary: {output_path}")
+            log(f"🔥 Commentary done")
             return True
     except Exception as e:
         log(f"❌ Commentary: {e}")
@@ -1453,10 +1536,9 @@ def process_commentary(clip_path, output_path):
 # 🎯 MAIN
 # ============================================================
 def main():
-    parser = argparse.ArgumentParser(description="AI Video Editor (Manual + Auto)")
+    parser = argparse.ArgumentParser(description="AI Video Editor")
     parser.add_argument("--link", help="Direct video URL")
     parser.add_argument("--title", help="Force custom title")
-    parser.add_argument("--out", default="", help="Output path")
     parser.add_argument("--game", help="Game name")
     parser.add_argument("--list-games", action="store_true", help="List games")
     parser.add_argument("--reset-rotation", action="store_true", help="Reset rotation")
@@ -1465,7 +1547,6 @@ def main():
 
     ensure_dirs()
 
-    # Special commands
     if args.list_games:
         games = get_all_games()
         if not games:
@@ -1486,7 +1567,6 @@ def main():
     # Interactive prompt
     if not args.link and not args.no_prompt:
         user_choice = ask_user_choice()
-
         if user_choice["mode"] == "1":
             args.link = user_choice["value"]
             if user_choice["game"]:
@@ -1494,20 +1574,18 @@ def main():
             if user_choice["title"]:
                 args.title = user_choice["title"]
 
-        elif user_choice["mode"] == "2":
-            pass  # Auto mode
-
     log("=" * 60)
-    log("🎬 AI VIDEO EDITOR v7")
+    log("🎬 AI VIDEO EDITOR v7 — GitHub Release Mode")
     log("=" * 60)
     log(f"⏰ {now_ist_ampm()}")
+    log(f"📦 Repo: {GITHUB_REPO or 'N/A'}")
+    log(f"🏷️ Release Tag: {RELEASE_TAG}")
     log("=" * 60)
 
     # Source resolve
     source = resolve_video_source(args)
     if not source:
         log("❌ No source — exiting")
-        log("   Use: --link URL | add to game_links_editor/")
         sys.exit(1)
 
     source_url = source["url"]
@@ -1534,7 +1612,7 @@ def main():
     style = random.choice(["curiosity", "aggressive", "question", "emoji_heavy"])
     title_result = generate_title(game_name, source_duration, style, GRID_PATH)
 
-    # 🚫 REJECT HANDLER
+    # REJECT HANDLER
     if title_result.get("status") == "reject":
         reject_reason = title_result.get("reason", "No reason given")
         log(f"🚫 AI Rejected: {reject_reason}")
@@ -1543,20 +1621,15 @@ def main():
             log("=" * 60)
             log("🚫 MOVING REJECTED LINK")
             log("=" * 60)
-
             moved = move_link_to_rejected_folder(
                 current_file=game_file_path,
                 used_line=used_line,
                 current_game=game_name,
                 reason=reject_reason,
             )
-
             if moved:
                 save_rotation(game_name)
                 log(f"   ✅ Rejected link moved")
-                log(f"   🔄 Next run me dusra link")
-            else:
-                log(f"   ⚠️ Move failed")
         else:
             log("📦 Manual mode — reject link not moved")
 
@@ -1565,7 +1638,7 @@ def main():
         log("=" * 60)
         sys.exit(0)
 
-    # SUCCESS — continue
+    # SUCCESS
     ai_title = args.title or title_result.get("title", f"{game_name} Clip 🔥")
     start_time = title_result.get("start_time", 0)
     clip_duration = title_result.get("duration", 15)
@@ -1589,32 +1662,59 @@ def main():
             final_video = dubbed
             log("🎙️ Commentary applied")
 
-    # Clean filename
+    # CLEAN FILENAME for release asset
     clean_name = re.sub(r'[^\w\s\-]', '', ai_title, flags=re.UNICODE)
     clean_name = re.sub(r'\s+', '_', clean_name)
     clean_name = re.sub(r'_+', '_', clean_name).strip('_')
     if not clean_name:
-        clean_name = f"clip_{now_ist().strftime('%Y%m%d_%H%M%S')}"
-    clean_name = clean_name[:100]
+        clean_name = f"clip_{now_ist_slug()}"
+    clean_name = clean_name[:80]
 
-    output_path = os.path.join(OUTPUT_DIR, f"{clean_name}.mp4")
-    counter = 1
-    while os.path.exists(output_path):
-        output_path = os.path.join(OUTPUT_DIR, f"{clean_name}_{counter}.mp4")
-        counter += 1
+    # Timestamp prefix to avoid collision
+    final_filename = f"{clean_name}.mp4"
+    final_output = f"{FRAMES_DIR}/{final_filename}"
 
-    if args.out:
-        output_path = args.out
-        os.makedirs(os.path.dirname(output_path) or OUTPUT_DIR, exist_ok=True)
+    if final_video != final_output:
+        subprocess.run(f'cp "{final_video}" "{final_output}"', shell=True)
 
-    if final_video != output_path:
-        subprocess.run(f'cp "{final_video}" "{output_path}"', shell=True)
-    log(f"📁 Saved: {output_path}")
+    log(f"📁 Prepared: {final_output}")
 
-    # Log
-    save_video_log(title=ai_title, edited_video_link=output_path)
+    # ============================================================
+    # 📤 UPLOAD TO GITHUB RELEASE
+    # ============================================================
+    log("=" * 60)
+    log("📤 UPLOADING TO GITHUB RELEASE")
+    log("=" * 60)
 
-    # Move link to used (auto mode only)
+    release_url = upload_to_github_release(final_output)
+
+    if not release_url:
+        log("❌ Upload failed — video not saved to release")
+        log("   ⚠️ Check GITHUB_TOKEN and GITHUB_REPOSITORY")
+        sys.exit(1)
+
+    log(f"✅ Release URL: {release_url}")
+
+    # Delete local video (don't save in runner)
+    try:
+        os.remove(final_output)
+        log(f"🗑️ Local video deleted (not saved in runner)")
+    except Exception:
+        pass
+
+    # Delete clip and dubbed
+    try:
+        if os.path.exists(clip_path):
+            os.remove(clip_path)
+    except Exception:
+        pass
+
+    # ============================================================
+    # 📝 SAVE LOG WITH RELEASE URL
+    # ============================================================
+    save_video_log(title=ai_title, video_url=release_url)
+
+    # Move link to used folder (auto mode only)
     if mode == "auto" and game_file_path and used_line:
         log("=" * 60)
         log("📦 MOVING LINK TO USED FOLDER")
@@ -1633,13 +1733,13 @@ def main():
     log("✅ DONE")
     log("=" * 60)
     log(f"🎬 Title: {ai_title}")
-    log(f"🔗 Video: {output_path}")
+    log(f"🔗 Video: {release_url}")
     log("=" * 60)
 
     print(json.dumps({
         "status": "success",
         "title": ai_title,
-        "video_link": os.path.abspath(output_path),
+        "video_link": release_url,
         "source_url": source_url,
         "mode": mode,
     }))
