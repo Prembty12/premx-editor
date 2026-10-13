@@ -1,8 +1,6 @@
 name: manualTriger
 
 on:
-  schedule:
-    - cron: '0 */12 * * *'
   workflow_dispatch:
     inputs:
       link:
@@ -62,12 +60,19 @@ jobs:
           COMMENTARY_ENABLED: 'true'
           SUBTITLES_ENABLED: 'true'
 
+          # 🏷️ Release tag
+          RELEASE_TAG: 'v6.0'
+
+          # GitHub (auto-provided)
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+
           MANUAL_LINK: ${{ github.event.inputs.link }}
         run: |
           if [ -n "$MANUAL_LINK" ]; then
-            python manual.py --link "$MANUAL_LINK"
+            python ai_agent_v7.py --link "$MANUAL_LINK"
           else
-            python manual.py --no-prompt
+            python ai_agent_v7.py --no-prompt
           fi
 
       - name: Commit and Push Updated Files
@@ -76,6 +81,6 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add output/ logs/ used_links/ rejected_links/ game_links_editor/ || true
-          git commit -m "🎬 Auto: video generated [skip ci]" || echo "No changes"
+          git add logs/ used_links/ rejected_links/ game_links_editor/ || true
+          git commit -m "🎬 Auto: video uploaded to release [skip ci]" || echo "No changes"
           git push || echo "Nothing to push"
