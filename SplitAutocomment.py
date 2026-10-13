@@ -362,12 +362,17 @@ def generate_batch_replies(comments_batch, max_retries=MAX_JSON_RETRIES):
 
     prompt = f"""Reply to each Facebook comment as a gaming creator.
 
-LANGUAGE: Same as comment (English/Hinglish).
-LENGTH: Max 20 words.
-TONE: Casual, funny, human. Use bhai/bro/yaar/lol/OP/fire.
-EMOJI: 1-2 max.
-If comment is abusive → savage comeback (no abuse back).
-If asks game name → mention it.
+1. Reply strictly in the SAME language as the original comment.
+2. Do not default to English if the original comment is in another language.
+3. Do not mix multiple languages in the reply.
+4. Keep it SHORT — maximum 25 words.
+5. Use natural slang.
+6. Use 1-2 emojis max.
+7. Sound like a real person, not a robot.
+8. Match the vibe of the comment.
+9. Make them WANT to reply back.
+10. If comment asks game name → tell the game name.
+11. If comment is abusive → savage witty comeback, no abuse back.
 
 Output JSON only:
 {{
