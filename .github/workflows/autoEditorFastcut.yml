@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       video_url:
-        description: '📥 Video ka direct link'
+        description: '📥 Video URL'
         required: true
         default: 'https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison22.mp4'
       frames_per_sec:
@@ -16,7 +16,7 @@ on:
         required: true
         default: '6'
       use_whisper:
-        description: 'Whisper use karna hai? (true/false)'
+        description: 'Use Whisper? (true/false)'
         required: true
         default: 'true'
 
@@ -46,7 +46,8 @@ jobs:
       - name: 📦 Install Python packages
         run: |
           python -m pip install --upgrade pip setuptools wheel
-          python -m pip install moviepy==1.0.3 opencv-python==4.8.1.78 Pillow==10.1.0 openai==1.3.0 librosa==0.10.1 numpy==1.24.3
+          python -m pip install moviepy==1.0.3 opencv-python==4.8.1.78 Pillow==10.1.0 librosa==0.10.1 numpy==1.24.3
+          python -m pip install openai
           python -m pip install faster-whisper
 
       - name: 📁 Create folders
@@ -56,19 +57,10 @@ jobs:
           mkdir -p sfx/hype sfx/dramatic sfx/funny sfx/victory
           mkdir -p music grids debug output
 
-      # ==========================================
-      # VIDEO DOWNLOAD (LINK SE)
-      # ==========================================
       - name: 📥 Download video
         run: |
           VIDEO_URL="${{ github.event.inputs.video_url }}"
-          echo "📥 Downloading: $VIDEO_URL"
-          
-          curl -L \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -o temp_frames/gameplay.mp4 \
-            "$VIDEO_URL"
-          
+          curl -L -o temp_frames/gameplay.mp4 "$VIDEO_URL"
           if [ -f "temp_frames/gameplay.mp4" ]; then
             echo "✅ Video: $(ls -lh temp_frames/gameplay.mp4 | awk '{print $5}')"
           else
@@ -76,17 +68,9 @@ jobs:
             exit 1
           fi
 
-      - name: 🔍 Verify files
-        run: |
-          echo "=== Script ==="
-          ls -lh autoEditorFastcut.py || echo "❌ Script missing"
-          echo ""
-          echo "=== Video ==="
-          ls -lh temp_frames/gameplay.mp4
-
       - name: 🎬 Run auto editor
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
           python autoEditorFastcut.py \
             --video "temp_frames/gameplay.mp4" \
