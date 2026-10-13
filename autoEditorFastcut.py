@@ -1,6 +1,6 @@
 """
-AUTO EDITOR — OpenRouter Version (gpt-4o-mini)
-FIXED: pkg_resources + model ID
+AUTO EDITOR — OpenRouter Version
+FIXED: pkg_resources auto-install at top
 """
 
 import os
@@ -10,15 +10,15 @@ import math
 import random
 import base64
 import argparse
+import subprocess
 
-# ===== FIX FOR pkg_resources =====
+# ===== FIX: pkg_resources install (script ke top pe) =====
 try:
     import pkg_resources
 except ImportError:
-    import subprocess
     subprocess.check_call([sys.executable, "-m", "pip", "install", "-q", "setuptools"])
     import pkg_resources
-# =================================
+# ========================================================
 
 import cv2
 import numpy as np
@@ -39,7 +39,7 @@ from openai import OpenAI
 # CONFIG
 # ==========================================
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
-OPENROUTER_MODEL = "openai/gpt-4o-mini"    # ← FREE model
+OPENROUTER_MODEL = "openai/gpt-4o-mini"
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
 MEME_DIR = "./memes"
@@ -252,7 +252,6 @@ def ai_analyze(frame_index, grid_paths, transcript, spikes, memes, sfx, music):
         }
     )
     
-    # Images base64
     images = []
     for p in grid_paths:
         with open(p, "rb") as f:
@@ -321,7 +320,6 @@ Return ONLY valid JSON (no markdown):
     
     text = response.choices[0].message.content.strip()
     
-    # Clean markdown
     if text.startswith("```"):
         text = text.split("```")[1]
         if text.startswith("json"):
