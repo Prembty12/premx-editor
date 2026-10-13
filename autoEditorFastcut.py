@@ -1,13 +1,11 @@
 """
 ================================================================
-AUTO EDITOR - OpenRouter Version (PRODUCTION READY)
+AUTO EDITOR - OpenRouter Multi-Key Version (PRODUCTION)
 ================================================================
+- 5 API keys with auto-retry (2 attempts each = 10 total)
+- JSON parse error -> try next key
 - MoviePy 1.0.3 compatible
-- Whisper model cached (fast)
-- Empty data protected
-- Aspect ratio enforced
-- Music loop fixed
-- Font fallback added
+- Whisper cached
 - Full error handling
 ================================================================
 """
@@ -19,8 +17,8 @@ import math
 import random
 import base64
 import argparse
-import subprocess
 import traceback
+import time
 from datetime import datetime
 
 import cv2
@@ -40,9 +38,22 @@ from openai import OpenAI
 # ================================================================
 # CONFIG
 # ================================================================
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
 OPENROUTER_MODEL = "openai/gpt-4o-mini"
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+
+# Multiple API keys (fallback chain)
+def get_api_keys():
+    keys = []
+    for i in range(1, 6):
+        if i == 1:
+            env_name = "OPENROUTER_API_KEY"
+        else:
+            env_name = f"OPENROUTER_API_KEY_{i}"
+        val = os.getenv(env_name, "").strip()
+        if val:
+            keys.append((env_name, val))
+    return keys
+
 
 MEME_DIR = "./memes"
 SFX_DIR = "./sfx"
@@ -59,7 +70,7 @@ _WHISPER_MODEL = None
 
 
 # ================================================================
-# LOGGING HELPERS
+# LOGGING
 # ================================================================
 def log_step(title):
     print("\n" + "=" * 70)
@@ -84,7 +95,7 @@ def log_info(msg):
 
 
 # ================================================================
-# AUTO-CREATE FOLDERS
+# FOLDERS
 # ================================================================
 def ensure_folders():
     folders = [
@@ -143,7 +154,7 @@ def create_frame_index(video_path, frames_per_sec=3):
 
 
 # ================================================================
-# 3. GRID GENERATOR
+# 3. GRIDS
 # ================================================================
 def create_grids(video_path, frame_index, output_dir="grids", max_images=6):
     total_frames = frame_index["total_frames"]
@@ -223,7 +234,7 @@ def create_grids(video_path, frame_index, output_dir="grids", max_images=6):
 
 
 # ================================================================
-# 4. TRANSCRIPT - faster-whisper (CACHED)
+# 4. TRANSCRIPT
 # ================================================================
 def get_whisper_model():
     global _WHISPER_MODEL
@@ -241,7 +252,7 @@ def get_transcript(video_path, use_whisper=True):
 
     try:
         model = get_whisper_model()
-        log_info("Transcribing with faster-whisper...")
+        log_info("Transcribing...")
         segments, info = model.transcribe(video_path)
         lines = [
             f"[{s.start:6.1f}s] {s.text.strip()}"
@@ -258,7 +269,7 @@ def get_transcript(video_path, use_whisper=True):
 
 
 # ================================================================
-# 5. SPIKE DETECTION
+# 5. SPIKES
 # ================================================================
 def get_spikes(video_path):
     log_info("Detecting audio spikes...")
@@ -296,7 +307,7 @@ def get_spikes(video_path):
 
 
 # ================================================================
-# 6. AVAILABLE ASSETS
+# 6. MOODS
 # ================================================================
 def get_available_moods():
     memes, sfx, music = {}, {}, []
@@ -333,32 +344,9 @@ def get_available_moods():
 
 
 # ================================================================
-# 7. AI ANALYSIS - OPENROUTER
+# 7. BUILD PROMPT (SEPARATE)
 # ================================================================
-def ai_analyze(frame_index, grid_paths, transcript, spikes, memes, sfx, music):
-    if not OPENROUTER_API_KEY:
-        raise Exception("OPENROUTER_API_KEY missing!")
-
-    log_info(f"Sending to OpenRouter ({OPENROUTER_MODEL})...")
-
-    client = OpenAI(
-        api_key=OPENROUTER_API_KEY,
-        base_url=OPENROUTER_BASE_URL,
-        default_headers={
-            "HTTP-Referer": "https://github.com/Prembty12/premx-editor",
-            "X-Title": "Auto Video Editor",
-        }
-    )
-
-    images = []
-    for p in grid_paths:
-        with open(p, "rb") as f:
-            b64 = base64.b64encode(f.read()).decode()
-        images.append({
-            "type": "image_url",
-            "image_url": {"url": f"data:image/jpeg;base64,{b64}"}
-        })
-
+def build_prompt(frame_index, grid_count, transcript, spikes, memes, sfx, music):
     frame_lines = [
         f"#{f['idx']}={f['t']}s"
         for f in frame_index["frames"][::3]
@@ -373,7 +361,7 @@ VIDEO: {frame_index['video_duration']:.1f}s | Sampling: {frame_index['fps_sampli
 FRAME INDEX (use ONLY these):
 {frame_list}
 
-GRIDS: {len(grid_paths)} images. Each frame has "#idx | MM:SS.S" label.
+GRIDS: {grid_count} images. Each frame has "#idx | MM:SS.S" label.
 
 TRANSCRIPT:
 {transcript}
@@ -397,7 +385,7 @@ RULES:
 - Every edit MUST have a "reason"
 - aspect_ratio MUST be exactly one of: "9:16", "1:1", "4:5" (default 9:16)
 
-Return ONLY valid JSON (no markdown):
+Return ONLY valid JSON (no markdown, no explanation, no code fences):
 {{
   "target_duration": 60,
   "aspect_ratio": "9:16",
@@ -410,35 +398,147 @@ Return ONLY valid JSON (no markdown):
   ]
 }}
 """
-
-    response = client.chat.completions.create(
-        model=OPENROUTER_MODEL,
-        messages=[{
-            "role": "user",
-            "content": [{"type": "text", "text": prompt}] + images
-        }],
-        max_tokens=4000
-    )
-
-    text = response.choices[0].message.content.strip()
-
-    if text.startswith("```"):
-        text = text.split("```")[1]
-        if text.startswith("json"):
-            text = text[4:]
-        text = text.strip()
-
-    result = json.loads(text)
-
-    if result.get("aspect_ratio") not in ("9:16", "1:1", "4:5"):
-        result["aspect_ratio"] = "9:16"
-
-    log_ok("OpenRouter responded")
-    return result
+    return prompt
 
 
 # ================================================================
-# 8. VERIFY + CONVERT
+# 8. JSON EXTRACTOR (STRICT)
+# ================================================================
+def extract_json(text):
+    """Extract JSON from AI response, robust against markdown/code fences."""
+    if not text:
+        raise ValueError("Empty AI response")
+
+    text = text.strip()
+
+    # Remove markdown code fences
+    if text.startswith("```"):
+        parts = text.split("```")
+        if len(parts) >= 2:
+            text = parts[1]
+        if text.lower().startswith("json"):
+            text = text[4:]
+        text = text.strip()
+
+    # Find first { and last }
+    start = text.find("{")
+    end = text.rfind("}")
+    if start == -1 or end == -1 or end <= start:
+        raise ValueError("No JSON object found in response")
+
+    json_str = text[start:end + 1]
+
+    # Try parse
+    try:
+        return json.loads(json_str)
+    except json.JSONDecodeError as e:
+        # Try cleaning common issues
+        cleaned = json_str.replace("'", '"')
+        try:
+            return json.loads(cleaned)
+        except Exception:
+            raise ValueError(f"JSON parse failed: {e}")
+
+
+# ================================================================
+# 9. AI ANALYZE — MULTI KEY + RETRY
+# ================================================================
+def ai_analyze(frame_index, grid_paths, transcript, spikes, memes, sfx, music):
+    api_keys = get_api_keys()
+    if not api_keys:
+        raise Exception("No OPENROUTER_API_KEY found in environment!")
+
+    log_info(f"Found {len(api_keys)} API key(s)")
+
+    # Prepare images (do it once, not per retry)
+    images = []
+    for p in grid_paths:
+        with open(p, "rb") as f:
+            b64 = base64.b64encode(f.read()).decode()
+        images.append({
+            "type": "image_url",
+            "image_url": {"url": f"data:image/jpeg;base64,{b64}"}
+        })
+
+    prompt = build_prompt(
+        frame_index, len(grid_paths),
+        transcript, spikes, memes, sfx, music
+    )
+
+    # Try each key, each key 2 attempts
+    last_error = None
+    total_attempts = 0
+
+    for key_idx, (key_name, key_val) in enumerate(api_keys, 1):
+        for attempt in range(1, 3):  # 2 attempts per key
+            total_attempts += 1
+            log_info(f"[Attempt {total_attempts}] Key #{key_idx} ({key_name}) - try {attempt}/2")
+
+            try:
+                client = OpenAI(
+                    api_key=key_val,
+                    base_url=OPENROUTER_BASE_URL,
+                    default_headers={
+                        "HTTP-Referer": "https://github.com/Prembty12/premx-editor",
+                        "X-Title": "Auto Video Editor",
+                    }
+                )
+
+                response = client.chat.completions.create(
+                    model=OPENROUTER_MODEL,
+                    messages=[{
+                        "role": "user",
+                        "content": [{"type": "text", "text": prompt}] + images
+                    }],
+                    max_tokens=4000,
+                    temperature=0.7
+                )
+
+                text = response.choices[0].message.content
+                log_ok(f"Got response ({len(text)} chars)")
+
+                # Parse JSON
+                result = extract_json(text)
+
+                # Enforce aspect ratio
+                if result.get("aspect_ratio") not in ("9:16", "1:1", "4:5"):
+                    result["aspect_ratio"] = "9:16"
+
+                log_ok(f"✅ SUCCESS with key #{key_idx} (attempt {attempt})")
+                return result
+
+            except json.JSONDecodeError as e:
+                last_error = f"JSON error: {e}"
+                log_warn(f"JSON parse failed: {e}")
+                time.sleep(1)
+                continue
+
+            except ValueError as e:
+                last_error = f"Parse error: {e}"
+                log_warn(f"Parse failed: {e}")
+                time.sleep(1)
+                continue
+
+            except Exception as e:
+                last_error = str(e)
+                err_str = str(e).lower()
+
+                # Rate limit / quota / auth errors → next key
+                if any(x in err_str for x in ["rate", "quota", "limit", "auth", "401", "403", "429"]):
+                    log_warn(f"Key issue: {e} → trying next key")
+                    break  # Break inner loop, go to next key
+
+                log_warn(f"Error: {e}")
+                time.sleep(2)
+                continue
+
+        log_warn(f"Key #{key_idx} exhausted, moving to next...")
+
+    raise Exception(f"All {len(api_keys)} keys failed after {total_attempts} attempts. Last error: {last_error}")
+
+
+# ================================================================
+# 10. VERIFY
 # ================================================================
 def verify_and_convert(ai_json, frame_index):
     log_info("Verifying AI output...")
@@ -484,7 +584,7 @@ def verify_and_convert(ai_json, frame_index):
 
 
 # ================================================================
-# 9. DEBUG LOG
+# 11. DEBUG LOG
 # ================================================================
 def save_debug_log(ai_json, frame_index):
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -525,7 +625,7 @@ def save_debug_log(ai_json, frame_index):
 
 
 # ================================================================
-# 10. MOOD PICKERS
+# 12. MOOD PICKERS
 # ================================================================
 def pick_meme(mood):
     mood_dir = os.path.join(MEME_DIR, mood)
@@ -568,7 +668,7 @@ def pick_sfx(mood):
 
 
 # ================================================================
-# 11. ASPECT + FILTER
+# 13. ASPECT + FILTER
 # ================================================================
 def apply_aspect(clip, ratio="9:16"):
     w, h = clip.size
@@ -610,7 +710,7 @@ def apply_filter(clip, name):
 
 
 # ================================================================
-# 12. BUILD REEL
+# 14. BUILD REEL
 # ================================================================
 def build_reel(video_path, ai_json, output_path):
     log_info("Building reel...")
@@ -623,7 +723,6 @@ def build_reel(video_path, ai_json, output_path):
 
     for edit in ai_json.get("edits", []):
 
-        # ---- INSERT MEME ----
         if "insert_meme" in edit:
             mood = edit.get("meme_mood", "funny")
             meme_path = pick_meme(mood)
@@ -640,12 +739,10 @@ def build_reel(video_path, ai_json, output_path):
                 log_warn(f"No meme found for mood: {mood}")
             continue
 
-        # ---- REMOVE ----
         if edit.get("remove", False):
             log_info(f"Cut: {edit.get('start_frame')}-{edit.get('end_frame')}")
             continue
 
-        # ---- KEEP SEGMENT ----
         start = edit.get("start")
         end = edit.get("end")
         if start is None or end is None:
@@ -716,7 +813,6 @@ def build_reel(video_path, ai_json, output_path):
 
     final = concatenate_videoclips(clips, method="compose")
 
-    # ---- AUDIO MIX ----
     audio = []
     if final.audio:
         audio.append(final.audio)
@@ -742,7 +838,6 @@ def build_reel(video_path, ai_json, output_path):
     if audio:
         final = final.set_audio(CompositeAudioClip(audio))
 
-    # ---- WRITE ----
     log_info("Writing video (this may take 1-3 min)...")
     final.write_videofile(
         output_path,
@@ -759,7 +854,7 @@ def build_reel(video_path, ai_json, output_path):
 
 
 # ================================================================
-# 13. MAIN
+# 15. MAIN
 # ================================================================
 def main():
     parser = argparse.ArgumentParser(description="Auto Video Editor")
@@ -771,68 +866,73 @@ def main():
 
     ensure_folders()
 
-    log_step("🎬 AUTO EDITOR - OpenRouter Version")
+    log_step("🎬 AUTO EDITOR - Multi-Key Version")
     log_info(f"Video: {args.video}")
     log_info(f"FPS: {args.fps}")
     log_info(f"Grids: {args.grids}")
     log_info(f"Whisper: {args.whisper}")
 
     if not os.path.exists(args.video):
-        log_err(f"Video nahi mila: {args.video}")
+        log_err(f"Video not found: {args.video}")
         sys.exit(1)
 
-    if not OPENROUTER_API_KEY:
-        log_err("OPENROUTER_API_KEY set nahi hai!")
-        log_info("GitHub Secrets me daalo: Settings → Secrets → Actions")
+    api_keys = get_api_keys()
+    if not api_keys:
+        log_err("No OPENROUTER_API_KEY found!")
+        log_info("Add at least OPENROUTER_API_KEY in GitHub Secrets")
         sys.exit(1)
+
+    log_info(f"API Keys loaded: {len(api_keys)}")
+    for name, _ in api_keys:
+        log_info(f"  → {name}")
 
     use_whisper = str(args.whisper).lower() == "true"
 
-    # STEP 1: Video info
+    # STEP 1
     log_step("STEP 1: Video Info")
     info = get_video_info(args.video)
     log_ok(f"Duration: {info['duration']:.1f}s")
     log_ok(f"Resolution: {info['width']}x{info['height']}")
     log_ok(f"FPS: {info['fps']:.2f}")
 
-    # STEP 2: Frame index
+    # STEP 2
     log_step("STEP 2: Frame Index")
     frame_index = create_frame_index(args.video, args.fps)
     log_ok(f"Total frames: {frame_index['total_frames']}")
 
-    # STEP 3: Grids
+    # STEP 3
     log_step("STEP 3: Grid Generation")
     grids = create_grids(args.video, frame_index, GRID_DIR, args.grids)
     log_ok(f"{len(grids)} grids created")
 
-    # STEP 4: Transcript
+    # STEP 4
     log_step("STEP 4: Transcript")
     transcript = get_transcript(args.video, use_whisper)
 
-    # STEP 5: Spikes
+    # STEP 5
     log_step("STEP 5: Spike Detection")
     spikes = get_spikes(args.video)
 
-    # STEP 6: Assets
+    # STEP 6
     log_step("STEP 6: Assets Scan")
     memes, sfx, music = get_available_moods()
     log_info(f"Memes: {list(memes.keys())}")
     log_info(f"SFX: {list(sfx.keys())}")
     log_info(f"Music: {len(music)} files")
 
-    # STEP 7: AI Analysis
-    log_step("STEP 7: AI Analysis")
+    # STEP 7
+    log_step("STEP 7: AI Analysis (Multi-Key Retry)")
     ai_json = ai_analyze(frame_index, grids, transcript, spikes, memes, sfx, music)
 
-    # STEP 8: Verify
+    # STEP 8
     log_step("STEP 8: Verify Edits")
     ai_json = verify_and_convert(ai_json, frame_index)
 
-    # STEP 9: Debug log
+    # STEP 9
     log_step("STEP 9: Debug Log")
     save_debug_log(ai_json, frame_index)
 
-    # STEP 10: Build reel
+    # STEP 10
     log_step("STEP 10: Build Reel")
     output = os.path.join(OUTPUT_DIR, "final_reel.mp4")
     build_reel(args.video, ai_json, output)
@@ -847,6 +947,6 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as e:
-        log_err(f"FATAL ERROR: {e}")
+        log_err(f"FATAL: {e}")
         traceback.print_exc()
         sys.exit(1)
