@@ -1,16 +1,12 @@
-name: autoEditorFastcut
+name: autoEditorFastcu
 
 on:
   workflow_dispatch:
     inputs:
       video_url:
-        description: '📥 Video ka direct link (GitHub Release ya koi bhi)'
+        description: '📥 Video ka direct link'
         required: true
         default: 'https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison22.mp4'
-      script_url:
-        description: '📥 Script ka link (agar repo me nahi hai)'
-        required: false
-        default: 'https://raw.githubusercontent.com/Prembty12/premx-editor/main/auto_editor.py'
       frames_per_sec:
         description: 'Frames per second'
         required: true
@@ -61,23 +57,82 @@ jobs:
           mkdir -p music grids debug output
 
       # ==========================================
-      # SCRIPT DOWNLOAD (agar repo me nahi hai)
+      # VIDEO DOWNLOAD (LINK SE)
       # ==========================================
-      - name: 📥 Download script (if needed)
+      - name: 📥 Download video
         run: |
-          if [ ! -f "auto_editor.py" ]; then
-            SCRIPT_URL="${{ github.event.inputs.script_url }}"
-            if [ -n "$SCRIPT_URL" ]; then
-              echo "📥 Downloading script..."
-              curl -L -o auto_editor.py "$SCRIPT_URL"
-              echo "✅ Script: $(ls -lh auto_editor.py | awk '{print $5}')"
-            else
-              echo "❌ auto_editor.py not found!"
-              exit 1
-            fi
+          VIDEO_URL="${{ github.event.inputs.video_url }}"
+          echo "📥 Downloading: $VIDEO_URL"
+          
+          curl -L \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -o temp_frames/gameplay.mp4 \
+            "$VIDEO_URL"
+          
+          if [ -f "temp_frames/gameplay.mp4" ]; then
+            echo "✅ Video: $(ls -lh temp_frames/gameplay.mp4 | awk '{print $5}')"
           else
-            echo "✅ auto_editor.py already exists"
+            echo "❌ Download failed!"
+            exit 1
           fi
+
+      - name: 🔍 Verify filesname: 🎬 Auto Video Editor
+
+on:
+  workflow_dispatch:
+    inputs:
+      video_url:
+        description: '📥 Video ka direct link'
+        required: true
+        default: 'https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison22.mp4'
+      frames_per_sec:
+        description: 'Frames per second'
+        required: true
+        default: '3'
+      max_grids:
+        description: 'Max grid images'
+        required: true
+        default: '6'
+      use_whisper:
+        description: 'Whisper use karna hai? (true/false)'
+        required: true
+        default: 'true'
+
+permissions:
+  contents: write
+
+jobs:
+  auto-edit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: 🔧 Install FFmpeg & ImageMagick
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg imagemagick fonts-dejavu wget curl
+          sudo sed -i 's/rights="none" pattern="@\*"/rights="read|write" pattern="@*"/' /etc/ImageMagick-6/policy.xml || true
+
+      - name: 📦 Install Python packages
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install moviepy==1.0.3 opencv-python==4.8.1.78 Pillow==10.1.0 openai==1.3.0 librosa==0.10.1 numpy==1.24.3
+          python -m pip install faster-whisper
+
+      - name: 📁 Create folders
+        run: |
+          mkdir -p input temp_frames
+          mkdir -p memes/shocked memes/funny memes/sad memes/victory
+          mkdir -p sfx/hype sfx/dramatic sfx/funny sfx/victory
+          mkdir -p music grids debug output
 
       # ==========================================
       # VIDEO DOWNLOAD (LINK SE)
@@ -85,19 +140,15 @@ jobs:
       - name: 📥 Download video
         run: |
           VIDEO_URL="${{ github.event.inputs.video_url }}"
-          echo "📥 Downloading video from:"
-          echo "   $VIDEO_URL"
+          echo "📥 Downloading: $VIDEO_URL"
           
-          # GitHub token use karo (private repo ke liye)
           curl -L \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -o temp_frames/gameplay.mp4 \
             "$VIDEO_URL"
           
           if [ -f "temp_frames/gameplay.mp4" ]; then
-            SIZE=$(ls -lh temp_frames/gameplay.mp4 | awk '{print $5}')
-            echo "✅ Video downloaded: $SIZE"
-            file temp_frames/gameplay.mp4
+            echo "✅ Video: $(ls -lh temp_frames/gameplay.mp4 | awk '{print $5}')"
           else
             echo "❌ Download failed!"
             exit 1
@@ -106,7 +157,7 @@ jobs:
       - name: 🔍 Verify files
         run: |
           echo "=== Script ==="
-          ls -lh auto_editor.py
+          ls -lh autoEditorFastcut.py || echo "❌ Script missing"
           echo ""
           echo "=== Video ==="
           ls -lh temp_frames/gameplay.mp4
@@ -115,7 +166,34 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          python auto_editor.py \
+          python autoEditorFastcut.py \
+            --video "temp_frames/gameplay.mp4" \
+            --fps "${{ github.event.inputs.frames_per_sec }}" \
+            --grids "${{ github.event.inputs.max_grids }}" \
+            --whisper "${{ github.event.inputs.use_whisper }}"
+
+      - name: 📤 Upload final reel
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: final-reel
+          path: |
+            output/
+            debug/
+            grids/
+          retention-days: 7
+        run: |
+          echo "=== Script ==="
+          ls -lh autoEditorFastcut.py || echo "❌ Script missing"
+          echo ""
+          echo "=== Video ==="
+          ls -lh temp_frames/gameplay.mp4
+
+      - name: 🎬 Run auto editor
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          python autoEditorFastcut.py \
             --video "temp_frames/gameplay.mp4" \
             --fps "${{ github.event.inputs.frames_per_sec }}" \
             --grids "${{ github.event.inputs.max_grids }}" \
