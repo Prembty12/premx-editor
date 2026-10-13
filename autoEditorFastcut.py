@@ -1,5 +1,6 @@
 """
-AUTO EDITOR — OpenRouter Version (FREE models available)
+AUTO EDITOR — OpenRouter Version (gpt-4o-mini)
+FIXED: pkg_resources + model ID
 """
 
 import os
@@ -9,6 +10,16 @@ import math
 import random
 import base64
 import argparse
+
+# ===== FIX FOR pkg_resources =====
+try:
+    import pkg_resources
+except ImportError:
+    import subprocess
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "-q", "setuptools"])
+    import pkg_resources
+# =================================
+
 import cv2
 import numpy as np
 import librosa
@@ -28,15 +39,7 @@ from openai import OpenAI
 # CONFIG
 # ==========================================
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
-
-# FREE model — ya change karo
-OPENROUTER_MODEL = "google/gemini-2.0-flash-exp:free"
-
-# Alternative free models:
-# "meta-llama/llama-3.3-70b-instruct:free"
-# "deepseek/deepseek-r1:free"
-# "qwen/qwen-2.5-72b-instruct:free"
-
+OPENROUTER_MODEL = "openai/gpt-4o-mini"    # ← FREE model
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
 MEME_DIR = "./memes"
