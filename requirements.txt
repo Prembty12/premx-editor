@@ -3,3 +3,10 @@ requests
 yt-dlp
 flask
 gunicorn
+moviepy==1.0.3
+opencv-python==4.8.1.78
+Pillow==10.1.0
+openai==1.3.0
+librosa==0.10.1
+openai-whisper==20231117
+numpy==1.24.3
