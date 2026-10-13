@@ -1,4 +1,4 @@
-name: 🎬 Auto Video Editor
+name: autoEditorFastcut
 
 on:
   workflow_dispatch:
