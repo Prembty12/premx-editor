@@ -7,6 +7,7 @@ AUTO EDITOR - OpenRouter Multi-Key Version (PRODUCTION)
 - MoviePy 1.0.3 compatible
 - Whisper cached
 - Full error handling
+- All folders inside FASTCUT/
 ================================================================
 """
 
@@ -41,26 +42,29 @@ from openai import OpenAI
 OPENROUTER_MODEL = "openai/gpt-4o-mini"
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
-# Multiple API keys (fallback chain)
+# ---- BASE WORK DIR (sab kuch iske andar) ----
+BASE_DIR    = "FASTCUT"
+INPUT_DIR   = os.path.join(BASE_DIR, "input")
+TEMP_DIR    = os.path.join(BASE_DIR, "temp_frames")
+MEME_DIR    = os.path.join(BASE_DIR, "memes")
+SFX_DIR     = os.path.join(BASE_DIR, "sfx")
+MUSIC_DIR   = os.path.join(BASE_DIR, "music")
+GRID_DIR    = os.path.join(BASE_DIR, "grids")
+DEBUG_DIR   = os.path.join(BASE_DIR, "debug")
+OUTPUT_DIR  = os.path.join(BASE_DIR, "output")
+
+
+# ================================================================
+# MULTI API KEYS
+# ================================================================
 def get_api_keys():
     keys = []
     for i in range(1, 6):
-        if i == 1:
-            env_name = "OPENROUTER_API_KEY"
-        else:
-            env_name = f"OPENROUTER_API_KEY_{i}"
+        env_name = "OPENROUTER_API_KEY" if i == 1 else f"OPENROUTER_API_KEY_{i}"
         val = os.getenv(env_name, "").strip()
         if val:
             keys.append((env_name, val))
     return keys
-
-
-MEME_DIR = "./memes"
-SFX_DIR = "./sfx"
-MUSIC_DIR = "./music"
-GRID_DIR = "./grids"
-DEBUG_DIR = "./debug"
-OUTPUT_DIR = "./output"
 
 
 # ================================================================
@@ -95,18 +99,111 @@ def log_info(msg):
 
 
 # ================================================================
-# FOLDERS
+# AUTO-CREATE FOLDERS (INSIDE FASTCUT/)
 # ================================================================
 def ensure_folders():
+    """Sab folders FASTCUT/ ke andar auto-create karo."""
     folders = [
-        "input",
-        "memes/shocked", "memes/funny", "memes/sad", "memes/victory",
-        "sfx/hype", "sfx/dramatic", "sfx/funny", "sfx/victory",
-        "music", "grids", "debug", "output",
+        # Core
+        BASE_DIR,
+        INPUT_DIR,
+        TEMP_DIR,
+        GRID_DIR,
+        DEBUG_DIR,
+        OUTPUT_DIR,
+
+        # Meme moods
+        MEME_DIR,
+        os.path.join(MEME_DIR, "shocked"),
+        os.path.join(MEME_DIR, "funny"),
+        os.path.join(MEME_DIR, "sad"),
+        os.path.join(MEME_DIR, "victory"),
+        os.path.join(MEME_DIR, "reaction"),
+        os.path.join(MEME_DIR, "hype"),
+        os.path.join(MEME_DIR, "fail"),
+        os.path.join(MEME_DIR, "win"),
+
+        # SFX moods
+        SFX_DIR,
+        os.path.join(SFX_DIR, "hype"),
+        os.path.join(SFX_DIR, "dramatic"),
+        os.path.join(SFX_DIR, "funny"),
+        os.path.join(SFX_DIR, "victory"),
+        os.path.join(SFX_DIR, "whoosh"),
+        os.path.join(SFX_DIR, "impact"),
+        os.path.join(SFX_DIR, "notification"),
+
+        # Music
+        MUSIC_DIR,
     ]
+
+    created = []
+    existed = []
+
     for f in folders:
-        os.makedirs(f, exist_ok=True)
-    log_ok(f"Created {len(folders)} folders")
+        if os.path.exists(f):
+            existed.append(f)
+        else:
+            os.makedirs(f, exist_ok=True)
+            created.append(f)
+
+    if created:
+        log_ok(f"Created {len(created)} new folders inside '{BASE_DIR}/':")
+        for f in created:
+            print(f"      📁 {f}")
+    else:
+        log_ok(f"All {len(folders)} folders already exist inside '{BASE_DIR}/'")
+
+    if existed:
+        log_info(f"{len(existed)} folders already existed")
+
+    _drop_folder_readmes()
+
+
+def _drop_folder_readmes():
+    """Har folder me README.txt daal do (agar empty ho)."""
+    readmes = {
+        os.path.join(MEME_DIR, "shocked"):  "Shocked reaction memes\nFormats: .mp4, .mov, .gif, .webm",
+        os.path.join(MEME_DIR, "funny"):    "Funny memes\nFormats: .mp4, .mov, .gif, .webm",
+        os.path.join(MEME_DIR, "sad"):      "Sad memes\nFormats: .mp4, .mov, .gif, .webm",
+        os.path.join(MEME_DIR, "victory"):  "Victory memes\nFormats: .mp4, .mov, .gif, .webm",
+        os.path.join(MEME_DIR, "reaction"): "General reaction memes\nFormats: .mp4, .mov, .gif, .webm",
+        os.path.join(MEME_DIR, "hype"):     "Hype memes\nFormats: .mp4, .mov, .gif, .webm",
+        os.path.join(MEME_DIR, "fail"):     "Fail memes\nFormats: .mp4, .mov, .gif, .webm",
+        os.path.join(MEME_DIR, "win"):      "Win memes\nFormats: .mp4, .mov, .gif, .webm",
+
+        os.path.join(SFX_DIR, "hype"):         "Hype SFX\nFormats: .mp3, .wav, .m4a, .aac",
+        os.path.join(SFX_DIR, "dramatic"):     "Dramatic SFX\nFormats: .mp3, .wav, .m4a, .aac",
+        os.path.join(SFX_DIR, "funny"):        "Funny SFX\nFormats: .mp3, .wav, .m4a, .aac",
+        os.path.join(SFX_DIR, "victory"):      "Victory SFX\nFormats: .mp3, .wav, .m4a, .aac",
+        os.path.join(SFX_DIR, "whoosh"):       "Whoosh SFX\nFormats: .mp3, .wav, .m4a, .aac",
+        os.path.join(SFX_DIR, "impact"):       "Impact SFX\nFormats: .mp3, .wav, .m4a, .aac",
+        os.path.join(SFX_DIR, "notification"): "Notification SFX\nFormats: .mp3, .wav, .m4a, .aac",
+
+        MUSIC_DIR:  "Background music\nFormats: .mp3, .wav, .m4a, .aac",
+        INPUT_DIR:  "Raw input videos",
+        OUTPUT_DIR: "Final reels",
+        GRID_DIR:   "Frame grid images",
+        DEBUG_DIR:  "AI decision logs",
+        TEMP_DIR:   "Temp working directory",
+    }
+
+    for folder, text in readmes.items():
+        if not os.path.exists(folder):
+            continue
+        items = [f for f in os.listdir(folder) if f != "README.txt"]
+        if items:
+            continue
+        readme_path = os.path.join(folder, "README.txt")
+        try:
+            with open(readme_path, "w", encoding="utf-8") as f:
+                f.write(f"📁 {folder}\n")
+                f.write("=" * 60 + "\n\n")
+                f.write(text + "\n\n")
+                f.write("=" * 60 + "\n")
+                f.write("Auto-managed folder.\n")
+        except Exception:
+            pass
 
 
 # ================================================================
@@ -156,7 +253,7 @@ def create_frame_index(video_path, frames_per_sec=3):
 # ================================================================
 # 3. GRIDS
 # ================================================================
-def create_grids(video_path, frame_index, output_dir="grids", max_images=6):
+def create_grids(video_path, frame_index, output_dir, max_images=6):
     total_frames = frame_index["total_frames"]
     if total_frames == 0:
         log_warn("No frames to grid")
@@ -344,7 +441,7 @@ def get_available_moods():
 
 
 # ================================================================
-# 7. BUILD PROMPT (SEPARATE)
+# 7. BUILD PROMPT
 # ================================================================
 def build_prompt(frame_index, grid_count, transcript, spikes, memes, sfx, music):
     frame_lines = [
@@ -402,16 +499,14 @@ Return ONLY valid JSON (no markdown, no explanation, no code fences):
 
 
 # ================================================================
-# 8. JSON EXTRACTOR (STRICT)
+# 8. JSON EXTRACTOR
 # ================================================================
 def extract_json(text):
-    """Extract JSON from AI response, robust against markdown/code fences."""
     if not text:
         raise ValueError("Empty AI response")
 
     text = text.strip()
 
-    # Remove markdown code fences
     if text.startswith("```"):
         parts = text.split("```")
         if len(parts) >= 2:
@@ -420,7 +515,6 @@ def extract_json(text):
             text = text[4:]
         text = text.strip()
 
-    # Find first { and last }
     start = text.find("{")
     end = text.rfind("}")
     if start == -1 or end == -1 or end <= start:
@@ -428,11 +522,9 @@ def extract_json(text):
 
     json_str = text[start:end + 1]
 
-    # Try parse
     try:
         return json.loads(json_str)
     except json.JSONDecodeError as e:
-        # Try cleaning common issues
         cleaned = json_str.replace("'", '"')
         try:
             return json.loads(cleaned)
@@ -450,7 +542,6 @@ def ai_analyze(frame_index, grid_paths, transcript, spikes, memes, sfx, music):
 
     log_info(f"Found {len(api_keys)} API key(s)")
 
-    # Prepare images (do it once, not per retry)
     images = []
     for p in grid_paths:
         with open(p, "rb") as f:
@@ -465,12 +556,11 @@ def ai_analyze(frame_index, grid_paths, transcript, spikes, memes, sfx, music):
         transcript, spikes, memes, sfx, music
     )
 
-    # Try each key, each key 2 attempts
     last_error = None
     total_attempts = 0
 
     for key_idx, (key_name, key_val) in enumerate(api_keys, 1):
-        for attempt in range(1, 3):  # 2 attempts per key
+        for attempt in range(1, 3):
             total_attempts += 1
             log_info(f"[Attempt {total_attempts}] Key #{key_idx} ({key_name}) - try {attempt}/2")
 
@@ -497,10 +587,8 @@ def ai_analyze(frame_index, grid_paths, transcript, spikes, memes, sfx, music):
                 text = response.choices[0].message.content
                 log_ok(f"Got response ({len(text)} chars)")
 
-                # Parse JSON
                 result = extract_json(text)
 
-                # Enforce aspect ratio
                 if result.get("aspect_ratio") not in ("9:16", "1:1", "4:5"):
                     result["aspect_ratio"] = "9:16"
 
@@ -523,10 +611,9 @@ def ai_analyze(frame_index, grid_paths, transcript, spikes, memes, sfx, music):
                 last_error = str(e)
                 err_str = str(e).lower()
 
-                # Rate limit / quota / auth errors → next key
                 if any(x in err_str for x in ["rate", "quota", "limit", "auth", "401", "403", "429"]):
                     log_warn(f"Key issue: {e} → trying next key")
-                    break  # Break inner loop, go to next key
+                    break
 
                 log_warn(f"Error: {e}")
                 time.sleep(2)
@@ -858,7 +945,7 @@ def build_reel(video_path, ai_json, output_path):
 # ================================================================
 def main():
     parser = argparse.ArgumentParser(description="Auto Video Editor")
-    parser.add_argument("--video", default="input/gameplay.mp4")
+    parser.add_argument("--video", default=os.path.join(TEMP_DIR, "gameplay.mp4"))
     parser.add_argument("--fps", type=int, default=3)
     parser.add_argument("--grids", type=int, default=6)
     parser.add_argument("--whisper", default="true")
@@ -867,6 +954,7 @@ def main():
     ensure_folders()
 
     log_step("🎬 AUTO EDITOR - Multi-Key Version")
+    log_info(f"Base dir: {BASE_DIR}/")
     log_info(f"Video: {args.video}")
     log_info(f"FPS: {args.fps}")
     log_info(f"Grids: {args.grids}")
