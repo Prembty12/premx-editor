@@ -2,10 +2,12 @@
 ================================================================
 AUTO EDITOR - OpenRouter Multi-Key Version (PRODUCTION FINAL)
 ================================================================
-- Full manual control (all settings at top)
 - 5 API keys with auto-retry
 - Smart prompt: preserves good content
-- High quality output (16 Mbps default)
+- 16 Mbps high quality output
+- Even dimensions (H.264 safe)
+- Grid logging
+- Git pull before push
 - Duration lock (no freeze)
 ================================================================
 """
@@ -36,233 +38,60 @@ import moviepy.video.fx.all as vfx
 from openai import OpenAI
 
 
-# ╔════════════════════════════════════════════════════════════════╗
-# ║                                                                ║
-# ║              🎛️  MASTER CONFIG — YAHAN EDIT KARO               ║
-# ║                                                                ║
-# ║  Ye saari settings ek jagah hain. Bas values change karo.     ║
-# ║  Kuch bhi chhupа nahi hai. Har option ka comment hai.          ║
-# ║                                                                ║
-# ╚════════════════════════════════════════════════════════════════╝
-
-CONFIG = {
-
-    # ═══════════════════════════════════════════════════════════════
-    # 📁 PATHS & FOLDERS
-    # ═══════════════════════════════════════════════════════════════
-
-    # Base folder jisme sab kuch hoga
-    "base_dir": "FASTCUT",
-
-    # Input video path (auto-set if None)
-    # Default: {base_dir}/temp_frames/gameplay.mp4
-    "video_path": None,
-
-    # ═══════════════════════════════════════════════════════════════
-    # 🤖 AI SETTINGS
-    # ═══════════════════════════════════════════════════════════════
-
-    # AI model (OpenRouter compatible)
-    "ai_model": "openai/gpt-4o-mini",
-
-    # Frame sampling rate (how many frames per second to sample)
-    # Higher = more detail but slower
-    # 2 = fast, 3 = balanced, 4-5 = detailed
-    "frames_per_sec": 3,
-
-    # Max grid images to send to AI
-    # 4 = fast, 6 = balanced, 10 = detailed
-    "max_grids": 6,
-
-    # Use Whisper for transcription?
-    # True = speech detection, False = faster
-    "use_whisper": True,
-
-    # AI creativity (0.0 = deterministic, 1.0 = creative)
-    # 0.5 = safe, 0.7 = balanced, 0.9 = wild
-    "ai_temperature": 0.7,
-
-    # AI max response length
-    "ai_max_tokens": 4000,
-
-    # ═══════════════════════════════════════════════════════════════
-    # 🎬 VIDEO OUTPUT SETTINGS
-    # ═══════════════════════════════════════════════════════════════
-
-    # Aspect ratio for output
-    # Options: "9:16" (Reels/TikTok), "1:1" (square), "4:5" (Instagram)
-    "aspect_ratio": "9:16",
-
-    # Video bitrate — quality vs file size
-    # "8000k"  = good,  small file
-    # "12000k" = better, medium
-    # "16000k" = great, large (DEFAULT)
-    # "20000k" = near-lossless, very large
-    "video_bitrate": "16000k",
-
-    # Audio bitrate
-    # "128k" = basic, "192k" = good, "256k" = great, "320k" = best
-    "audio_bitrate": "320k",
-
-    # CRF (Constant Rate Factor) — quality setting
-    # 0 = lossless (huge), 18 = near-lossless (DEFAULT), 23 = good, 28 = meh
-    # Lower = better quality + bigger file
-    "crf": 18,
-
-    # Encoding preset
-    # "ultrafast" (fast, low quality) → "slow" (better quality, slower)
-    # Options: ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow
-    "preset": "slow",
-
-    # Output FPS (None = use source FPS)
-    "output_fps": None,
-
-    # ═══════════════════════════════════════════════════════════════
-    # 🔊 AUDIO VOLUME CONTROL (0.0 to 1.0+)
-    # ═══════════════════════════════════════════════════════════════
-
-    # Background music volume
-    # 0.0 = mute, 0.25 = subtle (DEFAULT), 0.5 = prominent, 1.0 = loud
-    "music_volume": 0.25,
-
-    # SFX (sound effects) volume
-    # 0.0 = mute, 0.5 = subtle, 0.8 = clear (DEFAULT), 1.0 = loud
-    "sfx_volume": 0.8,
-
-    # Original video audio volume
-    # 0.0 = mute, 0.5 = quiet, 1.0 = normal (DEFAULT), 1.5 = boosted
-    "original_audio_volume": 1.0,
-
-    # ═══════════════════════════════════════════════════════════════
-    # 🎭 MEME CONTROL
-    # ═══════════════════════════════════════════════════════════════
-
-    # Minimum seconds a meme stays on screen
-    # 0.5 = very short, 1.5 = short (DEFAULT), 3.0 = long
-    "meme_min_duration": 1.5,
-
-    # Maximum seconds a meme stays on screen
-    # 2.0 = quick, 4.0 = normal (DEFAULT), 8.0 = very long
-    "meme_max_duration": 4.0,
-
-    # Meme scale (1.0 = original size)
-    # 0.8 = smaller, 1.0 = normal (DEFAULT), 1.2 = bigger
-    "meme_scale": 1.0,
-
-    # Allowed meme file formats
-    # Add/remove as needed
-    "meme_allowed_ext": [".mp4", ".mov", ".gif", ".webm"],
-
-    # ═══════════════════════════════════════════════════════════════
-    # ⚡ SPEED CONTROL
-    # ═══════════════════════════════════════════════════════════════
-
-    # Default playback speed for normal clips
-    # 1.0 = normal (DEFAULT), 1.2 = slightly faster, 0.8 = slower
-    "default_speed": 1.0,
-
-    # Maximum speedup allowed
-    # 2.0 = double speed (DEFAULT), 3.0 = 3x, 1.5 = max 1.5x
-    "max_speed": 2.0,
-
-    # Minimum slowdown allowed (for slow-mo)
-    # 0.5 = half speed (DEFAULT), 0.3 = very slow, 0.7 = slight slow-mo
-    "min_speed": 0.5,
-
-    # ═══════════════════════════════════════════════════════════════
-    # ✂️ CUT CONTROL
-    # ═══════════════════════════════════════════════════════════════
-
-    # Allow AI to cut boring parts?
-    # True = AI can remove boring (DEFAULT)
-    # False = keep full video (no cuts)
-    "allow_cuts": True,
-
-    # Preserve good content (don't over-cut)?
-    # True = preserve exciting moments (DEFAULT)
-    # False = aggressive editing
-    "preserve_good_content": True,
-
-    # Minimum clip duration (skip shorter clips)
-    # 0.5 = skip tiny clips (DEFAULT), 1.0 = skip short clips
-    "min_clip_duration": 0.5,
-
-    # Target output duration range (soft target)
-    # AI will try to hit this range
-    "target_min_sec": 30,
-    "target_max_sec": 90,
-
-    # ═══════════════════════════════════════════════════════════════
-    # 🎨 VISUAL EFFECTS
-    # ═══════════════════════════════════════════════════════════════
-
-    # Default text settings (if AI inserts text)
-    "text_font_size": 70,
-    "text_color": "white",
-    "text_stroke_color": "black",
-    "text_stroke_width": 3,
-    "text_font": "DejaVu-Sans-Bold",
-    "text_position": ("center", "top"),
-
-    # ═══════════════════════════════════════════════════════════════
-    # 🔑 API KEYS (from environment)
-    # ═══════════════════════════════════════════════════════════════
-
-    # These are read from GitHub Secrets / environment
-    # DO NOT put API keys here directly!
-    "api_key_names": [
-        "OPENROUTER_API_KEY",
-        "OPENROUTER_API_KEY_2",
-        "OPENROUTER_API_KEY_3",
-        "OPENROUTER_API_KEY_4",
-        "OPENROUTER_API_KEY_5",
-    ],
-
-    # Attempts per key (before moving to next)
-    "attempts_per_key": 2,
-
-    # ═══════════════════════════════════════════════════════════════
-    # 🖼️ GRID HISTORY (for analysis)
-    # ═══════════════════════════════════════════════════════════════
-
-    # Save grids to GitHub for analysis?
-    # True = save latest grids + debug logs (DEFAULT)
-    # False = delete everything after run
-    "save_grid_history": True,
-
-    # Auto-commit to git (in GitHub Actions)?
-    "auto_git_commit": True,
-}
-
-# ╔════════════════════════════════════════════════════════════════╗
-# ║                                                                ║
-# ║                  ✅ CONFIG ENDS HERE                           ║
-# ║                                                                ║
-# ║  Ab iske neeche sirf code hai, kuch edit karne ki zaroorat    ║
-# ║  nahi hai. Bas upar config change karo.                        ║
-# ║                                                                ║
-# ╚════════════════════════════════════════════════════════════════╝
-
-
 # ================================================================
-# DERIVED PATHS (auto-calculated from CONFIG)
+# CONFIG (sab kuch ek jagah)
 # ================================================================
-def get_paths():
-    base = CONFIG["base_dir"]
-    return {
-        "base":       base,
-        "input":      os.path.join(base, "input"),
-        "temp":       os.path.join(base, "temp_frames"),
-        "memes":      os.path.join(base, "memes"),
-        "sfx":        os.path.join(base, "sfx"),
-        "music":      os.path.join(base, "music"),
-        "grids":      os.path.join(base, "grids"),
-        "debug":      os.path.join(base, "debug"),
-        "output":     os.path.join(base, "output"),
-        "history":    os.path.join(base, "grid_history"),
-    }
+BASE_DIR    = "FASTCUT"
+INPUT_DIR   = os.path.join(BASE_DIR, "input")
+TEMP_DIR    = os.path.join(BASE_DIR, "temp_frames")
+MEME_DIR    = os.path.join(BASE_DIR, "memes")
+SFX_DIR     = os.path.join(BASE_DIR, "sfx")
+MUSIC_DIR   = os.path.join(BASE_DIR, "music")
+GRID_DIR    = os.path.join(BASE_DIR, "grids")
+DEBUG_DIR   = os.path.join(BASE_DIR, "debug")
+OUTPUT_DIR  = os.path.join(BASE_DIR, "output")
 
-PATHS = get_paths()
+OPENROUTER_MODEL = "openai/gpt-4o-mini"
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+
+# Audio + video settings
+ASPECT_RATIO = "9:16"
+VIDEO_BITRATE = "16000k"
+AUDIO_BITRATE = "320k"
+VIDEO_CRF = 18
+VIDEO_PRESET = "slow"
+
+# Audio volume
+MUSIC_VOLUME = 0.25
+SFX_VOLUME = 0.8
+ORIGINAL_AUDIO_VOLUME = 1.0
+
+# Meme
+MEME_MIN_DURATION = 1.5
+MEME_MAX_DURATION = 4.0
+MEME_ALLOWED_EXT = (".mp4", ".mov", ".gif", ".webm")
+
+# Speed
+DEFAULT_SPEED = 1.0
+MAX_SPEED = 2.0
+MIN_SPEED = 0.5
+
+# Cuts
+ALLOW_CUTS = True
+PRESERVE_GOOD = True
+MIN_CLIP_DURATION = 0.5
+TARGET_MIN_SEC = 30
+TARGET_MAX_SEC = 90
+
+# API
+API_KEY_NAMES = [
+    "OPENROUTER_API_KEY",
+    "OPENROUTER_API_KEY_2",
+    "OPENROUTER_API_KEY_3",
+    "OPENROUTER_API_KEY_4",
+    "OPENROUTER_API_KEY_5",
+]
+ATTEMPTS_PER_KEY = 2
 
 
 # ================================================================
@@ -280,52 +109,30 @@ def log_err(msg):   print(f"   ❌ {msg}")
 def log_info(msg):  print(f"   ℹ️  {msg}")
 
 
-def print_config():
-    """Print current config — verify karo kya use ho raha hai."""
-    log_step("🎛️  ACTIVE CONFIG")
-    groups = {
-        "📁 Paths":      ["base_dir", "video_path"],
-        "🤖 AI":         ["ai_model", "frames_per_sec", "max_grids",
-                          "use_whisper", "ai_temperature"],
-        "🎬 Video":      ["aspect_ratio", "video_bitrate", "audio_bitrate",
-                          "crf", "preset", "output_fps"],
-        "🔊 Audio":      ["music_volume", "sfx_volume", "original_audio_volume"],
-        "🎭 Meme":       ["meme_min_duration", "meme_max_duration", "meme_scale"],
-        "⚡ Speed":      ["default_speed", "max_speed", "min_speed"],
-        "✂️  Cuts":      ["allow_cuts", "preserve_good_content",
-                          "min_clip_duration", "target_min_sec", "target_max_sec"],
-    }
-    for group, keys in groups.items():
-        print(f"\n   {group}")
-        for k in keys:
-            print(f"      {k:28s} = {CONFIG[k]}")
-
-
 # ================================================================
 # FOLDERS
 # ================================================================
 def ensure_folders():
     folders = [
-        PATHS["base"], PATHS["input"], PATHS["temp"],
-        PATHS["grids"], PATHS["debug"], PATHS["output"], PATHS["history"],
-        PATHS["memes"],
-        os.path.join(PATHS["memes"], "shocked"),
-        os.path.join(PATHS["memes"], "funny"),
-        os.path.join(PATHS["memes"], "sad"),
-        os.path.join(PATHS["memes"], "victory"),
-        os.path.join(PATHS["memes"], "reaction"),
-        os.path.join(PATHS["memes"], "hype"),
-        os.path.join(PATHS["memes"], "fail"),
-        os.path.join(PATHS["memes"], "win"),
-        PATHS["sfx"],
-        os.path.join(PATHS["sfx"], "hype"),
-        os.path.join(PATHS["sfx"], "dramatic"),
-        os.path.join(PATHS["sfx"], "funny"),
-        os.path.join(PATHS["sfx"], "victory"),
-        os.path.join(PATHS["sfx"], "whoosh"),
-        os.path.join(PATHS["sfx"], "impact"),
-        os.path.join(PATHS["sfx"], "notification"),
-        PATHS["music"],
+        BASE_DIR, INPUT_DIR, TEMP_DIR, GRID_DIR, DEBUG_DIR, OUTPUT_DIR,
+        MEME_DIR,
+        os.path.join(MEME_DIR, "shocked"),
+        os.path.join(MEME_DIR, "funny"),
+        os.path.join(MEME_DIR, "sad"),
+        os.path.join(MEME_DIR, "victory"),
+        os.path.join(MEME_DIR, "reaction"),
+        os.path.join(MEME_DIR, "hype"),
+        os.path.join(MEME_DIR, "fail"),
+        os.path.join(MEME_DIR, "win"),
+        SFX_DIR,
+        os.path.join(SFX_DIR, "hype"),
+        os.path.join(SFX_DIR, "dramatic"),
+        os.path.join(SFX_DIR, "funny"),
+        os.path.join(SFX_DIR, "victory"),
+        os.path.join(SFX_DIR, "whoosh"),
+        os.path.join(SFX_DIR, "impact"),
+        os.path.join(SFX_DIR, "notification"),
+        MUSIC_DIR,
     ]
 
     created = 0
@@ -339,9 +146,8 @@ def ensure_folders():
     else:
         log_ok(f"All {len(folders)} folders ready")
 
-    # Drop .gitkeep
     for f in folders:
-        if f == PATHS["base"]:
+        if f == BASE_DIR:
             continue
         gitkeep = os.path.join(f, ".gitkeep")
         if not os.path.exists(gitkeep):
@@ -353,21 +159,19 @@ def ensure_folders():
 
 
 # ================================================================
-# GIT COMMIT
+# GIT COMMIT (with pull --rebase to avoid rejection)
 # ================================================================
 def git_commit_folders():
-    if not CONFIG["auto_git_commit"]:
-        return
     if not os.getenv("GITHUB_ACTIONS"):
         return
 
-    log_info("Committing FASTCUT structure to git...")
+    log_info("Committing FASTCUT structure...")
     try:
         subprocess.run(["git", "config", "user.email", "actions@github.com"],
                        check=True, timeout=10)
         subprocess.run(["git", "config", "user.name", "github-actions[bot]"],
                        check=True, timeout=10)
-        subprocess.run(["git", "add", f"{PATHS['base']}/"], check=True, timeout=30)
+        subprocess.run(["git", "add", f"{BASE_DIR}/"], check=True, timeout=30)
 
         diff = subprocess.run(["git", "diff", "--cached", "--quiet"], timeout=30)
         if diff.returncode == 0:
@@ -377,12 +181,23 @@ def git_commit_folders():
         subprocess.run(["git", "commit", "-m",
                         "📁 Auto: Update FASTCUT structure [skip ci]"],
                        check=True, timeout=30)
+
+        # Pull before push
+        pull = subprocess.run(
+            ["git", "pull", "--rebase", "--no-edit", "origin", "main"],
+            capture_output=True, text=True, timeout=60
+        )
+        if pull.returncode == 0:
+            log_ok("Pulled latest from remote")
+        else:
+            log_warn(f"Pull warning: {pull.stderr[:150]}")
+
         push = subprocess.run(["git", "push"], capture_output=True,
                               text=True, timeout=60)
         if push.returncode == 0:
             log_ok("Structure pushed ✅")
         else:
-            log_warn(f"Push failed: {push.stderr[:200]}")
+            log_warn(f"Push failed: {push.stderr[:150]}")
     except Exception as e:
         log_warn(f"Git error: {e}")
 
@@ -406,9 +221,8 @@ def get_video_info(video_path):
 # ================================================================
 # FRAME INDEX
 # ================================================================
-def create_frame_index(video_path):
+def create_frame_index(video_path, fps=3):
     info = get_video_info(video_path)
-    fps = CONFIG["frames_per_sec"]
     total = int(info["duration"] * fps)
     frames = [{"idx": i, "t": round(i / fps, 3)} for i in range(total)]
     return {
@@ -421,14 +235,12 @@ def create_frame_index(video_path):
 
 
 # ================================================================
-# GRIDS
+# GRIDS (with detailed logging)
 # ================================================================
-def create_grids(video_path, frame_index):
+def create_grids(video_path, frame_index, output_dir, max_images=6):
     total_frames = frame_index["total_frames"]
-    max_images = CONFIG["max_grids"]
-    output_dir = PATHS["grids"]
-
     if total_frames == 0:
+        log_warn("No frames to grid")
         return []
 
     num_grids = min(max_images, math.ceil(total_frames / 45))
@@ -437,7 +249,17 @@ def create_grids(video_path, frame_index):
     rows = math.ceil(frames_per_grid / cols)
     thumb_size = max(150, min(2000 // cols, 300))
 
-    log_info(f"Grids: {num_grids} | Frames/grid: {frames_per_grid} | Layout: {cols}x{rows}")
+    # 🔍 GRID PLAN LOGGING
+    log_info("=" * 50)
+    log_info("📐 GRID GENERATION PLAN")
+    log_info("=" * 50)
+    log_info(f"  Total frames:       {total_frames}")
+    log_info(f"  Number of grids:    {num_grids}")
+    log_info(f"  Frames per grid:    {frames_per_grid}")
+    log_info(f"  Grid layout:        {cols} cols × {rows} rows")
+    log_info(f"  Thumb size:         {thumb_size}px")
+    log_info(f"  Output dir:         {output_dir}")
+    log_info("=" * 50)
 
     cap = cv2.VideoCapture(video_path)
     paths = []
@@ -446,6 +268,8 @@ def create_grids(video_path, frame_index):
         start_idx = g * frames_per_grid
         end_idx = min(start_idx + frames_per_grid, total_frames)
         frames = []
+
+        log_info(f"  Grid #{g+1}: frames {start_idx}-{end_idx}")
 
         for i in range(start_idx, end_idx):
             f = frame_index["frames"][i]
@@ -456,7 +280,12 @@ def create_grids(video_path, frame_index):
 
             h, w = frame.shape[:2]
             thumb_h = int(thumb_size * (h / w))
-            frame = cv2.resize(frame, (thumb_size, thumb_h))
+
+            # 🔧 FIX: Force even dimensions
+            tw = thumb_size if thumb_size % 2 == 0 else thumb_size - 1
+            th = thumb_h if thumb_h % 2 == 0 else thumb_h - 1
+
+            frame = cv2.resize(frame, (tw, th))
             img = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
             draw = ImageDraw.Draw(img)
 
@@ -477,6 +306,7 @@ def create_grids(video_path, frame_index):
             frames.append(np.array(img))
 
         if not frames:
+            log_warn(f"  Grid #{g+1} skipped (no frames)")
             continue
 
         th, tw = frames[0].shape[:2]
@@ -489,9 +319,20 @@ def create_grids(video_path, frame_index):
         out = os.path.join(output_dir, f"grid_{g + 1}.jpg")
         Image.fromarray(grid).save(out, quality=92)
         paths.append(out)
-        log_ok(f"{os.path.basename(out)} ({grid.shape[1]}x{grid.shape[0]}px)")
+
+        # 🔍 FILE INFO LOGGING
+        size_kb = os.path.getsize(out) / 1024
+        log_ok(f"  ✅ Saved: {os.path.basename(out)} "
+               f"({grid.shape[1]}x{grid.shape[0]}px, {size_kb:.0f} KB)")
 
     cap.release()
+
+    log_info("=" * 50)
+    log_ok(f"📸 TOTAL GRIDS CREATED: {len(paths)}")
+    for p in paths:
+        log_info(f"     → {p}")
+    log_info("=" * 50)
+
     return paths
 
 
@@ -509,8 +350,8 @@ def get_whisper_model():
     return _WHISPER_MODEL
 
 
-def get_transcript(video_path):
-    if not CONFIG["use_whisper"]:
+def get_transcript(video_path, use_whisper=True):
+    if not use_whisper:
         log_info("Whisper skipped")
         return "No transcript"
     try:
@@ -520,6 +361,7 @@ def get_transcript(video_path):
         lines = [f"[{s.start:6.1f}s] {s.text.strip()}"
                  for s in segments if s.text.strip()]
         if not lines:
+            log_warn("No speech detected")
             return "No speech"
         log_ok(f"{len(lines)} segments (lang: {info.language})")
         return "\n".join(lines)
@@ -544,12 +386,14 @@ def get_spikes(video_path):
             if len(chunk) > 0:
                 per_sec.append(float(chunk.max()))
         if not per_sec:
+            log_warn("No audio frames")
             return "No spikes"
         threshold = float(np.percentile(per_sec, 80))
         spikes = [f"[{i:6.1f}s] RMS={v:.3f}" for i, v in enumerate(per_sec) if v > threshold]
         if not spikes:
+            log_warn("No spikes above threshold")
             return "No spikes"
-        log_ok(f"{len(spikes)} spikes")
+        log_ok(f"{len(spikes)} spikes detected")
         return "\n".join(spikes)
     except Exception as e:
         log_err(f"Spike error: {e}")
@@ -560,28 +404,28 @@ def get_spikes(video_path):
 # MOODS
 # ================================================================
 def get_available_moods():
-    exts = tuple(CONFIG["meme_allowed_ext"])
     memes, sfx, music = {}, {}, []
 
-    if os.path.exists(PATHS["memes"]):
-        for mood in os.listdir(PATHS["memes"]):
-            p = os.path.join(PATHS["memes"], mood)
+    if os.path.exists(MEME_DIR):
+        for mood in os.listdir(MEME_DIR):
+            p = os.path.join(MEME_DIR, mood)
             if os.path.isdir(p):
-                files = [f for f in os.listdir(p) if f.lower().endswith(exts)]
+                files = [f for f in os.listdir(p)
+                         if f.lower().endswith(MEME_ALLOWED_EXT)]
                 if files:
                     memes[mood] = files
 
-    if os.path.exists(PATHS["sfx"]):
-        for mood in os.listdir(PATHS["sfx"]):
-            p = os.path.join(PATHS["sfx"], mood)
+    if os.path.exists(SFX_DIR):
+        for mood in os.listdir(SFX_DIR):
+            p = os.path.join(SFX_DIR, mood)
             if os.path.isdir(p):
                 files = [f for f in os.listdir(p)
                          if f.lower().endswith(('.mp3', '.wav', '.m4a', '.aac'))]
                 if files:
                     sfx[mood] = files
 
-    if os.path.exists(PATHS["music"]):
-        music = [f for f in os.listdir(PATHS["music"])
+    if os.path.exists(MUSIC_DIR):
+        music = [f for f in os.listdir(MUSIC_DIR)
                  if f.lower().endswith(('.mp3', '.wav', '.m4a', '.aac'))]
 
     return memes, sfx, music
@@ -595,16 +439,15 @@ def build_prompt(frame_index, grid_count, transcript, spikes, memes, sfx, music)
     frame_list = "\n".join(frame_lines)
     source_dur = frame_index['video_duration']
 
-    allow_cuts = CONFIG["allow_cuts"]
-    preserve = CONFIG["preserve_good_content"]
-
-    cut_rule = "3. Cut ONLY boring parts (menus, loading, idle, walking). KEEP all action." if allow_cuts else "3. DO NOT cut anything — keep FULL video"
-    preserve_rule = "KEEP all exciting content at 1.0x speed. Preserve good moments." if preserve else "Aggressive editing allowed"
+    cut_rule = ("CUT ONLY truly boring: loading, menus, idle standing, walking aimlessly. "
+                "KEEP ALL action: fights, kills, reactions, clutch moments."
+                if ALLOW_CUTS else
+                "DO NOT cut anything — keep FULL video")
 
     prompt = f"""You are a PROFESSIONAL viral gaming editor.
 
 VIDEO: {source_dur:.1f}s | Sampling: {frame_index['fps_sampling']}fps | Frames: {frame_index['total_frames']}
-TARGET OUTPUT: {CONFIG['target_min_sec']}-{CONFIG['target_max_sec']} seconds (soft target)
+TARGET: {TARGET_MIN_SEC}-{TARGET_MAX_SEC} seconds (soft)
 
 FRAME INDEX (use ONLY these):
 {frame_list}
@@ -617,7 +460,7 @@ TRANSCRIPT:
 AUDIO SPIKES:
 {spikes}
 
-AVAILABLE ASSETS:
+AVAILABLE:
 - Meme moods: {list(memes.keys())}
 - SFX moods: {list(sfx.keys())}
 - Music: {music}
@@ -625,22 +468,24 @@ AVAILABLE ASSETS:
 RULES:
 1. USE FRAME NUMBERS (not timestamps)
 2. Hook in first 2-3 sec
-{cut_rule}
-4. Speed range: {CONFIG['min_speed']}x to {CONFIG['max_speed']}x
-5. {preserve_rule}
-6. aspect_ratio MUST be: "{CONFIG['aspect_ratio']}"
+3. {cut_rule}
+4. TARGET: 80-100% of source. If source=42s, output=34-42s.
+5. DO NOT over-cut. Better longer + exciting than short.
+6. Speed: normal=1.0x (most clips), hype=1.3x, clutch=0.7x
 7. Every edit MUST have a "reason"
+8. aspect_ratio MUST be: "{ASPECT_RATIO}"
 
-Return ONLY valid JSON:
+Return ONLY valid JSON (no markdown):
 {{
   "content_quality": "good|mixed|boring",
   "reasoning": "One sentence",
-  "target_duration": <number between {CONFIG['target_min_sec']} and {CONFIG['target_max_sec']}>,
-  "aspect_ratio": "{CONFIG['aspect_ratio']}",
+  "target_duration": <number between {TARGET_MIN_SEC} and {TARGET_MAX_SEC}>,
+  "aspect_ratio": "{ASPECT_RATIO}",
   "bg_music": "<filename from AVAILABLE music>",
+  "music_volume": {MUSIC_VOLUME},
   "edits": [
-    {{"start_frame": 0, "end_frame": 15, "remove": true, "reason": "Loading"}},
-    {{"start_frame": 15, "end_frame": 120, "speed": 1.0, "reason": "Keep full gameplay"}},
+    {{"start_frame": 0, "end_frame": 6, "remove": true, "reason": "Loading"}},
+    {{"start_frame": 6, "end_frame": 120, "speed": 1.0, "reason": "Keep full gameplay"}},
     {{"insert_meme": "auto", "meme_mood": "shocked", "reason": "Reaction"}}
   ]
 }}
@@ -686,7 +531,7 @@ def extract_json(text):
 # ================================================================
 def get_api_keys():
     keys = []
-    for name in CONFIG["api_key_names"]:
+    for name in API_KEY_NAMES:
         val = os.getenv(name, "").strip()
         if val:
             keys.append((name, val))
@@ -711,23 +556,24 @@ def ai_analyze(frame_index, grid_paths, transcript, spikes, memes, sfx, music):
             "type": "image_url",
             "image_url": {"url": f"data:image/jpeg;base64,{b64}"}
         })
+    log_info(f"Prepared {len(images)} grid images for AI")
 
     prompt = build_prompt(frame_index, len(grid_paths),
                           transcript, spikes, memes, sfx, music)
+    log_info(f"Prompt length: {len(prompt)} chars")
 
     last_error = None
     total_attempts = 0
-    attempts_per_key = CONFIG["attempts_per_key"]
 
     for key_idx, (key_name, key_val) in enumerate(api_keys, 1):
-        for attempt in range(1, attempts_per_key + 1):
+        for attempt in range(1, ATTEMPTS_PER_KEY + 1):
             total_attempts += 1
-            print(f"\n   🔄 Attempt #{total_attempts}: Key #{key_idx} ({key_name}) try {attempt}/{attempts_per_key}")
+            print(f"\n   🔄 Attempt #{total_attempts}: Key #{key_idx} ({key_name}) try {attempt}/{ATTEMPTS_PER_KEY}")
 
             try:
                 client = OpenAI(
                     api_key=key_val,
-                    base_url="https://openrouter.ai/api/v1",
+                    base_url=OPENROUTER_BASE_URL,
                     default_headers={
                         "HTTP-Referer": "https://github.com/Prembty12/premx-editor",
                         "X-Title": "Auto Video Editor",
@@ -736,13 +582,13 @@ def ai_analyze(frame_index, grid_paths, transcript, spikes, memes, sfx, music):
 
                 t_start = time.time()
                 response = client.chat.completions.create(
-                    model=CONFIG["ai_model"],
+                    model=OPENROUTER_MODEL,
                     messages=[{
                         "role": "user",
                         "content": [{"type": "text", "text": prompt}] + images
                     }],
-                    max_tokens=CONFIG["ai_max_tokens"],
-                    temperature=CONFIG["ai_temperature"]
+                    max_tokens=4000,
+                    temperature=0.7
                 )
                 elapsed = time.time() - t_start
 
@@ -755,9 +601,10 @@ def ai_analyze(frame_index, grid_paths, transcript, spikes, memes, sfx, music):
                 result = extract_json(text)
 
                 if result.get("aspect_ratio") not in ("9:16", "1:1", "4:5"):
-                    result["aspect_ratio"] = CONFIG["aspect_ratio"]
+                    result["aspect_ratio"] = ASPECT_RATIO
 
                 log_ok(f"Quality: {result.get('content_quality', '?')}")
+                log_ok(f"Reasoning: {result.get('reasoning', '-')}")
                 log_ok(f"Target: {result.get('target_duration')}s")
                 log_ok(f"Edits: {len(result.get('edits', []))}")
                 return result
@@ -784,6 +631,7 @@ def ai_analyze(frame_index, grid_paths, transcript, spikes, memes, sfx, music):
 # VERIFY
 # ================================================================
 def verify_and_convert(ai_json, frame_index):
+    log_info("Verifying AI output...")
     fps_sampling = frame_index["fps_sampling"]
     total_frames = frame_index["total_frames"]
 
@@ -793,7 +641,6 @@ def verify_and_convert(ai_json, frame_index):
 
     valid = set(range(total_frames))
     verified = []
-    min_dur = CONFIG["min_clip_duration"]
 
     for edit in ai_json.get("edits", []):
         if "insert_meme" in edit:
@@ -817,7 +664,7 @@ def verify_and_convert(ai_json, frame_index):
             edit["start"] = round(sf / fps_sampling, 3)
             edit["end"] = round(ef / fps_sampling, 3)
 
-            if not edit.get("remove") and (edit["end"] - edit["start"]) < min_dur:
+            if not edit.get("remove") and (edit["end"] - edit["start"]) < MIN_CLIP_DURATION:
                 log_warn(f"Skipping tiny clip: {edit['start']:.2f}-{edit['end']:.2f}s")
                 continue
 
@@ -834,7 +681,7 @@ def verify_and_convert(ai_json, frame_index):
 def save_debug_log(ai_json, frame_index):
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-    with open(os.path.join(PATHS["debug"], f"edits_{ts}.json"), "w") as f:
+    with open(os.path.join(DEBUG_DIR, f"edits_{ts}.json"), "w") as f:
         json.dump(ai_json, f, indent=2)
 
     lines = ["=" * 70, f"AI DECISIONS - {ts}", "=" * 70]
@@ -853,7 +700,7 @@ def save_debug_log(ai_json, frame_index):
             lines.append(f"  KEEP | {edit['start_frame']}-{edit['end_frame']} @ {edit.get('speed', 1.0)}x")
         lines.append(f"  Reason: {edit.get('reason', '-')}")
 
-    with open(os.path.join(PATHS["debug"], f"debug_{ts}.txt"), "w") as f:
+    with open(os.path.join(DEBUG_DIR, f"debug_{ts}.txt"), "w") as f:
         f.write("\n".join(lines))
 
     print("\n" + "\n".join(lines))
@@ -864,30 +711,28 @@ def save_debug_log(ai_json, frame_index):
 # PICKERS
 # ================================================================
 def pick_meme(mood):
-    exts = tuple(CONFIG["meme_allowed_ext"])
-    mood_dir = os.path.join(PATHS["memes"], mood)
-
+    mood_dir = os.path.join(MEME_DIR, mood)
     if os.path.exists(mood_dir):
-        files = [f for f in os.listdir(mood_dir) if f.lower().endswith(exts)]
+        files = [f for f in os.listdir(mood_dir) if f.lower().endswith(MEME_ALLOWED_EXT)]
         if files:
             return os.path.join(mood_dir, random.choice(files))
 
-    for root, dirs, files in os.walk(PATHS["memes"]):
-        vids = [f for f in files if f.lower().endswith(exts)]
+    for root, dirs, files in os.walk(MEME_DIR):
+        vids = [f for f in files if f.lower().endswith(MEME_ALLOWED_EXT)]
         if vids:
             return os.path.join(root, random.choice(vids))
     return None
 
 
 def pick_sfx(mood):
-    mood_dir = os.path.join(PATHS["sfx"], mood)
+    mood_dir = os.path.join(SFX_DIR, mood)
     if os.path.exists(mood_dir):
         files = [f for f in os.listdir(mood_dir)
                  if f.lower().endswith(('.mp3', '.wav', '.m4a', '.aac'))]
         if files:
             return os.path.join(mood_dir, random.choice(files))
 
-    for root, dirs, files in os.walk(PATHS["sfx"]):
+    for root, dirs, files in os.walk(SFX_DIR):
         sfx = [f for f in files if f.lower().endswith(('.mp3', '.wav', '.m4a', '.aac'))]
         if sfx:
             return os.path.join(root, random.choice(sfx))
@@ -895,25 +740,38 @@ def pick_sfx(mood):
 
 
 # ================================================================
-# ASPECT + FILTER
+# ASPECT + FILTER (FIXED: even dimensions)
 # ================================================================
-def apply_aspect(clip, ratio):
+def apply_aspect(clip, ratio="9:16"):
     w, h = clip.size
+
+    def make_even(n):
+        n = int(n)
+        return n if n % 2 == 0 else n - 1
+
     if ratio == "9:16":
         tw = h * (9 / 16)
         if tw <= w:
-            return clip.fx(vfx.crop, x_center=w / 2, y_center=h / 2, width=tw, height=h)
+            return clip.fx(vfx.crop, x_center=w / 2, y_center=h / 2,
+                          width=make_even(tw), height=make_even(h))
         th = w * (16 / 9)
-        return clip.fx(vfx.crop, x_center=w / 2, y_center=h / 2, width=w, height=th)
+        return clip.fx(vfx.crop, x_center=w / 2, y_center=h / 2,
+                      width=make_even(w), height=make_even(th))
+
     elif ratio == "1:1":
-        m = min(w, h)
-        return clip.fx(vfx.crop, x_center=w / 2, y_center=h / 2, width=m, height=m)
+        m = make_even(min(w, h))
+        return clip.fx(vfx.crop, x_center=w / 2, y_center=h / 2,
+                      width=m, height=m)
+
     elif ratio == "4:5":
         tw = h * (4 / 5)
         if tw <= w:
-            return clip.fx(vfx.crop, x_center=w / 2, y_center=h / 2, width=tw, height=h)
+            return clip.fx(vfx.crop, x_center=w / 2, y_center=h / 2,
+                          width=make_even(tw), height=make_even(h))
         th = w * (5 / 4)
-        return clip.fx(vfx.crop, x_center=w / 2, y_center=h / 2, width=w, height=th)
+        return clip.fx(vfx.crop, x_center=w / 2, y_center=h / 2,
+                      width=make_even(w), height=make_even(th))
+
     return clip
 
 
@@ -941,7 +799,7 @@ def build_reel(video_path, ai_json, output_path):
     main = VideoFileClip(video_path)
     source_fps = main.fps if main.fps else 30
     source_duration = float(main.duration)
-    aspect = ai_json.get("aspect_ratio", CONFIG["aspect_ratio"])
+    aspect = ai_json.get("aspect_ratio", ASPECT_RATIO)
 
     clips = []
     sfx_data = []
@@ -960,18 +818,13 @@ def build_reel(video_path, ai_json, output_path):
                     meme = VideoFileClip(meme_path)
                     original_dur = meme.duration
 
-                    min_d = CONFIG["meme_min_duration"]
-                    max_d = CONFIG["meme_max_duration"]
-                    target_d = min(max(original_dur, min_d), max_d)
+                    target_d = min(max(original_dur, MEME_MIN_DURATION), MEME_MAX_DURATION)
 
                     if original_dur > target_d:
                         meme = meme.subclip(0, target_d)
-                    elif original_dur < min_d:
-                        loops = int(min_d / original_dur) + 1
-                        meme = concatenate_videoclips([meme] * loops).subclip(0, min_d)
-
-                    if CONFIG["meme_scale"] != 1.0:
-                        meme = meme.fx(vfx.resize, CONFIG["meme_scale"])
+                    elif original_dur < MEME_MIN_DURATION:
+                        loops = int(MEME_MIN_DURATION / original_dur) + 1
+                        meme = concatenate_videoclips([meme] * loops).subclip(0, MEME_MIN_DURATION)
 
                     meme = apply_aspect(meme, aspect)
                     clips.append(meme)
@@ -1000,8 +853,8 @@ def build_reel(video_path, ai_json, output_path):
 
             seg = main.subclip(start, end)
 
-            speed = edit.get("speed", CONFIG["default_speed"])
-            speed = max(CONFIG["min_speed"], min(CONFIG["max_speed"], speed))
+            speed = edit.get("speed", DEFAULT_SPEED)
+            speed = max(MIN_SPEED, min(MAX_SPEED, speed))
             if speed != 1.0:
                 seg = seg.fx(vfx.speedx, speed)
 
@@ -1020,14 +873,10 @@ def build_reel(video_path, ai_json, output_path):
             if "text" in edit:
                 try:
                     txt = TextClip(
-                        edit["text"],
-                        fontsize=CONFIG["text_font_size"],
-                        color=CONFIG["text_color"],
-                        stroke_color=CONFIG["text_stroke_color"],
-                        stroke_width=CONFIG["text_stroke_width"],
-                        font=CONFIG["text_font"],
-                        method="caption"
-                    ).set_position(CONFIG["text_position"]).set_duration(seg.duration)
+                        edit["text"], fontsize=70, color="white",
+                        stroke_color="black", stroke_width=3,
+                        font="DejaVu-Sans-Bold", method="caption"
+                    ).set_position(("center", "top")).set_duration(seg.duration)
                     seg = CompositeVideoClip([seg, txt])
                 except Exception as e:
                     log_warn(f"Text error: {e}")
@@ -1055,17 +904,15 @@ def build_reel(video_path, ai_json, output_path):
     log_info(f"Video duration locked: {video_duration:.2f}s")
 
     # ============================================================
-    # AUDIO MIX (FULL CONTROL)
+    # AUDIO MIX
     # ============================================================
     audio_tracks = []
 
-    # 1. Original audio
     if final.audio:
-        orig = final.audio.volumex(CONFIG["original_audio_volume"])
+        orig = final.audio.volumex(ORIGINAL_AUDIO_VOLUME)
         audio_tracks.append(orig)
-        log_info(f"Original audio: {CONFIG['original_audio_volume']}x")
+        log_info(f"Original audio: {ORIGINAL_AUDIO_VOLUME}x")
 
-    # 2. SFX
     for start_t, sfx_path in sfx_data:
         try:
             sfx = AudioFileClip(sfx_path)
@@ -1074,24 +921,23 @@ def build_reel(video_path, ai_json, output_path):
                 continue
             if sfx.duration > remaining:
                 sfx = sfx.subclip(0, remaining)
-            sfx = sfx.set_start(start_t).volumex(CONFIG["sfx_volume"])
+            sfx = sfx.set_start(start_t).volumex(SFX_VOLUME)
             audio_tracks.append(sfx)
-            log_info(f"SFX @ {start_t:.2f}s: {CONFIG['sfx_volume']}x")
+            log_info(f"SFX @ {start_t:.2f}s: {SFX_VOLUME}x")
         except Exception as e:
             log_warn(f"SFX error: {e}")
 
-    # 3. Music
     if "bg_music" in ai_json:
-        mpath = os.path.join(PATHS["music"], ai_json["bg_music"])
+        mpath = os.path.join(MUSIC_DIR, ai_json["bg_music"])
         if os.path.exists(mpath):
             try:
-                music = AudioFileClip(mpath).volumex(CONFIG["music_volume"])
+                music = AudioFileClip(mpath).volumex(MUSIC_VOLUME)
                 if music.duration > video_duration:
                     music = music.subclip(0, video_duration)
                 else:
                     music = music.fx(vfx.loop, duration=video_duration)
                 audio_tracks.append(music)
-                log_ok(f"Music: {ai_json['bg_music']} @ {CONFIG['music_volume']}x")
+                log_ok(f"Music: {ai_json['bg_music']} @ {MUSIC_VOLUME}x")
             except Exception as e:
                 log_warn(f"Music error: {e}")
 
@@ -1104,24 +950,38 @@ def build_reel(video_path, ai_json, output_path):
     final = final.set_duration(video_duration)
 
     # ============================================================
+    # 🔧 FIX: Force even dimensions before write
+    # ============================================================
+    try:
+        w, h = final.size
+        w_even = w if w % 2 == 0 else w - 1
+        h_even = h if h % 2 == 0 else h - 1
+        if w != w_even or h != h_even:
+            log_warn(f"Resizing {w}x{h} → {w_even}x{h_even} (H.264 needs even)")
+            final = final.resize((w_even, h_even))
+        else:
+            log_info(f"Dimensions OK: {w}x{h}")
+    except Exception as e:
+        log_warn(f"Even-check error: {e}")
+
+    # ============================================================
     # WRITE
     # ============================================================
-    output_fps = CONFIG["output_fps"] if CONFIG["output_fps"] else source_fps
+    output_fps = source_fps
 
-    log_info(f"Writing: {CONFIG['video_bitrate']}, CRF={CONFIG['crf']}, "
-             f"preset={CONFIG['preset']}, fps={output_fps}")
+    log_info(f"Writing: {VIDEO_BITRATE}, CRF={VIDEO_CRF}, preset={VIDEO_PRESET}, fps={output_fps}")
 
     final.write_videofile(
         output_path,
         codec="libx264",
         audio_codec="aac",
-        audio_bitrate=CONFIG["audio_bitrate"],
-        bitrate=CONFIG["video_bitrate"],
+        audio_bitrate=AUDIO_BITRATE,
+        bitrate=VIDEO_BITRATE,
         fps=output_fps,
-        preset=CONFIG["preset"],
+        preset=VIDEO_PRESET,
         threads=4,
         ffmpeg_params=[
-            "-crf", str(CONFIG["crf"]),
+            "-crf", str(VIDEO_CRF),
             "-pix_fmt", "yuv420p",
             "-movflags", "+faststart"
         ],
@@ -1137,23 +997,26 @@ def build_reel(video_path, ai_json, output_path):
 # MAIN
 # ================================================================
 def main():
+    parser = argparse.ArgumentParser(description="Auto Video Editor")
+    parser.add_argument("--video", default=os.path.join(TEMP_DIR, "gameplay.mp4"))
+    parser.add_argument("--fps", type=int, default=3)
+    parser.add_argument("--grids", type=int, default=6)
+    parser.add_argument("--whisper", default="true")
+    args = parser.parse_args()
+
     print("\n")
     print("╔" + "═" * 68 + "╗")
-    print("║" + " " * 12 + "🎬 AUTO EDITOR — FULL CONTROL" + " " * 26 + "║")
+    print("║" + " " * 12 + "🎬 AUTO EDITOR - Smart Content Mode" + " " * 22 + "║")
     print("╚" + "═" * 68 + "╝")
-
-    # Auto-set video path
-    if not CONFIG["video_path"]:
-        CONFIG["video_path"] = os.path.join(PATHS["temp"], "gameplay.mp4")
 
     ensure_folders()
     git_commit_folders()
 
-    print_config()
+    log_info(f"Video: {args.video}")
+    log_info(f"FPS: {args.fps} | Grids: {args.grids} | Whisper: {args.whisper}")
 
-    video_path = CONFIG["video_path"]
-    if not os.path.exists(video_path):
-        log_err(f"Video not found: {video_path}")
+    if not os.path.exists(args.video):
+        log_err(f"Video not found: {args.video}")
         sys.exit(1)
 
     api_keys = get_api_keys()
@@ -1162,28 +1025,32 @@ def main():
         sys.exit(1)
     log_info(f"API keys: {len(api_keys)}")
 
+    use_whisper = str(args.whisper).lower() == "true"
+
     # STEP 1
     log_step("STEP 1: Video Info")
-    info = get_video_info(video_path)
-    log_ok(f"Duration: {info['duration']:.1f}s | Res: {info['width']}x{info['height']} | FPS: {info['fps']:.2f}")
+    info = get_video_info(args.video)
+    log_ok(f"Duration: {info['duration']:.1f}s")
+    log_ok(f"Resolution: {info['width']}x{info['height']}")
+    log_ok(f"FPS: {info['fps']:.2f}")
 
     # STEP 2
     log_step("STEP 2: Frame Index")
-    frame_index = create_frame_index(video_path)
+    frame_index = create_frame_index(args.video, args.fps)
     log_ok(f"Total frames: {frame_index['total_frames']}")
 
     # STEP 3
-    log_step("STEP 3: Grids")
-    grids = create_grids(video_path, frame_index)
+    log_step("STEP 3: Grid Generation")
+    grids = create_grids(args.video, frame_index, GRID_DIR, args.grids)
     log_ok(f"{len(grids)} grids created")
 
     # STEP 4
     log_step("STEP 4: Transcript")
-    transcript = get_transcript(video_path)
+    transcript = get_transcript(args.video, use_whisper)
 
     # STEP 5
     log_step("STEP 5: Spike Detection")
-    spikes = get_spikes(video_path)
+    spikes = get_spikes(args.video)
 
     # STEP 6
     log_step("STEP 6: Assets Scan")
@@ -1206,8 +1073,8 @@ def main():
 
     # STEP 10
     log_step("STEP 10: Build Reel")
-    output = os.path.join(PATHS["output"], "final_reel.mp4")
-    build_reel(video_path, ai_json, output)
+    output = os.path.join(OUTPUT_DIR, "final_reel.mp4")
+    build_reel(args.video, ai_json, output)
 
     log_step("🎉 DONE!")
 
