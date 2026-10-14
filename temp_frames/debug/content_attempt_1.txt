@@ -1,1 +1,1 @@
-{"clip_duration": 42, "reason": "Intense red-eyed cinematic fight sequence", "start_time": 0, "status": "APPROVE", "title": "Red Eyes Smile Cooked Him Fast 🔥"}
+{"clip_duration": 39, "reason": "Dramatic prison execution cinematic sequence", "start_time": 15, "status": "APPROVE", "title": "Prison Cell Betrayal 1 Shot Execution 👀🔥"}
