@@ -26,13 +26,15 @@ permissions:
 jobs:
   auto-edit:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
-      - name: 📥 Checkout (with write access)
+      - name: 📥 Checkout (fast — only last commit)
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0
+          fetch-depth: 1
+          lfs: false
 
       - name: 🐍 Setup Python
         uses: actions/setup-python@v5
@@ -58,7 +60,7 @@ jobs:
         run: |
           mkdir -p FASTCUT/temp_frames
           VIDEO_URL="${{ github.event.inputs.video_url }}"
-          curl -L -o FASTCUT/temp_frames/gameplay.mp4 "$VIDEO_URL"
+          curl -L --retry 3 --retry-delay 5 -o FASTCUT/temp_frames/gameplay.mp4 "$VIDEO_URL"
           if [ -f "FASTCUT/temp_frames/gameplay.mp4" ]; then
             echo "✅ Video: $(ls -lh FASTCUT/temp_frames/gameplay.mp4 | awk '{print $5}')"
           else
