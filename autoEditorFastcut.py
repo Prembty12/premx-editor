@@ -2,15 +2,11 @@
 ================================================================
 AUTO EDITOR - OpenRouter Multi-Key Version (PRODUCTION FINAL)
 ================================================================
-- 5 API keys with auto-retry (2 attempts each = 10 total)
-- Smart prompt: preserves good content, only cuts boring
-- High quality output (16 Mbps, CRF 18, near-lossless)
-- Duration lock — no freeze
-- Detailed terminal debugging (JSON, retry, API)
-- MoviePy 1.0.3 compatible
-- Whisper cached
-- All folders inside FASTCUT/
-- Auto git-commit FASTCUT structure (in GitHub Actions)
+- Full manual control (all settings at top)
+- 5 API keys with auto-retry
+- Smart prompt: preserves good content
+- High quality output (16 Mbps default)
+- Duration lock (no freeze)
 ================================================================
 """
 
@@ -40,41 +36,233 @@ import moviepy.video.fx.all as vfx
 from openai import OpenAI
 
 
-# ================================================================
-# CONFIG
-# ================================================================
-OPENROUTER_MODEL = "openai/gpt-4o-mini"
-OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+# ╔════════════════════════════════════════════════════════════════╗
+# ║                                                                ║
+# ║              🎛️  MASTER CONFIG — YAHAN EDIT KARO               ║
+# ║                                                                ║
+# ║  Ye saari settings ek jagah hain. Bas values change karo.     ║
+# ║  Kuch bhi chhupа nahi hai. Har option ka comment hai.          ║
+# ║                                                                ║
+# ╚════════════════════════════════════════════════════════════════╝
 
-# ---- BASE WORK DIR (sab kuch iske andar) ----
-BASE_DIR    = "FASTCUT"
-INPUT_DIR   = os.path.join(BASE_DIR, "input")
-TEMP_DIR    = os.path.join(BASE_DIR, "temp_frames")
-MEME_DIR    = os.path.join(BASE_DIR, "memes")
-SFX_DIR     = os.path.join(BASE_DIR, "sfx")
-MUSIC_DIR   = os.path.join(BASE_DIR, "music")
-GRID_DIR    = os.path.join(BASE_DIR, "grids")
-DEBUG_DIR   = os.path.join(BASE_DIR, "debug")
-OUTPUT_DIR  = os.path.join(BASE_DIR, "output")
+CONFIG = {
+
+    # ═══════════════════════════════════════════════════════════════
+    # 📁 PATHS & FOLDERS
+    # ═══════════════════════════════════════════════════════════════
+
+    # Base folder jisme sab kuch hoga
+    "base_dir": "FASTCUT",
+
+    # Input video path (auto-set if None)
+    # Default: {base_dir}/temp_frames/gameplay.mp4
+    "video_path": None,
+
+    # ═══════════════════════════════════════════════════════════════
+    # 🤖 AI SETTINGS
+    # ═══════════════════════════════════════════════════════════════
+
+    # AI model (OpenRouter compatible)
+    "ai_model": "openai/gpt-4o-mini",
+
+    # Frame sampling rate (how many frames per second to sample)
+    # Higher = more detail but slower
+    # 2 = fast, 3 = balanced, 4-5 = detailed
+    "frames_per_sec": 3,
+
+    # Max grid images to send to AI
+    # 4 = fast, 6 = balanced, 10 = detailed
+    "max_grids": 6,
+
+    # Use Whisper for transcription?
+    # True = speech detection, False = faster
+    "use_whisper": True,
+
+    # AI creativity (0.0 = deterministic, 1.0 = creative)
+    # 0.5 = safe, 0.7 = balanced, 0.9 = wild
+    "ai_temperature": 0.7,
+
+    # AI max response length
+    "ai_max_tokens": 4000,
+
+    # ═══════════════════════════════════════════════════════════════
+    # 🎬 VIDEO OUTPUT SETTINGS
+    # ═══════════════════════════════════════════════════════════════
+
+    # Aspect ratio for output
+    # Options: "9:16" (Reels/TikTok), "1:1" (square), "4:5" (Instagram)
+    "aspect_ratio": "9:16",
+
+    # Video bitrate — quality vs file size
+    # "8000k"  = good,  small file
+    # "12000k" = better, medium
+    # "16000k" = great, large (DEFAULT)
+    # "20000k" = near-lossless, very large
+    "video_bitrate": "16000k",
+
+    # Audio bitrate
+    # "128k" = basic, "192k" = good, "256k" = great, "320k" = best
+    "audio_bitrate": "320k",
+
+    # CRF (Constant Rate Factor) — quality setting
+    # 0 = lossless (huge), 18 = near-lossless (DEFAULT), 23 = good, 28 = meh
+    # Lower = better quality + bigger file
+    "crf": 18,
+
+    # Encoding preset
+    # "ultrafast" (fast, low quality) → "slow" (better quality, slower)
+    # Options: ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow
+    "preset": "slow",
+
+    # Output FPS (None = use source FPS)
+    "output_fps": None,
+
+    # ═══════════════════════════════════════════════════════════════
+    # 🔊 AUDIO VOLUME CONTROL (0.0 to 1.0+)
+    # ═══════════════════════════════════════════════════════════════
+
+    # Background music volume
+    # 0.0 = mute, 0.25 = subtle (DEFAULT), 0.5 = prominent, 1.0 = loud
+    "music_volume": 0.25,
+
+    # SFX (sound effects) volume
+    # 0.0 = mute, 0.5 = subtle, 0.8 = clear (DEFAULT), 1.0 = loud
+    "sfx_volume": 0.8,
+
+    # Original video audio volume
+    # 0.0 = mute, 0.5 = quiet, 1.0 = normal (DEFAULT), 1.5 = boosted
+    "original_audio_volume": 1.0,
+
+    # ═══════════════════════════════════════════════════════════════
+    # 🎭 MEME CONTROL
+    # ═══════════════════════════════════════════════════════════════
+
+    # Minimum seconds a meme stays on screen
+    # 0.5 = very short, 1.5 = short (DEFAULT), 3.0 = long
+    "meme_min_duration": 1.5,
+
+    # Maximum seconds a meme stays on screen
+    # 2.0 = quick, 4.0 = normal (DEFAULT), 8.0 = very long
+    "meme_max_duration": 4.0,
+
+    # Meme scale (1.0 = original size)
+    # 0.8 = smaller, 1.0 = normal (DEFAULT), 1.2 = bigger
+    "meme_scale": 1.0,
+
+    # Allowed meme file formats
+    # Add/remove as needed
+    "meme_allowed_ext": [".mp4", ".mov", ".gif", ".webm"],
+
+    # ═══════════════════════════════════════════════════════════════
+    # ⚡ SPEED CONTROL
+    # ═══════════════════════════════════════════════════════════════
+
+    # Default playback speed for normal clips
+    # 1.0 = normal (DEFAULT), 1.2 = slightly faster, 0.8 = slower
+    "default_speed": 1.0,
+
+    # Maximum speedup allowed
+    # 2.0 = double speed (DEFAULT), 3.0 = 3x, 1.5 = max 1.5x
+    "max_speed": 2.0,
+
+    # Minimum slowdown allowed (for slow-mo)
+    # 0.5 = half speed (DEFAULT), 0.3 = very slow, 0.7 = slight slow-mo
+    "min_speed": 0.5,
+
+    # ═══════════════════════════════════════════════════════════════
+    # ✂️ CUT CONTROL
+    # ═══════════════════════════════════════════════════════════════
+
+    # Allow AI to cut boring parts?
+    # True = AI can remove boring (DEFAULT)
+    # False = keep full video (no cuts)
+    "allow_cuts": True,
+
+    # Preserve good content (don't over-cut)?
+    # True = preserve exciting moments (DEFAULT)
+    # False = aggressive editing
+    "preserve_good_content": True,
+
+    # Minimum clip duration (skip shorter clips)
+    # 0.5 = skip tiny clips (DEFAULT), 1.0 = skip short clips
+    "min_clip_duration": 0.5,
+
+    # Target output duration range (soft target)
+    # AI will try to hit this range
+    "target_min_sec": 30,
+    "target_max_sec": 90,
+
+    # ═══════════════════════════════════════════════════════════════
+    # 🎨 VISUAL EFFECTS
+    # ═══════════════════════════════════════════════════════════════
+
+    # Default text settings (if AI inserts text)
+    "text_font_size": 70,
+    "text_color": "white",
+    "text_stroke_color": "black",
+    "text_stroke_width": 3,
+    "text_font": "DejaVu-Sans-Bold",
+    "text_position": ("center", "top"),
+
+    # ═══════════════════════════════════════════════════════════════
+    # 🔑 API KEYS (from environment)
+    # ═══════════════════════════════════════════════════════════════
+
+    # These are read from GitHub Secrets / environment
+    # DO NOT put API keys here directly!
+    "api_key_names": [
+        "OPENROUTER_API_KEY",
+        "OPENROUTER_API_KEY_2",
+        "OPENROUTER_API_KEY_3",
+        "OPENROUTER_API_KEY_4",
+        "OPENROUTER_API_KEY_5",
+    ],
+
+    # Attempts per key (before moving to next)
+    "attempts_per_key": 2,
+
+    # ═══════════════════════════════════════════════════════════════
+    # 🖼️ GRID HISTORY (for analysis)
+    # ═══════════════════════════════════════════════════════════════
+
+    # Save grids to GitHub for analysis?
+    # True = save latest grids + debug logs (DEFAULT)
+    # False = delete everything after run
+    "save_grid_history": True,
+
+    # Auto-commit to git (in GitHub Actions)?
+    "auto_git_commit": True,
+}
+
+# ╔════════════════════════════════════════════════════════════════╗
+# ║                                                                ║
+# ║                  ✅ CONFIG ENDS HERE                           ║
+# ║                                                                ║
+# ║  Ab iske neeche sirf code hai, kuch edit karne ki zaroorat    ║
+# ║  nahi hai. Bas upar config change karo.                        ║
+# ║                                                                ║
+# ╚════════════════════════════════════════════════════════════════╝
 
 
 # ================================================================
-# MULTI API KEYS
+# DERIVED PATHS (auto-calculated from CONFIG)
 # ================================================================
-def get_api_keys():
-    keys = []
-    for i in range(1, 6):
-        env_name = "OPENROUTER_API_KEY" if i == 1 else f"OPENROUTER_API_KEY_{i}"
-        val = os.getenv(env_name, "").strip()
-        if val:
-            keys.append((env_name, val))
-    return keys
+def get_paths():
+    base = CONFIG["base_dir"]
+    return {
+        "base":       base,
+        "input":      os.path.join(base, "input"),
+        "temp":       os.path.join(base, "temp_frames"),
+        "memes":      os.path.join(base, "memes"),
+        "sfx":        os.path.join(base, "sfx"),
+        "music":      os.path.join(base, "music"),
+        "grids":      os.path.join(base, "grids"),
+        "debug":      os.path.join(base, "debug"),
+        "output":     os.path.join(base, "output"),
+        "history":    os.path.join(base, "grid_history"),
+    }
 
-
-# ================================================================
-# GLOBAL CACHE
-# ================================================================
-_WHISPER_MODEL = None
+PATHS = get_paths()
 
 
 # ================================================================
@@ -86,162 +274,121 @@ def log_step(title):
     print("=" * 70)
 
 
-def log_ok(msg):
-    print(f"   ✅ {msg}")
+def log_ok(msg):    print(f"   ✅ {msg}")
+def log_warn(msg):  print(f"   ⚠️  {msg}")
+def log_err(msg):   print(f"   ❌ {msg}")
+def log_info(msg):  print(f"   ℹ️  {msg}")
 
 
-def log_warn(msg):
-    print(f"   ⚠️  {msg}")
-
-
-def log_err(msg):
-    print(f"   ❌ {msg}")
-
-
-def log_info(msg):
-    print(f"   ℹ️  {msg}")
+def print_config():
+    """Print current config — verify karo kya use ho raha hai."""
+    log_step("🎛️  ACTIVE CONFIG")
+    groups = {
+        "📁 Paths":      ["base_dir", "video_path"],
+        "🤖 AI":         ["ai_model", "frames_per_sec", "max_grids",
+                          "use_whisper", "ai_temperature"],
+        "🎬 Video":      ["aspect_ratio", "video_bitrate", "audio_bitrate",
+                          "crf", "preset", "output_fps"],
+        "🔊 Audio":      ["music_volume", "sfx_volume", "original_audio_volume"],
+        "🎭 Meme":       ["meme_min_duration", "meme_max_duration", "meme_scale"],
+        "⚡ Speed":      ["default_speed", "max_speed", "min_speed"],
+        "✂️  Cuts":      ["allow_cuts", "preserve_good_content",
+                          "min_clip_duration", "target_min_sec", "target_max_sec"],
+    }
+    for group, keys in groups.items():
+        print(f"\n   {group}")
+        for k in keys:
+            print(f"      {k:28s} = {CONFIG[k]}")
 
 
 # ================================================================
-# AUTO-CREATE FOLDERS (INSIDE FASTCUT/)
+# FOLDERS
 # ================================================================
 def ensure_folders():
-    """Sab folders FASTCUT/ ke andar auto-create karo."""
     folders = [
-        BASE_DIR, INPUT_DIR, TEMP_DIR, GRID_DIR, DEBUG_DIR, OUTPUT_DIR,
-        MEME_DIR,
-        os.path.join(MEME_DIR, "shocked"),
-        os.path.join(MEME_DIR, "funny"),
-        os.path.join(MEME_DIR, "sad"),
-        os.path.join(MEME_DIR, "victory"),
-        os.path.join(MEME_DIR, "reaction"),
-        os.path.join(MEME_DIR, "hype"),
-        os.path.join(MEME_DIR, "fail"),
-        os.path.join(MEME_DIR, "win"),
-        SFX_DIR,
-        os.path.join(SFX_DIR, "hype"),
-        os.path.join(SFX_DIR, "dramatic"),
-        os.path.join(SFX_DIR, "funny"),
-        os.path.join(SFX_DIR, "victory"),
-        os.path.join(SFX_DIR, "whoosh"),
-        os.path.join(SFX_DIR, "impact"),
-        os.path.join(SFX_DIR, "notification"),
-        MUSIC_DIR,
+        PATHS["base"], PATHS["input"], PATHS["temp"],
+        PATHS["grids"], PATHS["debug"], PATHS["output"], PATHS["history"],
+        PATHS["memes"],
+        os.path.join(PATHS["memes"], "shocked"),
+        os.path.join(PATHS["memes"], "funny"),
+        os.path.join(PATHS["memes"], "sad"),
+        os.path.join(PATHS["memes"], "victory"),
+        os.path.join(PATHS["memes"], "reaction"),
+        os.path.join(PATHS["memes"], "hype"),
+        os.path.join(PATHS["memes"], "fail"),
+        os.path.join(PATHS["memes"], "win"),
+        PATHS["sfx"],
+        os.path.join(PATHS["sfx"], "hype"),
+        os.path.join(PATHS["sfx"], "dramatic"),
+        os.path.join(PATHS["sfx"], "funny"),
+        os.path.join(PATHS["sfx"], "victory"),
+        os.path.join(PATHS["sfx"], "whoosh"),
+        os.path.join(PATHS["sfx"], "impact"),
+        os.path.join(PATHS["sfx"], "notification"),
+        PATHS["music"],
     ]
 
-    created, existed = [], []
+    created = 0
     for f in folders:
-        if os.path.exists(f):
-            existed.append(f)
-        else:
+        if not os.path.exists(f):
             os.makedirs(f, exist_ok=True)
-            created.append(f)
+            created += 1
 
     if created:
-        log_ok(f"Created {len(created)} new folders inside '{BASE_DIR}/':")
-        for f in created:
-            print(f"      📁 {f}")
+        log_ok(f"Created {created} new folders")
     else:
-        log_ok(f"All {len(folders)} folders already exist inside '{BASE_DIR}/'")
+        log_ok(f"All {len(folders)} folders ready")
 
-    if existed:
-        log_info(f"{len(existed)} folders already existed")
-
-    _drop_gitkeep_files(folders)
-    _drop_folder_readmes()
-
-
-def _drop_gitkeep_files(folders):
-    count = 0
-    for folder in folders:
-        if not os.path.isdir(folder) or folder == BASE_DIR:
+    # Drop .gitkeep
+    for f in folders:
+        if f == PATHS["base"]:
             continue
-        path = os.path.join(folder, ".gitkeep")
-        if not os.path.exists(path):
+        gitkeep = os.path.join(f, ".gitkeep")
+        if not os.path.exists(gitkeep):
             try:
-                with open(path, "w") as f:
-                    f.write("")
-                count += 1
+                with open(gitkeep, "w") as fh:
+                    fh.write("")
             except Exception:
                 pass
-    if count > 0:
-        log_ok(f"Dropped {count} .gitkeep files (for git tracking)")
-
-
-def _drop_folder_readmes():
-    readmes = {
-        os.path.join(MEME_DIR, "shocked"):  "Shocked reaction memes\nFormats: .mp4, .mov, .gif, .webm",
-        os.path.join(MEME_DIR, "funny"):    "Funny memes\nFormats: .mp4, .mov, .gif, .webm",
-        os.path.join(MEME_DIR, "sad"):      "Sad memes\nFormats: .mp4, .mov, .gif, .webm",
-        os.path.join(MEME_DIR, "victory"):  "Victory memes\nFormats: .mp4, .mov, .gif, .webm",
-        os.path.join(MEME_DIR, "reaction"): "General reaction memes\nFormats: .mp4, .mov, .gif, .webm",
-        os.path.join(MEME_DIR, "hype"):     "Hype memes\nFormats: .mp4, .mov, .gif, .webm",
-        os.path.join(MEME_DIR, "fail"):     "Fail memes\nFormats: .mp4, .mov, .gif, .webm",
-        os.path.join(MEME_DIR, "win"):      "Win memes\nFormats: .mp4, .mov, .gif, .webm",
-        os.path.join(SFX_DIR, "hype"):         "Hype SFX\nFormats: .mp3, .wav, .m4a, .aac",
-        os.path.join(SFX_DIR, "dramatic"):     "Dramatic SFX\nFormats: .mp3, .wav, .m4a, .aac",
-        os.path.join(SFX_DIR, "funny"):        "Funny SFX\nFormats: .mp3, .wav, .m4a, .aac",
-        os.path.join(SFX_DIR, "victory"):      "Victory SFX\nFormats: .mp3, .wav, .m4a, .aac",
-        os.path.join(SFX_DIR, "whoosh"):       "Whoosh SFX\nFormats: .mp3, .wav, .m4a, .aac",
-        os.path.join(SFX_DIR, "impact"):       "Impact SFX\nFormats: .mp3, .wav, .m4a, .aac",
-        os.path.join(SFX_DIR, "notification"): "Notification SFX\nFormats: .mp3, .wav, .m4a, .aac",
-        MUSIC_DIR:  "Background music",
-        INPUT_DIR:  "Raw input videos",
-        OUTPUT_DIR: "Final reels",
-        GRID_DIR:   "Frame grid images",
-        DEBUG_DIR:  "AI decision logs",
-        TEMP_DIR:   "Temp working directory",
-    }
-    for folder, text in readmes.items():
-        if not os.path.exists(folder):
-            continue
-        items = [f for f in os.listdir(folder) if f not in ("README.txt", ".gitkeep")]
-        if items:
-            continue
-        path = os.path.join(folder, "README.txt")
-        if os.path.exists(path):
-            continue
-        try:
-            with open(path, "w", encoding="utf-8") as f:
-                f.write(f"📁 {folder}\n\n{text}\n\nAuto-managed folder.\n")
-        except Exception:
-            pass
 
 
 # ================================================================
-# AUTO-COMMIT FASTCUT STRUCTURE TO GIT
+# GIT COMMIT
 # ================================================================
 def git_commit_folders():
+    if not CONFIG["auto_git_commit"]:
+        return
     if not os.getenv("GITHUB_ACTIONS"):
-        log_info("Not in GitHub Actions — skipping git commit")
         return
 
     log_info("Committing FASTCUT structure to git...")
     try:
-        subprocess.run(["git", "config", "user.email", "actions@github.com"], check=True, timeout=10)
-        subprocess.run(["git", "config", "user.name", "github-actions[bot]"], check=True, timeout=10)
-        subprocess.run(["git", "add", f"{BASE_DIR}/"], check=True, timeout=30)
+        subprocess.run(["git", "config", "user.email", "actions@github.com"],
+                       check=True, timeout=10)
+        subprocess.run(["git", "config", "user.name", "github-actions[bot]"],
+                       check=True, timeout=10)
+        subprocess.run(["git", "add", f"{PATHS['base']}/"], check=True, timeout=30)
 
         diff = subprocess.run(["git", "diff", "--cached", "--quiet"], timeout=30)
         if diff.returncode == 0:
-            log_info("No changes to commit (folders already tracked)")
+            log_info("No changes to commit")
             return
 
-        subprocess.run(
-            ["git", "commit", "-m", "📁 Auto: Update FASTCUT folder structure [skip ci]"],
-            check=True, timeout=30
-        )
-        push = subprocess.run(["git", "push"], capture_output=True, text=True, timeout=60)
+        subprocess.run(["git", "commit", "-m",
+                        "📁 Auto: Update FASTCUT structure [skip ci]"],
+                       check=True, timeout=30)
+        push = subprocess.run(["git", "push"], capture_output=True,
+                              text=True, timeout=60)
         if push.returncode == 0:
-            log_ok("FASTCUT structure committed & pushed ✅")
+            log_ok("Structure pushed ✅")
         else:
             log_warn(f"Push failed: {push.stderr[:200]}")
     except Exception as e:
-        log_warn(f"Git commit error: {e}")
+        log_warn(f"Git error: {e}")
 
 
 # ================================================================
-# 1. VIDEO INFO
+# VIDEO INFO
 # ================================================================
 def get_video_info(video_path):
     cap = cv2.VideoCapture(video_path)
@@ -257,29 +404,31 @@ def get_video_info(video_path):
 
 
 # ================================================================
-# 2. FRAME INDEX
+# FRAME INDEX
 # ================================================================
-def create_frame_index(video_path, frames_per_sec=3):
+def create_frame_index(video_path):
     info = get_video_info(video_path)
-    duration = info["duration"]
-    total_frames = int(duration * frames_per_sec)
-    frames = [{"idx": i, "t": round(i / frames_per_sec, 3)} for i in range(total_frames)]
+    fps = CONFIG["frames_per_sec"]
+    total = int(info["duration"] * fps)
+    frames = [{"idx": i, "t": round(i / fps, 3)} for i in range(total)]
     return {
-        "video_duration": duration,
-        "fps_sampling": frames_per_sec,
-        "total_frames": total_frames,
+        "video_duration": info["duration"],
+        "fps_sampling": fps,
+        "total_frames": total,
         "frames": frames,
         "info": info
     }
 
 
 # ================================================================
-# 3. GRIDS
+# GRIDS
 # ================================================================
-def create_grids(video_path, frame_index, output_dir, max_images=6):
+def create_grids(video_path, frame_index):
     total_frames = frame_index["total_frames"]
+    max_images = CONFIG["max_grids"]
+    output_dir = PATHS["grids"]
+
     if total_frames == 0:
-        log_warn("No frames to grid")
         return []
 
     num_grids = min(max_images, math.ceil(total_frames / 45))
@@ -288,10 +437,7 @@ def create_grids(video_path, frame_index, output_dir, max_images=6):
     rows = math.ceil(frames_per_grid / cols)
     thumb_size = max(150, min(2000 // cols, 300))
 
-    log_info(f"Total frames: {total_frames}")
-    log_info(f"Grids: {num_grids}")
-    log_info(f"Frames/grid: {frames_per_grid}")
-    log_info(f"Layout: {cols}x{rows}")
+    log_info(f"Grids: {num_grids} | Frames/grid: {frames_per_grid} | Layout: {cols}x{rows}")
 
     cap = cv2.VideoCapture(video_path)
     paths = []
@@ -343,35 +489,37 @@ def create_grids(video_path, frame_index, output_dir, max_images=6):
         out = os.path.join(output_dir, f"grid_{g + 1}.jpg")
         Image.fromarray(grid).save(out, quality=92)
         paths.append(out)
-        log_ok(f"{out} ({grid.shape[1]}x{grid.shape[0]}px)")
+        log_ok(f"{os.path.basename(out)} ({grid.shape[1]}x{grid.shape[0]}px)")
 
     cap.release()
     return paths
 
 
 # ================================================================
-# 4. TRANSCRIPT
+# TRANSCRIPT
 # ================================================================
+_WHISPER_MODEL = None
+
 def get_whisper_model():
     global _WHISPER_MODEL
     if _WHISPER_MODEL is None:
         from faster_whisper import WhisperModel
-        log_info("Loading whisper model (first time)...")
+        log_info("Loading whisper model...")
         _WHISPER_MODEL = WhisperModel("base", device="cpu", compute_type="int8")
     return _WHISPER_MODEL
 
 
-def get_transcript(video_path, use_whisper=True):
-    if not use_whisper:
+def get_transcript(video_path):
+    if not CONFIG["use_whisper"]:
         log_info("Whisper skipped")
         return "No transcript"
     try:
         model = get_whisper_model()
         log_info("Transcribing...")
         segments, info = model.transcribe(video_path)
-        lines = [f"[{s.start:6.1f}s] {s.text.strip()}" for s in segments if s.text.strip()]
+        lines = [f"[{s.start:6.1f}s] {s.text.strip()}"
+                 for s in segments if s.text.strip()]
         if not lines:
-            log_warn("No speech detected")
             return "No speech"
         log_ok(f"{len(lines)} segments (lang: {info.language})")
         return "\n".join(lines)
@@ -381,7 +529,7 @@ def get_transcript(video_path, use_whisper=True):
 
 
 # ================================================================
-# 5. SPIKES
+# SPIKES
 # ================================================================
 def get_spikes(video_path):
     log_info("Detecting audio spikes...")
@@ -401,7 +549,7 @@ def get_spikes(video_path):
         spikes = [f"[{i:6.1f}s] RMS={v:.3f}" for i, v in enumerate(per_sec) if v > threshold]
         if not spikes:
             return "No spikes"
-        log_ok(f"{len(spikes)} spikes detected")
+        log_ok(f"{len(spikes)} spikes")
         return "\n".join(spikes)
     except Exception as e:
         log_err(f"Spike error: {e}")
@@ -409,49 +557,54 @@ def get_spikes(video_path):
 
 
 # ================================================================
-# 6. MOODS
+# MOODS
 # ================================================================
 def get_available_moods():
+    exts = tuple(CONFIG["meme_allowed_ext"])
     memes, sfx, music = {}, {}, []
 
-    if os.path.exists(MEME_DIR):
-        for mood in os.listdir(MEME_DIR):
-            p = os.path.join(MEME_DIR, mood)
+    if os.path.exists(PATHS["memes"]):
+        for mood in os.listdir(PATHS["memes"]):
+            p = os.path.join(PATHS["memes"], mood)
             if os.path.isdir(p):
-                files = [f for f in os.listdir(p)
-                         if f.lower().endswith(('.mp4', '.mov', '.gif', '.webm'))]
+                files = [f for f in os.listdir(p) if f.lower().endswith(exts)]
                 if files:
                     memes[mood] = files
 
-    if os.path.exists(SFX_DIR):
-        for mood in os.listdir(SFX_DIR):
-            p = os.path.join(SFX_DIR, mood)
+    if os.path.exists(PATHS["sfx"]):
+        for mood in os.listdir(PATHS["sfx"]):
+            p = os.path.join(PATHS["sfx"], mood)
             if os.path.isdir(p):
                 files = [f for f in os.listdir(p)
                          if f.lower().endswith(('.mp3', '.wav', '.m4a', '.aac'))]
                 if files:
                     sfx[mood] = files
 
-    if os.path.exists(MUSIC_DIR):
-        music = [f for f in os.listdir(MUSIC_DIR)
+    if os.path.exists(PATHS["music"]):
+        music = [f for f in os.listdir(PATHS["music"])
                  if f.lower().endswith(('.mp3', '.wav', '.m4a', '.aac'))]
 
     return memes, sfx, music
 
 
 # ================================================================
-# 7. BUILD PROMPT (SMART LENGTH DECISION)
+# BUILD PROMPT
 # ================================================================
 def build_prompt(frame_index, grid_count, transcript, spikes, memes, sfx, music):
     frame_lines = [f"#{f['idx']}={f['t']}s" for f in frame_index["frames"][::3]]
     frame_list = "\n".join(frame_lines)
     source_dur = frame_index['video_duration']
 
-    prompt = f"""You are a PROFESSIONAL viral gaming editor. Your job is to make the video BETTER, not shorter.
+    allow_cuts = CONFIG["allow_cuts"]
+    preserve = CONFIG["preserve_good_content"]
 
-VIDEO INFO:
-- Duration: {source_dur:.1f}s
-- Sampling: {frame_index['fps_sampling']}fps | Total frames: {frame_index['total_frames']}
+    cut_rule = "3. Cut ONLY boring parts (menus, loading, idle, walking). KEEP all action." if allow_cuts else "3. DO NOT cut anything — keep FULL video"
+    preserve_rule = "KEEP all exciting content at 1.0x speed. Preserve good moments." if preserve else "Aggressive editing allowed"
+
+    prompt = f"""You are a PROFESSIONAL viral gaming editor.
+
+VIDEO: {source_dur:.1f}s | Sampling: {frame_index['fps_sampling']}fps | Frames: {frame_index['total_frames']}
+TARGET OUTPUT: {CONFIG['target_min_sec']}-{CONFIG['target_max_sec']} seconds (soft target)
 
 FRAME INDEX (use ONLY these):
 {frame_list}
@@ -461,83 +614,34 @@ GRIDS: {grid_count} images with "#idx | MM:SS.S" labels.
 TRANSCRIPT:
 {transcript}
 
-AUDIO SPIKES (loud moments = hype):
+AUDIO SPIKES:
 {spikes}
 
-AVAILABLE:
+AVAILABLE ASSETS:
 - Meme moods: {list(memes.keys())}
 - SFX moods: {list(sfx.keys())}
 - Music: {music}
 
-============================================================
-🎯 YOUR PRIMARY DECISION: ANALYZE CONTENT QUALITY
-============================================================
-
-Step 1: Watch the frames/grids carefully.
-Step 2: Classify EVERY second of the video into 2 buckets:
-
-  🟢 GOOD CONTENT (KEEP AT 1.0x speed):
-     - Fights, action, kills, clutch moments
-     - Funny reactions, rage, hype moments
-     - Big plays, skill shots, close calls
-     - Any moment with audio spike
-     - Any moment with emotion or speech
-
-  🔴 BORING CONTENT (REMOVE or SPEED UP):
-     - Loading screens, menus, settings
-     - Idle standing, walking, waiting
-     - Silent dead-time (no speech, no action)
-     - Repeated grinding, inventory, crafting
-     - Tutorial text, "Press X to continue"
-
-============================================================
-📏 OUTPUT LENGTH RULES (VERY IMPORTANT)
-============================================================
-
-CASE A: Content is GOOD (mostly exciting)
-  → PRESERVE the full length. Do NOT cut exciting parts.
-  → Target: 90-100% of source duration
-  → Example: 42s source → 38-42s output
-
-CASE B: Content is MIXED (some boring, some good)
-  → Cut ONLY the boring parts
-  → Target: 60-85% of source duration
-  → Example: 42s source → 26-36s output
-
-CASE C: Content is BAD (mostly boring)
-  → Cut aggressively, keep only best moments
-  → Target: 30-50% of source duration
-  → Example: 42s source → 13-21s output
-
-⚠️ DEFAULT: Prefer CASE A or B. Only use CASE C if truly necessary.
-
-============================================================
-✂️ EDITING RULES
-============================================================
-
+RULES:
 1. USE FRAME NUMBERS (not timestamps)
-2. Hook in first 2-3 sec — if first 3 sec are boring, CUT THEM
-3. Speed changes:
-   - Normal good content: 1.0x (keep as is)
-   - Slightly slow: 1.2-1.3x
-   - Very slow/boring but needed: 1.5-2.0x
-   - Clutch/slow-mo moments: 0.5-0.7x
-4. aspect_ratio MUST be: "9:16", "1:1", or "4:5" (default 9:16)
-5. Every edit MUST have a clear "reason"
-6. DO NOT remove more than 50% of good content
-7. If content is good, KEEP IT ALL at 1.0x
+2. Hook in first 2-3 sec
+{cut_rule}
+4. Speed range: {CONFIG['min_speed']}x to {CONFIG['max_speed']}x
+5. {preserve_rule}
+6. aspect_ratio MUST be: "{CONFIG['aspect_ratio']}"
+7. Every edit MUST have a "reason"
 
-Return ONLY valid JSON (no markdown, no code fences, no explanation):
+Return ONLY valid JSON:
 {{
   "content_quality": "good|mixed|boring",
-  "reasoning": "One sentence about what you observed",
-  "target_duration": <number>,
-  "aspect_ratio": "9:16",
+  "reasoning": "One sentence",
+  "target_duration": <number between {CONFIG['target_min_sec']} and {CONFIG['target_max_sec']}>,
+  "aspect_ratio": "{CONFIG['aspect_ratio']}",
   "bg_music": "<filename from AVAILABLE music>",
-  "music_volume": 0.25,
   "edits": [
-    {{"start_frame": 0, "end_frame": 6, "remove": true, "reason": "Loading screen"}},
-    {{"start_frame": 6, "end_frame": 120, "speed": 1.0, "reason": "Keep full gameplay"}}
+    {{"start_frame": 0, "end_frame": 15, "remove": true, "reason": "Loading"}},
+    {{"start_frame": 15, "end_frame": 120, "speed": 1.0, "reason": "Keep full gameplay"}},
+    {{"insert_meme": "auto", "meme_mood": "shocked", "reason": "Reaction"}}
   ]
 }}
 """
@@ -545,240 +649,141 @@ Return ONLY valid JSON (no markdown, no code fences, no explanation):
 
 
 # ================================================================
-# 8. JSON EXTRACTOR (DETAILED DEBUG)
+# JSON EXTRACTOR
 # ================================================================
 def extract_json(text):
-    print("\n   " + "─" * 60)
-    print("   🔍 JSON EXTRACTION DEBUG")
-    print("   " + "─" * 60)
-
     if not text:
-        print("   ❌ Empty AI response")
         raise ValueError("Empty AI response")
-
-    print(f"   📏 Raw response length: {len(text)} chars")
-    print(f"   📄 First 200: {repr(text[:200])}")
-    print(f"   📄 Last 200:  {repr(text[-200:])}")
-
     text = text.strip()
 
     if text.startswith("```"):
-        print("   🔧 Detected markdown fence — stripping...")
         parts = text.split("```")
         if len(parts) >= 2:
             text = parts[1]
         if text.lower().startswith("json"):
             text = text[4:]
         text = text.strip()
-        print(f"   ✅ After strip: {len(text)} chars")
 
     start = text.find("{")
     end = text.rfind("}")
-
-    if start == -1:
-        print("   ❌ No opening '{' found!")
-        print(f"   📄 Full response:\n{text[:1000]}")
-        raise ValueError("No JSON object found (missing '{')")
-
-    if end == -1:
-        print("   ❌ No closing '}' found!")
-        print(f"   📄 Full response:\n{text[:1000]}")
-        raise ValueError("No JSON object found (missing '}')")
-
-    if end <= start:
-        print(f"   ❌ Invalid boundaries: start={start}, end={end}")
-        raise ValueError("Invalid JSON boundaries")
+    if start == -1 or end == -1 or end <= start:
+        raise ValueError("No JSON object found")
 
     json_str = text[start:end + 1]
-    print(f"   ✅ JSON extracted: {len(json_str)} chars")
 
     try:
-        result = json.loads(json_str)
-        print(f"   ✅ JSON parsed successfully!")
-        print(f"   🔑 Keys: {list(result.keys())}")
-        print(f"   🎬 Edits count: {len(result.get('edits', []))}")
-        print("   " + "─" * 60 + "\n")
-        return result
-
+        return json.loads(json_str)
     except json.JSONDecodeError as e:
-        print(f"   ❌ JSON parse failed!")
-        print(f"   📌 Error: {e}")
-        print(f"   📌 Line {e.lineno}, Col {e.colno}, Pos {e.pos}")
-        if e.pos < len(json_str):
-            print(f"   📌 Around: ...{repr(json_str[max(0, e.pos-80):e.pos+80])}...")
-
-        print("   🔧 Attempting cleanup (single → double quotes)...")
         cleaned = json_str.replace("'", '"')
         try:
-            result = json.loads(cleaned)
-            print("   ✅ Cleanup succeeded!")
-            print("   " + "─" * 60 + "\n")
-            return result
-        except Exception as e2:
-            print(f"   ❌ Cleanup failed: {e2}")
-            print("   " + "─" * 60 + "\n")
+            return json.loads(cleaned)
+        except Exception:
             raise ValueError(f"JSON parse failed: {e}")
 
 
 # ================================================================
-# 9. AI ANALYZE — MULTI KEY + RETRY (DETAILED DEBUG)
+# API KEYS
+# ================================================================
+def get_api_keys():
+    keys = []
+    for name in CONFIG["api_key_names"]:
+        val = os.getenv(name, "").strip()
+        if val:
+            keys.append((name, val))
+    return keys
+
+
+# ================================================================
+# AI ANALYZE
 # ================================================================
 def ai_analyze(frame_index, grid_paths, transcript, spikes, memes, sfx, music):
     api_keys = get_api_keys()
     if not api_keys:
-        raise Exception("No OPENROUTER_API_KEY found in environment!")
+        raise Exception("No OPENROUTER_API_KEY found!")
 
-    print(f"\n   🔑 Total API keys available: {len(api_keys)}")
-    for i, (name, val) in enumerate(api_keys, 1):
-        masked = val[:8] + "..." + val[-4:] if len(val) > 12 else "***"
-        print(f"      {i}. {name} = {masked}")
+    log_info(f"Found {len(api_keys)} API key(s)")
 
-    print(f"\n   📸 Preparing {len(grid_paths)} grid images for AI...")
     images = []
-    for i, p in enumerate(grid_paths, 1):
-        try:
-            with open(p, "rb") as f:
-                b64 = base64.b64encode(f.read()).decode()
-            size_kb = len(b64) / 1024
-            images.append({
-                "type": "image_url",
-                "image_url": {"url": f"data:image/jpeg;base64,{b64}"}
-            })
-            print(f"      ✅ {os.path.basename(p)} ({size_kb:.0f} KB)")
-        except Exception as e:
-            print(f"      ❌ Failed to load {p}: {e}")
+    for p in grid_paths:
+        with open(p, "rb") as f:
+            b64 = base64.b64encode(f.read()).decode()
+        images.append({
+            "type": "image_url",
+            "image_url": {"url": f"data:image/jpeg;base64,{b64}"}
+        })
 
-    prompt = build_prompt(frame_index, len(grid_paths), transcript, spikes, memes, sfx, music)
-    print(f"   📝 Prompt length: {len(prompt)} chars\n")
+    prompt = build_prompt(frame_index, len(grid_paths),
+                          transcript, spikes, memes, sfx, music)
 
     last_error = None
     total_attempts = 0
+    attempts_per_key = CONFIG["attempts_per_key"]
 
     for key_idx, (key_name, key_val) in enumerate(api_keys, 1):
-        for attempt in range(1, 3):
+        for attempt in range(1, attempts_per_key + 1):
             total_attempts += 1
-
-            print("\n" + "=" * 60)
-            print(f"   🔄 ATTEMPT #{total_attempts}")
-            print(f"   🔑 Key #{key_idx} ({key_name}) — Try {attempt}/2")
-            print("=" * 60)
+            print(f"\n   🔄 Attempt #{total_attempts}: Key #{key_idx} ({key_name}) try {attempt}/{attempts_per_key}")
 
             try:
                 client = OpenAI(
                     api_key=key_val,
-                    base_url=OPENROUTER_BASE_URL,
+                    base_url="https://openrouter.ai/api/v1",
                     default_headers={
                         "HTTP-Referer": "https://github.com/Prembty12/premx-editor",
                         "X-Title": "Auto Video Editor",
                     }
                 )
 
-                print(f"   📡 Sending request to OpenRouter...")
-                print(f"   🤖 Model: {OPENROUTER_MODEL}")
-
                 t_start = time.time()
                 response = client.chat.completions.create(
-                    model=OPENROUTER_MODEL,
+                    model=CONFIG["ai_model"],
                     messages=[{
                         "role": "user",
                         "content": [{"type": "text", "text": prompt}] + images
                     }],
-                    max_tokens=4000,
-                    temperature=0.7
+                    max_tokens=CONFIG["ai_max_tokens"],
+                    temperature=CONFIG["ai_temperature"]
                 )
                 elapsed = time.time() - t_start
 
-                print(f"   ✅ Response received in {elapsed:.2f}s")
-
-                if hasattr(response, "usage") and response.usage:
-                    print(f"   📊 Tokens: {response.usage.total_tokens} "
-                          f"(prompt: {response.usage.prompt_tokens}, "
-                          f"completion: {response.usage.completion_tokens})")
-
                 text = response.choices[0].message.content
-                if not text:
-                    print("   ❌ Empty response from API!")
-                    last_error = "Empty response"
-                    time.sleep(1)
-                    continue
+                log_ok(f"Response in {elapsed:.2f}s ({len(text)} chars)")
 
-                print(f"   📄 Response: {len(text)} chars")
+                if response.usage:
+                    log_info(f"Tokens: {response.usage.total_tokens}")
 
                 result = extract_json(text)
 
                 if result.get("aspect_ratio") not in ("9:16", "1:1", "4:5"):
-                    print(f"   ⚠️  Invalid aspect: {result.get('aspect_ratio')} → forcing '9:16'")
-                    result["aspect_ratio"] = "9:16"
+                    result["aspect_ratio"] = CONFIG["aspect_ratio"]
 
-                print("\n   " + "─" * 60)
-                print("   🎯 AI DECISION SUMMARY")
-                print("   " + "─" * 60)
-                print(f"   Content quality: {result.get('content_quality', 'unknown')}")
-                print(f"   Reasoning: {result.get('reasoning', '-')}")
-                print(f"   Target duration: {result.get('target_duration', '?')}s")
-                print(f"   Aspect ratio: {result.get('aspect_ratio')}")
-                print(f"   Total edits: {len(result.get('edits', []))}")
-                print("   " + "─" * 60 + "\n")
-
-                print(f"   🎉 SUCCESS with key #{key_idx} (attempt {attempt})")
-                print("=" * 60 + "\n")
+                log_ok(f"Quality: {result.get('content_quality', '?')}")
+                log_ok(f"Target: {result.get('target_duration')}s")
+                log_ok(f"Edits: {len(result.get('edits', []))}")
                 return result
 
-            except json.JSONDecodeError as e:
-                last_error = f"JSONDecodeError: {e}"
-                print(f"\n   ❌ JSON DECODE ERROR: {e}")
-                print(f"   🔄 Retrying same key...\n")
+            except (json.JSONDecodeError, ValueError) as e:
+                last_error = str(e)
+                log_warn(f"Parse failed: {e}")
                 time.sleep(1)
                 continue
-
-            except ValueError as e:
-                last_error = f"ValueError: {e}"
-                print(f"\n   ❌ PARSE ERROR: {e}")
-                print(f"   🔄 Retrying same key...\n")
-                time.sleep(1)
-                continue
-
             except Exception as e:
                 last_error = str(e)
                 err_str = str(e).lower()
-                err_type = type(e).__name__
-
-                print(f"\n   ❌ API ERROR")
-                print(f"   📌 Type: {err_type}")
-                print(f"   📌 Message: {e}")
-
                 if any(x in err_str for x in ["rate", "quota", "limit", "auth", "401", "403", "429"]):
-                    print(f"   🔑 Key issue → moving to NEXT key")
-                    print("=" * 60 + "\n")
+                    log_warn(f"Key issue → next key")
                     break
-
-                print(f"   🔄 Retrying same key in 2s...")
+                log_warn(f"Error: {e}")
                 time.sleep(2)
                 continue
 
-        print(f"\n   ⚠️  Key #{key_idx} ({key_name}) exhausted")
-        if key_idx < len(api_keys):
-            print(f"   ➡️  Moving to key #{key_idx + 1}...\n")
-
-    print("\n" + "=" * 60)
-    print("   ❌ ALL KEYS FAILED")
-    print("=" * 60)
-    print(f"   Total attempts: {total_attempts}")
-    print(f"   Keys tried: {len(api_keys)}")
-    print(f"   Last error: {last_error}")
-    print("=" * 60 + "\n")
-
-    raise Exception(
-        f"All {len(api_keys)} keys failed after {total_attempts} attempts. "
-        f"Last error: {last_error}"
-    )
+    raise Exception(f"All keys failed. Last: {last_error}")
 
 
 # ================================================================
-# 10. VERIFY
+# VERIFY
 # ================================================================
 def verify_and_convert(ai_json, frame_index):
-    log_info("Verifying AI output...")
     fps_sampling = frame_index["fps_sampling"]
     total_frames = frame_index["total_frames"]
 
@@ -786,8 +791,9 @@ def verify_and_convert(ai_json, frame_index):
         ai_json["edits"] = []
         return ai_json
 
-    valid_frames = set(range(total_frames))
+    valid = set(range(total_frames))
     verified = []
+    min_dur = CONFIG["min_clip_duration"]
 
     for edit in ai_json.get("edits", []):
         if "insert_meme" in edit:
@@ -798,20 +804,22 @@ def verify_and_convert(ai_json, frame_index):
             sf = edit["start_frame"]
             ef = edit["end_frame"]
 
-            if sf not in valid_frames:
-                sf = min(valid_frames, key=lambda x: abs(x - sf))
-            if ef not in valid_frames:
-                ef = min(valid_frames, key=lambda x: abs(x - ef))
+            if sf not in valid:
+                sf = min(valid, key=lambda x: abs(x - sf))
+            if ef not in valid:
+                ef = min(valid, key=lambda x: abs(x - ef))
 
             if sf >= ef:
                 sf, ef = min(sf, ef), max(sf, ef)
-                if sf == ef:
-                    ef = min(sf + 1, total_frames - 1)
 
             edit["start_frame"] = sf
             edit["end_frame"] = ef
             edit["start"] = round(sf / fps_sampling, 3)
             edit["end"] = round(ef / fps_sampling, 3)
+
+            if not edit.get("remove") and (edit["end"] - edit["start"]) < min_dur:
+                log_warn(f"Skipping tiny clip: {edit['start']:.2f}-{edit['end']:.2f}s")
+                continue
 
         verified.append(edit)
 
@@ -821,73 +829,65 @@ def verify_and_convert(ai_json, frame_index):
 
 
 # ================================================================
-# 11. DEBUG LOG
+# DEBUG LOG
 # ================================================================
 def save_debug_log(ai_json, frame_index):
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-    json_path = os.path.join(DEBUG_DIR, f"edits_{timestamp}.json")
-    with open(json_path, "w") as f:
+    with open(os.path.join(PATHS["debug"], f"edits_{ts}.json"), "w") as f:
         json.dump(ai_json, f, indent=2)
 
-    lines = [
-        "=" * 70,
-        f"AI DECISIONS - {timestamp}",
-        "=" * 70,
-        f"Video: {frame_index['video_duration']:.1f}s | Frames: {frame_index['total_frames']}",
-        f"Content Quality: {ai_json.get('content_quality', 'unknown')}",
-        f"AI Reasoning: {ai_json.get('reasoning', '-')}",
-        f"Target: {ai_json.get('target_duration')}s | Aspect: {ai_json.get('aspect_ratio')}",
-        ""
-    ]
+    lines = ["=" * 70, f"AI DECISIONS - {ts}", "=" * 70]
+    lines.append(f"Quality: {ai_json.get('content_quality')}")
+    lines.append(f"Reasoning: {ai_json.get('reasoning')}")
+    lines.append(f"Target: {ai_json.get('target_duration')}s")
+    lines.append("")
 
     for i, edit in enumerate(ai_json.get("edits", []), 1):
         lines.append(f"--- EDIT #{i} ---")
         if "insert_meme" in edit:
-            lines.append(f"  🎭 MEME | Mood: {edit.get('meme_mood')}")
+            lines.append(f"  MEME | {edit.get('meme_mood')}")
         elif edit.get("remove"):
-            lines.append(f"  ✂️  CUT | Frames: {edit['start_frame']}-{edit['end_frame']}")
+            lines.append(f"  CUT | {edit['start_frame']}-{edit['end_frame']}")
         else:
-            lines.append(f"  🎬 KEEP | Frames: {edit['start_frame']}-{edit['end_frame']} "
-                         f"| Speed: {edit.get('speed', 1.0)}x")
+            lines.append(f"  KEEP | {edit['start_frame']}-{edit['end_frame']} @ {edit.get('speed', 1.0)}x")
         lines.append(f"  Reason: {edit.get('reason', '-')}")
 
-    log_path = os.path.join(DEBUG_DIR, f"debug_{timestamp}.txt")
-    with open(log_path, "w", encoding="utf-8") as f:
+    with open(os.path.join(PATHS["debug"], f"debug_{ts}.txt"), "w") as f:
         f.write("\n".join(lines))
 
     print("\n" + "\n".join(lines))
-    log_ok(f"Debug saved: {log_path}")
-    return log_path
+    return ts
 
 
 # ================================================================
-# 12. MOOD PICKERS
+# PICKERS
 # ================================================================
 def pick_meme(mood):
-    mood_dir = os.path.join(MEME_DIR, mood)
+    exts = tuple(CONFIG["meme_allowed_ext"])
+    mood_dir = os.path.join(PATHS["memes"], mood)
+
     if os.path.exists(mood_dir):
-        files = [f for f in os.listdir(mood_dir)
-                 if f.lower().endswith(('.mp4', '.mov', '.gif', '.webm'))]
+        files = [f for f in os.listdir(mood_dir) if f.lower().endswith(exts)]
         if files:
             return os.path.join(mood_dir, random.choice(files))
 
-    for root, dirs, files in os.walk(MEME_DIR):
-        vids = [f for f in files if f.lower().endswith(('.mp4', '.mov', '.gif', '.webm'))]
+    for root, dirs, files in os.walk(PATHS["memes"]):
+        vids = [f for f in files if f.lower().endswith(exts)]
         if vids:
             return os.path.join(root, random.choice(vids))
     return None
 
 
 def pick_sfx(mood):
-    mood_dir = os.path.join(SFX_DIR, mood)
+    mood_dir = os.path.join(PATHS["sfx"], mood)
     if os.path.exists(mood_dir):
         files = [f for f in os.listdir(mood_dir)
                  if f.lower().endswith(('.mp3', '.wav', '.m4a', '.aac'))]
         if files:
             return os.path.join(mood_dir, random.choice(files))
 
-    for root, dirs, files in os.walk(SFX_DIR):
+    for root, dirs, files in os.walk(PATHS["sfx"]):
         sfx = [f for f in files if f.lower().endswith(('.mp3', '.wav', '.m4a', '.aac'))]
         if sfx:
             return os.path.join(root, random.choice(sfx))
@@ -895,9 +895,9 @@ def pick_sfx(mood):
 
 
 # ================================================================
-# 13. ASPECT + FILTER
+# ASPECT + FILTER
 # ================================================================
-def apply_aspect(clip, ratio="9:16"):
+def apply_aspect(clip, ratio):
     w, h = clip.size
     if ratio == "9:16":
         tw = h * (9 / 16)
@@ -928,28 +928,20 @@ def apply_filter(clip, name):
         elif name == "vintage":
             clip = clip.fx(vfx.colorx, 0.8)
     except Exception as e:
-        log_warn(f"Filter error ({name}): {e}")
+        log_warn(f"Filter error: {e}")
     return clip
 
 
 # ================================================================
-# 14. BUILD REEL (16 Mbps + DURATION LOCK)
+# BUILD REEL
 # ================================================================
 def build_reel(video_path, ai_json, output_path):
-    print("\n" + "=" * 60)
-    print("   🎬 BUILD REEL — DEBUG")
-    print("=" * 60)
-    log_info(f"Source: {video_path}")
-    log_info(f"Aspect: {ai_json.get('aspect_ratio')}")
-    log_info(f"Music: {ai_json.get('bg_music', 'none')}")
-    log_info(f"Volume: {ai_json.get('music_volume', 0.3)}")
-    log_info(f"Total edits: {len(ai_json.get('edits', []))}")
-    print("=" * 60)
+    log_info("Building reel...")
 
     main = VideoFileClip(video_path)
     source_fps = main.fps if main.fps else 30
     source_duration = float(main.duration)
-    aspect = ai_json.get("aspect_ratio", "9:16")
+    aspect = ai_json.get("aspect_ratio", CONFIG["aspect_ratio"])
 
     clips = []
     sfx_data = []
@@ -959,26 +951,44 @@ def build_reel(video_path, ai_json, output_path):
 
     for edit in ai_json.get("edits", []):
 
+        # ---- MEME ----
         if "insert_meme" in edit:
             mood = edit.get("meme_mood", "funny")
             meme_path = pick_meme(mood)
             if meme_path:
                 try:
                     meme = VideoFileClip(meme_path)
+                    original_dur = meme.duration
+
+                    min_d = CONFIG["meme_min_duration"]
+                    max_d = CONFIG["meme_max_duration"]
+                    target_d = min(max(original_dur, min_d), max_d)
+
+                    if original_dur > target_d:
+                        meme = meme.subclip(0, target_d)
+                    elif original_dur < min_d:
+                        loops = int(min_d / original_dur) + 1
+                        meme = concatenate_videoclips([meme] * loops).subclip(0, min_d)
+
+                    if CONFIG["meme_scale"] != 1.0:
+                        meme = meme.fx(vfx.resize, CONFIG["meme_scale"])
+
                     meme = apply_aspect(meme, aspect)
                     clips.append(meme)
                     current_time += meme.duration
-                    log_ok(f"Meme ({mood}) — {meme.duration:.1f}s")
+                    log_ok(f"Meme ({mood}) {meme.duration:.1f}s [orig={original_dur:.1f}s]")
                 except Exception as e:
                     log_err(f"Meme error: {e}")
             else:
-                log_warn(f"No meme found for mood: {mood}")
+                log_warn(f"No meme for mood: {mood}")
             continue
 
+        # ---- REMOVE ----
         if edit.get("remove", False):
             log_info(f"Cut: {edit.get('start_frame')}-{edit.get('end_frame')}")
             continue
 
+        # ---- KEEP ----
         start = edit.get("start")
         end = edit.get("end")
         if start is None or end is None:
@@ -990,8 +1000,9 @@ def build_reel(video_path, ai_json, output_path):
 
             seg = main.subclip(start, end)
 
-            speed = edit.get("speed", 1.0)
-            if speed and speed != 1.0:
+            speed = edit.get("speed", CONFIG["default_speed"])
+            speed = max(CONFIG["min_speed"], min(CONFIG["max_speed"], speed))
+            if speed != 1.0:
                 seg = seg.fx(vfx.speedx, speed)
 
             zoom = edit.get("zoom")
@@ -1009,28 +1020,24 @@ def build_reel(video_path, ai_json, output_path):
             if "text" in edit:
                 try:
                     txt = TextClip(
-                        edit["text"], fontsize=70, color="white",
-                        stroke_color="black", stroke_width=3,
-                        font="DejaVu-Sans-Bold", method="caption"
-                    ).set_position(("center", "top")).set_duration(seg.duration)
+                        edit["text"],
+                        fontsize=CONFIG["text_font_size"],
+                        color=CONFIG["text_color"],
+                        stroke_color=CONFIG["text_stroke_color"],
+                        stroke_width=CONFIG["text_stroke_width"],
+                        font=CONFIG["text_font"],
+                        method="caption"
+                    ).set_position(CONFIG["text_position"]).set_duration(seg.duration)
                     seg = CompositeVideoClip([seg, txt])
-                except Exception:
-                    try:
-                        txt = TextClip(
-                            edit["text"], fontsize=70, color="white",
-                            stroke_color="black", stroke_width=3,
-                            method="caption"
-                        ).set_position(("center", "top")).set_duration(seg.duration)
-                        seg = CompositeVideoClip([seg, txt])
-                    except Exception as e2:
-                        log_warn(f"Text error: {e2}")
+                except Exception as e:
+                    log_warn(f"Text error: {e}")
 
             sfx_mood = edit.get("sfx_mood")
             if sfx_mood:
                 sfx_path = pick_sfx(sfx_mood)
                 if sfx_path:
                     sfx_data.append((current_time, sfx_path))
-                    log_ok(f"SFX ({sfx_mood}) recorded")
+                    log_ok(f"SFX ({sfx_mood})")
 
             clips.append(seg)
             current_time += seg.duration
@@ -1040,18 +1047,25 @@ def build_reel(video_path, ai_json, output_path):
             log_err(f"Clip error: {e}")
 
     if not clips:
-        log_err("No clips! Aborting.")
+        log_err("No clips!")
         return None
 
     final = concatenate_videoclips(clips, method="compose")
     video_duration = float(final.duration)
     log_info(f"Video duration locked: {video_duration:.2f}s")
 
-    # Audio
-    audio = []
-    if final.audio:
-        audio.append(final.audio)
+    # ============================================================
+    # AUDIO MIX (FULL CONTROL)
+    # ============================================================
+    audio_tracks = []
 
+    # 1. Original audio
+    if final.audio:
+        orig = final.audio.volumex(CONFIG["original_audio_volume"])
+        audio_tracks.append(orig)
+        log_info(f"Original audio: {CONFIG['original_audio_volume']}x")
+
+    # 2. SFX
     for start_t, sfx_path in sfx_data:
         try:
             sfx = AudioFileClip(sfx_path)
@@ -1060,45 +1074,57 @@ def build_reel(video_path, ai_json, output_path):
                 continue
             if sfx.duration > remaining:
                 sfx = sfx.subclip(0, remaining)
-            sfx = sfx.set_start(start_t)
-            audio.append(sfx)
+            sfx = sfx.set_start(start_t).volumex(CONFIG["sfx_volume"])
+            audio_tracks.append(sfx)
+            log_info(f"SFX @ {start_t:.2f}s: {CONFIG['sfx_volume']}x")
         except Exception as e:
             log_warn(f"SFX error: {e}")
 
+    # 3. Music
     if "bg_music" in ai_json:
-        mpath = os.path.join(MUSIC_DIR, ai_json["bg_music"])
+        mpath = os.path.join(PATHS["music"], ai_json["bg_music"])
         if os.path.exists(mpath):
             try:
-                vol = ai_json.get("music_volume", 0.3)
-                music = AudioFileClip(mpath).volumex(vol)
+                music = AudioFileClip(mpath).volumex(CONFIG["music_volume"])
                 if music.duration > video_duration:
                     music = music.subclip(0, video_duration)
                 else:
                     music = music.fx(vfx.loop, duration=video_duration)
-                audio.append(music)
-                log_ok(f"Music: {ai_json['bg_music']}")
+                audio_tracks.append(music)
+                log_ok(f"Music: {ai_json['bg_music']} @ {CONFIG['music_volume']}x")
             except Exception as e:
                 log_warn(f"Music error: {e}")
 
-    if audio:
-        composite_audio = CompositeAudioClip(audio)
-        if composite_audio.duration > video_duration:
-            composite_audio = composite_audio.subclip(0, video_duration)
-        final = final.set_audio(composite_audio)
+    if audio_tracks:
+        composite = CompositeAudioClip(audio_tracks)
+        if composite.duration > video_duration:
+            composite = composite.subclip(0, video_duration)
+        final = final.set_audio(composite)
 
     final = final.set_duration(video_duration)
 
-    log_info("Writing video at 16 Mbps (high quality)...")
+    # ============================================================
+    # WRITE
+    # ============================================================
+    output_fps = CONFIG["output_fps"] if CONFIG["output_fps"] else source_fps
+
+    log_info(f"Writing: {CONFIG['video_bitrate']}, CRF={CONFIG['crf']}, "
+             f"preset={CONFIG['preset']}, fps={output_fps}")
+
     final.write_videofile(
         output_path,
         codec="libx264",
         audio_codec="aac",
-        audio_bitrate="320k",
-        bitrate="16000k",
-        fps=source_fps,
-        preset="slow",
+        audio_bitrate=CONFIG["audio_bitrate"],
+        bitrate=CONFIG["video_bitrate"],
+        fps=output_fps,
+        preset=CONFIG["preset"],
         threads=4,
-        ffmpeg_params=["-crf", "18", "-pix_fmt", "yuv420p", "-movflags", "+faststart"],
+        ffmpeg_params=[
+            "-crf", str(CONFIG["crf"]),
+            "-pix_fmt", "yuv420p",
+            "-movflags", "+faststart"
+        ],
         verbose=False,
         logger=None
     )
@@ -1108,83 +1134,80 @@ def build_reel(video_path, ai_json, output_path):
 
 
 # ================================================================
-# 15. MAIN
+# MAIN
 # ================================================================
 def main():
-    parser = argparse.ArgumentParser(description="Auto Video Editor")
-    parser.add_argument("--video", default=os.path.join(TEMP_DIR, "gameplay.mp4"))
-    parser.add_argument("--fps", type=int, default=3)
-    parser.add_argument("--grids", type=int, default=6)
-    parser.add_argument("--whisper", default="true")
-    args = parser.parse_args()
-
     print("\n")
     print("╔" + "═" * 68 + "╗")
-    print("║" + " " * 15 + "🎬 AUTO EDITOR - OpenRouter" + " " * 26 + "║")
-    print("║" + " " * 10 + "Smart Content Mode + Multi-Key Retry" + " " * 22 + "║")
+    print("║" + " " * 12 + "🎬 AUTO EDITOR — FULL CONTROL" + " " * 26 + "║")
     print("╚" + "═" * 68 + "╝")
+
+    # Auto-set video path
+    if not CONFIG["video_path"]:
+        CONFIG["video_path"] = os.path.join(PATHS["temp"], "gameplay.mp4")
 
     ensure_folders()
     git_commit_folders()
 
-    log_step("🎬 AUTO EDITOR - Smart Content Mode (16 Mbps)")
-    log_info(f"Base dir: {BASE_DIR}/")
-    log_info(f"Video: {args.video}")
-    log_info(f"FPS: {args.fps}")
-    log_info(f"Grids: {args.grids}")
-    log_info(f"Whisper: {args.whisper}")
+    print_config()
 
-    if not os.path.exists(args.video):
-        log_err(f"Video not found: {args.video}")
+    video_path = CONFIG["video_path"]
+    if not os.path.exists(video_path):
+        log_err(f"Video not found: {video_path}")
         sys.exit(1)
 
     api_keys = get_api_keys()
     if not api_keys:
-        log_err("No OPENROUTER_API_KEY found!")
+        log_err("No API keys found!")
         sys.exit(1)
+    log_info(f"API keys: {len(api_keys)}")
 
-    log_info(f"API Keys loaded: {len(api_keys)}")
-
-    use_whisper = str(args.whisper).lower() == "true"
-
+    # STEP 1
     log_step("STEP 1: Video Info")
-    info = get_video_info(args.video)
-    log_ok(f"Duration: {info['duration']:.1f}s")
-    log_ok(f"Resolution: {info['width']}x{info['height']}")
-    log_ok(f"FPS: {info['fps']:.2f}")
+    info = get_video_info(video_path)
+    log_ok(f"Duration: {info['duration']:.1f}s | Res: {info['width']}x{info['height']} | FPS: {info['fps']:.2f}")
 
+    # STEP 2
     log_step("STEP 2: Frame Index")
-    frame_index = create_frame_index(args.video, args.fps)
+    frame_index = create_frame_index(video_path)
     log_ok(f"Total frames: {frame_index['total_frames']}")
 
-    log_step("STEP 3: Grid Generation")
-    grids = create_grids(args.video, frame_index, GRID_DIR, args.grids)
+    # STEP 3
+    log_step("STEP 3: Grids")
+    grids = create_grids(video_path, frame_index)
     log_ok(f"{len(grids)} grids created")
 
+    # STEP 4
     log_step("STEP 4: Transcript")
-    transcript = get_transcript(args.video, use_whisper)
+    transcript = get_transcript(video_path)
 
+    # STEP 5
     log_step("STEP 5: Spike Detection")
-    spikes = get_spikes(args.video)
+    spikes = get_spikes(video_path)
 
+    # STEP 6
     log_step("STEP 6: Assets Scan")
     memes, sfx, music = get_available_moods()
     log_info(f"Memes: {list(memes.keys())}")
     log_info(f"SFX: {list(sfx.keys())}")
     log_info(f"Music: {len(music)} files")
 
-    log_step("STEP 7: AI Analysis (Smart Content Decision)")
+    # STEP 7
+    log_step("STEP 7: AI Analysis")
     ai_json = ai_analyze(frame_index, grids, transcript, spikes, memes, sfx, music)
 
-    log_step("STEP 8: Verify Edits")
+    # STEP 8
+    log_step("STEP 8: Verify")
     ai_json = verify_and_convert(ai_json, frame_index)
 
+    # STEP 9
     log_step("STEP 9: Debug Log")
     save_debug_log(ai_json, frame_index)
 
+    # STEP 10
     log_step("STEP 10: Build Reel")
-    output = os.path.join(OUTPUT_DIR, "final_reel.mp4")
-    build_reel(args.video, ai_json, output)
+    output = os.path.join(PATHS["output"], "final_reel.mp4")
+    build_reel(video_path, ai_json, output)
 
     log_step("🎉 DONE!")
 
