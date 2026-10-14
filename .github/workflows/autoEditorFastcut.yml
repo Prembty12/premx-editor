@@ -28,8 +28,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📥 Checkout
+      - name: 📥 Checkout (with write access)
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: 🐍 Setup Python
         uses: actions/setup-python@v5
@@ -51,19 +54,9 @@ jobs:
           python -m pip install faster-whisper
           python -c "import moviepy, cv2, numpy, librosa, PIL, openai; print('✅ All imports OK')"
 
-      - name: 📁 Create FASTCUT folders
-        run: |
-          mkdir -p FASTCUT/input FASTCUT/temp_frames
-          mkdir -p FASTCUT/memes/shocked FASTCUT/memes/funny FASTCUT/memes/sad FASTCUT/memes/victory
-          mkdir -p FASTCUT/memes/reaction FASTCUT/memes/hype FASTCUT/memes/fail FASTCUT/memes/win
-          mkdir -p FASTCUT/sfx/hype FASTCUT/sfx/dramatic FASTCUT/sfx/funny FASTCUT/sfx/victory
-          mkdir -p FASTCUT/sfx/whoosh FASTCUT/sfx/impact FASTCUT/sfx/notification
-          mkdir -p FASTCUT/music FASTCUT/grids FASTCUT/debug FASTCUT/output
-          echo "✅ FASTCUT folders ready"
-          ls -la FASTCUT/
-
       - name: 📥 Download video
         run: |
+          mkdir -p FASTCUT/temp_frames
           VIDEO_URL="${{ github.event.inputs.video_url }}"
           curl -L -o FASTCUT/temp_frames/gameplay.mp4 "$VIDEO_URL"
           if [ -f "FASTCUT/temp_frames/gameplay.mp4" ]; then
@@ -73,13 +66,14 @@ jobs:
             exit 1
           fi
 
-      - name: 🎬 Run auto editor
+      - name: 🎬 Run auto editor (creates FASTCUT + commits)
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           OPENROUTER_API_KEY_2: ${{ secrets.OPENROUTER_API_KEY_2 }}
           OPENROUTER_API_KEY_3: ${{ secrets.OPENROUTER_API_KEY_3 }}
           OPENROUTER_API_KEY_4: ${{ secrets.OPENROUTER_API_KEY_4 }}
           OPENROUTER_API_KEY_5: ${{ secrets.OPENROUTER_API_KEY_5 }}
+          GITHUB_ACTIONS: "true"
         run: |
           python autoEditorFastcut.py \
             --video "FASTCUT/temp_frames/gameplay.mp4" \
@@ -89,12 +83,18 @@ jobs:
 
       - name: 🏷️ Rename output with timestamp
         id: rename
+        if: success()
         run: |
           TIMESTAMP=$(date +'%Y%m%d-%H%M%S')
           NEW_NAME="reel-${TIMESTAMP}.mp4"
-          mv "FASTCUT/output/final_reel.mp4" "FASTCUT/output/${NEW_NAME}"
-          echo "filename=${NEW_NAME}" >> $GITHUB_OUTPUT
-          echo "📌 Renamed to: ${NEW_NAME}"
+          if [ -f "FASTCUT/output/final_reel.mp4" ]; then
+            mv "FASTCUT/output/final_reel.mp4" "FASTCUT/output/${NEW_NAME}"
+            echo "filename=${NEW_NAME}" >> $GITHUB_OUTPUT
+            echo "📌 Renamed to: ${NEW_NAME}"
+          else
+            echo "❌ No output file found"
+            exit 1
+          fi
 
       - name: 📤 Upload to Release v1.6
         if: success()
@@ -120,8 +120,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 🧹 Cleanup (storage save)
+      - name: 🧹 Cleanup (only temp files, keep folders)
         if: always()
         run: |
-          rm -rf FASTCUT/output/ FASTCUT/debug/ FASTCUT/grids/ FASTCUT/temp_frames/
-          echo "✅ Cleaned up temp files"
+          rm -rf FASTCUT/temp_frames/*.mp4
+          rm -rf FASTCUT/grids/*.jpg
+          rm -rf FASTCUT/debug/*.json FASTCUT/debug/*.txt
+          rm -rf FASTCUT/output/*.mp4
+          echo "✅ Cleaned up temp files (folders preserved)"
