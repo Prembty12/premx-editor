@@ -1,12 +1,13 @@
 """
 ================================================================
-AUTO EDITOR - OpenRouter Multi-Key Version (PRODUCTION)
+AUTO EDITOR - OpenRouter Multi-Key Version (PRODUCTION FINAL)
 ================================================================
 - 5 API keys with auto-retry (2 attempts each = 10 total)
-- JSON parse error -> try next key
+- Smart prompt: preserves good content, only cuts boring
+- High quality output (16 Mbps, CRF 18, near-lossless)
+- Duration lock — no freeze
 - MoviePy 1.0.3 compatible
 - Whisper cached
-- Full error handling
 - All folders inside FASTCUT/
 - Auto git-commit FASTCUT structure (in GitHub Actions)
 ================================================================
@@ -246,7 +247,6 @@ def git_commit_folders():
     log_info("Committing FASTCUT structure to git...")
 
     try:
-        # Git config
         subprocess.run(
             ["git", "config", "user.email", "actions@github.com"],
             check=True, timeout=10
@@ -256,13 +256,11 @@ def git_commit_folders():
             check=True, timeout=10
         )
 
-        # Add FASTCUT
         subprocess.run(
             ["git", "add", f"{BASE_DIR}/"],
             check=True, timeout=30
         )
 
-        # Check if there's anything to commit
         diff = subprocess.run(
             ["git", "diff", "--cached", "--quiet"],
             timeout=30
@@ -272,13 +270,11 @@ def git_commit_folders():
             log_info("No changes to commit (folders already tracked)")
             return
 
-        # Commit
         subprocess.run(
             ["git", "commit", "-m", "📁 Auto: Update FASTCUT folder structure [skip ci]"],
             check=True, timeout=30
         )
 
-        # Push
         push_result = subprocess.run(
             ["git", "push"],
             capture_output=True, text=True, timeout=60
@@ -288,7 +284,6 @@ def git_commit_folders():
             log_ok("FASTCUT structure committed & pushed to GitHub ✅")
         else:
             log_warn(f"Push failed: {push_result.stderr[:200]}")
-            log_info("(Folders ready locally but not pushed)")
 
     except subprocess.CalledProcessError as e:
         log_warn(f"Git command failed: {e}")
@@ -535,7 +530,7 @@ def get_available_moods():
 
 
 # ================================================================
-# 7. BUILD PROMPT
+# 7. BUILD PROMPT (SMART LENGTH DECISION)
 # ================================================================
 def build_prompt(frame_index, grid_count, transcript, spikes, memes, sfx, music):
     frame_lines = [
@@ -544,20 +539,23 @@ def build_prompt(frame_index, grid_count, transcript, spikes, memes, sfx, music)
     ]
     frame_list = "\n".join(frame_lines)
 
-    prompt = f"""You are a PROFESSIONAL viral gaming editor with FULL CREATIVE FREEDOM.
-Game doesn't matter - works with ANY game.
+    source_dur = frame_index['video_duration']
 
-VIDEO: {frame_index['video_duration']:.1f}s | Sampling: {frame_index['fps_sampling']}fps | Total: {frame_index['total_frames']}
+    prompt = f"""You are a PROFESSIONAL viral gaming editor. Your job is to make the video BETTER, not shorter.
+
+VIDEO INFO:
+- Duration: {source_dur:.1f}s
+- Sampling: {frame_index['fps_sampling']}fps | Total frames: {frame_index['total_frames']}
 
 FRAME INDEX (use ONLY these):
 {frame_list}
 
-GRIDS: {grid_count} images. Each frame has "#idx | MM:SS.S" label.
+GRIDS: {grid_count} images with "#idx | MM:SS.S" labels.
 
 TRANSCRIPT:
 {transcript}
 
-AUDIO SPIKES:
+AUDIO SPIKES (loud moments = hype):
 {spikes}
 
 AVAILABLE:
@@ -565,27 +563,134 @@ AVAILABLE:
 - SFX moods: {list(sfx.keys())}
 - Music: {music}
 
-TASK: Create a PROFESSIONAL 30-90 sec viral reel.
+============================================================
+🎯 YOUR PRIMARY DECISION: ANALYZE CONTENT QUALITY
+============================================================
 
-RULES:
-- USE FRAME NUMBERS (not timestamps)
-- Hook in first 2-3 sec
-- CUT ALL boring
-- Speed: hype=1.3-1.5x, clutch=0.5-0.7x
-- Total 30-90 sec
-- Every edit MUST have a "reason"
-- aspect_ratio MUST be exactly one of: "9:16", "1:1", "4:5" (default 9:16)
+Step 1: Watch the frames/grids carefully.
+Step 2: Classify EVERY second of the video into 2 buckets:
 
-Return ONLY valid JSON (no markdown, no explanation, no code fences):
+  🟢 GOOD CONTENT (KEEP AT 1.0x speed):
+     - Fights, action, kills, clutch moments
+     - Funny reactions, rage, hype moments
+     - Big plays, skill shots, close calls
+     - Any moment with audio spike
+     - Any moment with emotion or speech
+
+  🔴 BORING CONTENT (REMOVE or SPEED UP):
+     - Loading screens, menus, settings
+     - Idle standing, walking, waiting
+     - Silent dead-time (no speech, no action)
+     - Repeated grinding, inventory, crafting
+     - Tutorial text, "Press X to continue"
+
+============================================================
+📏 OUTPUT LENGTH RULES (VERY IMPORTANT)
+============================================================
+
+CASE A: Content is GOOD (mostly exciting)
+  → PRESERVE the full length. Do NOT cut exciting parts.
+  → Target: 90-100% of source duration
+  → Example: 42s source → 38-42s output
+
+CASE B: Content is MIXED (some boring, some good)
+  → Cut ONLY the boring parts
+  → Target: 60-85% of source duration
+  → Example: 42s source → 26-36s output
+
+CASE C: Content is BAD (mostly boring)
+  → Cut aggressively, keep only best moments
+  → Target: 30-50% of source duration
+  → Example: 42s source → 13-21s output
+
+⚠️ DEFAULT: Prefer CASE A or B. Only use CASE C if truly necessary.
+
+============================================================
+✂️ EDITING RULES
+============================================================
+
+1. USE FRAME NUMBERS (not timestamps)
+2. Hook in first 2-3 sec — if first 3 sec are boring, CUT THEM
+3. Speed changes:
+   - Normal good content: 1.0x (keep as is)
+   - Slightly slow: 1.2-1.3x
+   - Very slow/boring but needed: 1.5-2.0x
+   - Clutch/slow-mo moments: 0.5-0.7x
+4. aspect_ratio MUST be: "9:16", "1:1", or "4:5" (default 9:16)
+5. Every edit MUST have a clear "reason"
+6. DO NOT remove more than 50% of good content
+7. If content is good, KEEP IT ALL at 1.0x
+
+============================================================
+🎬 EXAMPLES OF CORRECT EDITS
+============================================================
+
+EXAMPLE 1 — Good content (42s source, keep mostly):
 {{
-  "target_duration": 60,
+  "content_quality": "good",
+  "reasoning": "Continuous combat with clear audio spikes",
+  "target_duration": 40,
   "aspect_ratio": "9:16",
-  "bg_music": "hype_track.mp3",
-  "music_volume": 0.3,
+  "bg_music": "hype.mp3",
+  "music_volume": 0.25,
   "edits": [
-    {{"start_frame": 0, "end_frame": 15, "remove": true, "reason": "Boring intro"}},
-    {{"start_frame": 30, "end_frame": 45, "speed": 1.5, "sfx_mood": "hype", "reason": "Kill moment"}},
-    {{"insert_meme": "auto", "meme_mood": "shocked", "reason": "Reaction"}}
+    {{"start_frame": 0, "end_frame": 6, "remove": true, "reason": "Loading screen only"}},
+    {{"start_frame": 6, "end_frame": 120, "speed": 1.0, "reason": "All gameplay is exciting — keep full"}}
+  ]
+}}
+
+EXAMPLE 2 — Mixed content (42s source):
+{{
+  "content_quality": "mixed",
+  "reasoning": "Some boring walking between good fights",
+  "target_duration": 30,
+  "aspect_ratio": "9:16",
+  "bg_music": "hype.mp3",
+  "music_volume": 0.25,
+  "edits": [
+    {{"start_frame": 0, "end_frame": 9, "remove": true, "reason": "Menu + loading"}},
+    {{"start_frame": 9, "end_frame": 60, "speed": 1.0, "reason": "Main fight — keep full"}},
+    {{"start_frame": 60, "end_frame": 75, "remove": true, "reason": "Walking to next area, no action"}},
+    {{"start_frame": 75, "end_frame": 120, "speed": 1.0, "reason": "Boss fight — keep full"}}
+  ]
+}}
+
+EXAMPLE 3 — Boring content (42s source, only few good moments):
+{{
+  "content_quality": "boring",
+  "reasoning": "Mostly walking, only 2 short fights",
+  "target_duration": 18,
+  "aspect_ratio": "9:16",
+  "bg_music": "hype.mp3",
+  "music_volume": 0.25,
+  "edits": [
+    {{"start_frame": 0, "end_frame": 30, "remove": true, "reason": "Boring intro + walking"}},
+    {{"start_frame": 30, "end_frame": 45, "speed": 1.0, "reason": "Only good fight in the video"}},
+    {{"start_frame": 45, "end_frame": 90, "remove": true, "reason": "Boring grind"}},
+    {{"start_frame": 90, "end_frame": 126, "speed": 1.0, "reason": "Final kill"}}
+  ]
+}}
+
+============================================================
+NOW ANALYZE AND DECIDE
+============================================================
+
+Think:
+1. What % of this video is exciting vs boring?
+2. Which case (A/B/C) applies?
+3. What's the right target_duration?
+4. Which exact frames to cut?
+
+Return ONLY valid JSON (no markdown, no code fences, no explanation):
+{{
+  "content_quality": "good|mixed|boring",
+  "reasoning": "One sentence about what you observed",
+  "target_duration": <number>,
+  "aspect_ratio": "9:16",
+  "bg_music": "<filename from AVAILABLE music>",
+  "music_volume": 0.25,
+  "edits": [
+    ...
   ]
 }}
 """
@@ -686,6 +791,10 @@ def ai_analyze(frame_index, grid_paths, transcript, spikes, memes, sfx, music):
                 if result.get("aspect_ratio") not in ("9:16", "1:1", "4:5"):
                     result["aspect_ratio"] = "9:16"
 
+                log_ok(f"Content quality: {result.get('content_quality', 'unknown')}")
+                log_ok(f"Reasoning: {result.get('reasoning', '-')}")
+                log_ok(f"Target duration: {result.get('target_duration', '?')}s")
+
                 log_ok(f"✅ SUCCESS with key #{key_idx} (attempt {attempt})")
                 return result
 
@@ -779,6 +888,8 @@ def save_debug_log(ai_json, frame_index):
         f"AI DECISIONS - {timestamp}",
         "=" * 70,
         f"Video: {frame_index['video_duration']:.1f}s | Frames: {frame_index['total_frames']}",
+        f"Content Quality: {ai_json.get('content_quality', 'unknown')}",
+        f"AI Reasoning: {ai_json.get('reasoning', '-')}",
         f"Target: {ai_json.get('target_duration')}s | Aspect: {ai_json.get('aspect_ratio')}",
         ""
     ]
@@ -891,16 +1002,21 @@ def apply_filter(clip, name):
 
 
 # ================================================================
-# 14. BUILD REEL
+# 14. BUILD REEL (16 Mbps HIGH QUALITY + DURATION LOCK)
 # ================================================================
 def build_reel(video_path, ai_json, output_path):
     log_info("Building reel...")
 
     main = VideoFileClip(video_path)
+    source_fps = main.fps if main.fps else 30
+    source_duration = float(main.duration)
     aspect = ai_json.get("aspect_ratio", "9:16")
+
     clips = []
-    sfx_tracks = []
+    sfx_data = []
     current_time = 0.0
+
+    log_info(f"Source: {source_duration:.2f}s @ {source_fps:.2f}fps")
 
     for edit in ai_json.get("edits", []):
 
@@ -930,8 +1046,8 @@ def build_reel(video_path, ai_json, output_path):
             continue
 
         try:
-            start = max(0.0, min(start, main.duration))
-            end = max(start + 0.05, min(end, main.duration))
+            start = max(0.0, min(start, source_duration))
+            end = max(start + 0.05, min(end, source_duration))
 
             seg = main.subclip(start, end)
 
@@ -974,12 +1090,8 @@ def build_reel(video_path, ai_json, output_path):
             if sfx_mood:
                 sfx_path = pick_sfx(sfx_mood)
                 if sfx_path:
-                    try:
-                        sfx = AudioFileClip(sfx_path).set_start(current_time)
-                        sfx_tracks.append(sfx)
-                        log_ok(f"SFX ({sfx_mood})")
-                    except Exception as e:
-                        log_warn(f"SFX error: {e}")
+                    sfx_data.append((current_time, sfx_path))
+                    log_ok(f"SFX ({sfx_mood}) recorded")
 
             clips.append(seg)
             current_time += seg.duration
@@ -992,12 +1104,28 @@ def build_reel(video_path, ai_json, output_path):
         log_err("No clips! Aborting.")
         return None
 
+    # CONCATENATE VIDEO
     final = concatenate_videoclips(clips, method="compose")
+    video_duration = float(final.duration)
+    log_info(f"Video duration locked: {video_duration:.2f}s")
 
+    # BUILD AUDIO
     audio = []
     if final.audio:
         audio.append(final.audio)
-    audio.extend(sfx_tracks)
+
+    for start_t, sfx_path in sfx_data:
+        try:
+            sfx = AudioFileClip(sfx_path)
+            remaining = video_duration - start_t
+            if remaining <= 0.05:
+                continue
+            if sfx.duration > remaining:
+                sfx = sfx.subclip(0, remaining)
+            sfx = sfx.set_start(start_t)
+            audio.append(sfx)
+        except Exception as e:
+            log_warn(f"SFX error: {e}")
 
     if "bg_music" in ai_json:
         mpath = os.path.join(MUSIC_DIR, ai_json["bg_music"])
@@ -1005,32 +1133,47 @@ def build_reel(video_path, ai_json, output_path):
             try:
                 vol = ai_json.get("music_volume", 0.3)
                 music = AudioFileClip(mpath).volumex(vol)
-                if music.duration > final.duration:
-                    music = music.subclip(0, final.duration)
+                if music.duration > video_duration:
+                    music = music.subclip(0, video_duration)
                 else:
-                    music = music.fx(vfx.loop, duration=final.duration)
+                    music = music.fx(vfx.loop, duration=video_duration)
                 audio.append(music)
                 log_ok(f"Music: {ai_json['bg_music']}")
             except Exception as e:
                 log_warn(f"Music error: {e}")
-        else:
-            log_warn(f"Music not found: {mpath}")
 
     if audio:
-        final = final.set_audio(CompositeAudioClip(audio))
+        composite_audio = CompositeAudioClip(audio)
+        if composite_audio.duration > video_duration:
+            composite_audio = composite_audio.subclip(0, video_duration)
+        final = final.set_audio(composite_audio)
 
-    log_info("Writing video (this may take 1-3 min)...")
+    final = final.set_duration(video_duration)
+
+    # ============================================================
+    # WRITE VIDEO — 16 Mbps HIGH QUALITY
+    # ============================================================
+    log_info("Writing video at 16 Mbps (high quality)...")
+
     final.write_videofile(
         output_path,
         codec="libx264",
         audio_codec="aac",
-        fps=30,
-        preset="medium",
+        audio_bitrate="320k",
+        bitrate="16000k",          # ← 16 Mbps
+        fps=source_fps,
+        preset="slow",
         threads=4,
+        ffmpeg_params=[
+            "-crf", "18",
+            "-pix_fmt", "yuv420p",
+            "-movflags", "+faststart"
+        ],
         verbose=False,
         logger=None
     )
-    log_ok(f"Final: {output_path} ({final.duration:.1f}s)")
+
+    log_ok(f"Final: {output_path} ({final.duration:.2f}s)")
     return output_path
 
 
@@ -1048,7 +1191,7 @@ def main():
     ensure_folders()
     git_commit_folders()
 
-    log_step("🎬 AUTO EDITOR - Multi-Key Version")
+    log_step("🎬 AUTO EDITOR - Smart Content Mode (16 Mbps)")
     log_info(f"Base dir: {BASE_DIR}/")
     log_info(f"Video: {args.video}")
     log_info(f"FPS: {args.fps}")
@@ -1104,7 +1247,7 @@ def main():
     log_info(f"Music: {len(music)} files")
 
     # STEP 7
-    log_step("STEP 7: AI Analysis (Multi-Key Retry)")
+    log_step("STEP 7: AI Analysis (Smart Content Decision)")
     ai_json = ai_analyze(frame_index, grids, transcript, spikes, memes, sfx, music)
 
     # STEP 8
