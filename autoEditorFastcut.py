@@ -6,6 +6,7 @@ AUTO EDITOR - OpenRouter Multi-Key Version (PRODUCTION FINAL)
 - Smart prompt: preserves good content, only cuts boring
 - High quality output (16 Mbps, CRF 18, near-lossless)
 - Duration lock — no freeze
+- Detailed terminal debugging (JSON, retry, API)
 - MoviePy 1.0.3 compatible
 - Whisper cached
 - All folders inside FASTCUT/
@@ -107,15 +108,7 @@ def log_info(msg):
 def ensure_folders():
     """Sab folders FASTCUT/ ke andar auto-create karo."""
     folders = [
-        # Core
-        BASE_DIR,
-        INPUT_DIR,
-        TEMP_DIR,
-        GRID_DIR,
-        DEBUG_DIR,
-        OUTPUT_DIR,
-
-        # Meme moods
+        BASE_DIR, INPUT_DIR, TEMP_DIR, GRID_DIR, DEBUG_DIR, OUTPUT_DIR,
         MEME_DIR,
         os.path.join(MEME_DIR, "shocked"),
         os.path.join(MEME_DIR, "funny"),
@@ -125,8 +118,6 @@ def ensure_folders():
         os.path.join(MEME_DIR, "hype"),
         os.path.join(MEME_DIR, "fail"),
         os.path.join(MEME_DIR, "win"),
-
-        # SFX moods
         SFX_DIR,
         os.path.join(SFX_DIR, "hype"),
         os.path.join(SFX_DIR, "dramatic"),
@@ -135,14 +126,10 @@ def ensure_folders():
         os.path.join(SFX_DIR, "whoosh"),
         os.path.join(SFX_DIR, "impact"),
         os.path.join(SFX_DIR, "notification"),
-
-        # Music
         MUSIC_DIR,
     ]
 
-    created = []
-    existed = []
-
+    created, existed = [], []
     for f in folders:
         if os.path.exists(f):
             existed.append(f)
@@ -165,30 +152,23 @@ def ensure_folders():
 
 
 def _drop_gitkeep_files(folders):
-    """Har folder me .gitkeep daalo taaki git empty folder track kar sake."""
-    gitkeep_count = 0
+    count = 0
     for folder in folders:
-        if not os.path.isdir(folder):
+        if not os.path.isdir(folder) or folder == BASE_DIR:
             continue
-        if folder == BASE_DIR:
-            continue
-        gitkeep_path = os.path.join(folder, ".gitkeep")
-        if not os.path.exists(gitkeep_path):
+        path = os.path.join(folder, ".gitkeep")
+        if not os.path.exists(path):
             try:
-                with open(gitkeep_path, "w") as f:
+                with open(path, "w") as f:
                     f.write("")
-                gitkeep_count += 1
+                count += 1
             except Exception:
                 pass
-
-    if gitkeep_count > 0:
-        log_ok(f"Dropped {gitkeep_count} .gitkeep files (for git tracking)")
-    else:
-        log_info(".gitkeep files already exist in all folders")
+    if count > 0:
+        log_ok(f"Dropped {count} .gitkeep files (for git tracking)")
 
 
 def _drop_folder_readmes():
-    """Har folder me README.txt daal do (agar empty ho)."""
     readmes = {
         os.path.join(MEME_DIR, "shocked"):  "Shocked reaction memes\nFormats: .mp4, .mov, .gif, .webm",
         os.path.join(MEME_DIR, "funny"):    "Funny memes\nFormats: .mp4, .mov, .gif, .webm",
@@ -198,7 +178,6 @@ def _drop_folder_readmes():
         os.path.join(MEME_DIR, "hype"):     "Hype memes\nFormats: .mp4, .mov, .gif, .webm",
         os.path.join(MEME_DIR, "fail"):     "Fail memes\nFormats: .mp4, .mov, .gif, .webm",
         os.path.join(MEME_DIR, "win"):      "Win memes\nFormats: .mp4, .mov, .gif, .webm",
-
         os.path.join(SFX_DIR, "hype"):         "Hype SFX\nFormats: .mp3, .wav, .m4a, .aac",
         os.path.join(SFX_DIR, "dramatic"):     "Dramatic SFX\nFormats: .mp3, .wav, .m4a, .aac",
         os.path.join(SFX_DIR, "funny"):        "Funny SFX\nFormats: .mp3, .wav, .m4a, .aac",
@@ -206,66 +185,44 @@ def _drop_folder_readmes():
         os.path.join(SFX_DIR, "whoosh"):       "Whoosh SFX\nFormats: .mp3, .wav, .m4a, .aac",
         os.path.join(SFX_DIR, "impact"):       "Impact SFX\nFormats: .mp3, .wav, .m4a, .aac",
         os.path.join(SFX_DIR, "notification"): "Notification SFX\nFormats: .mp3, .wav, .m4a, .aac",
-
-        MUSIC_DIR:  "Background music\nFormats: .mp3, .wav, .m4a, .aac",
+        MUSIC_DIR:  "Background music",
         INPUT_DIR:  "Raw input videos",
         OUTPUT_DIR: "Final reels",
         GRID_DIR:   "Frame grid images",
         DEBUG_DIR:  "AI decision logs",
         TEMP_DIR:   "Temp working directory",
     }
-
     for folder, text in readmes.items():
         if not os.path.exists(folder):
             continue
         items = [f for f in os.listdir(folder) if f not in ("README.txt", ".gitkeep")]
         if items:
             continue
-        readme_path = os.path.join(folder, "README.txt")
-        if os.path.exists(readme_path):
+        path = os.path.join(folder, "README.txt")
+        if os.path.exists(path):
             continue
         try:
-            with open(readme_path, "w", encoding="utf-8") as f:
-                f.write(f"📁 {folder}\n")
-                f.write("=" * 60 + "\n\n")
-                f.write(text + "\n\n")
-                f.write("=" * 60 + "\n")
-                f.write("Auto-managed folder.\n")
+            with open(path, "w", encoding="utf-8") as f:
+                f.write(f"📁 {folder}\n\n{text}\n\nAuto-managed folder.\n")
         except Exception:
             pass
 
 
 # ================================================================
-# AUTO-COMMIT FASTCUT STRUCTURE TO GIT (GitHub Actions only)
+# AUTO-COMMIT FASTCUT STRUCTURE TO GIT
 # ================================================================
 def git_commit_folders():
-    """FASTCUT structure ko git me commit + push karo (GitHub Actions me)."""
     if not os.getenv("GITHUB_ACTIONS"):
         log_info("Not in GitHub Actions — skipping git commit")
         return
 
     log_info("Committing FASTCUT structure to git...")
-
     try:
-        subprocess.run(
-            ["git", "config", "user.email", "actions@github.com"],
-            check=True, timeout=10
-        )
-        subprocess.run(
-            ["git", "config", "user.name", "github-actions[bot]"],
-            check=True, timeout=10
-        )
+        subprocess.run(["git", "config", "user.email", "actions@github.com"], check=True, timeout=10)
+        subprocess.run(["git", "config", "user.name", "github-actions[bot]"], check=True, timeout=10)
+        subprocess.run(["git", "add", f"{BASE_DIR}/"], check=True, timeout=30)
 
-        subprocess.run(
-            ["git", "add", f"{BASE_DIR}/"],
-            check=True, timeout=30
-        )
-
-        diff = subprocess.run(
-            ["git", "diff", "--cached", "--quiet"],
-            timeout=30
-        )
-
+        diff = subprocess.run(["git", "diff", "--cached", "--quiet"], timeout=30)
         if diff.returncode == 0:
             log_info("No changes to commit (folders already tracked)")
             return
@@ -274,23 +231,11 @@ def git_commit_folders():
             ["git", "commit", "-m", "📁 Auto: Update FASTCUT folder structure [skip ci]"],
             check=True, timeout=30
         )
-
-        push_result = subprocess.run(
-            ["git", "push"],
-            capture_output=True, text=True, timeout=60
-        )
-
-        if push_result.returncode == 0:
-            log_ok("FASTCUT structure committed & pushed to GitHub ✅")
+        push = subprocess.run(["git", "push"], capture_output=True, text=True, timeout=60)
+        if push.returncode == 0:
+            log_ok("FASTCUT structure committed & pushed ✅")
         else:
-            log_warn(f"Push failed: {push_result.stderr[:200]}")
-
-    except subprocess.CalledProcessError as e:
-        log_warn(f"Git command failed: {e}")
-    except subprocess.TimeoutExpired:
-        log_warn("Git command timed out")
-    except FileNotFoundError:
-        log_warn("Git not installed")
+            log_warn(f"Push failed: {push.stderr[:200]}")
     except Exception as e:
         log_warn(f"Git commit error: {e}")
 
@@ -302,21 +247,13 @@ def get_video_info(video_path):
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
         raise Exception(f"Video open nahi hua: {video_path}")
-
     fps = cap.get(cv2.CAP_PROP_FPS)
     total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     duration = total / fps if fps > 0 else 0
     w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     cap.release()
-
-    return {
-        "duration": duration,
-        "fps": fps,
-        "width": w,
-        "height": h,
-        "total_frames": total
-    }
+    return {"duration": duration, "fps": fps, "width": w, "height": h, "total_frames": total}
 
 
 # ================================================================
@@ -326,10 +263,7 @@ def create_frame_index(video_path, frames_per_sec=3):
     info = get_video_info(video_path)
     duration = info["duration"]
     total_frames = int(duration * frames_per_sec)
-    frames = [
-        {"idx": i, "t": round(i / frames_per_sec, 3)}
-        for i in range(total_frames)
-    ]
+    frames = [{"idx": i, "t": round(i / frames_per_sec, 3)} for i in range(total_frames)]
     return {
         "video_duration": duration,
         "fps_sampling": frames_per_sec,
@@ -358,7 +292,6 @@ def create_grids(video_path, frame_index, output_dir, max_images=6):
     log_info(f"Grids: {num_grids}")
     log_info(f"Frames/grid: {frames_per_grid}")
     log_info(f"Layout: {cols}x{rows}")
-    log_info(f"Thumb size: {thumb_size}px")
 
     cap = cv2.VideoCapture(video_path)
     paths = []
@@ -393,10 +326,7 @@ def create_grids(video_path, frame_index, output_dir, max_images=6):
             label = f"#{f['idx']} | {ts}"
             bbox = draw.textbbox((0, 0), label, font=font)
             pad = max(2, thumb_size // 50)
-            draw.rectangle(
-                [pad, pad, 2 * pad + bbox[2], 2 * pad + bbox[3]],
-                fill="black"
-            )
+            draw.rectangle([pad, pad, 2 * pad + bbox[2], 2 * pad + bbox[3]], fill="black")
             draw.text((pad + 2, pad + 1), label, fill="yellow", font=font)
             frames.append(np.array(img))
 
@@ -435,15 +365,11 @@ def get_transcript(video_path, use_whisper=True):
     if not use_whisper:
         log_info("Whisper skipped")
         return "No transcript"
-
     try:
         model = get_whisper_model()
         log_info("Transcribing...")
         segments, info = model.transcribe(video_path)
-        lines = [
-            f"[{s.start:6.1f}s] {s.text.strip()}"
-            for s in segments if s.text.strip()
-        ]
+        lines = [f"[{s.start:6.1f}s] {s.text.strip()}" for s in segments if s.text.strip()]
         if not lines:
             log_warn("No speech detected")
             return "No speech"
@@ -464,27 +390,17 @@ def get_spikes(video_path):
         rms = librosa.feature.rms(y=y, frame_length=2048, hop_length=512)[0]
         hop_sec = 512 / sr
         win = max(1, int(1 / hop_sec))
-
         per_sec = []
         for i in range(0, len(rms), win):
             chunk = rms[i:i + win]
             if len(chunk) > 0:
                 per_sec.append(float(chunk.max()))
-
         if not per_sec:
-            log_warn("No audio frames")
             return "No spikes"
-
         threshold = float(np.percentile(per_sec, 80))
-        spikes = [
-            f"[{i:6.1f}s] RMS={v:.3f}"
-            for i, v in enumerate(per_sec) if v > threshold
-        ]
-
+        spikes = [f"[{i:6.1f}s] RMS={v:.3f}" for i, v in enumerate(per_sec) if v > threshold]
         if not spikes:
-            log_warn("No spikes above threshold")
             return "No spikes"
-
         log_ok(f"{len(spikes)} spikes detected")
         return "\n".join(spikes)
     except Exception as e:
@@ -502,10 +418,8 @@ def get_available_moods():
         for mood in os.listdir(MEME_DIR):
             p = os.path.join(MEME_DIR, mood)
             if os.path.isdir(p):
-                files = [
-                    f for f in os.listdir(p)
-                    if f.lower().endswith(('.mp4', '.mov', '.gif', '.webm'))
-                ]
+                files = [f for f in os.listdir(p)
+                         if f.lower().endswith(('.mp4', '.mov', '.gif', '.webm'))]
                 if files:
                     memes[mood] = files
 
@@ -513,18 +427,14 @@ def get_available_moods():
         for mood in os.listdir(SFX_DIR):
             p = os.path.join(SFX_DIR, mood)
             if os.path.isdir(p):
-                files = [
-                    f for f in os.listdir(p)
-                    if f.lower().endswith(('.mp3', '.wav', '.m4a', '.aac'))
-                ]
+                files = [f for f in os.listdir(p)
+                         if f.lower().endswith(('.mp3', '.wav', '.m4a', '.aac'))]
                 if files:
                     sfx[mood] = files
 
     if os.path.exists(MUSIC_DIR):
-        music = [
-            f for f in os.listdir(MUSIC_DIR)
-            if f.lower().endswith(('.mp3', '.wav', '.m4a', '.aac'))
-        ]
+        music = [f for f in os.listdir(MUSIC_DIR)
+                 if f.lower().endswith(('.mp3', '.wav', '.m4a', '.aac'))]
 
     return memes, sfx, music
 
@@ -533,12 +443,8 @@ def get_available_moods():
 # 7. BUILD PROMPT (SMART LENGTH DECISION)
 # ================================================================
 def build_prompt(frame_index, grid_count, transcript, spikes, memes, sfx, music):
-    frame_lines = [
-        f"#{f['idx']}={f['t']}s"
-        for f in frame_index["frames"][::3]
-    ]
+    frame_lines = [f"#{f['idx']}={f['t']}s" for f in frame_index["frames"][::3]]
     frame_list = "\n".join(frame_lines)
-
     source_dur = frame_index['video_duration']
 
     prompt = f"""You are a PROFESSIONAL viral gaming editor. Your job is to make the video BETTER, not shorter.
@@ -621,66 +527,6 @@ CASE C: Content is BAD (mostly boring)
 6. DO NOT remove more than 50% of good content
 7. If content is good, KEEP IT ALL at 1.0x
 
-============================================================
-🎬 EXAMPLES OF CORRECT EDITS
-============================================================
-
-EXAMPLE 1 — Good content (42s source, keep mostly):
-{{
-  "content_quality": "good",
-  "reasoning": "Continuous combat with clear audio spikes",
-  "target_duration": 40,
-  "aspect_ratio": "9:16",
-  "bg_music": "hype.mp3",
-  "music_volume": 0.25,
-  "edits": [
-    {{"start_frame": 0, "end_frame": 6, "remove": true, "reason": "Loading screen only"}},
-    {{"start_frame": 6, "end_frame": 120, "speed": 1.0, "reason": "All gameplay is exciting — keep full"}}
-  ]
-}}
-
-EXAMPLE 2 — Mixed content (42s source):
-{{
-  "content_quality": "mixed",
-  "reasoning": "Some boring walking between good fights",
-  "target_duration": 30,
-  "aspect_ratio": "9:16",
-  "bg_music": "hype.mp3",
-  "music_volume": 0.25,
-  "edits": [
-    {{"start_frame": 0, "end_frame": 9, "remove": true, "reason": "Menu + loading"}},
-    {{"start_frame": 9, "end_frame": 60, "speed": 1.0, "reason": "Main fight — keep full"}},
-    {{"start_frame": 60, "end_frame": 75, "remove": true, "reason": "Walking to next area, no action"}},
-    {{"start_frame": 75, "end_frame": 120, "speed": 1.0, "reason": "Boss fight — keep full"}}
-  ]
-}}
-
-EXAMPLE 3 — Boring content (42s source, only few good moments):
-{{
-  "content_quality": "boring",
-  "reasoning": "Mostly walking, only 2 short fights",
-  "target_duration": 18,
-  "aspect_ratio": "9:16",
-  "bg_music": "hype.mp3",
-  "music_volume": 0.25,
-  "edits": [
-    {{"start_frame": 0, "end_frame": 30, "remove": true, "reason": "Boring intro + walking"}},
-    {{"start_frame": 30, "end_frame": 45, "speed": 1.0, "reason": "Only good fight in the video"}},
-    {{"start_frame": 45, "end_frame": 90, "remove": true, "reason": "Boring grind"}},
-    {{"start_frame": 90, "end_frame": 126, "speed": 1.0, "reason": "Final kill"}}
-  ]
-}}
-
-============================================================
-NOW ANALYZE AND DECIDE
-============================================================
-
-Think:
-1. What % of this video is exciting vs boring?
-2. Which case (A/B/C) applies?
-3. What's the right target_duration?
-4. Which exact frames to cut?
-
 Return ONLY valid JSON (no markdown, no code fences, no explanation):
 {{
   "content_quality": "good|mixed|boring",
@@ -690,7 +536,8 @@ Return ONLY valid JSON (no markdown, no code fences, no explanation):
   "bg_music": "<filename from AVAILABLE music>",
   "music_volume": 0.25,
   "edits": [
-    ...
+    {{"start_frame": 0, "end_frame": 6, "remove": true, "reason": "Loading screen"}},
+    {{"start_frame": 6, "end_frame": 120, "speed": 1.0, "reason": "Keep full gameplay"}}
   ]
 }}
 """
@@ -698,62 +545,111 @@ Return ONLY valid JSON (no markdown, no code fences, no explanation):
 
 
 # ================================================================
-# 8. JSON EXTRACTOR
+# 8. JSON EXTRACTOR (DETAILED DEBUG)
 # ================================================================
 def extract_json(text):
+    print("\n   " + "─" * 60)
+    print("   🔍 JSON EXTRACTION DEBUG")
+    print("   " + "─" * 60)
+
     if not text:
+        print("   ❌ Empty AI response")
         raise ValueError("Empty AI response")
+
+    print(f"   📏 Raw response length: {len(text)} chars")
+    print(f"   📄 First 200: {repr(text[:200])}")
+    print(f"   📄 Last 200:  {repr(text[-200:])}")
 
     text = text.strip()
 
     if text.startswith("```"):
+        print("   🔧 Detected markdown fence — stripping...")
         parts = text.split("```")
         if len(parts) >= 2:
             text = parts[1]
         if text.lower().startswith("json"):
             text = text[4:]
         text = text.strip()
+        print(f"   ✅ After strip: {len(text)} chars")
 
     start = text.find("{")
     end = text.rfind("}")
-    if start == -1 or end == -1 or end <= start:
-        raise ValueError("No JSON object found in response")
+
+    if start == -1:
+        print("   ❌ No opening '{' found!")
+        print(f"   📄 Full response:\n{text[:1000]}")
+        raise ValueError("No JSON object found (missing '{')")
+
+    if end == -1:
+        print("   ❌ No closing '}' found!")
+        print(f"   📄 Full response:\n{text[:1000]}")
+        raise ValueError("No JSON object found (missing '}')")
+
+    if end <= start:
+        print(f"   ❌ Invalid boundaries: start={start}, end={end}")
+        raise ValueError("Invalid JSON boundaries")
 
     json_str = text[start:end + 1]
+    print(f"   ✅ JSON extracted: {len(json_str)} chars")
 
     try:
-        return json.loads(json_str)
+        result = json.loads(json_str)
+        print(f"   ✅ JSON parsed successfully!")
+        print(f"   🔑 Keys: {list(result.keys())}")
+        print(f"   🎬 Edits count: {len(result.get('edits', []))}")
+        print("   " + "─" * 60 + "\n")
+        return result
+
     except json.JSONDecodeError as e:
+        print(f"   ❌ JSON parse failed!")
+        print(f"   📌 Error: {e}")
+        print(f"   📌 Line {e.lineno}, Col {e.colno}, Pos {e.pos}")
+        if e.pos < len(json_str):
+            print(f"   📌 Around: ...{repr(json_str[max(0, e.pos-80):e.pos+80])}...")
+
+        print("   🔧 Attempting cleanup (single → double quotes)...")
         cleaned = json_str.replace("'", '"')
         try:
-            return json.loads(cleaned)
-        except Exception:
+            result = json.loads(cleaned)
+            print("   ✅ Cleanup succeeded!")
+            print("   " + "─" * 60 + "\n")
+            return result
+        except Exception as e2:
+            print(f"   ❌ Cleanup failed: {e2}")
+            print("   " + "─" * 60 + "\n")
             raise ValueError(f"JSON parse failed: {e}")
 
 
 # ================================================================
-# 9. AI ANALYZE — MULTI KEY + RETRY
+# 9. AI ANALYZE — MULTI KEY + RETRY (DETAILED DEBUG)
 # ================================================================
 def ai_analyze(frame_index, grid_paths, transcript, spikes, memes, sfx, music):
     api_keys = get_api_keys()
     if not api_keys:
         raise Exception("No OPENROUTER_API_KEY found in environment!")
 
-    log_info(f"Found {len(api_keys)} API key(s)")
+    print(f"\n   🔑 Total API keys available: {len(api_keys)}")
+    for i, (name, val) in enumerate(api_keys, 1):
+        masked = val[:8] + "..." + val[-4:] if len(val) > 12 else "***"
+        print(f"      {i}. {name} = {masked}")
 
+    print(f"\n   📸 Preparing {len(grid_paths)} grid images for AI...")
     images = []
-    for p in grid_paths:
-        with open(p, "rb") as f:
-            b64 = base64.b64encode(f.read()).decode()
-        images.append({
-            "type": "image_url",
-            "image_url": {"url": f"data:image/jpeg;base64,{b64}"}
-        })
+    for i, p in enumerate(grid_paths, 1):
+        try:
+            with open(p, "rb") as f:
+                b64 = base64.b64encode(f.read()).decode()
+            size_kb = len(b64) / 1024
+            images.append({
+                "type": "image_url",
+                "image_url": {"url": f"data:image/jpeg;base64,{b64}"}
+            })
+            print(f"      ✅ {os.path.basename(p)} ({size_kb:.0f} KB)")
+        except Exception as e:
+            print(f"      ❌ Failed to load {p}: {e}")
 
-    prompt = build_prompt(
-        frame_index, len(grid_paths),
-        transcript, spikes, memes, sfx, music
-    )
+    prompt = build_prompt(frame_index, len(grid_paths), transcript, spikes, memes, sfx, music)
+    print(f"   📝 Prompt length: {len(prompt)} chars\n")
 
     last_error = None
     total_attempts = 0
@@ -761,7 +657,11 @@ def ai_analyze(frame_index, grid_paths, transcript, spikes, memes, sfx, music):
     for key_idx, (key_name, key_val) in enumerate(api_keys, 1):
         for attempt in range(1, 3):
             total_attempts += 1
-            log_info(f"[Attempt {total_attempts}] Key #{key_idx} ({key_name}) - try {attempt}/2")
+
+            print("\n" + "=" * 60)
+            print(f"   🔄 ATTEMPT #{total_attempts}")
+            print(f"   🔑 Key #{key_idx} ({key_name}) — Try {attempt}/2")
+            print("=" * 60)
 
             try:
                 client = OpenAI(
@@ -773,6 +673,10 @@ def ai_analyze(frame_index, grid_paths, transcript, spikes, memes, sfx, music):
                     }
                 )
 
+                print(f"   📡 Sending request to OpenRouter...")
+                print(f"   🤖 Model: {OPENROUTER_MODEL}")
+
+                t_start = time.time()
                 response = client.chat.completions.create(
                     model=OPENROUTER_MODEL,
                     messages=[{
@@ -782,49 +686,92 @@ def ai_analyze(frame_index, grid_paths, transcript, spikes, memes, sfx, music):
                     max_tokens=4000,
                     temperature=0.7
                 )
+                elapsed = time.time() - t_start
+
+                print(f"   ✅ Response received in {elapsed:.2f}s")
+
+                if hasattr(response, "usage") and response.usage:
+                    print(f"   📊 Tokens: {response.usage.total_tokens} "
+                          f"(prompt: {response.usage.prompt_tokens}, "
+                          f"completion: {response.usage.completion_tokens})")
 
                 text = response.choices[0].message.content
-                log_ok(f"Got response ({len(text)} chars)")
+                if not text:
+                    print("   ❌ Empty response from API!")
+                    last_error = "Empty response"
+                    time.sleep(1)
+                    continue
+
+                print(f"   📄 Response: {len(text)} chars")
 
                 result = extract_json(text)
 
                 if result.get("aspect_ratio") not in ("9:16", "1:1", "4:5"):
+                    print(f"   ⚠️  Invalid aspect: {result.get('aspect_ratio')} → forcing '9:16'")
                     result["aspect_ratio"] = "9:16"
 
-                log_ok(f"Content quality: {result.get('content_quality', 'unknown')}")
-                log_ok(f"Reasoning: {result.get('reasoning', '-')}")
-                log_ok(f"Target duration: {result.get('target_duration', '?')}s")
+                print("\n   " + "─" * 60)
+                print("   🎯 AI DECISION SUMMARY")
+                print("   " + "─" * 60)
+                print(f"   Content quality: {result.get('content_quality', 'unknown')}")
+                print(f"   Reasoning: {result.get('reasoning', '-')}")
+                print(f"   Target duration: {result.get('target_duration', '?')}s")
+                print(f"   Aspect ratio: {result.get('aspect_ratio')}")
+                print(f"   Total edits: {len(result.get('edits', []))}")
+                print("   " + "─" * 60 + "\n")
 
-                log_ok(f"✅ SUCCESS with key #{key_idx} (attempt {attempt})")
+                print(f"   🎉 SUCCESS with key #{key_idx} (attempt {attempt})")
+                print("=" * 60 + "\n")
                 return result
 
             except json.JSONDecodeError as e:
-                last_error = f"JSON error: {e}"
-                log_warn(f"JSON parse failed: {e}")
+                last_error = f"JSONDecodeError: {e}"
+                print(f"\n   ❌ JSON DECODE ERROR: {e}")
+                print(f"   🔄 Retrying same key...\n")
                 time.sleep(1)
                 continue
 
             except ValueError as e:
-                last_error = f"Parse error: {e}"
-                log_warn(f"Parse failed: {e}")
+                last_error = f"ValueError: {e}"
+                print(f"\n   ❌ PARSE ERROR: {e}")
+                print(f"   🔄 Retrying same key...\n")
                 time.sleep(1)
                 continue
 
             except Exception as e:
                 last_error = str(e)
                 err_str = str(e).lower()
+                err_type = type(e).__name__
+
+                print(f"\n   ❌ API ERROR")
+                print(f"   📌 Type: {err_type}")
+                print(f"   📌 Message: {e}")
 
                 if any(x in err_str for x in ["rate", "quota", "limit", "auth", "401", "403", "429"]):
-                    log_warn(f"Key issue: {e} → trying next key")
+                    print(f"   🔑 Key issue → moving to NEXT key")
+                    print("=" * 60 + "\n")
                     break
 
-                log_warn(f"Error: {e}")
+                print(f"   🔄 Retrying same key in 2s...")
                 time.sleep(2)
                 continue
 
-        log_warn(f"Key #{key_idx} exhausted, moving to next...")
+        print(f"\n   ⚠️  Key #{key_idx} ({key_name}) exhausted")
+        if key_idx < len(api_keys):
+            print(f"   ➡️  Moving to key #{key_idx + 1}...\n")
 
-    raise Exception(f"All {len(api_keys)} keys failed after {total_attempts} attempts. Last error: {last_error}")
+    print("\n" + "=" * 60)
+    print("   ❌ ALL KEYS FAILED")
+    print("=" * 60)
+    print(f"   Total attempts: {total_attempts}")
+    print(f"   Keys tried: {len(api_keys)}")
+    print(f"   Last error: {last_error}")
+    print("=" * 60 + "\n")
+
+    raise Exception(
+        f"All {len(api_keys)} keys failed after {total_attempts} attempts. "
+        f"Last error: {last_error}"
+    )
 
 
 # ================================================================
@@ -901,10 +848,8 @@ def save_debug_log(ai_json, frame_index):
         elif edit.get("remove"):
             lines.append(f"  ✂️  CUT | Frames: {edit['start_frame']}-{edit['end_frame']}")
         else:
-            lines.append(
-                f"  🎬 KEEP | Frames: {edit['start_frame']}-{edit['end_frame']} "
-                f"| Speed: {edit.get('speed', 1.0)}x"
-            )
+            lines.append(f"  🎬 KEEP | Frames: {edit['start_frame']}-{edit['end_frame']} "
+                         f"| Speed: {edit.get('speed', 1.0)}x")
         lines.append(f"  Reason: {edit.get('reason', '-')}")
 
     log_path = os.path.join(DEBUG_DIR, f"debug_{timestamp}.txt")
@@ -922,18 +867,13 @@ def save_debug_log(ai_json, frame_index):
 def pick_meme(mood):
     mood_dir = os.path.join(MEME_DIR, mood)
     if os.path.exists(mood_dir):
-        files = [
-            f for f in os.listdir(mood_dir)
-            if f.lower().endswith(('.mp4', '.mov', '.gif', '.webm'))
-        ]
+        files = [f for f in os.listdir(mood_dir)
+                 if f.lower().endswith(('.mp4', '.mov', '.gif', '.webm'))]
         if files:
             return os.path.join(mood_dir, random.choice(files))
 
     for root, dirs, files in os.walk(MEME_DIR):
-        vids = [
-            f for f in files
-            if f.lower().endswith(('.mp4', '.mov', '.gif', '.webm'))
-        ]
+        vids = [f for f in files if f.lower().endswith(('.mp4', '.mov', '.gif', '.webm'))]
         if vids:
             return os.path.join(root, random.choice(vids))
     return None
@@ -942,18 +882,13 @@ def pick_meme(mood):
 def pick_sfx(mood):
     mood_dir = os.path.join(SFX_DIR, mood)
     if os.path.exists(mood_dir):
-        files = [
-            f for f in os.listdir(mood_dir)
-            if f.lower().endswith(('.mp3', '.wav', '.m4a', '.aac'))
-        ]
+        files = [f for f in os.listdir(mood_dir)
+                 if f.lower().endswith(('.mp3', '.wav', '.m4a', '.aac'))]
         if files:
             return os.path.join(mood_dir, random.choice(files))
 
     for root, dirs, files in os.walk(SFX_DIR):
-        sfx = [
-            f for f in files
-            if f.lower().endswith(('.mp3', '.wav', '.m4a', '.aac'))
-        ]
+        sfx = [f for f in files if f.lower().endswith(('.mp3', '.wav', '.m4a', '.aac'))]
         if sfx:
             return os.path.join(root, random.choice(sfx))
     return None
@@ -964,25 +899,21 @@ def pick_sfx(mood):
 # ================================================================
 def apply_aspect(clip, ratio="9:16"):
     w, h = clip.size
-
     if ratio == "9:16":
         tw = h * (9 / 16)
         if tw <= w:
             return clip.fx(vfx.crop, x_center=w / 2, y_center=h / 2, width=tw, height=h)
         th = w * (16 / 9)
         return clip.fx(vfx.crop, x_center=w / 2, y_center=h / 2, width=w, height=th)
-
     elif ratio == "1:1":
         m = min(w, h)
         return clip.fx(vfx.crop, x_center=w / 2, y_center=h / 2, width=m, height=m)
-
     elif ratio == "4:5":
         tw = h * (4 / 5)
         if tw <= w:
             return clip.fx(vfx.crop, x_center=w / 2, y_center=h / 2, width=tw, height=h)
         th = w * (5 / 4)
         return clip.fx(vfx.crop, x_center=w / 2, y_center=h / 2, width=w, height=th)
-
     return clip
 
 
@@ -1002,10 +933,18 @@ def apply_filter(clip, name):
 
 
 # ================================================================
-# 14. BUILD REEL (16 Mbps HIGH QUALITY + DURATION LOCK)
+# 14. BUILD REEL (16 Mbps + DURATION LOCK)
 # ================================================================
 def build_reel(video_path, ai_json, output_path):
-    log_info("Building reel...")
+    print("\n" + "=" * 60)
+    print("   🎬 BUILD REEL — DEBUG")
+    print("=" * 60)
+    log_info(f"Source: {video_path}")
+    log_info(f"Aspect: {ai_json.get('aspect_ratio')}")
+    log_info(f"Music: {ai_json.get('bg_music', 'none')}")
+    log_info(f"Volume: {ai_json.get('music_volume', 0.3)}")
+    log_info(f"Total edits: {len(ai_json.get('edits', []))}")
+    print("=" * 60)
 
     main = VideoFileClip(video_path)
     source_fps = main.fps if main.fps else 30
@@ -1104,12 +1043,11 @@ def build_reel(video_path, ai_json, output_path):
         log_err("No clips! Aborting.")
         return None
 
-    # CONCATENATE VIDEO
     final = concatenate_videoclips(clips, method="compose")
     video_duration = float(final.duration)
     log_info(f"Video duration locked: {video_duration:.2f}s")
 
-    # BUILD AUDIO
+    # Audio
     audio = []
     if final.audio:
         audio.append(final.audio)
@@ -1150,25 +1088,17 @@ def build_reel(video_path, ai_json, output_path):
 
     final = final.set_duration(video_duration)
 
-    # ============================================================
-    # WRITE VIDEO — 16 Mbps HIGH QUALITY
-    # ============================================================
     log_info("Writing video at 16 Mbps (high quality)...")
-
     final.write_videofile(
         output_path,
         codec="libx264",
         audio_codec="aac",
         audio_bitrate="320k",
-        bitrate="16000k",          # ← 16 Mbps
+        bitrate="16000k",
         fps=source_fps,
         preset="slow",
         threads=4,
-        ffmpeg_params=[
-            "-crf", "18",
-            "-pix_fmt", "yuv420p",
-            "-movflags", "+faststart"
-        ],
+        ffmpeg_params=["-crf", "18", "-pix_fmt", "yuv420p", "-movflags", "+faststart"],
         verbose=False,
         logger=None
     )
@@ -1188,6 +1118,12 @@ def main():
     parser.add_argument("--whisper", default="true")
     args = parser.parse_args()
 
+    print("\n")
+    print("╔" + "═" * 68 + "╗")
+    print("║" + " " * 15 + "🎬 AUTO EDITOR - OpenRouter" + " " * 26 + "║")
+    print("║" + " " * 10 + "Smart Content Mode + Multi-Key Retry" + " " * 22 + "║")
+    print("╚" + "═" * 68 + "╝")
+
     ensure_folders()
     git_commit_folders()
 
@@ -1205,60 +1141,47 @@ def main():
     api_keys = get_api_keys()
     if not api_keys:
         log_err("No OPENROUTER_API_KEY found!")
-        log_info("Add at least OPENROUTER_API_KEY in GitHub Secrets")
         sys.exit(1)
 
     log_info(f"API Keys loaded: {len(api_keys)}")
-    for name, _ in api_keys:
-        log_info(f"  → {name}")
 
     use_whisper = str(args.whisper).lower() == "true"
 
-    # STEP 1
     log_step("STEP 1: Video Info")
     info = get_video_info(args.video)
     log_ok(f"Duration: {info['duration']:.1f}s")
     log_ok(f"Resolution: {info['width']}x{info['height']}")
     log_ok(f"FPS: {info['fps']:.2f}")
 
-    # STEP 2
     log_step("STEP 2: Frame Index")
     frame_index = create_frame_index(args.video, args.fps)
     log_ok(f"Total frames: {frame_index['total_frames']}")
 
-    # STEP 3
     log_step("STEP 3: Grid Generation")
     grids = create_grids(args.video, frame_index, GRID_DIR, args.grids)
     log_ok(f"{len(grids)} grids created")
 
-    # STEP 4
     log_step("STEP 4: Transcript")
     transcript = get_transcript(args.video, use_whisper)
 
-    # STEP 5
     log_step("STEP 5: Spike Detection")
     spikes = get_spikes(args.video)
 
-    # STEP 6
     log_step("STEP 6: Assets Scan")
     memes, sfx, music = get_available_moods()
     log_info(f"Memes: {list(memes.keys())}")
     log_info(f"SFX: {list(sfx.keys())}")
     log_info(f"Music: {len(music)} files")
 
-    # STEP 7
     log_step("STEP 7: AI Analysis (Smart Content Decision)")
     ai_json = ai_analyze(frame_index, grids, transcript, spikes, memes, sfx, music)
 
-    # STEP 8
     log_step("STEP 8: Verify Edits")
     ai_json = verify_and_convert(ai_json, frame_index)
 
-    # STEP 9
     log_step("STEP 9: Debug Log")
     save_debug_log(ai_json, frame_index)
 
-    # STEP 10
     log_step("STEP 10: Build Reel")
     output = os.path.join(OUTPUT_DIR, "final_reel.mp4")
     build_reel(args.video, ai_json, output)
@@ -1266,9 +1189,6 @@ def main():
     log_step("🎉 DONE!")
 
 
-# ================================================================
-# ENTRY
-# ================================================================
 if __name__ == "__main__":
     try:
         main()
