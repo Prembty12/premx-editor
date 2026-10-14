@@ -51,19 +51,23 @@ jobs:
           python -m pip install faster-whisper
           python -c "import moviepy, cv2, numpy, librosa, PIL, openai; print('✅ All imports OK')"
 
-      - name: 📁 Create folders
+      - name: 📁 Create FASTCUT folders
         run: |
-          mkdir -p input temp_frames
-          mkdir -p memes/shocked memes/funny memes/sad memes/victory
-          mkdir -p sfx/hype sfx/dramatic sfx/funny sfx/victory
-          mkdir -p music grids debug output
+          mkdir -p FASTCUT/input FASTCUT/temp_frames
+          mkdir -p FASTCUT/memes/shocked FASTCUT/memes/funny FASTCUT/memes/sad FASTCUT/memes/victory
+          mkdir -p FASTCUT/memes/reaction FASTCUT/memes/hype FASTCUT/memes/fail FASTCUT/memes/win
+          mkdir -p FASTCUT/sfx/hype FASTCUT/sfx/dramatic FASTCUT/sfx/funny FASTCUT/sfx/victory
+          mkdir -p FASTCUT/sfx/whoosh FASTCUT/sfx/impact FASTCUT/sfx/notification
+          mkdir -p FASTCUT/music FASTCUT/grids FASTCUT/debug FASTCUT/output
+          echo "✅ FASTCUT folders ready"
+          ls -la FASTCUT/
 
       - name: 📥 Download video
         run: |
           VIDEO_URL="${{ github.event.inputs.video_url }}"
-          curl -L -o temp_frames/gameplay.mp4 "$VIDEO_URL"
-          if [ -f "temp_frames/gameplay.mp4" ]; then
-            echo "✅ Video: $(ls -lh temp_frames/gameplay.mp4 | awk '{print $5}')"
+          curl -L -o FASTCUT/temp_frames/gameplay.mp4 "$VIDEO_URL"
+          if [ -f "FASTCUT/temp_frames/gameplay.mp4" ]; then
+            echo "✅ Video: $(ls -lh FASTCUT/temp_frames/gameplay.mp4 | awk '{print $5}')"
           else
             echo "❌ Download failed!"
             exit 1
@@ -78,7 +82,7 @@ jobs:
           OPENROUTER_API_KEY_5: ${{ secrets.OPENROUTER_API_KEY_5 }}
         run: |
           python autoEditorFastcut.py \
-            --video "temp_frames/gameplay.mp4" \
+            --video "FASTCUT/temp_frames/gameplay.mp4" \
             --fps "${{ github.event.inputs.frames_per_sec }}" \
             --grids "${{ github.event.inputs.max_grids }}" \
             --whisper "${{ github.event.inputs.use_whisper }}"
@@ -88,7 +92,7 @@ jobs:
         run: |
           TIMESTAMP=$(date +'%Y%m%d-%H%M%S')
           NEW_NAME="reel-${TIMESTAMP}.mp4"
-          mv output/final_reel.mp4 "output/${NEW_NAME}"
+          mv "FASTCUT/output/final_reel.mp4" "FASTCUT/output/${NEW_NAME}"
           echo "filename=${NEW_NAME}" >> $GITHUB_OUTPUT
           echo "📌 Renamed to: ${NEW_NAME}"
 
@@ -101,18 +105,15 @@ jobs:
           body: |
             ## 🎬 Auto-Generated Reels Collection
 
-            Har run ki video yahan add hoti jayegi. Purani videos bhi yahan milengi.
-
-            **Latest Run Info:**
+            **Latest Run:**
             - Source: ${{ github.event.inputs.video_url }}
             - FPS: ${{ github.event.inputs.frames_per_sec }}
             - Grids: ${{ github.event.inputs.max_grids }}
             - Whisper: ${{ github.event.inputs.use_whisper }}
-            - Timestamp: ${{ github.run_id }}
 
-            **Run Link:** [View Run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            **Run Link:** [View](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
           files: |
-            output/${{ steps.rename.outputs.filename }}
+            FASTCUT/output/${{ steps.rename.outputs.filename }}
           draft: false
           prerelease: false
           fail_on_unmatched_files: true
@@ -122,5 +123,5 @@ jobs:
       - name: 🧹 Cleanup (storage save)
         if: always()
         run: |
-          rm -rf output/ debug/ grids/ temp_frames/
+          rm -rf FASTCUT/output/ FASTCUT/debug/ FASTCUT/grids/ FASTCUT/temp_frames/
           echo "✅ Cleaned up temp files"
