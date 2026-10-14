@@ -1,1 +1,1 @@
-{"clip_duration": 39, "reason": "Dramatic prison execution cinematic sequence", "start_time": 15, "status": "APPROVE", "title": "Prison Cell Betrayal 1 Shot Execution 👀🔥"}
+{"clip_duration": 30, "reason": "Intense combat and fast level progression", "start_time": 0, "status": "APPROVE", "title": "How He Beat 10 Enemies Solo 🔥🎯"}
