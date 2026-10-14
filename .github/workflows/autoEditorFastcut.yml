@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       video_url:
-        description: '📥 Video URL'
-        required: true
-        default: 'https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison22.mp4'
+        description: '📥 Video URL (optional — leave empty to use existing)'
+        required: false
+        default: ''
       frames_per_sec:
         description: 'Frames per second'
         required: true
@@ -23,18 +23,21 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   auto-edit:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
     steps:
-      - name: 📥 Checkout (fast — only last commit)
+      - name: 📥 Checkout
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 1
-          lfs: false
 
       - name: 🐍 Setup Python
         uses: actions/setup-python@v5
@@ -56,19 +59,27 @@ jobs:
           python -m pip install faster-whisper
           python -c "import moviepy, cv2, numpy, librosa, PIL, openai; print('✅ All imports OK')"
 
-      - name: 📥 Download video
+      - name: 📥 Download or use existing video
         run: |
           mkdir -p FASTCUT/temp_frames
           VIDEO_URL="${{ github.event.inputs.video_url }}"
-          curl -L --retry 3 --retry-delay 5 -o FASTCUT/temp_frames/gameplay.mp4 "$VIDEO_URL"
-          if [ -f "FASTCUT/temp_frames/gameplay.mp4" ]; then
-            echo "✅ Video: $(ls -lh FASTCUT/temp_frames/gameplay.mp4 | awk '{print $5}')"
+          EXISTING="FASTCUT/temp_frames/gameplay.mp4"
+
+          if [ -z "$VIDEO_URL" ]; then
+            if [ -f "$EXISTING" ]; then
+              echo "✅ Using EXISTING video: $(ls -lh $EXISTING | awk '{print $5}')"
+            else
+              echo "❌ No video_url AND no existing gameplay.mp4"
+              exit 1
+            fi
           else
-            echo "❌ Download failed!"
-            exit 1
+            echo "📥 Downloading new video..."
+            rm -f "$EXISTING"
+            curl -L --retry 3 --retry-delay 5 -o "$EXISTING" "$VIDEO_URL"
+            echo "✅ Downloaded: $(ls -lh $EXISTING | awk '{print $5}')"
           fi
 
-      - name: 🎬 Run auto editor (creates FASTCUT + commits)
+      - name: 🎬 Run auto editor
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           OPENROUTER_API_KEY_2: ${{ secrets.OPENROUTER_API_KEY_2 }}
@@ -83,7 +94,7 @@ jobs:
             --grids "${{ github.event.inputs.max_grids }}" \
             --whisper "${{ github.event.inputs.use_whisper }}"
 
-      - name: 🏷️ Rename output with timestamp
+      - name: 🏷️ Rename output
         id: rename
         if: success()
         run: |
@@ -94,7 +105,7 @@ jobs:
             echo "filename=${NEW_NAME}" >> $GITHUB_OUTPUT
             echo "📌 Renamed to: ${NEW_NAME}"
           else
-            echo "❌ No output file found"
+            echo "❌ No output file"
             exit 1
           fi
 
@@ -104,29 +115,51 @@ jobs:
         with:
           tag_name: v1.6
           name: "🎬 Reel Collection — v1.6"
-          body: |
-            ## 🎬 Auto-Generated Reels Collection
-
-            **Latest Run:**
-            - Source: ${{ github.event.inputs.video_url }}
-            - FPS: ${{ github.event.inputs.frames_per_sec }}
-            - Grids: ${{ github.event.inputs.max_grids }}
-            - Whisper: ${{ github.event.inputs.use_whisper }}
-
-            **Run Link:** [View](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
           files: |
             FASTCUT/output/${{ steps.rename.outputs.filename }}
           draft: false
           prerelease: false
-          fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 🧹 Cleanup (only temp files, keep folders)
+      # ⭐ GRID SAVE — ALWAYS RUNS
+      - name: 🖼️ Save Latest Grids to GitHub
         if: always()
         run: |
-          rm -rf FASTCUT/temp_frames/*.mp4
+          git config --local user.email "actions@github.com"
+          git config --local user.name "github-actions[bot]"
+
+          rm -rf FASTCUT/grid_history/latest
+          mkdir -p FASTCUT/grid_history/latest
+
+          if [ -d "FASTCUT/grids" ] && ls FASTCUT/grids/*.jpg >/dev/null 2>&1; then
+            cp FASTCUT/grids/*.jpg FASTCUT/grid_history/latest/
+            echo "✅ Copied $(ls FASTCUT/grid_history/latest/*.jpg | wc -l) grids"
+          else
+            echo "⚠️  No grids found"
+          fi
+
+          if [ -d "FASTCUT/debug" ] && ls FASTCUT/debug/*.txt >/dev/null 2>&1; then
+            cp FASTCUT/debug/*.txt FASTCUT/grid_history/latest/ 2>/dev/null || true
+            cp FASTCUT/debug/*.json FASTCUT/grid_history/latest/ 2>/dev/null || true
+            echo "✅ Copied debug logs"
+          fi
+
+          {
+            echo "Timestamp: $(date +'%Y-%m-%d %H:%M:%S')"
+            echo "Run ID: ${{ github.run_id }}"
+          } > FASTCUT/grid_history/latest/run_info.txt
+
+          git add FASTCUT/grid_history/
+          git diff --cached --quiet || git commit -m "🖼️ Auto: Latest grids [skip ci]"
+
+          git pull --rebase --no-edit origin main || true
+          git push || echo "Push failed (but grids saved locally)"
+
+      - name: 🧹 Cleanup
+        if: always()
+        run: |
           rm -rf FASTCUT/grids/*.jpg
           rm -rf FASTCUT/debug/*.json FASTCUT/debug/*.txt
           rm -rf FASTCUT/output/*.mp4
-          echo "✅ Cleaned up temp files (folders preserved)"
+          echo "✅ Cleaned temp files"
