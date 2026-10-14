@@ -83,13 +83,44 @@ jobs:
             --grids "${{ github.event.inputs.max_grids }}" \
             --whisper "${{ github.event.inputs.use_whisper }}"
 
-      - name: 📤 Upload final reel
-        uses: actions/upload-artifact@v4
-        if: always()
+      - name: 🏷️ Rename output with timestamp
+        id: rename
+        run: |
+          TIMESTAMP=$(date +'%Y%m%d-%H%M%S')
+          NEW_NAME="reel-${TIMESTAMP}.mp4"
+          mv output/final_reel.mp4 "output/${NEW_NAME}"
+          echo "filename=${NEW_NAME}" >> $GITHUB_OUTPUT
+          echo "📌 Renamed to: ${NEW_NAME}"
+
+      - name: 📤 Upload to Release v1.6
+        if: success()
+        uses: softprops/action-gh-release@v2
         with:
-          name: final-reel
-          path: |
-            output/
-            debug/
-            grids/
-          retention-days: 7
+          tag_name: v1.6
+          name: "🎬 Reel Collection — v1.6"
+          body: |
+            ## 🎬 Auto-Generated Reels Collection
+
+            Har run ki video yahan add hoti jayegi. Purani videos bhi yahan milengi.
+
+            **Latest Run Info:**
+            - Source: ${{ github.event.inputs.video_url }}
+            - FPS: ${{ github.event.inputs.frames_per_sec }}
+            - Grids: ${{ github.event.inputs.max_grids }}
+            - Whisper: ${{ github.event.inputs.use_whisper }}
+            - Timestamp: ${{ github.run_id }}
+
+            **Run Link:** [View Run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          files: |
+            output/${{ steps.rename.outputs.filename }}
+          draft: false
+          prerelease: false
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🧹 Cleanup (storage save)
+        if: always()
+        run: |
+          rm -rf output/ debug/ grids/ temp_frames/
+          echo "✅ Cleaned up temp files"
