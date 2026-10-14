@@ -1,14 +1,13 @@
 """
 ================================================================
-AUTO EDITOR - OpenRouter Multi-Key Version (PRODUCTION FINAL)
+AUTO EDITOR - VIRAL REEL STYLE (FINAL)
 ================================================================
-- 5 API keys with auto-retry
-- Smart prompt: preserves good content
-- 16 Mbps high quality output
-- Even dimensions (H.264 safe)
-- Grid logging
+- Preserves video length when content is good
+- Inserts memes at exciting moments
+- Adds SFX on action
+- Loud background music
+- Even dimensions (no FFMPEG error)
 - Git pull before push
-- Duration lock (no freeze)
 ================================================================
 """
 
@@ -39,10 +38,9 @@ from openai import OpenAI
 
 
 # ================================================================
-# CONFIG (sab kuch ek jagah)
+# CONFIG
 # ================================================================
 BASE_DIR    = "FASTCUT"
-INPUT_DIR   = os.path.join(BASE_DIR, "input")
 TEMP_DIR    = os.path.join(BASE_DIR, "temp_frames")
 MEME_DIR    = os.path.join(BASE_DIR, "memes")
 SFX_DIR     = os.path.join(BASE_DIR, "sfx")
@@ -54,33 +52,33 @@ OUTPUT_DIR  = os.path.join(BASE_DIR, "output")
 OPENROUTER_MODEL = "openai/gpt-4o-mini"
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
-# Audio + video settings
+# Video output
 ASPECT_RATIO = "9:16"
 VIDEO_BITRATE = "16000k"
 AUDIO_BITRATE = "320k"
 VIDEO_CRF = 18
 VIDEO_PRESET = "slow"
 
-# Audio volume
-MUSIC_VOLUME = 0.25
-SFX_VOLUME = 0.8
-ORIGINAL_AUDIO_VOLUME = 1.0
+# ⭐ AUDIO VOLUMES
+MUSIC_VOLUME = 0.5
+SFX_VOLUME = 1.0
+ORIGINAL_AUDIO_VOLUME = 0.8
 
 # Meme
 MEME_MIN_DURATION = 1.5
-MEME_MAX_DURATION = 4.0
+MEME_MAX_DURATION = 3.0
 MEME_ALLOWED_EXT = (".mp4", ".mov", ".gif", ".webm")
 
 # Speed
 DEFAULT_SPEED = 1.0
-MAX_SPEED = 2.0
-MIN_SPEED = 0.5
+MAX_SPEED = 1.5
+MIN_SPEED = 0.7
 
 # Cuts
 ALLOW_CUTS = True
 PRESERVE_GOOD = True
 MIN_CLIP_DURATION = 0.5
-TARGET_MIN_SEC = 30
+TARGET_MIN_SEC = 20
 TARGET_MAX_SEC = 90
 
 # API
@@ -102,7 +100,6 @@ def log_step(title):
     print(f"  {title}")
     print("=" * 70)
 
-
 def log_ok(msg):    print(f"   ✅ {msg}")
 def log_warn(msg):  print(f"   ⚠️  {msg}")
 def log_err(msg):   print(f"   ❌ {msg}")
@@ -114,7 +111,7 @@ def log_info(msg):  print(f"   ℹ️  {msg}")
 # ================================================================
 def ensure_folders():
     folders = [
-        BASE_DIR, INPUT_DIR, TEMP_DIR, GRID_DIR, DEBUG_DIR, OUTPUT_DIR,
+        BASE_DIR, TEMP_DIR, GRID_DIR, DEBUG_DIR, OUTPUT_DIR,
         MEME_DIR,
         os.path.join(MEME_DIR, "shocked"),
         os.path.join(MEME_DIR, "funny"),
@@ -159,13 +156,11 @@ def ensure_folders():
 
 
 # ================================================================
-# GIT COMMIT (with pull --rebase to avoid rejection)
+# GIT
 # ================================================================
 def git_commit_folders():
     if not os.getenv("GITHUB_ACTIONS"):
         return
-
-    log_info("Committing FASTCUT structure...")
     try:
         subprocess.run(["git", "config", "user.email", "actions@github.com"],
                        check=True, timeout=10)
@@ -179,25 +174,16 @@ def git_commit_folders():
             return
 
         subprocess.run(["git", "commit", "-m",
-                        "📁 Auto: Update FASTCUT structure [skip ci]"],
+                        "📁 Auto: Update FASTCUT [skip ci]"],
                        check=True, timeout=30)
 
-        # Pull before push
-        pull = subprocess.run(
-            ["git", "pull", "--rebase", "--no-edit", "origin", "main"],
-            capture_output=True, text=True, timeout=60
-        )
-        if pull.returncode == 0:
-            log_ok("Pulled latest from remote")
-        else:
-            log_warn(f"Pull warning: {pull.stderr[:150]}")
+        subprocess.run(["git", "pull", "--rebase", "--no-edit", "origin", "main"],
+                       capture_output=True, text=True, timeout=60)
 
         push = subprocess.run(["git", "push"], capture_output=True,
                               text=True, timeout=60)
         if push.returncode == 0:
             log_ok("Structure pushed ✅")
-        else:
-            log_warn(f"Push failed: {push.stderr[:150]}")
     except Exception as e:
         log_warn(f"Git error: {e}")
 
@@ -235,12 +221,11 @@ def create_frame_index(video_path, fps=3):
 
 
 # ================================================================
-# GRIDS (with detailed logging)
+# GRIDS
 # ================================================================
 def create_grids(video_path, frame_index, output_dir, max_images=6):
     total_frames = frame_index["total_frames"]
     if total_frames == 0:
-        log_warn("No frames to grid")
         return []
 
     num_grids = min(max_images, math.ceil(total_frames / 45))
@@ -249,17 +234,7 @@ def create_grids(video_path, frame_index, output_dir, max_images=6):
     rows = math.ceil(frames_per_grid / cols)
     thumb_size = max(150, min(2000 // cols, 300))
 
-    # 🔍 GRID PLAN LOGGING
-    log_info("=" * 50)
-    log_info("📐 GRID GENERATION PLAN")
-    log_info("=" * 50)
-    log_info(f"  Total frames:       {total_frames}")
-    log_info(f"  Number of grids:    {num_grids}")
-    log_info(f"  Frames per grid:    {frames_per_grid}")
-    log_info(f"  Grid layout:        {cols} cols × {rows} rows")
-    log_info(f"  Thumb size:         {thumb_size}px")
-    log_info(f"  Output dir:         {output_dir}")
-    log_info("=" * 50)
+    log_info(f"Frames: {total_frames} | Grids: {num_grids} | Layout: {cols}x{rows}")
 
     cap = cv2.VideoCapture(video_path)
     paths = []
@@ -268,8 +243,6 @@ def create_grids(video_path, frame_index, output_dir, max_images=6):
         start_idx = g * frames_per_grid
         end_idx = min(start_idx + frames_per_grid, total_frames)
         frames = []
-
-        log_info(f"  Grid #{g+1}: frames {start_idx}-{end_idx}")
 
         for i in range(start_idx, end_idx):
             f = frame_index["frames"][i]
@@ -280,8 +253,6 @@ def create_grids(video_path, frame_index, output_dir, max_images=6):
 
             h, w = frame.shape[:2]
             thumb_h = int(thumb_size * (h / w))
-
-            # 🔧 FIX: Force even dimensions
             tw = thumb_size if thumb_size % 2 == 0 else thumb_size - 1
             th = thumb_h if thumb_h % 2 == 0 else thumb_h - 1
 
@@ -306,7 +277,6 @@ def create_grids(video_path, frame_index, output_dir, max_images=6):
             frames.append(np.array(img))
 
         if not frames:
-            log_warn(f"  Grid #{g+1} skipped (no frames)")
             continue
 
         th, tw = frames[0].shape[:2]
@@ -319,20 +289,11 @@ def create_grids(video_path, frame_index, output_dir, max_images=6):
         out = os.path.join(output_dir, f"grid_{g + 1}.jpg")
         Image.fromarray(grid).save(out, quality=92)
         paths.append(out)
-
-        # 🔍 FILE INFO LOGGING
         size_kb = os.path.getsize(out) / 1024
-        log_ok(f"  ✅ Saved: {os.path.basename(out)} "
-               f"({grid.shape[1]}x{grid.shape[0]}px, {size_kb:.0f} KB)")
+        log_ok(f"grid_{g+1}.jpg ({grid.shape[1]}x{grid.shape[0]}px, {size_kb:.0f} KB)")
 
     cap.release()
-
-    log_info("=" * 50)
-    log_ok(f"📸 TOTAL GRIDS CREATED: {len(paths)}")
-    for p in paths:
-        log_info(f"     → {p}")
-    log_info("=" * 50)
-
+    log_ok(f"📸 TOTAL GRIDS: {len(paths)}")
     return paths
 
 
@@ -345,7 +306,7 @@ def get_whisper_model():
     global _WHISPER_MODEL
     if _WHISPER_MODEL is None:
         from faster_whisper import WhisperModel
-        log_info("Loading whisper model...")
+        log_info("Loading whisper...")
         _WHISPER_MODEL = WhisperModel("base", device="cpu", compute_type="int8")
     return _WHISPER_MODEL
 
@@ -356,7 +317,6 @@ def get_transcript(video_path, use_whisper=True):
         return "No transcript"
     try:
         model = get_whisper_model()
-        log_info("Transcribing...")
         segments, info = model.transcribe(video_path)
         lines = [f"[{s.start:6.1f}s] {s.text.strip()}"
                  for s in segments if s.text.strip()]
@@ -386,12 +346,10 @@ def get_spikes(video_path):
             if len(chunk) > 0:
                 per_sec.append(float(chunk.max()))
         if not per_sec:
-            log_warn("No audio frames")
             return "No spikes"
-        threshold = float(np.percentile(per_sec, 80))
+        threshold = float(np.percentile(per_sec, 75))
         spikes = [f"[{i:6.1f}s] RMS={v:.3f}" for i, v in enumerate(per_sec) if v > threshold]
         if not spikes:
-            log_warn("No spikes above threshold")
             return "No spikes"
         log_ok(f"{len(spikes)} spikes detected")
         return "\n".join(spikes)
@@ -432,32 +390,26 @@ def get_available_moods():
 
 
 # ================================================================
-# BUILD PROMPT
+# BUILD PROMPT — SMART LENGTH + MEMES + SFX
 # ================================================================
 def build_prompt(frame_index, grid_count, transcript, spikes, memes, sfx, music):
     frame_lines = [f"#{f['idx']}={f['t']}s" for f in frame_index["frames"][::3]]
     frame_list = "\n".join(frame_lines)
     source_dur = frame_index['video_duration']
 
-    cut_rule = ("CUT ONLY truly boring: loading, menus, idle standing, walking aimlessly. "
-                "KEEP ALL action: fights, kills, reactions, clutch moments."
-                if ALLOW_CUTS else
-                "DO NOT cut anything — keep FULL video")
+    prompt = f"""You are a VIRAL REEL EDITOR. Make this gameplay entertaining.
 
-    prompt = f"""You are a PROFESSIONAL viral gaming editor.
+VIDEO: {source_dur:.1f}s | Total frames: {frame_index['total_frames']} | FPS: {frame_index['fps_sampling']}
 
-VIDEO: {source_dur:.1f}s | Sampling: {frame_index['fps_sampling']}fps | Frames: {frame_index['total_frames']}
-TARGET: {TARGET_MIN_SEC}-{TARGET_MAX_SEC} seconds (soft)
-
-FRAME INDEX (use ONLY these):
+FRAME INDEX (use ONLY these frames):
 {frame_list}
 
-GRIDS: {grid_count} images with "#idx | MM:SS.S" labels.
+GRIDS: {grid_count} images. Each frame labeled "#idx | MM:SS.S".
 
 TRANSCRIPT:
 {transcript}
 
-AUDIO SPIKES:
+AUDIO SPIKES (loud = action):
 {spikes}
 
 AVAILABLE:
@@ -465,30 +417,89 @@ AVAILABLE:
 - SFX moods: {list(sfx.keys())}
 - Music: {music}
 
-RULES:
-1. USE FRAME NUMBERS (not timestamps)
-2. Hook in first 2-3 sec
-3. {cut_rule}
-4. TARGET: 80-100% of source. If source=42s, output=34-42s.
-5. DO NOT over-cut. Better longer + exciting than short.
-6. Speed: normal=1.0x (most clips), hype=1.3x, clutch=0.7x
-7. Every edit MUST have a "reason"
-8. aspect_ratio MUST be: "{ASPECT_RATIO}"
+╔══════════════════════════════════════════════════════════════╗
+║  🎯 PRIMARY RULE: VIDEO LENGTH                                ║
+╚══════════════════════════════════════════════════════════════╝
 
-Return ONLY valid JSON (no markdown):
+**If content is GOOD (fights, action, kills):**
+  → KEEP SAME LENGTH (42s source → 40-42s output)
+  → DO NOT cut. Preserve everything.
+  → Only insert memes + SFX
+
+**If content is MIXED (some boring):**
+  → Cut ONLY boring parts (menus, loading, idle)
+  → Target: 70-90% of source (42s → 30-38s)
+
+**If content is BORING (nothing happening):**
+  → Cut aggressively
+  → Target: 40-60% of source (42s → 17-25s)
+
+⚠️ DEFAULT: Assume content is GOOD. Preserve full video.
+
+╔══════════════════════════════════════════════════════════════╗
+║  🎭 MEME INSERTION RULES                                      ║
+╚══════════════════════════════════════════════════════════════╝
+
+Insert 3-6 memes at exciting moments:
+- Kill / win → mood: "victory" or "win"
+- Death / fail → mood: "fail" or "sad"
+- Funny moment → mood: "funny" or "reaction"
+- Surprise / shock → mood: "shocked"
+- Hype / action → mood: "hype"
+
+Meme duration: 1.5-3 seconds.
+Insert memes BETWEEN video clips (never overlap).
+
+╔══════════════════════════════════════════════════════════════╗
+║  🔊 SFX RULES                                                 ║
+╚══════════════════════════════════════════════════════════════╝
+
+Add "sfx_mood" field to KEEP edits on action moments:
+- Kill / punch → sfx_mood: "impact"
+- Big moment → sfx_mood: "dramatic"
+- Whoosh / transition → sfx_mood: "whoosh"
+- Funny → sfx_mood: "funny"
+- Victory → sfx_mood: "victory"
+- Hype → sfx_mood: "hype"
+
+Add 3-5 SFX total.
+
+╔══════════════════════════════════════════════════════════════╗
+║  ⚡ SPEED                                                     ║
+╚══════════════════════════════════════════════════════════════╝
+
+- Normal: 1.0x (use this for MOST clips)
+- Slightly boring: 1.2-1.5x
+- Clutch moments: 0.7x (slow-mo)
+
+╔══════════════════════════════════════════════════════════════╗
+║  📋 OUTPUT FORMAT                                             ║
+╚══════════════════════════════════════════════════════════════╝
+
+Return ONLY valid JSON (no markdown, no code fences):
+
 {{
   "content_quality": "good|mixed|boring",
-  "reasoning": "One sentence",
-  "target_duration": <number between {TARGET_MIN_SEC} and {TARGET_MAX_SEC}>,
+  "reasoning": "Brief explanation",
+  "target_duration": {int(source_dur)},
   "aspect_ratio": "{ASPECT_RATIO}",
   "bg_music": "<filename from AVAILABLE music>",
-  "music_volume": {MUSIC_VOLUME},
   "edits": [
-    {{"start_frame": 0, "end_frame": 6, "remove": true, "reason": "Loading"}},
-    {{"start_frame": 6, "end_frame": 120, "speed": 1.0, "reason": "Keep full gameplay"}},
-    {{"insert_meme": "auto", "meme_mood": "shocked", "reason": "Reaction"}}
+    {{"start_frame": 0, "end_frame": 15, "speed": 1.0, "reason": "Intro gameplay"}},
+    {{"insert_meme": "auto", "meme_mood": "funny", "reason": "Funny moment"}},
+    {{"start_frame": 15, "end_frame": 30, "speed": 1.0, "sfx_mood": "impact", "reason": "Kill"}},
+    {{"insert_meme": "auto", "meme_mood": "shocked", "reason": "Surprise"}},
+    {{"start_frame": 30, "end_frame": 90, "speed": 1.0, "reason": "Main action"}},
+    {{"insert_meme": "auto", "meme_mood": "victory", "reason": "Win"}},
+    {{"start_frame": 90, "end_frame": 126, "speed": 1.0, "sfx_mood": "victory", "reason": "Finale"}}
   ]
 }}
+
+REMINDER:
+- If content is GOOD → output ~= source length
+- Insert memes BETWEEN clips (not overlapping)
+- Add sfx_mood to KEEP edits
+- Do NOT cut exciting parts
 """
     return prompt
 
@@ -556,11 +567,11 @@ def ai_analyze(frame_index, grid_paths, transcript, spikes, memes, sfx, music):
             "type": "image_url",
             "image_url": {"url": f"data:image/jpeg;base64,{b64}"}
         })
-    log_info(f"Prepared {len(images)} grid images for AI")
+    log_info(f"Prepared {len(images)} grid images")
 
     prompt = build_prompt(frame_index, len(grid_paths),
                           transcript, spikes, memes, sfx, music)
-    log_info(f"Prompt length: {len(prompt)} chars")
+    log_info(f"Prompt: {len(prompt)} chars")
 
     last_error = None
     total_attempts = 0
@@ -595,18 +606,21 @@ def ai_analyze(frame_index, grid_paths, transcript, spikes, memes, sfx, music):
                 text = response.choices[0].message.content
                 log_ok(f"Response in {elapsed:.2f}s ({len(text)} chars)")
 
-                if response.usage:
-                    log_info(f"Tokens: {response.usage.total_tokens}")
-
                 result = extract_json(text)
 
                 if result.get("aspect_ratio") not in ("9:16", "1:1", "4:5"):
                     result["aspect_ratio"] = ASPECT_RATIO
 
+                meme_count = sum(1 for e in result.get("edits", []) if "insert_meme" in e)
+                sfx_count = sum(1 for e in result.get("edits", []) if "sfx_mood" in e)
+                keep_count = sum(1 for e in result.get("edits", [])
+                                 if not e.get("remove") and "insert_meme" not in e)
+
                 log_ok(f"Quality: {result.get('content_quality', '?')}")
                 log_ok(f"Reasoning: {result.get('reasoning', '-')}")
                 log_ok(f"Target: {result.get('target_duration')}s")
-                log_ok(f"Edits: {len(result.get('edits', []))}")
+                log_ok(f"Edits: {len(result.get('edits', []))} "
+                       f"[KEEP: {keep_count}, MEME: {meme_count}, SFX: {sfx_count}]")
                 return result
 
             except (json.JSONDecodeError, ValueError) as e:
@@ -631,7 +645,6 @@ def ai_analyze(frame_index, grid_paths, transcript, spikes, memes, sfx, music):
 # VERIFY
 # ================================================================
 def verify_and_convert(ai_json, frame_index):
-    log_info("Verifying AI output...")
     fps_sampling = frame_index["fps_sampling"]
     total_frames = frame_index["total_frames"]
 
@@ -665,7 +678,6 @@ def verify_and_convert(ai_json, frame_index):
             edit["end"] = round(ef / fps_sampling, 3)
 
             if not edit.get("remove") and (edit["end"] - edit["start"]) < MIN_CLIP_DURATION:
-                log_warn(f"Skipping tiny clip: {edit['start']:.2f}-{edit['end']:.2f}s")
                 continue
 
         verified.append(edit)
@@ -693,11 +705,14 @@ def save_debug_log(ai_json, frame_index):
     for i, edit in enumerate(ai_json.get("edits", []), 1):
         lines.append(f"--- EDIT #{i} ---")
         if "insert_meme" in edit:
-            lines.append(f"  MEME | {edit.get('meme_mood')}")
+            lines.append(f"  🎭 MEME | Mood: {edit.get('meme_mood')}")
         elif edit.get("remove"):
-            lines.append(f"  CUT | {edit['start_frame']}-{edit['end_frame']}")
+            lines.append(f"  ✂️  CUT | Frames: {edit['start_frame']}-{edit['end_frame']}")
         else:
-            lines.append(f"  KEEP | {edit['start_frame']}-{edit['end_frame']} @ {edit.get('speed', 1.0)}x")
+            lines.append(f"  🎬 KEEP | Frames: {edit['start_frame']}-{edit['end_frame']} "
+                         f"| Speed: {edit.get('speed', 1.0)}x")
+            if "sfx_mood" in edit:
+                lines.append(f"     🔊 SFX: {edit['sfx_mood']}")
         lines.append(f"  Reason: {edit.get('reason', '-')}")
 
     with open(os.path.join(DEBUG_DIR, f"debug_{ts}.txt"), "w") as f:
@@ -740,7 +755,7 @@ def pick_sfx(mood):
 
 
 # ================================================================
-# ASPECT + FILTER (FIXED: even dimensions)
+# ASPECT (even dimensions)
 # ================================================================
 def apply_aspect(clip, ratio="9:16"):
     w, h = clip.size
@@ -757,12 +772,9 @@ def apply_aspect(clip, ratio="9:16"):
         th = w * (16 / 9)
         return clip.fx(vfx.crop, x_center=w / 2, y_center=h / 2,
                       width=make_even(w), height=make_even(th))
-
     elif ratio == "1:1":
         m = make_even(min(w, h))
-        return clip.fx(vfx.crop, x_center=w / 2, y_center=h / 2,
-                      width=m, height=m)
-
+        return clip.fx(vfx.crop, x_center=w / 2, y_center=h / 2, width=m, height=m)
     elif ratio == "4:5":
         tw = h * (4 / 5)
         if tw <= w:
@@ -771,22 +783,6 @@ def apply_aspect(clip, ratio="9:16"):
         th = w * (5 / 4)
         return clip.fx(vfx.crop, x_center=w / 2, y_center=h / 2,
                       width=make_even(w), height=make_even(th))
-
-    return clip
-
-
-def apply_filter(clip, name):
-    try:
-        if name == "cinematic":
-            clip = clip.fx(vfx.colorx, 0.9).fx(vfx.lum_contrast, lum=0, contrast=20)
-        elif name == "vivid":
-            clip = clip.fx(vfx.colorx, 1.3)
-        elif name == "cold":
-            clip = clip.fx(vfx.colorx, 0.9)
-        elif name == "vintage":
-            clip = clip.fx(vfx.colorx, 0.8)
-    except Exception as e:
-        log_warn(f"Filter error: {e}")
     return clip
 
 
@@ -804,15 +800,20 @@ def build_reel(video_path, ai_json, output_path):
     clips = []
     sfx_data = []
     current_time = 0.0
+    meme_count = 0
+    sfx_count = 0
 
     log_info(f"Source: {source_duration:.2f}s @ {source_fps:.2f}fps")
 
     for edit in ai_json.get("edits", []):
 
-        # ---- MEME ----
+        # ══════════════════════════════════════════════
+        # MEME INSERT
+        # ══════════════════════════════════════════════
         if "insert_meme" in edit:
             mood = edit.get("meme_mood", "funny")
             meme_path = pick_meme(mood)
+
             if meme_path:
                 try:
                     meme = VideoFileClip(meme_path)
@@ -829,19 +830,33 @@ def build_reel(video_path, ai_json, output_path):
                     meme = apply_aspect(meme, aspect)
                     clips.append(meme)
                     current_time += meme.duration
-                    log_ok(f"Meme ({mood}) {meme.duration:.1f}s [orig={original_dur:.1f}s]")
+                    meme_count += 1
+
+                    # Add SFX on meme
+                    meme_sfx = pick_sfx("whoosh")
+                    if meme_sfx:
+                        sfx_data.append((current_time - meme.duration, meme_sfx, 0.5))
+                        sfx_count += 1
+
+                    log_ok(f"🎭 Meme #{meme_count} ({mood}) {meme.duration:.1f}s "
+                           f"[orig={original_dur:.1f}s]")
+
                 except Exception as e:
                     log_err(f"Meme error: {e}")
             else:
                 log_warn(f"No meme for mood: {mood}")
             continue
 
-        # ---- REMOVE ----
+        # ══════════════════════════════════════════════
+        # CUT
+        # ══════════════════════════════════════════════
         if edit.get("remove", False):
-            log_info(f"Cut: {edit.get('start_frame')}-{edit.get('end_frame')}")
+            log_info(f"✂️  Cut: frames {edit.get('start_frame')}-{edit.get('end_frame')}")
             continue
 
-        # ---- KEEP ----
+        # ══════════════════════════════════════════════
+        # KEEP VIDEO
+        # ══════════════════════════════════════════════
         start = edit.get("start")
         end = edit.get("end")
         if start is None or end is None:
@@ -858,62 +873,49 @@ def build_reel(video_path, ai_json, output_path):
             if speed != 1.0:
                 seg = seg.fx(vfx.speedx, speed)
 
-            zoom = edit.get("zoom")
-            if zoom:
-                try:
-                    seg = seg.fx(vfx.resize, zoom)
-                except Exception:
-                    pass
-
             seg = apply_aspect(seg, aspect)
 
-            if "filter" in edit:
-                seg = apply_filter(seg, edit["filter"])
-
-            if "text" in edit:
-                try:
-                    txt = TextClip(
-                        edit["text"], fontsize=70, color="white",
-                        stroke_color="black", stroke_width=3,
-                        font="DejaVu-Sans-Bold", method="caption"
-                    ).set_position(("center", "top")).set_duration(seg.duration)
-                    seg = CompositeVideoClip([seg, txt])
-                except Exception as e:
-                    log_warn(f"Text error: {e}")
-
+            # SFX attached to this segment
             sfx_mood = edit.get("sfx_mood")
             if sfx_mood:
                 sfx_path = pick_sfx(sfx_mood)
                 if sfx_path:
-                    sfx_data.append((current_time, sfx_path))
-                    log_ok(f"SFX ({sfx_mood})")
+                    sfx_data.append((current_time, sfx_path, SFX_VOLUME))
+                    sfx_count += 1
+                    log_ok(f"🔊 SFX ({sfx_mood}) at {current_time:.2f}s")
 
             clips.append(seg)
             current_time += seg.duration
-            log_ok(f"Keep: {start:.2f}-{end:.2f}s @ {speed}x")
+            log_ok(f"🎬 Keep: {start:.2f}-{end:.2f}s @ {speed}x")
 
         except Exception as e:
             log_err(f"Clip error: {e}")
 
     if not clips:
-        log_err("No clips!")
+        log_err("No clips! Aborting.")
         return None
 
+    # ══════════════════════════════════════════════════
+    # CONCATENATE
+    # ══════════════════════════════════════════════════
     final = concatenate_videoclips(clips, method="compose")
     video_duration = float(final.duration)
-    log_info(f"Video duration locked: {video_duration:.2f}s")
+    log_info(f"Video duration: {video_duration:.2f}s")
+    log_info(f"Total: {meme_count} memes, {sfx_count} SFX")
 
-    # ============================================================
+    # ══════════════════════════════════════════════════
     # AUDIO MIX
-    # ============================================================
+    # ══════════════════════════════════════════════════
     audio_tracks = []
 
+    # 1. Original audio
     if final.audio:
         orig = final.audio.volumex(ORIGINAL_AUDIO_VOLUME)
         audio_tracks.append(orig)
         log_info(f"Original audio: {ORIGINAL_AUDIO_VOLUME}x")
 
-    for start_t, sfx_path in sfx_data:
+    # 2. SFX
+    for start_t, sfx_path, vol in sfx_data:
         try:
             sfx = AudioFileClip(sfx_path)
             remaining = video_duration - start_t
@@ -921,12 +923,12 @@ def build_reel(video_path, ai_json, output_path):
                 continue
             if sfx.duration > remaining:
                 sfx = sfx.subclip(0, remaining)
-            sfx = sfx.set_start(start_t).volumex(SFX_VOLUME)
+            sfx = sfx.set_start(start_t).volumex(vol)
             audio_tracks.append(sfx)
-            log_info(f"SFX @ {start_t:.2f}s: {SFX_VOLUME}x")
         except Exception as e:
             log_warn(f"SFX error: {e}")
 
+    # 3. Background music
     if "bg_music" in ai_json:
         mpath = os.path.join(MUSIC_DIR, ai_json["bg_music"])
         if os.path.exists(mpath):
@@ -937,7 +939,7 @@ def build_reel(video_path, ai_json, output_path):
                 else:
                     music = music.fx(vfx.loop, duration=video_duration)
                 audio_tracks.append(music)
-                log_ok(f"Music: {ai_json['bg_music']} @ {MUSIC_VOLUME}x")
+                log_ok(f"🎵 Music: {ai_json['bg_music']} @ {MUSIC_VOLUME}x")
             except Exception as e:
                 log_warn(f"Music error: {e}")
 
@@ -946,30 +948,29 @@ def build_reel(video_path, ai_json, output_path):
         if composite.duration > video_duration:
             composite = composite.subclip(0, video_duration)
         final = final.set_audio(composite)
+        log_ok(f"Audio mixed: {len(audio_tracks)} tracks")
 
     final = final.set_duration(video_duration)
 
-    # ============================================================
-    # 🔧 FIX: Force even dimensions before write
-    # ============================================================
+    # ══════════════════════════════════════════════════
+    # FORCE EVEN DIMENSIONS
+    # ══════════════════════════════════════════════════
     try:
         w, h = final.size
         w_even = w if w % 2 == 0 else w - 1
         h_even = h if h % 2 == 0 else h - 1
         if w != w_even or h != h_even:
-            log_warn(f"Resizing {w}x{h} → {w_even}x{h_even} (H.264 needs even)")
+            log_warn(f"Resizing {w}x{h} → {w_even}x{h_even}")
             final = final.resize((w_even, h_even))
         else:
             log_info(f"Dimensions OK: {w}x{h}")
     except Exception as e:
         log_warn(f"Even-check error: {e}")
 
-    # ============================================================
+    # ══════════════════════════════════════════════════
     # WRITE
-    # ============================================================
-    output_fps = source_fps
-
-    log_info(f"Writing: {VIDEO_BITRATE}, CRF={VIDEO_CRF}, preset={VIDEO_PRESET}, fps={output_fps}")
+    # ══════════════════════════════════════════════════
+    log_info(f"Writing: {VIDEO_BITRATE}, CRF={VIDEO_CRF}, preset={VIDEO_PRESET}")
 
     final.write_videofile(
         output_path,
@@ -977,7 +978,7 @@ def build_reel(video_path, ai_json, output_path):
         audio_codec="aac",
         audio_bitrate=AUDIO_BITRATE,
         bitrate=VIDEO_BITRATE,
-        fps=output_fps,
+        fps=source_fps,
         preset=VIDEO_PRESET,
         threads=4,
         ffmpeg_params=[
@@ -1006,7 +1007,7 @@ def main():
 
     print("\n")
     print("╔" + "═" * 68 + "╗")
-    print("║" + " " * 12 + "🎬 AUTO EDITOR - Smart Content Mode" + " " * 22 + "║")
+    print("║" + " " * 12 + "🎬 AUTO EDITOR - VIRAL REEL MODE" + " " * 24 + "║")
     print("╚" + "═" * 68 + "╝")
 
     ensure_folders()
