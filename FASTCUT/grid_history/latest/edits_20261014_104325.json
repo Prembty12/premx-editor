@@ -1,0 +1,58 @@
+{
+  "content_quality": "good",
+  "reasoning": "The gameplay features exciting action and moments that warrant a full edit without cuts.",
+  "target_duration": 42,
+  "aspect_ratio": "9:16",
+  "bg_music": "437528__frankum__progressive-element-electronic-track.mp3",
+  "edits": [
+    {
+      "start_frame": 0,
+      "end_frame": 15,
+      "speed": 1.0,
+      "reason": "Intro gameplay",
+      "start": 0.0,
+      "end": 5.0
+    },
+    {
+      "insert_meme": "auto",
+      "meme_mood": "funny",
+      "reason": "Funny moment"
+    },
+    {
+      "start_frame": 15,
+      "end_frame": 30,
+      "speed": 1.0,
+      "sfx_mood": "impact",
+      "reason": "Kill",
+      "start": 5.0,
+      "end": 10.0
+    },
+    {
+      "insert_meme": "auto",
+      "meme_mood": "shocked",
+      "reason": "Surprise"
+    },
+    {
+      "start_frame": 30,
+      "end_frame": 90,
+      "speed": 1.0,
+      "reason": "Main action",
+      "start": 10.0,
+      "end": 30.0
+    },
+    {
+      "insert_meme": "auto",
+      "meme_mood": "victory",
+      "reason": "Win"
+    },
+    {
+      "start_frame": 90,
+      "end_frame": 126,
+      "speed": 1.0,
+      "sfx_mood": "victory",
+      "reason": "Finale",
+      "start": 30.0,
+      "end": 42.0
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+======================================================================
+AI DECISIONS - 20261014_104325
+======================================================================
+Quality: good
+Reasoning: The gameplay features exciting action and moments that warrant a full edit without cuts.
+Target: 42s
+
+--- EDIT #1 ---
+  🎬 KEEP | Frames: 0-15 | Speed: 1.0x
+  Reason: Intro gameplay
+--- EDIT #2 ---
+  🎭 MEME | Mood: funny
+  Reason: Funny moment
+--- EDIT #3 ---
+  🎬 KEEP | Frames: 15-30 | Speed: 1.0x
+     🔊 SFX: impact
+  Reason: Kill
+--- EDIT #4 ---
+  🎭 MEME | Mood: shocked
+  Reason: Surprise
+--- EDIT #5 ---
+  🎬 KEEP | Frames: 30-90 | Speed: 1.0x
+  Reason: Main action
+--- EDIT #6 ---
+  🎭 MEME | Mood: victory
+  Reason: Win
+--- EDIT #7 ---
+  🎬 KEEP | Frames: 90-126 | Speed: 1.0x
+     🔊 SFX: victory
+  Reason: Finale
