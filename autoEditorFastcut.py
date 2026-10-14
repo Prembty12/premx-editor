@@ -8,6 +8,7 @@ AUTO EDITOR - OpenRouter Multi-Key Version (PRODUCTION)
 - Whisper cached
 - Full error handling
 - All folders inside FASTCUT/
+- Auto git-commit FASTCUT structure (in GitHub Actions)
 ================================================================
 """
 
@@ -18,6 +19,7 @@ import math
 import random
 import base64
 import argparse
+import subprocess
 import traceback
 import time
 from datetime import datetime
@@ -157,7 +159,31 @@ def ensure_folders():
     if existed:
         log_info(f"{len(existed)} folders already existed")
 
+    _drop_gitkeep_files(folders)
     _drop_folder_readmes()
+
+
+def _drop_gitkeep_files(folders):
+    """Har folder me .gitkeep daalo taaki git empty folder track kar sake."""
+    gitkeep_count = 0
+    for folder in folders:
+        if not os.path.isdir(folder):
+            continue
+        if folder == BASE_DIR:
+            continue
+        gitkeep_path = os.path.join(folder, ".gitkeep")
+        if not os.path.exists(gitkeep_path):
+            try:
+                with open(gitkeep_path, "w") as f:
+                    f.write("")
+                gitkeep_count += 1
+            except Exception:
+                pass
+
+    if gitkeep_count > 0:
+        log_ok(f"Dropped {gitkeep_count} .gitkeep files (for git tracking)")
+    else:
+        log_info(".gitkeep files already exist in all folders")
 
 
 def _drop_folder_readmes():
@@ -191,10 +217,12 @@ def _drop_folder_readmes():
     for folder, text in readmes.items():
         if not os.path.exists(folder):
             continue
-        items = [f for f in os.listdir(folder) if f != "README.txt"]
+        items = [f for f in os.listdir(folder) if f not in ("README.txt", ".gitkeep")]
         if items:
             continue
         readme_path = os.path.join(folder, "README.txt")
+        if os.path.exists(readme_path):
+            continue
         try:
             with open(readme_path, "w", encoding="utf-8") as f:
                 f.write(f"📁 {folder}\n")
@@ -204,6 +232,72 @@ def _drop_folder_readmes():
                 f.write("Auto-managed folder.\n")
         except Exception:
             pass
+
+
+# ================================================================
+# AUTO-COMMIT FASTCUT STRUCTURE TO GIT (GitHub Actions only)
+# ================================================================
+def git_commit_folders():
+    """FASTCUT structure ko git me commit + push karo (GitHub Actions me)."""
+    if not os.getenv("GITHUB_ACTIONS"):
+        log_info("Not in GitHub Actions — skipping git commit")
+        return
+
+    log_info("Committing FASTCUT structure to git...")
+
+    try:
+        # Git config
+        subprocess.run(
+            ["git", "config", "user.email", "actions@github.com"],
+            check=True, timeout=10
+        )
+        subprocess.run(
+            ["git", "config", "user.name", "github-actions[bot]"],
+            check=True, timeout=10
+        )
+
+        # Add FASTCUT
+        subprocess.run(
+            ["git", "add", f"{BASE_DIR}/"],
+            check=True, timeout=30
+        )
+
+        # Check if there's anything to commit
+        diff = subprocess.run(
+            ["git", "diff", "--cached", "--quiet"],
+            timeout=30
+        )
+
+        if diff.returncode == 0:
+            log_info("No changes to commit (folders already tracked)")
+            return
+
+        # Commit
+        subprocess.run(
+            ["git", "commit", "-m", "📁 Auto: Update FASTCUT folder structure [skip ci]"],
+            check=True, timeout=30
+        )
+
+        # Push
+        push_result = subprocess.run(
+            ["git", "push"],
+            capture_output=True, text=True, timeout=60
+        )
+
+        if push_result.returncode == 0:
+            log_ok("FASTCUT structure committed & pushed to GitHub ✅")
+        else:
+            log_warn(f"Push failed: {push_result.stderr[:200]}")
+            log_info("(Folders ready locally but not pushed)")
+
+    except subprocess.CalledProcessError as e:
+        log_warn(f"Git command failed: {e}")
+    except subprocess.TimeoutExpired:
+        log_warn("Git command timed out")
+    except FileNotFoundError:
+        log_warn("Git not installed")
+    except Exception as e:
+        log_warn(f"Git commit error: {e}")
 
 
 # ================================================================
@@ -952,6 +1046,7 @@ def main():
     args = parser.parse_args()
 
     ensure_folders()
+    git_commit_folders()
 
     log_step("🎬 AUTO EDITOR - Multi-Key Version")
     log_info(f"Base dir: {BASE_DIR}/")
