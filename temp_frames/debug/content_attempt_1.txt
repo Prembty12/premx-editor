@@ -1,1 +1,1 @@
-{"clip_duration": 56, "reason": "Full cinematic sequence with intense character dialogue", "start_time": 0, "status": "APPROVE", "title": "The Dark Secret 5 Soldiers Hid 👀🔥"}
+{"clip_duration": 31, "reason": "Spider-Man action and cinematic story sequence", "start_time": 0, "status": "APPROVE", "title": "Spider Man Faces 1 Giant Ship 🕷️🔥"}
