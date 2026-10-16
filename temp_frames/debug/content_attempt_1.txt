@@ -1,1 +1,7 @@
-{"clip_duration": 31, "reason": "Spider-Man action and cinematic story sequence", "start_time": 0, "status": "APPROVE", "title": "Spider Man Faces 1 Giant Ship 🕷️🔥"}
+{
+  "clip_duration": 55,
+  "reason": "Continuous intense corridor combat with multiple gunfights",
+  "start_time": 2,
+  "status": "APPROVE",
+  "title": "5 Players Down In Hallway Fight 🔥🎯"
+}
