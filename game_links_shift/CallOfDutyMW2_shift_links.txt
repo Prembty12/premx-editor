@@ -3,3 +3,4 @@ The.Most.Unexpected.Play16 | Link: https://github.com/Prembty12/premx-editor/rel
 The.Most.Unexpected.Play4 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play4.mp4 | REJECT (OpenRouter): Slow aiming and walking, no combat action.
 The.Most.Unexpected.Play23 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play23.mp4 | REJECT (OpenRouter): Cinematic dialogue and slow walking.
 The.Most.Unexpected.Play20 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play20.mp4 | REJECT (OpenRouter): Only walking and climbing without combat
+The.Most.Unexpected.Play15 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play15.mp4 | REJECT (OpenRouter): No action or boring walking
