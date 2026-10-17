@@ -1,23 +1,23 @@
 {
-  "last_updated": "2026-10-17 08:33:21 AM",
+  "last_updated": "2026-10-17 08:29:14 PM",
   "period_days": 7,
   "trending": [
     {
       "game": "mm2remastered",
       "views_7d": 2493,
       "avg_per_video": 831,
-      "trend": "trending",
-      "ratio": 1.9420425333021736,
+      "trend": "viral",
+      "ratio": 2.1972501322051827,
       "fb_link": "https://www.facebook.com/reel/4395441457385128/",
       "source_link": ""
     },
     {
-      "game": "GearsOfWar",
-      "views_7d": 1699,
-      "avg_per_video": 566,
-      "trend": "steady",
-      "ratio": 1.3227389577003974,
-      "fb_link": "https://www.facebook.com/reel/1709982550461141/",
+      "game": "Russian_secret_missions",
+      "views_7d": 1851,
+      "avg_per_video": 617,
+      "trend": "trending",
+      "ratio": 1.6314119513484928,
+      "fb_link": "https://www.facebook.com/reel/1643198310839022/",
       "source_link": ""
     },
     {
@@ -25,54 +25,72 @@
       "views_7d": 1463,
       "avg_per_video": 487,
       "trend": "steady",
-      "ratio": 1.1381163823323206,
+      "ratio": 1.2876784769962983,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison11.mp4"
     },
     {
-      "game": "Callofdutyaw",
-      "views_7d": 1914,
-      "avg_per_video": 478,
-      "trend": "steady",
-      "ratio": 1.1170834307081094,
-      "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison37.mp4"
-    },
-    {
       "game": "MarvelsSpiderMan2",
-      "views_7d": 1902,
-      "avg_per_video": 475,
+      "views_7d": 1906,
+      "avg_per_video": 476,
       "trend": "steady",
-      "ratio": 1.1100724468333723,
+      "ratio": 1.258593336858805,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan222.mp4"
+    },
+    {
+      "game": "CallOfDutyMW2",
+      "views_7d": 891,
+      "avg_per_video": 445,
+      "trend": "steady",
+      "ratio": 1.1766261237440507,
+      "fb_link": "https://www.facebook.com/reel/28577601175201335/",
+      "source_link": ""
     }
   ],
   "below_avg": [
     {
-      "game": "ghostandela",
-      "views_7d": 347,
-      "avg_per_video": 347,
+      "game": "Callofdutyaw",
+      "views_7d": 1050,
+      "avg_per_video": 350,
       "trend": "slow",
-      "ratio": 0.8109371348445898,
-      "fb_link": "https://www.facebook.com/reel/1808594343510424/",
-      "source_link": ""
+      "ratio": 0.9254362771020624,
+      "fb_link": "",
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison37.mp4"
     },
     {
       "game": "Wolverine",
-      "views_7d": 942,
-      "avg_per_video": 188,
-      "trend": "below_avg",
-      "ratio": 0.4393549894835242,
+      "views_7d": 1259,
+      "avg_per_video": 251,
+      "trend": "slow",
+      "ratio": 0.6636700158646219,
+      "fb_link": "https://www.facebook.com/reel/3031651110507980/",
+      "source_link": ""
+    },
+    {
+      "game": "ghostandela",
+      "views_7d": 387,
+      "avg_per_video": 193,
+      "trend": "slow",
+      "ratio": 0.5103120042305659,
       "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine4.mp4"
+      "source_link": ""
+    },
+    {
+      "game": "GearsOfWar",
+      "views_7d": 225,
+      "avg_per_video": 112,
+      "trend": "below_avg",
+      "ratio": 0.29613960867266,
+      "fb_link": "https://www.facebook.com/reel/1709982550461141/",
+      "source_link": ""
     },
     {
       "game": "sifu",
       "views_7d": 80,
       "avg_per_video": 20,
       "trend": "below_avg",
-      "ratio": 0.046739892498247254,
+      "ratio": 0.05288207297726071,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu8.mp4"
     }
@@ -81,8 +99,8 @@
     "game": "mm2remastered",
     "views_7d": 2493,
     "avg_per_video": 831,
-    "trend": "trending",
-    "ratio": 1.9420425333021736,
+    "trend": "viral",
+    "ratio": 2.1972501322051827,
     "fb_link": "https://www.facebook.com/reel/4395441457385128/",
     "source_link": ""
   }

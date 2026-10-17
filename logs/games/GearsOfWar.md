@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 14 | **Last Updated:** 2026-10-17 08:33:21 AM IST
+**Total Videos:** 14 | **Last Updated:** 2026-10-17 08:29:14 PM IST
 
 ---
 
@@ -35,5 +35,5 @@
 | 10 | GearsOfWar9 | [🔵 FB](https://www.facebook.com/17870525709642100) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar9.mp4) |
 | 11 | GearsOfWar12 | [🔵 FB](https://www.facebook.com/17950968966297160) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar12.mp4) |
 | 12 | GearsOfWar2 | [🔵 FB](https://www.facebook.com/18078584450394109) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar2.mp4) |
-| 13 | GearsOfWar4 | [🔵 FB](https://www.facebook.com/18111333170158252) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar4.mp4) |
-| 14 | GearsOfWar7 | [🔵 FB](https://www.facebook.com/18118492247057978) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar7.mp4) |
+| 13 | GearsOfWar7 | [🔵 FB](https://www.facebook.com/18118492247057978) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar7.mp4) |
+| 14 | GearsOfWar4 | [🔵 FB](https://www.facebook.com/18111333170158252) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar4.mp4) |
