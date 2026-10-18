@@ -1,1 +1,1 @@
-{"clip_duration": 23, "reason": "Intense multi-enemy martial arts combat sequence", "start_time": 7, "status": "APPROVE", "title": "He Wrecked 10 Enemies With Bare Hands 🔥🎯"}
+{"clip_duration": 47, "reason": "Continuous rooftop combat with active shooting", "start_time": 0, "status": "APPROVE", "title": "3 Enemies Last Bullet Rooftop Wrecked 🔥🎯"}
