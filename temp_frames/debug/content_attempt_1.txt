@@ -1,1 +1,1 @@
-{"clip_duration": 32, "reason": "Intense giant robot boss battle with red lasers", "start_time": 10, "status": "APPROVE", "title": "Survived Giant Robot 4 Lasers 🤖🔥"}
+{"clip_duration": 23, "reason": "Intense multi-enemy martial arts combat sequence", "start_time": 7, "status": "APPROVE", "title": "He Wrecked 10 Enemies With Bare Hands 🔥🎯"}
