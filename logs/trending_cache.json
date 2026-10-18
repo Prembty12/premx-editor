@@ -1,106 +1,97 @@
 {
-  "last_updated": "2026-10-17 08:34:18 PM",
+  "last_updated": "2026-10-18 08:35:14 AM",
   "period_days": 7,
   "trending": [
     {
       "game": "mm2remastered",
-      "views_7d": 2493,
-      "avg_per_video": 831,
+      "views_7d": 2033,
+      "avg_per_video": 1016,
       "trend": "viral",
-      "ratio": 2.196088794926004,
+      "ratio": 2.888004548038658,
       "fb_link": "https://www.facebook.com/reel/4395441457385128/",
       "source_link": ""
     },
     {
       "game": "Russian_secret_missions",
-      "views_7d": 1853,
-      "avg_per_video": 617,
+      "views_7d": 2002,
+      "avg_per_video": 667,
       "trend": "trending",
-      "ratio": 1.6305496828752644,
+      "ratio": 1.8959636156907334,
       "fb_link": "https://www.facebook.com/reel/1643198310839022/",
       "source_link": ""
     },
     {
-      "game": "VietnamCavePrison",
-      "views_7d": 1463,
-      "avg_per_video": 487,
+      "game": "CallOfDutyMW2",
+      "views_7d": 909,
+      "avg_per_video": 454,
       "trend": "steady",
-      "ratio": 1.2869978858350952,
-      "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison11.mp4"
+      "ratio": 1.290505969300739,
+      "fb_link": "https://www.facebook.com/reel/28577601175201335/",
+      "source_link": ""
     },
     {
       "game": "MarvelsSpiderMan2",
-      "views_7d": 1906,
-      "avg_per_video": 476,
+      "views_7d": 1907,
+      "avg_per_video": 381,
       "trend": "steady",
-      "ratio": 1.2579281183932347,
+      "ratio": 1.083001705514497,
       "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan222.mp4"
-    },
-    {
-      "game": "CallOfDutyMW2",
-      "views_7d": 891,
-      "avg_per_video": 445,
-      "trend": "steady",
-      "ratio": 1.1760042283298098,
-      "fb_link": "https://www.facebook.com/reel/28577601175201335/",
-      "source_link": ""
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan220.mp4"
     }
   ],
   "below_avg": [
     {
-      "game": "Callofdutyaw",
-      "views_7d": 1050,
-      "avg_per_video": 350,
-      "trend": "slow",
-      "ratio": 0.9249471458773785,
-      "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison37.mp4"
-    },
-    {
       "game": "Wolverine",
-      "views_7d": 1265,
-      "avg_per_video": 253,
+      "views_7d": 1284,
+      "avg_per_video": 321,
       "trend": "slow",
-      "ratio": 0.6686046511627908,
+      "ratio": 0.9124502558271745,
       "fb_link": "https://www.facebook.com/reel/3031651110507980/",
       "source_link": ""
     },
     {
-      "game": "ghostandela",
-      "views_7d": 387,
-      "avg_per_video": 193,
+      "game": "VietnamCavePrison",
+      "views_7d": 270,
+      "avg_per_video": 270,
       "trend": "slow",
-      "ratio": 0.5100422832980973,
+      "ratio": 0.7674815235929505,
+      "fb_link": "",
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison11.mp4"
+    },
+    {
+      "game": "ghostandela",
+      "views_7d": 400,
+      "avg_per_video": 200,
+      "trend": "slow",
+      "ratio": 0.5685048322910744,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "GearsOfWar",
-      "views_7d": 225,
-      "avg_per_video": 112,
+      "views_7d": 226,
+      "avg_per_video": 113,
       "trend": "below_avg",
-      "ratio": 0.2959830866807611,
+      "ratio": 0.3212052302444571,
       "fb_link": "https://www.facebook.com/reel/1709982550461141/",
       "source_link": ""
     },
     {
-      "game": "sifu",
-      "views_7d": 80,
-      "avg_per_video": 20,
+      "game": "Callofdutyaw",
+      "views_7d": 152,
+      "avg_per_video": 76,
       "trend": "below_avg",
-      "ratio": 0.052854122621564484,
+      "ratio": 0.2160318362706083,
       "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu8.mp4"
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison37.mp4"
     }
   ],
   "recommendation": {
     "game": "mm2remastered",
-    "views_7d": 2493,
-    "avg_per_video": 831,
+    "views_7d": 2033,
+    "avg_per_video": 1016,
     "trend": "viral",
-    "ratio": 2.196088794926004,
+    "ratio": 2.888004548038658,
     "fb_link": "https://www.facebook.com/reel/4395441457385128/",
     "source_link": ""
   }
