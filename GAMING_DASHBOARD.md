@@ -1,6 +1,6 @@
 # 🚀 GAMING AGENT COMMAND & ANALYTICS DASHBOARD
 
-> **Last Updated:** 2026-10-18 07:03:09 PM IST | **Status:** All Systems Active & Synchronized
+> **Last Updated:** 2026-10-18 07:05:55 PM IST | **Status:** All Systems Active & Synchronized
 
 --- 
 
@@ -15,7 +15,7 @@
 | 5️⃣ | **codBlackops6** | 11 | 5,541 | 503 | 📈 Stable |
 | 6 | **GearsOfWar** | 10 | 4,627 | 462 | 📈 Stable |
 | 7 | **MarvelsSpiderMan2** | 18 | 3,834 | 213 | 📈 Stable |
-| 8 | **CallOfDutyMW2** | 11 | 3,183 | 289 | 📈 Stable |
+| 8 | **CallOfDutyMW2** | 12 | 3,183 | 265 | 📈 Stable |
 | 9 | **Wolverine** | 11 | 1,464 | 133 | 📈 Stable |
 | 10 | **sifu** | 18 | 988 | 54 | 📈 Stable |
 | 11 | **ghostandela** | 18 | 540 | 30 | 📈 Stable |
@@ -40,13 +40,13 @@
 | **GearsOfWar** | 2026-10-11 12:56 PM | 5 Soldiers Walked In 👀💥  #videogames #gamingcommunity #gaming #gearsofwar #gamin | [🔵 FB](https://www.facebook.com/reel/1709982550461141/) | 112 | [🟣 IG](https://www.instagram.com/reel/DeWFWfCkhcM/) | 10 | **4** / 14 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar9.mp4) | **[📜 View 14](logs/games/GearsOfWar.md)** |
 | **mm2remastered** | 2026-10-10 11:54 PM | 4 Soldiers Breached The Dark Room 🎯🔥  #videogames #gamingcommunity #gaming #mm2r | [🔵 FB](https://www.facebook.com/reel/4395441457385128/) | 657 | [🟣 IG](https://www.instagram.com/reel/DeUlSdaCIIp/) | 250 | **8** / 22 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_19.mp4) | **[📜 View 22](logs/games/mm2remastered.md)** |
 | **codBlackops6** | 2026-10-09 06:37 AM | 5 Jets Strike Massive Desert Base 💥🔥  #videogames #gamingcommunity #gaming #codb | [🔵 FB](https://www.facebook.com/reel/1086858517283105/) | 621 | [🟣 IG](https://www.instagram.com/reel/DePleq2kq8X/) | 620 | **22** / 33 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops62.mp4) | **[📜 View 33](logs/games/codBlackops6.md)** |
-| **CODMW4** | — | CODMW419 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | **18** / 19 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW419.mp4) | **[📜 View 19](logs/games/CODMW4.md)** |
+| **CODMW4** | — | CODMW419 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | **17** / 18 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW419.mp4) | **[📜 View 18](logs/games/CODMW4.md)** |
 
 --- 
 
 ## 📈 Trending Games (Last 7 Days)
 
-> Auto-detected based on views performance | Last Updated: 2026-10-18 07:03:09 PM
+> Auto-detected based on views performance | Last Updated: 2026-10-18 07:05:55 PM
 
 | Rank | Game Name | Views (7d) | Avg / Video | Trend | FB Post | Source |
 |:---:|---|---|---|---|---|---|
@@ -72,7 +72,7 @@
 
 ## 🎯 Best Time to Post (IST)
 
-> Analysis from 230 posts | Last Updated: 2026-10-18 07:03:09 PM
+> Analysis from 231 posts | Last Updated: 2026-10-18 07:05:55 PM
 
 | Rank | Time (IST) | Posts | Avg Views | Recommendation |
 |:---:|---|:---:|:---:|---|
@@ -96,13 +96,13 @@
 | Thursday | 28 | 294 |
 | Friday | 19 | 316 |
 | Saturday | 31 | 347 |
-| Sunday | 43 | 266 |
+| Sunday | 44 | 260 |
 
 --- 
 
 ## 🤖 Auto-Reply Log (v6 Timeout-Safe)
 
-> Auto-Comment Status: ✅ **ACTIVE** | Last Updated: 2026-10-18 07:03:09 PM | Total Replies: 28 | Skipped: 0
+> Auto-Comment Status: ✅ **ACTIVE** | Last Updated: 2026-10-18 07:05:55 PM | Total Replies: 28 | Skipped: 0
 
 ### 📊 Stats
 
@@ -155,37 +155,37 @@
 - **🎮 GearsOfWar** — [📜 View All 14 Videos](logs/games/GearsOfWar.md)
 - **🎮 mm2remastered** — [📜 View All 22 Videos](logs/games/mm2remastered.md)
 - **🎮 codBlackops6** — [📜 View All 33 Videos](logs/games/codBlackops6.md)
-- **🎮 CODMW4** — [📜 View All 19 Videos](logs/games/CODMW4.md)
+- **🎮 CODMW4** — [📜 View All 18 Videos](logs/games/CODMW4.md)
 
 --- 
 
 ## 🔄 Game Rotation Queue
 
-**📊 Total Games:** 12 | **🎯 Current:** `CODMW4` | **⏭️ Next Game:** `CallOfDutyMW2` (Position #2) | **🔢 Total Runs:** 224
+**📊 Total Games:** 12 | **🎯 Current:** `CallOfDutyMW2` | **⏭️ Next Game:** `Callofdutyaw` (Position #3) | **🔢 Total Runs:** 225
 
-**Last Updated:** 2026-10-18 07:03:09 PM IST
+**Last Updated:** 2026-10-18 07:05:55 PM IST
 
 | # | Game Name | Uploaded | Last Run # | Next Turn In | Status |
 |:---:|---|:---:|:---:|:---:|:---:|
-| 1 | **CODMW4** | 1 | 224 | 0 | 🎯 **CURRENT** |
-| 2 | **CallOfDutyMW2** | 11 | 218 | 1 | ⏭️ **NEXT UP** |
-| 3 | **Callofdutyaw** | 17 | 212 | 2 | ⏳ Wait 2 |
-| 4 | **GearsOfWar** | 10 | 196 | 3 | ⏳ Wait 3 |
-| 5 | **MarvelsSpiderMan2** | 18 | 219 | 4 | ⏳ Wait 4 |
-| 6 | **Russian_secret_missions** | 18 | 220 | 5 | ⏳ Wait 5 |
-| 7 | **VietnamCavePrison** | 16 | 207 | 6 | ⏳ Wait 6 |
-| 8 | **Wolverine** | 11 | 221 | 7 | ⏳ Wait 7 |
-| 9 | **codBlackops6** | 11 | 156 | 8 | ⏳ Wait 8 |
-| 10 | **ghostandela** | 18 | 222 | 9 | ⏳ Wait 9 |
-| 11 | **mm2remastered** | 14 | 192 | 10 | ⏳ Wait 10 |
-| 12 | **sifu** | 18 | 223 | 11 | ⏳ Wait 11 |
+| 1 | **CODMW4** | 1 | 224 | 11 | ⏳ Wait 11 |
+| 2 | **CallOfDutyMW2** | 12 | 225 | 0 | 🎯 **CURRENT** |
+| 3 | **Callofdutyaw** | 17 | 212 | 1 | ⏭️ **NEXT UP** |
+| 4 | **GearsOfWar** | 10 | 196 | 2 | ⏳ Wait 2 |
+| 5 | **MarvelsSpiderMan2** | 18 | 219 | 3 | ⏳ Wait 3 |
+| 6 | **Russian_secret_missions** | 18 | 220 | 4 | ⏳ Wait 4 |
+| 7 | **VietnamCavePrison** | 16 | 207 | 5 | ⏳ Wait 5 |
+| 8 | **Wolverine** | 11 | 221 | 6 | ⏳ Wait 6 |
+| 9 | **codBlackops6** | 11 | 156 | 7 | ⏳ Wait 7 |
+| 10 | **ghostandela** | 18 | 222 | 8 | ⏳ Wait 8 |
+| 11 | **mm2remastered** | 14 | 192 | 9 | ⏳ Wait 9 |
+| 12 | **sifu** | 18 | 223 | 10 | ⏳ Wait 10 |
 
 ### 📜 Recent Runs (Last 5)
 
 | Run # | Game | Timestamp (IST) |
 |:---:|---|---|
+| 225 | CallOfDutyMW2 | 2026-10-18 07:05:55 PM |
 | 224 | CODMW4 | 2026-10-18 07:03:09 PM |
 | 223 | sifu | 2026-10-18 06:50:38 PM |
 | 222 | ghostandela | 2026-10-18 06:47:36 PM |
 | 221 | Wolverine | 2026-10-18 08:38:36 AM |
-| 220 | Russian_secret_missions | 2026-10-18 08:35:14 AM |

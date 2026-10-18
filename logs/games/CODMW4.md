@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 19 | **Last Updated:** 2026-10-18 07:03:09 PM IST
+**Total Videos:** 18 | **Last Updated:** 2026-10-18 07:05:55 PM IST
 
 ---
 
@@ -10,10 +10,10 @@
 
 | Metric | Value |
 |---|---|
-| Total Videos | **19** |
-| Posted (FB or IG) | 0 / 19 |
-| FB Posted | 0 / 19 |
-| IG Posted | 0 / 19 |
+| Total Videos | **18** |
+| Posted (FB or IG) | 0 / 18 |
+| FB Posted | 0 / 18 |
+| IG Posted | 0 / 18 |
 | Total FB Views | **0** |
 | Total IG Views | **0** |
 
@@ -41,4 +41,3 @@
 | 16 | CODMW44 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW44.mp4) |
 | 17 | CODMW43 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW43.mp4) |
 | 18 | CODMW42 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW42.mp4) |
-| 19 | CODMW41 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW41.mp4) |
