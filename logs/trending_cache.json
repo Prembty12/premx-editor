@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-18 06:50:38 PM",
+  "last_updated": "2026-10-18 07:03:09 PM",
   "period_days": 7,
   "trending": [
     {
@@ -7,7 +7,7 @@
       "views_7d": 907,
       "avg_per_video": 907,
       "trend": "viral",
-      "ratio": 2.761875761266748,
+      "ratio": 2.766087221713937,
       "fb_link": "https://www.facebook.com/reel/4395441457385128/",
       "source_link": ""
     },
@@ -16,7 +16,7 @@
       "views_7d": 2040,
       "avg_per_video": 680,
       "trend": "viral",
-      "ratio": 2.0706455542021924,
+      "ratio": 2.0738029887160723,
       "fb_link": "https://www.facebook.com/reel/1643198310839022/",
       "source_link": ""
     },
@@ -25,7 +25,7 @@
       "views_7d": 913,
       "avg_per_video": 456,
       "trend": "steady",
-      "ratio": 1.3885505481120586,
+      "ratio": 1.3906678865507778,
       "fb_link": "https://www.facebook.com/reel/28577601175201335/",
       "source_link": ""
     }
@@ -36,7 +36,7 @@
       "views_7d": 1141,
       "avg_per_video": 285,
       "trend": "slow",
-      "ratio": 0.8678440925700366,
+      "ratio": 0.869167429094236,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan220.mp4"
     },
@@ -45,16 +45,16 @@
       "views_7d": 270,
       "avg_per_video": 270,
       "trend": "slow",
-      "ratio": 0.8221680876979294,
+      "ratio": 0.8234217749313816,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison11.mp4"
     },
     {
       "game": "Wolverine",
-      "views_7d": 1304,
-      "avg_per_video": 260,
+      "views_7d": 1305,
+      "avg_per_video": 261,
       "trend": "slow",
-      "ratio": 0.7917174177831913,
+      "ratio": 0.7959743824336688,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine3.mp4"
     },
@@ -63,7 +63,7 @@
       "views_7d": 410,
       "avg_per_video": 205,
       "trend": "slow",
-      "ratio": 0.6242387332521316,
+      "ratio": 0.6251906068923453,
       "fb_link": "",
       "source_link": ""
     },
@@ -72,7 +72,7 @@
       "views_7d": 122,
       "avg_per_video": 122,
       "trend": "below_avg",
-      "ratio": 0.37149817295980514,
+      "ratio": 0.3720646538578835,
       "fb_link": "https://www.facebook.com/reel/1709982550461141/",
       "source_link": ""
     }
@@ -82,7 +82,7 @@
     "views_7d": 907,
     "avg_per_video": 907,
     "trend": "viral",
-    "ratio": 2.761875761266748,
+    "ratio": 2.766087221713937,
     "fb_link": "https://www.facebook.com/reel/4395441457385128/",
     "source_link": ""
   }
