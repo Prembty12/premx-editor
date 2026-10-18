@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 30 | **Last Updated:** 2026-10-18 08:38:36 AM IST
+**Total Videos:** 30 | **Last Updated:** 2026-10-18 06:47:36 PM IST
 
 ---
 
@@ -11,10 +11,10 @@
 | Metric | Value |
 |---|---|
 | Total Videos | **30** |
-| Posted (FB or IG) | 16 / 30 |
+| Posted (FB or IG) | 17 / 30 |
 | FB Posted | 12 / 30 |
-| IG Posted | 8 / 30 |
-| Total FB Views | **1,565** |
+| IG Posted | 9 / 30 |
+| Total FB Views | **1,303** |
 | Total IG Views | **160** |
 
 ---
@@ -23,33 +23,33 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | He Smashed The 1v1 Giant Robot 💥🤖  #videogames #gamingcommunity #gaming #wolverine #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/3031651110507980/) | 441 | [🟣 IG](https://www.instagram.com/reel/Dej8LdmEVhC/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine10.mp4) |
-| 2 | Red Eyes Smile Cooked Him Fast 🔥  #videogames #gamingcommunity #gaming #wolverine #gamingreels #reel | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DechN7XgBHX/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine15.mp4) |
-| 3 | Wolverine Survives 1 HP Boss Fight 🔥  #videogames #gamingcommunity #gaming #wolverine #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1789742062294500/) | 121 | [🟣 IG](https://www.instagram.com/reel/DeTKRiAibUX/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine13.mp4) |
-| 4 | Wolverine vs Giant Robot Boss 🔥  #videogames #gamingcommunity #gaming #wolverine #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1452521040404406/) | 652 | [🟣 IG](https://www.instagram.com/reel/DeUSvQQlXAi/) | 50 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine14.mp4) |
-| 5 | Wolverine Slashed Huge Vampire 1 HP 🔥🎯  #videogames #gamingcommunity #gaming #wolverine #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2502233226855240/) | 69 | [🟣 IG](https://www.instagram.com/reel/DeSHOvtjsPD/) | 30 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine3.mp4) |
-| 6 | 1 Yellow Suit Wolverine Wrecked All 🔥🎯  #videogames #gamingcommunity #gaming #wolverine #gamingreels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DePV_JxAk57/) | 30 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine24.mp4) |
-| 7 | Logan Trapped In 1 Collar Screamed 😱🔥  #videogames #gamingcommunity #gaming #wolverine #gamingreels  | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeLjn1DDl43/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine7.mp4) |
-| 8 | Blue Claws Wolverine Slices 🔥  #videogames #gamingcommunity #gaming #wolverine #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeJ9XOnDIjq/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine29.mp4) |
-| 9 | He Has The Ultimate Power 🔥  #videogames #gamingcommunity #gaming #wolverine #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/3809681729172403/) | 282 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine9.mp4) |
+| 1 | Survived Giant Robot 4 Lasers 🤖🔥  #videogames #gamingcommunity #gaming #wolverine #gamingreels #reel | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Densgamk_iv/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine3.mp4) |
+| 2 | He Smashed The 1v1 Giant Robot 💥🤖  #videogames #gamingcommunity #gaming #wolverine #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/3031651110507980/) | 461 | [🟣 IG](https://www.instagram.com/reel/Dej8LdmEVhC/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine12.mp4) |
+| 3 | Red Eyes Smile Cooked Him Fast 🔥  #videogames #gamingcommunity #gaming #wolverine #gamingreels #reel | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DechN7XgBHX/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine15.mp4) |
+| 4 | Wolverine Survives 1 HP Boss Fight 🔥  #videogames #gamingcommunity #gaming #wolverine #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1789742062294500/) | 121 | [🟣 IG](https://www.instagram.com/reel/DeTKRiAibUX/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine14.mp4) |
+| 5 | Wolverine vs Giant Robot Boss 🔥  #videogames #gamingcommunity #gaming #wolverine #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1452521040404406/) | 652 | [🟣 IG](https://www.instagram.com/reel/DeUSvQQlXAi/) | 50 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine5.mp4) |
+| 6 | Wolverine Slashed Huge Vampire 1 HP 🔥🎯  #videogames #gamingcommunity #gaming #wolverine #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2502233226855240/) | 69 | [🟣 IG](https://www.instagram.com/reel/DeSHOvtjsPD/) | 30 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine7.mp4) |
+| 7 | 1 Yellow Suit Wolverine Wrecked All 🔥🎯  #videogames #gamingcommunity #gaming #wolverine #gamingreels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DePV_JxAk57/) | 30 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine24.mp4) |
+| 8 | Logan Trapped In 1 Collar Screamed 😱🔥  #videogames #gamingcommunity #gaming #wolverine #gamingreels  | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeLjn1DDl43/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine9.mp4) |
+| 9 | Blue Claws Wolverine Slices 🔥  #videogames #gamingcommunity #gaming #wolverine #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeJ9XOnDIjq/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine29.mp4) |
 | 10 | Wolverine29 | [🔵 FB](https://www.facebook.com/18103557227120627) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine29.mp4) |
-| 11 | Wolverine210 | [🔵 FB](https://www.facebook.com/17916107808263551) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine210.mp4) |
-| 12 | Wolverine24 | [🔵 FB](https://www.facebook.com/18095981942390995) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine24.mp4) |
-| 13 | Wolverine11 | [🔵 FB](https://www.facebook.com/18343309132280032) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine11.mp4) |
-| 14 | Wolverine4 | [🔵 FB](https://www.facebook.com/18460785688186608) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine4.mp4) |
+| 11 | Wolverine24 | [🔵 FB](https://www.facebook.com/18095981942390995) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine24.mp4) |
+| 12 | Wolverine11 | [🔵 FB](https://www.facebook.com/18343309132280032) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine11.mp4) |
+| 13 | Wolverine210 | [🔵 FB](https://www.facebook.com/17916107808263551) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine210.mp4) |
+| 14 | Wolverine15 | [🔵 FB](https://www.facebook.com/17913660378524825) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine15.mp4) |
 | 15 | Wolverine6 | [🔵 FB](https://www.facebook.com/18107918401921592) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine6.mp4) |
-| 16 | Wolverine15 | [🔵 FB](https://www.facebook.com/17913660378524825) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine15.mp4) |
-| 17 | Wolverine28 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine28.mp4) |
-| 18 | Wolverine27 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine27.mp4) |
-| 19 | Wolverine26 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine26.mp4) |
-| 20 | Wolverine25 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine25.mp4) |
-| 21 | Wolverine23 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine23.mp4) |
-| 22 | Wolverine14 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine14.mp4) |
-| 23 | Wolverine13 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine13.mp4) |
-| 24 | Wolverine12 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine12.mp4) |
-| 25 | Wolverine10 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine10.mp4) |
-| 26 | Wolverine9 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine9.mp4) |
-| 27 | Wolverine8 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine8.mp4) |
-| 28 | Wolverine7 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine7.mp4) |
-| 29 | Wolverine5 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine5.mp4) |
-| 30 | Wolverine3 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine3.mp4) |
+| 16 | Wolverine4 | [🔵 FB](https://www.facebook.com/18460785688186608) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine4.mp4) |
+| 17 | Wolverine3 | [🔵 FB](https://www.facebook.com/18099607337432890) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine3.mp4) |
+| 18 | Wolverine28 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine28.mp4) |
+| 19 | Wolverine27 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine27.mp4) |
+| 20 | Wolverine26 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine26.mp4) |
+| 21 | Wolverine25 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine25.mp4) |
+| 22 | Wolverine23 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine23.mp4) |
+| 23 | Wolverine14 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine14.mp4) |
+| 24 | Wolverine13 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine13.mp4) |
+| 25 | Wolverine12 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine12.mp4) |
+| 26 | Wolverine10 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine10.mp4) |
+| 27 | Wolverine9 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine9.mp4) |
+| 28 | Wolverine8 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine8.mp4) |
+| 29 | Wolverine7 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine7.mp4) |
+| 30 | Wolverine5 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine5.mp4) |
