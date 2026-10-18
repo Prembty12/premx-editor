@@ -1,1 +1,1 @@
-{"clip_duration": 47, "reason": "Continuous rooftop combat with active shooting", "start_time": 0, "status": "APPROVE", "title": "3 Enemies Last Bullet Rooftop Wrecked 🔥🎯"}
+{"clip_duration":31,"reason":"Cinematic fire and parkour action","start_time":0,"status":"APPROVE","title":"Spider-Man 2 Boats Burning Ship Chase 🔥"}
