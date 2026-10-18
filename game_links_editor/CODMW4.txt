@@ -9,3 +9,4 @@ CODMW48 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0
 CODMW49 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW49.mp4
 CODMW410 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW410.mp4
 CODMW411 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW411.mp4
+CODMW412 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW412.mp4
