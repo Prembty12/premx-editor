@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-19 09:54:09 PM",
+  "last_updated": "2026-10-19 09:57:04 PM",
   "period_days": 7,
   "trending": [
     {
@@ -7,7 +7,7 @@
       "views_7d": 1297,
       "avg_per_video": 648,
       "trend": "viral",
-      "ratio": 2.8499175371083014,
+      "ratio": 2.8467874794069195,
       "fb_link": "https://www.facebook.com/reel/1643198310839022/",
       "source_link": ""
     },
@@ -16,7 +16,7 @@
       "views_7d": 816,
       "avg_per_video": 408,
       "trend": "trending",
-      "ratio": 1.794392523364486,
+      "ratio": 1.7924217462932455,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play21.mp4"
     },
@@ -25,7 +25,7 @@
       "views_7d": 1122,
       "avg_per_video": 280,
       "trend": "steady",
-      "ratio": 1.2314458493677845,
+      "ratio": 1.230093355299286,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan238.mp4"
     }
@@ -36,7 +36,7 @@
       "views_7d": 420,
       "avg_per_video": 210,
       "trend": "slow",
-      "ratio": 0.9235843870258383,
+      "ratio": 0.9225700164744646,
       "fb_link": "",
       "source_link": ""
     },
@@ -45,16 +45,16 @@
       "views_7d": 540,
       "avg_per_video": 135,
       "trend": "slow",
-      "ratio": 0.5937328202308961,
+      "ratio": 0.5930807248764415,
       "fb_link": "https://www.facebook.com/reel/1559290532619169/",
       "source_link": ""
     },
     {
       "game": "CODMW4",
-      "views_7d": 125,
-      "avg_per_video": 125,
+      "views_7d": 127,
+      "avg_per_video": 127,
       "trend": "slow",
-      "ratio": 0.5497526113249038,
+      "ratio": 0.5579352004393191,
       "fb_link": "https://www.facebook.com/reel/2330140364405164/",
       "source_link": ""
     },
@@ -63,7 +63,7 @@
       "views_7d": 10,
       "avg_per_video": 10,
       "trend": "below_avg",
-      "ratio": 0.0439802089059923,
+      "ratio": 0.043931905546403076,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison37.mp4"
     },
@@ -72,7 +72,7 @@
       "views_7d": 10,
       "avg_per_video": 3,
       "trend": "below_avg",
-      "ratio": 0.013194062671797692,
+      "ratio": 0.013179571663920923,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu13.mp4"
     }
@@ -82,7 +82,7 @@
     "views_7d": 1297,
     "avg_per_video": 648,
     "trend": "viral",
-    "ratio": 2.8499175371083014,
+    "ratio": 2.8467874794069195,
     "fb_link": "https://www.facebook.com/reel/1643198310839022/",
     "source_link": ""
   }
