@@ -14,12 +14,12 @@
         "mm2remastered",
         "sifu"
     ],
-    "current_index": 7,
-    "current_game": "Wolverine",
-    "next_game": "codBlackops6",
-    "next_game_position": 9,
-    "last_updated": "2026-10-19 08:45:17 AM",
-    "total_runs": 228,
+    "current_index": 9,
+    "current_game": "ghostandela",
+    "next_game": "mm2remastered",
+    "next_game_position": 11,
+    "last_updated": "2026-10-19 08:49:22 AM",
+    "total_runs": 229,
     "rotation_log": [
         {
             "run": 1,
@@ -1160,6 +1160,11 @@
             "run": 228,
             "game": "Wolverine",
             "timestamp": "2026-10-19 08:45:17 AM"
+        },
+        {
+            "run": 229,
+            "game": "ghostandela",
+            "timestamp": "2026-10-19 08:49:22 AM"
         }
     ],
     "all_games": [
@@ -1168,7 +1173,7 @@
             "game": "CODMW4",
             "uploaded": 1,
             "last_run": 224,
-            "next_turn_in": 5,
+            "next_turn_in": 3,
             "status": "waiting"
         },
         {
@@ -1176,7 +1181,7 @@
             "game": "CallOfDutyMW2",
             "uploaded": 12,
             "last_run": 225,
-            "next_turn_in": 6,
+            "next_turn_in": 4,
             "status": "waiting"
         },
         {
@@ -1184,7 +1189,7 @@
             "game": "Callofdutyaw",
             "uploaded": 17,
             "last_run": 212,
-            "next_turn_in": 7,
+            "next_turn_in": 5,
             "status": "waiting"
         },
         {
@@ -1192,7 +1197,7 @@
             "game": "GearsOfWar",
             "uploaded": 10,
             "last_run": 196,
-            "next_turn_in": 8,
+            "next_turn_in": 6,
             "status": "waiting"
         },
         {
@@ -1200,7 +1205,7 @@
             "game": "MarvelsSpiderMan2",
             "uploaded": 19,
             "last_run": 226,
-            "next_turn_in": 9,
+            "next_turn_in": 7,
             "status": "waiting"
         },
         {
@@ -1208,7 +1213,7 @@
             "game": "Russian_secret_missions",
             "uploaded": 19,
             "last_run": 227,
-            "next_turn_in": 10,
+            "next_turn_in": 8,
             "status": "waiting"
         },
         {
@@ -1216,7 +1221,7 @@
             "game": "VietnamCavePrison",
             "uploaded": 16,
             "last_run": 207,
-            "next_turn_in": 11,
+            "next_turn_in": 9,
             "status": "waiting"
         },
         {
@@ -1224,39 +1229,39 @@
             "game": "Wolverine",
             "uploaded": 12,
             "last_run": 228,
-            "next_turn_in": 0,
-            "status": "current"
+            "next_turn_in": 10,
+            "status": "waiting"
         },
         {
             "position": 9,
             "game": "codBlackops6",
             "uploaded": 11,
             "last_run": 156,
-            "next_turn_in": 1,
-            "status": "next_up"
+            "next_turn_in": 11,
+            "status": "waiting"
         },
         {
             "position": 10,
             "game": "ghostandela",
-            "uploaded": 18,
-            "last_run": 222,
-            "next_turn_in": 2,
-            "status": "waiting"
+            "uploaded": 19,
+            "last_run": 229,
+            "next_turn_in": 0,
+            "status": "current"
         },
         {
             "position": 11,
             "game": "mm2remastered",
             "uploaded": 14,
             "last_run": 192,
-            "next_turn_in": 3,
-            "status": "waiting"
+            "next_turn_in": 1,
+            "status": "next_up"
         },
         {
             "position": 12,
             "game": "sifu",
             "uploaded": 18,
             "last_run": 223,
-            "next_turn_in": 4,
+            "next_turn_in": 2,
             "status": "waiting"
         }
     ]
