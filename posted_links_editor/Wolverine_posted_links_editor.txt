@@ -22,3 +22,6 @@ Video id : 18460785688186608
 Wolverine3 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine3.mp4
 Video id : 18099607337432890
 
+Wolverine21 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine21.mp4
+Video id : 18130597093770210
+
