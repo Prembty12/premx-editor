@@ -1,13 +1,13 @@
 {
-  "last_updated": "2026-10-19 03:49:31 PM",
+  "last_updated": "2026-10-19 06:46:56 PM",
   "period_days": 7,
   "trending": [
     {
       "game": "Russian_secret_missions",
-      "views_7d": 2073,
-      "avg_per_video": 691,
+      "views_7d": 1292,
+      "avg_per_video": 646,
       "trend": "viral",
-      "ratio": 2.7655803316180676,
+      "ratio": 2.6773238602723506,
       "fb_link": "https://www.facebook.com/reel/1643198310839022/",
       "source_link": ""
     },
@@ -16,7 +16,7 @@
       "views_7d": 816,
       "avg_per_video": 408,
       "trend": "trending",
-      "ratio": 1.6329331046312179,
+      "ratio": 1.6909413854351687,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play21.mp4"
     },
@@ -25,7 +25,7 @@
       "views_7d": 1121,
       "avg_per_video": 280,
       "trend": "steady",
-      "ratio": 1.1206403659233848,
+      "ratio": 1.1604499703966844,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan238.mp4"
     }
@@ -36,44 +36,44 @@
       "views_7d": 419,
       "avg_per_video": 209,
       "trend": "slow",
-      "ratio": 0.8364779874213837,
+      "ratio": 0.8661930136175252,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "Wolverine",
-      "views_7d": 525,
-      "avg_per_video": 131,
+      "views_7d": 532,
+      "avg_per_video": 133,
       "trend": "slow",
-      "ratio": 0.5242995997712979,
+      "ratio": 0.5512137359384252,
       "fb_link": "https://www.facebook.com/reel/1559290532619169/",
       "source_link": ""
-    },
-    {
-      "game": "sifu",
-      "views_7d": 60,
-      "avg_per_video": 20,
-      "trend": "below_avg",
-      "ratio": 0.08004574042309891,
-      "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu6.mp4"
     },
     {
       "game": "Callofdutyaw",
       "views_7d": 10,
       "avg_per_video": 10,
       "trend": "below_avg",
-      "ratio": 0.040022870211549454,
+      "ratio": 0.04144464179988159,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison37.mp4"
+    },
+    {
+      "game": "sifu",
+      "views_7d": 10,
+      "avg_per_video": 3,
+      "trend": "below_avg",
+      "ratio": 0.012433392539964476,
+      "fb_link": "",
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu13.mp4"
     }
   ],
   "recommendation": {
     "game": "Russian_secret_missions",
-    "views_7d": 2073,
-    "avg_per_video": 691,
+    "views_7d": 1292,
+    "avg_per_video": 646,
     "trend": "viral",
-    "ratio": 2.7655803316180676,
+    "ratio": 2.6773238602723506,
     "fb_link": "https://www.facebook.com/reel/1643198310839022/",
     "source_link": ""
   }

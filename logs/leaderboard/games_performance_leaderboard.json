@@ -13,7 +13,7 @@
         "total_views": 8529,
         "uploaded_videos": 17,
         "avg_views_per_video": 501,
-        "view_share_percentage": 16.19
+        "view_share_percentage": 16.18
     },
     {
         "rank": 3,
@@ -29,7 +29,7 @@
         "total_views": 5667,
         "uploaded_videos": 14,
         "avg_views_per_video": 404,
-        "view_share_percentage": 10.76
+        "view_share_percentage": 10.75
     },
     {
         "rank": 5,
@@ -37,7 +37,7 @@
         "total_views": 5541,
         "uploaded_videos": 11,
         "avg_views_per_video": 503,
-        "view_share_percentage": 10.52
+        "view_share_percentage": 10.51
     },
     {
         "rank": 6,
@@ -66,10 +66,10 @@
     {
         "rank": 9,
         "game_name": "Wolverine",
-        "total_views": 1517,
+        "total_views": 1524,
         "uploaded_videos": 12,
-        "avg_views_per_video": 126,
-        "view_share_percentage": 2.88
+        "avg_views_per_video": 127,
+        "view_share_percentage": 2.89
     },
     {
         "rank": 10,
@@ -77,7 +77,7 @@
         "total_views": 988,
         "uploaded_videos": 19,
         "avg_views_per_video": 52,
-        "view_share_percentage": 1.88
+        "view_share_percentage": 1.87
     },
     {
         "rank": 11,
@@ -91,7 +91,7 @@
         "rank": 12,
         "game_name": "CODMW4",
         "total_views": 0,
-        "uploaded_videos": 1,
+        "uploaded_videos": 2,
         "avg_views_per_video": 0,
         "view_share_percentage": 0.0
     }
