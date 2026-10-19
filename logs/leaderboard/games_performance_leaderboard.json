@@ -53,7 +53,7 @@
         "total_views": 3816,
         "uploaded_videos": 20,
         "avg_views_per_video": 190,
-        "view_share_percentage": 7.23
+        "view_share_percentage": 7.22
     },
     {
         "rank": 8,
@@ -66,7 +66,7 @@
     {
         "rank": 9,
         "game_name": "Wolverine",
-        "total_views": 1531,
+        "total_views": 1532,
         "uploaded_videos": 13,
         "avg_views_per_video": 117,
         "view_share_percentage": 2.9
@@ -83,16 +83,16 @@
         "rank": 11,
         "game_name": "ghostandela",
         "total_views": 550,
-        "uploaded_videos": 19,
-        "avg_views_per_video": 28,
+        "uploaded_videos": 20,
+        "avg_views_per_video": 27,
         "view_share_percentage": 1.04
     },
     {
         "rank": 12,
         "game_name": "CODMW4",
-        "total_views": 115,
+        "total_views": 125,
         "uploaded_videos": 2,
-        "avg_views_per_video": 57,
-        "view_share_percentage": 0.22
+        "avg_views_per_video": 62,
+        "view_share_percentage": 0.24
     }
 ]

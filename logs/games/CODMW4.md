@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 19 | **Last Updated:** 2026-10-19 09:37:45 PM IST
+**Total Videos:** 19 | **Last Updated:** 2026-10-19 09:54:09 PM IST
 
 ---
 
@@ -14,7 +14,7 @@
 | Posted (FB or IG) | 1 / 19 |
 | FB Posted | 1 / 19 |
 | IG Posted | 1 / 19 |
-| Total FB Views | **115** |
+| Total FB Views | **125** |
 | Total IG Views | **0** |
 
 ---
@@ -23,7 +23,7 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | Night Raid 5 Enemies Down 🔥🎯  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2330140364405164/) | 115 | [🟣 IG](https://www.instagram.com/reel/DerZ3Nagg3K/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW42.mp4) |
+| 1 | Night Raid 5 Enemies Down 🔥🎯  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2330140364405164/) | 125 | [🟣 IG](https://www.instagram.com/reel/DerZ3Nagg3K/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW42.mp4) |
 | 2 | CODMW419 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW419.mp4) |
 | 3 | CODMW418 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW418.mp4) |
 | 4 | CODMW417 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW417.mp4) |
