@@ -1054,7 +1054,7 @@ Return ONLY valid JSON:
     analysis_b64 = encode_image(analysis_grid_path)
 
     payload = {
-        "model": "openai/gpt-4o-mini",
+        "model": "openrouter/free",
         "messages": [{
             "role": "user",
             "content": [
@@ -1081,9 +1081,9 @@ Return ONLY valid JSON:
             "X-Title": "Gaming Commentary"
         }
 
-        for attempt in range(2):
+        for attempt in range(3):
             try:
-                print(f"      Attempt {attempt+1}/2...")
+                print(f"      Attempt {attempt+1}/3...")
                 r = requests.post(or_url, headers=headers, json=payload, timeout=240)
                 print(f"      Status: {r.status_code}")
 
