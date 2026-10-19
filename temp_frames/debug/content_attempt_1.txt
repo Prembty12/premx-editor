@@ -1,7 +1,1 @@
-{
-  "clip_duration": 30,
-  "reason": "Continuous intense kitchen brawl combat sequence",
-  "start_time": 0,
-  "status": "APPROVE",
-  "title": "Brutal Kitchen Brawl 1 vs 5 Smashed 🔥🎯"
-}
+{"clip_duration":57,"reason":"Intense scope target sequence","start_time":0,"status":"APPROVE","title":"Perfect Long Shot Lined Up 3 Targets 🎯🔥"}
