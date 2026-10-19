@@ -1,69 +1,60 @@
 {
-  "last_updated": "2026-10-18 08:54:52 PM",
+  "last_updated": "2026-10-19 08:42:36 AM",
   "period_days": 7,
   "trending": [
     {
-      "game": "mm2remastered",
-      "views_7d": 907,
-      "avg_per_video": 907,
-      "trend": "viral",
-      "ratio": 2.979632063074902,
-      "fb_link": "https://www.facebook.com/reel/4395441457385128/",
-      "source_link": ""
-    },
-    {
       "game": "Russian_secret_missions",
-      "views_7d": 2051,
-      "avg_per_video": 683,
+      "views_7d": 2067,
+      "avg_per_video": 689,
       "trend": "viral",
-      "ratio": 2.2437582128777924,
+      "ratio": 2.9542639352072415,
       "fb_link": "https://www.facebook.com/reel/1643198310839022/",
       "source_link": ""
     },
     {
       "game": "CallOfDutyMW2",
-      "views_7d": 963,
-      "avg_per_video": 321,
+      "views_7d": 983,
+      "avg_per_video": 327,
       "trend": "steady",
-      "ratio": 1.054533508541393,
+      "ratio": 1.4020962363030014,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play21.mp4"
+    },
+    {
+      "game": "VietnamCavePrison",
+      "views_7d": 270,
+      "avg_per_video": 270,
+      "trend": "steady",
+      "ratio": 1.1576941400666985,
+      "fb_link": "",
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison11.mp4"
     }
   ],
   "below_avg": [
     {
       "game": "MarvelsSpiderMan2",
       "views_7d": 1141,
-      "avg_per_video": 285,
+      "avg_per_video": 228,
       "trend": "slow",
-      "ratio": 0.9362680683311433,
+      "ratio": 0.977608384945212,
       "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan220.mp4"
-    },
-    {
-      "game": "VietnamCavePrison",
-      "views_7d": 270,
-      "avg_per_video": 270,
-      "trend": "slow",
-      "ratio": 0.8869908015768726,
-      "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison11.mp4"
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan238.mp4"
     },
     {
       "game": "ghostandela",
-      "views_7d": 410,
-      "avg_per_video": 205,
+      "views_7d": 417,
+      "avg_per_video": 208,
       "trend": "slow",
-      "ratio": 0.673455978975033,
+      "ratio": 0.8918532634587899,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "Wolverine",
-      "views_7d": 475,
-      "avg_per_video": 158,
+      "views_7d": 486,
+      "avg_per_video": 162,
       "trend": "slow",
-      "ratio": 0.519053876478318,
+      "ratio": 0.6946164840400191,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine3.mp4"
     },
@@ -71,19 +62,28 @@
       "game": "GearsOfWar",
       "views_7d": 122,
       "avg_per_video": 122,
-      "trend": "below_avg",
-      "ratio": 0.40078843626806837,
+      "trend": "slow",
+      "ratio": 0.5231062410671748,
       "fb_link": "https://www.facebook.com/reel/1709982550461141/",
       "source_link": ""
+    },
+    {
+      "game": "Callofdutyaw",
+      "views_7d": 152,
+      "avg_per_video": 76,
+      "trend": "below_avg",
+      "ratio": 0.32586946164840397,
+      "fb_link": "",
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison37.mp4"
     }
   ],
   "recommendation": {
-    "game": "mm2remastered",
-    "views_7d": 907,
-    "avg_per_video": 907,
+    "game": "Russian_secret_missions",
+    "views_7d": 2067,
+    "avg_per_video": 689,
     "trend": "viral",
-    "ratio": 2.979632063074902,
-    "fb_link": "https://www.facebook.com/reel/4395441457385128/",
+    "ratio": 2.9542639352072415,
+    "fb_link": "https://www.facebook.com/reel/1643198310839022/",
     "source_link": ""
   }
 }
