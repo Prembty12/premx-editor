@@ -1,14 +1,6 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v6.3 (Live Logs + 4-Tier Chain + No Fallback)
-===============================================================
-FEATURES:
-  ✅ Timing LOCK — GPT segment = SLOT time
-  ✅ 4-Tier Model Chain (GPT -> Dots -> OpenRouter/Free -> Auto Free)
-  ✅ 5 Keys × Retries (Robust JSON handling)
-  ✅ No Fixed Fallback (Original video on AI failure)
-  ✅ Live Terminal Logs (Flush enabled + FFmpeg quiet)
-  ✅ Full Logging (Screenshot path + GitHub URL)
+🎙️ AI Commentary Dubber — v6.5 (Original Prompt + Strict JSON + Live Logs)
 ===============================================================
 """
 
@@ -41,8 +33,7 @@ def parse_args():
     p.add_argument("--video", required=True, help="Input clip path")
     p.add_argument("--out", required=True, help="Output dubbed clip path")
     p.add_argument("--voice", default=None, help="ElevenLabs voice ID (optional)")
-    p.add_argument("--subtitles", choices=["true", "false"], default=None,
-                   help="Enable or disable ASS subtitles")
+    p.add_argument("--subtitles", choices=["true", "false"], default=None)
     return p.parse_args()
 
 ARGS = parse_args()
@@ -53,7 +44,6 @@ FINAL_DUBBED_VIDEO = ARGS.out
 # 🎛️ ON/OFF SWITCHES
 # ============================================================
 COMMENTARY_ENABLED = os.getenv("COMMENTARY_ENABLED", "true").lower() == "true"
-
 if ARGS.subtitles is not None:
     SUBTITLES_ENABLED = ARGS.subtitles.lower() == "true"
 else:
@@ -65,11 +55,7 @@ else:
 def _collect_keys(*env_names):
     return [os.getenv(name) for name in env_names if os.getenv(name)]
 
-OPENROUTER_KEYS = _collect_keys(
-    "OPENROUTER_API_KEY", "OPENROUTER_API_KEY_2", "OPENROUTER_API_KEY_3",
-    "OPENROUTER_API_KEY_4", "OPENROUTER_API_KEY_5",
-)
-
+OPENROUTER_KEYS = _collect_keys("OPENROUTER_API_KEY", "OPENROUTER_API_KEY_2", "OPENROUTER_API_KEY_3", "OPENROUTER_API_KEY_4", "OPENROUTER_API_KEY_5")
 GROQ_KEYS = _collect_keys("GROQ_API_KEY", "GROQ_API_KEY_2", "GROQ_API_KEY_3")
 
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
@@ -86,7 +72,6 @@ SEGMENTS_DIR       = "segments"
 MIN_SLOTS_HARD = 6
 MAX_SLOTS_HARD = 20
 DUCK_VOLUME = 0.35
-
 ANALYSIS_FRAMES = 90
 GRID_COLS = 9
 GRID_ROWS = 10
@@ -102,11 +87,9 @@ ATEMPO_MAX_LAST = 1.20
 ATEMPO_MAX_ACTION = 1.15
 
 MAX_SLOT_EXTEND = 0.2
-
 SPEED_ACTION = 1.14
 SPEED_DIALOG = 1.05
 SPEED_CALM   = 1.00
-
 VOL_ACTION = 1.9
 VOL_OTHER  = 1.4
 
@@ -123,64 +106,46 @@ COLOR_BLUE   = "&H00FF0000"
 COLOR_RESET  = "&H00FFFFFF"
 
 def get_pattern_color(word_index, total_words):
-    if word_index == total_words - 1:
-        return COLOR_BLUE
-    if word_index % 2 == 0:
-        return COLOR_WHITE
-    else:
-        return COLOR_YELLOW
+    if word_index == total_words - 1: return COLOR_BLUE
+    if word_index % 2 == 0: return COLOR_WHITE
+    else: return COLOR_YELLOW
 
 # ============================================================
-# ENV VALIDATION
+# ENV VALIDATION & HELPERS
 # ============================================================
 def validate_env():
     missing = []
-    if not OPENROUTER_KEYS:
-        missing.append("OPENROUTER_API_KEY (1-5)")
-    if not GROQ_KEYS:
-        missing.append("GROQ_API_KEY (1-3)")
-    if not ELEVENLABS_API_KEY:
-        missing.append("ELEVENLABS_API_KEY")
-
+    if not OPENROUTER_KEYS: missing.append("OPENROUTER_API_KEY")
+    if not GROQ_KEYS: missing.append("GROQ_API_KEY")
+    if not ELEVENLABS_API_KEY: missing.append("ELEVENLABS_API_KEY")
     if missing:
         print(f"❌ Missing env vars: {', '.join(missing)}")
         return False
-
     if not os.path.exists(FINAL_CLIP_PATH):
         print(f"❌ Input video not found: {FINAL_CLIP_PATH}")
         return False
-
     print(f"✅ Keys loaded — OpenRouter: {len(OPENROUTER_KEYS)} | Groq: {len(GROQ_KEYS)} | ElevenLabs: 1")
     return True
 
-# ============================================================
-# HELPERS
-# ============================================================
 def seconds_to_srt_time(seconds):
-    h = int(seconds // 3600)
-    m = int((seconds % 3600) // 60)
-    s = int(seconds % 60)
+    h, m, s = int(seconds // 3600), int((seconds % 3600) // 60), int(seconds % 60)
     ms = int((seconds - int(seconds)) * 1000)
     return f"{h:02d}:{m:02d}:{s:02d},{ms:03d}"
 
 def seconds_to_ass_time(seconds):
-    h = int(seconds // 3600)
-    m = int((seconds % 3600) // 60)
-    s = int(seconds % 60)
+    h, m, s = int(seconds // 3600), int((seconds % 3600) // 60), int(seconds % 60)
     cs = int(((seconds - int(seconds)) * 100))
     return f"{h}:{m:02d}:{s:02d}.{cs:02d}"
 
 def encode_image(path):
-    with open(path, "rb") as f:
-        return base64.b64encode(f.read()).decode('utf-8')
+    with open(path, "rb") as f: return base64.b64encode(f.read()).decode('utf-8')
 
 def get_duration(path):
-    cmd = f"ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 {path}"
     try:
+        cmd = f"ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 {path}"
         out = subprocess.check_output(cmd, shell=True).decode().strip()
         return float(out) if out else 10.0
-    except Exception:
-        return 10.0
+    except: return 10.0
 
 def parse_srt(srt_content):
     entries = []
@@ -203,11 +168,8 @@ def speed_for_type(slot_type):
 # ============================================================
 # ASS SUBTITLE GENERATOR
 # ============================================================
-def generate_full_ass_script(audio_files, font_name="Arial", font_size=60,
-                              alignment=2, vertical_margin=40,
-                              outline_size=3, shadow_size=2):
+def generate_full_ass_script(audio_files, font_name="Arial", font_size=60, alignment=2, vertical_margin=40, outline_size=3, shadow_size=2):
     print("🎨 Generating ASS Subtitles...")
-
     ass_content = f"""[Script Info]
 ScriptType: v4.00+
 PlayResX: 1920
@@ -221,48 +183,28 @@ Style: Default,{font_name},{font_size},&H00FFFFFF,&H000000FF,&H00000000,&H000000
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
-
     written = 0
     for item in audio_files:
-        start = item.get("start", 0)
-        end = item.get("actual_end", item.get("end", 3))
+        start, end = item.get("start", 0), item.get("actual_end", item.get("end", 3))
         text = item.get("text", "").strip()
         if not text: continue
-
         words = text.split()
         if not words: continue
-
-        total_dur = end - start
-        if total_dur <= 0: total_dur = 1.0
-
-        total_chars = sum(len(w) for w in words)
-        if total_chars == 0: total_chars = 1
-
+        total_dur = max(end - start, 0.1)
+        total_chars = sum(len(w) for w in words) or 1
         total_words = len(words)
-        current_time = start
-        cumulative_chars = 0
+        current_time, cumulative_chars = start, 0
 
         for i, w in enumerate(words):
             cumulative_chars += len(w)
-            frac = cumulative_chars / total_chars
-            seg_end = start + (total_dur * frac)
-
+            seg_end = start + (total_dur * (cumulative_chars / total_chars))
             visible_words = words[:i+1]
-            colored_words = []
-            for j, vw in enumerate(visible_words):
-                color = get_pattern_color(j, total_words)
-                colored_words.append(f"{{\\c{color}}}{vw}{{\\c{COLOR_RESET}}}")
-            colored_text = " ".join(colored_words)
-
-            start_t = seconds_to_ass_time(current_time)
-            end_t = seconds_to_ass_time(seg_end)
-
-            ass_content += f"Dialogue: 0,{start_t},{end_t},Default,,0,0,0,,{colored_text}\n"
+            colored_text = " ".join(f"{{\\c{get_pattern_color(j, total_words)}}}{vw}{{\\c{COLOR_RESET}}}" for j, vw in enumerate(visible_words))
+            ass_content += f"Dialogue: 0,{seconds_to_ass_time(current_time)},{seconds_to_ass_time(seg_end)},Default,,0,0,0,,{colored_text}\n"
             written += 1
             current_time = seg_end
 
-    with open(ASS_PATH, "w", encoding="utf-8") as f:
-        f.write(ass_content)
+    with open(ASS_PATH, "w", encoding="utf-8") as f: f.write(ass_content)
     print(f"✅ ASS Subtitles saved: {ASS_PATH} ({written} lines)\n")
 
 # ============================================================
@@ -298,57 +240,32 @@ def slot_loudness(timeline, start, end):
     return max(vals) if vals else -60
 
 # ============================================================
-# GIT PUSH (WITH URL LOGGING + QUIET)
+# GIT PUSH (QUIET & CLEAN)
 # ============================================================
 def commit_analysis_to_github():
     print("📤 [10] Pushing analysis image to GitHub...")
-    if not os.path.exists(ANALYSIS_GRID_PATH):
-        print("   ⚠️ No analysis image found, skipping git commit.")
-        return
-
+    if not os.path.exists(ANALYSIS_GRID_PATH): return
     try:
         subprocess.run("git config --global user.name 'GitHub Action'", shell=True, check=False)
         subprocess.run("git config --global user.email 'action@github.com'", shell=True, check=False)
-        
-        # -q lagaya hai taaki [new tag] print na ho
+        # -q (quiet) lagaya taaki [new tag] print na ho
         subprocess.run("git fetch -q origin", shell=True, check=False)
         subprocess.run("git pull -q --rebase --autostash origin main", shell=True, check=False)
-
         subprocess.run(f"git add {ANALYSIS_GRID_PATH}", shell=True, check=False)
         subprocess.run("git commit -m 'Update analysis image [skip ci]'", shell=True, check=False)
-        
-        push_res = subprocess.run("git push -q origin HEAD --force-with-lease", shell=True, capture_output=True, text=True)
-        if push_res.returncode == 0:
-            print("   🚀 Pushed to GitHub successfully.")
-            try:
-                remote_url = subprocess.check_output("git remote get-url origin", shell=True).decode().strip()
-                if remote_url.startswith("git@github.com:"):
-                    remote_url = remote_url.replace("git@github.com:", "https://github.com/").replace(".git", "")
-                elif remote_url.startswith("https://github.com/"):
-                    remote_url = remote_url.replace(".git", "")
-                
-                branch = subprocess.check_output("git branch --show-current", shell=True).decode().strip() or "main"
-                print(f"   🔗 View online: {remote_url}/blob/{branch}/{ANALYSIS_GRID_PATH}")
-                print(f"   🖼️  Raw image : {remote_url}/raw/{branch}/{ANALYSIS_GRID_PATH}")
-            except Exception as url_err:
-                print(f"   ⚠️ URL generate fail: {url_err}")
-        else:
-            print(f"   ❌ Push failed.")
-    except Exception as e:
-        print(f"   ⚠️ Git operation failed: {e}")
+        subprocess.run("git push -q origin HEAD --force-with-lease", shell=True, check=False)
+        print("   🚀 Pushed to GitHub successfully.")
+    except Exception as e: print(f"   ⚠️ Git operation failed: {e}")
     print()
 
 # ============================================================
-# STEP 1 — Extract Audio
+# STEP 1 & 2 — Extract & Transcribe
 # ============================================================
 def extract_audio(video_path, out_path):
     print("🎧 [1] Extracting audio...")
     subprocess.run(f"ffmpeg -y -i {video_path} -vn -acodec libmp3lame -q:a 4 {out_path} -hide_banner -loglevel error", shell=True, check=True)
     print("✅ Audio extracted\n")
 
-# ============================================================
-# STEP 2 — Transcribe
-# ============================================================
 def transcribe(audio_path):
     print(f"📝 [2] Transcribing audio (Groq — {len(GROQ_KEYS)} keys)...")
     url = "https://api.groq.com/openai/v1/audio/transcriptions"
@@ -367,24 +284,19 @@ def transcribe(audio_path):
                 res = r.json()
                 for i, seg in enumerate(res.get("segments", []), start=1):
                     srt_content += f"{i}\n{seconds_to_srt_time(seg.get('start', 0))} --> {seconds_to_srt_time(seg.get('end', 0))}\n{seg.get('text', '').strip()}\n\n"
-                with open(SRT_PATH, "w", encoding="utf-8") as sf:
-                    sf.write(srt_content)
+                with open(SRT_PATH, "w", encoding="utf-8") as sf: sf.write(srt_content)
                 print(f"   ✅ Key {key_idx} worked! SRT saved\n")
                 success = True
                 break
-            elif r.status_code in (401, 403, 429):
-                time.sleep(1); continue
-            else:
-                time.sleep(2); continue
-        except Exception:
-            time.sleep(2); continue
+            elif r.status_code in (401, 403, 429): time.sleep(1); continue
+            else: time.sleep(2); continue
+        except Exception: time.sleep(2); continue
 
-    if not success:
-        print("   ❌ All Groq keys failed\n")
+    if not success: print("   ❌ All Groq keys failed\n")
     return srt_content
 
 # ============================================================
-# STEP 3 — AUTO SLOTS
+# STEP 3 & 4 — Slots & Classification
 # ============================================================
 def build_auto_slots(video_path, vid_duration, srt_content):
     print("📐 [3] Building AUTO slots...")
@@ -404,18 +316,11 @@ def build_auto_slots(video_path, vid_duration, srt_content):
         vals = [v for _, v in loud_timeline]
         threshold = sorted(vals)[int(len(vals) * 0.8)]
         for t, v in loud_timeline:
-            if v >= threshold and v > -20:
-                audio_peaks.add(round(t, 2))
+            if v >= threshold and v > -20: audio_peaks.add(round(t, 2))
 
-    if vid_duration <= 20: base = 2.5
-    elif vid_duration <= 40: base = 3.0
-    elif vid_duration <= 70: base = 3.5
-    elif vid_duration <= 120: base = 4.5
-    else: base = 5.5
-
+    base = 2.5 if vid_duration <= 20 else 3.0 if vid_duration <= 40 else 3.5 if vid_duration <= 70 else 4.5 if vid_duration <= 120 else 5.5
     if speech_ratio > 0.7: base *= 0.85
     elif speech_ratio < 0.25: base *= 1.15
-
     cuts_per_sec = len(scene_times) / max(vid_duration, 1)
     if cuts_per_sec > 0.5: base *= 0.85
     elif cuts_per_sec < 0.12: base *= 1.1
@@ -438,44 +343,31 @@ def build_auto_slots(video_path, vid_duration, srt_content):
             snap = min(srt_cands if srt_cands else scene_cands if scene_cands else candidates, key=lambda x: abs(x - target_end))
             end = snap if abs(snap - target_end) < 1.0 else target_end
             used.add(snap)
-        else:
-            end = target_end
+        else: end = target_end
 
         end = min(end, vid_duration)
         end = max(end, t + 1.5)
 
-        slots.append({
-            "start": round(t, 2), "end": round(end, 2), "type": None, "visual_type": None,
-            "srt_text": "", "scene_count": 0, "avg_loud": -50, "sub_analysis": {},
-            "voice_speed": 1.0, "motion_score": 0, "gpt_type": None, "final_type": None, "speed_boost_log": []
-        })
+        slots.append({"start": round(t, 2), "end": round(end, 2), "type": None, "visual_type": None, "srt_text": "", "scene_count": 0, "avg_loud": -50, "sub_analysis": {}, "voice_speed": 1.0, "motion_score": 0, "gpt_type": None, "final_type": None, "speed_boost_log": []})
         t = end
         if t >= vid_duration - 0.1: break
 
-    if slots and slots[-1]["end"] < vid_duration - 0.1:
-        slots[-1]["end"] = round(vid_duration, 2)
-
+    if slots and slots[-1]["end"] < vid_duration - 0.1: slots[-1]["end"] = round(vid_duration, 2)
     for slot in slots:
         slot_srt = [e for e in srt_entries if e["start"] >= slot["start"] - 0.15 and e["end"] <= slot["end"] + 0.15]
         slot["srt_text"] = " ".join(e["text"] for e in slot_srt)
         for e in slot_srt:
-            e["start"] = slot["start"]
-            e["end"] = slot["end"]
+            e["start"], e["end"] = slot["start"], slot["end"]
 
     print(f"   ✅ Built {len(slots)} slots\n")
     return slots
 
-# ============================================================
-# STEP 4 — SIGNAL-BASED CLASSIFY
-# ============================================================
 def classify_slots_combined(video_path, slots, srt_content):
     print("🔍 [4] Classifying slots (signal + motion)...")
     scene_times = get_scene_timeline(video_path)
     loud_timeline = get_loudness_timeline(video_path)
     srt_entries = parse_srt(srt_content)
-
     ACTION_WORDS = {"shoot","fire","hit","run","kill","die","attack","grenade","boom","jump","dodge","cover","reload","go","move","watch","left","right","down","up","quick","destroy","target","lock","bang","drop","danger","whoa","oh","yeah","nice","sick","cook","big","fast"}
-    DIALOG_WORDS = {"you","me","we","what","why","how","hey","listen","wait","okay","yeah","know","think","feel","want","need","can","will"}
 
     for slot in slots:
         motion = get_motion_score(video_path, slot["start"], slot["end"])
@@ -516,9 +408,7 @@ def classify_slots_combined(video_path, slots, srt_content):
         slot["scene_count"] = sum(1 for st in scene_times if slot["start"] <= st < slot["end"])
         slot["avg_loud"] = round(slot_loudness(loud_timeline, slot["start"], slot["end"]), 1)
         slot["sub_analysis"] = {"action_ratio": round(action_ratio, 2), "dialog_ratio": round(dialog_ratio, 2), "calm_ratio": round(calm_ratio, 2), "motion_score": motion}
-
         voice_speed = speed_for_type(slot["type"])
-        slot["speed_boost_log"] = [f"base_{slot['type']}={voice_speed:.2f}"]
         if slot["type"] == "action":
             if slot["scene_count"] >= 3: voice_speed += 0.03
             if slot["avg_loud"] > -12: voice_speed += 0.03
@@ -529,7 +419,7 @@ def classify_slots_combined(video_path, slots, srt_content):
     return slots
 
 # ============================================================
-# STEP 5 — 8K PORTRAIT ANALYSIS GRID (WITH LIVE PROGRESS)
+# STEP 5 — 8K PORTRAIT ANALYSIS GRID (LIVE PROGRESS)
 # ============================================================
 def build_analysis_grid(video_path, vid_duration, slots, num_frames=ANALYSIS_FRAMES):
     print(f"🖼️ [5] Building 8K PORTRAIT grid — {num_frames} frames...")
@@ -544,8 +434,7 @@ def build_analysis_grid(video_path, vid_duration, slots, num_frames=ANALYSIS_FRA
             slot_dur = slot["end"] - slot["start"]
             n_frames = max(1, round(num_frames * (slot_dur / total_dur)))
             for k in range(n_frames):
-                t = slot["start"] + (slot_dur * ((k + 0.5) / n_frames))
-                frame_specs.append((t, slot["start"], slot["end"], slot_idx))
+                frame_specs.append((slot["start"] + (slot_dur * ((k + 0.5) / n_frames)), slot["start"], slot["end"], slot_idx))
 
     frame_specs = sorted(frame_specs, key=lambda x: x[0])
     if len(frame_specs) > num_frames:
@@ -556,29 +445,21 @@ def build_analysis_grid(video_path, vid_duration, slots, num_frames=ANALYSIS_FRA
     for i, (t, slot_start, slot_end, slot_idx) in enumerate(frame_specs):
         fp = f"temp_analysis_{i:03d}.jpg"
         subprocess.run(f"ffmpeg -y -ss {t:.2f} -i {video_path} -vframes 1 -q:v 1 {fp} -hide_banner -loglevel error", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        if os.path.exists(fp):
-            frame_paths.append((fp, t, slot_start, slot_end, slot_idx))
-        
-        # 👇 Live Progress
-        if i > 0 and i % 20 == 0:
-            print(f"   📸 Extracted {i}/{len(frame_specs)} frames...")
+        if os.path.exists(fp): frame_paths.append((fp, t, slot_start, slot_end, slot_idx))
+        if i > 0 and i % 20 == 0: print(f"   📸 Extracted {i}/{len(frame_specs)} frames...")
 
     cell_w, cell_h = CANVAS_W // GRID_COLS, CANVAS_H // GRID_ROWS
     grid = Image.new("RGB", (CANVAS_W, CANVAS_H), (0, 0, 0))
     draw = ImageDraw.Draw(grid)
-
     try:
         font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", max(28, cell_w // 16))
         small_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", max(20, cell_w // 24))
-    except:
-        font = small_font = ImageFont.load_default()
+    except: font = small_font = ImageFont.load_default()
 
     for idx, (fp, t, slot_start, slot_end, slot_idx) in enumerate(frame_paths):
         if idx >= GRID_COLS * GRID_ROWS: break
-        try:
-            img = ImageOps.fit(Image.open(fp), (cell_w, cell_h), method=Image.LANCZOS)
+        try: img = ImageOps.fit(Image.open(fp), (cell_w, cell_h), method=Image.LANCZOS)
         except: continue
-
         x, y = (idx % GRID_COLS) * cell_w, (idx // GRID_COLS) * cell_h
         grid.paste(img, (x, y))
         draw.rectangle([x + 6, y + 6, x + 420, y + 100], fill="black")
@@ -587,81 +468,71 @@ def build_analysis_grid(video_path, vid_duration, slots, num_frames=ANALYSIS_FRA
 
     grid.save(ANALYSIS_GRID_PATH, quality=92, optimize=True, subsampling=2)
     size_8k = os.path.getsize(ANALYSIS_GRID_PATH) / (1024 * 1024)
-    covered_slots = len(set(f[4] for f in frame_paths))
-    abs_path = os.path.abspath(ANALYSIS_GRID_PATH)
-
     print(f"✅ 8K Full Quality: {grid.size[0]}x{grid.size[1]} ({size_8k:.2f} MB)")
     print(f"💾 Saved: {ANALYSIS_GRID_PATH}")
     print(f"   📸 Frames captured : {len(frame_paths)}")
-    print(f"   📋 Slots covered   : {covered_slots}/{len(slots)}")
-    print(f"   📂 Absolute path   : {abs_path}")
+    print(f"   📋 Slots covered   : {len(set(f[4] for f in frame_paths))}/{len(slots)}")
+    print(f"   📂 Absolute path   : {os.path.abspath(ANALYSIS_GRID_PATH)}")
     print(f"   👀 Screenshot AI ko bhejne ke liye ready hai\n")
 
     for fp, _, _, _, _ in frame_paths:
         if os.path.exists(fp): os.remove(fp)
 
 # ============================================================
-# MODEL HELPERS (ROBUST JSON + FREE VISION)
+# BULLETPROOF JSON PARSER & FREE MODELS
 # ============================================================
 def extract_json_from_response(raw):
     if not raw: return None
     s = str(raw).strip()
-    if s.startswith("```"):
-        parts = s.split("```")
-        if len(parts) > 1:
-            s = parts[1]
-            if s.startswith("json"): s = s[4:].strip()
-            s = s.rstrip("`").strip()
-    try: return json.loads(s)
+    try: 
+        parsed = json.loads(s)
+        if isinstance(parsed, dict) and "segments" in parsed: return parsed
     except: pass
-    m = re.search(r'\{[\s\S]*\}', s)
+    m = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', s, re.DOTALL | re.IGNORECASE)
     if m:
-        try: return json.loads(m.group(0))
+        try:
+            parsed = json.loads(m.group(1))
+            if isinstance(parsed, dict) and "segments" in parsed: return parsed
         except: pass
+    start, end = s.find('{'), s.rfind('}')
+    if start != -1 and end != -1 and end > start:
+        try:
+            parsed = json.loads(s[start:end+1])
+            if isinstance(parsed, dict) and "segments" in parsed: return parsed
+        except: pass
+    try:
+        fixed = re.sub(r',\s*([\]}])', r'\1', s)
+        start, end = fixed.find('{'), fixed.rfind('}')
+        if start != -1 and end != -1:
+            parsed = json.loads(fixed[start:end+1])
+            if isinstance(parsed, dict) and "segments" in parsed: return parsed
+    except: pass
     return None
 
 def get_free_vision_models(limit=3):
-    KNOWN_FREE = [
-        "meta-llama/llama-3.2-11b-vision-instruct:free",
-        "google/gemini-flash-1.5-8b-exp:free",
-        "qwen/qwen2.5-vl-72b-instruct:free"
-    ]
+    KNOWN_FREE = ["meta-llama/llama-3.2-11b-vision-instruct:free", "google/gemini-flash-1.5-8b-exp:free", "qwen/qwen2.5-vl-72b-instruct:free"]
     try:
         r = requests.get("https://openrouter.ai/api/v1/models", timeout=15)
         if r.status_code == 200:
-            found = []
-            for m in r.json().get("data", []):
-                mid = m.get("id", "")
-                if not mid: continue
-                is_free = (str(m.get("pricing", {}).get("prompt", "1")) == "0" and str(m.get("pricing", {}).get("completion", "1")) == "0") or mid.endswith(":free")
-                if is_free and "image" in m.get("architecture", {}).get("input_modalities", []):
-                    found.append(mid)
+            found = [m.get("id") for m in r.json().get("data", []) if m.get("id") and ("0" in [str(m.get("pricing", {}).get("prompt")), str(m.get("pricing", {}).get("completion"))] or m.get("id").endswith(":free")) and "image" in m.get("architecture", {}).get("input_modalities", [])]
             if found: return found[:limit]
     except: pass
     return KNOWN_FREE[:limit]
 
 # ============================================================
-# STEP 6 — GPT CALL (4-TIER + 5 KEYS RETRY)
+# STEP 6 — GENERATE SCRIPT (ORIGINAL PROMPT + STRICT JSON)
 # ============================================================
 def generate_full_script(slots, srt_content, analysis_grid_path):
     print(f"🤖 [6] Generating script (Simple 4-Tier Fallback)...")
-
     if os.path.exists(analysis_grid_path):
         try:
-            img_info = Image.open(analysis_grid_path)
-            sz_mb = os.path.getsize(analysis_grid_path) / (1024 * 1024)
-            print(f"   📸 Analysis Screenshot (AI ko yeh dikhega):")
-            print(f"      📂 Path       : {os.path.abspath(analysis_grid_path)}")
-            print(f"      📐 Dimensions : {img_info.width}x{img_info.height}")
-            print(f"      📦 Size       : {sz_mb:.2f} MB\n")
+            img = Image.open(analysis_grid_path)
+            print(f"   📸 Analysis Screenshot:\n      📂 Path : {os.path.abspath(analysis_grid_path)}\n      📐 Dim  : {img.width}x{img.height}\n      📦 Size : {os.path.getsize(analysis_grid_path)/(1024*1024):.2f} MB\n")
         except Exception as e: print(f"   ⚠️ Image read fail: {e}")
-    else: print(f"   ❌ WARNING: Grid NOT FOUND at {analysis_grid_path}")
 
-    slot_lines = []
-    for i, s in enumerate(slots, 1):
-        sa = s.get("sub_analysis", {})
-        slot_lines.append(f"- Slot {i}: {s['start']:.2f}s → {s['end']:.2f}s [{s['type'].upper()}] (scenes={s['scene_count']}, loud={s['avg_loud']}dB, action={sa.get('action_ratio', 0)}, dialog={sa.get('dialog_ratio', 0)}, motion={sa.get('motion_score', 0)}) SRT: \"{s['srt_text'][:70]}\"")
+    slot_lines = [f"- Slot {i}: {s['start']:.2f}s → {s['end']:.2f}s [{s['type'].upper()}] (scenes={s['scene_count']}, loud={s['avg_loud']}dB, action={sa.get('action_ratio', 0)}, dialog={sa.get('dialog_ratio', 0)}, motion={sa.get('motion_score', 0)}) SRT: \"{s['srt_text'][:70]}\"" for i, s in enumerate(slots, 1) if (sa := s.get("sub_analysis", {})) is not None]
 
+    # 👇 YEH AAPKA EXACT ORIGINAL PROMPT HAI
     prompt = f"""You are a HYPED-UP gaming YouTuber — like a streamer going CRAZY on stream.
 You shout, laugh, hype, roast. Pure energy. Zero boring lines.
 
@@ -711,17 +582,17 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 - NEVER repeat the same reaction twice in a row. Every moment deserves a UNIQUE response.
 - VARY your reaction LENGTH — some words, some fragments, some full sentences.
 - Match VOICE TONE to the moment — whisper for tension, SHOUT for action, calm for chill.
-- If you see KILLING, DYING, DESTROYING, or DAMAGE — react FIRST, describe LATER.
+- If you see KILLING, DYING, DESTROYING, or DAMAGE — react FIRST, describe LATER. Reaction > description.
 - Add SUSPENSE before big moments when you sense buildup — hold the tension.
 - NEVER say what you SEE — say what you FEEL. Emotion over description.
-- When multiple enemies die at once — react with ESCALATING hype.
+- When multiple enemies die at once — react with ESCALATING hype, not the same tone.
 - When YOU take damage — react with PAIN or PANIC, not calm.
 - When YOU dodge or survive — react with RELIEF or COCKY confidence.
-- When YOU win a fight — react with DOMINANCE.
-- ALWAYS address the viewer naturally.
-- Keep reactions SHORTER when action is FAST, LONGER when SLOW.
-- NEVER narrate like a documentary.
-- If nothing big happens — build ANTICIPATION.
+- When YOU win a fight — react with DOMINANCE, not just happiness.
+- ALWAYS address the viewer naturally — make them feel part of the fight.
+- Keep reactions SHORTER when action is FAST, LONGER when action is SLOW.
+- NEVER narrate like a documentary. YOU are IN the moment, not outside it.
+- If nothing big happens — build ANTICIPATION, don't fill silence with boring lines.
 
 **🎯 ENGAGEMENT & RETENTION**
 - Address the viewer directly (guys, friends, you)
@@ -803,41 +674,25 @@ Return ONLY valid JSON:
             ratio = 1440 / img.width
             small_img = img.resize((1440, int(img.height * ratio)), Image.LANCZOS)
             small_path = analysis_grid_path.replace(".jpg", "_small.jpg")
-            small_img.save(small_path, quality=80, optimize=True)
+            small_img.save(small_path, quality=70, optimize=True) 
             small_b64 = encode_image(small_path)
         else: small_b64 = full_b64
     except: small_b64 = full_b64
 
-    # =========================================================
-    # 🎯 SIMPLE 4-TIER LOGIC 
-    # =========================================================
-    models_to_try = [
-        "openai/gpt-4o-mini",
-        "dots-studio/dots-3-note-preview:free",
-        "openrouter/free"
-    ]
-    
-    free_models = get_free_vision_models(limit=3)
-    models_to_try.extend(free_models)
-
+    models_to_try = ["openai/gpt-4o-mini", "dots-studio/dots-3-note-preview:free", "openrouter/free"] + get_free_vision_models(limit=3)
     print(f"   📋 Model Chain: {models_to_try}\n")
 
-    segments = None
-    winning_model = None
+    segments, winning_model = None, None
 
-    # BAHARI LOOP: Ek ek model try karo
     for model_id in models_to_try:
         if segments: break
-        
         print(f"🤖 [MODEL TRY] {model_id}")
         is_gpt = (model_id == "openai/gpt-4o-mini")
         img_b64 = full_b64 if is_gpt else small_b64
         detail = "high" if is_gpt else "low"
         
-        # ANDAR KA LOOP: Har model ke liye 5 keys try karo
         for key_idx, or_key in enumerate(OPENROUTER_KEYS, start=1):
             if segments: break
-            
             print(f"   🔑 Key {key_idx}/{len(OPENROUTER_KEYS)}...", end=" ")
             
             payload = {
@@ -847,9 +702,9 @@ Return ONLY valid JSON:
                     {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{img_b64}", "detail": detail}}
                 ]}],
                 "max_tokens": 4000,
-                "temperature": 0.9,
+                "temperature": 0.8,
+                "response_format": {"type": "json_object"} 
             }
-            if is_gpt: payload["response_format"] = {"type": "json_object"}
 
             headers = {"Authorization": f"Bearer {or_key}", "Content-Type": "application/json"}
 
@@ -868,7 +723,8 @@ Return ONLY valid JSON:
                         print("✅ SUCCESS!")
                         break
                     else:
-                        print("⚠️ Empty/Bad JSON")
+                        snippet = raw[:40].replace('\n', ' ') if raw else "NULL"
+                        print(f"⚠️ Bad JSON (Model ne bola: '{snippet}...')")
                 elif r.status_code in (401, 402, 403):
                     print("❌ Dead/No Credits")
                 elif r.status_code == 429:
@@ -880,13 +736,10 @@ Return ONLY valid JSON:
                     print(f"⚠️ Err {r.status_code}")
                     
             except Exception as e:
-                print(f"⚠️ Exception ({str(e)[:20]})")
+                print(f"⚠️ Exception ({str(e)[:30]})")
                 
-        print() # Next model se pehle space
+        print()
 
-    # =========================================================
-    # AGAR SAARE MODEL FAIL HO GAYE
-    # =========================================================
     if not segments:
         print("=" * 60)
         print("❌ ALL MODELS AND KEYS FAILED")
@@ -964,17 +817,14 @@ def generate_audio(segments, slots, vid_duration):
     for idx, seg in enumerate(segments):
         text = seg.get("text", "").strip()
         if not text: continue
-
         matched_slot = None
         slot_num = seg.get("slot")
-        if slot_num and 1 <= slot_num <= len(slots):
-            matched_slot = slots[slot_num - 1]
+        if slot_num and 1 <= slot_num <= len(slots): matched_slot = slots[slot_num - 1]
         else:
             best_diff = 999
             for s in slots:
                 diff = abs(s["start"] - seg.get("start", 0))
                 if diff < best_diff: best_diff, matched_slot = diff, s
-
         if not matched_slot: continue
 
         slot_start, slot_end = matched_slot["start"], matched_slot["end"]
@@ -983,10 +833,7 @@ def generate_audio(segments, slots, vid_duration):
         visual_type = (matched_slot.get("type") or "calm").lower().strip()
         seg_file = f"{SEGMENTS_DIR}/seg_{idx:03d}.mp3"
 
-        data = {
-            "text": text, "model_id": "eleven_multilingual_v2",
-            "voice_settings": {"stability": 0.4, "similarity_boost": 0.75, "style": 0.5, "use_speaker_boost": True, "speed": voice_speed}
-        }
+        data = {"text": text, "model_id": "eleven_multilingual_v2", "voice_settings": {"stability": 0.4, "similarity_boost": 0.75, "style": 0.5, "use_speaker_boost": True, "speed": voice_speed}}
 
         try:
             r = requests.post(url, json=data, headers=headers, timeout=60)
@@ -999,8 +846,7 @@ def generate_audio(segments, slots, vid_duration):
 
                 if visual_type == "action" and not is_last:
                     if actual > target_dur + 0.05:
-                        needed_tempo = actual / target_dur
-                        tempo = max(ATEMPO_MIN, min(ATEMPO_MAX_ACTION, needed_tempo))
+                        tempo = max(ATEMPO_MIN, min(ATEMPO_MAX_ACTION, actual / target_dur))
                         if tempo > 1.01:
                             fit_file = f"{SEGMENTS_DIR}/seg_{idx:03d}_fit.mp3"
                             subprocess.run(f"ffmpeg -y -i {seg_file} -filter:a atempo={tempo:.3f} {fit_file} -hide_banner -loglevel error", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -1008,15 +854,13 @@ def generate_audio(segments, slots, vid_duration):
                             atempo_used = f"{tempo:.3f} (action)"
                         else: final = seg_file
                     else: final = seg_file
-
                     final_dur = get_duration(final)
                     if final_dur > target_dur + 0.2:
                         slot_extended = min(final_dur - target_dur, MAX_SLOT_EXTEND)
                         atempo_used += f" + slot+{slot_extended:.2f}s"
                 else:
                     if actual > 0 and target_dur > 0:
-                        needed_tempo = actual / target_dur
-                        tempo = max(ATEMPO_MIN, min(atempo_max, needed_tempo))
+                        tempo = max(ATEMPO_MIN, min(atempo_max, actual / target_dur))
                         if tempo > 1.01:
                             fit_file = f"{SEGMENTS_DIR}/seg_{idx:03d}_fit.mp3"
                             subprocess.run(f"ffmpeg -y -i {seg_file} -filter:a atempo={tempo:.3f} {fit_file} -hide_banner -loglevel error", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -1025,76 +869,46 @@ def generate_audio(segments, slots, vid_duration):
                         else: final = seg_file
                     else: final = seg_file
 
-                new_slot_end = slot_end + slot_extended
-                actual_end = slot_start + get_duration(final)
-
-                audio_files.append({"file": final, "start": slot_start, "end": new_slot_end, "actual_end": actual_end, "actual_dur": actual, "text": text, "visual_type": visual_type, "slot_extended": slot_extended})
-
-                final_dur = get_duration(final)
-                status = "✅ FIT" if final_dur <= target_dur + 0.01 else ("⚠️ OVERLAP" if slot_extended > 0 else "⚠️ OVER")
-                print(f"   {status} [Slot {slot_num}] [{visual_type.upper()}] [speed={voice_speed:.2f}] Slot={slot_start:.2f}-{slot_end:.2f}s | Audio={actual:.2f}s → {final_dur:.2f}s | atempo={atempo_used} | \"{text[:40]}\"")
-            elif r.status_code == 401:
-                print("   ❌ 401 — ElevenLabs key galat!"); break
-            elif r.status_code == 429:
-                print("   ⚠️ 429 — rate limit"); time.sleep(3)
-            else:
-                print(f"   ❌ {r.status_code}: {r.text[:100]}")
-        except Exception as e:
-            print(f"   ⚠️ seg {idx}: {e}")
+                audio_files.append({"file": final, "start": slot_start, "end": slot_end + slot_extended, "actual_end": slot_start + get_duration(final), "actual_dur": actual, "text": text, "visual_type": visual_type, "slot_extended": slot_extended})
+                print(f"   ✅ FIT [Slot {slot_num}] [{visual_type.upper()}] [speed={voice_speed:.2f}] Audio={actual:.2f}s → {get_duration(final):.2f}s | atempo={atempo_used}")
+            elif r.status_code == 401: print("   ❌ 401 — ElevenLabs key galat!"); break
+            elif r.status_code == 429: print("   ⚠️ 429 — rate limit"); time.sleep(3)
+        except Exception as e: print(f"   ⚠️ seg {idx}: {e}")
 
     print(f"\n✅ {len(audio_files)} audio segments generated\n")
     return audio_files
 
 # ============================================================
-# STEP 8 — Timed Audio
+# STEP 8 & 9 — Audio & Merge
 # ============================================================
 def build_timed_audio(audio_files, vid_duration):
     print("🎼 [8] Building timed audio...")
     silent = f"{SEGMENTS_DIR}/silent_base.mp3"
     subprocess.run(f"ffmpeg -y -f lavfi -i anullsrc=r=44100:cl=stereo -t {vid_duration} -q:a 9 -acodec libmp3lame {silent} -hide_banner -loglevel error", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
     inputs, parts, mix_inputs = ["-i", silent], [], ["[0:a]"]
     for i, a in enumerate(audio_files, start=1):
         inputs.extend(["-i", a["file"]])
         delay = int(a["start"] * 1000)
         parts.append(f"[{i}:a]adelay={delay}|{delay}[a{i}]")
         mix_inputs.append(f"[a{i}]")
-
     filter_complex = ";".join(parts) + f";{''.join(mix_inputs)}amix=inputs={len(mix_inputs)}:duration=first:dropout_transition=0:normalize=0,alimiter=limit=0.95[out]"
     final_audio = f"{SEGMENTS_DIR}/final_commentary.mp3"
-    
-    cmd = f"ffmpeg -y {' '.join(inputs)} -filter_complex \"{filter_complex}\" -map \"[out]\" -acodec libmp3lame -q:a 4 {final_audio} -hide_banner -loglevel error"
-    subprocess.run(cmd, shell=True, check=True)
+    subprocess.run(f"ffmpeg -y {' '.join(inputs)} -filter_complex \"{filter_complex}\" -map \"[out]\" -acodec libmp3lame -q:a 4 {final_audio} -hide_banner -loglevel error", shell=True, check=True)
     print("✅ Timed commentary built\n")
     return final_audio
 
-# ============================================================
-# STEP 9 — Final Merge
-# ============================================================
 def merge_final(video_path, commentary_audio, out_path, audio_files, enable_subtitles=True):
     print("🎬 [9] Merging...")
-    action_times, other_times = [], []
-    for a in audio_files:
-        if (a.get("visual_type") or "").lower().strip() == "action":
-            action_times.append(f"between(t,{a['start']:.2f},{a['end']:.2f})")
-        else:
-            other_times.append(f"between(t,{a['start']:.2f},{a['end']:.2f})")
-
+    action_times = [f"between(t,{a['start']:.2f},{a['end']:.2f})" for a in audio_files if (a.get("visual_type") or "").lower().strip() == "action"]
+    other_times = [f"between(t,{a['start']:.2f},{a['end']:.2f})" for a in audio_files if (a.get("visual_type") or "").lower().strip() != "action"]
     all_conditions = "+".join(action_times + other_times) if (action_times + other_times) else "0"
-    volume_expr = f"if({all_conditions},{DUCK_VOLUME},1.0)"
     action_condition = "+".join(action_times) if action_times else "0"
-    vo_volume_expr = f"if({action_condition},{VOL_ACTION},{VOL_OTHER})" if action_times else f"{VOL_OTHER}"
 
-    filter_complex = f"[0:a]volume='{volume_expr}':eval=frame[bg];[1:a]volume='{vo_volume_expr}':eval=frame[vo];[bg][vo]amix=inputs=2:duration=first:dropout_transition=0:normalize=0,alimiter=limit=0.95[aout]"
-    
-    subtitles_active = enable_subtitles and os.path.exists(ASS_PATH)
-    if subtitles_active:
-        vf_flag, video_codec = f'-vf "subtitles={ASS_PATH}:fontsdir={FONTS_DIR}"', "-c:v libx264 -preset fast -crf 23 -pix_fmt yuv420p"
-    else:
-        vf_flag, video_codec = "", "-c:v copy"
+    filter_complex = f"[0:a]volume='if({all_conditions},{DUCK_VOLUME},1.0)':eval=frame[bg];[1:a]volume='if({action_condition},{VOL_ACTION},{VOL_OTHER})':eval=frame[vo];[bg][vo]amix=inputs=2:duration=first:dropout_transition=0:normalize=0,alimiter=limit=0.95[aout]"
+    vf_flag = f'-vf "subtitles={ASS_PATH}:fontsdir={FONTS_DIR}"' if enable_subtitles and os.path.exists(ASS_PATH) else ""
+    video_codec = "-c:v libx264 -preset fast -crf 23 -pix_fmt yuv420p" if vf_flag else "-c:v copy"
 
-    cmd = f'ffmpeg -y -i {video_path} -i {commentary_audio} -filter_complex "{filter_complex}" {vf_flag} -map 0:v:0 -map "[aout]" {video_codec} -c:a aac -b:a 192k -shortest {out_path} -hide_banner -loglevel error'
-    subprocess.run(cmd, shell=True, check=True)
+    subprocess.run(f'ffmpeg -y -i {video_path} -i {commentary_audio} -filter_complex "{filter_complex}" {vf_flag} -map 0:v:0 -map "[aout]" {video_codec} -c:a aac -b:a 192k -shortest {out_path} -hide_banner -loglevel error', shell=True, check=True)
     print(f"🔥 Final video ready: {out_path}\n")
 
 def fallback_copy_original():
@@ -1110,16 +924,14 @@ def fallback_copy_original():
 # MAIN
 # ============================================================
 def main():
-    print("=" * 60)
-    print("🎙️ AI COMMENTARY DUBBER — v6.3 (Live Logs)")
-    print("=" * 60)
+    print("=" * 60 + "\n🎙️ AI COMMENTARY DUBBER — v6.5 (Original Prompt + Strict JSON)\n" + "=" * 60)
     
     if not COMMENTARY_ENABLED:
-        print("🚫 Commentary is OFF — copying original clip...")
+        print("🚫 Commentary OFF — copying original...")
         sys.exit(0 if fallback_copy_original() else 1)
 
     if not validate_env():
-        print("⚠️ Missing Keys — falling back to original clip...")
+        print("⚠️ Missing Keys — falling back...")
         fallback_copy_original()
         sys.exit(0)
 
@@ -1136,16 +948,12 @@ def main():
         segments = generate_full_script(slots, srt_content, ANALYSIS_GRID_PATH)
 
         if not segments:
-            print("=" * 60)
-            print("⚠️ NO SEGMENTS — Original video upload ho raha hai.")
-            print("=" * 60)
+            print("=" * 60 + "\n⚠️ NO SEGMENTS — Original video upload ho raha hai.\n" + "=" * 60)
             commit_analysis_to_github()
-            if fallback_copy_original(): sys.exit(0)
-            else: sys.exit(1)
+            sys.exit(0 if fallback_copy_original() else 1)
 
         audio_files = generate_audio(segments, slots, vid_dur)
-        if not audio_files:
-            raise Exception("No audio files generated")
+        if not audio_files: raise Exception("No audio files generated")
 
         if SUBTITLES_ENABLED:
             generate_full_ass_script(audio_files, font_name="BebasNeue-Regular", font_size=55, alignment=2, vertical_margin=65)
@@ -1153,9 +961,7 @@ def main():
         final_audio = build_timed_audio(audio_files, vid_dur)
         merge_final(FINAL_CLIP_PATH, final_audio, FINAL_DUBBED_VIDEO, audio_files, enable_subtitles=SUBTITLES_ENABLED)
 
-        print("=" * 60)
-        print(f"🔥🔥 DONE! {FINAL_DUBBED_VIDEO}")
-        print("=" * 60)
+        print("=" * 60 + f"\n🔥🔥 DONE! {FINAL_DUBBED_VIDEO}\n" + "=" * 60)
         commit_analysis_to_github()
         sys.exit(0)
 
