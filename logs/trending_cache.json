@@ -1,13 +1,13 @@
 {
-  "last_updated": "2026-10-19 09:57:04 PM",
+  "last_updated": "2026-10-19 11:52:12 PM",
   "period_days": 7,
   "trending": [
     {
       "game": "Russian_secret_missions",
-      "views_7d": 1297,
-      "avg_per_video": 648,
+      "views_7d": 1298,
+      "avg_per_video": 649,
       "trend": "viral",
-      "ratio": 2.8467874794069195,
+      "ratio": 2.7083985393844547,
       "fb_link": "https://www.facebook.com/reel/1643198310839022/",
       "source_link": ""
     },
@@ -16,7 +16,7 @@
       "views_7d": 816,
       "avg_per_video": 408,
       "trend": "trending",
-      "ratio": 1.7924217462932455,
+      "ratio": 1.702660406885759,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play21.mp4"
     },
@@ -25,37 +25,37 @@
       "views_7d": 1122,
       "avg_per_video": 280,
       "trend": "steady",
-      "ratio": 1.230093355299286,
+      "ratio": 1.16849243609807,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan238.mp4"
     }
   ],
   "below_avg": [
     {
-      "game": "ghostandela",
-      "views_7d": 420,
-      "avg_per_video": 210,
+      "game": "CODMW4",
+      "views_7d": 221,
+      "avg_per_video": 221,
       "trend": "slow",
-      "ratio": 0.9225700164744646,
+      "ratio": 0.9222743870631195,
+      "fb_link": "https://www.facebook.com/reel/2330140364405164/",
+      "source_link": ""
+    },
+    {
+      "game": "ghostandela",
+      "views_7d": 423,
+      "avg_per_video": 211,
+      "trend": "slow",
+      "ratio": 0.8805425143453313,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "Wolverine",
-      "views_7d": 540,
+      "views_7d": 543,
       "avg_per_video": 135,
       "trend": "slow",
-      "ratio": 0.5930807248764415,
+      "ratio": 0.5633802816901409,
       "fb_link": "https://www.facebook.com/reel/1559290532619169/",
-      "source_link": ""
-    },
-    {
-      "game": "CODMW4",
-      "views_7d": 127,
-      "avg_per_video": 127,
-      "trend": "slow",
-      "ratio": 0.5579352004393191,
-      "fb_link": "https://www.facebook.com/reel/2330140364405164/",
       "source_link": ""
     },
     {
@@ -63,7 +63,7 @@
       "views_7d": 10,
       "avg_per_video": 10,
       "trend": "below_avg",
-      "ratio": 0.043931905546403076,
+      "ratio": 0.041731872717788214,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison37.mp4"
     },
@@ -72,17 +72,17 @@
       "views_7d": 10,
       "avg_per_video": 3,
       "trend": "below_avg",
-      "ratio": 0.013179571663920923,
+      "ratio": 0.012519561815336464,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu13.mp4"
     }
   ],
   "recommendation": {
     "game": "Russian_secret_missions",
-    "views_7d": 1297,
-    "avg_per_video": 648,
+    "views_7d": 1298,
+    "avg_per_video": 649,
     "trend": "viral",
-    "ratio": 2.8467874794069195,
+    "ratio": 2.7083985393844547,
     "fb_link": "https://www.facebook.com/reel/1643198310839022/",
     "source_link": ""
   }
