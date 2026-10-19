@@ -1,18 +1,26 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v6.2 (4-Tier Chain + 5 Keys Retry + No Fallback)
+🎙️ AI Commentary Dubber — v6.3 (Live Logs + 4-Tier Chain + No Fallback)
 ===============================================================
 FEATURES:
   ✅ Timing LOCK — GPT segment = SLOT time
   ✅ 4-Tier Model Chain (GPT -> Dots -> OpenRouter/Free -> Auto Free)
   ✅ 5 Keys × Retries (Robust JSON handling)
   ✅ No Fixed Fallback (Original video on AI failure)
-  ✅ Full Terminal Logging (Screenshot path + GitHub URL)
+  ✅ Live Terminal Logs (Flush enabled + FFmpeg quiet)
+  ✅ Full Logging (Screenshot path + GitHub URL)
 ===============================================================
 """
 
 import os
 import sys
+import functools
+
+# 👇 Force print to flush instantly (Live logs in GitHub Actions)
+print = functools.partial(print, flush=True)
+try: sys.stdout.reconfigure(line_buffering=True)
+except: pass
+
 import argparse
 import subprocess
 import requests
@@ -171,8 +179,7 @@ def get_duration(path):
     try:
         out = subprocess.check_output(cmd, shell=True).decode().strip()
         return float(out) if out else 10.0
-    except Exception as e:
-        print(f"⚠️ duration fail: {e}")
+    except Exception:
         return 10.0
 
 def parse_srt(srt_content):
@@ -189,12 +196,9 @@ def parse_srt(srt_content):
     return entries
 
 def speed_for_type(slot_type):
-    if slot_type == "action":
-        return SPEED_ACTION
-    elif slot_type == "dialog":
-        return SPEED_DIALOG
-    else:
-        return SPEED_CALM
+    if slot_type == "action": return SPEED_ACTION
+    elif slot_type == "dialog": return SPEED_DIALOG
+    else: return SPEED_CALM
 
 # ============================================================
 # ASS SUBTITLE GENERATOR
@@ -267,19 +271,18 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 def get_motion_score(video_path, start, end):
     try:
         duration = max(end - start, 0.5)
-        cmd = f'ffmpeg -ss {start:.2f} -t {duration:.2f} -i {video_path} -vf "select=\'gt(scene,0.1)\',metadata=print" -f null - 2>&1'
+        cmd = f'ffmpeg -ss {start:.2f} -t {duration:.2f} -i {video_path} -vf "select=\'gt(scene,0.1)\',metadata=print" -f null -hide_banner -loglevel error - 2>&1'
         out = subprocess.run(cmd, shell=True, capture_output=True, text=True).stderr
         return len(re.findall(r"pts_time", out))
-    except:
-        return 0
+    except: return 0
 
 def get_scene_timeline(video_path):
-    cmd = f'ffmpeg -i {video_path} -filter:v "select=\'gt(scene,0.3)\',showinfo" -f null - 2>&1'
+    cmd = f'ffmpeg -i {video_path} -filter:v "select=\'gt(scene,0.3)\',showinfo" -f null -hide_banner -loglevel error - 2>&1'
     out = subprocess.run(cmd, shell=True, capture_output=True, text=True).stderr
     return [float(m.group(1)) for m in re.finditer(r"pts_time:([\d.]+)", out)]
 
 def get_loudness_timeline(video_path):
-    cmd = f'ffmpeg -i {video_path} -af "astats=metadata=1:reset=1,ametadata=print:key=lavfi.astats.Overall.RMS_level:file=-" -f null - 2>&1'
+    cmd = f'ffmpeg -i {video_path} -af "astats=metadata=1:reset=1,ametadata=print:key=lavfi.astats.Overall.RMS_level:file=-" -f null -hide_banner -loglevel error - 2>&1'
     out = subprocess.run(cmd, shell=True, capture_output=True, text=True).stdout
     timeline, t = [], 0.0
     for line in out.split("\n"):
@@ -295,7 +298,7 @@ def slot_loudness(timeline, start, end):
     return max(vals) if vals else -60
 
 # ============================================================
-# GIT PUSH (WITH URL LOGGING)
+# GIT PUSH (WITH URL LOGGING + QUIET)
 # ============================================================
 def commit_analysis_to_github():
     print("📤 [10] Pushing analysis image to GitHub...")
@@ -306,24 +309,15 @@ def commit_analysis_to_github():
     try:
         subprocess.run("git config --global user.name 'GitHub Action'", shell=True, check=False)
         subprocess.run("git config --global user.email 'action@github.com'", shell=True, check=False)
-        subprocess.run("git fetch origin", shell=True, check=False)
         
-        rebase_res = subprocess.run("git pull --rebase --autostash origin main", shell=True, capture_output=True, text=True)
-        if rebase_res.returncode != 0:
-            subprocess.run("git pull --rebase --autostash origin master", shell=True, check=False)
+        # -q lagaya hai taaki [new tag] print na ho
+        subprocess.run("git fetch -q origin", shell=True, check=False)
+        subprocess.run("git pull -q --rebase --autostash origin main", shell=True, check=False)
 
         subprocess.run(f"git add {ANALYSIS_GRID_PATH}", shell=True, check=False)
-        commit_res = subprocess.run("git commit -m 'Update analysis image [skip ci]'", shell=True, capture_output=True, text=True)
+        subprocess.run("git commit -m 'Update analysis image [skip ci]'", shell=True, check=False)
         
-        if commit_res.returncode == 0:
-            print("   ✅ Committed analysis image.")
-        else:
-            print("   ℹ️ No changes to commit.")
-
-        push_res = subprocess.run("git push origin HEAD --force-with-lease", shell=True, capture_output=True, text=True)
-        if push_res.returncode != 0:
-            push_res = subprocess.run("git push origin HEAD", shell=True, capture_output=True, text=True)
-
+        push_res = subprocess.run("git push -q origin HEAD --force-with-lease", shell=True, capture_output=True, text=True)
         if push_res.returncode == 0:
             print("   🚀 Pushed to GitHub successfully.")
             try:
@@ -349,7 +343,7 @@ def commit_analysis_to_github():
 # ============================================================
 def extract_audio(video_path, out_path):
     print("🎧 [1] Extracting audio...")
-    subprocess.run(f"ffmpeg -y -i {video_path} -vn -acodec libmp3lame -q:a 4 {out_path}", shell=True, check=True)
+    subprocess.run(f"ffmpeg -y -i {video_path} -vn -acodec libmp3lame -q:a 4 {out_path} -hide_banner -loglevel error", shell=True, check=True)
     print("✅ Audio extracted\n")
 
 # ============================================================
@@ -499,7 +493,6 @@ def classify_slots_combined(video_path, slots, srt_content):
             sw_text = " ".join(e["text"] for e in srt_entries if e["start"] >= sw["start"] and e["end"] <= sw["end"]).lower()
             words = set(sw_text.split())
             has_action_word = len(words & ACTION_WORDS) >= 1
-            has_dialog_word = len(words & DIALOG_WORDS) >= 1
             has_speech = len(sw_text.strip()) > 3
 
             if has_action_word or scene_cuts >= 2 or loud > -15: action_count += 1
@@ -536,7 +529,7 @@ def classify_slots_combined(video_path, slots, srt_content):
     return slots
 
 # ============================================================
-# STEP 5 — 8K PORTRAIT ANALYSIS GRID (WITH LOGGING)
+# STEP 5 — 8K PORTRAIT ANALYSIS GRID (WITH LIVE PROGRESS)
 # ============================================================
 def build_analysis_grid(video_path, vid_duration, slots, num_frames=ANALYSIS_FRAMES):
     print(f"🖼️ [5] Building 8K PORTRAIT grid — {num_frames} frames...")
@@ -562,9 +555,13 @@ def build_analysis_grid(video_path, vid_duration, slots, num_frames=ANALYSIS_FRA
     frame_paths = []
     for i, (t, slot_start, slot_end, slot_idx) in enumerate(frame_specs):
         fp = f"temp_analysis_{i:03d}.jpg"
-        subprocess.run(f"ffmpeg -y -ss {t:.2f} -i {video_path} -vframes 1 -q:v 1 {fp}", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(f"ffmpeg -y -ss {t:.2f} -i {video_path} -vframes 1 -q:v 1 {fp} -hide_banner -loglevel error", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         if os.path.exists(fp):
             frame_paths.append((fp, t, slot_start, slot_end, slot_idx))
+        
+        # 👇 Live Progress
+        if i > 0 and i % 20 == 0:
+            print(f"   📸 Extracted {i}/{len(frame_specs)} frames...")
 
     cell_w, cell_h = CANVAS_W // GRID_COLS, CANVAS_H // GRID_ROWS
     grid = Image.new("RGB", (CANVAS_W, CANVAS_H), (0, 0, 0))
@@ -649,7 +646,6 @@ def get_free_vision_models(limit=3):
 def generate_full_script(slots, srt_content, analysis_grid_path):
     print(f"🤖 [6] Generating script (Simple 4-Tier Fallback)...")
 
-    # 📸 LOG: Screenshot info
     if os.path.exists(analysis_grid_path):
         try:
             img_info = Image.open(analysis_grid_path)
@@ -814,7 +810,6 @@ Return ONLY valid JSON:
 
     # =========================================================
     # 🎯 SIMPLE 4-TIER LOGIC 
-    # 1. GPT -> 2. Dots -> 3. OpenRouter/Free -> 4. Specific Free Models
     # =========================================================
     models_to_try = [
         "openai/gpt-4o-mini",
@@ -1008,7 +1003,7 @@ def generate_audio(segments, slots, vid_duration):
                         tempo = max(ATEMPO_MIN, min(ATEMPO_MAX_ACTION, needed_tempo))
                         if tempo > 1.01:
                             fit_file = f"{SEGMENTS_DIR}/seg_{idx:03d}_fit.mp3"
-                            subprocess.run(f"ffmpeg -y -i {seg_file} -filter:a atempo={tempo:.3f} {fit_file}", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                            subprocess.run(f"ffmpeg -y -i {seg_file} -filter:a atempo={tempo:.3f} {fit_file} -hide_banner -loglevel error", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                             final = fit_file if os.path.exists(fit_file) else seg_file
                             atempo_used = f"{tempo:.3f} (action)"
                         else: final = seg_file
@@ -1024,7 +1019,7 @@ def generate_audio(segments, slots, vid_duration):
                         tempo = max(ATEMPO_MIN, min(atempo_max, needed_tempo))
                         if tempo > 1.01:
                             fit_file = f"{SEGMENTS_DIR}/seg_{idx:03d}_fit.mp3"
-                            subprocess.run(f"ffmpeg -y -i {seg_file} -filter:a atempo={tempo:.3f} {fit_file}", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                            subprocess.run(f"ffmpeg -y -i {seg_file} -filter:a atempo={tempo:.3f} {fit_file} -hide_banner -loglevel error", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                             final = fit_file if os.path.exists(fit_file) else seg_file
                             atempo_used = f"{tempo:.3f}" + (" (last)" if is_last else "")
                         else: final = seg_file
@@ -1056,7 +1051,7 @@ def generate_audio(segments, slots, vid_duration):
 def build_timed_audio(audio_files, vid_duration):
     print("🎼 [8] Building timed audio...")
     silent = f"{SEGMENTS_DIR}/silent_base.mp3"
-    subprocess.run(f"ffmpeg -y -f lavfi -i anullsrc=r=44100:cl=stereo -t {vid_duration} -q:a 9 -acodec libmp3lame {silent}", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    subprocess.run(f"ffmpeg -y -f lavfi -i anullsrc=r=44100:cl=stereo -t {vid_duration} -q:a 9 -acodec libmp3lame {silent} -hide_banner -loglevel error", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     inputs, parts, mix_inputs = ["-i", silent], [], ["[0:a]"]
     for i, a in enumerate(audio_files, start=1):
@@ -1068,7 +1063,7 @@ def build_timed_audio(audio_files, vid_duration):
     filter_complex = ";".join(parts) + f";{''.join(mix_inputs)}amix=inputs={len(mix_inputs)}:duration=first:dropout_transition=0:normalize=0,alimiter=limit=0.95[out]"
     final_audio = f"{SEGMENTS_DIR}/final_commentary.mp3"
     
-    cmd = f"ffmpeg -y {' '.join(inputs)} -filter_complex \"{filter_complex}\" -map \"[out]\" -acodec libmp3lame -q:a 4 {final_audio}"
+    cmd = f"ffmpeg -y {' '.join(inputs)} -filter_complex \"{filter_complex}\" -map \"[out]\" -acodec libmp3lame -q:a 4 {final_audio} -hide_banner -loglevel error"
     subprocess.run(cmd, shell=True, check=True)
     print("✅ Timed commentary built\n")
     return final_audio
@@ -1098,13 +1093,13 @@ def merge_final(video_path, commentary_audio, out_path, audio_files, enable_subt
     else:
         vf_flag, video_codec = "", "-c:v copy"
 
-    cmd = f'ffmpeg -y -i {video_path} -i {commentary_audio} -filter_complex "{filter_complex}" {vf_flag} -map 0:v:0 -map "[aout]" {video_codec} -c:a aac -b:a 192k -shortest {out_path}'
+    cmd = f'ffmpeg -y -i {video_path} -i {commentary_audio} -filter_complex "{filter_complex}" {vf_flag} -map 0:v:0 -map "[aout]" {video_codec} -c:a aac -b:a 192k -shortest {out_path} -hide_banner -loglevel error'
     subprocess.run(cmd, shell=True, check=True)
     print(f"🔥 Final video ready: {out_path}\n")
 
 def fallback_copy_original():
     try:
-        subprocess.run(f"ffmpeg -y -i {FINAL_CLIP_PATH} -c copy {FINAL_DUBBED_VIDEO}", shell=True, check=True)
+        subprocess.run(f"ffmpeg -y -i {FINAL_CLIP_PATH} -c copy {FINAL_DUBBED_VIDEO} -hide_banner -loglevel error", shell=True, check=True)
         print(f"✅ Original copied: {FINAL_DUBBED_VIDEO}")
         return True
     except Exception as e:
@@ -1116,7 +1111,7 @@ def fallback_copy_original():
 # ============================================================
 def main():
     print("=" * 60)
-    print("🎙️ AI COMMENTARY DUBBER — v6.2 (4-Tier Chain)")
+    print("🎙️ AI COMMENTARY DUBBER — v6.3 (Live Logs)")
     print("=" * 60)
     
     if not COMMENTARY_ENABLED:
