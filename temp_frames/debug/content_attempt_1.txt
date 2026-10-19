@@ -1,1 +1,5 @@
+<<<<<<< Updated upstream
 {"clip_duration": 35, "reason": "Yellow suit combat and cinematic crashes", "start_time": 0, "status": "APPROVE", "title": "Yellow Suit 1 Wolverine Crash 🔥🎯"}
+=======
+{"clip_duration": 54, "reason": "Intense tactical hostage rescue cinematic sequence", "start_time": 0, "status": "APPROVE", "title": "1 Hostage Crying Skull Squad Breached 🔥🎯"}
+>>>>>>> Stashed changes
