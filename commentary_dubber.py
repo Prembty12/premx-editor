@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v8.2 (Original Prompt + Smart JSON Parser)
+🎙️ AI Commentary Dubber — v8.2 (Smart JSON Extract + Original Prompt)
 ===============================================================
 """
 
@@ -163,44 +163,6 @@ def speed_for_type(slot_type):
     if slot_type == "action": return SPEED_ACTION
     elif slot_type == "dialog": return SPEED_DIALOG
     else: return SPEED_CALM
-
-# ============================================================
-# 🧠 SMART JSON EXTRACTOR (Fixes Free Model JSON Errors)
-# ============================================================
-def extract_json_from_response(raw):
-    if not raw: return None
-    text = str(raw).strip()
-    
-    # 1. Direct Parse
-    try: 
-        return json.loads(text)
-    except: pass
-    
-    # 2. Markdown Extract (```json ... ```)
-    if "```" in text:
-        parts = text.split("```")
-        for p in parts:
-            p = p.strip()
-            if p.startswith("json"):
-                p = p[4:].strip()
-            try: return json.loads(p)
-            except: pass
-            
-    # 3. Find First { and Last } (Removes extra text)
-    start = text.find('{')
-    end = text.rfind('}')
-    if start != -1 and end != -1 and end > start:
-        json_str = text[start:end+1]
-        try: return json.loads(json_str)
-        except: pass
-        
-        # Try fixing trailing commas if any
-        try:
-            fixed = re.sub(r',\s*([\]}])', r'\1', json_str)
-            return json.loads(fixed)
-        except: pass
-            
-    return None
 
 # ============================================================
 # ASS SUBTITLE GENERATOR
@@ -536,10 +498,10 @@ def get_free_vision_models(limit=3):
     return KNOWN_FREE[:limit]
 
 # ============================================================
-# STEP 6 — GENERATE SCRIPT (100% ORIGINAL PROMPT)
+# STEP 6 — GENERATE SCRIPT (SMART JSON EXTRACT)
 # ============================================================
 def generate_full_script(slots, srt_content, analysis_grid_path):
-    print(f"🤖 [6] Generating script (Original Prompt)...")
+    print(f"🤖 [6] Generating script (Smart JSON Extract)...")
     if os.path.exists(analysis_grid_path):
         try:
             img = Image.open(analysis_grid_path)
@@ -661,7 +623,7 @@ If you see ANY of these → visual_type = "action":
 7. Max 2-3 follow requests
 
 **STORY CONTEXT:**
-{srt_content[:4200]}
+{srt_content[:2500]}
 
 **YOUR SLOTS (fill ALL {len(slots)}):**
 {chr(10).join(slot_lines)}
@@ -739,22 +701,38 @@ Return ONLY valid JSON:
                     actual_model = ai.get('model', model_id)
                     raw = ai['choices'][0]['message'].get('content', '').strip()
                     
-                    # 👇 SMART PARSER USE
-                    parsed = extract_json_from_response(raw)
+                    # 🔥 SMART JSON EXTRACTION
+                    parsed = None
+                    try:
+                        temp_raw = raw
+                        if temp_raw.startswith("```"):
+                            temp_raw = temp_raw.split("```")[1]
+                            if temp_raw.startswith("json"):
+                                temp_raw = temp_raw[4:].strip()
+                            temp_raw = temp_raw.rstrip("`").strip()
+                        parsed = json.loads(temp_raw)
+                    except:
+                        # Agar direct parse fail ho, toh { } ke beech ka text nikalo
+                        start_idx = raw.find('{')
+                        end_idx = raw.rfind('}')
+                        if start_idx != -1 and end_idx != -1:
+                            try:
+                                parsed = json.loads(raw[start_idx:end_idx+1])
+                            except:
+                                pass
                     
-                    if parsed:
-                        segments = parsed.get("segments", [])
-                        if isinstance(segments, list) and len(segments) > 0:
-                            winning_model = model_id
-                            winning_route = actual_model
-                            print(f"✅ SUCCESS! (Requested: {model_id} → Actual: {actual_model} | Key: {key_idx})")
-                            if len(segments) != len(slots):
-                                print(f"   ⚠️ WARNING: AI ne {len(segments)}/{len(slots)} segments diye hain.")
-                            break
-                        else:
-                            print("⚠️ Empty segments array")
+                    if parsed and isinstance(parsed.get("segments"), list) and len(parsed["segments"]) > 0:
+                        segments = parsed["segments"]
+                        winning_model = model_id
+                        winning_route = actual_model
+                        print(f"✅ SUCCESS! (Requested: {model_id} → Actual: {actual_model} | Key: {key_idx})")
+                        if len(segments) != len(slots):
+                            print(f"   ⚠️ WARNING: AI ne {len(segments)}/{len(slots)} segments diye hain.")
+                        break
                     else:
-                        print("⚠️ JSON Error (Failed to parse)")
+                        # Print snippet to show why it failed
+                        snippet = raw[:40].replace('\n', ' ') if raw else "NULL"
+                        print(f"⚠️ JSON Error (Model ne bheja: '{snippet}...')")
 
                 elif r.status_code in (401, 402, 403): print("❌ Dead/No Credits")
                 elif r.status_code == 429: print("⚠️ Rate Limit")
@@ -961,7 +939,7 @@ def fallback_copy_original():
 # MAIN
 # ============================================================
 def main():
-    print("=" * 60 + "\n🎙️ AI COMMENTARY DUBBER — v8.2 (Smart JSON)\n" + "=" * 60)
+    print("=" * 60 + "\n🎙️ AI COMMENTARY DUBBER — v8.2 (Smart JSON Extract)\n" + "=" * 60)
     
     if not COMMENTARY_ENABLED:
         print("🚫 Commentary OFF — copying original...")
