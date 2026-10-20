@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 20 | **Last Updated:** 2026-10-20 12:05:36 PM IST
+**Total Videos:** 20 | **Last Updated:** 2026-10-20 12:57:21 PM IST
 
 ---
 
@@ -14,7 +14,7 @@
 | Posted (FB or IG) | 20 / 20 |
 | FB Posted | 18 / 20 |
 | IG Posted | 6 / 20 |
-| Total FB Views | **3,568** |
+| Total FB Views | **3,569** |
 | Total IG Views | **2,100** |
 
 ---
@@ -23,7 +23,7 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | 4 Soldiers Breached The Dark Room 🎯🔥  #videogames #gamingcommunity #gaming #mm2remastered #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/4395441457385128/) | 657 | [🟣 IG](https://www.instagram.com/reel/DeUlSdaCIIp/) | 250 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_19.mp4) |
+| 1 | 4 Soldiers Breached The Dark Room 🎯🔥  #videogames #gamingcommunity #gaming #mm2remastered #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/4395441457385128/) | 658 | [🟣 IG](https://www.instagram.com/reel/DeUlSdaCIIp/) | 250 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_19.mp4) |
 | 2 | 1 Gun Vs Fiery Storm 🔥🎯  #videogames #gamingcommunity #gaming #mm2remastered #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1798800707831375/) | 667 | [🟣 IG](https://www.instagram.com/reel/DeP8-j0gBia/) | 460 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_5.mp4) |
 | 3 | Survived 5 Enemies On Fiery Street 🔥🎯  #videogames #gamingcommunity #gaming #mm2remastered #gamingre | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeSMCtoj1k1/) | 460 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_20.mp4) |
 | 4 | Last Bullet At The Capitol 🔥🎯  #videogames #gamingcommunity #gaming #mm2remastered #gamingreels #ree | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeLxuCUDhnM/) | 450 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_3.mp4) |
@@ -32,12 +32,12 @@
 | 7 | Red Sky Combat Zone 💀🔥  #videogames #gamingcommunity #gaming #mm2remastered #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/3584878615007660/) | 833 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_6.mp4) |
 | 8 | Intense Firefight Survival Mode 💥🎯  #videogames #gamingcommunity #gaming #mm2remastered #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2293098418120844/) | 884 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_11.mp4) |
 | 9 | mm2remastered 5 | [🔵 FB](https://www.facebook.com/18179068996426692) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_5.mp4) |
-| 10 | mm2remastered 19 | [🔵 FB](https://www.facebook.com/18340518010268231) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_19.mp4) |
-| 11 | mm2remastered 10 | [🔵 FB](https://www.facebook.com/18092882522156718) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_10.mp4) |
+| 10 | mm2remastered 7 | [🔵 FB](https://www.facebook.com/18094596086432519) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_7.mp4) |
+| 11 | mm2remastered 19 | [🔵 FB](https://www.facebook.com/18340518010268231) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_19.mp4) |
 | 12 | mm2remastered 4 | [🔵 FB](https://www.facebook.com/18105468170244032) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_4.mp4) |
-| 13 | mm2remastered 14 | [🔵 FB](https://www.facebook.com/18031516268850520) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_14.mp4) |
-| 14 | mm2remastered 6 | [🔵 FB](https://www.facebook.com/18283670941290283) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_6.mp4) |
-| 15 | mm2remastered 7 | [🔵 FB](https://www.facebook.com/18094596086432519) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_7.mp4) |
+| 13 | mm2remastered 6 | [🔵 FB](https://www.facebook.com/18283670941290283) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_6.mp4) |
+| 14 | mm2remastered 10 | [🔵 FB](https://www.facebook.com/18092882522156718) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_10.mp4) |
+| 15 | mm2remastered 14 | [🔵 FB](https://www.facebook.com/18031516268850520) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_14.mp4) |
 | 16 | mm2remastered 11 | [🔵 FB](https://www.facebook.com/18113656111832694) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_11.mp4) |
 | 17 | mm2remastered 3 | [🔵 FB](https://www.facebook.com/18138352654715598) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_3.mp4) |
 | 18 | mm2remastered 17 | [🔵 FB](https://www.facebook.com/17955279579260431) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_17.mp4) |
