@@ -1,1 +1,1 @@
-{"clip_duration": 51, "reason": "Dramatic cinematic dialogue with high tension", "start_time": 6, "status": "APPROVE", "title": "One Secret Meeting Unites The Army 🔥🤝"}
+{"clip_duration": 38, "reason": "Intense cinematic combat and struggle sequence", "start_time": 9, "status": "APPROVE", "title": "Wolverine 1 HP Claws Vs Vampire 🔥⚔️"}
