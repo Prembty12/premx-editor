@@ -1,1 +1,1 @@
-{"clip_duration": 18, "reason": "Red silhouette jumps and spark action", "start_time": 12, "status": "APPROVE", "title": "Survived The Red Abyss Drop 🔥🎯"}
+{"clip_duration": 51, "reason": "Dramatic cinematic dialogue with high tension", "start_time": 6, "status": "APPROVE", "title": "One Secret Meeting Unites The Army 🔥🤝"}
