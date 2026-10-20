@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v8.2 (Smart JSON Extract + Original Prompt)
+🎙️ AI Commentary Dubber — v8.4 (Show AI Text + Timing)
 ===============================================================
 """
 
@@ -498,10 +498,10 @@ def get_free_vision_models(limit=3):
     return KNOWN_FREE[:limit]
 
 # ============================================================
-# STEP 6 — GENERATE SCRIPT (SMART JSON EXTRACT)
+# STEP 6 — GENERATE SCRIPT (WITH COMMENTARY LOGGING)
 # ============================================================
 def generate_full_script(slots, srt_content, analysis_grid_path):
-    print(f"🤖 [6] Generating script (Smart JSON Extract)...")
+    print(f"🤖 [6] Generating script (NoneType Fixed + Smart JSON)...")
     if os.path.exists(analysis_grid_path):
         try:
             img = Image.open(analysis_grid_path)
@@ -510,7 +510,6 @@ def generate_full_script(slots, srt_content, analysis_grid_path):
 
     slot_lines = [f"- Slot {i}: {s['start']:.2f}s → {s['end']:.2f}s [{s['type'].upper()}] (scenes={s['scene_count']}, loud={s['avg_loud']}dB, action={sa.get('action_ratio', 0)}, dialog={sa.get('dialog_ratio', 0)}, motion={sa.get('motion_score', 0)}) SRT: \"{s['srt_text'][:70]}\"" for i, s in enumerate(slots, 1) if (sa := s.get("sub_analysis", {})) is not None]
 
-    # 👇 ORIGINAL PROMPT + STRICT JSON RULES
     prompt = f"""You are a HYPED-UP gaming YouTuber — like a streamer going CRAZY on stream.
 You shout, laugh, hype, roast. Pure energy. Zero boring lines.
 
@@ -699,9 +698,14 @@ Return ONLY valid JSON:
                 if r.status_code == 200:
                     ai = r.json()
                     actual_model = ai.get('model', model_id)
-                    raw = ai['choices'][0]['message'].get('content', '').strip()
                     
-                    # 🔥 SMART JSON EXTRACTION
+                    content = ai.get('choices', [{}])[0].get('message', {}).get('content')
+                    raw = str(content).strip() if content else ""
+                    
+                    if not raw:
+                        print("⚠️ Empty/None Response")
+                        continue
+
                     parsed = None
                     try:
                         temp_raw = raw
@@ -712,7 +716,6 @@ Return ONLY valid JSON:
                             temp_raw = temp_raw.rstrip("`").strip()
                         parsed = json.loads(temp_raw)
                     except:
-                        # Agar direct parse fail ho, toh { } ke beech ka text nikalo
                         start_idx = raw.find('{')
                         end_idx = raw.rfind('}')
                         if start_idx != -1 and end_idx != -1:
@@ -730,7 +733,6 @@ Return ONLY valid JSON:
                             print(f"   ⚠️ WARNING: AI ne {len(segments)}/{len(slots)} segments diye hain.")
                         break
                     else:
-                        # Print snippet to show why it failed
                         snippet = raw[:40].replace('\n', ' ') if raw else "NULL"
                         print(f"⚠️ JSON Error (Model ne bheja: '{snippet}...')")
 
@@ -782,6 +784,17 @@ Return ONLY valid JSON:
                     seg["slot"] = slots.index(best_slot) + 1
 
     print(f"   ✅ ALL SEGMENTS LOCKED TO SLOT TIMES\n")
+
+    # 👇 NEW: Print AI Commentary with Timing
+    print(f"   📝 AI COMMENTARY & TIMING VERIFICATION:")
+    for seg in segments:
+        slot_num = seg.get("slot", "?")
+        s_time = seg.get("start", 0.0)
+        e_time = seg.get("end", 0.0)
+        text = seg.get("text", "")
+        vtype = str(seg.get("visual_type", "calm")).upper()
+        print(f"      🎬 Slot {slot_num}: [{s_time:.2f}s → {e_time:.2f}s] [{vtype}] | \"{text}\"")
+    print()
 
     # TYPE REFINEMENT
     for seg in segments:
@@ -939,7 +952,7 @@ def fallback_copy_original():
 # MAIN
 # ============================================================
 def main():
-    print("=" * 60 + "\n🎙️ AI COMMENTARY DUBBER — v8.2 (Smart JSON Extract)\n" + "=" * 60)
+    print("=" * 60 + "\n🎙️ AI COMMENTARY DUBBER — v8.4 (Show AI Text)\n" + "=" * 60)
     
     if not COMMENTARY_ENABLED:
         print("🚫 Commentary OFF — copying original...")
