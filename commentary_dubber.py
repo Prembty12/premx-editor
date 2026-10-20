@@ -674,7 +674,7 @@ Return ONLY valid JSON.
         if segments: break
         
         # Nvidia ke liye 1 retry, openrouter ke liye 2 retries
-        max_retries = 1 if model_id == "nvidia/nemotron-3.5-super-vl:free" else 2
+        max_retries = 1 if model_id == "dots-studio/dots-3-note-preview:free" else 2
         print(f"🤖 [MODEL TRY] {model_id} (Max {max_retries} try per key)")
         
         model_success = False
@@ -750,7 +750,7 @@ Return ONLY valid JSON.
                         
                         if not raw:
                             print(f"⚠️ Empty Response (Route: {actual_model})")
-                            if model_id == "nvidia/nemotron-3.5-super-vl:free":
+                            if model_id == "dots-studio/dots-3-note-preview:free":
                                 break # Nvidia fail, next model pe jao
                             time.sleep(2)
                             continue
@@ -767,12 +767,12 @@ Return ONLY valid JSON.
                                 break
                             else:
                                 print(f"⚠️ Schema Error (Route: {actual_model})")
-                                if model_id == "nvidia/nemotron-3.5-super-vl:free":
+                                if model_id == "dots-studio/dots-3-note-preview:free":
                                     break # Nvidia fail, next model pe jao
                                 time.sleep(2)
                         except json.JSONDecodeError:
                             print(f"⚠️ JSON Error (Route: {actual_model})")
-                            if model_id == "nvidia/nemotron-3.5-super-vl:free":
+                            if model_id == "dots-studio/dots-3-note-preview:free":
                                 break # Nvidia fail, next model pe jao
                             time.sleep(2)
                             
@@ -785,7 +785,7 @@ Return ONLY valid JSON.
                     print(f"⚠️ Exc: {str(e)[:30]} (Next Key)")
                     break 
                     
-            if model_id == "nvidia/nemotron-3.5-super-vl:free" and not model_success:
+            if model_id == "dots-studio/dots-3-note-preview:free" and not model_success:
                 print(f"   ⏭️ Nvidia model failed. Switching to openrouter/free...")
                 break # Break key loop, go to next model
                 
