@@ -5,7 +5,7 @@
         "total_views": 11652,
         "uploaded_videos": 16,
         "avg_views_per_video": 728,
-        "view_share_percentage": 21.86
+        "view_share_percentage": 21.88
     },
     {
         "rank": 2,
@@ -13,15 +13,15 @@
         "total_views": 8530,
         "uploaded_videos": 17,
         "avg_views_per_video": 501,
-        "view_share_percentage": 16.01
+        "view_share_percentage": 16.02
     },
     {
         "rank": 3,
         "game_name": "Russian_secret_missions",
         "total_views": 6502,
-        "uploaded_videos": 22,
-        "avg_views_per_video": 295,
-        "view_share_percentage": 12.2
+        "uploaded_videos": 23,
+        "avg_views_per_video": 282,
+        "view_share_percentage": 12.21
     },
     {
         "rank": 4,
@@ -29,7 +29,7 @@
         "total_views": 5669,
         "uploaded_videos": 14,
         "avg_views_per_video": 404,
-        "view_share_percentage": 10.64
+        "view_share_percentage": 10.65
     },
     {
         "rank": 5,
@@ -37,15 +37,15 @@
         "total_views": 5291,
         "uploaded_videos": 11,
         "avg_views_per_video": 481,
-        "view_share_percentage": 9.93
+        "view_share_percentage": 9.94
     },
     {
         "rank": 6,
         "game_name": "GearsOfWar",
-        "total_views": 4630,
+        "total_views": 4560,
         "uploaded_videos": 10,
-        "avg_views_per_video": 463,
-        "view_share_percentage": 8.69
+        "avg_views_per_video": 456,
+        "view_share_percentage": 8.56
     },
     {
         "rank": 7,
@@ -53,7 +53,7 @@
         "total_views": 3818,
         "uploaded_videos": 23,
         "avg_views_per_video": 166,
-        "view_share_percentage": 7.16
+        "view_share_percentage": 7.17
     },
     {
         "rank": 8,
@@ -73,19 +73,19 @@
     },
     {
         "rank": 10,
+        "game_name": "CODMW4",
+        "total_views": 934,
+        "uploaded_videos": 5,
+        "avg_views_per_video": 186,
+        "view_share_percentage": 1.75
+    },
+    {
+        "rank": 11,
         "game_name": "sifu",
         "total_views": 918,
         "uploaded_videos": 19,
         "avg_views_per_video": 48,
         "view_share_percentage": 1.72
-    },
-    {
-        "rank": 11,
-        "game_name": "CODMW4",
-        "total_views": 903,
-        "uploaded_videos": 5,
-        "avg_views_per_video": 180,
-        "view_share_percentage": 1.69
     },
     {
         "rank": 12,
