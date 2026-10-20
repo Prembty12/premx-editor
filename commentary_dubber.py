@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v6.7 (Bulletproof JSON Extractor)
+🎙️ AI Commentary Dubber — v7.0 (100% Original Prompt + 4-Tier Fallback)
 ===============================================================
 """
 
 import os
 import sys
 import functools
-import ast
 
 # 👇 Force print to flush instantly
 print = functools.partial(print, flush=True)
@@ -476,63 +475,8 @@ def build_analysis_grid(video_path, vid_duration, slots, num_frames=ANALYSIS_FRA
         if os.path.exists(fp): os.remove(fp)
 
 # ============================================================
-# 🔥 BULLETPROOF JSON PARSER (WILL NOT FAIL)
+# FREE MODELS HELPER
 # ============================================================
-def extract_json_from_response(raw):
-    if not raw: return None
-    s = str(raw).strip()
-    
-    # 1. Direct Parse
-    try: 
-        parsed = json.loads(s)
-        if isinstance(parsed, dict) and "segments" in parsed: return parsed
-        # Agar model ne direct array bheja hai
-        if isinstance(parsed, list) and len(parsed) > 0: return {"segments": parsed}
-    except: pass
-    
-    # 2. Markdown Extract
-    m = re.search(r'```(?:json)?\s*([\s\S]*?)\s*```', s, re.DOTALL | re.IGNORECASE)
-    if m:
-        try:
-            parsed = json.loads(m.group(1))
-            if isinstance(parsed, dict) and "segments" in parsed: return parsed
-            if isinstance(parsed, list) and len(parsed) > 0: return {"segments": parsed}
-        except: pass
-    
-    # 3. Find { and } and force parse
-    start, end = s.find('{'), s.rfind('}')
-    if start != -1 and end != -1 and end > start:
-        json_str = s[start:end+1]
-        try:
-            parsed = json.loads(json_str)
-            if isinstance(parsed, dict) and "segments" in parsed: return parsed
-        except: pass
-        
-        # Fix trailing commas
-        try:
-            fixed = re.sub(r',\s*([\]}])', r'\1', json_str)
-            parsed = json.loads(fixed)
-            if isinstance(parsed, dict) and "segments" in parsed: return parsed
-        except: pass
-        
-        # AST Literal Eval (Single Quotes Fix)
-        try:
-            py_str = json_str.replace("true", "True").replace("false", "False").replace("null", "None")
-            parsed = ast.literal_eval(py_str)
-            if isinstance(parsed, dict) and "segments" in parsed: return parsed
-        except: pass
-
-    # 4. Find [ and ] (Array fallback)
-    start, end = s.find('['), s.rfind(']')
-    if start != -1 and end != -1 and end > start:
-        json_str = s[start:end+1]
-        try:
-            parsed = json.loads(json_str)
-            if isinstance(parsed, list) and len(parsed) > 0: return {"segments": parsed}
-        except: pass
-
-    return None
-
 def get_free_vision_models(limit=3):
     KNOWN_FREE = ["meta-llama/llama-3.2-11b-vision-instruct:free", "google/gemini-flash-1.5-8b-exp:free", "qwen/qwen2.5-vl-72b-instruct:free"]
     try:
@@ -544,10 +488,10 @@ def get_free_vision_models(limit=3):
     return KNOWN_FREE[:limit]
 
 # ============================================================
-# STEP 6 — GENERATE SCRIPT
+# STEP 6 — GENERATE SCRIPT (100% ORIGINAL PROMPT)
 # ============================================================
 def generate_full_script(slots, srt_content, analysis_grid_path):
-    print(f"🤖 [6] Generating script (Strict JSON Prompt)...")
+    print(f"🤖 [6] Generating script (Original Prompt)...")
     if os.path.exists(analysis_grid_path):
         try:
             img = Image.open(analysis_grid_path)
@@ -556,43 +500,129 @@ def generate_full_script(slots, srt_content, analysis_grid_path):
 
     slot_lines = [f"- Slot {i}: {s['start']:.2f}s → {s['end']:.2f}s [{s['type'].upper()}] (scenes={s['scene_count']}, loud={s['avg_loud']}dB, action={sa.get('action_ratio', 0)}, dialog={sa.get('dialog_ratio', 0)}, motion={sa.get('motion_score', 0)}) SRT: \"{s['srt_text'][:70]}\"" for i, s in enumerate(slots, 1) if (sa := s.get("sub_analysis", {})) is not None]
 
-    prompt = f"""⚠️ CRITICAL INSTRUCTION: DO NOT WRAP IN MARKDOWN (NO ```json). DO NOT THINK OUT LOUD. DO NOT EXPLAIN. OUTPUT ONLY RAW JSON. ⚠️
-
-You are a HYPED-UP gaming YouTuber — like a streamer going CRAZY on stream.
+    # 👇 100% ORIGINAL PROMPT WAPAS
+    prompt = f"""You are a HYPED-UP gaming YouTuber — like a streamer going CRAZY on stream.
 You shout, laugh, hype, roast. Pure energy. Zero boring lines.
 
 **YOU ARE GETTING 1 IMAGE — ANALYSIS GRID:**
 - Each cell shows: "SLOT X: A.A-B.Bs" (yellow) + "frame@T.TTs" (cyan)
 - ⚠️ USE THE SLOT TIME (yellow label) — NOT the frame time
+- Match frames to slots by SLOT number
 
 **YOUR JOB:**
 Look at the frames. React LOUDLY like a real streamer watching live gameplay.
+Focus on VISUALS — characters, screens, action, environment, weapons, enemies, faces.
 
-**HOW TO TALK:**
-- Contractions: "he's", "ain't", "gonna", "wanna", "kinda". Slang: "bruh", "yo", "nah", "fr". Short sentences.
-- Start with: "YO!", "BRO!", "WAIT!", "NAH!", "AYY!"
+**HOW TO TALK — NATURAL CASUAL ENGLISH:**
+- Contractions: "he's", "ain't", "gonna", "wanna", "kinda"
+- Slang: "bruh", "yo", "bro", "nah", "fr", "lowkey", "bet", "cap"
+- Short sentences. Fragments OK.
+- Start with reactions: "YO!", "BRO!", "WAIT!", "NAH!", "AYY!", "WHAT'S UP GUYS!", "YO WHAT'S UP GUYS!",
+
+**REACTION PATTERNS (use 20-25 varied):**
+1. BIG ACTION
+2. PREDICTIONS WITH HOOK
+3. SMART MOVES
+4. ENEMY ROAST
+5. EPIC MOMENTS
+6. FULL FREEDOM
+7. HYPE
+8. WEIRD
+9. CLOSE CALL
+10. FOLLOW REQUEST (2-3 total)
+11. FREESTYLE
+12. ENVIRONMENT
+13. SOUND
+14. CINEMATIC SHOT
+15. FLIRTY/FUNNY "BABY" (1-2 times only)
+16. LIKE + BELL CTA (3-4 times)
+17. SWEARING (Max 5-7 times, censored)
+18. HMM / THINKING (2-3 times, dialog/calm only)
+19. HYPE INTRO (2-3 times)
+20. COMMENT CTA
+21. KILL/DEATH/HIT — React INSTANTLY
 
 **🎮 REAL-TIME GAMEPLAY MODE:**
-- You ARE the player. PRESENT TENSE. React INSTANTLY.
-- Short explosive reactions for action, full sentences for calm. VARY length.
-- NEVER repeat same reaction. Say what you FEEL.
+- You ARE the player. Not watching. React LIVE like you're in the fight RIGHT NOW.
+- Always PRESENT TENSE — happening this second, not after.
+- Every enemy death, every hit, every dodge, every shot fired — react INSTANTLY. Never miss a moment.
+- Use SHORT, EXPLOSIVE reactions when killing or destroying. Full sentences only for calm moments.
+- NEVER repeat the same reaction twice in a row. Every moment deserves a UNIQUE response.
+- VARY your reaction LENGTH — some words, some fragments, some full sentences.
+- Match VOICE TONE to the moment — whisper for tension, SHOUT for action, calm for chill.
+- If you see KILLING, DYING, DESTROYING, or DAMAGE — react FIRST, describe LATER. Reaction > description.
+- Add SUSPENSE before big moments when you sense buildup — hold the tension.
+- NEVER say what you SEE — say what you FEEL. Emotion over description.
+- When multiple enemies die at once — react with ESCALATING hype, not the same tone.
+- When YOU take damage — react with PAIN or PANIC, not calm.
+- When YOU dodge or survive — react with RELIEF or COCKY confidence.
+- When YOU win a fight — react with DOMINANCE, not just happiness.
+- ALWAYS address the viewer naturally — make them feel part of the fight.
+- Keep reactions SHORTER when action is FAST, LONGER when action is SLOW.
+- NEVER narrate like a documentary. YOU are IN the moment, not outside it.
+- If nothing big happens — build ANTICIPATION, don't fill silence with boring lines.
 
-**🎭 PACING:**
-- "action" → 3-5 words, CAPS.
-- "dialog" → 5-7 words, conversational.
-- "calm" → 6-8 words, chill. NO shouting here.
+**🎯 ENGAGEMENT & RETENTION**
+- Address the viewer directly (guys, friends, you)
+- Ask natural questions
+- Hype them up
+- Keep them watching till the end
 
-**⚠️ ACTION DETECTION:** FIRE, EXPLOSIONS, BLOOD, WEAPONS, RUNNING → visual_type = "action". Face → "dialog". Scenery → "calm".
+**🎭 SCENE-MATCHING:**
+- ACTION → shout, hype, CAPS lines
+- DIALOG → conversational, NO shouting
+- CALM → chill, relaxed, NO hype
+
+**🚫 NEVER shout on non-action scenes.**
+
+**PACING:**
+- "action" → 3-5 words, HIGH energy, CAPS
+- "dialog" → 5-7 words, conversational
+- "calm" → 6-8 words, chill
+
+**🎯 VISUAL CLASSIFICATION RULES**
+
+**⚠️⚠️⚠️ AGGRESSIVE ACTION DETECTION ⚠️⚠️⚠️**
+If you see ANY of these → visual_type = "action":
+- 🔥 FIRE, FLAMES, EXPLOSIONS, BLAST
+- 💥 SMOKE, SPARKS, DUST
+- 🩸 BLOOD, GORE, DAMAGE
+- 🔫 WEAPONS FIRING, MUZZLE FLASH
+- ⚔️ COMBAT STANCE, FISTS UP, MID-ATTACK
+- 👥 MULTIPLE CHARACTERS CLOSE
+- 🏃 RUNNING, JUMPING, DODGING
+- 💢 CHARACTER BEING HIT, KNOCKED BACK
+- 📊 HEALTH BARS, HIT MARKERS
+- 🎯 AIMING DOWN SIGHTS
+- 🎬 CINEMATIC ACTION, SHAKY CAM
+
+**visual_type = "dialog" ONLY if:**
+- Close-up of face while speaking
+- Character standing still, facing camera
+
+**visual_type = "calm" for EVERYTHING ELSE:**
+- Slow camera panning, scenery, menus, walking slowly
+
+**RULES:**
+1. NATURAL — casual, slang, contractions
+2. REACT with emotion
+3. Focus on VISUALS
+4. UNIQUE lines based on actual frames
+5. 5-8 words per line
+6. Reference "guys" or "you" naturally
+7. Max 2-3 follow requests
 
 **STORY CONTEXT:**
-{srt_content[:2000]}
+{srt_content[:2500]}
 
 **YOUR SLOTS (fill ALL {len(slots)}):**
 {chr(10).join(slot_lines)}
 
-Return ONLY valid JSON matching this EXACT structure:
+**BANNED:** "insane play", "here we go", "game on"
+
+Return ONLY valid JSON:
 {{
-  "story_summary": "Brief summary.",
+  "story_summary": "Brief one-line summary.",
   "segments": [
     {{
       "slot": 1,
@@ -639,8 +669,8 @@ Return ONLY valid JSON matching this EXACT structure:
                     {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{img_b64}", "detail": detail}}
                 ]}],
                 "max_tokens": 4000,
-                "temperature": 0.7,
-                "response_format": {"type": "json_object"} 
+                "temperature": 0.9,
+                "response_format": {"type": "json_object"}
             }
 
             headers = {"Authorization": f"Bearer {or_key}", "Content-Type": "application/json"}
@@ -649,22 +679,34 @@ Return ONLY valid JSON matching this EXACT structure:
                 r = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload, timeout=240)
                 
                 if r.status_code == 200:
-                    raw = r.json().get('choices', [{}])[0].get('message', {}).get('content', "")
-                    # 🔥 Ye function ab kabhi fail nahi hoga agar data thoda bhi valid hua toh
-                    parsed = extract_json_from_response(raw)
-                    if parsed and isinstance(parsed.get("segments"), list) and len(parsed["segments"]) > 0:
-                        segments = parsed["segments"]
+                    ai = r.json()
+                    raw = ai.get('choices', [{}])[0].get('message', {}).get('content', "")
+                    
+                    # 👇 100% ORIGINAL JSON PARSING LOGIC
+                    if raw.startswith("```"):
+                        raw = raw.split("```")[1]
+                        if raw.startswith("json"):
+                            raw = raw[4:].strip()
+                        raw = raw.rstrip("`").strip()
+                        
+                    parsed = json.loads(raw)
+                    segments = parsed.get("segments", [])
+                    
+                    if isinstance(segments, list) and len(segments) > 0:
                         winning_model = model_id
                         print("✅ SUCCESS!")
                         break
                     else:
-                        snippet = raw[:40].replace('\n', ' ') if raw else "NULL"
-                        print(f"⚠️ Bad JSON (Model ne bola: '{snippet}...')")
+                        print("⚠️ Empty segments")
+
                 elif r.status_code in (401, 402, 403): print("❌ Dead/No Credits")
                 elif r.status_code == 429: print("⚠️ Rate Limit")
                 elif r.status_code == 404: print("❌ Model Not Found"); break
                 else: print(f"⚠️ Err {r.status_code}")
-            except Exception as e: print(f"⚠️ Exc ({str(e)[:20]})")
+                    
+            except Exception as e: 
+                print(f"⚠️ JSON Error")
+                
         print()
 
     if not segments:
@@ -674,13 +716,12 @@ Return ONLY valid JSON matching this EXACT structure:
     print(f"🏆 Winning Model: {winning_model}\n")
 
     # =========================================================
-    # 🔒 SMART TIMING LOCK (BULLETPROOF FIX)
+    # 🔒 SMART TIMING LOCK
     # =========================================================
     print(f"   🔒 TIMING LOCK — Verifying segments vs Slots...")
     locked_count = 0
 
     if len(segments) == len(slots):
-        print(f"      ⚡ Forcing index match ({len(segments)} segments = {len(slots)} slots)...")
         for i, seg in enumerate(segments):
             seg["slot"] = i + 1
             seg["start"] = slots[i]["start"]
@@ -861,7 +902,7 @@ def fallback_copy_original():
 # MAIN
 # ============================================================
 def main():
-    print("=" * 60 + "\n🎙️ AI COMMENTARY DUBBER — v6.7 (Bulletproof JSON)\n" + "=" * 60)
+    print("=" * 60 + "\n🎙️ AI COMMENTARY DUBBER — v7.0 (Original Prompt)\n" + "=" * 60)
     
     if not COMMENTARY_ENABLED:
         print("🚫 Commentary OFF — copying original...")
