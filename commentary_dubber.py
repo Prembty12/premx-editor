@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v7.3 (Strict JSON Prompt + Model Info + Slot Gap)
+🎙️ AI Commentary Dubber — v8.1 (Original Prompt + Actual Route Output)
 ===============================================================
 """
 
@@ -294,7 +294,7 @@ def transcribe(audio_path):
     return srt_content
 
 # ============================================================
-# STEP 3 & 4 — Slots & Classification (WITH GAP)
+# STEP 3 & 4 — Slots & Classification
 # ============================================================
 def build_auto_slots(video_path, vid_duration, srt_content):
     print("📐 [3] Building AUTO slots...")
@@ -498,10 +498,10 @@ def get_free_vision_models(limit=3):
     return KNOWN_FREE[:limit]
 
 # ============================================================
-# STEP 6 — GENERATE SCRIPT (STRICT JSON PROMPT)
+# STEP 6 — GENERATE SCRIPT (100% ORIGINAL PROMPT)
 # ============================================================
 def generate_full_script(slots, srt_content, analysis_grid_path):
-    print(f"🤖 [6] Generating script (Strict JSON)...")
+    print(f"🤖 [6] Generating script (Original Prompt)...")
     if os.path.exists(analysis_grid_path):
         try:
             img = Image.open(analysis_grid_path)
@@ -667,7 +667,8 @@ Return ONLY valid JSON:
 
     models_to_try = ["openai/gpt-4o-mini", "dots-studio/dots-3-note-preview:free", "openrouter/free"] + get_free_vision_models(limit=3)
     
-    segments, winning_model = None, None
+    # 👇 ADDED winning_route variable
+    segments, winning_model, winning_route = None, None, None
 
     for model_id in models_to_try:
         if segments: break
@@ -698,7 +699,8 @@ Return ONLY valid JSON:
                 
                 if r.status_code == 200:
                     ai = r.json()
-                    raw = ai.get('choices', [{}])[0].get('message', {}).get('content', "")
+                    actual_model = ai.get('model', model_id) # 👈 Extract actual model
+                    raw = ai['choices'][0]['message'].get('content', '').strip()
                     
                     if raw.startswith("```"):
                         raw = raw.split("```")[1]
@@ -711,11 +713,13 @@ Return ONLY valid JSON:
                     
                     if isinstance(segments, list) and len(segments) > 0:
                         winning_model = model_id
-                        # 👇 Yahan Model aur Key Print ho raha hai
-                        print(f"✅ SUCCESS! (Model: {model_id} | Key: {key_idx})")
+                        winning_route = actual_model # 👈 Save actual model
+                        print(f"✅ SUCCESS! (Requested: {model_id} → Actual: {actual_model} | Key: {key_idx})")
+                        if len(segments) != len(slots):
+                            print(f"   ⚠️ WARNING: AI ne {len(segments)}/{len(slots)} segments diye hain.")
                         break
                     else:
-                        print("⚠️ Empty segments")
+                        print("⚠️ Empty segments array")
 
                 elif r.status_code in (401, 402, 403): print("❌ Dead/No Credits")
                 elif r.status_code == 429: print("⚠️ Rate Limit")
@@ -731,7 +735,11 @@ Return ONLY valid JSON:
         print("=" * 60 + "\n❌ ALL MODELS AND KEYS FAILED\n⚠️ Returning empty. Original video will be uploaded.\n" + "=" * 60 + "\n")
         return []
 
-    print(f"🏆 Winning Model: {winning_model}\n")
+    print(f"=======================================================")
+    print(f"🏆 WINNING MODEL: {winning_model}")
+    if winning_model != winning_route and winning_route:
+        print(f"   🔀 ACTUAL ROUTE USED: {winning_route}") # 👈 Print actual model
+    print(f"=======================================================\n")
 
     # =========================================================
     # 🔒 STRICT TIMING LOCK
@@ -918,7 +926,7 @@ def fallback_copy_original():
 # MAIN
 # ============================================================
 def main():
-    print("=" * 60 + "\n🎙️ AI COMMENTARY DUBBER — v7.3 (Strict JSON + Model Info)\n" + "=" * 60)
+    print("=" * 60 + "\n🎙️ AI COMMENTARY DUBBER — v8.1 (Actual Route Output)\n" + "=" * 60)
     
     if not COMMENTARY_ENABLED:
         print("🚫 Commentary OFF — copying original...")
