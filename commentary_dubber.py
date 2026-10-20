@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v7.1 (Original Prompt + Strict Timing Lock)
+🎙️ AI Commentary Dubber — v7.2 (Original Prompt + Strict Timing + Slot Gap)
 ===============================================================
 """
 
@@ -41,7 +41,7 @@ FINAL_CLIP_PATH    = ARGS.video
 FINAL_DUBBED_VIDEO = ARGS.out
 
 # ============================================================
-# 🎛️ ON/OFF SWITCHES
+# 🎛️ ON/OFF SWITCHES & CONFIG
 # ============================================================
 COMMENTARY_ENABLED = os.getenv("COMMENTARY_ENABLED", "true").lower() == "true"
 if ARGS.subtitles is not None:
@@ -49,9 +49,7 @@ if ARGS.subtitles is not None:
 else:
     SUBTITLES_ENABLED = os.getenv("SUBTITLES_ENABLED", "true").lower() == "true"
 
-# ============================================================
 # 🔑 MULTI-KEY CONFIG
-# ============================================================
 def _collect_keys(*env_names):
     return [os.getenv(name) for name in env_names if os.getenv(name)]
 
@@ -87,6 +85,7 @@ ATEMPO_MAX_LAST = 1.20
 ATEMPO_MAX_ACTION = 1.15
 
 MAX_SLOT_EXTEND = 0.2
+SLOT_GAP = 0.4      # 👈 YAHAN GAP SET KARO (0.4 seconds)
 SPEED_ACTION = 1.14
 SPEED_DIALOG = 1.05
 SPEED_CALM   = 1.00
@@ -295,7 +294,7 @@ def transcribe(audio_path):
     return srt_content
 
 # ============================================================
-# STEP 3 & 4 — Slots & Classification
+# STEP 3 & 4 — Slots & Classification (WITH GAP)
 # ============================================================
 def build_auto_slots(video_path, vid_duration, srt_content):
     print("📐 [3] Building AUTO slots...")
@@ -324,9 +323,11 @@ def build_auto_slots(video_path, vid_duration, srt_content):
     if cuts_per_sec > 0.5: base *= 0.85
     elif cuts_per_sec < 0.12: base *= 1.1
 
-    slot_sec = base
-    total = max(MIN_SLOTS_HARD, min(MAX_SLOTS_HARD, int(round(vid_duration / slot_sec))))
-    slot_sec = vid_duration / total
+    total = max(MIN_SLOTS_HARD, min(MAX_SLOTS_HARD, int(round(vid_duration / base))))
+    
+    # 👇 GAP Calculation (Total Gap time minus karke slot_sec nikala)
+    slot_sec = (vid_duration - (total - 1) * SLOT_GAP) / total
+    if slot_sec < 1.0: slot_sec = 1.0
 
     all_boundaries = sorted(srt_boundaries | scene_boundaries | audio_peaks)
     all_boundaries = [b for b in all_boundaries if 0.5 < b < vid_duration - 0.5]
@@ -334,7 +335,7 @@ def build_auto_slots(video_path, vid_duration, srt_content):
     slots, t, used = [], 0.0, set()
     for i in range(total):
         target_end = vid_duration if i == total - 1 else t + slot_sec
-        candidates = [b for b in all_boundaries if b not in used and t + 1.5 < b < target_end + 1.0]
+        candidates = [b for b in all_boundaries if b not in used and t + 1.0 < b < target_end + 0.5]
 
         if candidates and i < total - 1:
             srt_cands = [b for b in candidates if b in srt_boundaries]
@@ -342,14 +343,25 @@ def build_auto_slots(video_path, vid_duration, srt_content):
             snap = min(srt_cands if srt_cands else scene_cands if scene_cands else candidates, key=lambda x: abs(x - target_end))
             end = snap if abs(snap - target_end) < 1.0 else target_end
             used.add(snap)
-        else: end = target_end
+        else: 
+            end = target_end
 
         end = min(end, vid_duration)
-        end = max(end, t + 1.5)
+        end = max(end, t + 1.0)
 
-        slots.append({"start": round(t, 2), "end": round(end, 2), "type": None, "visual_type": None, "srt_text": "", "scene_count": 0, "avg_loud": -50, "sub_analysis": {}, "voice_speed": 1.0, "motion_score": 0, "gpt_type": None, "final_type": None, "speed_boost_log": []})
-        t = end
-        if t >= vid_duration - 0.1: break
+        slots.append({
+            "start": round(t, 2), "end": round(end, 2), "type": None, "visual_type": None, 
+            "srt_text": "", "scene_count": 0, "avg_loud": -50, "sub_analysis": {}, 
+            "voice_speed": 1.0, "motion_score": 0, "gpt_type": None, "final_type": None, "speed_boost_log": []
+        })
+        
+        # 👇 YAHAN GAP ADD KAR RAHE HAIN (t = end + SLOT_GAP)
+        if i == total - 1:
+            t = end
+        else:
+            t = end + SLOT_GAP
+            
+        if t >= vid_duration - 0.5: break
 
     if slots and slots[-1]["end"] < vid_duration - 0.1: slots[-1]["end"] = round(vid_duration, 2)
     for slot in slots:
@@ -358,7 +370,7 @@ def build_auto_slots(video_path, vid_duration, srt_content):
         for e in slot_srt:
             e["start"], e["end"] = slot["start"], slot["end"]
 
-    print(f"   ✅ Built {len(slots)} slots\n")
+    print(f"   ✅ Built {len(slots)} slots (Gap: {SLOT_GAP}s)\n")
     return slots
 
 def classify_slots_combined(video_path, slots, srt_content):
@@ -720,14 +732,11 @@ Return ONLY valid JSON:
     # =========================================================
     print(f"   🔒 TIMING LOCK — Forcing all segments to match slots...")
     
-    # 1. Agar AI ne exactly slots jitne segments diye hain -> Index Match
     if len(segments) == len(slots):
-        print(f"      ⚡ Force matching {len(segments)} segments to {len(slots)} slots...")
         for i, seg in enumerate(segments):
             seg["slot"] = i + 1
             seg["start"] = slots[i]["start"]
             seg["end"] = slots[i]["end"]
-    # 2. Agar slot number diya hai -> Slot Match
     else:
         for seg in segments:
             slot_num = seg.get("slot")
@@ -735,7 +744,6 @@ Return ONLY valid JSON:
                 exact_slot = slots[slot_num - 1]
                 seg["start"] = exact_slot["start"]
                 seg["end"] = exact_slot["end"]
-            # 3. Agar slot number nahi diya -> Nearest Time Match
             else:
                 best_slot, best_diff = None, 999
                 for s in slots:
@@ -904,7 +912,7 @@ def fallback_copy_original():
 # MAIN
 # ============================================================
 def main():
-    print("=" * 60 + "\n🎙️ AI COMMENTARY DUBBER — v7.1 (Original Prompt + Strict Timing Lock)\n" + "=" * 60)
+    print("=" * 60 + "\n🎙️ AI COMMENTARY DUBBER — v7.2 (With Gap + Original Prompt)\n" + "=" * 60)
     
     if not COMMENTARY_ENABLED:
         print("🚫 Commentary OFF — copying original...")
