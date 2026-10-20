@@ -1,10 +1,10 @@
 {
-  "last_updated": "2026-10-21 01:23:35 AM",
+  "last_updated": "2026-10-21 01:26:21 AM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 1914,
+      "views_7d": 1915,
       "avg_per_video": 478,
       "trend": "viral",
       "ratio": 2.270013568521031,
@@ -13,7 +13,7 @@
     },
     {
       "game": "MarvelsSpiderMan2",
-      "views_7d": 2521,
+      "views_7d": 2522,
       "avg_per_video": 360,
       "trend": "trending",
       "ratio": 1.7096336499321574,
@@ -70,7 +70,7 @@
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 1914,
+    "views_7d": 1915,
     "avg_per_video": 478,
     "trend": "viral",
     "ratio": 2.270013568521031,
