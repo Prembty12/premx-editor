@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v8.4 (Show AI Text + Timing)
+🎙️ AI Commentary Dubber — v8.6 (Nvidia -> OpenRouter/Free -> Dots + Fast Fail)
 ===============================================================
 """
 
@@ -85,7 +85,7 @@ ATEMPO_MAX_LAST = 1.20
 ATEMPO_MAX_ACTION = 1.15
 
 MAX_SLOT_EXTEND = 0.2
-SLOT_GAP = 0.4
+SLOT_GAP = 0.4      # 👈 GAP (0.4 seconds)
 SPEED_ACTION = 1.14
 SPEED_DIALOG = 1.05
 SPEED_CALM   = 1.00
@@ -163,6 +163,45 @@ def speed_for_type(slot_type):
     if slot_type == "action": return SPEED_ACTION
     elif slot_type == "dialog": return SPEED_DIALOG
     else: return SPEED_CALM
+
+# ============================================================
+# 🔥 BULLETPROOF JSON EXTRACTOR (Never fails)
+# ============================================================
+def extract_json_from_response(raw):
+    if not raw: return None
+    text = str(raw).strip()
+    
+    # 1. Direct Parse
+    try: 
+        parsed = json.loads(text)
+        if isinstance(parsed, dict) and "segments" in parsed: return parsed
+    except: pass
+    
+    # 2. Markdown Parse
+    m = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', text, re.DOTALL | re.IGNORECASE)
+    if m:
+        try:
+            parsed = json.loads(m.group(1))
+            if isinstance(parsed, dict) and "segments" in parsed: return parsed
+        except: pass
+
+    # 3. Find { and }
+    start, end = text.find('{'), text.rfind('}')
+    if start != -1 and end != -1 and end > start:
+        json_str = text[start:end+1]
+        try:
+            parsed = json.loads(json_str)
+            if isinstance(parsed, dict) and "segments" in parsed: return parsed
+        except: pass
+        
+        # 4. Fix trailing commas
+        try:
+            fixed = re.sub(r',\s*([\]}])', r'\1', json_str)
+            parsed = json.loads(fixed)
+            if isinstance(parsed, dict) and "segments" in parsed: return parsed
+        except: pass
+        
+    return None
 
 # ============================================================
 # ASS SUBTITLE GENERATOR
@@ -498,10 +537,10 @@ def get_free_vision_models(limit=3):
     return KNOWN_FREE[:limit]
 
 # ============================================================
-# STEP 6 — GENERATE SCRIPT (WITH COMMENTARY LOGGING)
+# STEP 6 — GENERATE SCRIPT (NVIDIA -> OPENROUTER/FREE -> DOTS)
 # ============================================================
 def generate_full_script(slots, srt_content, analysis_grid_path):
-    print(f"🤖 [6] Generating script (NoneType Fixed + Smart JSON)...")
+    print(f"🤖 [6] Generating script (Fast Fail Logic)...")
     if os.path.exists(analysis_grid_path):
         try:
             img = Image.open(analysis_grid_path)
@@ -664,19 +703,27 @@ Return ONLY valid JSON:
         else: small_b64 = full_b64
     except: small_b64 = full_b64
 
-    models_to_try = ["openai/gpt-4o-mini", "dots-studio/dots-3-note-preview:free", "openrouter/free"] + get_free_vision_models(limit=3)
+    # 👇 NVIDIA PEHLE, FIR OPENROUTER/FREE, FIR DOTS
+    models_to_try = [
+        "nvidia/nemotron-3.5-super-vl:free",
+        "openrouter/free",
+        "dots-studio/dots-3-note-preview:free"
+    ] + get_free_vision_models(limit=3)
     
     segments, winning_model, winning_route = None, None, None
 
     for model_id in models_to_try:
         if segments: break
         print(f"🤖 [MODEL TRY] {model_id}")
-        is_gpt = (model_id == "openai/gpt-4o-mini")
+        
+        is_gpt = ("gpt" in model_id)
         img_b64 = full_b64 if is_gpt else small_b64
         detail = "high" if is_gpt else "low"
         
+        model_failed = False
+        
         for key_idx, or_key in enumerate(OPENROUTER_KEYS, start=1):
-            if segments: break
+            if segments or model_failed: break
             print(f"   🔑 Key {key_idx}/{len(OPENROUTER_KEYS)}...", end=" ")
             
             payload = {
@@ -703,26 +750,11 @@ Return ONLY valid JSON:
                     raw = str(content).strip() if content else ""
                     
                     if not raw:
-                        print("⚠️ Empty/None Response")
-                        continue
-
-                    parsed = None
-                    try:
-                        temp_raw = raw
-                        if temp_raw.startswith("```"):
-                            temp_raw = temp_raw.split("```")[1]
-                            if temp_raw.startswith("json"):
-                                temp_raw = temp_raw[4:].strip()
-                            temp_raw = temp_raw.rstrip("`").strip()
-                        parsed = json.loads(temp_raw)
-                    except:
-                        start_idx = raw.find('{')
-                        end_idx = raw.rfind('}')
-                        if start_idx != -1 and end_idx != -1:
-                            try:
-                                parsed = json.loads(raw[start_idx:end_idx+1])
-                            except:
-                                pass
+                        print("⚠️ Empty/None Response (Skipping Model)")
+                        model_failed = True
+                        break
+                        
+                    parsed = extract_json_from_response(raw)
                     
                     if parsed and isinstance(parsed.get("segments"), list) and len(parsed["segments"]) > 0:
                         segments = parsed["segments"]
@@ -733,16 +765,20 @@ Return ONLY valid JSON:
                             print(f"   ⚠️ WARNING: AI ne {len(segments)}/{len(slots)} segments diye hain.")
                         break
                     else:
-                        snippet = raw[:40].replace('\n', ' ') if raw else "NULL"
-                        print(f"⚠️ JSON Error (Model ne bheja: '{snippet}...')")
+                        print(f"⚠️ JSON Error (Skipping Model)")
+                        model_failed = True
+                        break
 
-                elif r.status_code in (401, 402, 403): print("❌ Dead/No Credits")
-                elif r.status_code == 429: print("⚠️ Rate Limit")
-                elif r.status_code == 404: print("❌ Model Not Found"); break
-                else: print(f"⚠️ Err {r.status_code}")
+                elif r.status_code in (401, 402, 403): print("❌ Dead/No Credits (Next Key)")
+                elif r.status_code == 429: print("⚠️ Rate Limit (Next Key)")
+                elif r.status_code == 404: 
+                    print("❌ Model Not Found (Skipping Model)")
+                    model_failed = True
+                    break
+                else: print(f"⚠️ Err {r.status_code} (Next Key)")
                     
             except Exception as e: 
-                print(f"⚠️ Exception: {str(e)[:20]}")
+                print(f"⚠️ Exc: {str(e)[:20]} (Next Key)")
                 
         print()
 
@@ -785,7 +821,6 @@ Return ONLY valid JSON:
 
     print(f"   ✅ ALL SEGMENTS LOCKED TO SLOT TIMES\n")
 
-    # 👇 NEW: Print AI Commentary with Timing
     print(f"   📝 AI COMMENTARY & TIMING VERIFICATION:")
     for seg in segments:
         slot_num = seg.get("slot", "?")
@@ -952,7 +987,7 @@ def fallback_copy_original():
 # MAIN
 # ============================================================
 def main():
-    print("=" * 60 + "\n🎙️ AI COMMENTARY DUBBER — v8.4 (Show AI Text)\n" + "=" * 60)
+    print("=" * 60 + "\n🎙️ AI COMMENTARY DUBBER — v8.6 (Nvidia -> OpenRouter/Free)\n" + "=" * 60)
     
     if not COMMENTARY_ENABLED:
         print("🚫 Commentary OFF — copying original...")
