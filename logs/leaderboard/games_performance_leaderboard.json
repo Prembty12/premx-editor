@@ -5,7 +5,7 @@
         "total_views": 11474,
         "uploaded_videos": 16,
         "avg_views_per_video": 717,
-        "view_share_percentage": 20.71
+        "view_share_percentage": 20.7
     },
     {
         "rank": 2,
@@ -13,7 +13,7 @@
         "total_views": 8531,
         "uploaded_videos": 17,
         "avg_views_per_video": 501,
-        "view_share_percentage": 15.4
+        "view_share_percentage": 15.39
     },
     {
         "rank": 3,
@@ -21,7 +21,7 @@
         "total_views": 6525,
         "uploaded_videos": 25,
         "avg_views_per_video": 261,
-        "view_share_percentage": 11.78
+        "view_share_percentage": 11.77
     },
     {
         "rank": 4,
@@ -29,7 +29,7 @@
         "total_views": 5599,
         "uploaded_videos": 14,
         "avg_views_per_video": 399,
-        "view_share_percentage": 10.11
+        "view_share_percentage": 10.1
     },
     {
         "rank": 5,
@@ -42,10 +42,10 @@
     {
         "rank": 6,
         "game_name": "MarvelsSpiderMan2",
-        "total_views": 5196,
+        "total_views": 5211,
         "uploaded_videos": 25,
-        "avg_views_per_video": 207,
-        "view_share_percentage": 9.38
+        "avg_views_per_video": 208,
+        "view_share_percentage": 9.4
     },
     {
         "rank": 7,
@@ -61,15 +61,15 @@
         "total_views": 3261,
         "uploaded_videos": 12,
         "avg_views_per_video": 271,
-        "view_share_percentage": 5.89
+        "view_share_percentage": 5.88
     },
     {
         "rank": 9,
         "game_name": "CODMW4",
-        "total_views": 1915,
+        "total_views": 1923,
         "uploaded_videos": 7,
-        "avg_views_per_video": 273,
-        "view_share_percentage": 3.46
+        "avg_views_per_video": 274,
+        "view_share_percentage": 3.47
     },
     {
         "rank": 10,
@@ -91,8 +91,8 @@
         "rank": 12,
         "game_name": "ghostandela",
         "total_views": 557,
-        "uploaded_videos": 24,
-        "avg_views_per_video": 23,
+        "uploaded_videos": 25,
+        "avg_views_per_video": 22,
         "view_share_percentage": 1.01
     }
 ]
