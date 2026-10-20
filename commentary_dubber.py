@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v7.0 (100% Original Prompt + 4-Tier Fallback)
+🎙️ AI Commentary Dubber — v7.1 (Original Prompt + Strict Timing Lock)
 ===============================================================
 """
 
@@ -716,35 +716,37 @@ Return ONLY valid JSON:
     print(f"🏆 Winning Model: {winning_model}\n")
 
     # =========================================================
-    # 🔒 SMART TIMING LOCK
+    # 🔒 100% STRICT TIMING LOCK (Force Match to Slots)
     # =========================================================
-    print(f"   🔒 TIMING LOCK — Verifying segments vs Slots...")
-    locked_count = 0
-
+    print(f"   🔒 TIMING LOCK — Forcing all segments to match slots...")
+    
+    # 1. Agar AI ne exactly slots jitne segments diye hain -> Index Match
     if len(segments) == len(slots):
+        print(f"      ⚡ Force matching {len(segments)} segments to {len(slots)} slots...")
         for i, seg in enumerate(segments):
             seg["slot"] = i + 1
             seg["start"] = slots[i]["start"]
             seg["end"] = slots[i]["end"]
-            locked_count += 1
+    # 2. Agar slot number diya hai -> Slot Match
     else:
         for seg in segments:
             slot_num = seg.get("slot")
             if slot_num and isinstance(slot_num, int) and 1 <= slot_num <= len(slots):
                 exact_slot = slots[slot_num - 1]
-                if seg.get("start") != exact_slot["start"] or seg.get("end") != exact_slot["end"]: locked_count += 1
-                seg["start"], seg["end"] = exact_slot["start"], exact_slot["end"]
+                seg["start"] = exact_slot["start"]
+                seg["end"] = exact_slot["end"]
+            # 3. Agar slot number nahi diya -> Nearest Time Match
             else:
                 best_slot, best_diff = None, 999
                 for s in slots:
                     diff = abs(s["start"] - float(seg.get("start", 0)))
                     if diff < best_diff: best_diff, best_slot = diff, s
-                if best_slot and best_diff < 3.0:
-                    seg["start"], seg["end"] = best_slot["start"], best_slot["end"]
+                if best_slot:
+                    seg["start"] = best_slot["start"]
+                    seg["end"] = best_slot["end"]
                     seg["slot"] = slots.index(best_slot) + 1
-                    locked_count += 1
 
-    print(f"   ✅ TIMING LOCKED: {locked_count} segments\n")
+    print(f"   ✅ ALL SEGMENTS LOCKED TO SLOT TIMES\n")
 
     # TYPE REFINEMENT
     for seg in segments:
@@ -902,7 +904,7 @@ def fallback_copy_original():
 # MAIN
 # ============================================================
 def main():
-    print("=" * 60 + "\n🎙️ AI COMMENTARY DUBBER — v7.0 (Original Prompt)\n" + "=" * 60)
+    print("=" * 60 + "\n🎙️ AI COMMENTARY DUBBER — v7.1 (Original Prompt + Strict Timing Lock)\n" + "=" * 60)
     
     if not COMMENTARY_ENABLED:
         print("🚫 Commentary OFF — copying original...")
