@@ -1,1 +1,1 @@
-{"clip_duration":42,"reason":"Giant robot boss fight with lasers","start_time":0,"status":"APPROVE","title":"He Smashes 1 Giant Robot Core 🔥"}
+{"clip_duration": 18, "reason": "Red silhouette jumps and spark action", "start_time": 12, "status": "APPROVE", "title": "Survived The Red Abyss Drop 🔥🎯"}
