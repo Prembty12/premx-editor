@@ -625,8 +625,8 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 
 **PACING:**
 - "action" → 3-5 words, HIGH energy, CAPS
-- "dialog" → 4-6 words, conversational
-- "calm" → 5-7 words, chill
+- "dialog" → 5-7 words, conversational
+- "calm" → 6-8 words, chill
 
 **🎯 VISUAL CLASSIFICATION RULES**
 
@@ -707,7 +707,6 @@ Return ONLY valid JSON:
     models_to_try = [
         "nvidia/nemotron-3.5-super-vl:free",
         "openrouter/free",
-        "dots-studio/dots-3-note-preview:free"
     ] + get_free_vision_models(limit=3)
     
     segments, winning_model, winning_route = None, None, None
