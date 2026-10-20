@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v8.1 (Original Prompt + Actual Route Output)
+🎙️ AI Commentary Dubber — v8.2 (Original Prompt + Smart JSON Parser)
 ===============================================================
 """
 
@@ -85,7 +85,7 @@ ATEMPO_MAX_LAST = 1.20
 ATEMPO_MAX_ACTION = 1.15
 
 MAX_SLOT_EXTEND = 0.2
-SLOT_GAP = 0.4      # 👈 GAP (0.4 seconds)
+SLOT_GAP = 0.4
 SPEED_ACTION = 1.14
 SPEED_DIALOG = 1.05
 SPEED_CALM   = 1.00
@@ -163,6 +163,44 @@ def speed_for_type(slot_type):
     if slot_type == "action": return SPEED_ACTION
     elif slot_type == "dialog": return SPEED_DIALOG
     else: return SPEED_CALM
+
+# ============================================================
+# 🧠 SMART JSON EXTRACTOR (Fixes Free Model JSON Errors)
+# ============================================================
+def extract_json_from_response(raw):
+    if not raw: return None
+    text = str(raw).strip()
+    
+    # 1. Direct Parse
+    try: 
+        return json.loads(text)
+    except: pass
+    
+    # 2. Markdown Extract (```json ... ```)
+    if "```" in text:
+        parts = text.split("```")
+        for p in parts:
+            p = p.strip()
+            if p.startswith("json"):
+                p = p[4:].strip()
+            try: return json.loads(p)
+            except: pass
+            
+    # 3. Find First { and Last } (Removes extra text)
+    start = text.find('{')
+    end = text.rfind('}')
+    if start != -1 and end != -1 and end > start:
+        json_str = text[start:end+1]
+        try: return json.loads(json_str)
+        except: pass
+        
+        # Try fixing trailing commas if any
+        try:
+            fixed = re.sub(r',\s*([\]}])', r'\1', json_str)
+            return json.loads(fixed)
+        except: pass
+            
+    return None
 
 # ============================================================
 # ASS SUBTITLE GENERATOR
@@ -623,7 +661,7 @@ If you see ANY of these → visual_type = "action":
 7. Max 2-3 follow requests
 
 **STORY CONTEXT:**
-{srt_content[:2500]}
+{srt_content[:4200]}
 
 **YOUR SLOTS (fill ALL {len(slots)}):**
 {chr(10).join(slot_lines)}
@@ -667,7 +705,6 @@ Return ONLY valid JSON:
 
     models_to_try = ["openai/gpt-4o-mini", "dots-studio/dots-3-note-preview:free", "openrouter/free"] + get_free_vision_models(limit=3)
     
-    # 👇 ADDED winning_route variable
     segments, winning_model, winning_route = None, None, None
 
     for model_id in models_to_try:
@@ -699,27 +736,25 @@ Return ONLY valid JSON:
                 
                 if r.status_code == 200:
                     ai = r.json()
-                    actual_model = ai.get('model', model_id) # 👈 Extract actual model
+                    actual_model = ai.get('model', model_id)
                     raw = ai['choices'][0]['message'].get('content', '').strip()
                     
-                    if raw.startswith("```"):
-                        raw = raw.split("```")[1]
-                        if raw.startswith("json"):
-                            raw = raw[4:].strip()
-                        raw = raw.rstrip("`").strip()
-                        
-                    parsed = json.loads(raw)
-                    segments = parsed.get("segments", [])
+                    # 👇 SMART PARSER USE
+                    parsed = extract_json_from_response(raw)
                     
-                    if isinstance(segments, list) and len(segments) > 0:
-                        winning_model = model_id
-                        winning_route = actual_model # 👈 Save actual model
-                        print(f"✅ SUCCESS! (Requested: {model_id} → Actual: {actual_model} | Key: {key_idx})")
-                        if len(segments) != len(slots):
-                            print(f"   ⚠️ WARNING: AI ne {len(segments)}/{len(slots)} segments diye hain.")
-                        break
+                    if parsed:
+                        segments = parsed.get("segments", [])
+                        if isinstance(segments, list) and len(segments) > 0:
+                            winning_model = model_id
+                            winning_route = actual_model
+                            print(f"✅ SUCCESS! (Requested: {model_id} → Actual: {actual_model} | Key: {key_idx})")
+                            if len(segments) != len(slots):
+                                print(f"   ⚠️ WARNING: AI ne {len(segments)}/{len(slots)} segments diye hain.")
+                            break
+                        else:
+                            print("⚠️ Empty segments array")
                     else:
-                        print("⚠️ Empty segments array")
+                        print("⚠️ JSON Error (Failed to parse)")
 
                 elif r.status_code in (401, 402, 403): print("❌ Dead/No Credits")
                 elif r.status_code == 429: print("⚠️ Rate Limit")
@@ -727,7 +762,7 @@ Return ONLY valid JSON:
                 else: print(f"⚠️ Err {r.status_code}")
                     
             except Exception as e: 
-                print(f"⚠️ JSON Error")
+                print(f"⚠️ Exception: {str(e)[:20]}")
                 
         print()
 
@@ -738,7 +773,7 @@ Return ONLY valid JSON:
     print(f"=======================================================")
     print(f"🏆 WINNING MODEL: {winning_model}")
     if winning_model != winning_route and winning_route:
-        print(f"   🔀 ACTUAL ROUTE USED: {winning_route}") # 👈 Print actual model
+        print(f"   🔀 ACTUAL ROUTE USED: {winning_route}")
     print(f"=======================================================\n")
 
     # =========================================================
@@ -926,7 +961,7 @@ def fallback_copy_original():
 # MAIN
 # ============================================================
 def main():
-    print("=" * 60 + "\n🎙️ AI COMMENTARY DUBBER — v8.1 (Actual Route Output)\n" + "=" * 60)
+    print("=" * 60 + "\n🎙️ AI COMMENTARY DUBBER — v8.2 (Smart JSON)\n" + "=" * 60)
     
     if not COMMENTARY_ENABLED:
         print("🚫 Commentary OFF — copying original...")
