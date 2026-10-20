@@ -705,7 +705,7 @@ Return ONLY valid JSON:
 
     # 👇 NVIDIA PEHLE, FIR OPENROUTER/FREE, FIR DOTS
     models_to_try = [
-        "nvidia/nemotron-3.5-super-vl:free",
+        "vidia/nemotron-3.5-super-vl:free",
         "openrouter/free",
     ] + get_free_vision_models(limit=3)
     
