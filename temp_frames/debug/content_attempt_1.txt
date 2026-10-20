@@ -1,1 +1,1 @@
-{"clip_duration":57,"reason":"Intense scope target sequence","start_time":0,"status":"APPROVE","title":"Perfect Long Shot Lined Up 3 Targets 🎯🔥"}
+{"clip_duration": 42, "reason": "Intense giant robot boss battle action", "start_time": 0, "status": "APPROVE", "title": "Wolverine 1v1 Giant Sentinel Boss 🛡️🔥"}
