@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v7.2 (Original Prompt + Strict Timing + Slot Gap)
+🎙️ AI Commentary Dubber — v7.3 (Strict JSON Prompt + Model Info + Slot Gap)
 ===============================================================
 """
 
@@ -85,7 +85,7 @@ ATEMPO_MAX_LAST = 1.20
 ATEMPO_MAX_ACTION = 1.15
 
 MAX_SLOT_EXTEND = 0.2
-SLOT_GAP = 0.4      # 👈 YAHAN GAP SET KARO (0.4 seconds)
+SLOT_GAP = 0.4      # 👈 GAP (0.4 seconds)
 SPEED_ACTION = 1.14
 SPEED_DIALOG = 1.05
 SPEED_CALM   = 1.00
@@ -325,7 +325,6 @@ def build_auto_slots(video_path, vid_duration, srt_content):
 
     total = max(MIN_SLOTS_HARD, min(MAX_SLOTS_HARD, int(round(vid_duration / base))))
     
-    # 👇 GAP Calculation (Total Gap time minus karke slot_sec nikala)
     slot_sec = (vid_duration - (total - 1) * SLOT_GAP) / total
     if slot_sec < 1.0: slot_sec = 1.0
 
@@ -355,7 +354,6 @@ def build_auto_slots(video_path, vid_duration, srt_content):
             "voice_speed": 1.0, "motion_score": 0, "gpt_type": None, "final_type": None, "speed_boost_log": []
         })
         
-        # 👇 YAHAN GAP ADD KAR RAHE HAIN (t = end + SLOT_GAP)
         if i == total - 1:
             t = end
         else:
@@ -500,10 +498,10 @@ def get_free_vision_models(limit=3):
     return KNOWN_FREE[:limit]
 
 # ============================================================
-# STEP 6 — GENERATE SCRIPT (100% ORIGINAL PROMPT)
+# STEP 6 — GENERATE SCRIPT (STRICT JSON PROMPT)
 # ============================================================
 def generate_full_script(slots, srt_content, analysis_grid_path):
-    print(f"🤖 [6] Generating script (Original Prompt)...")
+    print(f"🤖 [6] Generating script (Strict JSON)...")
     if os.path.exists(analysis_grid_path):
         try:
             img = Image.open(analysis_grid_path)
@@ -512,7 +510,7 @@ def generate_full_script(slots, srt_content, analysis_grid_path):
 
     slot_lines = [f"- Slot {i}: {s['start']:.2f}s → {s['end']:.2f}s [{s['type'].upper()}] (scenes={s['scene_count']}, loud={s['avg_loud']}dB, action={sa.get('action_ratio', 0)}, dialog={sa.get('dialog_ratio', 0)}, motion={sa.get('motion_score', 0)}) SRT: \"{s['srt_text'][:70]}\"" for i, s in enumerate(slots, 1) if (sa := s.get("sub_analysis", {})) is not None]
 
-    # 👇 100% ORIGINAL PROMPT WAPAS
+    # 👇 ORIGINAL PROMPT + STRICT JSON RULES
     prompt = f"""You are a HYPED-UP gaming YouTuber — like a streamer going CRAZY on stream.
 You shout, laugh, hype, roast. Pure energy. Zero boring lines.
 
@@ -632,6 +630,14 @@ If you see ANY of these → visual_type = "action":
 
 **BANNED:** "insane play", "here we go", "game on"
 
+**CRITICAL JSON RULES:**
+- NO markdown formatting (Do NOT use ```json ... ```)
+- NO extra text before or after the JSON
+- NO escaped quotes (use standard double quotes)
+- NO null values (use empty string "" instead)
+- NO empty values (every field must have content)
+- ONLY return the JSON object
+
 Return ONLY valid JSON:
 {{
   "story_summary": "Brief one-line summary.",
@@ -694,7 +700,6 @@ Return ONLY valid JSON:
                     ai = r.json()
                     raw = ai.get('choices', [{}])[0].get('message', {}).get('content', "")
                     
-                    # 👇 100% ORIGINAL JSON PARSING LOGIC
                     if raw.startswith("```"):
                         raw = raw.split("```")[1]
                         if raw.startswith("json"):
@@ -706,7 +711,8 @@ Return ONLY valid JSON:
                     
                     if isinstance(segments, list) and len(segments) > 0:
                         winning_model = model_id
-                        print("✅ SUCCESS!")
+                        # 👇 Yahan Model aur Key Print ho raha hai
+                        print(f"✅ SUCCESS! (Model: {model_id} | Key: {key_idx})")
                         break
                     else:
                         print("⚠️ Empty segments")
@@ -728,7 +734,7 @@ Return ONLY valid JSON:
     print(f"🏆 Winning Model: {winning_model}\n")
 
     # =========================================================
-    # 🔒 100% STRICT TIMING LOCK (Force Match to Slots)
+    # 🔒 STRICT TIMING LOCK
     # =========================================================
     print(f"   🔒 TIMING LOCK — Forcing all segments to match slots...")
     
@@ -912,7 +918,7 @@ def fallback_copy_original():
 # MAIN
 # ============================================================
 def main():
-    print("=" * 60 + "\n🎙️ AI COMMENTARY DUBBER — v7.2 (With Gap + Original Prompt)\n" + "=" * 60)
+    print("=" * 60 + "\n🎙️ AI COMMENTARY DUBBER — v7.3 (Strict JSON + Model Info)\n" + "=" * 60)
     
     if not COMMENTARY_ENABLED:
         print("🚫 Commentary OFF — copying original...")
