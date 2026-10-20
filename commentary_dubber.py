@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v8.8 (Nvidia 1 Try -> OpenRouter Free Retry)
+🎙️ AI Commentary Dubber — v9.0 (No Image Compression + Strict Timing Lock)
 ===============================================================
 """
 
@@ -20,6 +20,7 @@ import json
 import base64
 import re
 import time
+import ast
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 from dotenv import load_dotenv
 
@@ -165,33 +166,50 @@ def speed_for_type(slot_type):
     else: return SPEED_CALM
 
 # ============================================================
-# 🔥 BULLETPROOF JSON EXTRACTOR (Fallback only, strict schema should work)
+# 🔥 ULTIMATE JSON EXTRACTOR
 # ============================================================
 def extract_json_from_response(raw):
     if not raw: return None
     text = str(raw).strip()
+    
     try: 
         parsed = json.loads(text)
         if isinstance(parsed, dict) and "segments" in parsed: return parsed
+        if isinstance(parsed, list) and len(parsed) > 0: return {"segments": parsed}
     except: pass
+    
     m = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', text, re.DOTALL | re.IGNORECASE)
     if m:
         try:
             parsed = json.loads(m.group(1))
             if isinstance(parsed, dict) and "segments" in parsed: return parsed
+            if isinstance(parsed, list) and len(parsed) > 0: return {"segments": parsed}
         except: pass
-    start, end = text.find('{'), text.rfind('}')
-    if start != -1 and end != -1 and end > start:
-        json_str = text[start:end+1]
-        try:
-            parsed = json.loads(json_str)
-            if isinstance(parsed, dict) and "segments" in parsed: return parsed
-        except: pass
-        try:
-            fixed = re.sub(r',\s*([\]}])', r'\1', json_str)
-            parsed = json.loads(fixed)
-            if isinstance(parsed, dict) and "segments" in parsed: return parsed
-        except: pass
+
+    for start_c, end_c in [('{', '}'), ('[', ']')]:
+        start, end = text.find(start_c), text.rfind(end_c)
+        if start != -1 and end != -1 and end > start:
+            json_str = text[start:end+1]
+            try:
+                parsed = json.loads(json_str)
+                if isinstance(parsed, dict) and "segments" in parsed: return parsed
+                if isinstance(parsed, list) and len(parsed) > 0: return {"segments": parsed}
+            except: pass
+            
+            try:
+                fixed = re.sub(r',\s*([\]}])', r'\1', json_str)
+                parsed = json.loads(fixed)
+                if isinstance(parsed, dict) and "segments" in parsed: return parsed
+                if isinstance(parsed, list) and len(parsed) > 0: return {"segments": parsed}
+            except: pass
+            
+            try:
+                py_str = json_str.replace("true", "True").replace("false", "False").replace("null", "None")
+                parsed = ast.literal_eval(py_str)
+                if isinstance(parsed, dict) and "segments" in parsed: return parsed
+                if isinstance(parsed, list) and len(parsed) > 0: return {"segments": parsed}
+            except: pass
+            
     return None
 
 # ============================================================
@@ -515,10 +533,23 @@ def build_analysis_grid(video_path, vid_duration, slots, num_frames=ANALYSIS_FRA
         if os.path.exists(fp): os.remove(fp)
 
 # ============================================================
-# STEP 6 — GENERATE SCRIPT (Nvidia 1 Try -> OpenRouter Free)
+# FREE MODELS HELPER
+# ============================================================
+def get_free_vision_models(limit=3):
+    KNOWN_FREE = ["meta-llama/llama-3.2-11b-vision-instruct:free", "google/gemini-flash-1.5-8b-exp:free", "qwen/qwen2.5-vl-72b-instruct:free"]
+    try:
+        r = requests.get("https://openrouter.ai/api/v1/models", timeout=15)
+        if r.status_code == 200:
+            found = [m.get("id") for m in r.json().get("data", []) if m.get("id") and ("0" in [str(m.get("pricing", {}).get("prompt")), str(m.get("pricing", {}).get("completion"))] or m.get("id").endswith(":free")) and "image" in m.get("architecture", {}).get("input_modalities", [])]
+            if found: return found[:limit]
+    except: pass
+    return KNOWN_FREE[:limit]
+
+# ============================================================
+# STEP 6 — GENERATE SCRIPT (NO IMAGE COMPRESSION)
 # ============================================================
 def generate_full_script(slots, srt_content, analysis_grid_path):
-    print(f"🤖 [6] Generating script (Fast Fail Logic)...")
+    print(f"🤖 [6] Generating script (No Image Compression)...")
     if os.path.exists(analysis_grid_path):
         try:
             img = Image.open(analysis_grid_path)
@@ -527,7 +558,6 @@ def generate_full_script(slots, srt_content, analysis_grid_path):
 
     slot_lines = [f"- Slot {i}: {s['start']:.2f}s → {s['end']:.2f}s [{s['type'].upper()}] (scenes={s['scene_count']}, loud={s['avg_loud']}dB, action={sa.get('action_ratio', 0)}, dialog={sa.get('dialog_ratio', 0)}, motion={sa.get('motion_score', 0)}) SRT: \"{s['srt_text'][:70]}\"" for i, s in enumerate(slots, 1) if (sa := s.get("sub_analysis", {})) is not None]
 
-    # 👇 AAPKA PURANA PROMPT (BILKUL SAME) 👇
     prompt = f"""You are a HYPED-UP gaming YouTuber — like a streamer going CRAZY on stream.
 You shout, laugh, hype, roast. Pure energy. Zero boring lines.
 
@@ -647,147 +677,101 @@ If you see ANY of these → visual_type = "action":
 
 **BANNED:** "insane play", "here we go", "game on"
 
-Return ONLY valid JSON.
+**CRITICAL JSON RULES:**
+- NO markdown formatting (Do NOT use ```json ... ```)
+- NO extra text before or after the JSON
+- NO escaped quotes (use standard double quotes)
+- NO null values (use empty string "" instead)
+- NO empty values (every field must have content)
+- ONLY return the JSON object
+
+Return ONLY valid JSON:
+{{
+  "story_summary": "Brief one-line summary.",
+  "segments": [
+    {{
+      "slot": 1,
+      "start": 0.0,
+      "end": 3.5,
+      "text": "...",
+      "visual_type": "calm"
+    }}
+  ]
+}}
 """
 
+    # 👇 Yahan se image compression hata di gayi hai
     full_b64 = encode_image(analysis_grid_path)
-    try:
-        img = Image.open(analysis_grid_path)
-        if img.width > 1024:
-            ratio = 1024 / img.width
-            small_img = img.resize((1024, int(img.height * ratio)), Image.LANCZOS)
-            small_path = analysis_grid_path.replace(".jpg", "_small.jpg")
-            small_img.save(small_path, quality=70, optimize=True)
-            small_b64 = encode_image(small_path)
-        else: small_b64 = full_b64
-    except: small_b64 = full_b64
-
-    # 👇 NAYA LOGIC: Pehle Nvidia 1 baar, fir Openrouter/free 2 baar per key 👇
+    
     models_to_try = [
-        "dots-studio/dots-3-note-preview:free", 
-        "openrouter/free"
-    ]
+        "nvidia/nemotron-3.5-super-vl:free",
+        "openrouter/free",
+        "dots-studio/dots-3-note-preview:free"
+    ] + get_free_vision_models(limit=3)
     
     segments, winning_model, winning_route = None, None, None
 
     for model_id in models_to_try:
         if segments: break
+        print(f"🤖 [MODEL TRY] {model_id}")
         
-        # Nvidia ke liye 1 retry, openrouter ke liye 2 retries
-        max_retries = 1 if model_id == "dots-studio/dots-3-note-preview:free" else 2
-        print(f"🤖 [MODEL TRY] {model_id} (Max {max_retries} try per key)")
-        
-        model_success = False
+        img_b64 = full_b64  # 👈 Hamesha Full Resolution Image
+        detail = "high"     # 👈 Hamesha High Detail
         
         for key_idx, or_key in enumerate(OPENROUTER_KEYS, start=1):
-            if segments or model_success: break
-            print(f"   🔑 Key {key_idx}/{len(OPENROUTER_KEYS)}")
+            if segments: break
+            print(f"   🔑 Key {key_idx}/{len(OPENROUTER_KEYS)}...", end=" ")
             
-            for attempt in range(1, max_retries + 1):
-                if segments: break
-                print(f"      🔄 Attempt {attempt}/{max_retries}...", end=" ")
+            payload = {
+                "model": model_id,
+                "messages": [{"role": "user", "content": [
+                    {"type": "text", "text": prompt},
+                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{img_b64}", "detail": detail}}
+                ]}],
+                "max_tokens": 4000,
+                "temperature": 0.9,
+                "response_format": {"type": "json_object"}
+            }
+
+            headers = {"Authorization": f"Bearer {or_key}", "Content-Type": "application/json"}
+
+            try:
+                r = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload, timeout=240)
                 
-                # 👇 STRICT PAYLOAD 👇
-                payload = {
-                    "model": model_id,
-                    "messages": [
-                        {
-                            "role": "user", 
-                            "content": [
-                                {"type": "text", "text": prompt},
-                                {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{small_b64}", "detail": "low"}}
-                            ]
-                        }
-                    ],
-                    "max_tokens": 3000,
-                    "temperature": 0.7,
-                    "response_format": {
-                        "type": "json_schema",
-                        "json_schema": {
-                            "name": "commentary_schema",
-                            "strict": True,
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "story_summary": {"type": "string"},
-                                    "segments": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "object",
-                                            "properties": {
-                                                "slot": {"type": "integer"},
-                                                "start": {"type": "number"},
-                                                "end": {"type": "number"},
-                                                "text": {"type": "string"},
-                                                "visual_type": {"type": "string", "enum": ["action", "dialog", "calm"]}
-                                            },
-                                            "required": ["slot", "start", "end", "text", "visual_type"],
-                                            "additionalProperties": False
-                                        }
-                                    }
-                                },
-                                "required": ["story_summary", "segments"],
-                                "additionalProperties": False
-                            }
-                        }
-                    },
-                    "provider": {
-                        "require_parameters": True
-                    }
-                }
-
-                headers = {"Authorization": f"Bearer {or_key}", "Content-Type": "application/json"}
-
-                try:
-                    r = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload, timeout=240)
+                if r.status_code == 200:
+                    ai = r.json()
+                    actual_model = ai.get('model', model_id)
                     
-                    if r.status_code == 200:
-                        ai = r.json()
-                        actual_model = ai.get('model', model_id)
+                    content = ai.get('choices', [{}])[0].get('message', {}).get('content')
+                    raw = str(content).strip() if content else ""
+                    
+                    if not raw:
+                        print("⚠️ Empty/None Response (Next Key)")
+                        continue 
                         
-                        content = ai.get('choices', [{}])[0].get('message', {}).get('content')
-                        raw = str(content).strip() if content else ""
-                        
-                        if not raw:
-                            print(f"⚠️ Empty Response (Route: {actual_model})")
-                            if model_id == "dots-studio/dots-3-note-preview:free":
-                                break # Nvidia fail, next model pe jao
-                            time.sleep(2)
-                            continue
-                            
-                        try:
-                            # Strict schema ki wajah se seedha parse hoga
-                            parsed = json.loads(raw)
-                            if isinstance(parsed, dict) and "segments" in parsed and len(parsed["segments"]) > 0:
-                                segments = parsed["segments"]
-                                winning_model = model_id
-                                winning_route = actual_model
-                                model_success = True
-                                print(f"✅ SUCCESS! (Route: {actual_model})")
-                                break
-                            else:
-                                print(f"⚠️ Schema Error (Route: {actual_model})")
-                                if model_id == "dots-studio/dots-3-note-preview:free":
-                                    break # Nvidia fail, next model pe jao
-                                time.sleep(2)
-                        except json.JSONDecodeError:
-                            print(f"⚠️ JSON Error (Route: {actual_model})")
-                            if model_id == "dots-studio/dots-3-note-preview:free":
-                                break # Nvidia fail, next model pe jao
-                            time.sleep(2)
-                            
+                    parsed = extract_json_from_response(raw)
+                    
+                    if parsed and isinstance(parsed.get("segments"), list) and len(parsed["segments"]) > 0:
+                        segments = parsed["segments"]
+                        winning_model = model_id
+                        winning_route = actual_model
+                        print(f"✅ SUCCESS! (Requested: {model_id} → Actual: {actual_model} | Key: {key_idx})")
+                        if len(segments) != len(slots):
+                            print(f"   ⚠️ WARNING: AI ne {len(segments)}/{len(slots)} segments diye hain.")
+                        break
                     else:
-                        # 400, 401, 429 errors
-                        print(f"❌ Err {r.status_code} (Next Key)")
-                        break # Key issue, next key pe jao
-                        
-                except Exception as e: 
-                    print(f"⚠️ Exc: {str(e)[:30]} (Next Key)")
-                    break 
+                        print(f"⚠️ JSON Error (Next Key)")
+                        continue
+
+                elif r.status_code in (401, 402, 403): print("❌ Dead/No Credits (Next Key)")
+                elif r.status_code == 429: print("⚠️ Rate Limit (Next Key)")
+                elif r.status_code == 404: 
+                    print("❌ Model Not Found (Skipping Model)")
+                    break
+                else: print(f"⚠️ Err {r.status_code} (Next Key)")
                     
-            if model_id == "dots-studio/dots-3-note-preview:free" and not model_success:
-                print(f"   ⏭️ Nvidia model failed. Switching to openrouter/free...")
-                break # Break key loop, go to next model
+            except Exception as e: 
+                print(f"⚠️ Exc: {str(e)[:20]} (Next Key)")
                 
         print()
 
@@ -996,7 +980,7 @@ def fallback_copy_original():
 # MAIN
 # ============================================================
 def main():
-    print("=" * 60 + "\n🎙️ AI COMMENTARY DUBBER — v8.8 (Nvidia 1 Try -> OpenRouter Free)\n" + "=" * 60)
+    print("=" * 60 + "\n🎙️ AI COMMENTARY DUBBER — v9.0 (No Image Compression)\n" + "=" * 60)
     
     if not COMMENTARY_ENABLED:
         print("🚫 Commentary OFF — copying original...")
