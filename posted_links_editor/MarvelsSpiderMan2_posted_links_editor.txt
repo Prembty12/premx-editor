@@ -64,3 +64,6 @@ Video id : 17914272342546226
 MarvelsSpiderMan226 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan226.mp4
 Video id : 18117956918094791
 
+MarvelsSpiderMan242 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan242.mp4
+Video id : 18483508726118350
+

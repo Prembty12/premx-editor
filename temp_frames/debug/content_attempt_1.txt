@@ -1,1 +1,1 @@
-{"clip_duration": 38, "reason": "Intense cinematic combat and struggle sequence", "start_time": 9, "status": "APPROVE", "title": "Wolverine 1 HP Claws Vs Vampire 🔥⚔️"}
+{"clip_duration":21,"reason":"Intense Spider-Man combat on burning ship.","start_time":10,"status":"APPROVE","title":"Spider Man vs Enemies On Burning Ship 🕷️🔥"}
