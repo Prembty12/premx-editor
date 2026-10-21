@@ -5,7 +5,7 @@
         "total_views": 11474,
         "uploaded_videos": 16,
         "avg_views_per_video": 717,
-        "view_share_percentage": 21.41
+        "view_share_percentage": 21.53
     },
     {
         "rank": 2,
@@ -13,7 +13,7 @@
         "total_views": 6525,
         "uploaded_videos": 26,
         "avg_views_per_video": 250,
-        "view_share_percentage": 12.18
+        "view_share_percentage": 12.24
     },
     {
         "rank": 3,
@@ -21,7 +21,7 @@
         "total_views": 6355,
         "uploaded_videos": 17,
         "avg_views_per_video": 373,
-        "view_share_percentage": 11.86
+        "view_share_percentage": 11.92
     },
     {
         "rank": 4,
@@ -29,15 +29,15 @@
         "total_views": 5599,
         "uploaded_videos": 14,
         "avg_views_per_video": 399,
-        "view_share_percentage": 10.45
+        "view_share_percentage": 10.5
     },
     {
         "rank": 5,
         "game_name": "MarvelsSpiderMan2",
-        "total_views": 5351,
+        "total_views": 5357,
         "uploaded_videos": 26,
-        "avg_views_per_video": 205,
-        "view_share_percentage": 9.99
+        "avg_views_per_video": 206,
+        "view_share_percentage": 10.05
     },
     {
         "rank": 6,
@@ -45,15 +45,15 @@
         "total_views": 5291,
         "uploaded_videos": 11,
         "avg_views_per_video": 481,
-        "view_share_percentage": 9.87
+        "view_share_percentage": 9.93
     },
     {
         "rank": 7,
         "game_name": "GearsOfWar",
-        "total_views": 4560,
+        "total_views": 4260,
         "uploaded_videos": 10,
-        "avg_views_per_video": 456,
-        "view_share_percentage": 8.51
+        "avg_views_per_video": 426,
+        "view_share_percentage": 7.99
     },
     {
         "rank": 8,
@@ -61,23 +61,23 @@
         "total_views": 3263,
         "uploaded_videos": 12,
         "avg_views_per_video": 271,
-        "view_share_percentage": 6.09
+        "view_share_percentage": 6.12
     },
     {
         "rank": 9,
         "game_name": "CODMW4",
-        "total_views": 2119,
+        "total_views": 2127,
         "uploaded_videos": 8,
-        "avg_views_per_video": 264,
-        "view_share_percentage": 3.95
+        "avg_views_per_video": 265,
+        "view_share_percentage": 3.99
     },
     {
         "rank": 10,
         "game_name": "Wolverine",
         "total_views": 1574,
-        "uploaded_videos": 18,
-        "avg_views_per_video": 87,
-        "view_share_percentage": 2.94
+        "uploaded_videos": 19,
+        "avg_views_per_video": 82,
+        "view_share_percentage": 2.95
     },
     {
         "rank": 11,
@@ -85,7 +85,7 @@
         "total_views": 918,
         "uploaded_videos": 19,
         "avg_views_per_video": 48,
-        "view_share_percentage": 1.71
+        "view_share_percentage": 1.72
     },
     {
         "rank": 12,
@@ -93,6 +93,6 @@
         "total_views": 557,
         "uploaded_videos": 25,
         "avg_views_per_video": 22,
-        "view_share_percentage": 1.04
+        "view_share_percentage": 1.05
     }
 ]
