@@ -1,1 +1,1 @@
-{"clip_duration": 31, "reason": "Intense continuous combat action on helicarrier deck", "start_time": 0, "status": "APPROVE", "title": "Spider Man Wrecks 5 Enemies 🔥🕷️"}
+{"clip_duration": 31, "reason": "Spider-Man combat vs enemies with electric powers", "start_time": 0, "status": "APPROVE", "title": "Spider Man Cooked 4 Enemies Solo ⚡🔥"}
