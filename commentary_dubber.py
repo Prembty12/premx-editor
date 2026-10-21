@@ -704,8 +704,8 @@ Return ONLY valid JSON:
     full_b64 = encode_image(analysis_grid_path)
     
     models_to_try = [
-        "nvidia/nemotron-3.5-super-vl:free",
         "openrouter/free",
+        "nvidia/nemotron-3.5-super-vl:free",
         "dots-studio/dots-3-note-preview:free"
     ] + get_free_vision_models(limit=3)
     
