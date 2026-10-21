@@ -1,1 +1,2 @@
 CODMW41 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW41.mp4 | REJECT (OpenRouter): No gameplay action, only cinematic talking.
+CODMW411 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW411.mp4 | REJECT (OpenRouter): Only museum navigation and walking without combat or action
