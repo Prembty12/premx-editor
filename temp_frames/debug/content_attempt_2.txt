@@ -1,1 +1,0 @@
-{"status": "APPROVE", "title": "4 Giant Mechs Destroyed 🤖🔥", "start_time": 0, "clip_duration": 42, "reason": "Full mech combat sequence covered"}
