@@ -1,31 +1,31 @@
 {
-  "last_updated": "2026-10-21 01:54:43 PM",
+  "last_updated": "2026-10-21 02:26:48 PM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 2176,
-      "avg_per_video": 435,
+      "views_7d": 2183,
+      "avg_per_video": 436,
       "trend": "viral",
-      "ratio": 2.094222833562586,
+      "ratio": 2.1691542288557213,
       "fb_link": "https://www.facebook.com/reel/28435963296104261/",
       "source_link": ""
     },
     {
       "game": "MarvelsSpiderMan2",
-      "views_7d": 2711,
-      "avg_per_video": 387,
+      "views_7d": 2717,
+      "avg_per_video": 339,
       "trend": "trending",
-      "ratio": 1.8631361760660248,
+      "ratio": 1.6865671641791045,
       "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan239.mp4"
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan216.mp4"
     },
     {
       "game": "Russian_secret_missions",
       "views_7d": 1339,
       "avg_per_video": 334,
       "trend": "trending",
-      "ratio": 1.607977991746905,
+      "ratio": 1.6616915422885572,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions15.mp4"
     }
@@ -36,7 +36,7 @@
       "views_7d": 427,
       "avg_per_video": 142,
       "trend": "slow",
-      "ratio": 0.6836313617606602,
+      "ratio": 0.7064676616915423,
       "fb_link": "",
       "source_link": ""
     },
@@ -45,7 +45,7 @@
       "views_7d": 583,
       "avg_per_video": 83,
       "trend": "below_avg",
-      "ratio": 0.3995873452544704,
+      "ratio": 0.4129353233830846,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine7.mp4"
     },
@@ -54,7 +54,7 @@
       "views_7d": 70,
       "avg_per_video": 70,
       "trend": "below_avg",
-      "ratio": 0.33700137551581844,
+      "ratio": 0.3482587064676617,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play21.mp4"
     },
@@ -63,17 +63,17 @@
       "views_7d": 10,
       "avg_per_video": 3,
       "trend": "below_avg",
-      "ratio": 0.014442916093535076,
+      "ratio": 0.014925373134328358,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu13.mp4"
     }
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 2176,
-    "avg_per_video": 435,
+    "views_7d": 2183,
+    "avg_per_video": 436,
     "trend": "viral",
-    "ratio": 2.094222833562586,
+    "ratio": 2.1691542288557213,
     "fb_link": "https://www.facebook.com/reel/28435963296104261/",
     "source_link": ""
   }
