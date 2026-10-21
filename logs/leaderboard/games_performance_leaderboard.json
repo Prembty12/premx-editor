@@ -5,23 +5,23 @@
         "total_views": 11474,
         "uploaded_videos": 16,
         "avg_views_per_video": 717,
-        "view_share_percentage": 20.58
+        "view_share_percentage": 21.41
     },
     {
         "rank": 2,
-        "game_name": "Callofdutyaw",
-        "total_views": 8531,
-        "uploaded_videos": 17,
-        "avg_views_per_video": 501,
-        "view_share_percentage": 15.3
+        "game_name": "Russian_secret_missions",
+        "total_views": 6525,
+        "uploaded_videos": 26,
+        "avg_views_per_video": 250,
+        "view_share_percentage": 12.18
     },
     {
         "rank": 3,
-        "game_name": "Russian_secret_missions",
-        "total_views": 6525,
-        "uploaded_videos": 25,
-        "avg_views_per_video": 261,
-        "view_share_percentage": 11.7
+        "game_name": "Callofdutyaw",
+        "total_views": 6355,
+        "uploaded_videos": 17,
+        "avg_views_per_video": 373,
+        "view_share_percentage": 11.86
     },
     {
         "rank": 4,
@@ -29,15 +29,15 @@
         "total_views": 5599,
         "uploaded_videos": 14,
         "avg_views_per_video": 399,
-        "view_share_percentage": 10.04
+        "view_share_percentage": 10.45
     },
     {
         "rank": 5,
         "game_name": "MarvelsSpiderMan2",
-        "total_views": 5350,
+        "total_views": 5351,
         "uploaded_videos": 26,
         "avg_views_per_video": 205,
-        "view_share_percentage": 9.6
+        "view_share_percentage": 9.99
     },
     {
         "rank": 6,
@@ -45,7 +45,7 @@
         "total_views": 5291,
         "uploaded_videos": 11,
         "avg_views_per_video": 481,
-        "view_share_percentage": 9.49
+        "view_share_percentage": 9.87
     },
     {
         "rank": 7,
@@ -53,7 +53,7 @@
         "total_views": 4560,
         "uploaded_videos": 10,
         "avg_views_per_video": 456,
-        "view_share_percentage": 8.18
+        "view_share_percentage": 8.51
     },
     {
         "rank": 8,
@@ -61,15 +61,15 @@
         "total_views": 3263,
         "uploaded_videos": 12,
         "avg_views_per_video": 271,
-        "view_share_percentage": 5.85
+        "view_share_percentage": 6.09
     },
     {
         "rank": 9,
         "game_name": "CODMW4",
-        "total_views": 2115,
+        "total_views": 2119,
         "uploaded_videos": 8,
         "avg_views_per_video": 264,
-        "view_share_percentage": 3.79
+        "view_share_percentage": 3.95
     },
     {
         "rank": 10,
@@ -77,7 +77,7 @@
         "total_views": 1574,
         "uploaded_videos": 18,
         "avg_views_per_video": 87,
-        "view_share_percentage": 2.82
+        "view_share_percentage": 2.94
     },
     {
         "rank": 11,
@@ -85,7 +85,7 @@
         "total_views": 918,
         "uploaded_videos": 19,
         "avg_views_per_video": 48,
-        "view_share_percentage": 1.65
+        "view_share_percentage": 1.71
     },
     {
         "rank": 12,
@@ -93,6 +93,6 @@
         "total_views": 557,
         "uploaded_videos": 25,
         "avg_views_per_video": 22,
-        "view_share_percentage": 1.0
+        "view_share_percentage": 1.04
     }
 ]

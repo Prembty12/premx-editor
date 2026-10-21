@@ -1,6 +1,6 @@
 # 🚀 GAMING AGENT COMMAND & ANALYTICS DASHBOARD
 
-> **Last Updated:** 2026-10-21 08:40:09 AM IST | **Status:** All Systems Active & Synchronized
+> **Last Updated:** 2026-10-21 08:52:39 AM IST | **Status:** All Systems Active & Synchronized
 
 --- 
 
@@ -9,14 +9,14 @@
 | Rank | Game Name | Total Videos | Total Views | Avg Views / Video | Performance Tier |
 | :---: | :--- | :---: | :---: | :---: | :---: |
 | 🥇 | **VietnamCavePrison** | 16 | 11,474 | 717 | 📈 Stable |
-| 🥈 | **Callofdutyaw** | 17 | 8,531 | 501 | 📈 Stable |
-| 🥉 | **Russian_secret_missions** | 25 | 6,525 | 261 | 📈 Stable |
+| 🥈 | **Russian_secret_missions** | 26 | 6,525 | 250 | 📈 Stable |
+| 🥉 | **Callofdutyaw** | 17 | 6,355 | 373 | 📈 Stable |
 | 4️⃣ | **mm2remastered** | 14 | 5,599 | 399 | 📈 Stable |
-| 5️⃣ | **MarvelsSpiderMan2** | 26 | 5,350 | 205 | 📈 Stable |
+| 5️⃣ | **MarvelsSpiderMan2** | 26 | 5,351 | 205 | 📈 Stable |
 | 6 | **codBlackops6** | 11 | 5,291 | 481 | 📈 Stable |
 | 7 | **GearsOfWar** | 10 | 4,560 | 456 | 📈 Stable |
 | 8 | **CallOfDutyMW2** | 12 | 3,263 | 271 | 📈 Stable |
-| 9 | **CODMW4** | 8 | 2,115 | 264 | 📈 Stable |
+| 9 | **CODMW4** | 8 | 2,119 | 264 | 📈 Stable |
 | 10 | **Wolverine** | 18 | 1,574 | 87 | 📈 Stable |
 | 11 | **sifu** | 19 | 918 | 48 | 📈 Stable |
 | 12 | **ghostandela** | 25 | 557 | 22 | 📈 Stable |
@@ -29,14 +29,14 @@
 
 | Game Name | 📅 Last Posted | 📺 Latest Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📊 Remaining / Total | 📂 Source | 📜 All |
 |---|---|---|---|---|---|---|---|---|---|
-| **CODMW4** | 2026-10-21 02:19 AM | He Entered Room 4 Enemies Alive 🔥🎯  #videogames #gamingcommunity #gaming #codmw4 | [🔵 FB](https://www.facebook.com/reel/28435963296104261/) | 127 | [🟣 IG](https://www.instagram.com/reel/DeuuAowismg/) | 0 | **15** / 23 | _N/A_ | **[📜 View 23](logs/games/CODMW4.md)** |
+| **MarvelsSpiderMan2** | 2026-10-21 08:48 AM | He Survived 1 Falling Container Crash 💥🔥  #videogames #gamingcommunity #gaming # | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DevbH09kvSq/) | 0 | **17** / 43 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan239.mp4) | **[📜 View 43](logs/games/MarvelsSpiderMan2.md)** |
+| **CODMW4** | 2026-10-21 02:19 AM | He Entered Room 4 Enemies Alive 🔥🎯  #videogames #gamingcommunity #gaming #codmw4 | [🔵 FB](https://www.facebook.com/reel/28435963296104261/) | 130 | [🟣 IG](https://www.instagram.com/reel/DeuuAowismg/) | 0 | **15** / 23 | _N/A_ | **[📜 View 23](logs/games/CODMW4.md)** |
 | **Wolverine** | 2026-10-20 10:42 PM | 4 Giant Mechs Destroyed 🤖🔥  #videogames #gamingcommunity #gaming #wolverine #gam | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeuVyCcEbks/) | 0 | **17** / 35 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine7.mp4) | **[📜 View 35](logs/games/Wolverine.md)** |
-| **MarvelsSpiderMan2** | 2026-10-20 10:13 PM | Spider Man vs Enemies On Burning Ship 🕷️🔥  #videogames #gamingcommunity #gaming  | [🔵 FB](https://www.facebook.com/reel/1421164929520538/) | 1,512 | [🟣 IG](https://www.instagram.com/reel/DeuRdi6AGJR/) | 10 | **16** / 42 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan230.mp4) | **[📜 View 42](logs/games/MarvelsSpiderMan2.md)** |
-| **Russian_secret_missions** | 2026-10-20 02:23 PM | One Secret Meeting Unites The Army 🔥🤝  #videogames #gamingcommunity #gaming #rus | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DetcpbnAJZT/) | 20 | **5** / 30 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions38.mp4) | **[📜 View 30](logs/games/Russian_secret_missions.md)** |
+| **Russian_secret_missions** | 2026-10-20 02:23 PM | One Secret Meeting Unites The Army 🔥🤝  #videogames #gamingcommunity #gaming #rus | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DetcpbnAJZT/) | 20 | **4** / 30 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions38.mp4) | **[📜 View 30](logs/games/Russian_secret_missions.md)** |
 | **ghostandela** | 2026-10-20 12:17 PM | 5 Soldiers vs 1 Girl Standoff 🔥😱  #videogames #gamingcommunity #gaming #ghostand | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DetOP5RlXwY/) | 0 | **9** / 34 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela13.mp4) | **[📜 View 34](logs/games/ghostandela.md)** |
 | **sifu** | 2026-10-19 03:57 PM | Brutal Kitchen Brawl 1 vs 5 Smashed 🔥🎯  #videogames #gamingcommunity #gaming #si | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DerCpG3DeWc/) | 0 | **9** / 28 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu13.mp4) | **[📜 View 28](logs/games/sifu.md)** |
 | **CallOfDutyMW2** | 2026-10-18 07:14 PM | 3 Enemies Last Bullet Rooftop Wrecked 🔥🎯  #videogames #gamingcommunity #gaming # | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Deo0Y_ZCvOk/) | 70 | ✅ 11 / 11 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play21.mp4) | **[📜 View 11](logs/games/CallOfDutyMW2.md)** |
-| **Callofdutyaw** | 2026-10-12 10:01 AM | Survived The Massive Firestorm 🔥😱  #videogames #gamingcommunity #gaming #callofd | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeYYZyClYL0/) | 10 | **21** / 38 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison37.mp4) | **[📜 View 38](logs/games/Callofdutyaw.md)** |
+| **Callofdutyaw** | 2026-10-12 10:01 AM | Survived The Massive Firestorm 🔥😱  #videogames #gamingcommunity #gaming #callofd | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeYYZyClYL0/) | 10 | **20** / 37 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison37.mp4) | **[📜 View 37](logs/games/Callofdutyaw.md)** |
 | **VietnamCavePrison** | 2026-10-11 03:28 PM | Helicopter River Strike 4 Targets Hit 🔥🎯  #videogames #gamingcommunity #gaming # | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeWZA7qDJ27/) | 270 | **18** / 34 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison11.mp4) | **[📜 View 34](logs/games/VietnamCavePrison.md)** |
 | **GearsOfWar** | 2026-10-11 12:56 PM | 5 Soldiers Walked In 👀💥  #videogames #gamingcommunity #gaming #gearsofwar #gamin | [🔵 FB](https://www.facebook.com/reel/1709982550461141/) | 114 | [🟣 IG](https://www.instagram.com/reel/DeWFWfCkhcM/) | 10 | **4** / 14 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar9.mp4) | **[📜 View 14](logs/games/GearsOfWar.md)** |
 | **mm2remastered** | 2026-10-10 11:54 PM | 4 Soldiers Breached The Dark Room 🎯🔥  #videogames #gamingcommunity #gaming #mm2r | [🔵 FB](https://www.facebook.com/reel/4395441457385128/) | 658 | [🟣 IG](https://www.instagram.com/reel/DeUlSdaCIIp/) | 250 | **6** / 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_19.mp4) | **[📜 View 20](logs/games/mm2remastered.md)** |
@@ -46,12 +46,12 @@
 
 ## 📈 Trending Games (Last 7 Days)
 
-> Auto-detected based on views performance | Last Updated: 2026-10-21 08:40:09 AM
+> Auto-detected based on views performance | Last Updated: 2026-10-21 08:52:39 AM
 
 | Rank | Game Name | Views (7d) | Avg / Video | Trend | FB Post | Source |
 |:---:|---|---|---|---|---|---|
-| 🥇 | **MarvelsSpiderMan2** | 2,676 | 446 | 🚀 **VIRAL** | [🔵](https://www.facebook.com/reel/1421164929520538/) | _N/A_ |
-| 🥈 | **CODMW4** | 2,115 | 423 | 🔥 Trending | [🔵](https://www.facebook.com/reel/28435963296104261/) | _N/A_ |
+| 🥇 | **CODMW4** | 2,119 | 423 | 🚀 **VIRAL** | [🔵](https://www.facebook.com/reel/28435963296104261/) | _N/A_ |
+| 🥈 | **MarvelsSpiderMan2** | 2,677 | 382 | 🔥 Trending | _N/A_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan239.mp4) |
 | 🥉 | **Russian_secret_missions** | 1,359 | 339 | 🔥 Trending | _N/A_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions38.mp4) |
 
 ### 📉 Below Average This Week
@@ -65,13 +65,13 @@
 
 ### 💡 Recommendation
 
-**Best game to post next:** 🚀 **MarvelsSpiderMan2** (Avg 446 views/video)
+**Best game to post next:** 🚀 **CODMW4** (Avg 423 views/video)
 
 --- 
 
 ## 🎯 Best Time to Post (IST)
 
-> Analysis from 268 posts | Last Updated: 2026-10-21 08:40:09 AM
+> Analysis from 269 posts | Last Updated: 2026-10-21 08:52:39 AM
 
 | Rank | Time (IST) | Posts | Avg Views | Recommendation |
 |:---:|---|:---:|:---:|---|
@@ -91,7 +91,7 @@
 |---|---|---|
 | Monday | 40 | 440 |
 | Tuesday | 61 | 289 |
-| Wednesday | 43 | 330 |
+| Wednesday | 44 | 357 |
 | Thursday | 28 | 294 |
 | Friday | 19 | 316 |
 | Saturday | 31 | 347 |
@@ -101,7 +101,7 @@
 
 ## 🤖 Auto-Reply Log (v6 Timeout-Safe)
 
-> Auto-Comment Status: ✅ **ACTIVE** | Last Updated: 2026-10-21 08:40:09 AM | Total Replies: 28 | Skipped: 0
+> Auto-Comment Status: ✅ **ACTIVE** | Last Updated: 2026-10-21 08:52:39 AM | Total Replies: 28 | Skipped: 0
 
 ### 📊 Stats
 
@@ -143,14 +143,14 @@
 
 > Click any game below to view its complete video list with all FB/IG links:
 
+- **🎮 MarvelsSpiderMan2** — [📜 View All 43 Videos](logs/games/MarvelsSpiderMan2.md)
 - **🎮 CODMW4** — [📜 View All 23 Videos](logs/games/CODMW4.md)
 - **🎮 Wolverine** — [📜 View All 35 Videos](logs/games/Wolverine.md)
-- **🎮 MarvelsSpiderMan2** — [📜 View All 42 Videos](logs/games/MarvelsSpiderMan2.md)
 - **🎮 Russian_secret_missions** — [📜 View All 30 Videos](logs/games/Russian_secret_missions.md)
 - **🎮 ghostandela** — [📜 View All 34 Videos](logs/games/ghostandela.md)
 - **🎮 sifu** — [📜 View All 28 Videos](logs/games/sifu.md)
 - **🎮 CallOfDutyMW2** — [📜 View All 11 Videos](logs/games/CallOfDutyMW2.md)
-- **🎮 Callofdutyaw** — [📜 View All 38 Videos](logs/games/Callofdutyaw.md)
+- **🎮 Callofdutyaw** — [📜 View All 37 Videos](logs/games/Callofdutyaw.md)
 - **🎮 VietnamCavePrison** — [📜 View All 34 Videos](logs/games/VietnamCavePrison.md)
 - **🎮 GearsOfWar** — [📜 View All 14 Videos](logs/games/GearsOfWar.md)
 - **🎮 mm2remastered** — [📜 View All 20 Videos](logs/games/mm2remastered.md)
@@ -160,31 +160,31 @@
 
 ## 🔄 Game Rotation Queue
 
-**📊 Total Games:** 12 | **🎯 Current:** `MarvelsSpiderMan2` | **⏭️ Next Game:** `Russian_secret_missions` (Position #6) | **🔢 Total Runs:** 262
+**📊 Total Games:** 12 | **🎯 Current:** `Russian_secret_missions` | **⏭️ Next Game:** `VietnamCavePrison` (Position #7) | **🔢 Total Runs:** 263
 
-**Last Updated:** 2026-10-21 08:40:09 AM IST
+**Last Updated:** 2026-10-21 08:52:39 AM IST
 
 | # | Game Name | Uploaded | Last Run # | Next Turn In | Status |
 |:---:|---|:---:|:---:|:---:|:---:|
-| 1 | **CODMW4** | 8 | 261 | 8 | ⏳ Wait 8 |
-| 2 | **CallOfDutyMW2** | 12 | 225 | 9 | ⏳ Wait 9 |
-| 3 | **Callofdutyaw** | 17 | 212 | 10 | ⏳ Wait 10 |
-| 4 | **GearsOfWar** | 10 | 196 | 11 | ⏳ Wait 11 |
-| 5 | **MarvelsSpiderMan2** | 26 | 262 | 0 | 🎯 **CURRENT** |
-| 6 | **Russian_secret_missions** | 25 | 258 | 1 | ⏭️ **NEXT UP** |
-| 7 | **VietnamCavePrison** | 16 | 207 | 2 | ⏳ Wait 2 |
-| 8 | **Wolverine** | 18 | 259 | 3 | ⏳ Wait 3 |
-| 9 | **codBlackops6** | 11 | 156 | 4 | ⏳ Wait 4 |
-| 10 | **ghostandela** | 25 | 260 | 5 | ⏳ Wait 5 |
-| 11 | **mm2remastered** | 14 | 192 | 6 | ⏳ Wait 6 |
-| 12 | **sifu** | 19 | 230 | 7 | ⏳ Wait 7 |
+| 1 | **CODMW4** | 8 | 261 | 7 | ⏳ Wait 7 |
+| 2 | **CallOfDutyMW2** | 12 | 225 | 8 | ⏳ Wait 8 |
+| 3 | **Callofdutyaw** | 17 | 212 | 9 | ⏳ Wait 9 |
+| 4 | **GearsOfWar** | 10 | 196 | 10 | ⏳ Wait 10 |
+| 5 | **MarvelsSpiderMan2** | 26 | 262 | 11 | ⏳ Wait 11 |
+| 6 | **Russian_secret_missions** | 26 | 263 | 0 | 🎯 **CURRENT** |
+| 7 | **VietnamCavePrison** | 16 | 207 | 1 | ⏭️ **NEXT UP** |
+| 8 | **Wolverine** | 18 | 259 | 2 | ⏳ Wait 2 |
+| 9 | **codBlackops6** | 11 | 156 | 3 | ⏳ Wait 3 |
+| 10 | **ghostandela** | 25 | 260 | 4 | ⏳ Wait 4 |
+| 11 | **mm2remastered** | 14 | 192 | 5 | ⏳ Wait 5 |
+| 12 | **sifu** | 19 | 230 | 6 | ⏳ Wait 6 |
 
 ### 📜 Recent Runs (Last 5)
 
 | Run # | Game | Timestamp (IST) |
 |:---:|---|---|
+| 263 | Russian_secret_missions | 2026-10-21 08:52:39 AM |
 | 262 | MarvelsSpiderMan2 | 2026-10-21 08:40:09 AM |
 | 261 | CODMW4 | 2026-10-21 02:04:04 AM |
 | 260 | ghostandela | 2026-10-21 02:00:17 AM |
 | 259 | Wolverine | 2026-10-21 01:26:21 AM |
-| 258 | Russian_secret_missions | 2026-10-21 01:23:35 AM |
