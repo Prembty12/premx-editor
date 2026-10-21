@@ -13,3 +13,4 @@ ghostandela37 | Link: https://github.com/Prembty12/premx-editor/releases/downloa
 ghostandela49 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela49.mp4 | REJECT (OpenRouter): Only cinematic walking and talking, no gameplay action.
 ghostandela27 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela27.mp4 | REJECT (OpenRouter): Ambient fire but only idle soldier walking and talking
 ghostandela2 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela2.mp4 | REJECT (OpenRouter): Black screen with no gameplay visible
+ghostandela22 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela22.mp4 | REJECT (OpenRouter): Only static prison dialogue, no action.
