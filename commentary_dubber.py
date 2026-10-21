@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v9.0 (No Image Compression + Strict Timing Lock)
+🎙️ AI Commentary Dubber — v9.0 (No Image Compression + Strict Timing Lock + JSON Schema + Response Healing)
 ===============================================================
 """
 
@@ -563,8 +563,7 @@ You shout, laugh, hype, roast. Pure energy. Zero boring lines.
 
 **YOU ARE GETTING 1 IMAGE — ANALYSIS GRID:**
 - Each cell shows: "SLOT X: A.A-B.Bs" (yellow) + "frame@T.TTs" (cyan)
-- ⚠️ USE THE SLOT TIME (yellow label) — NOT the frame time
-- Match frames to slots by SLOT number
+- ⚠️ USE THE SLOT TIME (yellow label) — NOT the frame time- Match frames to slots by SLOT number
 
 **YOUR JOB:**
 Look at the frames. React LOUDLY like a real streamer watching live gameplay.
@@ -676,79 +675,45 @@ If you see ANY of these → visual_type = "action":
 {chr(10).join(slot_lines)}
 
 **BANNED:** "insane play", "here we go", "game on"
-
-**CRITICAL JSON RULES:**
-- NO markdown formatting (Do NOT use ```json ... ```)
-- NO extra text before or after the JSON
-- NO escaped quotes (use standard double quotes)
-- NO null values (use empty string "" instead)
-- NO empty values (every field must have content)
-- ONLY return the JSON object
-
-Return ONLY valid JSON:
-{{
-  "story_summary": "Brief one-line summary.",
-  "segments": [
-    {{
-      "slot": 1,
-      "start": 0.0,
-      "end": 3.5,
-      "text": "...",
-      "visual_type": "calm"
-    }}
-  ]
-}}
 """
 
     full_b64 = encode_image(analysis_grid_path)
-
-    # ---------- Single API call helper ----------
-    def _try_call(model_id, or_key):
-        """Returns (segments_or_None, actual_model, error_type_or_None)."""
-        payload = {
-            "model": model_id,
-            "messages": [{"role": "user", "content": [
-                {"type": "text", "text": prompt},
-                {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{full_b64}", "detail": "high"}}
-            ]}],
-            "max_tokens": 4000,
-            "temperature": 0.9,
-            "response_format": {"type": "json_object"}
-        }
-        headers = {"Authorization": f"Bearer {or_key}", "Content-Type": "application/json"}
-        try:
-            r = requests.post("https://openrouter.ai/api/v1/chat/completions",
-                              headers=headers, json=payload, timeout=240)
-            if r.status_code == 200:
-                ai = r.json()
-                actual_model = ai.get('model', model_id)
-                content = ai.get('choices', [{}])[0].get('message', {}).get('content')
-                raw = str(content).strip() if content else ""
-                if not raw:
-                    return None, actual_model, "empty"
-                parsed = extract_json_from_response(raw)
-                if parsed and isinstance(parsed.get("segments"), list) and len(parsed["segments"]) > 0:
-                    return parsed["segments"], actual_model, None
-                return None, actual_model, "json"
-            elif r.status_code == 404:
-                return None, model_id, "not_found"
-            elif r.status_code in (401, 402, 403):
-                return None, model_id, "auth"
-            elif r.status_code == 429:
-                return None, model_id, "rate"
-            else:
-                return None, model_id, f"http_{r.status_code}"
-        except Exception:
-            return None, model_id, "exception"
-
+    
     segments, winning_model, winning_route = None, None, None
 
     # =====================================================
-    # MODEL 1 — nvidia/nemotron : SIRF 2 ATTEMPTS TOTAL
-    #   • 2+ keys  → 2 different keys, 1 try each
-    #   • 1 key    → same key 2 tries
+    # JSON SCHEMA DEFINITION (STRICT STRUCTURED OUTPUTS)
     # =====================================================
-    print("🤖 [MODEL TRY 1] nvidia/nemotron-3.5-super-vl:free (max 2 attempts total)")
+    schema = {
+        "type": "object",
+        "properties": {
+            "story_summary": {
+                "type": "string",
+                "description": "Brief one-line summary of the video."
+            },
+            "segments": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "slot": {"type": "integer", "description": "Slot number"},
+                        "start": {"type": "number", "description": "Start time in seconds"},
+                        "end": {"type": "number", "description": "End time in seconds"},
+                        "text": {"type": "string", "description": "The commentary text"},
+                        "visual_type": {"type": "string", "enum": ["action", "dialog", "calm"], "description": "Visual classification of the slot"}
+                    },
+                    "required": ["slot", "start", "end", "text", "visual_type"]
+                }
+            }
+        },
+        "required": ["story_summary", "segments"]
+    }
+
+    # =====================================================
+    # MODEL 1 — nvidia/nemotron-3.5-super-vl:free
+    # SIRF 2 ATTEMPTS TOTAL
+    # =====================================================
+    print(f"🤖 [MODEL TRY 1] nvidia/nemotron-3.5-super-vl:free (max 2 attempts total)")
     if len(OPENROUTER_KEYS) >= 2:
         first_attempts = [OPENROUTER_KEYS[0], OPENROUTER_KEYS[1]]
     elif len(OPENROUTER_KEYS) == 1:
@@ -759,54 +724,209 @@ Return ONLY valid JSON:
     for attempt_num, or_key in enumerate(first_attempts, start=1):
         if segments: break
         print(f"   🔑 Attempt {attempt_num}/{len(first_attempts)}...", end=" ")
-        segs, actual, err = _try_call("nvidia/nemotron-3.5-super-vl:free", or_key)
-        if segs:
-            segments, winning_model, winning_route = segs, "nvidia/nemotron-3.5-super-vl:free", actual
-            print(f"✅ SUCCESS! (Actual: {actual})")
-            if len(segments) != len(slots):
-                print(f"   ⚠️ WARNING: AI ne {len(segments)}/{len(slots)} segments diye hain.")
-            break
-        elif err == "not_found":
-            print("❌ Model Not Found — skipping model")
-            break
-        else:
-            print(f"⚠️ {err} → next attempt")
-    print()
+        
+        payload = {
+            "model": "nvidia/nemotron-3.5-super-vl:free",
+            "messages": [{"role": "user", "content": [
+                {"type": "text", "text": prompt},
+                {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{full_b64}", "detail": "high"}}
+            ]}],
+            "max_tokens": 4000,
+            "temperature": 0.9,
+            "response_format": {
+                "type": "json_schema",
+                "json_schema": {
+                    "name": "CommentaryScript",
+                    "strict": True,
+                    "schema": schema
+                }
+            },
+            "plugins": [{"id": "response-healing"}]
+        }
+        headers = {"Authorization": f"Bearer {or_key}", "Content-Type": "application/json"}
 
-    # =====================================================
-    # MODEL 2 — openrouter/free : HAR KEY 2 TRY
-    #   • JSON / empty error → SAME key retry (2nd try)
-    #   • 401/402/403/429 etc. → next key (no retry)
-    #   • Max total = len(OPENROUTER_KEYS) × 2  (5 keys → 10 bar)
-    # =====================================================
-    if not segments:
-        print(f"🤖 [MODEL TRY 2] openrouter/free (each key up to 2 tries on JSON error → max {len(OPENROUTER_KEYS)*2} attempts)")
-        stop_model2 = False
-        for key_idx, or_key in enumerate(OPENROUTER_KEYS, start=1):
-            if segments or stop_model2: break
-            for retry in range(2):
-                if segments or stop_model2: break
-                print(f"   🔑 Key {key_idx}/{len(OPENROUTER_KEYS)} — try {retry+1}/2...", end=" ")
-                segs, actual, err = _try_call("openrouter/free", or_key)
-                if segs:
-                    segments, winning_model, winning_route = segs, "openrouter/free", actual
-                    print(f"✅ SUCCESS! (Actual: {actual})")
+        try:
+            r = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload, timeout=240)
+            if r.status_code == 200:
+                ai = r.json()
+                actual_model = ai.get('model', "nvidia/nemotron-3.5-super-vl:free")
+                content = ai.get('choices', [{}])[0].get('message', {}).get('content')
+                raw = str(content).strip() if content else ""
+                
+                if not raw:
+                    print("⚠️ Empty Response → next attempt")
+                    continue 
+                    
+                parsed = extract_json_from_response(raw)
+                if parsed and isinstance(parsed.get("segments"), list) and len(parsed["segments"]) > 0:
+                    segments = parsed["segments"]
+                    winning_model = "nvidia/nemotron-3.5-super-vl:free"
+                    winning_route = actual_model
+                    print(f"✅ SUCCESS! (Actual: {actual_model})")
                     if len(segments) != len(slots):
                         print(f"   ⚠️ WARNING: AI ne {len(segments)}/{len(slots)} segments diye hain.")
                     break
-                elif err == "not_found":
-                    print("❌ Model Not Found — skipping model")
-                    stop_model2 = True
-                    break
-                elif err in ("json", "empty"):
-                    if retry == 0:
-                        print(f"⚠️ {err} → retry same key")
-                        continue
-                    else:
-                        print(f"⚠️ {err} → next key")
-                        break
                 else:
-                    print(f"⚠️ {err} → next key")
+                    print(f"⚠️ JSON Error → next attempt")
+                    continue
+            elif r.status_code in (401, 402, 403): print("❌ Dead/No Credits → next attempt")
+            elif r.status_code == 429: print("⚠️ Rate Limit → next attempt")
+            elif r.status_code == 404: 
+                print("❌ Model Not Found — skipping model")
+                break
+            else: print(f"⚠️ Err {r.status_code} → next attempt")
+        except Exception as e: 
+            print(f"⚠️ Exc: {str(e)[:20]} → next attempt")
+    print()
+
+    # =====================================================
+    # MODEL 2 — nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free
+    # ISKO BHI 2 ATTEMPTS RAKHE HAI
+    # =====================================================
+    if not segments:
+        print(f"🤖 [MODEL TRY 2] nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free (max 2 attempts total)")
+        for attempt_num, or_key in enumerate(first_attempts, start=1):
+            if segments: break
+            print(f"   🔑 Attempt {attempt_num}/{len(first_attempts)}...", end=" ")
+            
+            payload = {
+                "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+                "messages": [{"role": "user", "content": [
+                    {"type": "text", "text": prompt},
+                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{full_b64}", "detail": "high"}}
+                ]}],
+                "max_tokens": 4000,
+                "temperature": 0.9,
+                "response_format": {
+                    "type": "json_schema",
+                    "json_schema": {
+                        "name": "CommentaryScript",
+                        "strict": True,
+                        "schema": schema
+                    }
+                },
+                "plugins": [{"id": "response-healing"}]
+            }
+            headers = {"Authorization": f"Bearer {or_key}", "Content-Type": "application/json"}
+
+            try:
+                r = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload, timeout=240)
+                if r.status_code == 200:
+                    ai = r.json()
+                    actual_model = ai.get('model', "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free")
+                    content = ai.get('choices', [{}])[0].get('message', {}).get('content')
+                    raw = str(content).strip() if content else ""
+                    
+                    if not raw:
+                        print("⚠️ Empty Response → next attempt")
+                        continue 
+                        
+                    parsed = extract_json_from_response(raw)
+                    if parsed and isinstance(parsed.get("segments"), list) and len(parsed["segments"]) > 0:
+                        segments = parsed["segments"]
+                        winning_model = "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free"
+                        winning_route = actual_model
+                        print(f"✅ SUCCESS! (Actual: {actual_model})")
+                        if len(segments) != len(slots):
+                            print(f"   ⚠️ WARNING: AI ne {len(segments)}/{len(slots)} segments diye hain.")
+                        break
+                    else:
+                        print(f"⚠️ JSON Error → next attempt")
+                        continue
+                elif r.status_code in (401, 402, 403): print("❌ Dead/No Credits → next attempt")
+                elif r.status_code == 429: print("⚠️ Rate Limit → next attempt")
+                elif r.status_code == 404: 
+                    print("❌ Model Not Found — skipping model")
+                    break
+                else: print(f"⚠️ Err {r.status_code} → next attempt")
+            except Exception as e: 
+                print(f"⚠️ Exc: {str(e)[:20]} → next attempt")
+        print()
+
+    # =====================================================
+    # MODEL 3 — openrouter/free : HAR KEY 2 TRY
+    # =====================================================
+    if not segments:
+        print(f"🤖 [MODEL TRY 3] openrouter/free (each key up to 2 tries on JSON error → max {len(OPENROUTER_KEYS)*2} attempts)")
+        stop_model3 = False
+        
+        for key_idx, or_key in enumerate(OPENROUTER_KEYS, start=1):
+            if segments or stop_model3: break
+            
+            for retry in range(2):
+                if segments or stop_model3: break
+                
+                print(f"   🔑 Key {key_idx}/{len(OPENROUTER_KEYS)} — try {retry+1}/2...", end=" ")
+                
+                payload = {
+                    "model": "openrouter/free",
+                    "messages": [{"role": "user", "content": [
+                        {"type": "text", "text": prompt},
+                        {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{full_b64}", "detail": "high"}}
+                    ]}],
+                    "max_tokens": 4000,
+                    "temperature": 0.9,
+                    "response_format": {
+                        "type": "json_schema",
+                        "json_schema": {
+                            "name": "CommentaryScript",
+                            "strict": True,
+                            "schema": schema
+                        }
+                    },
+                    "plugins": [{"id": "response-healing"}]
+                }
+                headers = {"Authorization": f"Bearer {or_key}", "Content-Type": "application/json"}
+
+                try:
+                    r = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload, timeout=240)
+                    
+                    if r.status_code == 200:
+                        ai = r.json()
+                        actual_model = ai.get('model', "openrouter/free")
+                        content = ai.get('choices', [{}])[0].get('message', {}).get('content')
+                        raw = str(content).strip() if content else ""
+                        
+                        if not raw:
+                            if retry == 0:
+                                print("⚠️ Empty → retry same key")
+                                continue
+                            else:
+                                print("⚠️ Empty → next key")
+                                break 
+                                
+                        parsed = extract_json_from_response(raw)
+                        if parsed and isinstance(parsed.get("segments"), list) and len(parsed["segments"]) > 0:
+                            segments = parsed["segments"]
+                            winning_model = "openrouter/free"
+                            winning_route = actual_model
+                            print(f"✅ SUCCESS! (Actual: {actual_model})")
+                            if len(segments) != len(slots):
+                                print(f"   ⚠️ WARNING: AI ne {len(segments)}/{len(slots)} segments diye hain.")
+                            break
+                        else:
+                            if retry == 0:
+                                print("⚠️ JSON Error → retry same key")
+                                continue
+                            else:
+                                print("⚠️ JSON Error → next key")
+                                break
+
+                    elif r.status_code in (401, 402, 403): 
+                        print("❌ Dead/No Credits → next key")
+                        break
+                    elif r.status_code == 429: 
+                        print("⚠️ Rate Limit → next key")
+                        break
+                    elif r.status_code == 404: 
+                        print("❌ Model Not Found — skipping model")
+                        stop_model3 = True
+                        break
+                    else: 
+                        print(f"⚠️ Err {r.status_code} → next key")
+                        break
+                except Exception as e: 
+                    print(f"⚠️ Exc: {str(e)[:20]} → next key")
                     break
         print()
 
