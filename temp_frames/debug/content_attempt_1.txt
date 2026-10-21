@@ -1,1 +1,1 @@
-{"clip_duration": 57, "reason": "Cinematic sci-fi soldier survival action sequence", "start_time": 0, "status": "APPROVE", "title": "Red Eye Soldier Survival 1 HP 🚀🔥"}
+{"clip_duration": 31, "reason": "Intense continuous combat action on helicarrier deck", "start_time": 0, "status": "APPROVE", "title": "Spider Man Wrecks 5 Enemies 🔥🕷️"}
