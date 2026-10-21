@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v9.4 (Nvidia 2 Retries + OpenRouter Fallback)
+🎙️ AI Commentary Dubber — v9.0 (No Image Compression + Strict Timing Lock)
 ===============================================================
 """
 
@@ -142,7 +142,7 @@ def encode_image(path):
 
 def get_duration(path):
     try:
-        cmd = f"ffprobe -nostdin -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 {path}"
+        cmd = f"ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 {path}"
         out = subprocess.check_output(cmd, shell=True).decode().strip()
         return float(out) if out else 10.0
     except: return 10.0
@@ -260,18 +260,18 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 def get_motion_score(video_path, start, end):
     try:
         duration = max(end - start, 0.5)
-        cmd = f'ffmpeg -nostdin -ss {start:.2f} -t {duration:.2f} -i {video_path} -vf "select=\'gt(scene,0.1)\',metadata=print" -f null -hide_banner -loglevel error - 2>&1'
+        cmd = f'ffmpeg -ss {start:.2f} -t {duration:.2f} -i {video_path} -vf "select=\'gt(scene,0.1)\',metadata=print" -f null -hide_banner -loglevel error - 2>&1'
         out = subprocess.run(cmd, shell=True, capture_output=True, text=True).stderr
         return len(re.findall(r"pts_time", out))
     except: return 0
 
 def get_scene_timeline(video_path):
-    cmd = f'ffmpeg -nostdin -i {video_path} -filter:v "select=\'gt(scene,0.3)\',showinfo" -f null -hide_banner -loglevel error - 2>&1'
+    cmd = f'ffmpeg -i {video_path} -filter:v "select=\'gt(scene,0.3)\',showinfo" -f null -hide_banner -loglevel error - 2>&1'
     out = subprocess.run(cmd, shell=True, capture_output=True, text=True).stderr
     return [float(m.group(1)) for m in re.finditer(r"pts_time:([\d.]+)", out)]
 
 def get_loudness_timeline(video_path):
-    cmd = f'ffmpeg -nostdin -i {video_path} -af "astats=metadata=1:reset=1,ametadata=print:key=lavfi.astats.Overall.RMS_level:file=-" -f null -hide_banner -loglevel error - 2>&1'
+    cmd = f'ffmpeg -i {video_path} -af "astats=metadata=1:reset=1,ametadata=print:key=lavfi.astats.Overall.RMS_level:file=-" -f null -hide_banner -loglevel error - 2>&1'
     out = subprocess.run(cmd, shell=True, capture_output=True, text=True).stdout
     timeline, t = [], 0.0
     for line in out.split("\n"):
@@ -309,7 +309,7 @@ def commit_analysis_to_github():
 # ============================================================
 def extract_audio(video_path, out_path):
     print("🎧 [1] Extracting audio...")
-    subprocess.run(f"ffmpeg -nostdin -y -i {video_path} -vn -acodec libmp3lame -q:a 4 {out_path} -hide_banner -loglevel error", shell=True, check=True)
+    subprocess.run(f"ffmpeg -y -i {video_path} -vn -acodec libmp3lame -q:a 4 {out_path} -hide_banner -loglevel error", shell=True, check=True)
     print("✅ Audio extracted\n")
 
 def transcribe(audio_path):
@@ -476,7 +476,7 @@ def classify_slots_combined(video_path, slots, srt_content):
     return slots
 
 # ============================================================
-# STEP 5 — 8K PORTRAIT ANALYSIS GRID (Hang Fix)
+# STEP 5 — 8K PORTRAIT ANALYSIS GRID
 # ============================================================
 def build_analysis_grid(video_path, vid_duration, slots, num_frames=ANALYSIS_FRAMES):
     print(f"🖼️ [5] Building 8K PORTRAIT grid — {num_frames} frames...")
@@ -501,7 +501,7 @@ def build_analysis_grid(video_path, vid_duration, slots, num_frames=ANALYSIS_FRA
     frame_paths = []
     for i, (t, slot_start, slot_end, slot_idx) in enumerate(frame_specs):
         fp = f"temp_analysis_{i:03d}.jpg"
-        subprocess.run(f"ffmpeg -nostdin -y -ss {t:.2f} -i {video_path} -vframes 1 -q:v 1 {fp} -hide_banner -loglevel error", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(f"ffmpeg -y -ss {t:.2f} -i {video_path} -vframes 1 -q:v 1 {fp} -hide_banner -loglevel error", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         if os.path.exists(fp): frame_paths.append((fp, t, slot_start, slot_end, slot_idx))
         if i > 0 and i % 20 == 0: print(f"   📸 Extracted {i}/{len(frame_specs)} frames...")
 
@@ -523,7 +523,7 @@ def build_analysis_grid(video_path, vid_duration, slots, num_frames=ANALYSIS_FRA
         draw.text((x + 14, y + 12), f"SLOT {slot_idx+1}: {slot_start:.1f}-{slot_end:.1f}s", fill="yellow", font=font)
         draw.text((x + 14, y + 58), f"frame@{t:.2f}s", fill="cyan", font=small_font)
 
-    grid.save(ANALYSIS_GRID_PATH, quality=92, optimize=False, subsampling=2)
+    grid.save(ANALYSIS_GRID_PATH, quality=92, optimize=True, subsampling=2)
     print(f"✅ 8K Full Quality: {grid.size[0]}x{grid.size[1]} ({os.path.getsize(ANALYSIS_GRID_PATH)/(1024*1024):.2f} MB)")
     print(f"💾 Saved: {ANALYSIS_GRID_PATH}")
     print(f"   📸 Frames captured : {len(frame_paths)}")
@@ -533,10 +533,23 @@ def build_analysis_grid(video_path, vid_duration, slots, num_frames=ANALYSIS_FRA
         if os.path.exists(fp): os.remove(fp)
 
 # ============================================================
-# STEP 6 — GENERATE SCRIPT (NVIDIA 2 RETRIES)
+# FREE MODELS HELPER
+# ============================================================
+def get_free_vision_models(limit=3):
+    KNOWN_FREE = ["meta-llama/llama-3.2-11b-vision-instruct:free", "google/gemini-flash-1.5-8b-exp:free", "qwen/qwen2.5-vl-72b-instruct:free"]
+    try:
+        r = requests.get("https://openrouter.ai/api/v1/models", timeout=15)
+        if r.status_code == 200:
+            found = [m.get("id") for m in r.json().get("data", []) if m.get("id") and ("0" in [str(m.get("pricing", {}).get("prompt")), str(m.get("pricing", {}).get("completion"))] or m.get("id").endswith(":free")) and "image" in m.get("architecture", {}).get("input_modalities", [])]
+            if found: return found[:limit]
+    except: pass
+    return KNOWN_FREE[:limit]
+
+# ============================================================
+# STEP 6 — GENERATE SCRIPT (NO IMAGE COMPRESSION)
 # ============================================================
 def generate_full_script(slots, srt_content, analysis_grid_path):
-    print(f"🤖 [6] Generating script (Nvidia 2 Retries + Fallback)...")
+    print(f"🤖 [6] Generating script (No Image Compression)...")
     if os.path.exists(analysis_grid_path):
         try:
             img = Image.open(analysis_grid_path)
@@ -688,79 +701,113 @@ Return ONLY valid JSON:
 """
 
     full_b64 = encode_image(analysis_grid_path)
-    
-    models_to_try = [
-        "vidia/nemotron-3.5-super-vl:free",
-        "openrouter/free"
-    ]
-    
+
+    # ---------- Single API call helper ----------
+    def _try_call(model_id, or_key):
+        """Returns (segments_or_None, actual_model, error_type_or_None)."""
+        payload = {
+            "model": model_id,
+            "messages": [{"role": "user", "content": [
+                {"type": "text", "text": prompt},
+                {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{full_b64}", "detail": "high"}}
+            ]}],
+            "max_tokens": 4000,
+            "temperature": 0.9,
+            "response_format": {"type": "json_object"}
+        }
+        headers = {"Authorization": f"Bearer {or_key}", "Content-Type": "application/json"}
+        try:
+            r = requests.post("https://openrouter.ai/api/v1/chat/completions",
+                              headers=headers, json=payload, timeout=240)
+            if r.status_code == 200:
+                ai = r.json()
+                actual_model = ai.get('model', model_id)
+                content = ai.get('choices', [{}])[0].get('message', {}).get('content')
+                raw = str(content).strip() if content else ""
+                if not raw:
+                    return None, actual_model, "empty"
+                parsed = extract_json_from_response(raw)
+                if parsed and isinstance(parsed.get("segments"), list) and len(parsed["segments"]) > 0:
+                    return parsed["segments"], actual_model, None
+                return None, actual_model, "json"
+            elif r.status_code == 404:
+                return None, model_id, "not_found"
+            elif r.status_code in (401, 402, 403):
+                return None, model_id, "auth"
+            elif r.status_code == 429:
+                return None, model_id, "rate"
+            else:
+                return None, model_id, f"http_{r.status_code}"
+        except Exception:
+            return None, model_id, "exception"
+
     segments, winning_model, winning_route = None, None, None
 
-    for model_id in models_to_try:
+    # =====================================================
+    # MODEL 1 — nvidia/nemotron : SIRF 2 ATTEMPTS TOTAL
+    #   • 2+ keys  → 2 different keys, 1 try each
+    #   • 1 key    → same key 2 tries
+    # =====================================================
+    print("🤖 [MODEL TRY 1] nvidia/nemotron-3.5-super-vl:free (max 2 attempts total)")
+    if len(OPENROUTER_KEYS) >= 2:
+        first_attempts = [OPENROUTER_KEYS[0], OPENROUTER_KEYS[1]]
+    elif len(OPENROUTER_KEYS) == 1:
+        first_attempts = [OPENROUTER_KEYS[0], OPENROUTER_KEYS[0]]
+    else:
+        first_attempts = []
+
+    for attempt_num, or_key in enumerate(first_attempts, start=1):
         if segments: break
-        print(f"🤖 [MODEL TRY] {model_id}")
-        
-        img_b64 = full_b64  
-        detail = "high"     
-        
-        # 👇 Yahan Nvidia ke liye sirf 2 keys set ki hain
-        keys_for_model = OPENROUTER_KEYS[:2] if model_id == "vidia/nemotron-3.5-super-vl:free" else OPENROUTER_KEYS
-        
-        for key_idx, or_key in enumerate(keys_for_model, start=1):
-            if segments: break
-            print(f"   🔑 Key {key_idx}/{len(keys_for_model)}...", end=" ")
-            
-            payload = {
-                "model": model_id,
-                "messages": [{"role": "user", "content": [
-                    {"type": "text", "text": prompt},
-                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{img_b64}", "detail": detail}}
-                ]}],
-                "max_tokens": 4000,
-                "temperature": 0.9,
-                "response_format": {"type": "json_object"}
-            }
+        print(f"   🔑 Attempt {attempt_num}/{len(first_attempts)}...", end=" ")
+        segs, actual, err = _try_call("nvidia/nemotron-3.5-super-vl:free", or_key)
+        if segs:
+            segments, winning_model, winning_route = segs, "nvidia/nemotron-3.5-super-vl:free", actual
+            print(f"✅ SUCCESS! (Actual: {actual})")
+            if len(segments) != len(slots):
+                print(f"   ⚠️ WARNING: AI ne {len(segments)}/{len(slots)} segments diye hain.")
+            break
+        elif err == "not_found":
+            print("❌ Model Not Found — skipping model")
+            break
+        else:
+            print(f"⚠️ {err} → next attempt")
+    print()
 
-            headers = {"Authorization": f"Bearer {or_key}", "Content-Type": "application/json"}
-
-            try:
-                r = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload, timeout=240)
-                
-                if r.status_code == 200:
-                    ai = r.json()
-                    actual_model = ai.get('model', model_id)
-                    
-                    content = ai.get('choices', [{}])[0].get('message', {}).get('content')
-                    raw = str(content).strip() if content else ""
-                    
-                    if not raw:
-                        print("⚠️ Empty/None Response (Next Key)")
-                        continue 
-                        
-                    parsed = extract_json_from_response(raw)
-                    
-                    if parsed and isinstance(parsed.get("segments"), list) and len(parsed["segments"]) > 0:
-                        segments = parsed["segments"]
-                        winning_model = model_id
-                        winning_route = actual_model
-                        print(f"✅ SUCCESS! (Requested: {model_id} → Actual: {actual_model} | Key: {key_idx})")
-                        if len(segments) != len(slots):
-                            print(f"   ⚠️ WARNING: AI ne {len(segments)}/{len(slots)} segments diye hain.")
-                        break
-                    else:
-                        print(f"⚠️ JSON Error (Next Key)")
-                        continue
-
-                elif r.status_code in (401, 402, 403): print("❌ Dead/No Credits (Next Key)")
-                elif r.status_code == 429: print("⚠️ Rate Limit (Next Key)")
-                elif r.status_code == 404: 
-                    print("❌ Model Not Found (Skipping Model)")
+    # =====================================================
+    # MODEL 2 — openrouter/free : HAR KEY 2 TRY
+    #   • JSON / empty error → SAME key retry (2nd try)
+    #   • 401/402/403/429 etc. → next key (no retry)
+    #   • Max total = len(OPENROUTER_KEYS) × 2  (5 keys → 10 bar)
+    # =====================================================
+    if not segments:
+        print(f"🤖 [MODEL TRY 2] openrouter/free (each key up to 2 tries on JSON error → max {len(OPENROUTER_KEYS)*2} attempts)")
+        stop_model2 = False
+        for key_idx, or_key in enumerate(OPENROUTER_KEYS, start=1):
+            if segments or stop_model2: break
+            for retry in range(2):
+                if segments or stop_model2: break
+                print(f"   🔑 Key {key_idx}/{len(OPENROUTER_KEYS)} — try {retry+1}/2...", end=" ")
+                segs, actual, err = _try_call("openrouter/free", or_key)
+                if segs:
+                    segments, winning_model, winning_route = segs, "openrouter/free", actual
+                    print(f"✅ SUCCESS! (Actual: {actual})")
+                    if len(segments) != len(slots):
+                        print(f"   ⚠️ WARNING: AI ne {len(segments)}/{len(slots)} segments diye hain.")
                     break
-                else: print(f"⚠️ Err {r.status_code} (Next Key)")
-                    
-            except Exception as e: 
-                print(f"⚠️ Exc: {str(e)[:20]} (Next Key)")
-                
+                elif err == "not_found":
+                    print("❌ Model Not Found — skipping model")
+                    stop_model2 = True
+                    break
+                elif err in ("json", "empty"):
+                    if retry == 0:
+                        print(f"⚠️ {err} → retry same key")
+                        continue
+                    else:
+                        print(f"⚠️ {err} → next key")
+                        break
+                else:
+                    print(f"⚠️ {err} → next key")
+                    break
         print()
 
     if not segments:
@@ -893,7 +940,7 @@ def generate_audio(segments, slots, vid_duration):
                         tempo = max(ATEMPO_MIN, min(ATEMPO_MAX_ACTION, actual / target_dur))
                         if tempo > 1.01:
                             fit_file = f"{SEGMENTS_DIR}/seg_{idx:03d}_fit.mp3"
-                            subprocess.run(f"ffmpeg -nostdin -y -i {seg_file} -filter:a atempo={tempo:.3f} {fit_file} -hide_banner -loglevel error", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                            subprocess.run(f"ffmpeg -y -i {seg_file} -filter:a atempo={tempo:.3f} {fit_file} -hide_banner -loglevel error", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                             final = fit_file if os.path.exists(fit_file) else seg_file
                             atempo_used = f"{tempo:.3f} (action)"
                         else: final = seg_file
@@ -907,7 +954,7 @@ def generate_audio(segments, slots, vid_duration):
                         tempo = max(ATEMPO_MIN, min(atempo_max, actual / target_dur))
                         if tempo > 1.01:
                             fit_file = f"{SEGMENTS_DIR}/seg_{idx:03d}_fit.mp3"
-                            subprocess.run(f"ffmpeg -nostdin -y -i {seg_file} -filter:a atempo={tempo:.3f} {fit_file} -hide_banner -loglevel error", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                            subprocess.run(f"ffmpeg -y -i {seg_file} -filter:a atempo={tempo:.3f} {fit_file} -hide_banner -loglevel error", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                             final = fit_file if os.path.exists(fit_file) else seg_file
                             atempo_used = f"{tempo:.3f}" + (" (last)" if is_last else "")
                         else: final = seg_file
@@ -928,7 +975,7 @@ def generate_audio(segments, slots, vid_duration):
 def build_timed_audio(audio_files, vid_duration):
     print("🎼 [8] Building timed audio...")
     silent = f"{SEGMENTS_DIR}/silent_base.mp3"
-    subprocess.run(f"ffmpeg -nostdin -y -f lavfi -i anullsrc=r=44100:cl=stereo -t {vid_duration} -q:a 9 -acodec libmp3lame {silent} -hide_banner -loglevel error", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    subprocess.run(f"ffmpeg -y -f lavfi -i anullsrc=r=44100:cl=stereo -t {vid_duration} -q:a 9 -acodec libmp3lame {silent} -hide_banner -loglevel error", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     inputs, parts, mix_inputs = ["-i", silent], [], ["[0:a]"]
     for i, a in enumerate(audio_files, start=1):
         inputs.extend(["-i", a["file"]])
@@ -937,7 +984,7 @@ def build_timed_audio(audio_files, vid_duration):
         mix_inputs.append(f"[a{i}]")
     filter_complex = ";".join(parts) + f";{''.join(mix_inputs)}amix=inputs={len(mix_inputs)}:duration=first:dropout_transition=0:normalize=0,alimiter=limit=0.95[out]"
     final_audio = f"{SEGMENTS_DIR}/final_commentary.mp3"
-    subprocess.run(f"ffmpeg -nostdin -y {' '.join(inputs)} -filter_complex \"{filter_complex}\" -map \"[out]\" -acodec libmp3lame -q:a 4 {final_audio} -hide_banner -loglevel error", shell=True, check=True)
+    subprocess.run(f"ffmpeg -y {' '.join(inputs)} -filter_complex \"{filter_complex}\" -map \"[out]\" -acodec libmp3lame -q:a 4 {final_audio} -hide_banner -loglevel error", shell=True, check=True)
     print("✅ Timed commentary built\n")
     return final_audio
 
@@ -952,12 +999,12 @@ def merge_final(video_path, commentary_audio, out_path, audio_files, enable_subt
     vf_flag = f'-vf "subtitles={ASS_PATH}:fontsdir={FONTS_DIR}"' if enable_subtitles and os.path.exists(ASS_PATH) else ""
     video_codec = "-c:v libx264 -preset fast -crf 23 -pix_fmt yuv420p" if vf_flag else "-c:v copy"
 
-    subprocess.run(f'ffmpeg -nostdin -y -i {video_path} -i {commentary_audio} -filter_complex "{filter_complex}" {vf_flag} -map 0:v:0 -map "[aout]" {video_codec} -c:a aac -b:a 192k -shortest {out_path} -hide_banner -loglevel error', shell=True, check=True)
+    subprocess.run(f'ffmpeg -y -i {video_path} -i {commentary_audio} -filter_complex "{filter_complex}" {vf_flag} -map 0:v:0 -map "[aout]" {video_codec} -c:a aac -b:a 192k -shortest {out_path} -hide_banner -loglevel error', shell=True, check=True)
     print(f"🔥 Final video ready: {out_path}\n")
 
 def fallback_copy_original():
     try:
-        subprocess.run(f"ffmpeg -nostdin -y -i {FINAL_CLIP_PATH} -c copy {FINAL_DUBBED_VIDEO} -hide_banner -loglevel error", shell=True, check=True)
+        subprocess.run(f"ffmpeg -y -i {FINAL_CLIP_PATH} -c copy {FINAL_DUBBED_VIDEO} -hide_banner -loglevel error", shell=True, check=True)
         print(f"✅ Original copied: {FINAL_DUBBED_VIDEO}")
         return True
     except Exception as e:
@@ -968,7 +1015,7 @@ def fallback_copy_original():
 # MAIN
 # ============================================================
 def main():
-    print("=" * 60 + "\n🎙️ AI COMMENTARY DUBBER — v9.4 (Nvidia 2 Retries)\n" + "=" * 60)
+    print("=" * 60 + "\n🎙️ AI COMMENTARY DUBBER — v9.0 (No Image Compression)\n" + "=" * 60)
     
     if not COMMENTARY_ENABLED:
         print("🚫 Commentary OFF — copying original...")
