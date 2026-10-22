@@ -1,1 +1,1 @@
-{"clip_duration": 42, "reason": "Dramatic cinematic choke and magic", "start_time": 0, "status": "APPROVE", "title": "1 Red Eye Choked Boss 🔥😱"}
+{"clip_duration": 31, "reason": "Intense Spider-Man combat with fiery explosions", "start_time": 0, "status": "APPROVE", "title": "Spider-Man Wrecked 5 Enemies 🔥🎯"}
