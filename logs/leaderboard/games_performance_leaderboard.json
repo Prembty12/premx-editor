@@ -10,10 +10,10 @@
     {
         "rank": 2,
         "game_name": "Russian_secret_missions",
-        "total_views": 6527,
+        "total_views": 6477,
         "uploaded_videos": 26,
-        "avg_views_per_video": 251,
-        "view_share_percentage": 12.16
+        "avg_views_per_video": 249,
+        "view_share_percentage": 12.07
     },
     {
         "rank": 3,
@@ -26,10 +26,10 @@
     {
         "rank": 4,
         "game_name": "MarvelsSpiderMan2",
-        "total_views": 5821,
+        "total_views": 5826,
         "uploaded_videos": 28,
-        "avg_views_per_video": 207,
-        "view_share_percentage": 10.85
+        "avg_views_per_video": 208,
+        "view_share_percentage": 10.86
     },
     {
         "rank": 5,
@@ -45,7 +45,7 @@
         "total_views": 4715,
         "uploaded_videos": 14,
         "avg_views_per_video": 336,
-        "view_share_percentage": 8.78
+        "view_share_percentage": 8.79
     },
     {
         "rank": 7,
@@ -66,10 +66,10 @@
     {
         "rank": 9,
         "game_name": "CODMW4",
-        "total_views": 2901,
-        "uploaded_videos": 10,
-        "avg_views_per_video": 290,
-        "view_share_percentage": 5.4
+        "total_views": 2914,
+        "uploaded_videos": 11,
+        "avg_views_per_video": 264,
+        "view_share_percentage": 5.43
     },
     {
         "rank": 10,
@@ -90,9 +90,9 @@
     {
         "rank": 12,
         "game_name": "ghostandela",
-        "total_views": 559,
+        "total_views": 579,
         "uploaded_videos": 28,
-        "avg_views_per_video": 19,
-        "view_share_percentage": 1.04
+        "avg_views_per_video": 20,
+        "view_share_percentage": 1.08
     }
 ]
