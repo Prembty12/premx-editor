@@ -297,8 +297,8 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                 word_upper = vw.upper()
                 colored_words.append(f"{{\\c{color}}}{word_upper}{{\\c{COLOR_RESET}}}")
             
-            # \fs42 = Har word ka size 42 hoga (chota aur clean)
-            anim_tag = "{\\fsp8\\blur1.5\\fs42\\fscx70\\fscy70\\t(0,100,\\fscx100\\fscy100)}"
+            # \fs42 = Har word ka size fade in hoga (chota aur clean)
+            anim_tag = "{\\fsp8\\blur1.5\\fs42\\fad(100,0)}"
             colored_text = anim_tag + " ".join(colored_words)
 
             start_t = seconds_to_ass_time(current_time)
@@ -1739,7 +1739,7 @@ def main():
             generate_full_ass_script(
                 audio_files=audio_files,
                 font_name="BebasNeue-Regular",
-                font_size=40,
+                font_size=45,
                 alignment=2,
                 vertical_margin=65
             )
