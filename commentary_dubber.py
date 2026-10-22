@@ -297,8 +297,9 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                 word_upper = vw.upper()
                 colored_words.append(f"{{\\c{color}}}{word_upper}{{\\c{COLOR_RESET}}}")
             
-            # \fsp12 = Letter Spacing, \blur2 = Glow effect
-            colored_text = "{\\fsp12\\blur2}" + " ".join(colored_words)
+            # \fs42 = Har word ka size 42 hoga (chota aur clean)
+            anim_tag = "{\\fsp8\\blur1.5\\fs42\\fscx70\\fscy70\\t(0,100,\\fscx100\\fscy100)}"
+            colored_text = anim_tag + " ".join(colored_words)
 
             start_t = seconds_to_ass_time(current_time)
             end_t = seconds_to_ass_time(seg_end)
