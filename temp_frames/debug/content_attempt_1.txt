@@ -1,1 +1,1 @@
-{"clip_duration": 24, "reason": "Dramatic interrogation cutscene with high tension", "start_time": 30, "status": "APPROVE", "title": "The 1 Secret Ghost Discovered Was Shocking 🔥"}
+{"clip_duration": 42, "reason": "Dramatic cinematic choke and magic", "start_time": 0, "status": "APPROVE", "title": "1 Red Eye Choked Boss 🔥😱"}
