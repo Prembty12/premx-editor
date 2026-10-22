@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-23 01:57:48 AM",
+  "last_updated": "2026-10-23 02:01:13 AM",
   "period_days": 7,
   "trending": [
     {
@@ -7,7 +7,7 @@
       "views_7d": 3558,
       "avg_per_video": 508,
       "trend": "viral",
-      "ratio": 2.3075924724205064,
+      "ratio": 2.3060959792477305,
       "fb_link": "https://www.facebook.com/reel/2770439856808801/",
       "source_link": ""
     },
@@ -16,16 +16,16 @@
       "views_7d": 1321,
       "avg_per_video": 440,
       "trend": "trending",
-      "ratio": 1.9987021414665802,
+      "ratio": 1.9974059662775616,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions15.mp4"
     },
     {
       "game": "MarvelsSpiderMan2",
-      "views_7d": 2602,
+      "views_7d": 2603,
       "avg_per_video": 325,
       "trend": "steady",
-      "ratio": 1.4763140817650877,
+      "ratio": 1.4753566796368354,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan219.mp4"
     }
@@ -36,7 +36,7 @@
       "views_7d": 640,
       "avg_per_video": 160,
       "trend": "slow",
-      "ratio": 0.72680077871512,
+      "ratio": 0.7263294422827496,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela17.mp4"
     },
@@ -45,16 +45,16 @@
       "views_7d": 637,
       "avg_per_video": 70,
       "trend": "below_avg",
-      "ratio": 0.31797534068786504,
+      "ratio": 0.317769130998703,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "CallOfDutyMW2",
-      "views_7d": 76,
-      "avg_per_video": 38,
+      "views_7d": 78,
+      "avg_per_video": 39,
       "trend": "below_avg",
-      "ratio": 0.17261518494484102,
+      "ratio": 0.17704280155642024,
       "fb_link": "https://www.facebook.com/reel/2181972149061480/",
       "source_link": ""
     },
@@ -73,7 +73,7 @@
     "views_7d": 3558,
     "avg_per_video": 508,
     "trend": "viral",
-    "ratio": 2.3075924724205064,
+    "ratio": 2.3060959792477305,
     "fb_link": "https://www.facebook.com/reel/2770439856808801/",
     "source_link": ""
   }
