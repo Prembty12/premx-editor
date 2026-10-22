@@ -17,6 +17,7 @@ FEATURES:
   ✅ 3 Models Auto-Retry (JSON Object + Healing)
   ✅ Sanitized Text (NoneType Crash Fixed)
   ✅ Strict Completeness Check (Rejects incomplete segments)
+  ✅ Cinematic Subtitles (Cyan/Red + ALL CAPS + Glow + Spacing)
 ===============================================================
 """
 
@@ -131,21 +132,20 @@ os.makedirs(FONTS_DIR, exist_ok=True)
 
 
 # ============================================================
-# 🎨 PAINTING COLOUR FINISHING
+# 🎨 CINEMATIC COLOUR FINISHING
 # ============================================================
-COLOR_WHITE  = "&H00FFFFFF"
-COLOR_YELLOW = "&H0000FFFF"
-COLOR_BLUE   = "&H00FF0000"
+COLOR_CYAN   = "&H00FFFF00"  # Light Blue (Image wala)
+COLOR_RED    = "&H000000FF"  # Red (NEVER wala)
 COLOR_RESET  = "&H00FFFFFF"
 
 
 def get_pattern_color(word_index, total_words):
+    # Aakhri word hamesha RED hoga
     if word_index == total_words - 1:
-        return COLOR_BLUE
-    if word_index % 2 == 0:
-        return COLOR_WHITE
+        return COLOR_RED
+    # Baaki saare words CYAN (Light Blue) honge
     else:
-        return COLOR_YELLOW
+        return COLOR_CYAN
 
 
 # ============================================================
@@ -240,7 +240,7 @@ def speed_for_type(slot_type):
 def generate_full_ass_script(audio_files, font_name="Arial", font_size=60,
                               alignment=2, vertical_margin=40,
                               outline_size=3, shadow_size=2):
-    print("🎨 Generating ASS Subtitles (PAINTING COLOUR FINISHING)...")
+    print("🎨 Generating ASS Subtitles (CINEMATIC FINISHING)...")
 
     ass_content = f"""[Script Info]
 ScriptType: v4.00+
@@ -293,8 +293,12 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             colored_words = []
             for j, vw in enumerate(visible_words):
                 color = get_pattern_color(j, total_words)
-                colored_words.append(f"{{\\c{color}}}{vw}{{\\c{COLOR_RESET}}}")
-            colored_text = " ".join(colored_words)
+                # Capitalize the word to look like the screenshots
+                word_upper = vw.upper()
+                colored_words.append(f"{{\\c{color}}}{word_upper}{{\\c{COLOR_RESET}}}")
+            
+            # \fsp12 = Letter Spacing, \blur2 = Glow effect
+            colored_text = "{\\fsp12\\blur2}" + " ".join(colored_words)
 
             start_t = seconds_to_ass_time(current_time)
             end_t = seconds_to_ass_time(seg_end)
@@ -308,7 +312,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
     print(f"✅ ASS Subtitles saved: {ASS_PATH}")
     print(f"   📊 Total subtitle lines: {written}")
-    print(f"   🎨 Style: Painting Colour Finishing\n")
+    print(f"   🎨 Style: Cinematic Finishing\n")
 
 
 # ============================================================
@@ -1676,7 +1680,7 @@ def main():
     print(f"🎵 atempo: normal={ATEMPO_MAX} | last={ATEMPO_MAX_LAST} | action={ATEMPO_MAX_ACTION}")
     print(f"📏 Slot extend: max {MAX_SLOT_EXTEND}s")
     print(f"🔊 Volume: Action={VOL_ACTION}x | Other={VOL_OTHER}x")
-    print(f"🎨 Subtitle: Painting Colour Finishing")
+    print(f"🎨 Subtitle: Cinematic Finishing")
     print(f"🎮 Mode: REAL-TIME GAMEPLAY (18 rules)")
     print("=" * 60 + "\n")
 
