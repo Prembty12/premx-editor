@@ -669,6 +669,7 @@ def classify_slots_combined(video_path, slots, srt_content):
                     "go","move","watch","left","right","down","up","quick",
                     "destroy","target","lock","bang","drop","danger",
                     "whoa","oh","yeah","nice","sick","cook","big","fast"}
+    KILL_WORDS = {"kill","killed","die","died","dead","hit","headshot","shot","destroyed","deleted","bodied","clapped","cooked","one tap","one shot","eliminated","frag","boom","explode","blast"}
     DIALOG_WORDS = {"you","me","we","what","why","how","hey","listen",
                     "wait","okay","yeah","know","think","feel","want",
                     "need","can","will"}
@@ -698,6 +699,10 @@ def classify_slots_combined(video_path, slots, srt_content):
                 if e["start"] >= sw["start"] and e["end"] <= sw["end"]
             ).lower()
             words = set(sw_text.split())
+
+            if words & KILL_WORDS:
+                action_count += 1
+                continue
 
             has_action_word = len(words & ACTION_WORDS) >= 1
             has_dialog_word = len(words & DIALOG_WORDS) >= 1
@@ -967,7 +972,7 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 18. HMM / THINKING (1-2 times, dialog/calm only)
 19. HYPE INTRO (1-2 times)
 20. COMMENT CTA
-21. KILL/DEATH/HIT — React INSTANTLY
+21. KILL/DEATH/HIT — React INSTANTLY, NEVER skip, react to WHO killed WHOM (player kills enemy = hype/dominance, enemy kills player = pain/panic, player damaged = pain, player dodges = cocky, multi-kill = escalating), first word = reaction, no narrator lines.
 
 **🎮 REAL-TIME GAMEPLAY MODE:**
 - You ARE the player. Not watching. React LIVE like you're in the fight RIGHT NOW.
@@ -1343,6 +1348,7 @@ Return ONLY valid JSON:
             ):
                 final_type = "action"
                 override_count += 1
+                print(f"   🔄 GPT: CALM → Code: ACTION")
             elif (
                 vt == "calm"
                 and signal_says_action_strong
@@ -1350,8 +1356,11 @@ Return ONLY valid JSON:
             ):
                 final_type = "dialog"
                 dialog_protected += 1
+                print(f"   🔄 GPT: CALM → Code: DIALOG")
             else:
                 final_type = vt
+                if vt != (best_slot.get("type") or "").lower():
+                    print(f"   ℹ️  GPT: {vt.upper()} → no change")
 
             if (
                 final_type != best_slot.get("type")
