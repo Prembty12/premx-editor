@@ -1,60 +1,60 @@
 {
-  "last_updated": "2026-10-21 10:09:04 PM",
+  "last_updated": "2026-10-22 08:51:26 AM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 2654,
-      "avg_per_video": 442,
+      "views_7d": 2901,
+      "avg_per_video": 483,
       "trend": "viral",
-      "ratio": 2.2147458840372223,
+      "ratio": 2.3094262295081966,
       "fb_link": "https://www.facebook.com/reel/1772902693799070/",
       "source_link": ""
     },
     {
-      "game": "Russian_secret_missions",
-      "views_7d": 1340,
-      "avg_per_video": 335,
-      "trend": "trending",
-      "ratio": 1.6785969935576235,
-      "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions15.mp4"
-    },
-    {
       "game": "MarvelsSpiderMan2",
-      "views_7d": 1932,
-      "avg_per_video": 322,
+      "views_7d": 2071,
+      "avg_per_video": 345,
       "trend": "trending",
-      "ratio": 1.6134574087329991,
+      "ratio": 1.6495901639344264,
       "fb_link": "https://www.facebook.com/reel/2149517728973395/",
       "source_link": ""
+    },
+    {
+      "game": "Russian_secret_missions",
+      "views_7d": 1341,
+      "avg_per_video": 335,
+      "trend": "trending",
+      "ratio": 1.6017759562841531,
+      "fb_link": "",
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions15.mp4"
     }
   ],
   "below_avg": [
     {
       "game": "ghostandela",
-      "views_7d": 428,
-      "avg_per_video": 142,
+      "views_7d": 429,
+      "avg_per_video": 143,
       "trend": "slow",
-      "ratio": 0.7115246957766642,
+      "ratio": 0.6837431693989071,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "Wolverine",
-      "views_7d": 587,
-      "avg_per_video": 83,
+      "views_7d": 595,
+      "avg_per_video": 85,
       "trend": "below_avg",
-      "ratio": 0.41589119541875447,
+      "ratio": 0.40642076502732244,
       "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine7.mp4"
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine28.mp4"
     },
     {
       "game": "CallOfDutyMW2",
       "views_7d": 70,
       "avg_per_video": 70,
       "trend": "below_avg",
-      "ratio": 0.35075161059413024,
+      "ratio": 0.33469945355191255,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play21.mp4"
     },
@@ -63,17 +63,17 @@
       "views_7d": 10,
       "avg_per_video": 3,
       "trend": "below_avg",
-      "ratio": 0.015032211882605583,
+      "ratio": 0.014344262295081968,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu13.mp4"
     }
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 2654,
-    "avg_per_video": 442,
+    "views_7d": 2901,
+    "avg_per_video": 483,
     "trend": "viral",
-    "ratio": 2.2147458840372223,
+    "ratio": 2.3094262295081966,
     "fb_link": "https://www.facebook.com/reel/1772902693799070/",
     "source_link": ""
   }
