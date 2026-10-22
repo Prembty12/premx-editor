@@ -1117,7 +1117,7 @@ Return ONLY valid JSON:
         }
         
         try:
-            r = requests.post(or_url, headers=headers, json=payload, timeout=240)
+            r = requests.post(or_url, headers=headers, json=payload, timeout=120)
             if r.status_code == 200:
                 ai = r.json()
                 actual_model = ai.get('model', model_id)
@@ -1738,7 +1738,7 @@ def main():
             generate_full_ass_script(
                 audio_files=audio_files,
                 font_name="BebasNeue-Regular",
-                font_size=55,
+                font_size=40,
                 alignment=2,
                 vertical_margin=65
             )
