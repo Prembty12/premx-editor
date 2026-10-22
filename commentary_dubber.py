@@ -985,7 +985,7 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 - VARY your reaction LENGTH — some words, some fragments, some full sentences.
 - Match VOICE TONE to the moment — whisper for tension, SHOUT for action, calm for chill.
 - If you see KILLING, DYING, DESTROYING, or DAMAGE — react FIRST, describe LATER. Reaction > description.
-- Add SUSPENSE before big moments when you sense buildup — hold the tension.
+- Add SUSPENSE before big moments (quiet voice, hold the tension), but when the action actually hits, instantly switch to hype.
 - NEVER say what you SEE — say what you FEEL. Emotion over description.
 - When multiple enemies die at once — react with ESCALATING hype, not the same tone.
 - When YOU take damage — react with PAIN or PANIC, not calm.
