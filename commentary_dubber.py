@@ -944,7 +944,7 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 - Contractions: "he's", "ain't", "gonna", "wanna", "kinda"
 - Slang: "bruh", "yo", "bro", "nah", "fr", "lowkey", "bet", "cap"
 - Short sentences. Fragments OK.
-- Start with reactions: "YO!", "BRO!", "WAIT!", "NAH!", "AYY!", "WHAT'S UP GUYS!", "YO WHAT'S UP GUYS!",
+- Start with reactions: "YO!", "BRO!", "WAIT!", "NAH!", "AYY!", "WHAT'S UP GUYS!", "AYY WHAT'S UP GUYS!",
 
 **REACTION PATTERNS (use 20-25 varied):**
 1. BIG ACTION
@@ -962,10 +962,10 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 13. SOUND
 14. CINEMATIC SHOT
 15. FLIRTY/FUNNY "BABY" (1-2 times only)
-16. LIKE + BELL CTA (3-4 times)
-17. SWEARING (Max 5-7 times, censored)
-18. HMM / THINKING (2-3 times, dialog/calm only)
-19. HYPE INTRO (2-3 times)
+16. LIKE + FOLLOW CTA (1-2 times)
+17. SWEARING (max 5-8, censor with asterisks): "Holy sh*t!", "What the f*ck!", "That's bullsh*t!", "You m*therf*cker!", "D*mn it!", "Son of a b*tch!", "F*ck yeah!", "Sh*t, bro!", "F*cking insane!", "What the h*ll!", "D*mn, bro!"
+18. HMM / THINKING (1-2 times, dialog/calm only)
+19. HYPE INTRO (1-2 times)
 20. COMMENT CTA
 21. KILL/DEATH/HIT — React INSTANTLY
 
