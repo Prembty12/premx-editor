@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v6.0 (Painting + Action 1.15 + Real-Time + Full Logging)
+🎙️ AI Commentary Dubber — v6.1 (Strict Completeness + Real-Time + Full Logging)
 ===============================================================
 FEATURES:
   ✅ Timing LOCK — GPT segment = SLOT time
@@ -16,6 +16,7 @@ FEATURES:
   ✅ Full Terminal Logging (type + speed)
   ✅ 3 Models Auto-Retry (JSON Object + Healing)
   ✅ Sanitized Text (NoneType Crash Fixed)
+  ✅ Strict Completeness Check (Rejects incomplete segments)
 ===============================================================
 """
 
@@ -1044,6 +1045,11 @@ If you see ANY of these → visual_type = "action":
 **YOUR SLOTS (fill ALL {len(slots)}):**
 {chr(10).join(slot_lines)}
 
+**⚠️ CRITICAL WARNING:**
+- You MUST generate exactly **{len(slots)}** segments.
+- Do NOT skip ANY slot. The array MUST contain a response for every slot from 1 to {len(slots)}.
+- If you miss even one slot, the system will FAIL and reject your response.
+
 **BANNED:** "insane play", "here we go", "game on"
 
 **CRITICAL JSON RULES:**
@@ -1115,8 +1121,16 @@ Return ONLY valid JSON:
                     raw = raw.rstrip("`").strip()
                     
                 parsed = json.loads(raw)
-                if isinstance(parsed, dict) and "segments" in parsed and len(parsed["segments"]) > 0:
-                    return parsed["segments"], actual_model, None
+                if isinstance(parsed, dict) and "segments" in parsed:
+                    segs = parsed["segments"]
+                    
+                    # 🛡️ STRICT COMPLETENESS CHECK
+                    if len(segs) < len(slots):
+                        return None, actual_model, "incomplete"
+                        
+                    if len(segs) > 0:
+                        return segs, actual_model, None
+                        
                 return None, actual_model, "json"
             elif r.status_code == 404: return None, model_id, "not_found"
             elif r.status_code in (401, 402, 403): return None, model_id, "auth"
@@ -1191,7 +1205,7 @@ Return ONLY valid JSON:
                     print("❌ Model Not Found — skipping")
                     stop_m3 = True
                     break
-                elif err in ("json", "empty"):
+                elif err in ("json", "empty", "incomplete"):
                     if retry == 0:
                         print(f"⚠️ {err} → retry same key")
                         continue
@@ -1389,7 +1403,7 @@ def generate_audio(segments, slots, vid_duration):
         raw_text = seg.get("text")
         text = str(raw_text).strip() if raw_text is not None else ""
         if not text or text.lower() == "none":
-            print(f"   ⚠️ seg {idx}: empty text, skipping")
+            print(f"   ⚠️ seg {idx} (Slot {seg.get('slot')}): empty text, skipping")
             continue
 
         slot_num = seg.get("slot")
@@ -1641,7 +1655,7 @@ def fallback_copy_original():
 # ============================================================
 def main():
     print("=" * 60)
-    print("🎙️ AI COMMENTARY DUBBER — v6.0 (Real-Time + Full Logging)")
+    print("🎙️ AI COMMENTARY DUBBER — v6.1 (Real-Time + Full Logging)")
     print("=" * 60)
     print(f"📹 Input : {FINAL_CLIP_PATH}")
     print(f"📤 Output: {FINAL_DUBBED_VIDEO}")
