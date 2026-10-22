@@ -5,7 +5,7 @@
         "total_views": 11475,
         "uploaded_videos": 16,
         "avg_views_per_video": 717,
-        "view_share_percentage": 21.1
+        "view_share_percentage": 21.12
     },
     {
         "rank": 2,
@@ -13,23 +13,23 @@
         "total_views": 6457,
         "uploaded_videos": 26,
         "avg_views_per_video": 248,
-        "view_share_percentage": 11.87
+        "view_share_percentage": 11.89
     },
     {
         "rank": 3,
+        "game_name": "MarvelsSpiderMan2",
+        "total_views": 6363,
+        "uploaded_videos": 31,
+        "avg_views_per_video": 205,
+        "view_share_percentage": 11.71
+    },
+    {
+        "rank": 4,
         "game_name": "Callofdutyaw",
         "total_views": 6357,
         "uploaded_videos": 17,
         "avg_views_per_video": 373,
-        "view_share_percentage": 11.69
-    },
-    {
-        "rank": 4,
-        "game_name": "MarvelsSpiderMan2",
-        "total_views": 6355,
-        "uploaded_videos": 31,
-        "avg_views_per_video": 205,
-        "view_share_percentage": 11.68
+        "view_share_percentage": 11.7
     },
     {
         "rank": 5,
@@ -37,7 +37,7 @@
         "total_views": 5081,
         "uploaded_videos": 11,
         "avg_views_per_video": 461,
-        "view_share_percentage": 9.34
+        "view_share_percentage": 9.35
     },
     {
         "rank": 6,
@@ -45,39 +45,39 @@
         "total_views": 4305,
         "uploaded_videos": 14,
         "avg_views_per_video": 307,
-        "view_share_percentage": 7.91
+        "view_share_percentage": 7.92
     },
     {
         "rank": 7,
         "game_name": "GearsOfWar",
-        "total_views": 4260,
+        "total_views": 4160,
         "uploaded_videos": 10,
-        "avg_views_per_video": 426,
-        "view_share_percentage": 7.83
+        "avg_views_per_video": 416,
+        "view_share_percentage": 7.66
     },
     {
         "rank": 8,
         "game_name": "CODMW4",
-        "total_views": 3560,
+        "total_views": 3579,
         "uploaded_videos": 13,
-        "avg_views_per_video": 273,
-        "view_share_percentage": 6.54
+        "avg_views_per_video": 275,
+        "view_share_percentage": 6.59
     },
     {
         "rank": 9,
         "game_name": "CallOfDutyMW2",
-        "total_views": 3276,
+        "total_views": 3284,
         "uploaded_videos": 12,
         "avg_views_per_video": 273,
-        "view_share_percentage": 6.02
+        "view_share_percentage": 6.04
     },
     {
         "rank": 10,
         "game_name": "Wolverine",
         "total_views": 1629,
-        "uploaded_videos": 23,
-        "avg_views_per_video": 70,
-        "view_share_percentage": 2.99
+        "uploaded_videos": 24,
+        "avg_views_per_video": 67,
+        "view_share_percentage": 3.0
     },
     {
         "rank": 11,

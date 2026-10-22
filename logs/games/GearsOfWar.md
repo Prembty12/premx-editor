@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 14 | **Last Updated:** 2026-10-23 02:18:09 AM IST
+**Total Videos:** 13 | **Last Updated:** 2026-10-23 03:01:30 AM IST
 
 ---
 
@@ -10,12 +10,12 @@
 
 | Metric | Value |
 |---|---|
-| Total Videos | **14** |
-| Posted (FB or IG) | 14 / 14 |
-| FB Posted | 12 / 14 |
-| IG Posted | 6 / 14 |
+| Total Videos | **13** |
+| Posted (FB or IG) | 13 / 13 |
+| FB Posted | 12 / 13 |
+| IG Posted | 5 / 13 |
 | Total FB Views | **3,630** |
-| Total IG Views | **630** |
+| Total IG Views | **530** |
 
 ---
 
@@ -28,12 +28,11 @@
 | 3 | Slashed 5 Enemies At 1 HP 🔥🗡️  #videogames #gamingcommunity #gaming #gearsofwar #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1977642476247722/) | 1,235 | [🟣 IG](https://www.instagram.com/reel/DeQqP9tjG9H/) | 240 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar12.mp4) |
 | 4 | He Fell Then 4 Soldiers Fought Back 🔥😭  #videogames #gamingcommunity #gaming #gearsofwar #gamingreel | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeO0l7nAc1f/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar4.mp4) |
 | 5 | 1 HP Boss Fight Last Stand 🔥🎯  #videogames #gamingcommunity #gaming #gearsofwar #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2977424322612880/) | 487 | [🟣 IG](https://www.instagram.com/reel/DeNJRi7jXIB/) | 230 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar4.mp4) |
-| 6 | Giant Beast Boss Combat 🔥  #videogames #gamingcommunity #gaming #gearsofwar #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeJvEc5gu53/) | 100 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar7.mp4) |
-| 7 | Giant Beast Battle 🦖💥  #videogames #gamingcommunity #gaming #gearsofwar #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1515180523779657/) | 118 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar7.mp4) |
-| 8 | Monsters Rise Up 🩸🔥  #videogames #gamingcommunity #gaming #gearsofwar #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2563430397490305/) | 1,622 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar7.mp4) |
+| 6 | Giant Beast Battle 🦖💥  #videogames #gamingcommunity #gaming #gearsofwar #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1515180523779657/) | 118 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar7.mp4) |
+| 7 | Monsters Rise Up 🩸🔥  #videogames #gamingcommunity #gaming #gearsofwar #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2563430397490305/) | 1,622 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar7.mp4) |
+| 8 | GearsOfWar9 | [🔵 FB](https://www.facebook.com/17870525709642100) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar9.mp4) |
 | 9 | GearsOfWar12 | [🔵 FB](https://www.facebook.com/17950968966297160) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar12.mp4) |
 | 10 | GearsOfWar3 | [🔵 FB](https://www.facebook.com/18105163727360770) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar3.mp4) |
-| 11 | GearsOfWar9 | [🔵 FB](https://www.facebook.com/17870525709642100) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar9.mp4) |
-| 12 | GearsOfWar2 | [🔵 FB](https://www.facebook.com/18078584450394109) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar2.mp4) |
-| 13 | GearsOfWar4 | [🔵 FB](https://www.facebook.com/18111333170158252) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar4.mp4) |
-| 14 | GearsOfWar7 | [🔵 FB](https://www.facebook.com/18118492247057978) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar7.mp4) |
+| 11 | GearsOfWar4 | [🔵 FB](https://www.facebook.com/18111333170158252) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar4.mp4) |
+| 12 | GearsOfWar7 | [🔵 FB](https://www.facebook.com/18118492247057978) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar7.mp4) |
+| 13 | GearsOfWar2 | [🔵 FB](https://www.facebook.com/18078584450394109) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar2.mp4) |
