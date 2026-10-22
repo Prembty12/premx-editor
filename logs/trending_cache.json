@@ -1,13 +1,13 @@
 {
-  "last_updated": "2026-10-22 09:32:48 AM",
+  "last_updated": "2026-10-22 09:35:54 AM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 2914,
-      "avg_per_video": 485,
+      "views_7d": 2919,
+      "avg_per_video": 486,
       "trend": "viral",
-      "ratio": 2.364206128133705,
+      "ratio": 2.3674321503131526,
       "fb_link": "https://www.facebook.com/reel/1772902693799070/",
       "source_link": ""
     },
@@ -16,7 +16,7 @@
       "views_7d": 2076,
       "avg_per_video": 346,
       "trend": "trending",
-      "ratio": 1.6866295264623956,
+      "ratio": 1.6854558107167712,
       "fb_link": "https://www.facebook.com/reel/2149517728973395/",
       "source_link": ""
     },
@@ -25,7 +25,7 @@
       "views_7d": 1341,
       "avg_per_video": 335,
       "trend": "trending",
-      "ratio": 1.633008356545961,
+      "ratio": 1.6318719554627696,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions15.mp4"
     }
@@ -36,7 +36,7 @@
       "views_7d": 449,
       "avg_per_video": 112,
       "trend": "slow",
-      "ratio": 0.5459610027855153,
+      "ratio": 0.5455810716771051,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela17.mp4"
     },
@@ -45,7 +45,7 @@
       "views_7d": 595,
       "avg_per_video": 85,
       "trend": "below_avg",
-      "ratio": 0.41434540389972147,
+      "ratio": 0.41405706332637443,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine28.mp4"
     },
@@ -54,7 +54,7 @@
       "views_7d": 70,
       "avg_per_video": 70,
       "trend": "below_avg",
-      "ratio": 0.3412256267409471,
+      "ratio": 0.3409881697981907,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play21.mp4"
     },
@@ -63,17 +63,17 @@
       "views_7d": 10,
       "avg_per_video": 3,
       "trend": "below_avg",
-      "ratio": 0.014623955431754874,
+      "ratio": 0.014613778705636744,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu13.mp4"
     }
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 2914,
-    "avg_per_video": 485,
+    "views_7d": 2919,
+    "avg_per_video": 486,
     "trend": "viral",
-    "ratio": 2.364206128133705,
+    "ratio": 2.3674321503131526,
     "fb_link": "https://www.facebook.com/reel/1772902693799070/",
     "source_link": ""
   }
