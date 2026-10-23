@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v6.3 (Dynamic Smart Subtitles)
+🎙️ AI Commentary Dubber — v6.4 (Strict Completeness + Real-Time + Full Logging)
 ===============================================================
 FEATURES:
-  ✅ Smart Dynamic Subtitles (Action = Blink + Explosion | Calm = Smooth Fade)
-  ✅ Explosive Words Detection (BOOM, KILL, DIE, etc. = Explosion)
-  ✅ 100% Subtitle-Audio SYNC
   ✅ Timing LOCK — GPT segment = SLOT time
+  ✅ SRT time = SLOT time (FORCED)
+  ✅ Slot-aligned grid — frame = slot time
+  ✅ Audio delay = slot start
+  ✅ Smart Subtitle (Smooth 3x Blink + Rare Explosion)
+  ✅ 100% Subtitle-Audio SYNC
+  ✅ Smart Re-encode
   ✅ Real-Time Gameplay Mode
   ✅ Full Terminal Logging
   ✅ 3 Models Auto-Retry
@@ -215,24 +218,24 @@ def speed_for_type(slot_type):
 
 
 # ============================================================
-# ASS SUBTITLE GENERATOR (SMART DYNAMIC ANIMATION)
+# ASS SUBTITLE GENERATOR (SMART DYNAMIC + SMOOTH 3X BLINK + RARE EXPLOSION)
 # ============================================================
 def generate_full_ass_script(audio_files, font_name="BebasNeue-Regular", font_size=80,
-                              alignment=5, vertical_margin=40,
+                              alignment=2, vertical_margin=65,
                               outline_size=6, shadow_size=2):
-    print("🎨 Generating SMART Dynamic ASS Subtitles...")
+    print("🎨 Generating SMART Dynamic ASS Subtitles (Smooth 3x Blink + Rare Explosion)...")
 
     # Colors
     COLOR_ACTIVE_CYAN = "&H00FFFF00" # Bright Cyan
     COLOR_ACTIVE_RED  = "&H000000FF" # Intense Red
     COLOR_WHITE       = "&H00FFFFFF" # White
     
-    # Position Settings (1920x1080 Landscape Video)
+    # 🔥 POSITION SETTINGS (Vertical Margin 65)
     TEXT_X = 960
-    TEXT_Y = 540  
+    TEXT_Y = 1080 - vertical_margin  # 1080 - 65 = 1015 (Bottom Placement)
     
-    # 🔥 Explosive Words (Agar ye words aayen toh blast hoga)
-    EXPLOSIVE_WORDS = {"BOOM", "KILL", "DIE", "SH*T", "F*CK", "DAMN", "NO", "WAIT", "WOW", "HOLY", "CRAZY", "INSANE", "DESTROY", "BLAST"}
+    # 🔥 Explosive Words (Kam kar diye taaki bar-bar blast na ho)
+    EXPLOSIVE_WORDS = {"BOOM", "KILL", "DIE", "SH*T", "F*CK", "DESTROY", "BLAST"}
     
     ass_events = ""
 
@@ -251,10 +254,18 @@ def generate_full_ass_script(audio_files, font_name="BebasNeue-Regular", font_si
 
         # Check Scene Type & Explosive Words
         visual_type = item.get("visual_type", "calm").lower()
-        has_explosive_word = any(w.upper() in EXPLOSIVE_WORDS for w in words)
         
-        # 🔥 SMART LOGIC: Blast tabhi hoga jab Action scene ho YA explosive word ho
-        is_explosive_scene = (visual_type == "action") or has_explosive_word
+        # 🔥 SMART TRIGGER LOGIC (Kam baar blast hoga)
+        last_word = words[-1].upper()
+        has_explosive_word = last_word in EXPLOSIVE_WORDS
+        
+        is_explosive_scene = False
+        if has_explosive_word:
+            is_explosive_scene = True
+        elif visual_type == "action":
+            # Action scene me bhi sirf 40% chance hi blast hone ka
+            if random.random() < 0.4:
+                is_explosive_scene = True
 
         total_dur = end - start
         if total_dur <= 0:
@@ -262,6 +273,24 @@ def generate_full_ass_script(audio_files, font_name="BebasNeue-Regular", font_si
 
         total_words = len(words)
         dur_per_word = total_dur / total_words
+
+        # 🔥 AUTO-FIT FONT SIZE (Line bahar nahi jayegi)
+        line_str_preview = " ".join([w.upper() for w in words])
+        current_font_size = font_size
+        if len(line_str_preview) > 24:
+            current_font_size = int(font_size * (24 / len(line_str_preview)))
+            current_font_size = max(45, current_font_size)
+
+        # 🔥 SMOOTH BLINK LOGIC (3 baar smooth chamak)
+        if visual_type == "action" or has_explosive_word:
+            # Smooth fade 3x
+            blink_effect = "\\t(0,100,\\alpha&H80&)\\t(100,200,\\alpha&H00&)\\t(200,300,\\alpha&H80&)\\t(300,400,\\alpha&H00&)\\t(400,500,\\alpha&H80&)\\t(500,600,\\alpha&H00&)"
+        elif visual_type == "dialog":
+            # Dialog: 1 slow gentle fade
+            blink_effect = "\\t(0,300,\\alpha&H80&)\\t(300,600,\\alpha&H00&)"
+        else:
+            # Calm: No blink
+            blink_effect = ""
 
         # 1. PROGRESSIVE ANIMATION (Word by Word)
         for active_idx in range(total_words):
@@ -279,22 +308,22 @@ def generate_full_ass_script(audio_files, font_name="BebasNeue-Regular", font_si
                     anim = "{\\fscx80\\fscy80\\alpha&H80&\\blur2\\t(0,600,\\fscx50\\fscy50\\alpha&HFF&)}"
                     
                 elif j == active_idx:
-                    # ACTIVE WORD: Smooth Glow Pop-in
+                    # ACTIVE WORD: Pop-in + Smooth Blink
                     color = COLOR_ACTIVE_RED if is_last else COLOR_ACTIVE_CYAN
-                    anim = "{\\fscx160\\fscy160\\blur15\\t(0,600,\\fscx100\\fscy100\\blur3)}"
+                    anim = f"{{\\fscx160\\fscy160\\blur15\\t(0,600,\\fscx100\\fscy100\\blur3){blink_effect}}}"
 
                 word_anim = f"{anim}{{\\c{color}}}{w.upper()}"
                 styled_words.append(word_anim)
 
             # SINGLE LINE LOGIC
-            full_line = f"{{\\an5\\pos({TEXT_X},{TEXT_Y})\\fsp2\\fs{font_size}\\bord{outline_size}\\shad{shadow_size}}}" + " ".join(styled_words)
+            full_line = f"{{\\an2\\pos({TEXT_X},{TEXT_Y})\\fsp2\\fs{current_font_size}\\bord{outline_size}\\shad{shadow_size}}}" + " ".join(styled_words)
 
             start_t = seconds_to_ass_time(w_start)
             end_t = seconds_to_ass_time(w_end)
             
             ass_events += f"Dialogue: 0,{start_t},{end_t},Default,,0,0,0,,{full_line}\n"
 
-            # 2. SMART BLINK + EXPLOSION (Sirf Action ya Explosive words pe)
+            # 2. EXPLOSION (Sirf tab jab upar ka logic true ho)
             if active_idx == total_words - 1 and is_explosive_scene:
                 # A. Blink Effect (Flash on last word)
                 blink_styled = []
@@ -304,27 +333,26 @@ def generate_full_ass_script(audio_files, font_name="BebasNeue-Regular", font_si
                     else:
                         blink_styled.append(f"{{\\c{COLOR_WHITE}\\alpha&HFF&}}{w.upper()}")
                 
-                blink_line = f"{{\\an5\\pos({TEXT_X},{TEXT_Y})\\fsp2\\fs{font_size}\\bord{outline_size}\\shad{shadow_size}}}" + " ".join(blink_styled)
+                blink_line = f"{{\\an2\\pos({TEXT_X},{TEXT_Y})\\fsp2\\fs{current_font_size}\\bord{outline_size}\\shad{shadow_size}}}" + " ".join(blink_styled)
 
                 b1_start = w_end
                 b1_end = b1_start + 0.15 
                 ass_events += f"Dialogue: 1,{seconds_to_ass_time(b1_start)},{seconds_to_ass_time(b1_end)},Default,,0,0,0,,{blink_line}\n"
 
-                # B. EXPLOSION EFFECT (Letters toot kar udenge)
+                # B. EXPLOSION EFFECT
                 explode_start = w_end + 0.05
                 explode_dur = 1.2 
                 explode_end = explode_start + explode_dur
                 
-                line_str = " ".join([w.upper() for w in words])
-                char_w = font_size // 2
-                total_width = len(line_str) * char_w
+                char_w = current_font_size // 2
+                total_width = len(line_str_preview) * char_w
                 start_x = TEXT_X - (total_width / 2)
                 
-                for char_idx, char in enumerate(line_str):
+                for char_idx, char in enumerate(line_str_preview):
                     if char == " ": continue
                     
                     char_x = start_x + (char_idx * char_w)
-                    y_pos = TEXT_Y
+                    y_pos = TEXT_Y - (current_font_size / 2) 
                     
                     dx = random.randint(-800, 800)
                     dy = random.randint(-900, 200)
@@ -335,7 +363,7 @@ def generate_full_ass_script(audio_files, font_name="BebasNeue-Regular", font_si
                         f"{{\\an5\\pos({char_x},{y_pos})"
                         f"\\move({char_x},{y_pos},{char_x+dx},{y_pos+dy},0,{int(explode_dur*1000)})"
                         f"\\frz{rot}\\t(0,{int(explode_dur*1000)},\\alpha&HFF&\\fscx20\\fscy20)"
-                        f"\\c{c}\\bord{outline_size-1}\\blur2\\fs{font_size}\\b1}}{char}"
+                        f"\\c{c}\\bord{outline_size-1}\\blur2\\fs{current_font_size}\\b1}}{char}"
                     )
                     
                     ass_events += f"Dialogue: 2,{seconds_to_ass_time(explode_start)},{seconds_to_ass_time(explode_end)},Default,,0,0,0,,{tag}\n"
@@ -349,7 +377,7 @@ WrapStyle: 2
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,{font_name},{font_size},&H00FFFFFF,&H000000FF,&H00000000,&H80000000,-1,0,0,0,100,100,0,0,1,{outline_size},{shadow_size},5,10,10,10,1
+Style: Default,{font_name},{font_size},&H00FFFFFF,&H000000FF,&H00000000,&H80000000,-1,0,0,0,100,100,0,0,1,{outline_size},{shadow_size},2,10,10,{vertical_margin},1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -359,7 +387,8 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         f.write(ass_content)
 
     print(f"✅ SMART ASS Subtitles saved: {ASS_PATH}")
-    print(f"   🎨 Style: Dynamic (Action=Explosion | Calm=Smooth Fade)\n")
+    print(f"   🎨 Style: Smooth 3x Blink + Rare Explosion")
+    print(f"   📏 Position: Vertical Margin {vertical_margin} | Auto-Fit: Enabled\n")
 
 
 # ============================================================
@@ -1719,7 +1748,7 @@ def fallback_copy_original():
 # ============================================================
 def main():
     print("=" * 60)
-    print("🎙️ AI COMMENTARY DUBBER — v6.3 (Dynamic Smart Subtitles)")
+    print("🎙️ AI COMMENTARY DUBBER — v6.4 (Rare Explosion + Smooth Subtitle)")
     print("=" * 60)
     print(f"📹 Input : {FINAL_CLIP_PATH}")
     print(f"📤 Output: {FINAL_DUBBED_VIDEO}")
@@ -1729,7 +1758,7 @@ def main():
     print(f"🎵 atempo: normal={ATEMPO_MAX} | last={ATEMPO_MAX_LAST} | action={ATEMPO_MAX_ACTION}")
     print(f"📏 Slot extend: max {MAX_SLOT_EXTEND}s")
     print(f"🔊 Volume: Action={VOL_ACTION}x | Other={VOL_OTHER}x")
-    print(f"🎨 Subtitle: Smart Dynamic (Action = Blink/Explosion | Calm = Smooth)")
+    print(f"🎨 Subtitle: Smooth 3x Blink + Rare Explosion (40% chance)")
     print(f"🎮 Mode: REAL-TIME GAMEPLAY (18 rules)")
     print("=" * 60 + "\n")
 
@@ -1787,10 +1816,10 @@ def main():
             generate_full_ass_script(
                 audio_files=audio_files,
                 font_name="BebasNeue-Regular",
-                font_size=80,      # 1920x1080 ke hisaab se bada size
-                alignment=5,
+                font_size=80,
+                alignment=2,
                 outline_size=6,
-                vertical_margin=40
+                vertical_margin=65  # 👈 Yahan 65 set kiya hai
             )
 
         final_audio = build_timed_audio(audio_files, vid_dur)
