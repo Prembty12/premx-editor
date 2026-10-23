@@ -293,11 +293,10 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             colored_words = []
             for j, vw in enumerate(visible_words):
                 color = get_pattern_color(j, total_words)
-                # Capitalize the word to look like the screenshots
-                word_upper = vw.upper()
+                word_upper = vw.upper()  # Text ko CAPS mein convert karta hai
                 colored_words.append(f"{{\\c{color}}}{word_upper}{{\\c{COLOR_RESET}}}")
             
-            # \fs42 = Har word ka size fade in hoga (chota aur clean)
+            # Visual Animation Tags: Fade In + Glow + Spacing + Chota Size
             anim_tag = "{\\fsp8\\blur1.5\\fs42\\fad(100,0)}"
             colored_text = anim_tag + " ".join(colored_words)
 
