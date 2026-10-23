@@ -17,7 +17,7 @@ FEATURES:
   ✅ 3 Models Auto-Retry (JSON Object + Healing)
   ✅ Sanitized Text (NoneType Crash Fixed)
   ✅ Strict Completeness Check (Rejects incomplete segments)
-  ✅ Cinematic Subtitles (Cyan/Red + ALL CAPS + Glow + Spacing)
+  ✅ Cinematic Subtitles (Cyan/Red + ALL CAPS + Fade In + Glow + Spacing)
 ===============================================================
 """
 
@@ -1154,39 +1154,25 @@ Return ONLY valid JSON:
     winning_model = None
     winning_route = None
 
-    # =====================================================
-    # MODEL 1
-    # =====================================================
-    print(f"🤖 [MODEL TRY 1] nvidia/nemotron-3.5-super-vl:free (max 2 attempts total)")
-    first_attempts = [OPENROUTER_KEYS[0], OPENROUTER_KEYS[1]] if len(OPENROUTER_KEYS) >= 2 else [OPENROUTER_KEYS[0]] * 2 if len(OPENROUTER_KEYS) == 1 else []
-    
-    for attempt, key in enumerate(first_attempts, start=1):
-        if segments: break
-        if attempt > 1: time.sleep(2)
-        print(f"   🔑 Attempt {attempt}/{len(first_attempts)}...", end=" ")
-        segs, actual, err = _try_call("nvidia/nemotron-3.5-super-vl:free", key)
-        if segs:
-            segments, winning_model, winning_route = segs, "nvidia/nemotron-3.5-super-vl:free", actual
-            print(f"✅ SUCCESS! (Actual: {actual})")
-        elif err == "not_found":
-            print("❌ Model Not Found — skipping")
-            break
-        else:
-            print(f"⚠️ {err} → next attempt")
-    print()
+    # ✅ NAYA LOOP: Retry from beginning if all fail
+    for full_retry in range(2):
+        if full_retry > 0:
+            print("\n🔄 ALL MODELS FAILED! Restarting from Nvidia Model 1...\n")
+            time.sleep(3)
 
-    # =====================================================
-    # MODEL 2
-    # =====================================================
-    if not segments:
-        print(f"🤖 [MODEL TRY 2] nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free (max 2 attempts total)")
+        # =====================================================
+        # MODEL 1
+        # =====================================================
+        print(f"🤖 [MODEL TRY 1] nvidia/nemotron-3.5-super-vl:free (max 2 attempts total)")
+        first_attempts = [OPENROUTER_KEYS[0], OPENROUTER_KEYS[1]] if len(OPENROUTER_KEYS) >= 2 else [OPENROUTER_KEYS[0]] * 2 if len(OPENROUTER_KEYS) == 1 else []
+        
         for attempt, key in enumerate(first_attempts, start=1):
             if segments: break
             if attempt > 1: time.sleep(2)
             print(f"   🔑 Attempt {attempt}/{len(first_attempts)}...", end=" ")
-            segs, actual, err = _try_call("nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free", key)
+            segs, actual, err = _try_call("nvidia/nemotron-3.5-super-vl:free", key)
             if segs:
-                segments, winning_model, winning_route = segs, "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free", actual
+                segments, winning_model, winning_route = segs, "nvidia/nemotron-3.5-super-vl:free", actual
                 print(f"✅ SUCCESS! (Actual: {actual})")
             elif err == "not_found":
                 print("❌ Model Not Found — skipping")
@@ -1195,55 +1181,71 @@ Return ONLY valid JSON:
                 print(f"⚠️ {err} → next attempt")
         print()
 
-    # =====================================================
-    # MODEL 3
-    # =====================================================
-    if not segments:
-        print(f"🤖 [MODEL TRY 3] openrouter/free (each key up to 2 tries → max {len(OPENROUTER_KEYS)*2} attempts)")
-        stop_m3 = False
-        for k_idx, key in enumerate(OPENROUTER_KEYS, start=1):
-            if segments or stop_m3: break
-            for retry in range(2):
-                if segments or stop_m3: break
-                if retry > 0: time.sleep(1.5)
-                print(f"   🔑 Key {k_idx}/{len(OPENROUTER_KEYS)} — try {retry+1}/2...", end=" ")
-                segs, actual, err = _try_call("openrouter/free", key)
+        # =====================================================
+        # MODEL 2
+        # =====================================================
+        if not segments:
+            print(f"🤖 [MODEL TRY 2] nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free (max 2 attempts total)")
+            for attempt, key in enumerate(first_attempts, start=1):
+                if segments: break
+                if attempt > 1: time.sleep(2)
+                print(f"   🔑 Attempt {attempt}/{len(first_attempts)}...", end=" ")
+                segs, actual, err = _try_call("nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free", key)
                 if segs:
-                    segments, winning_model, winning_route = segs, "openrouter/free", actual
+                    segments, winning_model, winning_route = segs, "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free", actual
                     print(f"✅ SUCCESS! (Actual: {actual})")
-                    break
                 elif err == "not_found":
                     print("❌ Model Not Found — skipping")
-                    stop_m3 = True
                     break
-                elif err in ("json", "empty", "incomplete"):
-                    if retry == 0:
-                        print(f"⚠️ {err} → retry same key")
-                        continue
+                else:
+                    print(f"⚠️ {err} → next attempt")
+            print()
+
+        # =====================================================
+        # MODEL 3
+        # =====================================================
+        if not segments:
+            print(f"🤖 [MODEL TRY 3] openrouter/free (each key up to 2 tries → max {len(OPENROUTER_KEYS)*2} attempts)")
+            stop_m3 = False
+            for k_idx, key in enumerate(OPENROUTER_KEYS, start=1):
+                if segments or stop_m3: break
+                for retry in range(2):
+                    if segments or stop_m3: break
+                    if retry > 0: time.sleep(1.5)
+                    print(f"   🔑 Key {k_idx}/{len(OPENROUTER_KEYS)} — try {retry+1}/2...", end=" ")
+                    segs, actual, err = _try_call("openrouter/free", key)
+                    if segs:
+                        segments, winning_model, winning_route = segs, "openrouter/free", actual
+                        print(f"✅ SUCCESS! (Actual: {actual})")
+                        break
+                    elif err == "not_found":
+                        print("❌ Model Not Found — skipping")
+                        stop_m3 = True
+                        break
+                    elif err in ("json", "empty", "incomplete"):
+                        if retry == 0:
+                            print(f"⚠️ {err} → retry same key")
+                            continue
+                        else:
+                            print(f"⚠️ {err} → next key")
+                            break
                     else:
                         print(f"⚠️ {err} → next key")
                         break
-                else:
-                    print(f"⚠️ {err} → next key")
-                    break
-        print()
+            print()
 
+        if segments:
+            break # Agar koi model pass ho gaya, toh loop se bahar nikal jao
+
+    # ✅ FALLBACK: Agar 2 baar me bhi fail hua, toh original video copy karo
     if not segments:
-        print("⚠️ All OpenRouter models and keys failed — using fallback\n")
-        FALLBACK = {
-            "action": ["Ohh things are heating up!", "He's in the middle of it!",
-                       "Chaos everywhere!", "Let him cook!"],
-            "dialog": ["Wait, what did he say?", "Hmm interesting...",
-                       "He's talking to someone!", "What's the plan here?"],
-            "calm":   ["Just vibing here, chilling.", "Too quiet... sus.",
-                       "Taking in the view...", "Chill vibes here..."]
-        }
-        return [
-            {"slot": i+1, "start": s["start"], "end": s["end"],
-             "text": FALLBACK[s["type"]][i % 4],
-             "visual_type": s["type"]}
-            for i, s in enumerate(slots)
-        ]
+        print("❌ All OpenRouter models failed after 2 full retries.")
+        print("🎬 Uploading original video as fallback...")
+        commit_analysis_to_github()
+        if fallback_copy_original():
+            sys.exit(0)
+        else:
+            sys.exit(1)
 
     print(f"=======================================================\n🏆 WINNING MODEL: {winning_model}")
     if winning_model != winning_route and winning_route:
