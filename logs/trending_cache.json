@@ -1,13 +1,13 @@
 {
-  "last_updated": "2026-10-23 02:52:42 PM",
+  "last_updated": "2026-10-23 03:06:02 PM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 5648,
-      "avg_per_video": 627,
+      "views_7d": 5678,
+      "avg_per_video": 630,
       "trend": "viral",
-      "ratio": 2.7042513863216264,
+      "ratio": 2.708845208845209,
       "fb_link": "https://www.facebook.com/reel/1437173231884696/",
       "source_link": ""
     },
@@ -16,7 +16,7 @@
       "views_7d": 1321,
       "avg_per_video": 440,
       "trend": "trending",
-      "ratio": 1.8977202711028958,
+      "ratio": 1.8918918918918919,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions15.mp4"
     },
@@ -25,7 +25,7 @@
       "views_7d": 2680,
       "avg_per_video": 297,
       "trend": "steady",
-      "ratio": 1.2809611829944547,
+      "ratio": 1.277027027027027,
       "fb_link": "",
       "source_link": ""
     }
@@ -36,16 +36,16 @@
       "views_7d": 640,
       "avg_per_video": 128,
       "trend": "slow",
-      "ratio": 0.5520640788662969,
+      "ratio": 0.5503685503685504,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "CallOfDutyMW2",
-      "views_7d": 134,
-      "avg_per_video": 67,
+      "views_7d": 139,
+      "avg_per_video": 69,
       "trend": "below_avg",
-      "ratio": 0.2889710412815773,
+      "ratio": 0.2966830466830467,
       "fb_link": "https://www.facebook.com/reel/2181972149061480/",
       "source_link": ""
     },
@@ -54,7 +54,7 @@
       "views_7d": 647,
       "avg_per_video": 64,
       "trend": "below_avg",
-      "ratio": 0.27603203943314847,
+      "ratio": 0.2751842751842752,
       "fb_link": "",
       "source_link": ""
     },
@@ -70,10 +70,10 @@
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 5648,
-    "avg_per_video": 627,
+    "views_7d": 5678,
+    "avg_per_video": 630,
     "trend": "viral",
-    "ratio": 2.7042513863216264,
+    "ratio": 2.708845208845209,
     "fb_link": "https://www.facebook.com/reel/1437173231884696/",
     "source_link": ""
   }
