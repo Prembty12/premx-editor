@@ -5,47 +5,47 @@
         "total_views": 10975,
         "uploaded_videos": 16,
         "avg_views_per_video": 685,
-        "view_share_percentage": 19.71
+        "view_share_percentage": 20.32
     },
     {
         "rank": 2,
         "game_name": "MarvelsSpiderMan2",
-        "total_views": 6499,
+        "total_views": 6500,
         "uploaded_videos": 33,
         "avg_views_per_video": 196,
-        "view_share_percentage": 11.67
+        "view_share_percentage": 12.04
     },
     {
         "rank": 3,
         "game_name": "Russian_secret_missions",
-        "total_views": 6457,
+        "total_views": 6458,
         "uploaded_videos": 26,
         "avg_views_per_video": 248,
-        "view_share_percentage": 11.6
+        "view_share_percentage": 11.96
     },
     {
         "rank": 4,
         "game_name": "CODMW4",
-        "total_views": 6391,
+        "total_views": 6408,
         "uploaded_videos": 15,
-        "avg_views_per_video": 426,
-        "view_share_percentage": 11.48
+        "avg_views_per_video": 427,
+        "view_share_percentage": 11.87
     },
     {
         "rank": 5,
-        "game_name": "Callofdutyaw",
-        "total_views": 6357,
-        "uploaded_videos": 17,
-        "avg_views_per_video": 373,
-        "view_share_percentage": 11.42
-    },
-    {
-        "rank": 6,
         "game_name": "codBlackops6",
         "total_views": 4751,
         "uploaded_videos": 11,
         "avg_views_per_video": 431,
-        "view_share_percentage": 8.53
+        "view_share_percentage": 8.8
+    },
+    {
+        "rank": 6,
+        "game_name": "Callofdutyaw",
+        "total_views": 4656,
+        "uploaded_videos": 17,
+        "avg_views_per_video": 273,
+        "view_share_percentage": 8.62
     },
     {
         "rank": 7,
@@ -53,7 +53,7 @@
         "total_views": 4160,
         "uploaded_videos": 10,
         "avg_views_per_video": 416,
-        "view_share_percentage": 7.47
+        "view_share_percentage": 7.7
     },
     {
         "rank": 8,
@@ -61,7 +61,7 @@
         "total_views": 3472,
         "uploaded_videos": 14,
         "avg_views_per_video": 248,
-        "view_share_percentage": 6.24
+        "view_share_percentage": 6.43
     },
     {
         "rank": 9,
@@ -69,7 +69,7 @@
         "total_views": 3364,
         "uploaded_videos": 12,
         "avg_views_per_video": 280,
-        "view_share_percentage": 6.04
+        "view_share_percentage": 6.23
     },
     {
         "rank": 10,
@@ -77,7 +77,7 @@
         "total_views": 1620,
         "uploaded_videos": 26,
         "avg_views_per_video": 62,
-        "view_share_percentage": 2.91
+        "view_share_percentage": 3.0
     },
     {
         "rank": 11,
@@ -85,14 +85,14 @@
         "total_views": 868,
         "uploaded_videos": 19,
         "avg_views_per_video": 45,
-        "view_share_percentage": 1.56
+        "view_share_percentage": 1.61
     },
     {
         "rank": 12,
         "game_name": "ghostandela",
         "total_views": 770,
-        "uploaded_videos": 32,
-        "avg_views_per_video": 24,
-        "view_share_percentage": 1.38
+        "uploaded_videos": 33,
+        "avg_views_per_video": 23,
+        "view_share_percentage": 1.43
     }
 ]

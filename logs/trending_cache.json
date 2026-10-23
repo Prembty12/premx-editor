@@ -1,13 +1,13 @@
 {
-  "last_updated": "2026-10-23 10:52:46 PM",
+  "last_updated": "2026-10-23 11:23:44 PM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 6391,
-      "avg_per_video": 639,
+      "views_7d": 6408,
+      "avg_per_video": 640,
       "trend": "viral",
-      "ratio": 2.67044776119403,
+      "ratio": 2.682634730538922,
       "fb_link": "",
       "source_link": ""
     },
@@ -16,16 +16,16 @@
       "views_7d": 1321,
       "avg_per_video": 440,
       "trend": "trending",
-      "ratio": 1.8388059701492538,
+      "ratio": 1.8443113772455089,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions15.mp4"
     },
     {
       "game": "MarvelsSpiderMan2",
-      "views_7d": 2738,
+      "views_7d": 2739,
       "avg_per_video": 342,
       "trend": "steady",
-      "ratio": 1.4292537313432836,
+      "ratio": 1.4335329341317364,
       "fb_link": "",
       "source_link": ""
     }
@@ -36,7 +36,7 @@
       "views_7d": 640,
       "avg_per_video": 106,
       "trend": "below_avg",
-      "ratio": 0.4429850746268657,
+      "ratio": 0.44431137724550895,
       "fb_link": "",
       "source_link": ""
     },
@@ -45,16 +45,16 @@
       "views_7d": 169,
       "avg_per_video": 84,
       "trend": "below_avg",
-      "ratio": 0.351044776119403,
+      "ratio": 0.3520958083832335,
       "fb_link": "https://www.facebook.com/reel/2181972149061480/",
       "source_link": ""
     },
     {
       "game": "Wolverine",
       "views_7d": 648,
-      "avg_per_video": 64,
+      "avg_per_video": 58,
       "trend": "below_avg",
-      "ratio": 0.2674626865671642,
+      "ratio": 0.2431137724550898,
       "fb_link": "",
       "source_link": ""
     },
@@ -70,10 +70,10 @@
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 6391,
-    "avg_per_video": 639,
+    "views_7d": 6408,
+    "avg_per_video": 640,
     "trend": "viral",
-    "ratio": 2.67044776119403,
+    "ratio": 2.682634730538922,
     "fb_link": "",
     "source_link": ""
   }
