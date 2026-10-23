@@ -5,7 +5,7 @@
         "total_views": 10975,
         "uploaded_videos": 16,
         "avg_views_per_video": 685,
-        "view_share_percentage": 19.58
+        "view_share_percentage": 19.87
     },
     {
         "rank": 2,
@@ -13,15 +13,15 @@
         "total_views": 6457,
         "uploaded_videos": 26,
         "avg_views_per_video": 248,
-        "view_share_percentage": 11.52
+        "view_share_percentage": 11.69
     },
     {
         "rank": 3,
         "game_name": "MarvelsSpiderMan2",
-        "total_views": 6431,
+        "total_views": 6432,
         "uploaded_videos": 32,
-        "avg_views_per_video": 200,
-        "view_share_percentage": 11.48
+        "avg_views_per_video": 201,
+        "view_share_percentage": 11.65
     },
     {
         "rank": 4,
@@ -29,15 +29,15 @@
         "total_views": 6357,
         "uploaded_videos": 17,
         "avg_views_per_video": 373,
-        "view_share_percentage": 11.34
+        "view_share_percentage": 11.51
     },
     {
         "rank": 5,
         "game_name": "CODMW4",
-        "total_views": 5678,
+        "total_views": 5698,
         "uploaded_videos": 14,
-        "avg_views_per_video": 405,
-        "view_share_percentage": 10.13
+        "avg_views_per_video": 407,
+        "view_share_percentage": 10.32
     },
     {
         "rank": 6,
@@ -45,23 +45,23 @@
         "total_views": 5081,
         "uploaded_videos": 11,
         "avg_views_per_video": 461,
-        "view_share_percentage": 9.07
+        "view_share_percentage": 9.2
     },
     {
         "rank": 7,
-        "game_name": "mm2remastered",
-        "total_views": 4310,
-        "uploaded_videos": 14,
-        "avg_views_per_video": 307,
-        "view_share_percentage": 7.69
-    },
-    {
-        "rank": 8,
         "game_name": "GearsOfWar",
         "total_views": 4160,
         "uploaded_videos": 10,
         "avg_views_per_video": 416,
-        "view_share_percentage": 7.42
+        "view_share_percentage": 7.53
+    },
+    {
+        "rank": 8,
+        "game_name": "mm2remastered",
+        "total_views": 3472,
+        "uploaded_videos": 14,
+        "avg_views_per_video": 248,
+        "view_share_percentage": 6.29
     },
     {
         "rank": 9,
@@ -69,7 +69,7 @@
         "total_views": 3334,
         "uploaded_videos": 12,
         "avg_views_per_video": 277,
-        "view_share_percentage": 5.95
+        "view_share_percentage": 6.04
     },
     {
         "rank": 10,
@@ -77,7 +77,7 @@
         "total_views": 1619,
         "uploaded_videos": 25,
         "avg_views_per_video": 64,
-        "view_share_percentage": 2.89
+        "view_share_percentage": 2.93
     },
     {
         "rank": 11,
@@ -85,14 +85,14 @@
         "total_views": 868,
         "uploaded_videos": 19,
         "avg_views_per_video": 45,
-        "view_share_percentage": 1.55
+        "view_share_percentage": 1.57
     },
     {
         "rank": 12,
         "game_name": "ghostandela",
         "total_views": 770,
-        "uploaded_videos": 31,
+        "uploaded_videos": 32,
         "avg_views_per_video": 24,
-        "view_share_percentage": 1.37
+        "view_share_percentage": 1.39
     }
 ]
