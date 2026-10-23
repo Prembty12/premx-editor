@@ -1,13 +1,13 @@
 {
-  "last_updated": "2026-10-23 10:50:21 PM",
+  "last_updated": "2026-10-23 10:52:46 PM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 6388,
-      "avg_per_video": 638,
+      "views_7d": 6391,
+      "avg_per_video": 639,
       "trend": "viral",
-      "ratio": 2.6678614097968936,
+      "ratio": 2.67044776119403,
       "fb_link": "",
       "source_link": ""
     },
@@ -16,16 +16,16 @@
       "views_7d": 1321,
       "avg_per_video": 440,
       "trend": "trending",
-      "ratio": 1.8399044205495818,
+      "ratio": 1.8388059701492538,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions15.mp4"
     },
     {
       "game": "MarvelsSpiderMan2",
-      "views_7d": 2736,
+      "views_7d": 2738,
       "avg_per_video": 342,
       "trend": "steady",
-      "ratio": 1.4301075268817205,
+      "ratio": 1.4292537313432836,
       "fb_link": "",
       "source_link": ""
     }
@@ -36,7 +36,7 @@
       "views_7d": 640,
       "avg_per_video": 106,
       "trend": "below_avg",
-      "ratio": 0.4432497013142174,
+      "ratio": 0.4429850746268657,
       "fb_link": "",
       "source_link": ""
     },
@@ -45,7 +45,7 @@
       "views_7d": 169,
       "avg_per_video": 84,
       "trend": "below_avg",
-      "ratio": 0.35125448028673834,
+      "ratio": 0.351044776119403,
       "fb_link": "https://www.facebook.com/reel/2181972149061480/",
       "source_link": ""
     },
@@ -54,7 +54,7 @@
       "views_7d": 648,
       "avg_per_video": 64,
       "trend": "below_avg",
-      "ratio": 0.26762246117084826,
+      "ratio": 0.2674626865671642,
       "fb_link": "",
       "source_link": ""
     },
@@ -70,10 +70,10 @@
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 6388,
-    "avg_per_video": 638,
+    "views_7d": 6391,
+    "avg_per_video": 639,
     "trend": "viral",
-    "ratio": 2.6678614097968936,
+    "ratio": 2.67044776119403,
     "fb_link": "",
     "source_link": ""
   }
