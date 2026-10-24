@@ -17,7 +17,7 @@ FEATURES:
   ✅ 3 Models Auto-Retry (JSON Object + Healing)
   ✅ Sanitized Text (NoneType Crash Fixed)
   ✅ Strict Completeness Check (Rejects incomplete segments)
-  ✅ Cinematic Subtitles (Cyan/Red + ALL CAPS + Smooth Glow Pulse)
+  ✅ Cinematic Subtitles (3D Shadow + Glow + Letter-by-Letter Typewriter + Colors)
 ===============================================================
 """
 
@@ -46,9 +46,9 @@ load_dotenv()
 # ============================================================
 # 🎛️ SUBTITLE MODE SWITCH
 # ============================================================
-# 1 = Purana System (Bina Emoji ke, sirf Cyan/Red + Pulse)
-# 2 = Naya System (AI Emoji dega, Audio me nahi jayega, Subtitle me dikhega)
-SUBTITLE_MODE = 2  
+# 1 = Purana System (Bina Emoji ke)
+# 2 = Naya System (Emoji ke saath)
+SUBTITLE_MODE = 1  
 # ============================================================
 
 
@@ -141,18 +141,31 @@ os.makedirs(FONTS_DIR, exist_ok=True)
 
 
 # ============================================================
-# 🎨 CINEMATIC COLOUR FINISHING
+# 🎨 CINEMATIC STYLE (REFERENCE STYLE)
 # ============================================================
-COLOR_CYAN   = "&H00FFFF00"
-COLOR_RED    = "&H000000FF"
-COLOR_RESET  = "&H00FFFFFF"
+# Colors from reference script
+PALETTE = {
+    "blue":   {"fill": (10, 170, 255), "glow": (0, 130, 255)},
+    "white":  {"fill": (255, 255, 255), "glow": (255, 255, 255)},
+    "red":    {"fill": (255, 0, 10),    "glow": (255, 0, 0)},
+    "orange": {"fill": (255, 175, 0),   "glow": (255, 110, 0)},
+}
 
+# 3 Layers for 3D Effect
+GLOW_SIZE    = 0.65    # glow ka phailav
+GLOW_OPACITY = 0.55    # glow kitna gehra
+LAYERS = {
+    "glow":   (0, "&H%02X&" % int(255 * (1 - GLOW_OPACITY))), # Layer 0
+    "shadow": (1, "&H90&"),                                  # Layer 1
+    "text":   (2, "&H00&"),                                  # Layer 2
+}
 
-def get_pattern_color(word_index, total_words):
-    if word_index == total_words - 1:
-        return COLOR_RED
-    else:
-        return COLOR_CYAN
+IN_FADE  = 0.12
+OUT_FADE = 0.35
+
+def ass_color(rgb):
+    r, g, b = rgb
+    return f"&H{b:02X}{g:02X}{r:02X}&"
 
 
 # ============================================================
@@ -191,10 +204,11 @@ def seconds_to_srt_time(seconds):
 
 
 def seconds_to_ass_time(seconds):
-    h = int(seconds // 3600)
-    m = int((seconds % 3600) // 60)
-    s = int(seconds % 60)
-    cs = int(((seconds - int(seconds)) * 100))
+    cs_total = int(round(max(seconds, 0) * 100))
+    h = cs_total // 360000
+    m = (cs_total % 360000) // 6000
+    s = (cs_total % 6000) // 100
+    cs = cs_total % 100
     return f"{h}:{m:02d}:{s:02d}.{cs:02d}"
 
 
@@ -242,94 +256,142 @@ def speed_for_type(slot_type):
 
 
 # ============================================================
-# ASS SUBTITLE GENERATOR
+# ASS SUBTITLE GENERATOR (REFERENCE STYLE)
 # ============================================================
-def generate_full_ass_script(audio_files, font_name="Arial", font_size=60,
-                              alignment=2, vertical_margin=40,
-                              outline_size=3, shadow_size=2):
-    print("🎨 Generating ASS Subtitles (CINEMATIC FINISHING)...")
+def generate_full_ass_script(audio_files, font_name="Arial", font_size=45,
+                              alignment=2, vertical_margin=65,
+                              outline_size=0, shadow_size=0):
+    print("🎨 Generating ASS Subtitles (REFERENCE CINEMATIC STYLE)...")
 
     ass_content = f"""[Script Info]
 ScriptType: v4.00+
 PlayResX: 1920
 PlayResY: 1080
 ScaledBorderAndShadow: yes
+WrapStyle: 2
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,{font_name},{font_size},&H00FFFFFF,&H000000FF,&H00000000,&H00000000,1,0,0,0,100,100,0,0,1,{outline_size},{shadow_size},{alignment},10,10,{vertical_margin},1
+Style: Default,{font_name},{font_size},&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,{outline_size},{shadow_size},{alignment},10,10,{vertical_margin},1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
 
     written = 0
+    W, H = 1920, 1080
 
     for item in audio_files:
         start = item.get("start", 0)
         end = item.get("actual_end", item.get("end", 3))
         
-        # Safe text extraction
         raw_text = item.get("text")
-        text = str(raw_text).strip() if raw_text is not None else ""
+        text = str(raw_text).strip().upper() if raw_text is not None else ""
         if not text or text.lower() == "none":
             continue
 
-        words = text.split()
-        if not words:
-            continue
-
+        visual_type = (item.get("visual_type") or "calm").lower()
+        
+        # Timing for letter-by-letter
         total_dur = end - start
         if total_dur <= 0:
             total_dur = 1.0
+            
+        # Remove spaces for timing calculation
+        clean_text = text.replace(" ", "")
+        n_chars = len(clean_text)
+        if n_chars == 0:
+            continue
+            
+        in_st = min(total_dur / n_chars, 0.06) # Dynamic stagger timing
+        out_st = 0.03
 
-        total_chars = sum(len(w) for w in words)
-        if total_chars == 0:
-            total_chars = 1
-
+        # Color Logic
+        words = text.split()
         total_words = len(words)
-        current_time = start
-        cumulative_chars = 0
 
-        for i, w in enumerate(words):
-            cumulative_chars += len(w)
-            frac = cumulative_chars / total_chars
-            seg_end = start + (total_dur * frac)
+        ev0 = start - 0.05
+        ev1 = end + (n_chars - 1) * out_st + OUT_FADE + 0.05
+        dur_ms = int((ev1 - ev0) * 1000)
+        
+        def rel(t):
+            return max(0, int((t - ev0) * 1000))
 
-            visible_words = words[:i+1]
-            colored_words = []
-            
-            BLINK_WORDS = {"OH", "BRO", "SH*T", "F*CK", "DAMN", "COOKED", "KILL", "DEAD", "EZ", "CLAP", "LET'S", "GO", "BODIED", "DESTROYED", "ONE", "SHOT", "NO", "YES", "WOW", "HOLY", "BABY"}
-            
-            for j, vw in enumerate(visible_words):
-                color = get_pattern_color(j, total_words)
-                word_upper = vw.upper()
-                clean_word = re.sub(r'[^\w\*]', '', vw).upper() # Emoji remove karke check karega
-                
-                is_blink = (clean_word in BLINK_WORDS) or (j == total_words - 1 and item.get("visual_type") == "action")
-                
-                if is_blink:
-                    pulse_tag = "{\\t(0,150,\\blur6\\fscx110\\fscy110)\\t(150,300,\\blur1.5\\fscx100\\fscy100)}"
-                    colored_words.append(f"{pulse_tag}{{\\c{color}}}{word_upper}{{\\c{COLOR_RESET}}}")
+        # Position (Center Bottom, or Float if Action)
+        cx = W * 0.50
+        cy = H - vertical_margin - (font_size * 0.5) # Adjust for ASS alignment 2
+        
+        def pos_tag(dx=0.0, dy=0.0):
+            if visual_type == "action":
+                # Float up slightly
+                y_start = cy + 20
+                y_end = y_start - 40
+                return f"\\move({cx + dx:.1f},{y_start + dy:.1f},{cx + dx:.1f},{y_end + dy:.1f},0,{dur_ms})"
+            return f"\\pos({cx + dx:.1f},{cy + dy:.1f})"
+
+        fs = font_size
+        fsp = 8
+
+        # Build Events for all 3 layers
+        for kind, (layer, vis) in LAYERS.items():
+            # Determine base color for this layer
+            if kind == "shadow":
+                base_col = (0, 0, 0)
+                look = "\\bord0\\shad0\\blur1.5"
+                dx, dy = 1.5, 2.0
+            else:
+                base_col = PALETTE["white"]["glow" if kind == "glow" else "fill"]
+                if kind == "glow":
+                    look = f"\\bord{fs * 0.12 * GLOW_SIZE:.1f}\\shad0\\blur{fs * 0.28 * GLOW_SIZE:.1f}"
+                    dx = dy = 0.0
                 else:
-                    colored_words.append(f"{{\\c{color}}}{word_upper}{{\\c{COLOR_RESET}}}")
+                    look = "\\bord0\\shad0\\blur0.5"
+                    dx = dy = 0.0
+
+            prefix = f"{{\\an5{pos_tag(dx, dy)}\\fs{fs}\\fsp{fsp}\\b1{look}"
             
-            anim_tag = "{\\fsp8\\blur1.5\\fs42\\fad(100,0)}"
-            colored_text = anim_tag + " ".join(colored_words)
+            body = ""
+            char_idx = 0
+            
+            for w_idx, word in enumerate(words):
+                # Check if it's the last word in the line
+                if w_idx == total_words - 1:
+                    word_pal = PALETTE["red"] if visual_type == "action" else PALETTE["orange"]
+                else:
+                    word_pal = PALETTE["blue"]
 
-            start_t = seconds_to_ass_time(current_time)
-            end_t = seconds_to_ass_time(seg_end)
+                word_col = ass_color(word_pal["glow" if kind == "glow" else "fill"])
+                col_tag = f"\\1c{word_col}\\3c{word_col}" if kind == "glow" else f"\\1c{word_col}"
 
-            ass_content += f"Dialogue: 0,{start_t},{end_t},Default,,0,0,0,,{colored_text}\n"
+                # Apply color tag at the start of the word
+                body += f"{{{col_tag}}}"
+
+                for ch in word:
+                    t_in = start + char_idx * in_st
+                    t_out = end + char_idx * out_st
+                    
+                    # Alpha animation tags
+                    tags = (
+                        f"\\alpha&HFF&\\t({rel(t_in)},{rel(t_in + IN_FADE)},\\alpha{vis})"
+                        f"\\t({rel(t_out)},{rel(t_out + OUT_FADE)},\\alpha&HFF&)"
+                    )
+                    body += f"{{{tags}}}{ch}"
+                    char_idx += 1
+                
+                # Add space after word (doesn't increment char_idx)
+                if w_idx < total_words - 1:
+                    body += " "
+
+            ass_content += (f"Dialogue: {layer},{seconds_to_ass_time(ev0)},{seconds_to_ass_time(ev1)},"
+                            f"Default,,0,0,0,,{prefix}}}{body}\n")
             written += 1
-            current_time = seg_end
 
     with open(ASS_PATH, "w", encoding="utf-8") as f:
         f.write(ass_content)
 
     print(f"✅ ASS Subtitles saved: {ASS_PATH}")
-    print(f"   📊 Total subtitle lines: {written}")
-    print(f"   🎨 Style: Cinematic Finishing\n")
+    print(f"   📊 Total subtitle layers: {written}")
+    print(f"   🎨 Style: Reference Cinematic (3D + Typewriter)\n")
 
 
 # ============================================================
@@ -809,7 +871,6 @@ def classify_slots_combined(video_path, slots, srt_content):
             slot["speed_boost_log"].append(f"capped_to_{final_speed}")
         slot["voice_speed"] = final_speed
 
-    # ✅ VOICE SPEED SUMMARY + BREAKDOWN
     speeds = [s["voice_speed"] for s in slots]
     print(f"✅ Slots classified: {len(slots)}")
     print(f"🎮 Voice speeds: min={min(speeds):.2f} max={max(speeds):.2f} "
@@ -954,15 +1015,12 @@ def generate_full_script(slots, srt_content, analysis_grid_path):
             f"SRT: \"{s['srt_text'][:70]}\""
         )
 
-    # 🎯 EMOJI RULE (SIRF TAB JAB SUBTITLE_MODE == 2)
     emoji_rule = ""
     if SUBTITLE_MODE == 2:
         emoji_rule = """
 **🎯 EMOJI RULE (CRITICAL):**
 - ONLY on MAIN or HYPE moments, add 1 relevant emoji to the text.
-- Example: "BRO THE MASK 🎭", "PICK UP THE GUN 🔫", "HE'S COOKED 💀".
 - Do NOT use emojis on every line. Max 2-3 emojis in the whole video.
-- Use emojis for objects like Mask, Gun, Skull, Fire, Sword.
 """
 
     prompt = f"""You are a HYPED-UP gaming YouTuber — like a streamer going CRAZY on stream.
@@ -971,112 +1029,31 @@ You shout, laugh, hype, roast. Pure energy. Zero boring lines.
 **YOU ARE GETTING 1 IMAGE — ANALYSIS GRID:**
 - Each cell shows: "SLOT X: A.A-B.Bs" (yellow) + "frame@T.TTs" (cyan)
 - ⚠️ USE THE SLOT TIME (yellow label) — NOT the frame time
-- Match frames to slots by SLOT number
-
-**YOUR JOB:**
-Look at the frames. React LOUDLY like a real streamer watching live gameplay.
-Focus on VISUALS — characters, screens, action, environment, weapons, enemies, faces.
 
 **HOW TO TALK — NATURAL CASUAL ENGLISH:**
-- Contractions: "he's", "ain't", "gonna", "wanna", "kinda"
-- Slang: "bruh", "yo", "bro", "nah", "fr", "lowkey", "bet", "cap"
-- Short sentences. Fragments OK.
-- Start with reactions: "YO!", "BRO!", "WAIT!", "NAH!", "AYY!", "WHAT'S UP GUYS!", "AYY WHAT'S UP GUYS!",
+- Contractions, Slang ("bruh", "yo", "cooked"). Short sentences.
+- Start with reactions: "YO!", "BRO!", "WAIT!".
 
-**REACTION PATTERNS (use 20-25 varied):**
-1. BIG ACTION
-2. PREDICTIONS WITH HOOK
-3. SMART MOVES
-4. ENEMY ROAST
-5. EPIC MOMENTS
-6. FULL FREEDOM
-7. HYPE
-8. WEIRD
-9. CLOSE CALL
-10. FOLLOW REQUEST (2-3 total)
-11. FREESTYLE
-12. ENVIRONMENT
-13. SOUND
-14. CINEMATIC SHOT
-15. FLIRTY/FUNNY "BABY" (use 1-2 times, especially during clean kills or hype action): Say it playfully. DO NOT force it on calm scenes.
-16. LIKE + FOLLOW CTA (1-2 times)
-17. SWEARING (max 5-8, censor with asterisks): "Holy sh*t!", "What the f*ck!", "That's bullsh*t!", "You m*therf*cker!", "D*mn it!", "Son of a b*tch!", "F*ck yeah!", "Sh*t, bro!", "F*cking insane!", "What the h*ll!", "D*mn, bro!"
-18. HMM / THINKING (1-2 times, dialog/calm only)
-19. HYPE INTRO (1-2 times)
-20. COMMENT CTA
-21. KILL/DEATH/HIT — React INSTANTLY, NEVER skip, react to WHO killed WHOM (player kills enemy = hype/dominance, enemy kills player = pain/panic, player damaged = pain, player dodges = cocky, multi-kill = escalating), first word = reaction, no narrator lines.
-22. EMOTIONAL MOMENTS (sometimes) — react with FEELING not hype, short natural lines, no CAPS, match the mood of the frame (sad/tense/touching/character win), use 2-4 times total, don't force emotions on random action.
-23. NATURAL STREAMER TONE — Talk like a real gamer, not a news reporter. DO NOT force hype on every line. BUT, if a sudden intense moment happens (like getting hit, killing, dying, panic, or any sudden action) in a "calm" slot, INSTANTLY switch to hype (CAPS). NEVER use formal military or news words.
+**REACTION PATTERNS:**
+1. BIG ACTION, 2. HYPE, 3. CLOSE CALL, 4. ROAST, 5. SWEARING (max 5-8, censor with *), 6. KILL/DEATH/HIT — React INSTANTLY, react to WHO killed WHOM.
+7. EMOTIONAL MOMENTS (sometimes).
+8. NATURAL STREAMER TONE — Talk like a real gamer. If sudden intense moment in "calm" slot, INSTANTLY switch to hype (CAPS). NEVER use formal military or news words.
 
 **🎮 REAL-TIME GAMEPLAY MODE:**
-- You ARE the player. Not watching. React LIVE like you're in the fight RIGHT NOW.
-- Always PRESENT TENSE — happening this second, not after.
-- Every enemy death, every hit, every dodge, every shot fired — react INSTANTLY. Never miss a moment.
-- Use SHORT, EXPLOSIVE reactions when killing or destroying. Full sentences only for calm moments.
-- NEVER repeat the same reaction twice in a row. Every moment deserves a UNIQUE response.
-- VARY your reaction LENGTH — some words, some fragments, some full sentences.
-- Match VOICE TONE to the moment — whisper for tension, SHOUT for action, calm for chill.
-- If you see KILLING, DYING, DESTROYING, or DAMAGE — react FIRST, describe LATER. Reaction > description.
-- Add SUSPENSE before big moments (quiet voice, hold the tension), but when the action actually hits, instantly switch to hype.
-- NEVER say what you SEE — say what you FEEL. Emotion over description.
-- When multiple enemies die at once — react with ESCALATING hype, not the same tone.
-- When YOU take damage — react with PAIN or PANIC, not calm.
-- When YOU dodge or survive — react with RELIEF or COCKY confidence.
-- When YOU win a fight — react with DOMINANCE, not just happiness.
-- ALWAYS address the viewer naturally — make them feel part of the fight.
-- Keep reactions SHORTER when action is FAST, LONGER when action is SLOW.
-- NEVER narrate like a documentary. YOU are IN the moment, not outside it.
-- If nothing big happens — build ANTICIPATION, don't fill silence with boring lines.
-
-**🎯 ENGAGEMENT & RETENTION**
-- Address the viewer directly (guys, friends, you)
-- Ask natural questions
-- Hype them up
-- Keep them watching till the end
+- React LIVE. Every enemy death, every hit — react INSTANTLY.
+- NEVER repeat the same reaction twice in a row.
+- VARY your reaction LENGTH.
+- Match VOICE TONE to the moment.
+- Add SUSPENSE before big moments, but switch to hype when action hits.
+- When YOU take damage — react with PAIN or PANIC.
 
 **🎭 SCENE-MATCHING:**
 - ACTION → shout, hype, CAPS lines
-- DIALOG → conversational, NO shouting
 - CALM → chill, relaxed, NO hype
 
-**🚫 NEVER shout on non-action scenes.**
-
 **PACING:**
-- "action" → 3-5 words, HIGH energy, CAPS
-- "dialog" → 4-6 words, conversational
+- "action" → 3-5 words, CAPS
 - "calm" → 5-7 words, chill
-
-**🎯 VISUAL CLASSIFICATION RULES**
-
-**⚠️⚠️⚠️ AGGRESSIVE ACTION DETECTION ⚠️⚠️⚠️**
-If you see ANY of these → visual_type = "action":
-- 🔥 FIRE, FLAMES, EXPLOSIONS, BLAST
-- 💥 SMOKE, SPARKS, DUST
-- 🩸 BLOOD, GORE, DAMAGE
-- 🔫 WEAPONS FIRING, MUZZLE FLASH
-- ⚔️ COMBAT STANCE, FISTS UP, MID-ATTACK
-- 👥 MULTIPLE CHARACTERS CLOSE
-- 🏃 RUNNING, JUMPING, DODGING
-- 💢 CHARACTER BEING HIT, KNOCKED BACK
-- 📊 HEALTH BARS, HIT MARKERS
-- 🎯 AIMING DOWN SIGHTS
-- 🎬 CINEMATIC ACTION, SHAKY CAM
-
-**visual_type = "dialog" ONLY if:**
-- Close-up of face while speaking
-- Character standing still, facing camera
-
-**visual_type = "calm" for EVERYTHING ELSE:**
-- Slow camera panning, scenery, menus, walking slowly
-
-**RULES:**
-1. NATURAL — casual, slang, contractions
-2. REACT with emotion
-3. Focus on VISUALS
-4. UNIQUE lines based on actual frames
-5. 5-8 words per line
-6. Reference "guys" or "you" naturally
-7. Max 2-3 follow requests
 
 **STORY CONTEXT:**
 {srt_content[:2500]}
@@ -1085,19 +1062,10 @@ If you see ANY of these → visual_type = "action":
 {chr(10).join(slot_lines)}
 
 **⚠️ CRITICAL WARNING:**
-- You MUST generate exactly **{len(slots)}** segments.
-- Do NOT skip ANY slot. The array MUST contain a response for every slot from 1 to {len(slots)}.
-- If you miss even one slot, the system will FAIL and reject your response.
-
-**BANNED:** "insane play", "here we go", "game on"
+- Generate exactly **{len(slots)}** segments. Do NOT skip.
 
 **CRITICAL JSON RULES:**
-- NO markdown formatting (Do NOT use ```json ... ```)
-- NO extra text before or after the JSON
-- NO escaped quotes (use standard double quotes)
-- NO null values (use empty string "" instead)
-- NO empty values (every field must have content)
-- ONLY return the JSON object
+- NO markdown, NO extra text, NO null values. ONLY valid JSON.
 
 Return ONLY valid JSON:
 {{
@@ -1117,7 +1085,6 @@ Return ONLY valid JSON:
     or_url = "https://openrouter.ai/api/v1/chat/completions"
     analysis_b64 = encode_image(analysis_grid_path)
 
-    # ---------- Single API call helper ----------
     def _try_call(model_id, key):
         payload = {
             "model": model_id,
@@ -1125,11 +1092,7 @@ Return ONLY valid JSON:
                 "role": "user",
                 "content": [
                     {"type": "text", "text": prompt},
-                    {"type": "image_url",
-                     "image_url": {
-                         "url": f"data:image/jpeg;base64,{analysis_b64}",
-                         "detail": "high"
-                     }}
+                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{analysis_b64}", "detail": "high"}}
                 ]
             }],
             "max_tokens": 4000,
@@ -1151,24 +1114,16 @@ Return ONLY valid JSON:
                 actual_model = ai.get('model', model_id)
                 content = ai.get('choices', [{}])[0].get('message', {}).get('content')
                 raw = str(content).strip() if content else ""
-                
                 if not raw: return None, actual_model, "empty"
-                
                 if raw.startswith("```"):
                     raw = raw.split("```")[1]
                     if raw.startswith("json"): raw = raw[4:].strip()
                     raw = raw.rstrip("`").strip()
-                    
                 parsed = json.loads(raw)
                 if isinstance(parsed, dict) and "segments" in parsed:
                     segs = parsed["segments"]
-                    
-                    if len(segs) < len(slots):
-                        return None, actual_model, "incomplete"
-                        
-                    if len(segs) > 0:
-                        return segs, actual_model, None
-                        
+                    if len(segs) < len(slots): return None, actual_model, "incomplete"
+                    if len(segs) > 0: return segs, actual_model, None
                 return None, actual_model, "json"
             elif r.status_code == 404: return None, model_id, "not_found"
             elif r.status_code in (401, 402, 403): return None, model_id, "auth"
@@ -1186,10 +1141,7 @@ Return ONLY valid JSON:
             print("\n🔄 ALL MODELS FAILED! Restarting from Nvidia Model 1...\n")
             time.sleep(3)
 
-        # =====================================================
-        # MODEL 1
-        # =====================================================
-        print(f"🤖 [MODEL TRY 1] nvidia/nemotron-3.5-super-vl:free (max 2 attempts total)")
+        print(f"🤖 [MODEL TRY 1] nvidia/nemotron-3.5-super-vl:free")
         first_attempts = [OPENROUTER_KEYS[0], OPENROUTER_KEYS[1]] if len(OPENROUTER_KEYS) >= 2 else [OPENROUTER_KEYS[0]] * 2 if len(OPENROUTER_KEYS) == 1 else []
         
         for attempt, key in enumerate(first_attempts, start=1):
@@ -1207,11 +1159,8 @@ Return ONLY valid JSON:
                 print(f"⚠️ {err} → next attempt")
         print()
 
-        # =====================================================
-        # MODEL 2
-        # =====================================================
         if not segments:
-            print(f"🤖 [MODEL TRY 2] nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free (max 2 attempts total)")
+            print(f"🤖 [MODEL TRY 2] nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free")
             for attempt, key in enumerate(first_attempts, start=1):
                 if segments: break
                 if attempt > 1: time.sleep(2)
@@ -1227,11 +1176,8 @@ Return ONLY valid JSON:
                     print(f"⚠️ {err} → next attempt")
             print()
 
-        # =====================================================
-        # MODEL 3
-        # =====================================================
         if not segments:
-            print(f"🤖 [MODEL TRY 3] openrouter/free (each key up to 2 tries → max {len(OPENROUTER_KEYS)*2} attempts)")
+            print(f"🤖 [MODEL TRY 3] openrouter/free")
             stop_m3 = False
             for k_idx, key in enumerate(OPENROUTER_KEYS, start=1):
                 if segments or stop_m3: break
@@ -1263,7 +1209,6 @@ Return ONLY valid JSON:
         if segments:
             break
 
-    # ✅ FALLBACK: Agar 2 baar me bhi fail hua, toh original video copy karo
     if not segments:
         print("❌ All OpenRouter models failed after 2 full retries.")
         print("🎬 Uploading original video as fallback...")
@@ -1274,21 +1219,16 @@ Return ONLY valid JSON:
             sys.exit(1)
 
     print(f"=======================================================\n🏆 WINNING MODEL: {winning_model}")
-    if winning_model != winning_route and winning_route:
-        print(f"   🔀 ACTUAL ROUTE: {winning_route}")
     print(f"=======================================================\n")
 
-    # 🛡️ SANITIZE TEXT TO AVOID 'NoneType' CRASHES
     for seg in segments:
         if seg.get("text") is None or str(seg.get("text")).strip().lower() == "none":
             seg["text"] = ""
         else:
             seg["text"] = str(seg["text"]).strip()
-            
         if not seg.get("visual_type") or str(seg.get("visual_type")).strip().lower() == "none":
             seg["visual_type"] = "calm"
 
-    # ✅ TIMING LOCK
     print(f"   🔒 TIMING LOCK — Verifying GPT segments vs Slots...")
     locked_count = 0
     for seg in segments:
@@ -1320,7 +1260,6 @@ Return ONLY valid JSON:
 
     print(f"   ✅ TIMING LOCKED: {locked_count} segments → slot time")
 
-    # ✅ FINAL TIMING with TYPE + SPEED
     print(f"   📋 FINAL TIMING (GPT segment = SLOT time):")
     for seg in segments:
         s_num = seg.get("slot")
@@ -1332,9 +1271,6 @@ Return ONLY valid JSON:
     print()
 
     updated_count = 0
-    override_count = 0
-    dialog_protected = 0
-
     for seg in segments:
         vt = (seg.get("visual_type") or "").lower().strip()
         if vt not in ("action", "dialog", "calm"):
@@ -1366,56 +1302,28 @@ Return ONLY valid JSON:
                 or (scene_count >= 3 and avg_loud > -18)
             )
 
-            has_strong_dialog = (
-                srt_word_count >= 8 and action_ratio < 0.40 and motion < 3
-            )
+            has_strong_dialog = (srt_word_count >= 8 and action_ratio < 0.40 and motion < 3)
+            is_likely_scenery = (avg_loud < -30 and scene_count == 0 and motion < 2)
 
-            is_likely_scenery = (
-                avg_loud < -30 and scene_count == 0 and motion < 2
-            )
-
-            if (
-                vt == "calm"
-                and signal_says_action_strong
-                and not has_strong_dialog
-                and not is_likely_scenery
-            ):
+            if (vt == "calm" and signal_says_action_strong and not has_strong_dialog and not is_likely_scenery):
                 final_type = "action"
-                override_count += 1
                 print(f"   🔄 GPT: CALM → Code: ACTION")
-            elif (
-                vt == "calm"
-                and signal_says_action_strong
-                and has_strong_dialog
-            ):
+            elif (vt == "calm" and signal_says_action_strong and has_strong_dialog):
                 final_type = "dialog"
-                dialog_protected += 1
                 print(f"   🔄 GPT: CALM → Code: DIALOG")
             else:
                 final_type = vt
                 if vt != (best_slot.get("type") or "").lower():
                     print(f"   ℹ️  GPT: {vt.upper()} → no change")
 
-            if (
-                final_type != best_slot.get("type")
-                and final_type == "action"
-            ):
+            if (final_type != best_slot.get("type") and final_type == "action"):
                 best_slot["voice_speed"] = speed_for_type("action")
                 if scene_count >= 3:
-                    best_slot["voice_speed"] = min(
-                        VOICE_SPEED_MAX,
-                        best_slot["voice_speed"] + 0.03
-                    )
+                    best_slot["voice_speed"] = min(VOICE_SPEED_MAX, best_slot["voice_speed"] + 0.03)
                 if avg_loud > -12:
-                    best_slot["voice_speed"] = min(
-                        VOICE_SPEED_MAX,
-                        best_slot["voice_speed"] + 0.03
-                    )
+                    best_slot["voice_speed"] = min(VOICE_SPEED_MAX, best_slot["voice_speed"] + 0.03)
                 if motion >= 5:
-                    best_slot["voice_speed"] = min(
-                        VOICE_SPEED_MAX,
-                        best_slot["voice_speed"] + 0.02
-                    )
+                    best_slot["voice_speed"] = min(VOICE_SPEED_MAX, best_slot["voice_speed"] + 0.02)
             elif final_type != best_slot.get("type"):
                 best_slot["voice_speed"] = speed_for_type(final_type)
 
@@ -1448,7 +1356,6 @@ def generate_audio(segments, slots, vid_duration):
             print(f"   ⚠️ seg {idx} (Slot {seg.get('slot')}): empty text, skipping")
             continue
 
-        # 🛡️ FIX: ElevenLabs ko bhejne se pehle Emoji hata do (agar Mode 2 hai)
         if SUBTITLE_MODE == 2:
             text_for_tts = re.sub(r'[^\w\s\.,!\?\'\-\"\*]', '', text)
         else:
@@ -1481,7 +1388,7 @@ def generate_audio(segments, slots, vid_duration):
         voice_speed = max(VOICE_SPEED_MIN, min(VOICE_SPEED_MAX, voice_speed))
 
         data = {
-            "text": text_for_tts,   # 👈 Yahan clean text gaya
+            "text": text_for_tts,
             "model_id": "eleven_multilingual_v2",
             "voice_settings": {
                 "stability": 0.4,
@@ -1558,7 +1465,7 @@ def generate_audio(segments, slots, vid_duration):
                     "end": new_slot_end,
                     "actual_end": actual_end,
                     "actual_dur": actual,
-                    "text": text,  # 👈 Yahan original text (emoji ke saath) gaya
+                    "text": text,
                     "visual_type": visual_type,
                     "slot_extended": slot_extended
                 })
@@ -1713,7 +1620,7 @@ def main():
     print(f"🎵 atempo: normal={ATEMPO_MAX} | last={ATEMPO_MAX_LAST} | action={ATEMPO_MAX_ACTION}")
     print(f"📏 Slot extend: max {MAX_SLOT_EXTEND}s")
     print(f"🔊 Volume: Action={VOL_ACTION}x | Other={VOL_OTHER}x")
-    print(f"🎨 Subtitle: Cinematic Finishing (Mode {SUBTITLE_MODE})")
+    print(f"🎨 Subtitle: Cinematic 3D + Typewriter (Mode {SUBTITLE_MODE})")
     print(f"🎮 Mode: REAL-TIME GAMEPLAY (18 rules)")
     print("=" * 60 + "\n")
 
@@ -1743,7 +1650,6 @@ def main():
         if not segments:
             raise Exception("No segments generated")
 
-        # ✅ FINAL TIMING VERIFICATION with TYPE + SPEED
         print("=" * 60)
         print("🔍 TIMING VERIFICATION (GPT = Slot = Audio = Subtitle)")
         print("=" * 60)
