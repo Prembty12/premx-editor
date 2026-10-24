@@ -1,10 +1,10 @@
 {
-  "last_updated": "2026-10-24 11:08:54 PM",
+  "last_updated": "2026-10-24 11:15:02 PM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 6799,
+      "views_7d": 6802,
       "avg_per_video": 618,
       "trend": "viral",
       "ratio": 3.8659517426273458,
@@ -70,7 +70,7 @@
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 6799,
+    "views_7d": 6802,
     "avg_per_video": 618,
     "trend": "viral",
     "ratio": 3.8659517426273458,
