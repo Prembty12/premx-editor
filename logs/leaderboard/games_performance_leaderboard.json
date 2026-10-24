@@ -10,10 +10,10 @@
     {
         "rank": 2,
         "game_name": "CODMW4",
-        "total_views": 6574,
+        "total_views": 6579,
         "uploaded_videos": 16,
-        "avg_views_per_video": 410,
-        "view_share_percentage": 12.61
+        "avg_views_per_video": 411,
+        "view_share_percentage": 12.62
     },
     {
         "rank": 3,
@@ -21,7 +21,7 @@
         "total_views": 6505,
         "uploaded_videos": 34,
         "avg_views_per_video": 191,
-        "view_share_percentage": 12.48
+        "view_share_percentage": 12.47
     },
     {
         "rank": 4,
@@ -29,7 +29,7 @@
         "total_views": 6458,
         "uploaded_videos": 26,
         "avg_views_per_video": 248,
-        "view_share_percentage": 12.39
+        "view_share_percentage": 12.38
     },
     {
         "rank": 5,
@@ -91,8 +91,8 @@
         "rank": 12,
         "game_name": "ghostandela",
         "total_views": 770,
-        "uploaded_videos": 33,
-        "avg_views_per_video": 23,
+        "uploaded_videos": 34,
+        "avg_views_per_video": 22,
         "view_share_percentage": 1.48
     }
 ]
