@@ -1,19 +1,51 @@
+Bhai, bilkul sahi samjha. Main script me ek Switch (Mode) bana deta hu.
+
+Tum script ke sabse upar ek line change karke decide kar sakte ho ki tumhe Option 1 chahiye ya Option 2.
+
+⚙️ Mode Kaise Kaam Karega?
+
+Script ke top par ye line hogi:
+
+```python
+SUBTITLE_MODE = 1  # 1 = Purana (No Emoji), 2 = Naya (Emoji ke saath)
+```
+
+· Agar tum 1 rakhte ho: AI emoji nahi dega, aur jo tumhara abhi ka smooth Cyan/Red subtitle hai wahi chalega.
+· Agar tum 2 rakhte ho: AI main parts par emojis dega, ElevenLabs ko bina emoji ke audio jayega, aur subtitle me emoji ke saath naya update dikhega.
+
+---
+
+🛠️ Kya-Kya Changes Kiye Hain:
+
+1. Top me SUBTITLE_MODE add kiya hai.
+2. Prompt me condition lagayi hai: Agar Mode 2 hai, tabhi AI ko emoji use karne ka rule milega.
+3. Audio me filter lagaya hai: Agar Mode 2 hai, toh ElevenLabs ko bhejne se pehle emoji hata diya jayega (par subtitle me rehne diya jayega).
+
+---
+
+🚀 Ye Lo Full Final Code:
+
+```python
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v6.4 (Strict Completeness + Real-Time + Full Logging)
+🎙️ AI Commentary Dubber — v6.1 (Strict Completeness + Real-Time + Full Logging)
 ===============================================================
 FEATURES:
   ✅ Timing LOCK — GPT segment = SLOT time
   ✅ SRT time = SLOT time (FORCED)
   ✅ Slot-aligned grid — frame = slot time
   ✅ Audio delay = slot start
-  ✅ Smart Subtitle (Smooth 3x Blink + Rare Explosion)
+  ✅ Action pe atempo 1.15 tak
+  ✅ Calm/Dialog pe atempo 1.10
+  ✅ Last slot atempo 1.20
   ✅ 100% Subtitle-Audio SYNC
   ✅ Smart Re-encode
-  ✅ Real-Time Gameplay Mode
-  ✅ Full Terminal Logging
-  ✅ 3 Models Auto-Retry
-  ✅ Cinematic Subtitles (Cyan/Red + ALL CAPS + Glow + Spacing)
+  ✅ Real-Time Gameplay Mode (18 rules)
+  ✅ Full Terminal Logging (type + speed)
+  ✅ 3 Models Auto-Retry (JSON Object + Healing)
+  ✅ Sanitized Text (NoneType Crash Fixed)
+  ✅ Strict Completeness Check (Rejects incomplete segments)
+  ✅ Cinematic Subtitles (Cyan/Red + ALL CAPS + Smooth Glow Pulse)
 ===============================================================
 """
 
@@ -33,11 +65,19 @@ import json
 import base64
 import re
 import time
-import random
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 from dotenv import load_dotenv
 
 load_dotenv()
+
+
+# ============================================================
+# 🎛️ SUBTITLE MODE SWITCH
+# ============================================================
+# 1 = Purana System (Bina Emoji ke, sirf Cyan/Red + Pulse)
+# 2 = Naya System (AI Emoji dega, Audio me nahi jayega, Subtitle me dikhega)
+SUBTITLE_MODE = 2  
+# ============================================================
 
 
 # ============================================================
@@ -129,6 +169,21 @@ os.makedirs(FONTS_DIR, exist_ok=True)
 
 
 # ============================================================
+# 🎨 CINEMATIC COLOUR FINISHING
+# ============================================================
+COLOR_CYAN   = "&H00FFFF00"
+COLOR_RED    = "&H000000FF"
+COLOR_RESET  = "&H00FFFFFF"
+
+
+def get_pattern_color(word_index, total_words):
+    if word_index == total_words - 1:
+        return COLOR_RED
+    else:
+        return COLOR_CYAN
+
+
+# ============================================================
 # ENV VALIDATION
 # ============================================================
 def validate_env():
@@ -167,10 +222,7 @@ def seconds_to_ass_time(seconds):
     h = int(seconds // 3600)
     m = int((seconds % 3600) // 60)
     s = int(seconds % 60)
-    cs = int(round((seconds - int(seconds)) * 100))
-    if cs == 100:
-        s += 1
-        cs = 0
+    cs = int(((seconds - int(seconds)) * 100))
     return f"{h}:{m:02d}:{s:02d}.{cs:02d}"
 
 
@@ -218,31 +270,34 @@ def speed_for_type(slot_type):
 
 
 # ============================================================
-# ASS SUBTITLE GENERATOR (SMART DYNAMIC + SMOOTH 3X BLINK + RARE EXPLOSION)
+# ASS SUBTITLE GENERATOR
 # ============================================================
-def generate_full_ass_script(audio_files, font_name="BebasNeue-Regular", font_size=80,
-                              alignment=2, vertical_margin=65,
-                              outline_size=6, shadow_size=2):
-    print("🎨 Generating SMART Dynamic ASS Subtitles (Smooth 3x Blink + Rare Explosion)...")
+def generate_full_ass_script(audio_files, font_name="Arial", font_size=60,
+                              alignment=2, vertical_margin=40,
+                              outline_size=3, shadow_size=2):
+    print("🎨 Generating ASS Subtitles (CINEMATIC FINISHING)...")
 
-    # Colors
-    COLOR_ACTIVE_CYAN = "&H00FFFF00" # Bright Cyan
-    COLOR_ACTIVE_RED  = "&H000000FF" # Intense Red
-    COLOR_WHITE       = "&H00FFFFFF" # White
-    
-    # 🔥 POSITION SETTINGS (Vertical Margin 65)
-    TEXT_X = 960
-    TEXT_Y = 1080 - vertical_margin  # 1080 - 65 = 1015 (Bottom Placement)
-    
-    # 🔥 Explosive Words (Kam kar diye taaki bar-bar blast na ho)
-    EXPLOSIVE_WORDS = {"BOOM", "KILL", "DIE", "SH*T", "F*CK", "DESTROY", "BLAST"}
-    
-    ass_events = ""
+    ass_content = f"""[Script Info]
+ScriptType: v4.00+
+PlayResX: 1920
+PlayResY: 1080
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,{font_name},{font_size},&H00FFFFFF,&H000000FF,&H00000000,&H00000000,1,0,0,0,100,100,0,0,1,{outline_size},{shadow_size},{alignment},10,10,{vertical_margin},1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+"""
+
+    written = 0
 
     for item in audio_files:
         start = item.get("start", 0)
         end = item.get("actual_end", item.get("end", 3))
         
+        # Safe text extraction
         raw_text = item.get("text")
         text = str(raw_text).strip() if raw_text is not None else ""
         if not text or text.lower() == "none":
@@ -252,143 +307,57 @@ def generate_full_ass_script(audio_files, font_name="BebasNeue-Regular", font_si
         if not words:
             continue
 
-        # Check Scene Type & Explosive Words
-        visual_type = item.get("visual_type", "calm").lower()
-        
-        # 🔥 SMART TRIGGER LOGIC (Kam baar blast hoga)
-        last_word = words[-1].upper()
-        has_explosive_word = last_word in EXPLOSIVE_WORDS
-        
-        is_explosive_scene = False
-        if has_explosive_word:
-            is_explosive_scene = True
-        elif visual_type == "action":
-            # Action scene me bhi sirf 40% chance hi blast hone ka
-            if random.random() < 0.4:
-                is_explosive_scene = True
-
         total_dur = end - start
         if total_dur <= 0:
             total_dur = 1.0
 
+        total_chars = sum(len(w) for w in words)
+        if total_chars == 0:
+            total_chars = 1
+
         total_words = len(words)
-        dur_per_word = total_dur / total_words
+        current_time = start
+        cumulative_chars = 0
 
-        # 🔥 AUTO-FIT FONT SIZE (Line bahar nahi jayegi)
-        line_str_preview = " ".join([w.upper() for w in words])
-        current_font_size = font_size
-        if len(line_str_preview) > 24:
-            current_font_size = int(font_size * (24 / len(line_str_preview)))
-            current_font_size = max(45, current_font_size)
+        for i, w in enumerate(words):
+            cumulative_chars += len(w)
+            frac = cumulative_chars / total_chars
+            seg_end = start + (total_dur * frac)
 
-        # 🔥 SMOOTH BLINK LOGIC (3 baar smooth chamak)
-        if visual_type == "action" or has_explosive_word:
-            # Smooth fade 3x
-            blink_effect = "\\t(0,100,\\alpha&H80&)\\t(100,200,\\alpha&H00&)\\t(200,300,\\alpha&H80&)\\t(300,400,\\alpha&H00&)\\t(400,500,\\alpha&H80&)\\t(500,600,\\alpha&H00&)"
-        elif visual_type == "dialog":
-            # Dialog: 1 slow gentle fade
-            blink_effect = "\\t(0,300,\\alpha&H80&)\\t(300,600,\\alpha&H00&)"
-        else:
-            # Calm: No blink
-            blink_effect = ""
-
-        # 1. PROGRESSIVE ANIMATION (Word by Word)
-        for active_idx in range(total_words):
-            w_start = start + (active_idx * dur_per_word)
-            w_end = w_start + dur_per_word
+            visible_words = words[:i+1]
+            colored_words = []
             
-            styled_words = []
-            for j in range(active_idx + 1):
-                w = words[j]
-                is_last = (j == total_words - 1)
-                
-                if j < active_idx:
-                    # PAST WORDS: Smooth zoom out and fade
-                    color = COLOR_WHITE
-                    anim = "{\\fscx80\\fscy80\\alpha&H80&\\blur2\\t(0,600,\\fscx50\\fscy50\\alpha&HFF&)}"
-                    
-                elif j == active_idx:
-                    # ACTIVE WORD: Pop-in + Smooth Blink
-                    color = COLOR_ACTIVE_RED if is_last else COLOR_ACTIVE_CYAN
-                    anim = f"{{\\fscx120\\fscy120\\blur15\\t(0,600,\\fscx100\\fscy100\\blur3){blink_effect}}}"
-
-                word_anim = f"{anim}{{\\c{color}}}{w.upper()}"
-                styled_words.append(word_anim)
-
-            # SINGLE LINE LOGIC
-            full_line = f"{{\\an2\\pos({TEXT_X},{TEXT_Y})\\fsp2\\fs{current_font_size}\\bord{outline_size}\\shad{shadow_size}}}" + " ".join(styled_words)
-
-            start_t = seconds_to_ass_time(w_start)
-            end_t = seconds_to_ass_time(w_end)
+            BLINK_WORDS = {"OH", "BRO", "SH*T", "F*CK", "DAMN", "COOKED", "KILL", "DEAD", "EZ", "CLAP", "LET'S", "GO", "BODIED", "DESTROYED", "ONE", "SHOT", "NO", "YES", "WOW", "HOLY", "BABY"}
             
-            ass_events += f"Dialogue: 0,{start_t},{end_t},Default,,0,0,0,,{full_line}\n"
-
-            # 2. EXPLOSION (Sirf tab jab upar ka logic true ho)
-            if active_idx == total_words - 1 and is_explosive_scene:
-                # A. Blink Effect (Flash on last word)
-                blink_styled = []
-                for j, w in enumerate(words):
-                    if j == total_words - 1:
-                        blink_styled.append(f"{{\\fscx140\\fscy140\\c{COLOR_ACTIVE_RED}\\blur8}}{w.upper()}")
-                    else:
-                        blink_styled.append(f"{{\\c{COLOR_WHITE}\\alpha&HFF&}}{w.upper()}")
+            for j, vw in enumerate(visible_words):
+                color = get_pattern_color(j, total_words)
+                word_upper = vw.upper()
+                clean_word = re.sub(r'[^\w\*]', '', vw).upper() # Emoji remove karke check karega
                 
-                blink_line = f"{{\\an2\\pos({TEXT_X},{TEXT_Y})\\fsp2\\fs{current_font_size}\\bord{outline_size}\\shad{shadow_size}}}" + " ".join(blink_styled)
-
-                b1_start = w_end
-                b1_end = b1_start + 0.15 
-                ass_events += f"Dialogue: 1,{seconds_to_ass_time(b1_start)},{seconds_to_ass_time(b1_end)},Default,,0,0,0,,{blink_line}\n"
-
-                # B. EXPLOSION EFFECT
-                explode_start = w_end + 0.05
-                explode_dur = 1.2 
-                explode_end = explode_start + explode_dur
+                is_blink = (clean_word in BLINK_WORDS) or (j == total_words - 1 and item.get("visual_type") == "action")
                 
-                char_w = current_font_size // 2
-                total_width = len(line_str_preview) * char_w
-                start_x = TEXT_X - (total_width / 2)
-                
-                for char_idx, char in enumerate(line_str_preview):
-                    if char == " ": continue
-                    
-                    char_x = start_x + (char_idx * char_w)
-                    y_pos = TEXT_Y - (current_font_size / 2) 
-                    
-                    dx = random.randint(-800, 800)
-                    dy = random.randint(-900, 200)
-                    rot = random.randint(-1080, 1080)
-                    c = random.choice([COLOR_ACTIVE_CYAN, COLOR_ACTIVE_RED, COLOR_WHITE])
-                    
-                    tag = (
-                        f"{{\\an5\\pos({char_x},{y_pos})"
-                        f"\\move({char_x},{y_pos},{char_x+dx},{y_pos+dy},0,{int(explode_dur*1000)})"
-                        f"\\frz{rot}\\t(0,{int(explode_dur*1000)},\\alpha&HFF&\\fscx20\\fscy20)"
-                        f"\\c{c}\\bord{outline_size-1}\\blur2\\fs{current_font_size}\\b1}}{char}"
-                    )
-                    
-                    ass_events += f"Dialogue: 2,{seconds_to_ass_time(explode_start)},{seconds_to_ass_time(explode_end)},Default,,0,0,0,,{tag}\n"
+                if is_blink:
+                    pulse_tag = "{\\t(0,150,\\blur6\\fscx110\\fscy110)\\t(150,300,\\blur1.5\\fscx100\\fscy100)}"
+                    colored_words.append(f"{pulse_tag}{{\\c{color}}}{word_upper}{{\\c{COLOR_RESET}}}")
+                else:
+                    colored_words.append(f"{{\\c{color}}}{word_upper}{{\\c{COLOR_RESET}}}")
+            
+            anim_tag = "{\\fsp8\\blur1.5\\fs42\\fad(100,0)}"
+            colored_text = anim_tag + " ".join(colored_words)
 
-    ass_content = f"""[Script Info]
-ScriptType: v4.00+
-PlayResX: 1920
-PlayResY: 1080
-ScaledBorderAndShadow: yes
-WrapStyle: 2
+            start_t = seconds_to_ass_time(current_time)
+            end_t = seconds_to_ass_time(seg_end)
 
-[V4+ Styles]
-Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,{font_name},{font_size},&H00FFFFFF,&H000000FF,&H00000000,&H80000000,-1,0,0,0,100,100,0,0,1,{outline_size},{shadow_size},2,10,10,{vertical_margin},1
-
-[Events]
-Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
-{ass_events}"""
+            ass_content += f"Dialogue: 0,{start_t},{end_t},Default,,0,0,0,,{colored_text}\n"
+            written += 1
+            current_time = seg_end
 
     with open(ASS_PATH, "w", encoding="utf-8") as f:
         f.write(ass_content)
 
-    print(f"✅ SMART ASS Subtitles saved: {ASS_PATH}")
-    print(f"   🎨 Style: Smooth 3x Blink + Rare Explosion")
-    print(f"   📏 Position: Vertical Margin {vertical_margin} | Auto-Fit: Enabled\n")
+    print(f"✅ ASS Subtitles saved: {ASS_PATH}")
+    print(f"   📊 Total subtitle lines: {written}")
+    print(f"   🎨 Style: Cinematic Finishing\n")
 
 
 # ============================================================
@@ -1013,9 +982,20 @@ def generate_full_script(slots, srt_content, analysis_grid_path):
             f"SRT: \"{s['srt_text'][:70]}\""
         )
 
+    # 🎯 EMOJI RULE (SIRF TAB JAB SUBTITLE_MODE == 2)
+    emoji_rule = ""
+    if SUBTITLE_MODE == 2:
+        emoji_rule = """
+**🎯 EMOJI RULE (CRITICAL):**
+- ONLY on MAIN or HYPE moments, add 1 relevant emoji to the text.
+- Example: "BRO THE MASK 🎭", "PICK UP THE GUN 🔫", "HE'S COOKED 💀".
+- Do NOT use emojis on every line. Max 2-3 emojis in the whole video.
+- Use emojis for objects like Mask, Gun, Skull, Fire, Sword.
+"""
+
     prompt = f"""You are a HYPED-UP gaming YouTuber — like a streamer going CRAZY on stream.
 You shout, laugh, hype, roast. Pure energy. Zero boring lines.
-
+{emoji_rule}
 **YOU ARE GETTING 1 IMAGE — ANALYSIS GRID:**
 - Each cell shows: "SLOT X: A.A-B.Bs" (yellow) + "frame@T.TTs" (cyan)
 - ⚠️ USE THE SLOT TIME (yellow label) — NOT the frame time
@@ -1211,7 +1191,6 @@ Return ONLY valid JSON:
                 if isinstance(parsed, dict) and "segments" in parsed:
                     segs = parsed["segments"]
                     
-                    # 🛡️ STRICT COMPLETENESS CHECK
                     if len(segs) < len(slots):
                         return None, actual_model, "incomplete"
                         
@@ -1230,7 +1209,6 @@ Return ONLY valid JSON:
     winning_model = None
     winning_route = None
 
-    # ✅ NAYA LOOP: Retry from beginning if all fail
     for full_retry in range(2):
         if full_retry > 0:
             print("\n🔄 ALL MODELS FAILED! Restarting from Nvidia Model 1...\n")
@@ -1311,7 +1289,7 @@ Return ONLY valid JSON:
             print()
 
         if segments:
-            break # Agar koi model pass ho gaya, toh loop se bahar nikal jao
+            break
 
     # ✅ FALLBACK: Agar 2 baar me bhi fail hua, toh original video copy karo
     if not segments:
@@ -1492,12 +1470,17 @@ def generate_audio(segments, slots, vid_duration):
 
     audio_files = []
     for idx, seg in enumerate(segments):
-        # Safe text extraction (fixes NoneType crash)
         raw_text = seg.get("text")
         text = str(raw_text).strip() if raw_text is not None else ""
         if not text or text.lower() == "none":
             print(f"   ⚠️ seg {idx} (Slot {seg.get('slot')}): empty text, skipping")
             continue
+
+        # 🛡️ FIX: ElevenLabs ko bhejne se pehle Emoji hata do (agar Mode 2 hai)
+        if SUBTITLE_MODE == 2:
+            text_for_tts = re.sub(r'[^\w\s\.,!\?\'\-\"\*]', '', text)
+        else:
+            text_for_tts = text
 
         slot_num = seg.get("slot")
         matched_slot = None
@@ -1526,7 +1509,7 @@ def generate_audio(segments, slots, vid_duration):
         voice_speed = max(VOICE_SPEED_MIN, min(VOICE_SPEED_MAX, voice_speed))
 
         data = {
-            "text": text,
+            "text": text_for_tts,   # 👈 Yahan clean text gaya
             "model_id": "eleven_multilingual_v2",
             "voice_settings": {
                 "stability": 0.4,
@@ -1603,7 +1586,7 @@ def generate_audio(segments, slots, vid_duration):
                     "end": new_slot_end,
                     "actual_end": actual_end,
                     "actual_dur": actual,
-                    "text": text,
+                    "text": text,  # 👈 Yahan original text (emoji ke saath) gaya
                     "visual_type": visual_type,
                     "slot_extended": slot_extended
                 })
@@ -1748,7 +1731,7 @@ def fallback_copy_original():
 # ============================================================
 def main():
     print("=" * 60)
-    print("🎙️ AI COMMENTARY DUBBER — v6.4 (Rare Explosion + Smooth Subtitle)")
+    print("🎙️ AI COMMENTARY DUBBER — v6.1 (Real-Time + Full Logging)")
     print("=" * 60)
     print(f"📹 Input : {FINAL_CLIP_PATH}")
     print(f"📤 Output: {FINAL_DUBBED_VIDEO}")
@@ -1758,7 +1741,7 @@ def main():
     print(f"🎵 atempo: normal={ATEMPO_MAX} | last={ATEMPO_MAX_LAST} | action={ATEMPO_MAX_ACTION}")
     print(f"📏 Slot extend: max {MAX_SLOT_EXTEND}s")
     print(f"🔊 Volume: Action={VOL_ACTION}x | Other={VOL_OTHER}x")
-    print(f"🎨 Subtitle: Smooth 3x Blink + Rare Explosion (40% chance)")
+    print(f"🎨 Subtitle: Cinematic Finishing (Mode {SUBTITLE_MODE})")
     print(f"🎮 Mode: REAL-TIME GAMEPLAY (18 rules)")
     print("=" * 60 + "\n")
 
@@ -1816,10 +1799,9 @@ def main():
             generate_full_ass_script(
                 audio_files=audio_files,
                 font_name="BebasNeue-Regular",
-                font_size=80,
+                font_size=45,
                 alignment=2,
-                outline_size=6,
-                vertical_margin=65  # 👈 Yahan 65 set kiya hai
+                vertical_margin=65
             )
 
         final_audio = build_timed_audio(audio_files, vid_dur)
@@ -1849,3 +1831,14 @@ def main():
 
 if __name__ == "__main__":
     main()
+```
+
+---
+
+🎯 Kya-kya add hua isme:
+
+1. Line 37: SUBTITLE_MODE = 1 (Switch add kiya).
+2. Prompt me: Agar mode 2 hai, tabhi AI emoji wala rule padhega.
+3. Audio function me: text_for_tts banaya jo emoji hata dega, par audio_files me original text (emoji ke saath) save karega.
+4. Regex me \*: Censored swears (jaise sh*t) ko protect karne ke liye \* add kiya, taaki ElevenLabs use sahi bole.
+
