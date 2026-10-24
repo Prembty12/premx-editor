@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-24 08:38:04 AM",
+  "last_updated": "2026-10-24 08:40:48 AM",
   "period_days": 7,
   "trending": [
     {
@@ -7,7 +7,7 @@
       "views_7d": 6579,
       "avg_per_video": 598,
       "trend": "viral",
-      "ratio": 2.719948018193632,
+      "ratio": 2.7181818181818183,
       "fb_link": "",
       "source_link": ""
     },
@@ -16,16 +16,16 @@
       "views_7d": 1321,
       "avg_per_video": 440,
       "trend": "viral",
-      "ratio": 2.001299545159194,
+      "ratio": 2.0,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions15.mp4"
     },
     {
       "game": "MarvelsSpiderMan2",
-      "views_7d": 2744,
-      "avg_per_video": 304,
+      "views_7d": 2746,
+      "avg_per_video": 305,
       "trend": "steady",
-      "ratio": 1.382716049382716,
+      "ratio": 1.3863636363636365,
       "fb_link": "",
       "source_link": ""
     }
@@ -36,7 +36,7 @@
       "views_7d": 179,
       "avg_per_video": 89,
       "trend": "below_avg",
-      "ratio": 0.4048083170890188,
+      "ratio": 0.40454545454545454,
       "fb_link": "https://www.facebook.com/reel/2181972149061480/",
       "source_link": ""
     },
@@ -45,7 +45,7 @@
       "views_7d": 648,
       "avg_per_video": 58,
       "trend": "below_avg",
-      "ratio": 0.26380766731643923,
+      "ratio": 0.2636363636363636,
       "fb_link": "",
       "source_link": ""
     },
@@ -54,7 +54,7 @@
       "views_7d": 250,
       "avg_per_video": 50,
       "trend": "below_avg",
-      "ratio": 0.22742040285899934,
+      "ratio": 0.22727272727272727,
       "fb_link": "",
       "source_link": ""
     },
@@ -73,7 +73,7 @@
     "views_7d": 6579,
     "avg_per_video": 598,
     "trend": "viral",
-    "ratio": 2.719948018193632,
+    "ratio": 2.7181818181818183,
     "fb_link": "",
     "source_link": ""
   }
