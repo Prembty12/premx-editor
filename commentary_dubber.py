@@ -1,31 +1,3 @@
-Bhai, bilkul sahi samjha. Main script me ek Switch (Mode) bana deta hu.
-
-Tum script ke sabse upar ek line change karke decide kar sakte ho ki tumhe Option 1 chahiye ya Option 2.
-
-⚙️ Mode Kaise Kaam Karega?
-
-Script ke top par ye line hogi:
-
-```python
-SUBTITLE_MODE = 1  # 1 = Purana (No Emoji), 2 = Naya (Emoji ke saath)
-```
-
-· Agar tum 1 rakhte ho: AI emoji nahi dega, aur jo tumhara abhi ka smooth Cyan/Red subtitle hai wahi chalega.
-· Agar tum 2 rakhte ho: AI main parts par emojis dega, ElevenLabs ko bina emoji ke audio jayega, aur subtitle me emoji ke saath naya update dikhega.
-
----
-
-🛠️ Kya-Kya Changes Kiye Hain:
-
-1. Top me SUBTITLE_MODE add kiya hai.
-2. Prompt me condition lagayi hai: Agar Mode 2 hai, tabhi AI ko emoji use karne ka rule milega.
-3. Audio me filter lagaya hai: Agar Mode 2 hai, toh ElevenLabs ko bhejne se pehle emoji hata diya jayega (par subtitle me rehne diya jayega).
-
----
-
-🚀 Ye Lo Full Final Code:
-
-```python
 #!/usr/bin/env python3
 """
 🎙️ AI Commentary Dubber — v6.1 (Strict Completeness + Real-Time + Full Logging)
@@ -1831,14 +1803,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-```
-
----
-
-🎯 Kya-kya add hua isme:
-
-1. Line 37: SUBTITLE_MODE = 1 (Switch add kiya).
-2. Prompt me: Agar mode 2 hai, tabhi AI emoji wala rule padhega.
-3. Audio function me: text_for_tts banaya jo emoji hata dega, par audio_files me original text (emoji ke saath) save karega.
-4. Regex me \*: Censored swears (jaise sh*t) ko protect karne ke liye \* add kiya, taaki ElevenLabs use sahi bole.
-
