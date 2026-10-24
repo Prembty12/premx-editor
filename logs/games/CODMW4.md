@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 26 | **Last Updated:** 2026-10-24 11:15:02 PM IST
+**Total Videos:** 26 | **Last Updated:** 2026-10-24 11:30:18 PM IST
 
 ---
 
@@ -14,7 +14,7 @@
 | Posted (FB or IG) | 11 / 26 |
 | FB Posted | 9 / 26 |
 | IG Posted | 11 / 26 |
-| Total FB Views | **6,402** |
+| Total FB Views | **6,410** |
 | Total IG Views | **400** |
 
 ---
@@ -25,8 +25,8 @@
 |---|---|---|---|---|---|---|
 | 1 | Palace Gunfight 4 Enemies Down 🔥🎯  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/De2Kd7hknhj/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW43.mp4) |
 | 2 | 4 Enemies Palace Ambush 🎯🔥  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/De2Bjn_iOwQ/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW44.mp4) |
-| 3 | 4 Soldiers Breached Room 🔥🎯  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1437173231884696/) | 2,167 | [🟣 IG](https://www.instagram.com/reel/De0m-WxlH8V/) | 80 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW45.mp4) |
-| 4 | Palace Gunfight Against 4 Heavy Soldiers 🔥🎯  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1427148915522157/) | 533 | [🟣 IG](https://www.instagram.com/reel/Dez5PL3Cazz/) | 140 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW46.mp4) |
+| 3 | 4 Soldiers Breached Room 🔥🎯  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1437173231884696/) | 2,173 | [🟣 IG](https://www.instagram.com/reel/De0m-WxlH8V/) | 80 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW45.mp4) |
+| 4 | Palace Gunfight Against 4 Heavy Soldiers 🔥🎯  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1427148915522157/) | 535 | [🟣 IG](https://www.instagram.com/reel/Dez5PL3Cazz/) | 140 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW46.mp4) |
 | 5 | 1 Tank Demolishes Snow Base 💥❄️  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2770439856808801/) | 512 | [🟣 IG](https://www.instagram.com/reel/DeyZP-nHa7O/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW47.mp4) |
 | 6 | Base Raid 10 Kills 💥😳  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1772902693799070/) | 877 | [🟣 IG](https://www.instagram.com/reel/DewJWMHiVAP/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW48.mp4) |
 | 7 | He Entered Room 4 Enemies Alive 🔥🎯  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/28435963296104261/) | 179 | [🟣 IG](https://www.instagram.com/reel/DeuuAowismg/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW49.mp4) |
