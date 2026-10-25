@@ -1,22 +1,22 @@
 {
-  "last_updated": "2026-10-24 11:35:49 PM",
+  "last_updated": "2026-10-25 08:46:27 AM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 6810,
-      "avg_per_video": 619,
+      "views_7d": 6863,
+      "avg_per_video": 623,
       "trend": "viral",
-      "ratio": 3.865298840321142,
+      "ratio": 3.8661347517730498,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "MarvelsSpiderMan2",
-      "views_7d": 2784,
+      "views_7d": 2788,
       "avg_per_video": 278,
       "trend": "trending",
-      "ratio": 1.7359500446030331,
+      "ratio": 1.7251773049645391,
       "fb_link": "",
       "source_link": ""
     }
@@ -24,10 +24,10 @@
   "below_avg": [
     {
       "game": "CallOfDutyMW2",
-      "views_7d": 206,
-      "avg_per_video": 103,
+      "views_7d": 212,
+      "avg_per_video": 106,
       "trend": "slow",
-      "ratio": 0.6431757359500446,
+      "ratio": 0.6578014184397163,
       "fb_link": "https://www.facebook.com/reel/2181972149061480/",
       "source_link": ""
     },
@@ -36,7 +36,7 @@
       "views_7d": 678,
       "avg_per_video": 56,
       "trend": "below_avg",
-      "ratio": 0.3496877787689563,
+      "ratio": 0.3475177304964539,
       "fb_link": "",
       "source_link": ""
     },
@@ -45,7 +45,7 @@
       "views_7d": 250,
       "avg_per_video": 50,
       "trend": "below_avg",
-      "ratio": 0.31222123104371097,
+      "ratio": 0.31028368794326244,
       "fb_link": "",
       "source_link": ""
     },
@@ -54,7 +54,7 @@
       "views_7d": 30,
       "avg_per_video": 15,
       "trend": "below_avg",
-      "ratio": 0.0936663693131133,
+      "ratio": 0.09308510638297872,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions15.mp4"
     },
@@ -70,10 +70,10 @@
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 6810,
-    "avg_per_video": 619,
+    "views_7d": 6863,
+    "avg_per_video": 623,
     "trend": "viral",
-    "ratio": 3.865298840321142,
+    "ratio": 3.8661347517730498,
     "fb_link": "",
     "source_link": ""
   }

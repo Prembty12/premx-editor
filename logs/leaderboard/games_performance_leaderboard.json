@@ -2,26 +2,26 @@
     {
         "rank": 1,
         "game_name": "VietnamCavePrison",
-        "total_views": 10975,
+        "total_views": 9138,
         "uploaded_videos": 16,
-        "avg_views_per_video": 685,
-        "view_share_percentage": 21.26
+        "avg_views_per_video": 571,
+        "view_share_percentage": 18.34
     },
     {
         "rank": 2,
         "game_name": "CODMW4",
-        "total_views": 6810,
+        "total_views": 6863,
         "uploaded_videos": 19,
-        "avg_views_per_video": 358,
-        "view_share_percentage": 13.19
+        "avg_views_per_video": 361,
+        "view_share_percentage": 13.77
     },
     {
         "rank": 3,
         "game_name": "MarvelsSpiderMan2",
-        "total_views": 6545,
-        "uploaded_videos": 36,
-        "avg_views_per_video": 181,
-        "view_share_percentage": 12.68
+        "total_views": 6549,
+        "uploaded_videos": 37,
+        "avg_views_per_video": 177,
+        "view_share_percentage": 13.14
     },
     {
         "rank": 4,
@@ -29,7 +29,7 @@
         "total_views": 5595,
         "uploaded_videos": 26,
         "avg_views_per_video": 215,
-        "view_share_percentage": 10.84
+        "view_share_percentage": 11.23
     },
     {
         "rank": 5,
@@ -37,7 +37,7 @@
         "total_views": 4751,
         "uploaded_videos": 11,
         "avg_views_per_video": 431,
-        "view_share_percentage": 9.21
+        "view_share_percentage": 9.53
     },
     {
         "rank": 6,
@@ -45,7 +45,7 @@
         "total_views": 4160,
         "uploaded_videos": 10,
         "avg_views_per_video": 416,
-        "view_share_percentage": 8.06
+        "view_share_percentage": 8.35
     },
     {
         "rank": 7,
@@ -53,15 +53,15 @@
         "total_views": 3472,
         "uploaded_videos": 14,
         "avg_views_per_video": 248,
-        "view_share_percentage": 6.73
+        "view_share_percentage": 6.97
     },
     {
         "rank": 8,
         "game_name": "CallOfDutyMW2",
-        "total_views": 3401,
+        "total_views": 3408,
         "uploaded_videos": 12,
-        "avg_views_per_video": 283,
-        "view_share_percentage": 6.59
+        "avg_views_per_video": 284,
+        "view_share_percentage": 6.84
     },
     {
         "rank": 9,
@@ -69,7 +69,7 @@
         "total_views": 2644,
         "uploaded_videos": 17,
         "avg_views_per_video": 155,
-        "view_share_percentage": 5.12
+        "view_share_percentage": 5.31
     },
     {
         "rank": 10,
@@ -77,7 +77,7 @@
         "total_views": 1650,
         "uploaded_videos": 29,
         "avg_views_per_video": 56,
-        "view_share_percentage": 3.2
+        "view_share_percentage": 3.31
     },
     {
         "rank": 11,
@@ -85,7 +85,7 @@
         "total_views": 838,
         "uploaded_videos": 19,
         "avg_views_per_video": 44,
-        "view_share_percentage": 1.62
+        "view_share_percentage": 1.68
     },
     {
         "rank": 12,
@@ -93,6 +93,6 @@
         "total_views": 770,
         "uploaded_videos": 36,
         "avg_views_per_video": 21,
-        "view_share_percentage": 1.49
+        "view_share_percentage": 1.55
     }
 ]
