@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v6.5 (Ghost-Style Subtitles + Strict Completeness + Real-Time)
+🎙️ AI Commentary Dubber — v6.4 (Strict Completeness + Real-Time + Full Logging)
 ===============================================================
 FEATURES:
   ✅ Timing LOCK — GPT segment = SLOT time
   ✅ SRT time = SLOT time (FORCED)
   ✅ Slot-aligned grid — frame = slot time
   ✅ Audio delay = slot start
-  ✅ 👻 GHOST-STYLE Subtitles (Typewriter + Glow + Left-to-Right Fade + Beat Flash)
+  ✅ Smart Subtitle (Smooth 3x Blink + Rare Explosion)
   ✅ 100% Subtitle-Audio SYNC
   ✅ Smart Re-encode
   ✅ Real-Time Gameplay Mode
   ✅ Full Terminal Logging
   ✅ 3 Models Auto-Retry
+  ✅ Cinematic Subtitles (Cyan/Red + ALL CAPS + Glow + Spacing)
 ===============================================================
 """
 
@@ -128,35 +129,6 @@ os.makedirs(FONTS_DIR, exist_ok=True)
 
 
 # ============================================================
-# 👻 GHOST-STYLE SUBTITLE CONFIG
-# ============================================================
-GHOST_FONT_NAME = "Liberation Sans"   # Arial Bold jaisa. Na mile to .ttf ko fonts/ folder me daalo ya "Arial"/"Roboto" likho
-GHOST_FONT_SIZE_RATIO = 0.0372        # video width ka %, 1080 pe ~40px (bada chahiye to 0.045)
-GHOST_SPACING_RATIO   = 0.0055        # letter spacing
-GHOST_MAX_WIDTH_RATIO = 0.88          # line is se chaudi ho to chhoti / 2 rows me tootegi
-
-GHOST_GLOW_SIZE    = 0.65             # glow ka phailav (0.0 = no glow)
-GHOST_GLOW_OPACITY = 0.55             # glow kitna gehra (0.0 - 1.0)
-
-GHOST_IN_STAGGER  = 0.040             # har letter ke beech gap (aate waqt), max
-GHOST_OUT_STAGGER = 0.030             # har letter ke beech gap (jaate waqt), max
-GHOST_IN_FADE     = 0.12
-GHOST_OUT_FADE    = 0.35
-
-# Colors (R, G, B)
-GHOST_PALETTE = {
-    "blue":   {"fill": (0, 185, 255),  "glow": (0, 140, 255)},
-    "white":  {"fill": (255, 255, 255), "glow": (255, 255, 255)},
-    "red":    {"fill": (255, 0, 0),     "glow": (255, 0, 0)},
-    "orange": {"fill": (255, 185, 0),   "glow": (255, 120, 0)},
-}
-# Scene type -> color (chaho to badal lo)
-GHOST_TYPE_COLOR = {"action": "red", "dialog": "white", "calm": "blue"}
-GHOST_KILL_WORDS = {"BOOM", "KILL", "DIE", "DEAD", "HEADSHOT", "DESTROY", "BLAST", "SH*T", "F*CK"}
-# ============================================================
-
-
-# ============================================================
 # ENV VALIDATION
 # ============================================================
 def validate_env():
@@ -246,179 +218,177 @@ def speed_for_type(slot_type):
 
 
 # ============================================================
-# 👻 GHOST-STYLE ASS SUBTITLE GENERATOR
-#    Typewriter (letter-by-letter) + Glow + Left-to-Right Fade-out + Beat Flash
+# ASS SUBTITLE GENERATOR (SMART DYNAMIC + SMOOTH 3X BLINK + RARE EXPLOSION)
 # ============================================================
-def _ghost_ms(t):
-    return max(0, int(round(t * 1000)))
-
-
-def _ghost_col(rgb):
-    r, g, b = rgb
-    return f"&H{b:02X}{g:02X}{r:02X}&"
-
-
-def _ghost_video_size(path):
-    """Video ka asli size (taaki ASS PlayRes match kare, stretch na ho)."""
-    try:
-        out = subprocess.check_output(
-            ["ffprobe", "-v", "error", "-select_streams", "v:0",
-             "-show_entries", "stream=width,height", "-of", "csv=s=x:p=0", path],
-            text=True).strip().splitlines()[0]
-        w, h = out.split("x")
-        return int(w), int(h)
-    except Exception:
-        return 1080, 1920
-
-
-def _ghost_plan_rows(text, W, fs0):
-    """Text ko screen me fit karta hai: pehle font chhota, phir 2 rows."""
-    fsp = GHOST_SPACING_RATIO * W
-    adv = lambda f: 0.51 * f + fsp
-    max_w = W * GHOST_MAX_WIDTH_RATIO
-    n = len(text)
-    if n * adv(fs0) <= max_w:
-        return [text], fs0
-    f = (max_w / n - fsp) / 0.51
-    if f >= 0.72 * fs0:
-        return [text], int(f)
-    words = text.split()
-    if len(words) < 2:
-        return [text], int(max(f, 0.5 * fs0))
-    best = min(range(1, len(words)),
-               key=lambda k: abs(len(" ".join(words[:k])) - len(" ".join(words[k:]))))
-    rows = [" ".join(words[:best]), " ".join(words[best:])]
-    n2 = max(len(r) for r in rows)
-    f = (max_w / n2 - fsp) / 0.51
-    return rows, int(max(min(fs0, f), 0.55 * fs0))
-
-
-def _ghost_item_events(item, W, H, margin):
-    raw = str(item.get("text") or "").strip()
-    text = raw.upper().replace("{", "").replace("}", "").replace("\\", "")
-    if not text or text == "NONE":
-        return ""
-
-    start = float(item.get("start", 0))
-    end = float(item.get("actual_end", item.get("end", start + 3)))
-    if end <= start:
-        end = start + 1.0
-
-    vtype = str(item.get("visual_type") or "calm").lower()
-    color = GHOST_TYPE_COLOR.get(vtype, "white")
-    if text.split()[-1].strip("!?.,") in GHOST_KILL_WORDS:
-        color = "red"
-    pal = GHOST_PALETTE[color]
-
-    fs0 = max(10, round(W * GHOST_FONT_SIZE_RATIO))
-    rows, fs = _ghost_plan_rows(text, W, fs0)
-    fsp = round(W * GHOST_SPACING_RATIO, 1)
-    s = W / 1080.0
-
-    n_total = sum(len(r) for r in rows) + (len(rows) - 1)
-    dur = end - start
-    in_st = min(GHOST_IN_STAGGER, 0.5 * dur / max(n_total, 1))
-    out_st = min(GHOST_OUT_STAGGER, 0.25 / max(n_total, 1))
-    typed_done = start + n_total * in_st + GHOST_IN_FADE
-    exit_t = max(typed_done + 0.2, end - 0.15)
-
-    # Action lines pe do chhote white beat-flash
-    flashes = []
-    if vtype == "action":
-        f0 = typed_done + 0.05
-        if exit_t - f0 > 0.35:
-            flashes = [(f0, f0 + 0.05, "white"), (f0 + 0.22, f0 + 0.27, "white")]
-
-    ev0 = start - 0.05
-    ev1 = exit_t + (n_total - 1) * out_st + GHOST_OUT_FADE + 0.05
-    rel = lambda t: _ghost_ms(t - ev0)
-
-    layers = {
-        "glow":   (0, "&H%02X&" % int(255 * (1 - GHOST_GLOW_OPACITY))),
-        "shadow": (1, "&H90&"),
-        "text":   (2, "&H00&"),
-    }
-    cx = W / 2
-    line_h = 1.25 * fs
-    base_y = H - margin - 0.575 * fs      # last row ka line-box bottom = bottom margin pe
-
-    events = ""
-    offset = 0
-    for r_idx, row in enumerate(rows):
-        cy = base_y - (len(rows) - 1 - r_idx) * line_h
-        for kind, (layer, vis) in layers.items():
-            if kind == "glow":
-                base = pal["glow"]
-                look = f"\\bord{fs * 0.12 * GHOST_GLOW_SIZE:.1f}\\shad0\\blur{fs * 0.28 * GHOST_GLOW_SIZE:.1f}"
-                dx = dy = 0.0
-            elif kind == "shadow":
-                base = (0, 0, 0)
-                look = "\\bord0\\shad0\\blur1.5"
-                dx, dy = 1.5 * s, 2.0 * s
-            else:
-                base = pal["fill"]
-                look = "\\bord0\\shad0\\blur0.5"
-                dx = dy = 0.0
-            ctag = (lambda rgb: f"\\1c{_ghost_col(rgb)}\\3c{_ghost_col(rgb)}") if kind == "glow" \
-                else (lambda rgb: f"\\1c{_ghost_col(rgb)}")
-
-            prefix = f"{{\\an5\\pos({cx + dx:.1f},{cy + dy:.1f})\\fs{fs}\\fsp{fsp}\\b1{look}{ctag(base)}}}"
-            body = ""
-            for i, ch in enumerate(row):
-                if ch == " ":
-                    body += " "
-                    continue
-                gi = offset + i
-                t_in = start + gi * in_st
-                t_out = exit_t + gi * out_st
-                tags = (f"\\alpha&HFF&\\t({rel(t_in)},{rel(t_in + GHOST_IN_FADE)},\\alpha{vis})"
-                        f"\\t({rel(t_out)},{rel(t_out + GHOST_OUT_FADE)},\\alpha&HFF&)")
-                if kind != "shadow":
-                    for f0, f1, fcol in flashes:
-                        fc = GHOST_PALETTE[fcol]["glow" if kind == "glow" else "fill"]
-                        tags += (f"\\t({rel(f0)},{rel(f0) + 1},{ctag(fc)})"
-                                 f"\\t({rel(f1)},{rel(f1) + 1},{ctag(base)})")
-                body += f"{{{tags}}}{ch}"
-            events += (f"Dialogue: {layer},{seconds_to_ass_time(ev0)},{seconds_to_ass_time(ev1)},"
-                       f"Default,,0,0,0,,{prefix}{body}\n")
-        offset += len(row) + 1
-    return events
-
-
-def generate_full_ass_script(audio_files, font_name=None, font_size=None,
+def generate_full_ass_script(audio_files, font_name="BebasNeue-Regular", font_size=80,
                               alignment=2, vertical_margin=65,
-                              outline_size=None, shadow_size=None, video_path=None):
-    """Purane function ka hi naam/signature. Ab ghost-style subtitles banata hai."""
-    print("👻 Generating GHOST-style ASS Subtitles (Typewriter + Glow + L→R Fade)...")
+                              outline_size=6, shadow_size=2):
+    print("🎨 Generating SMART Dynamic ASS Subtitles (Smooth 3x Blink + Rare Explosion)...")
 
-    W, H = _ghost_video_size(video_path or FINAL_CLIP_PATH)
-    fs = max(10, round(W * GHOST_FONT_SIZE_RATIO))
+    # Colors
+    COLOR_ACTIVE_CYAN = "&H00FFFF00" # Bright Cyan
+    COLOR_ACTIVE_RED  = "&H000000FF" # Intense Red
+    COLOR_WHITE       = "&H00FFFFFF" # White
+    
+    # 🔥 POSITION SETTINGS (Vertical Margin 65)
+    TEXT_X = 960
+    TEXT_Y = 1080 - vertical_margin  # 1080 - 65 = 1015 (Bottom Placement)
+    
+    # 🔥 Explosive Words (Kam kar diye taaki bar-bar blast na ho)
+    EXPLOSIVE_WORDS = {"BOOM", "KILL", "DIE", "SH*T", "F*CK", "DESTROY", "BLAST"}
+    
+    ass_events = ""
 
-    events = ""
-    for item in sorted(audio_files, key=lambda a: a.get("start", 0)):
-        events += _ghost_item_events(item, W, H, vertical_margin)
+    for item in audio_files:
+        start = item.get("start", 0)
+        end = item.get("actual_end", item.get("end", 3))
+        
+        raw_text = item.get("text")
+        text = str(raw_text).strip() if raw_text is not None else ""
+        if not text or text.lower() == "none":
+            continue
+
+        words = text.split()
+        if not words:
+            continue
+
+        # Check Scene Type & Explosive Words
+        visual_type = item.get("visual_type", "calm").lower()
+        
+        # 🔥 SMART TRIGGER LOGIC (Kam baar blast hoga)
+        last_word = words[-1].upper()
+        has_explosive_word = last_word in EXPLOSIVE_WORDS
+        
+        is_explosive_scene = False
+        if has_explosive_word:
+            is_explosive_scene = True
+        elif visual_type == "action":
+            # Action scene me bhi sirf 40% chance hi blast hone ka
+            if random.random() < 0.4:
+                is_explosive_scene = True
+
+        total_dur = end - start
+        if total_dur <= 0:
+            total_dur = 1.0
+
+        total_words = len(words)
+        dur_per_word = total_dur / total_words
+
+        # 🔥 AUTO-FIT FONT SIZE (Line bahar nahi jayegi)
+        line_str_preview = " ".join([w.upper() for w in words])
+        current_font_size = font_size
+        if len(line_str_preview) > 24:
+            current_font_size = int(font_size * (24 / len(line_str_preview)))
+            current_font_size = max(45, current_font_size)
+
+        # 🔥 SMOOTH BLINK LOGIC (3 baar smooth chamak)
+        if visual_type == "action" or has_explosive_word:
+            # Smooth fade 3x
+            blink_effect = "\\t(0,100,\\alpha&H80&)\\t(100,200,\\alpha&H00&)\\t(200,300,\\alpha&H80&)\\t(300,400,\\alpha&H00&)\\t(400,500,\\alpha&H80&)\\t(500,600,\\alpha&H00&)"
+        elif visual_type == "dialog":
+            # Dialog: 1 slow gentle fade
+            blink_effect = "\\t(0,300,\\alpha&H80&)\\t(300,600,\\alpha&H00&)"
+        else:
+            # Calm: No blink
+            blink_effect = ""
+
+        # 1. PROGRESSIVE ANIMATION (Word by Word)
+        for active_idx in range(total_words):
+            w_start = start + (active_idx * dur_per_word)
+            w_end = w_start + dur_per_word
+            
+            styled_words = []
+            for j in range(active_idx + 1):
+                w = words[j]
+                is_last = (j == total_words - 1)
+                
+                if j < active_idx:
+                    # PAST WORDS: Smooth zoom out and fade
+                    color = COLOR_WHITE
+                    anim = "{\\fscx80\\fscy80\\alpha&H80&\\blur2\\t(0,600,\\fscx50\\fscy50\\alpha&HFF&)}"
+                    
+                elif j == active_idx:
+                    # ACTIVE WORD: Pop-in + Smooth Blink
+                    color = COLOR_ACTIVE_RED if is_last else COLOR_ACTIVE_CYAN
+                    anim = f"{{\\fscx120\\fscy120\\blur15\\t(0,600,\\fscx100\\fscy100\\blur3){blink_effect}}}"
+
+                word_anim = f"{anim}{{\\c{color}}}{w.upper()}"
+                styled_words.append(word_anim)
+
+            # SINGLE LINE LOGIC
+            full_line = f"{{\\an2\\pos({TEXT_X},{TEXT_Y})\\fsp2\\fs{current_font_size}\\bord{outline_size}\\shad{shadow_size}}}" + " ".join(styled_words)
+
+            start_t = seconds_to_ass_time(w_start)
+            end_t = seconds_to_ass_time(w_end)
+            
+            ass_events += f"Dialogue: 0,{start_t},{end_t},Default,,0,0,0,,{full_line}\n"
+
+            # 2. EXPLOSION (Sirf tab jab upar ka logic true ho)
+            if active_idx == total_words - 1 and is_explosive_scene:
+                # A. Blink Effect (Flash on last word)
+                blink_styled = []
+                for j, w in enumerate(words):
+                    if j == total_words - 1:
+                        blink_styled.append(f"{{\\fscx140\\fscy140\\c{COLOR_ACTIVE_RED}\\blur8}}{w.upper()}")
+                    else:
+                        blink_styled.append(f"{{\\c{COLOR_WHITE}\\alpha&HFF&}}{w.upper()}")
+                
+                blink_line = f"{{\\an2\\pos({TEXT_X},{TEXT_Y})\\fsp2\\fs{current_font_size}\\bord{outline_size}\\shad{shadow_size}}}" + " ".join(blink_styled)
+
+                b1_start = w_end
+                b1_end = b1_start + 0.15 
+                ass_events += f"Dialogue: 1,{seconds_to_ass_time(b1_start)},{seconds_to_ass_time(b1_end)},Default,,0,0,0,,{blink_line}\n"
+
+                # B. EXPLOSION EFFECT
+                explode_start = w_end + 0.05
+                explode_dur = 1.2 
+                explode_end = explode_start + explode_dur
+                
+                char_w = current_font_size // 2
+                total_width = len(line_str_preview) * char_w
+                start_x = TEXT_X - (total_width / 2)
+                
+                for char_idx, char in enumerate(line_str_preview):
+                    if char == " ": continue
+                    
+                    char_x = start_x + (char_idx * char_w)
+                    y_pos = TEXT_Y - (current_font_size / 2) 
+                    
+                    dx = random.randint(-800, 800)
+                    dy = random.randint(-900, 200)
+                    rot = random.randint(-1080, 1080)
+                    c = random.choice([COLOR_ACTIVE_CYAN, COLOR_ACTIVE_RED, COLOR_WHITE])
+                    
+                    tag = (
+                        f"{{\\an5\\pos({char_x},{y_pos})"
+                        f"\\move({char_x},{y_pos},{char_x+dx},{y_pos+dy},0,{int(explode_dur*1000)})"
+                        f"\\frz{rot}\\t(0,{int(explode_dur*1000)},\\alpha&HFF&\\fscx20\\fscy20)"
+                        f"\\c{c}\\bord{outline_size-1}\\blur2\\fs{current_font_size}\\b1}}{char}"
+                    )
+                    
+                    ass_events += f"Dialogue: 2,{seconds_to_ass_time(explode_start)},{seconds_to_ass_time(explode_end)},Default,,0,0,0,,{tag}\n"
 
     ass_content = f"""[Script Info]
 ScriptType: v4.00+
-PlayResX: {W}
-PlayResY: {H}
+PlayResX: 1920
+PlayResY: 1080
 ScaledBorderAndShadow: yes
 WrapStyle: 2
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,{GHOST_FONT_NAME},{fs},&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,0,0,5,10,10,10,1
+Style: Default,{font_name},{font_size},&H00FFFFFF,&H000000FF,&H00000000,&H80000000,-1,0,0,0,100,100,0,0,1,{outline_size},{shadow_size},2,10,10,{vertical_margin},1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
-{events}"""
+{ass_events}"""
 
     with open(ASS_PATH, "w", encoding="utf-8") as f:
         f.write(ass_content)
 
-    print(f"✅ GHOST ASS Subtitles saved: {ASS_PATH} ({W}x{H}, {len(audio_files)} lines)")
-    print(f"   🎨 Style: Typewriter + Glow + Left-to-Right Fade | Action = red + beat flash")
-    print(f"   📏 Position: Bottom margin {vertical_margin} | Auto-Fit: ON\n")
+    print(f"✅ SMART ASS Subtitles saved: {ASS_PATH}")
+    print(f"   🎨 Style: Smooth 3x Blink + Rare Explosion")
+    print(f"   📏 Position: Vertical Margin {vertical_margin} | Auto-Fit: Enabled\n")
 
 
 # ============================================================
@@ -1778,7 +1748,7 @@ def fallback_copy_original():
 # ============================================================
 def main():
     print("=" * 60)
-    print("🎙️ AI COMMENTARY DUBBER — v6.5 (Ghost-Style Subtitles)")
+    print("🎙️ AI COMMENTARY DUBBER — v6.4 (Rare Explosion + Smooth Subtitle)")
     print("=" * 60)
     print(f"📹 Input : {FINAL_CLIP_PATH}")
     print(f"📤 Output: {FINAL_DUBBED_VIDEO}")
@@ -1788,7 +1758,7 @@ def main():
     print(f"🎵 atempo: normal={ATEMPO_MAX} | last={ATEMPO_MAX_LAST} | action={ATEMPO_MAX_ACTION}")
     print(f"📏 Slot extend: max {MAX_SLOT_EXTEND}s")
     print(f"🔊 Volume: Action={VOL_ACTION}x | Other={VOL_OTHER}x")
-    print(f"👻 Subtitle: Ghost-Style (Typewriter + Glow + L→R Fade + Beat Flash)")
+    print(f"🎨 Subtitle: Smooth 3x Blink + Rare Explosion (40% chance)")
     print(f"🎮 Mode: REAL-TIME GAMEPLAY (18 rules)")
     print("=" * 60 + "\n")
 
@@ -1845,9 +1815,11 @@ def main():
         if SUBTITLES_ENABLED:
             generate_full_ass_script(
                 audio_files=audio_files,
+                font_name="BebasNeue-Regular",
+                font_size=80,
                 alignment=2,
-                vertical_margin=65,  # 👈 Bottom se 65px margin
-                video_path=FINAL_CLIP_PATH
+                outline_size=6,
+                vertical_margin=65  # 👈 Yahan 65 set kiya hai
             )
 
         final_audio = build_timed_audio(audio_files, vid_dur)
