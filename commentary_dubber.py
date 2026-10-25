@@ -378,7 +378,15 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                     
                     if is_flash:
                         flash_col = ass_color(PALETTE["white"]["glow" if kind == "glow" else "fill"])
-                        tags += f"\\t({rel(t_in + 50)},{rel(t_in + 150)},{col_tag.replace('\\1c', '\\1c' + flash_col).replace('\\3c', '\\3c' + flash_col)})"
+                        
+                        # 🛡️ Yahan F-string ka backslash error fix kiya gaya hai
+                        new_1c = "\\1c" + flash_col
+                        new_3c = "\\3c" + flash_col
+                        
+                        part1 = col_tag.replace("\\1c", new_1c)
+                        part2 = part1.replace("\\3c", new_3c)
+                        
+                        tags += f"\\t({rel(t_in + 50)},{rel(t_in + 150)},{part2})"
 
                     body += f"{{{tags}}}{ch}"
                     char_idx += 1
