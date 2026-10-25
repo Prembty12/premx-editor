@@ -1,33 +1,33 @@
 {
-  "last_updated": "2026-10-25 03:13:05 PM",
+  "last_updated": "2026-10-25 09:14:57 PM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 6935,
-      "avg_per_video": 577,
+      "views_7d": 6981,
+      "avg_per_video": 581,
       "trend": "viral",
-      "ratio": 3.925170068027211,
+      "ratio": 3.7938432835820897,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "MarvelsSpiderMan2",
-      "views_7d": 2870,
-      "avg_per_video": 260,
+      "views_7d": 3260,
+      "avg_per_video": 296,
       "trend": "trending",
-      "ratio": 1.7687074829931972,
-      "fb_link": "",
+      "ratio": 1.9328358208955225,
+      "fb_link": "https://www.facebook.com/reel/1782013866423428/",
       "source_link": ""
     }
   ],
   "below_avg": [
     {
       "game": "CallOfDutyMW2",
-      "views_7d": 217,
-      "avg_per_video": 108,
+      "views_7d": 221,
+      "avg_per_video": 110,
       "trend": "slow",
-      "ratio": 0.7346938775510204,
+      "ratio": 0.7182835820895522,
       "fb_link": "https://www.facebook.com/reel/2181972149061480/",
       "source_link": ""
     },
@@ -36,16 +36,16 @@
       "views_7d": 210,
       "avg_per_video": 52,
       "trend": "below_avg",
-      "ratio": 0.35374149659863946,
+      "ratio": 0.3395522388059702,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "Wolverine",
-      "views_7d": 209,
-      "avg_per_video": 17,
+      "views_7d": 219,
+      "avg_per_video": 18,
       "trend": "below_avg",
-      "ratio": 0.11564625850340136,
+      "ratio": 0.11753731343283583,
       "fb_link": "",
       "source_link": ""
     },
@@ -54,7 +54,7 @@
       "views_7d": 30,
       "avg_per_video": 15,
       "trend": "below_avg",
-      "ratio": 0.10204081632653061,
+      "ratio": 0.09794776119402986,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions15.mp4"
     },
@@ -70,10 +70,10 @@
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 6935,
-    "avg_per_video": 577,
+    "views_7d": 6981,
+    "avg_per_video": 581,
     "trend": "viral",
-    "ratio": 3.925170068027211,
+    "ratio": 3.7938432835820897,
     "fb_link": "",
     "source_link": ""
   }
