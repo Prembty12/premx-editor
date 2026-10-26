@@ -1,22 +1,22 @@
 {
-  "last_updated": "2026-10-25 09:14:57 PM",
+  "last_updated": "2026-10-26 08:47:09 AM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 6981,
-      "avg_per_video": 581,
+      "views_7d": 7035,
+      "avg_per_video": 586,
       "trend": "viral",
-      "ratio": 3.7938432835820897,
+      "ratio": 3.7529734675205857,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "MarvelsSpiderMan2",
-      "views_7d": 3260,
-      "avg_per_video": 296,
+      "views_7d": 3366,
+      "avg_per_video": 306,
       "trend": "trending",
-      "ratio": 1.9328358208955225,
+      "ratio": 1.959743824336688,
       "fb_link": "https://www.facebook.com/reel/1782013866423428/",
       "source_link": ""
     }
@@ -24,10 +24,10 @@
   "below_avg": [
     {
       "game": "CallOfDutyMW2",
-      "views_7d": 221,
-      "avg_per_video": 110,
+      "views_7d": 226,
+      "avg_per_video": 113,
       "trend": "slow",
-      "ratio": 0.7182835820895522,
+      "ratio": 0.7236962488563586,
       "fb_link": "https://www.facebook.com/reel/2181972149061480/",
       "source_link": ""
     },
@@ -36,17 +36,17 @@
       "views_7d": 210,
       "avg_per_video": 52,
       "trend": "below_avg",
-      "ratio": 0.3395522388059702,
+      "ratio": 0.33302836230558097,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "Wolverine",
-      "views_7d": 219,
-      "avg_per_video": 18,
+      "views_7d": 254,
+      "avg_per_video": 21,
       "trend": "below_avg",
-      "ratio": 0.11753731343283583,
-      "fb_link": "",
+      "ratio": 0.1344922232387923,
+      "fb_link": "https://www.facebook.com/reel/28988583820780976/",
       "source_link": ""
     },
     {
@@ -54,7 +54,7 @@
       "views_7d": 30,
       "avg_per_video": 15,
       "trend": "below_avg",
-      "ratio": 0.09794776119402986,
+      "ratio": 0.09606587374199452,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions15.mp4"
     },
@@ -70,10 +70,10 @@
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 6981,
-    "avg_per_video": 581,
+    "views_7d": 7035,
+    "avg_per_video": 586,
     "trend": "viral",
-    "ratio": 3.7938432835820897,
+    "ratio": 3.7529734675205857,
     "fb_link": "",
     "source_link": ""
   }

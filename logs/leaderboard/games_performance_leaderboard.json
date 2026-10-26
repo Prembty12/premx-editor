@@ -1,35 +1,35 @@
 [
     {
         "rank": 1,
-        "game_name": "VietnamCavePrison",
-        "total_views": 9038,
-        "uploaded_videos": 16,
-        "avg_views_per_video": 564,
-        "view_share_percentage": 17.94
+        "game_name": "MarvelsSpiderMan2",
+        "total_views": 7127,
+        "uploaded_videos": 38,
+        "avg_views_per_video": 187,
+        "view_share_percentage": 15.45
     },
     {
         "rank": 2,
-        "game_name": "MarvelsSpiderMan2",
-        "total_views": 7021,
-        "uploaded_videos": 38,
-        "avg_views_per_video": 184,
-        "view_share_percentage": 13.94
+        "game_name": "CODMW4",
+        "total_views": 7035,
+        "uploaded_videos": 20,
+        "avg_views_per_video": 351,
+        "view_share_percentage": 15.25
     },
     {
         "rank": 3,
-        "game_name": "CODMW4",
-        "total_views": 6981,
-        "uploaded_videos": 20,
-        "avg_views_per_video": 349,
-        "view_share_percentage": 13.86
+        "game_name": "Russian_secret_missions",
+        "total_views": 5596,
+        "uploaded_videos": 26,
+        "avg_views_per_video": 215,
+        "view_share_percentage": 12.13
     },
     {
         "rank": 4,
-        "game_name": "Russian_secret_missions",
-        "total_views": 5595,
-        "uploaded_videos": 26,
-        "avg_views_per_video": 215,
-        "view_share_percentage": 11.11
+        "game_name": "VietnamCavePrison",
+        "total_views": 5353,
+        "uploaded_videos": 16,
+        "avg_views_per_video": 334,
+        "view_share_percentage": 11.6
     },
     {
         "rank": 5,
@@ -37,7 +37,7 @@
         "total_views": 4741,
         "uploaded_videos": 11,
         "avg_views_per_video": 431,
-        "view_share_percentage": 9.41
+        "view_share_percentage": 10.28
     },
     {
         "rank": 6,
@@ -45,23 +45,23 @@
         "total_views": 4160,
         "uploaded_videos": 10,
         "avg_views_per_video": 416,
-        "view_share_percentage": 8.26
+        "view_share_percentage": 9.02
     },
     {
         "rank": 7,
-        "game_name": "mm2remastered",
-        "total_views": 3472,
-        "uploaded_videos": 14,
-        "avg_views_per_video": 248,
-        "view_share_percentage": 6.89
+        "game_name": "CallOfDutyMW2",
+        "total_views": 3422,
+        "uploaded_videos": 12,
+        "avg_views_per_video": 285,
+        "view_share_percentage": 7.42
     },
     {
         "rank": 8,
-        "game_name": "CallOfDutyMW2",
-        "total_views": 3417,
-        "uploaded_videos": 12,
-        "avg_views_per_video": 284,
-        "view_share_percentage": 6.78
+        "game_name": "mm2remastered",
+        "total_views": 3022,
+        "uploaded_videos": 14,
+        "avg_views_per_video": 215,
+        "view_share_percentage": 6.55
     },
     {
         "rank": 9,
@@ -69,30 +69,30 @@
         "total_views": 2644,
         "uploaded_videos": 17,
         "avg_views_per_video": 155,
-        "view_share_percentage": 5.25
+        "view_share_percentage": 5.73
     },
     {
         "rank": 10,
         "game_name": "Wolverine",
-        "total_views": 1690,
+        "total_views": 1725,
         "uploaded_videos": 31,
-        "avg_views_per_video": 54,
-        "view_share_percentage": 3.36
+        "avg_views_per_video": 55,
+        "view_share_percentage": 3.74
     },
     {
         "rank": 11,
-        "game_name": "sifu",
-        "total_views": 838,
-        "uploaded_videos": 19,
-        "avg_views_per_video": 44,
-        "view_share_percentage": 1.66
+        "game_name": "ghostandela",
+        "total_views": 771,
+        "uploaded_videos": 38,
+        "avg_views_per_video": 20,
+        "view_share_percentage": 1.67
     },
     {
         "rank": 12,
-        "game_name": "ghostandela",
-        "total_views": 771,
-        "uploaded_videos": 37,
-        "avg_views_per_video": 20,
-        "view_share_percentage": 1.53
+        "game_name": "sifu",
+        "total_views": 535,
+        "uploaded_videos": 19,
+        "avg_views_per_video": 28,
+        "view_share_percentage": 1.16
     }
 ]
