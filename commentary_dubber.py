@@ -17,7 +17,7 @@ FEATURES:
   ✅ 3 Models Auto-Retry (JSON Object + Healing)
   ✅ Sanitized Text (NoneType Crash Fixed)
   ✅ Strict Completeness Check (Rejects incomplete segments)
-  ✅ Cinematic Subtitles (3D Shadow + Glow + Letter-by-Letter Typewriter + Colors)
+  ✅ Cinematic Subtitles (Crispy Text + Float + Fight Flash + Auto-Wrap + Mode 2 Fixed)
 ===============================================================
 """
 
@@ -47,7 +47,7 @@ load_dotenv()
 # 🎛️ SUBTITLE MODE SWITCH
 # ============================================================
 # 1 = Purana System (Bina Emoji ke)
-# 2 = Naya System (Emoji ke saath)
+# 2 = Naya System (Emoji ke saath, Ab Crispy & Colored)
 SUBTITLE_MODE = 1  
 # ============================================================
 
@@ -143,7 +143,6 @@ os.makedirs(FONTS_DIR, exist_ok=True)
 # ============================================================
 # 🎨 CINEMATIC STYLE (REFERENCE STYLE)
 # ============================================================
-# Colors from reference script
 PALETTE = {
     "blue":   {"fill": (10, 170, 255), "glow": (0, 130, 255)},
     "white":  {"fill": (255, 255, 255), "glow": (255, 255, 255)},
@@ -256,12 +255,12 @@ def speed_for_type(slot_type):
 
 
 # ============================================================
-# ASS SUBTITLE GENERATOR (REFERENCE STYLE)
+# ASS SUBTITLE GENERATOR (UPDATED FOR BOTH MODES - CRISPY & WRAPPED)
 # ============================================================
-def generate_full_ass_script(audio_files, font_name="Arial", font_size=45,
-                              alignment=2, vertical_margin=65,
+def generate_full_ass_script(audio_files, font_name="Arial", font_size=42,
+                              alignment=2, vertical_margin=80,
                               outline_size=0, shadow_size=0):
-    print("🎨 Generating ASS Subtitles (REFERENCE CINEMATIC STYLE)...")
+    print(f"🎨 Generating ASS Subtitles (CRISPY FLOAT STYLE - MODE {SUBTITLE_MODE})...")
 
     ass_content = f"""[Script Info]
 ScriptType: v4.00+
@@ -292,23 +291,37 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
         visual_type = (item.get("visual_type") or "calm").lower()
         
+        # Split long text into multiple lines to prevent it going out of bounds
+        words = text.split()
+        lines = []
+        current_line = []
+        for w in words:
+            current_line.append(w)
+            # If line gets too long, push it and start a new one
+            if len(" ".join(current_line)) > 26: 
+                lines.append(" ".join(current_line))
+                current_line = []
+        if current_line:
+            lines.append(" ".join(current_line))
+            
+        text = "\\N".join(lines)
+
         # Timing for letter-by-letter
         total_dur = end - start
         if total_dur <= 0:
             total_dur = 1.0
             
-        # Remove spaces for timing calculation
-        clean_text = text.replace(" ", "")
+        # Remove spaces and \N for timing calculation
+        clean_text = text.replace(" ", "").replace("\\N", "")
         n_chars = len(clean_text)
         if n_chars == 0:
             continue
             
-        in_st = min(total_dur / n_chars, 0.06) # Dynamic stagger timing
+        in_st = min(total_dur / n_chars, 0.06)
         out_st = 0.03
 
-        # Color Logic
-        words = text.split()
-        total_words = len(words)
+        all_words = text.split()
+        total_words = len(all_words)
 
         ev0 = start - 0.05
         ev1 = end + (n_chars - 1) * out_st + OUT_FADE + 0.05
@@ -317,35 +330,32 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         def rel(t):
             return max(0, int((t - ev0) * 1000))
 
-        # Position (Center Bottom, or Float if Action)
         cx = W * 0.50
-        cy = H - vertical_margin - (font_size * 0.5) # Adjust for ASS alignment 2
+        cy = H - vertical_margin - (font_size * (len(lines) * 0.6))
         
         def pos_tag(dx=0.0, dy=0.0):
             if visual_type == "action":
-                # Float up slightly
-                y_start = cy + 20
-                y_end = y_start - 40
-                return f"\\move({cx + dx:.1f},{y_start + dy:.1f},{cx + dx:.1f},{y_end + dy:.1f},0,{dur_ms})"
-            return f"\\pos({cx + dx:.1f},{cy + dy:.1f})"
+                y_start = cy + 30
+                y_end = y_start - 60
+            else:
+                y_start = cy + 15
+                y_end = y_start - 30
+            return f"\\move({cx + dx:.1f},{y_start + dy:.1f},{cx + dx:.1f},{y_end + dy:.1f},0,{dur_ms})"
 
         fs = font_size
-        fsp = 8
+        fsp = 4
 
-        # Build Events for all 3 layers
         for kind, (layer, vis) in LAYERS.items():
-            # Determine base color for this layer
             if kind == "shadow":
-                base_col = (0, 0, 0)
-                look = "\\bord0\\shad0\\blur1.5"
-                dx, dy = 1.5, 2.0
+                look = "\\bord0\\shad2.5"
+                dx, dy = 2.0, 3.0
             else:
-                base_col = PALETTE["white"]["glow" if kind == "glow" else "fill"]
                 if kind == "glow":
                     look = f"\\bord{fs * 0.12 * GLOW_SIZE:.1f}\\shad0\\blur{fs * 0.28 * GLOW_SIZE:.1f}"
                     dx = dy = 0.0
                 else:
-                    look = "\\bord0\\shad0\\blur0.5"
+                    # CRISPY TEXT: Solid outline, hard shadow, no blur
+                    look = f"\\bord{fs * 0.08:.1f}\\shad1.5\\blur0" 
                     dx = dy = 0.0
 
             prefix = f"{{\\an5{pos_tag(dx, dy)}\\fs{fs}\\fsp{fsp}\\b1{look}"
@@ -353,33 +363,47 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             body = ""
             char_idx = 0
             
-            for w_idx, word in enumerate(words):
-                # Check if it's the last word in the line
+            for w_idx, word in enumerate(all_words):
+                if word == "\\N":
+                    body += "\\N"
+                    continue
+
+                # 🎨 COLOR LOGIC FIX: Apply color to individual words
                 if w_idx == total_words - 1:
+                    # Last word - Red for action, Orange for others
                     word_pal = PALETTE["red"] if visual_type == "action" else PALETTE["orange"]
                 else:
+                    # Other words - Blue
                     word_pal = PALETTE["blue"]
 
+                # ASS color tag format: \1c&HBBGGRR& 
                 word_col = ass_color(word_pal["glow" if kind == "glow" else "fill"])
-                col_tag = f"\\1c{word_col}\\3c{word_col}" if kind == "glow" else f"\\1c{word_col}"
+                
+                # Emoji handling: Color tag text ko color karega, emoji ko nahi
+                col_tag = f"\\1c{word_col}"
+                if kind == "glow":
+                    col_tag += f"\\3c{word_col}"
 
-                # Apply color tag at the start of the word
                 body += f"{{{col_tag}}}"
 
                 for ch in word:
                     t_in = start + char_idx * in_st
                     t_out = end + char_idx * out_st
                     
-                    # Alpha animation tags
                     tags = (
                         f"\\alpha&HFF&\\t({rel(t_in)},{rel(t_in + IN_FADE)},\\alpha{vis})"
                         f"\\t({rel(t_out)},{rel(t_out + OUT_FADE)},\\alpha&HFF&)"
                     )
+                    
+                    # Flash effect for the last hype word
+                    if w_idx == total_words - 1 and kind != "shadow":
+                        flash_color = ass_color(PALETTE["orange"]["fill"])
+                        tags += f"\\t({rel(t_in)},{rel(t_in + 0.15)},\\1c{flash_color})"
+                    
                     body += f"{{{tags}}}{ch}"
                     char_idx += 1
                 
-                # Add space after word (doesn't increment char_idx)
-                if w_idx < total_words - 1:
+                if w_idx < total_words - 1 and all_words[w_idx+1] != "\\N":
                     body += " "
 
             ass_content += (f"Dialogue: {layer},{seconds_to_ass_time(ev0)},{seconds_to_ass_time(ev1)},"
@@ -391,7 +415,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
     print(f"✅ ASS Subtitles saved: {ASS_PATH}")
     print(f"   📊 Total subtitle layers: {written}")
-    print(f"   🎨 Style: Reference Cinematic (3D + Typewriter)\n")
+    print(f"   🎨 Style: Crispy Float + Flash (Mode {SUBTITLE_MODE})\n")
 
 
 # ============================================================
@@ -1620,7 +1644,7 @@ def main():
     print(f"🎵 atempo: normal={ATEMPO_MAX} | last={ATEMPO_MAX_LAST} | action={ATEMPO_MAX_ACTION}")
     print(f"📏 Slot extend: max {MAX_SLOT_EXTEND}s")
     print(f"🔊 Volume: Action={VOL_ACTION}x | Other={VOL_OTHER}x")
-    print(f"🎨 Subtitle: Cinematic 3D + Typewriter (Mode {SUBTITLE_MODE})")
+    print(f"🎨 Subtitle: Crispy Float + Flash (Mode {SUBTITLE_MODE})")
     print(f"🎮 Mode: REAL-TIME GAMEPLAY (18 rules)")
     print("=" * 60 + "\n")
 
@@ -1677,9 +1701,9 @@ def main():
             generate_full_ass_script(
                 audio_files=audio_files,
                 font_name="BebasNeue-Regular",
-                font_size=45,
+                font_size=42,
                 alignment=2,
-                vertical_margin=65
+                vertical_margin=80
             )
 
         final_audio = build_timed_audio(audio_files, vid_dur)
@@ -1708,4 +1732,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main() 
