@@ -20,3 +20,4 @@ ghostandela6 | Link: https://github.com/Prembty12/premx-editor/releases/download
 ghostandela39 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela39.mp4 | REJECT (OpenRouter): Boring corridor walking with no combat.
 ghostandela41 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela41.mp4 | REJECT (OpenRouter): Only menu checking and running without combat
 ghostandela9 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela9.mp4 | REJECT (OpenRouter): Black screen with zero gameplay or action
+ghostandela34 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela34.mp4 | REJECT (OpenRouter): Empty corridor walking with zero combat action.
