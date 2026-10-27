@@ -1,13 +1,13 @@
 {
-  "last_updated": "2026-10-27 03:27:31 PM",
+  "last_updated": "2026-10-27 03:30:18 PM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 7628,
-      "avg_per_video": 508,
+      "views_7d": 7637,
+      "avg_per_video": 509,
       "trend": "viral",
-      "ratio": 3.280442804428044,
+      "ratio": 3.2838709677419353,
       "fb_link": "https://www.facebook.com/reel/2283271625790545/",
       "source_link": ""
     },
@@ -16,7 +16,7 @@
       "views_7d": 4103,
       "avg_per_video": 341,
       "trend": "viral",
-      "ratio": 2.202029520295203,
+      "ratio": 2.2,
       "fb_link": "https://www.facebook.com/reel/1483390583931941/",
       "source_link": ""
     },
@@ -25,7 +25,7 @@
       "views_7d": 163,
       "avg_per_video": 163,
       "trend": "steady",
-      "ratio": 1.0525830258302582,
+      "ratio": 1.0516129032258064,
       "fb_link": "https://www.facebook.com/reel/2181972149061480/",
       "source_link": ""
     }
@@ -36,7 +36,7 @@
       "views_7d": 210,
       "avg_per_video": 35,
       "trend": "below_avg",
-      "ratio": 0.22601476014760147,
+      "ratio": 0.22580645161290322,
       "fb_link": "",
       "source_link": ""
     },
@@ -45,7 +45,7 @@
       "views_7d": 359,
       "avg_per_video": 22,
       "trend": "below_avg",
-      "ratio": 0.14206642066420663,
+      "ratio": 0.14193548387096774,
       "fb_link": "",
       "source_link": ""
     },
@@ -54,7 +54,7 @@
       "views_7d": 30,
       "avg_per_video": 15,
       "trend": "below_avg",
-      "ratio": 0.09686346863468634,
+      "ratio": 0.0967741935483871,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions15.mp4"
     },
@@ -70,10 +70,10 @@
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 7628,
-    "avg_per_video": 508,
+    "views_7d": 7637,
+    "avg_per_video": 509,
     "trend": "viral",
-    "ratio": 3.280442804428044,
+    "ratio": 3.2838709677419353,
     "fb_link": "https://www.facebook.com/reel/2283271625790545/",
     "source_link": ""
   }
