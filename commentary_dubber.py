@@ -48,8 +48,6 @@ load_dotenv()
 # ============================================================
 # 🎛️ SUBTITLE MODE SWITCH
 # ============================================================
-# 1 = Purana System (Bina Emoji ke)
-# 2 = Naya System (Emoji ke saath)
 SUBTITLE_MODE = 1  
 # ============================================================
 
@@ -256,7 +254,7 @@ def speed_for_type(slot_type):
 
 
 # ============================================================
-# ASS SUBTITLE GENERATOR (100% FIXED BRACKETS + AUTO-WRAP + CRISPY)
+# ASS SUBTITLE GENERATOR (FIXED: vis_val variable name conflict)
 # ============================================================
 def generate_full_ass_script(audio_files, font_name="Arial", font_size=40,
                               alignment=2, vertical_margin=65,
@@ -287,6 +285,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         
         raw_text = item.get("text")
         text = str(raw_text).strip().upper() if raw_text is not None else ""
+        text = text.replace("\\", "").replace("{", "").replace("}", "")
         if not text or text.lower() == "none":
             continue
 
@@ -342,7 +341,8 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         fs = font_size
         fsp = 8
 
-        for kind, (layer, vis) in LAYERS.items():
+        # 🔥 FIX: Variable rename vis -> vis_val to avoid ASS conflict
+        for kind, (layer, vis_val) in LAYERS.items():
             if kind == "shadow":
                 base_col = (0, 0, 0)
                 look = "\\bord0\\shad2.5\\blur0.8"
@@ -380,8 +380,10 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                     t_in = start + char_idx * in_st
                     t_out = end + char_idx * out_st
                     
+                    # 🔥 FIX: Clean multi-line tags with vis_val
                     tags = (
-                        f"\\alpha&HFF&\\t({rel(t_in)},{rel(t_in + IN_FADE)},\\alpha{vis})"
+                        f"\\alpha&HFF&"
+                        f"\\t({rel(t_in)},{rel(t_in + IN_FADE)},\\alpha{vis_val})"
                         f"\\t({rel(t_out)},{rel(t_out + OUT_FADE)},\\alpha&HFF&)"
                     )
                     body += f"{{{tags}}}{ch}"
@@ -1223,10 +1225,6 @@ If you see ANY of these → visual_type = "action":
     }
 
     def _build_payload(model_id, strict=True):
-        """
-        strict=True  → json_schema + strict:true + require_parameters
-        strict=False → json_object + response-healing (fallback)
-        """
         if strict:
             response_format = {
                 "type": "json_schema",
@@ -1254,16 +1252,13 @@ If you see ANY of these → visual_type = "action":
         }
 
         if strict:
-            # Route only to providers that support all requested params
             payload["provider"] = {"require_parameters": True}
         else:
-            # Healing only useful in json_object fallback mode
             payload["plugins"] = [{"id": "response-healing"}]
 
         return payload
 
     def _parse_and_validate(raw):
-        """Parse JSON and enforce completeness + type sanity."""
         if not raw:
             return None, "empty"
         raw = str(raw).strip()
@@ -1293,11 +1288,6 @@ If you see ANY of these → visual_type = "action":
         return None, "json"
 
     def _try_call(model_id, key):
-        """
-        Try strict json_schema first.
-        If model/endpoint doesn't support it (400/422),
-        auto-fallback to json_object for the SAME key.
-        """
         headers = {
             "Authorization": f"Bearer {key}",
             "Content-Type": "application/json",
@@ -1305,7 +1295,6 @@ If you see ANY of these → visual_type = "action":
             "X-Title": "Gaming Commentary"
         }
 
-        # ---------- ATTEMPT 1: STRICT JSON SCHEMA ----------
         try:
             payload = _build_payload(model_id, strict=True)
             r = requests.post(or_url, headers=headers, json=payload, timeout=120)
@@ -1329,17 +1318,13 @@ If you see ANY of these → visual_type = "action":
                 return None, model_id, "rate"
 
             elif r.status_code in (400, 422):
-                # Likely: model doesn't support json_schema / require_parameters mismatch
-                # → fallback to json_object
                 print("(schema unsupported → json_object)", end=" ")
-                # fall through to Attempt 2
             else:
                 return None, model_id, f"http_{r.status_code}"
 
         except Exception as e:
             return None, model_id, f"exception: {str(e)[:50]}"
 
-        # ---------- ATTEMPT 2: JSON_OBJECT FALLBACK ----------
         try:
             payload = _build_payload(model_id, strict=False)
             r2 = requests.post(or_url, headers=headers, json=payload, timeout=120)
@@ -1364,9 +1349,6 @@ If you see ANY of these → visual_type = "action":
         except Exception as e:
             return None, model_id, f"exception: {str(e)[:50]}"
 
-    # ============================================================
-    # MODEL TRY LOOP (manual change karne ke liye yahin edit karein)
-    # ============================================================
     segments = None
     winning_model = None
     winning_route = None
@@ -1580,7 +1562,7 @@ def generate_audio(segments, slots, vid_duration):
     print("🔊 [7] Generating TTS (action me atempo 1.15 tak)...")
     url = f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID}"
     headers = {
-        "Accept": "audio/mpeg",
+        "Accept": "application/json",
         "Content-Type": "application/json",
         "xi-api-key": ELEVENLABS_API_KEY
     }
