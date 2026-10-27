@@ -20,7 +20,7 @@ FEATURES:
   ✅ Cinematic Subtitles (3D Shadow + Glow + Letter-by-Letter Typewriter + Colors + Auto-Wrap + Crispy Text)
   ✅ NEW: Structured Outputs (json_schema + strict:true) with auto json_object fallback
   ✅ NEW: provider.require_parameters = true (route only to supporting endpoints)
-  ✅ FIXED: Alpha tag error (text sanitization + tag string building)
+  ✅ FIXED: Alpha tag error (individual tag blocks)
 ===============================================================
 """
 
@@ -287,7 +287,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         raw_text = item.get("text")
         text = str(raw_text).strip().upper() if raw_text is not None else ""
         
-        # 🔥 GPT ke text ko saaf karein
+        # GPT ke text ko saaf karein
         text = text.replace("\\", "").replace("{", "").replace("}", "")
         
         if not text or text.lower() == "none":
@@ -345,7 +345,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         fs = font_size
         fsp = 8
 
-        # 🔥 FIX: Loop variable ko vis_val kiya
+        # 🔥 FIX: vis_val variable name
         for kind, (layer, vis_val) in LAYERS.items():
             if kind == "shadow":
                 base_col = (0, 0, 0)
@@ -384,13 +384,12 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                     t_in = start + char_idx * in_st
                     t_out = end + char_idx * out_st
                     
-                    # 🔥 FIX: Tags ko saaf aur alag lines me banaya
-                    tags = (
-                        f"\\alpha&HFF&"
-                        f"\\t({rel(t_in)},{rel(t_in + IN_FADE)},\\alpha{vis_val})"
-                        f"\\t({rel(t_out)},{rel(t_out + OUT_FADE)},\\alpha&HFF&)"
-                    )
-                    body += f"{{{tags}}}{ch}"
+                    # 🔥 FIX: Har tag alag block me (No dual-line confusion)
+                    body += f"{{\\alpha&HFF&}}"
+                    body += f"{{\\t({rel(t_in)},{rel(t_in + IN_FADE)},\\alpha{vis_val})}}"
+                    body += f"{{\\t({rel(t_out)},{rel(t_out + OUT_FADE)},\\alpha&HFF&)}}"
+                    body += ch
+                    
                     char_idx += 1
                 
                 if w_idx < total_words - 1 and words[w_idx+1] != "\\N":
