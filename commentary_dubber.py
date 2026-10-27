@@ -296,14 +296,14 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         if not text or text.lower() == "none":
             continue
 
-        # 🔥 TESTING: Line limit 80
-        if len(text) > 80:
+        # 🔥 NORMAL LIMIT (Wapas 26 kar diya)
+        if len(text) > 26:
             words_list = text.split()
             lines = []
             current_line = []
             for w in words_list:
                 current_line.append(w)
-                if len(" ".join(current_line)) > 80:
+                if len(" ".join(current_line)) > 26:
                     lines.append(" ".join(current_line))
                     current_line = []
             if current_line:
@@ -1114,9 +1114,9 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 **🚫 NEVER shout on non-action scenes.**
 
 **PACING:**
-- "action" → 15-20 words, HIGH energy, CAPS
-- "dialog" → 15-20 words, conversational
-- "calm" → 15-20 words, chill
+- "action" → 3-5 words, HIGH energy, CAPS
+- "dialog" → 4-6 words, conversational
+- "calm" → 5-7 words, chill
 
 **🎯 VISUAL CLASSIFICATION RULES**
 
@@ -1146,7 +1146,7 @@ If you see ANY of these → visual_type = "action":
 2. REACT with emotion
 3. Focus on VISUALS
 4. UNIQUE lines based on actual frames
-5. 15-20 words per line
+5. 5-8 words per line
 6. Reference "guys" or "you" naturally
 7. Max 2-3 follow requests
 
