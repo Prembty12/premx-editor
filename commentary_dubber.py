@@ -17,7 +17,7 @@ FEATURES:
   ✅ 3 Models Auto-Retry (JSON Object + Healing)
   ✅ Sanitized Text (NoneType Crash Fixed)
   ✅ Strict Completeness Check (Rejects incomplete segments)
-  ✅ Cinematic Subtitles (3D Shadow + Glow + Letter-by-Letter Typewriter + Colors)
+  ✅ Cinematic Subtitles (3D Shadow + Glow + Letter-by-Letter Typewriter + Colors + Auto-Wrap + Crispy Text)
 ===============================================================
 """
 
@@ -256,7 +256,7 @@ def speed_for_type(slot_type):
 
 
 # ============================================================
-# ASS SUBTITLE GENERATOR (REFERENCE STYLE)
+# ASS SUBTITLE GENERATOR (UPDATED: AUTO-WRAP + CRISPY TEXT)
 # ============================================================
 def generate_full_ass_script(audio_files, font_name="Arial", font_size=45,
                               alignment=2, vertical_margin=65,
@@ -268,11 +268,11 @@ ScriptType: v4.00+
 PlayResX: 1920
 PlayResY: 1080
 ScaledBorderAndShadow: yes
-WrapStyle: 2
+WrapStyle: 0
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,{font_name},{font_size},&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,{outline_size},{shadow_size},{alignment},10,10,{vertical_margin},1
+Style: Default,{font_name},{font_size},&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,{outline_size},{shadow_size},{alignment},100,100,{vertical_margin},1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -290,6 +290,20 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         if not text or text.lower() == "none":
             continue
 
+        # 🔥 AUTO-WRAP LOGIC
+        if len(text) > 26:
+            words_list = text.split()
+            lines = []
+            current_line = []
+            for w in words_list:
+                current_line.append(w)
+                if len(" ".join(current_line)) > 26:
+                    lines.append(" ".join(current_line))
+                    current_line = []
+            if current_line:
+                lines.append(" ".join(current_line))
+            text = "\\N".join(lines)
+
         visual_type = (item.get("visual_type") or "calm").lower()
         
         # Timing for letter-by-letter
@@ -297,8 +311,8 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         if total_dur <= 0:
             total_dur = 1.0
             
-        # Remove spaces for timing calculation
-        clean_text = text.replace(" ", "")
+        # Remove spaces and \N for timing calculation
+        clean_text = text.replace(" ", "").replace("\\N", "")
         n_chars = len(clean_text)
         if n_chars == 0:
             continue
@@ -319,7 +333,10 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
         # Position (Center Bottom, or Float if Action)
         cx = W * 0.50
-        cy = H - vertical_margin - (font_size * 0.5) # Adjust for ASS alignment 2
+        
+        # 🔥 DYNAMIC HEIGHT FOR MULTI-LINE
+        num_lines = text.count("\\N") + 1
+        cy = H - vertical_margin - (font_size * 0.5 * num_lines) 
         
         def pos_tag(dx=0.0, dy=0.0):
             if visual_type == "action":
@@ -337,15 +354,16 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             # Determine base color for this layer
             if kind == "shadow":
                 base_col = (0, 0, 0)
-                look = "\\bord0\\shad0\\blur1.5"
-                dx, dy = 1.5, 2.0
+                look = "\\bord0\\shad2.5\\blur0.8"  # Crispy shadow
+                dx, dy = 2.0, 3.0
             else:
                 base_col = PALETTE["white"]["glow" if kind == "glow" else "fill"]
                 if kind == "glow":
                     look = f"\\bord{fs * 0.12 * GLOW_SIZE:.1f}\\shad0\\blur{fs * 0.28 * GLOW_SIZE:.1f}"
                     dx = dy = 0.0
                 else:
-                    look = "\\bord0\\shad0\\blur0.5"
+                    # CRISPY TEXT: Solid thick border + hard shadow + zero blur
+                    look = f"\\bord{fs * 0.08:.1f}\\shad2.5\\blur0"
                     dx = dy = 0.0
 
             prefix = f"{{\\an5{pos_tag(dx, dy)}\\fs{fs}\\fsp{fsp}\\b1{look}"
@@ -354,6 +372,11 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             char_idx = 0
             
             for w_idx, word in enumerate(words):
+                # Handle Auto-Wrap Line Break
+                if word == "\\N":
+                    body += "\\N"
+                    continue
+
                 # Check if it's the last word in the line
                 if w_idx == total_words - 1:
                     word_pal = PALETTE["red"] if visual_type == "action" else PALETTE["orange"]
@@ -379,11 +402,12 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                     char_idx += 1
                 
                 # Add space after word (doesn't increment char_idx)
-                if w_idx < total_words - 1:
+                if w_idx < total_words - 1 and words[w_idx+1] != "\\N":
                     body += " "
 
+            # 🔥 BRACKET FIX: Single closing bracket for prefix
             ass_content += (f"Dialogue: {layer},{seconds_to_ass_time(ev0)},{seconds_to_ass_time(ev1)},"
-                            f"Default,,0,0,0,,{prefix}}}{body}\n")
+                            f"Default,,0,0,0,,{prefix}{body}\n")
             written += 1
 
     with open(ASS_PATH, "w", encoding="utf-8") as f:
@@ -391,7 +415,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
     print(f"✅ ASS Subtitles saved: {ASS_PATH}")
     print(f"   📊 Total subtitle layers: {written}")
-    print(f"   🎨 Style: Reference Cinematic (3D + Typewriter)\n")
+    print(f"   🎨 Style: Reference Cinematic (Crispy + Auto-Wrap)\n")
 
 
 # ============================================================
@@ -1620,7 +1644,7 @@ def main():
     print(f"🎵 atempo: normal={ATEMPO_MAX} | last={ATEMPO_MAX_LAST} | action={ATEMPO_MAX_ACTION}")
     print(f"📏 Slot extend: max {MAX_SLOT_EXTEND}s")
     print(f"🔊 Volume: Action={VOL_ACTION}x | Other={VOL_OTHER}x")
-    print(f"🎨 Subtitle: Cinematic 3D + Typewriter (Mode {SUBTITLE_MODE})")
+    print(f"🎨 Subtitle: Cinematic 3D + Typewriter + Auto-Wrap (Mode {SUBTITLE_MODE})")
     print(f"🎮 Mode: REAL-TIME GAMEPLAY (18 rules)")
     print("=" * 60 + "\n")
 
@@ -1677,7 +1701,7 @@ def main():
             generate_full_ass_script(
                 audio_files=audio_files,
                 font_name="BebasNeue-Regular",
-                font_size=45,
+                font_size=55, # Font size badha diya taaki crispy aur bada lage
                 alignment=2,
                 vertical_margin=65
             )
