@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 27 | **Last Updated:** 2026-10-27 08:22:09 AM IST
+**Total Videos:** 27 | **Last Updated:** 2026-10-27 08:42:51 AM IST
 
 ---
 
@@ -14,7 +14,7 @@
 | Posted (FB or IG) | 14 / 27 |
 | FB Posted | 10 / 27 |
 | IG Posted | 14 / 27 |
-| Total FB Views | **7,060** |
+| Total FB Views | **7,061** |
 | Total IG Views | **450** |
 
 ---
@@ -24,7 +24,7 @@
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
 | 1 | He Survived Museum Shootout 5 Enemies 🔫🔥  #videogames #gamingcommunity #gaming #codmw4 #gamingreels  | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/De-vjtED-JU/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW43.mp4) |
-| 2 | Museum Trap 4 Enemies Wrecked 🔥🎯  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1661492925378526/) | 423 | [🟣 IG](https://www.instagram.com/reel/De8U3qeDG2Y/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW44.mp4) |
+| 2 | Museum Trap 4 Enemies Wrecked 🔥🎯  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1661492925378526/) | 424 | [🟣 IG](https://www.instagram.com/reel/De8U3qeDG2Y/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW44.mp4) |
 | 3 | Last Bullet Wrecked 4 Enemies In Hall 🔥🎯  #videogames #gamingcommunity #gaming #codmw4 #gamingreels  | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/De6NItHCmzF/) | 40 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW45.mp4) |
 | 4 | Palace Gunfight 4 Enemies Down 🔥🎯  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/De2Kd7hknhj/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW46.mp4) |
 | 5 | 4 Enemies Palace Ambush 🎯🔥  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/De2Bjn_iOwQ/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW47.mp4) |

@@ -1,22 +1,22 @@
 {
-  "last_updated": "2026-10-27 08:22:09 AM",
+  "last_updated": "2026-10-27 08:42:51 AM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 7510,
+      "views_7d": 7511,
       "avg_per_video": 536,
       "trend": "viral",
-      "ratio": 3.395475113122172,
+      "ratio": 3.3862815884476536,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "MarvelsSpiderMan2",
-      "views_7d": 3968,
-      "avg_per_video": 330,
+      "views_7d": 4008,
+      "avg_per_video": 334,
       "trend": "viral",
-      "ratio": 2.090497737556561,
+      "ratio": 2.1101083032490977,
       "fb_link": "https://www.facebook.com/reel/1483390583931941/",
       "source_link": ""
     },
@@ -25,7 +25,7 @@
       "views_7d": 160,
       "avg_per_video": 160,
       "trend": "steady",
-      "ratio": 1.0135746606334841,
+      "ratio": 1.0108303249097474,
       "fb_link": "https://www.facebook.com/reel/2181972149061480/",
       "source_link": ""
     }
@@ -36,16 +36,16 @@
       "views_7d": 210,
       "avg_per_video": 42,
       "trend": "below_avg",
-      "ratio": 0.2660633484162896,
+      "ratio": 0.26534296028880866,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "Wolverine",
-      "views_7d": 344,
-      "avg_per_video": 22,
+      "views_7d": 345,
+      "avg_per_video": 21,
       "trend": "below_avg",
-      "ratio": 0.13936651583710408,
+      "ratio": 0.13267148014440433,
       "fb_link": "",
       "source_link": ""
     },
@@ -54,7 +54,7 @@
       "views_7d": 30,
       "avg_per_video": 15,
       "trend": "below_avg",
-      "ratio": 0.09502262443438914,
+      "ratio": 0.09476534296028881,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions15.mp4"
     },
@@ -70,10 +70,10 @@
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 7510,
+    "views_7d": 7511,
     "avg_per_video": 536,
     "trend": "viral",
-    "ratio": 3.395475113122172,
+    "ratio": 3.3862815884476536,
     "fb_link": "",
     "source_link": ""
   }
