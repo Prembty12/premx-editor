@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🎙️ AI Commentary Dubber — v6.1 (Strict Completeness + Real-Time + Full Logging)
+🎙️ AI Commentary Dubber — v6.2 (Structured Outputs + Real-Time + Full Logging)
 ===============================================================
 FEATURES:
   ✅ Timing LOCK — GPT segment = SLOT time
@@ -18,6 +18,8 @@ FEATURES:
   ✅ Sanitized Text (NoneType Crash Fixed)
   ✅ Strict Completeness Check (Rejects incomplete segments)
   ✅ Cinematic Subtitles (3D Shadow + Glow + Letter-by-Letter Typewriter + Colors + Auto-Wrap + Crispy Text)
+  ✅ NEW: Structured Outputs (json_schema + strict:true) with auto json_object fallback
+  ✅ NEW: provider.require_parameters = true (route only to supporting endpoints)
 ===============================================================
 """
 
@@ -143,7 +145,6 @@ os.makedirs(FONTS_DIR, exist_ok=True)
 # ============================================================
 # 🎨 CINEMATIC STYLE (REFERENCE STYLE)
 # ============================================================
-# Colors from reference script
 PALETTE = {
     "blue":   {"fill": (10, 170, 255), "glow": (0, 130, 255)},
     "white":  {"fill": (255, 255, 255), "glow": (255, 255, 255)},
@@ -151,13 +152,12 @@ PALETTE = {
     "orange": {"fill": (255, 175, 0),   "glow": (255, 110, 0)},
 }
 
-# 3 Layers for 3D Effect
-GLOW_SIZE    = 0.65    # glow ka phailav
-GLOW_OPACITY = 0.55    # glow kitna gehra
+GLOW_SIZE    = 0.65
+GLOW_OPACITY = 0.55
 LAYERS = {
-    "glow":   (0, "&H%02X&" % int(255 * (1 - GLOW_OPACITY))), # Layer 0
-    "shadow": (1, "&H90&"),                                  # Layer 1
-    "text":   (2, "&H00&"),                                  # Layer 2
+    "glow":   (0, "&H%02X&" % int(255 * (1 - GLOW_OPACITY))),
+    "shadow": (1, "&H90&"),
+    "text":   (2, "&H00&"),
 }
 
 IN_FADE  = 0.12
@@ -290,7 +290,6 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         if not text or text.lower() == "none":
             continue
 
-        # 🔥 AUTO-WRAP LOGIC
         if len(text) > 26:
             words_list = text.split()
             lines = []
@@ -306,21 +305,18 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
         visual_type = (item.get("visual_type") or "calm").lower()
         
-        # Timing for letter-by-letter
         total_dur = end - start
         if total_dur <= 0:
             total_dur = 1.0
             
-        # Remove spaces and \N for timing calculation
         clean_text = text.replace(" ", "").replace("\\N", "")
         n_chars = len(clean_text)
         if n_chars == 0:
             continue
             
-        in_st = min(total_dur / n_chars, 0.06) # Dynamic stagger timing
+        in_st = min(total_dur / n_chars, 0.06)
         out_st = 0.03
 
-        # Color Logic
         words = text.split()
         total_words = len(words)
 
@@ -331,16 +327,13 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         def rel(t):
             return max(0, int((t - ev0) * 1000))
 
-        # Position (Center Bottom, or Float if Action)
         cx = W * 0.50
         
-        # 🔥 DYNAMIC HEIGHT FOR MULTI-LINE
         num_lines = text.count("\\N") + 1
         cy = H - vertical_margin - (font_size * 0.5 * num_lines) 
         
         def pos_tag(dx=0.0, dy=0.0):
             if visual_type == "action":
-                # Float up slightly
                 y_start = cy + 20
                 y_end = y_start - 40
                 return f"\\move({cx + dx:.1f},{y_start + dy:.1f},{cx + dx:.1f},{y_end + dy:.1f},0,{dur_ms})"
@@ -349,12 +342,10 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         fs = font_size
         fsp = 8
 
-        # Build Events for all 3 layers
         for kind, (layer, vis) in LAYERS.items():
-            # Determine base color for this layer
             if kind == "shadow":
                 base_col = (0, 0, 0)
-                look = "\\bord0\\shad2.5\\blur0.8"  # Crispy shadow
+                look = "\\bord0\\shad2.5\\blur0.8"
                 dx, dy = 2.0, 3.0
             else:
                 base_col = PALETTE["white"]["glow" if kind == "glow" else "fill"]
@@ -362,23 +353,19 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                     look = f"\\bord{fs * 0.12 * GLOW_SIZE:.1f}\\shad0\\blur{fs * 0.28 * GLOW_SIZE:.1f}"
                     dx = dy = 0.0
                 else:
-                    # CRISPY TEXT: Solid thick border + hard shadow + zero blur
                     look = f"\\bord{fs * 0.08:.1f}\\shad2.5\\blur0"
                     dx = dy = 0.0
 
-            # 🔥 BRACKET FIX: Yaha 3 closing brackets hone chahiye
             prefix = f"{{\\an5{pos_tag(dx, dy)}\\fs{fs}\\fsp{fsp}\\b1{look}}}"
             
             body = ""
             char_idx = 0
             
             for w_idx, word in enumerate(words):
-                # Handle Auto-Wrap Line Break
                 if word == "\\N":
                     body += "\\N"
                     continue
 
-                # Check if it's the last word in the line
                 if w_idx == total_words - 1:
                     word_pal = PALETTE["red"] if visual_type == "action" else PALETTE["orange"]
                 else:
@@ -387,14 +374,12 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                 word_col = ass_color(word_pal["glow" if kind == "glow" else "fill"])
                 col_tag = f"\\1c{word_col}\\3c{word_col}" if kind == "glow" else f"\\1c{word_col}"
 
-                # Apply color tag at the start of the word
                 body += f"{{{col_tag}}}"
 
                 for ch in word:
                     t_in = start + char_idx * in_st
                     t_out = end + char_idx * out_st
                     
-                    # Alpha animation tags
                     tags = (
                         f"\\alpha&HFF&\\t({rel(t_in)},{rel(t_in + IN_FADE)},\\alpha{vis})"
                         f"\\t({rel(t_out)},{rel(t_out + OUT_FADE)},\\alpha&HFF&)"
@@ -402,11 +387,9 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                     body += f"{{{tags}}}{ch}"
                     char_idx += 1
                 
-                # Add space after word (doesn't increment char_idx)
                 if w_idx < total_words - 1 and words[w_idx+1] != "\\N":
                     body += " "
 
-            # 🔥 BRACKET FIX: Yaha sirf {prefix}{body} aayega (no extra brace)
             ass_content += (f"Dialogue: {layer},{seconds_to_ass_time(ev0)},{seconds_to_ass_time(ev1)},"
                             f"Default,,0,0,0,,{prefix}{body}\n")
             written += 1
@@ -736,7 +719,6 @@ def build_auto_slots(video_path, vid_duration, srt_content):
     if slots and slots[-1]["end"] < vid_duration - 0.1:
         slots[-1]["end"] = round(vid_duration, 2)
 
-    # ✅ SRT TIME = SLOT TIME (FORCED)
     for slot in slots:
         slot_srt = [
             e for e in srt_entries
@@ -1023,10 +1005,10 @@ def build_analysis_grid(video_path, vid_duration, slots, num_frames=ANALYSIS_FRA
 
 
 # ============================================================
-# STEP 6 — GPT Call (TIMING LOCK + REAL-TIME MODE)
+# STEP 6 — GPT Call (Structured Outputs + Timing Lock + Real-Time Mode)
 # ============================================================
 def generate_full_script(slots, srt_content, analysis_grid_path):
-    print(f"🤖 [6] Generating FULL script (OpenRouter — {len(OPENROUTER_KEYS)} keys)...")
+    print(f"🤖 [6] Generating FULL script (OpenRouter Structured Outputs — {len(OPENROUTER_KEYS)} keys)...")
 
     slot_lines = []
     for i, s in enumerate(slots, 1):
@@ -1088,29 +1070,85 @@ You shout, laugh, hype, roast. Pure energy. Zero boring lines.
 
 **⚠️ CRITICAL WARNING:**
 - Generate exactly **{len(slots)}** segments. Do NOT skip.
+- Each segment's "slot" MUST be 1 to {len(slots)}.
+- Each segment's "visual_type" MUST be one of: "action", "dialog", "calm".
 
-**CRITICAL JSON RULES:**
-- NO markdown, NO extra text, NO null values. ONLY valid JSON.
-
-Return ONLY valid JSON:
-{{
-  "story_summary": "Brief one-line summary.",
-  "segments": [
-    {{
-      "slot": 1,
-      "start": 0.0,
-      "end": 3.5,
-      "text": "YOUR COMMENTARY HERE",
-      "visual_type": "calm"
-    }}
-  ]
-}}
+Return ONLY valid JSON matching the provided schema.
 """
 
     or_url = "https://openrouter.ai/api/v1/chat/completions"
     analysis_b64 = encode_image(analysis_grid_path)
 
-    def _try_call(model_id, key):
+    # ============================================================
+    # 🔒 STRICT JSON SCHEMA (OpenRouter Structured Outputs)
+    # ============================================================
+    SEGMENT_SCHEMA = {
+        "type": "object",
+        "properties": {
+            "slot": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": len(slots),
+                "description": f"Slot number (1-indexed), must be 1 to {len(slots)}"
+            },
+            "start": {
+                "type": "number",
+                "description": "Slot start time in seconds"
+            },
+            "end": {
+                "type": "number",
+                "description": "Slot end time in seconds"
+            },
+            "text": {
+                "type": "string",
+                "description": "Commentary text (1-20 words, hype/casual English)"
+            },
+            "visual_type": {
+                "type": "string",
+                "enum": ["action", "dialog", "calm"],
+                "description": "Scene tone for this segment"
+            }
+        },
+        "required": ["slot", "start", "end", "text", "visual_type"],
+        "additionalProperties": False
+    }
+
+    RESPONSE_SCHEMA = {
+        "type": "object",
+        "properties": {
+            "story_summary": {
+                "type": "string",
+                "description": "Brief one-line summary of the clip"
+            },
+            "segments": {
+                "type": "array",
+                "description": f"Exactly {len(slots)} segments, one per slot",
+                "items": SEGMENT_SCHEMA,
+                "minItems": len(slots),
+                "maxItems": len(slots)
+            }
+        },
+        "required": ["story_summary", "segments"],
+        "additionalProperties": False
+    }
+
+    def _build_payload(model_id, strict=True):
+        """
+        strict=True  → json_schema + strict:true + require_parameters
+        strict=False → json_object + response-healing (fallback)
+        """
+        if strict:
+            response_format = {
+                "type": "json_schema",
+                "json_schema": {
+                    "name": "commentary_script",
+                    "strict": True,
+                    "schema": RESPONSE_SCHEMA
+                }
+            }
+        else:
+            response_format = {"type": "json_object"}
+
         payload = {
             "model": model_id,
             "messages": [{
@@ -1122,60 +1160,142 @@ Return ONLY valid JSON:
             }],
             "max_tokens": 4000,
             "temperature": 0.9,
-            "response_format": {"type": "json_object"},
-            "plugins": [{"id": "response-healing"}]
+            "response_format": response_format,
         }
+
+        if strict:
+            # Route only to providers that support all requested params
+            payload["provider"] = {"require_parameters": True}
+        else:
+            # Healing only useful in json_object fallback mode
+            payload["plugins"] = [{"id": "response-healing"}]
+
+        return payload
+
+    def _parse_and_validate(raw):
+        """Parse JSON and enforce completeness + type sanity."""
+        if not raw:
+            return None, "empty"
+        raw = str(raw).strip()
+        if raw.startswith("```"):
+            raw = raw.split("```")[1]
+            if raw.startswith("json"):
+                raw = raw[4:].strip()
+            raw = raw.rstrip("`").strip()
+
+        try:
+            parsed = json.loads(raw)
+        except Exception:
+            return None, "json"
+
+        if not isinstance(parsed, dict) or "segments" not in parsed:
+            return None, "json"
+
+        segs = parsed.get("segments")
+        if not isinstance(segs, list):
+            return None, "json"
+
+        if len(segs) < len(slots):
+            return None, "incomplete"
+
+        if len(segs) > 0:
+            return segs, None
+        return None, "json"
+
+    def _try_call(model_id, key):
+        """
+        Try strict json_schema first.
+        If model/endpoint doesn't support it (400/422),
+        auto-fallback to json_object for the SAME key.
+        """
         headers = {
             "Authorization": f"Bearer {key}",
             "Content-Type": "application/json",
             "HTTP-Referer": "https://github.com/",
             "X-Title": "Gaming Commentary"
         }
-        
+
+        # ---------- ATTEMPT 1: STRICT JSON SCHEMA ----------
         try:
+            payload = _build_payload(model_id, strict=True)
             r = requests.post(or_url, headers=headers, json=payload, timeout=120)
+
             if r.status_code == 200:
                 ai = r.json()
                 actual_model = ai.get('model', model_id)
                 content = ai.get('choices', [{}])[0].get('message', {}).get('content')
-                raw = str(content).strip() if content else ""
-                if not raw: return None, actual_model, "empty"
-                if raw.startswith("```"):
-                    raw = raw.split("```")[1]
-                    if raw.startswith("json"): raw = raw[4:].strip()
-                    raw = raw.rstrip("`").strip()
-                parsed = json.loads(raw)
-                if isinstance(parsed, dict) and "segments" in parsed:
-                    segs = parsed["segments"]
-                    if len(segs) < len(slots): return None, actual_model, "incomplete"
-                    if len(segs) > 0: return segs, actual_model, None
-                return None, actual_model, "json"
-            elif r.status_code == 404: return None, model_id, "not_found"
-            elif r.status_code in (401, 402, 403): return None, model_id, "auth"
-            elif r.status_code == 429: return None, model_id, "rate"
-            else: return None, model_id, f"http_{r.status_code}"
-        except Exception:
-            return None, model_id, "exception"
+                segs, err = _parse_and_validate(content)
+                if segs:
+                    return segs, actual_model, None
+                return None, actual_model, err
 
+            elif r.status_code == 404:
+                return None, model_id, "not_found"
+
+            elif r.status_code in (401, 402, 403):
+                return None, model_id, "auth"
+
+            elif r.status_code == 429:
+                return None, model_id, "rate"
+
+            elif r.status_code in (400, 422):
+                # Likely: model doesn't support json_schema / require_parameters mismatch
+                # → fallback to json_object
+                print("(schema unsupported → json_object)", end=" ")
+                # fall through to Attempt 2
+            else:
+                return None, model_id, f"http_{r.status_code}"
+
+        except Exception as e:
+            return None, model_id, f"exception: {str(e)[:50]}"
+
+        # ---------- ATTEMPT 2: JSON_OBJECT FALLBACK ----------
+        try:
+            payload = _build_payload(model_id, strict=False)
+            r2 = requests.post(or_url, headers=headers, json=payload, timeout=120)
+
+            if r2.status_code == 200:
+                ai = r2.json()
+                actual_model = ai.get('model', model_id)
+                content = ai.get('choices', [{}])[0].get('message', {}).get('content')
+                segs, err = _parse_and_validate(content)
+                if segs:
+                    return segs, actual_model, None
+                return None, actual_model, err
+            elif r2.status_code == 404:
+                return None, model_id, "not_found"
+            elif r2.status_code in (401, 402, 403):
+                return None, model_id, "auth"
+            elif r2.status_code == 429:
+                return None, model_id, "rate"
+            else:
+                return None, model_id, f"http_{r2.status_code}"
+
+        except Exception as e:
+            return None, model_id, f"exception: {str(e)[:50]}"
+
+    # ============================================================
+    # MODEL TRY LOOP (manual change karne ke liye yahin edit karein)
+    # ============================================================
     segments = None
     winning_model = None
     winning_route = None
 
     for full_retry in range(2):
         if full_retry > 0:
-            print("\n🔄 ALL MODELS FAILED! Restarting from Nvidia Model 1...\n")
+            print("\n🔄 ALL MODELS FAILED! Restarting from Model 1...\n")
             time.sleep(3)
 
-        print(f"🤖 [MODEL TRY 1] nvidia/nemotron-3.5-super-vl:free")
+        print(f"🤖 [MODEL TRY 1] nex-agi/nex-n2-pro:free")
         first_attempts = [OPENROUTER_KEYS[0], OPENROUTER_KEYS[1]] if len(OPENROUTER_KEYS) >= 2 else [OPENROUTER_KEYS[0]] * 2 if len(OPENROUTER_KEYS) == 1 else []
-        
+
         for attempt, key in enumerate(first_attempts, start=1):
             if segments: break
             if attempt > 1: time.sleep(2)
             print(f"   🔑 Attempt {attempt}/{len(first_attempts)}...", end=" ")
-            segs, actual, err = _try_call("nvidia/nemotron-3.5-super-vl:free", key)
+            segs, actual, err = _try_call("nex-agi/nex-n2-pro:free", key)
             if segs:
-                segments, winning_model, winning_route = segs, "nvidia/nemotron-3.5-super-vl:free", actual
+                segments, winning_model, winning_route = segs, "nex-agi/nex-n2-pro:free", actual
                 print(f"✅ SUCCESS! (Actual: {actual})")
             elif err == "not_found":
                 print("❌ Model Not Found — skipping")
@@ -1635,7 +1755,7 @@ def fallback_copy_original():
 # ============================================================
 def main():
     print("=" * 60)
-    print("🎙️ AI COMMENTARY DUBBER — v6.1 (Real-Time + Full Logging)")
+    print("🎙️ AI COMMENTARY DUBBER — v6.2 (Structured Outputs)")
     print("=" * 60)
     print(f"📹 Input : {FINAL_CLIP_PATH}")
     print(f"📤 Output: {FINAL_DUBBED_VIDEO}")
@@ -1647,6 +1767,7 @@ def main():
     print(f"🔊 Volume: Action={VOL_ACTION}x | Other={VOL_OTHER}x")
     print(f"🎨 Subtitle: Cinematic 3D + Typewriter + Auto-Wrap (Mode {SUBTITLE_MODE})")
     print(f"🎮 Mode: REAL-TIME GAMEPLAY (18 rules)")
+    print(f"🔒 Structured Outputs: json_schema strict + require_parameters")
     print("=" * 60 + "\n")
 
     if not COMMENTARY_ENABLED:
@@ -1702,7 +1823,7 @@ def main():
             generate_full_ass_script(
                 audio_files=audio_files,
                 font_name="BebasNeue-Regular",
-                font_size=40, # Font size chota kar diya taaki screen me fit ho
+                font_size=40,
                 alignment=2,
                 vertical_margin=65
             )
