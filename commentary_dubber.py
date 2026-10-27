@@ -256,9 +256,9 @@ def speed_for_type(slot_type):
 
 
 # ============================================================
-# ASS SUBTITLE GENERATOR (UPDATED: AUTO-WRAP + CRISPY TEXT)
+# ASS SUBTITLE GENERATOR (100% FIXED BRACKETS + AUTO-WRAP + CRISPY)
 # ============================================================
-def generate_full_ass_script(audio_files, font_name="Arial", font_size=45,
+def generate_full_ass_script(audio_files, font_name="Arial", font_size=40,
                               alignment=2, vertical_margin=65,
                               outline_size=0, shadow_size=0):
     print("🎨 Generating ASS Subtitles (REFERENCE CINEMATIC STYLE)...")
@@ -366,6 +366,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                     look = f"\\bord{fs * 0.08:.1f}\\shad2.5\\blur0"
                     dx = dy = 0.0
 
+            # 🔥 BRACKET FIX: Yaha 3 closing brackets hone chahiye
             prefix = f"{{\\an5{pos_tag(dx, dy)}\\fs{fs}\\fsp{fsp}\\b1{look}}}"
             
             body = ""
@@ -405,7 +406,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                 if w_idx < total_words - 1 and words[w_idx+1] != "\\N":
                     body += " "
 
-            # 🔥 BRACKET FIX: Single closing bracket for prefix
+            # 🔥 BRACKET FIX: Yaha sirf {prefix}{body} aayega (no extra brace)
             ass_content += (f"Dialogue: {layer},{seconds_to_ass_time(ev0)},{seconds_to_ass_time(ev1)},"
                             f"Default,,0,0,0,,{prefix}{body}\n")
             written += 1
@@ -1701,7 +1702,7 @@ def main():
             generate_full_ass_script(
                 audio_files=audio_files,
                 font_name="BebasNeue-Regular",
-                font_size=45, # Font size badha diya taaki crispy aur bada lage
+                font_size=40, # Font size chota kar diya taaki screen me fit ho
                 alignment=2,
                 vertical_margin=65
             )
