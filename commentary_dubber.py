@@ -1286,16 +1286,16 @@ Return ONLY valid JSON matching the provided schema.
             print("\n🔄 ALL MODELS FAILED! Restarting from Model 1...\n")
             time.sleep(3)
 
-        print(f"🤖 [MODEL TRY 1] dots-studio/dots-3-note-preview:free")
+        print(f"🤖 [MODEL TRY 1] nvidia/nemotron-3.5-super-vl:free")
         first_attempts = [OPENROUTER_KEYS[0], OPENROUTER_KEYS[1]] if len(OPENROUTER_KEYS) >= 2 else [OPENROUTER_KEYS[0]] * 2 if len(OPENROUTER_KEYS) == 1 else []
 
         for attempt, key in enumerate(first_attempts, start=1):
             if segments: break
             if attempt > 1: time.sleep(2)
             print(f"   🔑 Attempt {attempt}/{len(first_attempts)}...", end=" ")
-            segs, actual, err = _try_call("dots-studio/dots-3-note-preview:free", key)
+            segs, actual, err = _try_call("nvidia/nemotron-3.5-super-vl:free", key)
             if segs:
-                segments, winning_model, winning_route = segs, "dots-studio/dots-3-note-preview:free", actual
+                segments, winning_model, winning_route = segs, "", actual
                 print(f"✅ SUCCESS! (Actual: {actual})")
             elif err == "not_found":
                 print("❌ Model Not Found — skipping")
