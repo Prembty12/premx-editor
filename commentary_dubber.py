@@ -22,6 +22,7 @@ FEATURES:
   ✅ NEW: provider.require_parameters = true (route only to supporting endpoints)
   ✅ FIXED: Multi-line subtitle alpha error (clean tag structure)
   ✅ FIXED: Loop logic for openrouter/free (try all keys before retry)
+  ✅ FIXED: JSON markdown parsing & retry logic
 ===============================================================
 """
 
@@ -1223,6 +1224,8 @@ If you see ANY of these → visual_type = "action":
     def _parse_and_validate(raw):
         if not raw: return None, "empty"
         raw = str(raw).strip()
+        
+        # 🔥 FIX: Agar model ne markdown ```json ... ``` bheja hai toh use saaf karo
         if raw.startswith("```"):
             raw = raw.split("```")[1]
             if raw.startswith("json"): raw = raw[4:].strip()
@@ -1329,7 +1332,7 @@ If you see ANY of these → visual_type = "action":
                     print(f"⚠️ {err} → next attempt")
             print()
 
-        # 🔥 FIXED: OPENROUTER/FREE LOOP
+        # 🔥 FIXED: OPENROUTER/FREE LOOP (JSON ERROR HANDLING)
         if not segments:
             print(f"🤖 [MODEL TRY 3] openrouter/free")
             for k_idx, key in enumerate(OPENROUTER_KEYS, start=1):
@@ -1339,23 +1342,24 @@ If you see ANY of these → visual_type = "action":
                     if retry > 0: time.sleep(1.5)
                     print(f"   🔑 Key {k_idx}/{len(OPENROUTER_KEYS)} — try {retry+1}/2...", end=" ")
                     segs, actual, err = _try_call("openrouter/free", key)
+                    
                     if segs:
                         segments, winning_model, winning_route = segs, "openrouter/free", actual
                         print(f"✅ SUCCESS! (Actual: {actual})")
                         break
                     elif err == "not_found":
                         print(f"❌ Model Not Found — skipping key {k_idx}")
-                        break # Break inner retry, try next key
-                    elif err in ("json", "empty", "incomplete"):
+                        break # Skip to next key
+                    elif err == "json":
                         if retry == 0:
-                            print(f"⚠️ {err} → retry same key")
+                            print(f"⚠️ json → retry same key")
                             continue
                         else:
-                            print(f"⚠️ {err} → next key")
-                            break
+                            print(f"⚠️ json → next key")
+                            break # Skip to next key
                     else:
                         print(f"⚠️ {err} → next key")
-                        break
+                        break # Skip to next key
             print()
 
         if segments:
