@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 12 | **Last Updated:** 2026-10-27 09:16:31 AM IST
+**Total Videos:** 12 | **Last Updated:** 2026-10-27 11:16:54 AM IST
 
 ---
 
@@ -14,7 +14,7 @@
 | Posted (FB or IG) | 12 / 12 |
 | FB Posted | 11 / 12 |
 | IG Posted | 4 / 12 |
-| Total FB Views | **2,966** |
+| Total FB Views | **2,967** |
 | Total IG Views | **260** |
 
 ---
@@ -23,7 +23,7 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | Ghost the Mask 🎭 #callofduty #mw2 | [🔵 FB](https://www.facebook.com/reel/2181972149061480/) | 160 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play8.mp4) |
+| 1 | Ghost the Mask 🎭 #callofduty #mw2 | [🔵 FB](https://www.facebook.com/reel/2181972149061480/) | 161 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play8.mp4) |
 | 2 | 3 Enemies Last Bullet Rooftop Wrecked 🔥🎯  #videogames #gamingcommunity #gaming #callofdutymw2 #gamin | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Deo0Y_ZCvOk/) | 70 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play21.mp4) |
 | 3 | Roof Fight 1 HP vs 4 🔥🎯  #videogames #gamingcommunity #gaming #callofdutymw2 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/28577601175201335/) | 737 | [🟣 IG](https://www.instagram.com/reel/DeXMc05ivIE/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play17.mp4) |
 | 4 | 4 Soldiers Walked Straight Into My Trap 🎯🔥  #videogames #gamingcommunity #gaming #callofdutymw2 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1044648048624733/) | 129 | [🟣 IG](https://www.instagram.com/reel/DeV5-_XFV4L/) | 40 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play19.mp4) |
