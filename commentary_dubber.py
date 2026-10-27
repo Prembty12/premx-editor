@@ -1112,9 +1112,9 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 **🚫 NEVER shout on non-action scenes.**
 
 **PACING:**
-- "action" → 10-15 words, HIGH energy, CAPS
-- "dialog" → 10-15 words, conversational
-- "calm" → 10-15 words, chill
+- "action" → 3-5 words, HIGH energy, CAPS
+- "dialog" → 4-6 words, conversational
+- "calm" → 5-7 words, chill
 
 **🎯 VISUAL CLASSIFICATION RULES**
 
