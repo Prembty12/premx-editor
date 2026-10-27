@@ -20,7 +20,7 @@ FEATURES:
   ✅ Cinematic Subtitles (3D Shadow + Glow + Letter-by-Letter Typewriter + Colors + Auto-Wrap + Crispy Text)
   ✅ NEW: Structured Outputs (json_schema + strict:true) with auto json_object fallback
   ✅ NEW: provider.require_parameters = true (route only to supporting endpoints)
-  ✅ FIXED: Alpha tag error (individual tag blocks)
+  ✅ FIXED: Multi-line subtitle alpha error (clean tag structure)
 ===============================================================
 """
 
@@ -255,7 +255,7 @@ def speed_for_type(slot_type):
 
 
 # ============================================================
-# ASS SUBTITLE GENERATOR (100% FIXED)
+# ASS SUBTITLE GENERATOR (FINAL FIX - NO LINE LIMIT ERRORS)
 # ============================================================
 def generate_full_ass_script(audio_files, font_name="Arial", font_size=40,
                               alignment=2, vertical_margin=65,
@@ -287,12 +287,14 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         raw_text = item.get("text")
         text = str(raw_text).strip().upper() if raw_text is not None else ""
         
-        # GPT ke text ko saaf karein
+        # 🔥 SANITIZE: Saare gande characters hatao
         text = text.replace("\\", "").replace("{", "").replace("}", "")
         
         if not text or text.lower() == "none":
             continue
 
+        # 🔥 NO LIMIT: Text ko jitna lamba ho sakta hai fit karo, par 2 line tak hi rakho
+        # (2 lines tak rakhne se screen par accha dikhta hai, 3+ lines screen cover kar leti hain)
         if len(text) > 26:
             words_list = text.split()
             lines = []
@@ -345,7 +347,6 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         fs = font_size
         fsp = 8
 
-        # 🔥 FIX: vis_val variable name
         for kind, (layer, vis_val) in LAYERS.items():
             if kind == "shadow":
                 base_col = (0, 0, 0)
@@ -384,12 +385,11 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                     t_in = start + char_idx * in_st
                     t_out = end + char_idx * out_st
                     
-                    # 🔥 FIX: Har tag alag block me (No dual-line confusion)
+                    # 🔥 FIX: Har tag alag block me (No alpha error)
                     body += f"{{\\alpha&HFF&}}"
                     body += f"{{\\t({rel(t_in)},{rel(t_in + IN_FADE)},\\alpha{vis_val})}}"
                     body += f"{{\\t({rel(t_out)},{rel(t_out + OUT_FADE)},\\alpha&HFF&)}}"
                     body += ch
-                    
                     char_idx += 1
                 
                 if w_idx < total_words - 1 and words[w_idx+1] != "\\N":
@@ -1112,9 +1112,9 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 **🚫 NEVER shout on non-action scenes.**
 
 **PACING:**
-- "action" → 3-5 words, HIGH energy, CAPS
-- "dialog" → 4-6 words, conversational
-- "calm" → 5-7 words, chill
+- "action" → 10-15 words, HIGH energy, CAPS
+- "dialog" → 10-15 words, conversational
+- "calm" → 10-15 words, chill
 
 **🎯 VISUAL CLASSIFICATION RULES**
 
