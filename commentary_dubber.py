@@ -21,6 +21,7 @@ FEATURES:
   ✅ NEW: Structured Outputs (json_schema + strict:true) with auto json_object fallback
   ✅ NEW: provider.require_parameters = true (route only to supporting endpoints)
   ✅ FIXED: Multi-line subtitle alpha error (clean tag structure)
+  ✅ FIXED: Loop logic for openrouter/free (try all keys before retry)
 ===============================================================
 """
 
@@ -287,21 +288,22 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         raw_text = item.get("text")
         text = str(raw_text).strip().upper() if raw_text is not None else ""
         
-        # 🔥 SANITIZE: Saare gande characters hatao
+        # 🔥 SANITIZE
         text = text.replace("\\", "").replace("{", "").replace("}", "")
+        text = re.sub(r'alpha&H[0-9A-Fa-f]{2}&', '', text)
+        text = re.sub(r't\(\d+,\d+,.*?\)', '', text)
         
         if not text or text.lower() == "none":
             continue
 
-        # 🔥 NO LIMIT: Text ko jitna lamba ho sakta hai fit karo, par 2 line tak hi rakho
-        # (2 lines tak rakhne se screen par accha dikhta hai, 3+ lines screen cover kar leti hain)
-        if len(text) > 26:
+        # 🔥 TESTING: Line limit 80
+        if len(text) > 80:
             words_list = text.split()
             lines = []
             current_line = []
             for w in words_list:
                 current_line.append(w)
-                if len(" ".join(current_line)) > 26:
+                if len(" ".join(current_line)) > 80:
                     lines.append(" ".join(current_line))
                     current_line = []
             if current_line:
@@ -385,7 +387,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                     t_in = start + char_idx * in_st
                     t_out = end + char_idx * out_st
                     
-                    # 🔥 FIX: Har tag alag block me (No alpha error)
+                    # 🔥 FIX: Tags alag alag blocks me
                     body += f"{{\\alpha&HFF&}}"
                     body += f"{{\\t({rel(t_in)},{rel(t_in + IN_FADE)},\\alpha{vis_val})}}"
                     body += f"{{\\t({rel(t_out)},{rel(t_out + OUT_FADE)},\\alpha&HFF&)}}"
@@ -1112,9 +1114,9 @@ Focus on VISUALS — characters, screens, action, environment, weapons, enemies,
 **🚫 NEVER shout on non-action scenes.**
 
 **PACING:**
-- "action" → 3-5 words, HIGH energy, CAPS
-- "dialog" → 4-6 words, conversational
-- "calm" → 5-7 words, chill
+- "action" → 15-20 words, HIGH energy, CAPS
+- "dialog" → 15-20 words, conversational
+- "calm" → 15-20 words, chill
 
 **🎯 VISUAL CLASSIFICATION RULES**
 
@@ -1144,7 +1146,7 @@ If you see ANY of these → visual_type = "action":
 2. REACT with emotion
 3. Focus on VISUALS
 4. UNIQUE lines based on actual frames
-5. 5-8 words per line
+5. 15-20 words per line
 6. Reference "guys" or "you" naturally
 7. Max 2-3 follow requests
 
@@ -1174,35 +1176,14 @@ If you see ANY of these → visual_type = "action":
     or_url = "https://openrouter.ai/api/v1/chat/completions"
     analysis_b64 = encode_image(analysis_grid_path)
 
-    # ============================================================
-    # 🔒 STRICT JSON SCHEMA (OpenRouter Structured Outputs)
-    # ============================================================
     SEGMENT_SCHEMA = {
         "type": "object",
         "properties": {
-            "slot": {
-                "type": "integer",
-                "minimum": 1,
-                "maximum": len(slots),
-                "description": f"Slot number (1-indexed), must be 1 to {len(slots)}"
-            },
-            "start": {
-                "type": "number",
-                "description": "Slot start time in seconds"
-            },
-            "end": {
-                "type": "number",
-                "description": "Slot end time in seconds"
-            },
-            "text": {
-                "type": "string",
-                "description": "Commentary text (1-20 words, hype/casual English)"
-            },
-            "visual_type": {
-                "type": "string",
-                "enum": ["action", "dialog", "calm"],
-                "description": "Scene tone for this segment"
-            }
+            "slot": {"type": "integer", "minimum": 1, "maximum": len(slots), "description": f"Slot number (1-indexed), must be 1 to {len(slots)}"},
+            "start": {"type": "number", "description": "Slot start time in seconds"},
+            "end": {"type": "number", "description": "Slot end time in seconds"},
+            "text": {"type": "string", "description": "Commentary text (1-20 words, hype/casual English)"},
+            "visual_type": {"type": "string", "enum": ["action", "dialog", "calm"], "description": "Scene tone for this segment"}
         },
         "required": ["slot", "start", "end", "text", "visual_type"],
         "additionalProperties": False
@@ -1211,17 +1192,8 @@ If you see ANY of these → visual_type = "action":
     RESPONSE_SCHEMA = {
         "type": "object",
         "properties": {
-            "story_summary": {
-                "type": "string",
-                "description": "Brief one-line summary of the clip"
-            },
-            "segments": {
-                "type": "array",
-                "description": f"Exactly {len(slots)} segments, one per slot",
-                "items": SEGMENT_SCHEMA,
-                "minItems": len(slots),
-                "maxItems": len(slots)
-            }
+            "story_summary": {"type": "string", "description": "Brief one-line summary of the clip"},
+            "segments": {"type": "array", "description": f"Exactly {len(slots)} segments, one per slot", "items": SEGMENT_SCHEMA, "minItems": len(slots), "maxItems": len(slots)}
         },
         "required": ["story_summary", "segments"],
         "additionalProperties": False
@@ -1229,26 +1201,13 @@ If you see ANY of these → visual_type = "action":
 
     def _build_payload(model_id, strict=True):
         if strict:
-            response_format = {
-                "type": "json_schema",
-                "json_schema": {
-                    "name": "commentary_script",
-                    "strict": True,
-                    "schema": RESPONSE_SCHEMA
-                }
-            }
+            response_format = {"type": "json_schema", "json_schema": {"name": "commentary_script", "strict": True, "schema": RESPONSE_SCHEMA}}
         else:
             response_format = {"type": "json_object"}
 
         payload = {
             "model": model_id,
-            "messages": [{
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": prompt},
-                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{analysis_b64}", "detail": "high"}}
-                ]
-            }],
+            "messages": [{"role": "user", "content": [{"type": "text", "text": prompt}, {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{analysis_b64}", "detail": "high"}}]}],
             "max_tokens": 4000,
             "temperature": 0.9,
             "response_format": response_format,
@@ -1262,13 +1221,11 @@ If you see ANY of these → visual_type = "action":
         return payload
 
     def _parse_and_validate(raw):
-        if not raw:
-            return None, "empty"
+        if not raw: return None, "empty"
         raw = str(raw).strip()
         if raw.startswith("```"):
             raw = raw.split("```")[1]
-            if raw.startswith("json"):
-                raw = raw[4:].strip()
+            if raw.startswith("json"): raw = raw[4:].strip()
             raw = raw.rstrip("`").strip()
 
         try:
@@ -1291,64 +1248,40 @@ If you see ANY of these → visual_type = "action":
         return None, "json"
 
     def _try_call(model_id, key):
-        headers = {
-            "Authorization": f"Bearer {key}",
-            "Content-Type": "application/json",
-            "HTTP-Referer": "https://github.com/",
-            "X-Title": "Gaming Commentary"
-        }
-
+        headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json", "HTTP-Referer": "https://github.com/", "X-Title": "Gaming Commentary"}
         try:
             payload = _build_payload(model_id, strict=True)
             r = requests.post(or_url, headers=headers, json=payload, timeout=120)
-
             if r.status_code == 200:
                 ai = r.json()
                 actual_model = ai.get('model', model_id)
                 content = ai.get('choices', [{}])[0].get('message', {}).get('content')
                 segs, err = _parse_and_validate(content)
-                if segs:
-                    return segs, actual_model, None
+                if segs: return segs, actual_model, None
                 return None, actual_model, err
-
-            elif r.status_code == 404:
-                return None, model_id, "not_found"
-
-            elif r.status_code in (401, 402, 403):
-                return None, model_id, "auth"
-
-            elif r.status_code == 429:
-                return None, model_id, "rate"
-
+            elif r.status_code == 404: return None, model_id, "not_found"
+            elif r.status_code in (401, 402, 403): return None, model_id, "auth"
+            elif r.status_code == 429: return None, model_id, "rate"
             elif r.status_code in (400, 422):
                 print("(schema unsupported → json_object)", end=" ")
-            else:
-                return None, model_id, f"http_{r.status_code}"
-
+            else: return None, model_id, f"http_{r.status_code}"
         except Exception as e:
             return None, model_id, f"exception: {str(e)[:50]}"
 
         try:
             payload = _build_payload(model_id, strict=False)
             r2 = requests.post(or_url, headers=headers, json=payload, timeout=120)
-
             if r2.status_code == 200:
                 ai = r2.json()
                 actual_model = ai.get('model', model_id)
                 content = ai.get('choices', [{}])[0].get('message', {}).get('content')
                 segs, err = _parse_and_validate(content)
-                if segs:
-                    return segs, actual_model, None
+                if segs: return segs, actual_model, None
                 return None, actual_model, err
-            elif r2.status_code == 404:
-                return None, model_id, "not_found"
-            elif r2.status_code in (401, 402, 403):
-                return None, model_id, "auth"
-            elif r2.status_code == 429:
-                return None, model_id, "rate"
-            else:
-                return None, model_id, f"http_{r2.status_code}"
-
+            elif r2.status_code == 404: return None, model_id, "not_found"
+            elif r2.status_code in (401, 402, 403): return None, model_id, "auth"
+            elif r2.status_code == 429: return None, model_id, "rate"
+            else: return None, model_id, f"http_{r2.status_code}"
         except Exception as e:
             return None, model_id, f"exception: {str(e)[:50]}"
 
@@ -1396,13 +1329,13 @@ If you see ANY of these → visual_type = "action":
                     print(f"⚠️ {err} → next attempt")
             print()
 
+        # 🔥 FIXED: OPENROUTER/FREE LOOP
         if not segments:
             print(f"🤖 [MODEL TRY 3] openrouter/free")
-            stop_m3 = False
             for k_idx, key in enumerate(OPENROUTER_KEYS, start=1):
-                if segments or stop_m3: break
+                if segments: break
                 for retry in range(2):
-                    if segments or stop_m3: break
+                    if segments: break
                     if retry > 0: time.sleep(1.5)
                     print(f"   🔑 Key {k_idx}/{len(OPENROUTER_KEYS)} — try {retry+1}/2...", end=" ")
                     segs, actual, err = _try_call("openrouter/free", key)
@@ -1411,9 +1344,8 @@ If you see ANY of these → visual_type = "action":
                         print(f"✅ SUCCESS! (Actual: {actual})")
                         break
                     elif err == "not_found":
-                        print("❌ Model Not Found — skipping")
-                        stop_m3 = True
-                        break
+                        print(f"❌ Model Not Found — skipping key {k_idx}")
+                        break # Break inner retry, try next key
                     elif err in ("json", "empty", "incomplete"):
                         if retry == 0:
                             print(f"⚠️ {err} → retry same key")
@@ -1495,8 +1427,7 @@ If you see ANY of these → visual_type = "action":
     updated_count = 0
     for seg in segments:
         vt = (seg.get("visual_type") or "").lower().strip()
-        if vt not in ("action", "dialog", "calm"):
-            continue
+        if vt not in ("action", "dialog", "calm"): continue
 
         best_slot = None
         best_diff = 999
@@ -1516,14 +1447,7 @@ If you see ANY of these → visual_type = "action":
             srt_word_count = len(best_slot.get("srt_text", "").split())
 
             best_slot["gpt_type"] = vt
-
-            signal_says_action_strong = (
-                (signal_type == "action" and action_ratio >= 0.25)
-                or (motion >= 3)
-                or (action_ratio >= 0.30)
-                or (scene_count >= 3 and avg_loud > -18)
-            )
-
+            signal_says_action_strong = ((signal_type == "action" and action_ratio >= 0.25) or (motion >= 3) or (action_ratio >= 0.30) or (scene_count >= 3 and avg_loud > -18))
             has_strong_dialog = (srt_word_count >= 8 and action_ratio < 0.40 and motion < 3)
             is_likely_scenery = (avg_loud < -30 and scene_count == 0 and motion < 2)
 
