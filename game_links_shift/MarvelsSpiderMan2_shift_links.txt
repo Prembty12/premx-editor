@@ -3,3 +3,4 @@ MarvelsSpiderMan241 | Link: https://github.com/Prembty12/premx-editor/releases/d
 MarvelsSpiderMan224 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan224.mp4 | REJECT (OpenRouter): Red-lit corridor running, zero combat.
 MarvelsSpiderMan229 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan229.mp4 | REJECT (OpenRouter): Underwater pipe walking, no combat
 MarvelsSpiderMan225 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan225.mp4 | REJECT (OpenRouter): Corridor walking and map screens, boring.
+MarvelsSpiderMan223 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan223.mp4 | REJECT (OpenRouter): Cinematic travel and stealth, no combat.
