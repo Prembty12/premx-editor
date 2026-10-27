@@ -366,7 +366,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                     look = f"\\bord{fs * 0.08:.1f}\\shad2.5\\blur0"
                     dx = dy = 0.0
 
-            prefix = f"{{\\an5{pos_tag(dx, dy)}\\fs{fs}\\fsp{fsp}\\b1{look}"
+            prefix = f"{{\\an5{pos_tag(dx, dy)}\\fs{fs}\\fsp{fsp}\\b1{look}}}"
             
             body = ""
             char_idx = 0
@@ -1701,7 +1701,7 @@ def main():
             generate_full_ass_script(
                 audio_files=audio_files,
                 font_name="BebasNeue-Regular",
-                font_size=55, # Font size badha diya taaki crispy aur bada lage
+                font_size=45, # Font size badha diya taaki crispy aur bada lage
                 alignment=2,
                 vertical_margin=65
             )
