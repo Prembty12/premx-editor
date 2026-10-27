@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-27 07:47:50 AM",
+  "last_updated": "2026-10-27 08:22:09 AM",
   "period_days": 7,
   "trending": [
     {
@@ -7,16 +7,16 @@
       "views_7d": 7510,
       "avg_per_video": 536,
       "trend": "viral",
-      "ratio": 3.420237010027347,
+      "ratio": 3.395475113122172,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "MarvelsSpiderMan2",
-      "views_7d": 3851,
-      "avg_per_video": 320,
+      "views_7d": 3968,
+      "avg_per_video": 330,
       "trend": "viral",
-      "ratio": 2.0419325432999087,
+      "ratio": 2.090497737556561,
       "fb_link": "https://www.facebook.com/reel/1483390583931941/",
       "source_link": ""
     },
@@ -25,7 +25,7 @@
       "views_7d": 160,
       "avg_per_video": 160,
       "trend": "steady",
-      "ratio": 1.0209662716499543,
+      "ratio": 1.0135746606334841,
       "fb_link": "https://www.facebook.com/reel/2181972149061480/",
       "source_link": ""
     }
@@ -36,16 +36,16 @@
       "views_7d": 210,
       "avg_per_video": 42,
       "trend": "below_avg",
-      "ratio": 0.268003646308113,
+      "ratio": 0.2660633484162896,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "Wolverine",
-      "views_7d": 343,
-      "avg_per_video": 24,
+      "views_7d": 344,
+      "avg_per_video": 22,
       "trend": "below_avg",
-      "ratio": 0.15314494074749316,
+      "ratio": 0.13936651583710408,
       "fb_link": "",
       "source_link": ""
     },
@@ -54,7 +54,7 @@
       "views_7d": 30,
       "avg_per_video": 15,
       "trend": "below_avg",
-      "ratio": 0.09571558796718323,
+      "ratio": 0.09502262443438914,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions15.mp4"
     },
@@ -73,7 +73,7 @@
     "views_7d": 7510,
     "avg_per_video": 536,
     "trend": "viral",
-    "ratio": 3.420237010027347,
+    "ratio": 3.395475113122172,
     "fb_link": "",
     "source_link": ""
   }
