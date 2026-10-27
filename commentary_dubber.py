@@ -20,6 +20,7 @@ FEATURES:
   ✅ Cinematic Subtitles (3D Shadow + Glow + Letter-by-Letter Typewriter + Colors + Auto-Wrap + Crispy Text)
   ✅ NEW: Structured Outputs (json_schema + strict:true) with auto json_object fallback
   ✅ NEW: provider.require_parameters = true (route only to supporting endpoints)
+  ✅ FIXED: Alpha tag error (text sanitization + tag string building)
 ===============================================================
 """
 
@@ -254,7 +255,7 @@ def speed_for_type(slot_type):
 
 
 # ============================================================
-# ASS SUBTITLE GENERATOR (FIXED: vis_val variable name conflict)
+# ASS SUBTITLE GENERATOR (100% FIXED)
 # ============================================================
 def generate_full_ass_script(audio_files, font_name="Arial", font_size=40,
                               alignment=2, vertical_margin=65,
@@ -285,7 +286,10 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         
         raw_text = item.get("text")
         text = str(raw_text).strip().upper() if raw_text is not None else ""
+        
+        # 🔥 GPT ke text ko saaf karein
         text = text.replace("\\", "").replace("{", "").replace("}", "")
+        
         if not text or text.lower() == "none":
             continue
 
@@ -341,7 +345,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         fs = font_size
         fsp = 8
 
-        # 🔥 FIX: Variable rename vis -> vis_val to avoid ASS conflict
+        # 🔥 FIX: Loop variable ko vis_val kiya
         for kind, (layer, vis_val) in LAYERS.items():
             if kind == "shadow":
                 base_col = (0, 0, 0)
@@ -380,7 +384,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                     t_in = start + char_idx * in_st
                     t_out = end + char_idx * out_st
                     
-                    # 🔥 FIX: Clean multi-line tags with vis_val
+                    # 🔥 FIX: Tags ko saaf aur alag lines me banaya
                     tags = (
                         f"\\alpha&HFF&"
                         f"\\t({rel(t_in)},{rel(t_in + IN_FADE)},\\alpha{vis_val})"
