@@ -1,22 +1,22 @@
 {
-  "last_updated": "2026-10-27 04:39:35 PM",
+  "last_updated": "2026-10-27 04:42:27 PM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 7671,
+      "views_7d": 7674,
       "avg_per_video": 511,
       "trend": "viral",
-      "ratio": 2.876172607879925,
+      "ratio": 2.873477038425492,
       "fb_link": "https://www.facebook.com/reel/2283271625790545/",
       "source_link": ""
     },
     {
       "game": "MarvelsSpiderMan2",
-      "views_7d": 4120,
-      "avg_per_video": 316,
+      "views_7d": 4125,
+      "avg_per_video": 317,
       "trend": "trending",
-      "ratio": 1.778611632270169,
+      "ratio": 1.7825679475164011,
       "fb_link": "https://www.facebook.com/reel/1058860950504105/",
       "source_link": ""
     }
@@ -27,7 +27,7 @@
       "views_7d": 164,
       "avg_per_video": 164,
       "trend": "slow",
-      "ratio": 0.9230769230769231,
+      "ratio": 0.922211808809747,
       "fb_link": "https://www.facebook.com/reel/2181972149061480/",
       "source_link": ""
     },
@@ -36,7 +36,7 @@
       "views_7d": 220,
       "avg_per_video": 36,
       "trend": "below_avg",
-      "ratio": 0.20262664165103192,
+      "ratio": 0.20243673851921273,
       "fb_link": "",
       "source_link": ""
     },
@@ -45,7 +45,7 @@
       "views_7d": 389,
       "avg_per_video": 24,
       "trend": "below_avg",
-      "ratio": 0.1350844277673546,
+      "ratio": 0.13495782567947515,
       "fb_link": "",
       "source_link": ""
     },
@@ -54,17 +54,17 @@
       "views_7d": 30,
       "avg_per_video": 15,
       "trend": "below_avg",
-      "ratio": 0.08442776735459663,
+      "ratio": 0.08434864104967198,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions15.mp4"
     }
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 7671,
+    "views_7d": 7674,
     "avg_per_video": 511,
     "trend": "viral",
-    "ratio": 2.876172607879925,
+    "ratio": 2.873477038425492,
     "fb_link": "https://www.facebook.com/reel/2283271625790545/",
     "source_link": ""
   }

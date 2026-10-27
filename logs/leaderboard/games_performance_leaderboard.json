@@ -2,15 +2,15 @@
     {
         "rank": 1,
         "game_name": "MarvelsSpiderMan2",
-        "total_views": 7881,
-        "uploaded_videos": 43,
-        "avg_views_per_video": 183,
-        "view_share_percentage": 17.19
+        "total_views": 7886,
+        "uploaded_videos": 44,
+        "avg_views_per_video": 179,
+        "view_share_percentage": 17.2
     },
     {
         "rank": 2,
         "game_name": "CODMW4",
-        "total_views": 7671,
+        "total_views": 7674,
         "uploaded_videos": 26,
         "avg_views_per_video": 295,
         "view_share_percentage": 16.73
@@ -93,6 +93,6 @@
         "total_views": 415,
         "uploaded_videos": 19,
         "avg_views_per_video": 21,
-        "view_share_percentage": 0.91
+        "view_share_percentage": 0.9
     }
 ]
