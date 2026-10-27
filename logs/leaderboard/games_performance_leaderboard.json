@@ -2,18 +2,18 @@
     {
         "rank": 1,
         "game_name": "MarvelsSpiderMan2",
-        "total_views": 8535,
-        "uploaded_videos": 45,
-        "avg_views_per_video": 189,
-        "view_share_percentage": 19.29
+        "total_views": 8548,
+        "uploaded_videos": 46,
+        "avg_views_per_video": 185,
+        "view_share_percentage": 19.59
     },
     {
         "rank": 2,
         "game_name": "CODMW4",
-        "total_views": 7764,
+        "total_views": 7768,
         "uploaded_videos": 28,
         "avg_views_per_video": 277,
-        "view_share_percentage": 17.55
+        "view_share_percentage": 17.8
     },
     {
         "rank": 3,
@@ -21,7 +21,7 @@
         "total_views": 4983,
         "uploaded_videos": 16,
         "avg_views_per_video": 311,
-        "view_share_percentage": 11.26
+        "view_share_percentage": 11.42
     },
     {
         "rank": 4,
@@ -29,7 +29,7 @@
         "total_views": 4225,
         "uploaded_videos": 26,
         "avg_views_per_video": 162,
-        "view_share_percentage": 9.55
+        "view_share_percentage": 9.68
     },
     {
         "rank": 5,
@@ -37,7 +37,7 @@
         "total_views": 3930,
         "uploaded_videos": 10,
         "avg_views_per_video": 393,
-        "view_share_percentage": 8.88
+        "view_share_percentage": 9.01
     },
     {
         "rank": 6,
@@ -45,7 +45,7 @@
         "total_views": 3230,
         "uploaded_videos": 12,
         "avg_views_per_video": 269,
-        "view_share_percentage": 7.3
+        "view_share_percentage": 7.4
     },
     {
         "rank": 7,
@@ -53,23 +53,23 @@
         "total_views": 3022,
         "uploaded_videos": 14,
         "avg_views_per_video": 215,
-        "view_share_percentage": 6.83
+        "view_share_percentage": 6.93
     },
     {
         "rank": 8,
-        "game_name": "codBlackops6",
-        "total_views": 2866,
-        "uploaded_videos": 11,
-        "avg_views_per_video": 260,
-        "view_share_percentage": 6.48
-    },
-    {
-        "rank": 9,
         "game_name": "Callofdutyaw",
         "total_views": 2524,
         "uploaded_videos": 17,
         "avg_views_per_video": 148,
-        "view_share_percentage": 5.71
+        "view_share_percentage": 5.78
+    },
+    {
+        "rank": 9,
+        "game_name": "codBlackops6",
+        "total_views": 2246,
+        "uploaded_videos": 11,
+        "avg_views_per_video": 204,
+        "view_share_percentage": 5.15
     },
     {
         "rank": 10,
@@ -77,7 +77,7 @@
         "total_views": 1953,
         "uploaded_videos": 38,
         "avg_views_per_video": 51,
-        "view_share_percentage": 4.41
+        "view_share_percentage": 4.48
     },
     {
         "rank": 11,
@@ -85,7 +85,7 @@
         "total_views": 791,
         "uploaded_videos": 45,
         "avg_views_per_video": 17,
-        "view_share_percentage": 1.79
+        "view_share_percentage": 1.81
     },
     {
         "rank": 12,
@@ -93,6 +93,6 @@
         "total_views": 415,
         "uploaded_videos": 19,
         "avg_views_per_video": 21,
-        "view_share_percentage": 0.94
+        "view_share_percentage": 0.95
     }
 ]
