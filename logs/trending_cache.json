@@ -1,51 +1,51 @@
 {
-  "last_updated": "2026-10-27 07:32:12 AM",
+  "last_updated": "2026-10-27 07:47:50 AM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 7499,
-      "avg_per_video": 576,
+      "views_7d": 7510,
+      "avg_per_video": 536,
       "trend": "viral",
-      "ratio": 3.5492957746478875,
-      "fb_link": "https://www.facebook.com/reel/1661492925378526/",
+      "ratio": 3.420237010027347,
+      "fb_link": "",
       "source_link": ""
     },
     {
       "game": "MarvelsSpiderMan2",
-      "views_7d": 3831,
-      "avg_per_video": 319,
-      "trend": "trending",
-      "ratio": 1.9656690140845072,
+      "views_7d": 3851,
+      "avg_per_video": 320,
+      "trend": "viral",
+      "ratio": 2.0419325432999087,
       "fb_link": "https://www.facebook.com/reel/1483390583931941/",
+      "source_link": ""
+    },
+    {
+      "game": "CallOfDutyMW2",
+      "views_7d": 160,
+      "avg_per_video": 160,
+      "trend": "steady",
+      "ratio": 1.0209662716499543,
+      "fb_link": "https://www.facebook.com/reel/2181972149061480/",
       "source_link": ""
     }
   ],
   "below_avg": [
     {
-      "game": "CallOfDutyMW2",
-      "views_7d": 160,
-      "avg_per_video": 160,
-      "trend": "slow",
-      "ratio": 0.9859154929577465,
-      "fb_link": "https://www.facebook.com/reel/2181972149061480/",
-      "source_link": ""
-    },
-    {
       "game": "ghostandela",
       "views_7d": 210,
       "avg_per_video": 42,
       "trend": "below_avg",
-      "ratio": 0.25880281690140844,
+      "ratio": 0.268003646308113,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "Wolverine",
-      "views_7d": 342,
+      "views_7d": 343,
       "avg_per_video": 24,
       "trend": "below_avg",
-      "ratio": 0.14788732394366197,
+      "ratio": 0.15314494074749316,
       "fb_link": "",
       "source_link": ""
     },
@@ -54,7 +54,7 @@
       "views_7d": 30,
       "avg_per_video": 15,
       "trend": "below_avg",
-      "ratio": 0.09242957746478873,
+      "ratio": 0.09571558796718323,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions15.mp4"
     },
@@ -70,11 +70,11 @@
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 7499,
-    "avg_per_video": 576,
+    "views_7d": 7510,
+    "avg_per_video": 536,
     "trend": "viral",
-    "ratio": 3.5492957746478875,
-    "fb_link": "https://www.facebook.com/reel/1661492925378526/",
+    "ratio": 3.420237010027347,
+    "fb_link": "",
     "source_link": ""
   }
 }
