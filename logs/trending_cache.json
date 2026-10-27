@@ -1,22 +1,22 @@
 {
-  "last_updated": "2026-10-28 02:01:02 AM",
+  "last_updated": "2026-10-28 02:15:51 AM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 7388,
-      "avg_per_video": 492,
+      "views_7d": 7545,
+      "avg_per_video": 503,
       "trend": "viral",
-      "ratio": 2.7981042654028436,
+      "ratio": 2.831144465290807,
       "fb_link": "https://www.facebook.com/reel/1439404977770688/",
       "source_link": ""
     },
     {
       "game": "MarvelsSpiderMan2",
-      "views_7d": 4805,
+      "views_7d": 4810,
       "avg_per_video": 343,
       "trend": "trending",
-      "ratio": 1.9507109004739336,
+      "ratio": 1.9305816135084428,
       "fb_link": "https://www.facebook.com/reel/1759534302003257/",
       "source_link": ""
     }
@@ -27,7 +27,7 @@
       "views_7d": 164,
       "avg_per_video": 164,
       "trend": "slow",
-      "ratio": 0.9327014218009478,
+      "ratio": 0.9230769230769231,
       "fb_link": "https://www.facebook.com/reel/2181972149061480/",
       "source_link": ""
     },
@@ -36,7 +36,7 @@
       "views_7d": 230,
       "avg_per_video": 32,
       "trend": "below_avg",
-      "ratio": 0.1819905213270142,
+      "ratio": 0.1801125703564728,
       "fb_link": "",
       "source_link": ""
     },
@@ -45,7 +45,7 @@
       "views_7d": 433,
       "avg_per_video": 24,
       "trend": "below_avg",
-      "ratio": 0.13649289099526066,
+      "ratio": 0.1350844277673546,
       "fb_link": "",
       "source_link": ""
     },
@@ -61,10 +61,10 @@
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 7388,
-    "avg_per_video": 492,
+    "views_7d": 7545,
+    "avg_per_video": 503,
     "trend": "viral",
-    "ratio": 2.7981042654028436,
+    "ratio": 2.831144465290807,
     "fb_link": "https://www.facebook.com/reel/1439404977770688/",
     "source_link": ""
   }
