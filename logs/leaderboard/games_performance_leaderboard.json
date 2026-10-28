@@ -2,18 +2,18 @@
     {
         "rank": 1,
         "game_name": "MarvelsSpiderMan2",
-        "total_views": 8650,
+        "total_views": 8679,
         "uploaded_videos": 48,
         "avg_views_per_video": 180,
-        "view_share_percentage": 19.9
+        "view_share_percentage": 19.99
     },
     {
         "rank": 2,
         "game_name": "CODMW4",
-        "total_views": 8013,
+        "total_views": 8062,
         "uploaded_videos": 30,
-        "avg_views_per_video": 267,
-        "view_share_percentage": 18.44
+        "avg_views_per_video": 268,
+        "view_share_percentage": 18.57
     },
     {
         "rank": 3,
@@ -21,7 +21,7 @@
         "total_views": 4983,
         "uploaded_videos": 16,
         "avg_views_per_video": 311,
-        "view_share_percentage": 11.46
+        "view_share_percentage": 11.48
     },
     {
         "rank": 4,
@@ -29,7 +29,7 @@
         "total_views": 4225,
         "uploaded_videos": 26,
         "avg_views_per_video": 162,
-        "view_share_percentage": 9.72
+        "view_share_percentage": 9.73
     },
     {
         "rank": 5,
@@ -37,15 +37,15 @@
         "total_views": 3930,
         "uploaded_videos": 10,
         "avg_views_per_video": 393,
-        "view_share_percentage": 9.04
+        "view_share_percentage": 9.05
     },
     {
         "rank": 6,
         "game_name": "CallOfDutyMW2",
-        "total_views": 3230,
+        "total_views": 3101,
         "uploaded_videos": 12,
-        "avg_views_per_video": 269,
-        "view_share_percentage": 7.43
+        "avg_views_per_video": 258,
+        "view_share_percentage": 7.14
     },
     {
         "rank": 7,
@@ -53,7 +53,7 @@
         "total_views": 2562,
         "uploaded_videos": 14,
         "avg_views_per_video": 183,
-        "view_share_percentage": 5.89
+        "view_share_percentage": 5.9
     },
     {
         "rank": 8,
@@ -74,10 +74,10 @@
     {
         "rank": 10,
         "game_name": "Wolverine",
-        "total_views": 2017,
-        "uploaded_videos": 40,
-        "avg_views_per_video": 50,
-        "view_share_percentage": 4.64
+        "total_views": 2019,
+        "uploaded_videos": 41,
+        "avg_views_per_video": 49,
+        "view_share_percentage": 4.65
     },
     {
         "rank": 11,
@@ -85,7 +85,7 @@
         "total_views": 671,
         "uploaded_videos": 47,
         "avg_views_per_video": 14,
-        "view_share_percentage": 1.54
+        "view_share_percentage": 1.55
     },
     {
         "rank": 12,
@@ -93,6 +93,6 @@
         "total_views": 415,
         "uploaded_videos": 19,
         "avg_views_per_video": 21,
-        "view_share_percentage": 0.95
+        "view_share_percentage": 0.96
     }
 ]

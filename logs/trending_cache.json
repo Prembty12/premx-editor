@@ -1,33 +1,33 @@
 {
-  "last_updated": "2026-10-28 09:34:20 AM",
+  "last_updated": "2026-10-28 11:45:35 AM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 7621,
-      "avg_per_video": 476,
+      "views_7d": 6776,
+      "avg_per_video": 451,
       "trend": "viral",
-      "ratio": 2.717411988582303,
+      "ratio": 2.692537313432836,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "MarvelsSpiderMan2",
-      "views_7d": 4889,
-      "avg_per_video": 349,
+      "views_7d": 4918,
+      "avg_per_video": 327,
       "trend": "trending",
-      "ratio": 1.9923882017126546,
-      "fb_link": "https://www.facebook.com/reel/1759534302003257/",
+      "ratio": 1.9522388059701492,
+      "fb_link": "",
       "source_link": ""
     }
   ],
   "below_avg": [
     {
       "game": "CallOfDutyMW2",
-      "views_7d": 164,
-      "avg_per_video": 164,
+      "views_7d": 165,
+      "avg_per_video": 165,
       "trend": "slow",
-      "ratio": 0.9362511893434824,
+      "ratio": 0.9850746268656716,
       "fb_link": "https://www.facebook.com/reel/2181972149061480/",
       "source_link": ""
     },
@@ -36,16 +36,16 @@
       "views_7d": 240,
       "avg_per_video": 34,
       "trend": "below_avg",
-      "ratio": 0.19410085632730734,
+      "ratio": 0.20298507462686566,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "Wolverine",
-      "views_7d": 487,
+      "views_7d": 489,
       "avg_per_video": 28,
       "trend": "below_avg",
-      "ratio": 0.1598477640342531,
+      "ratio": 0.16716417910447762,
       "fb_link": "",
       "source_link": ""
     },
@@ -61,10 +61,10 @@
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 7621,
-    "avg_per_video": 476,
+    "views_7d": 6776,
+    "avg_per_video": 451,
     "trend": "viral",
-    "ratio": 2.717411988582303,
+    "ratio": 2.692537313432836,
     "fb_link": "",
     "source_link": ""
   }
