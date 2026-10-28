@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 28 | **Last Updated:** 2026-10-28 11:25:18 PM IST
+**Total Videos:** 28 | **Last Updated:** 2026-10-28 11:28:11 PM IST
 
 ---
 
@@ -14,7 +14,7 @@
 | Posted (FB or IG) | 17 / 28 |
 | FB Posted | 13 / 28 |
 | IG Posted | 17 / 28 |
-| Total FB Views | **8,369** |
+| Total FB Views | **8,371** |
 | Total IG Views | **540** |
 
 ---
@@ -24,7 +24,7 @@
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
 | 1 | Palace Lobby 5 Enemies Wrecked 🔫🔥  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2368633470640935/) | 368 | [🟣 IG](https://www.instagram.com/reel/DfBayQEgIoY/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW43.mp4) |
-| 2 | 4 Targets Wrecked In Snowy Warzone 🎯💥  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1439404977770688/) | 592 | [🟣 IG](https://www.instagram.com/reel/DfAn-NyjByR/) | 70 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW44.mp4) |
+| 2 | 4 Targets Wrecked In Snowy Warzone 🎯💥  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1439404977770688/) | 594 | [🟣 IG](https://www.instagram.com/reel/DfAn-NyjByR/) | 70 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW44.mp4) |
 | 3 | He Entered Dark Building 4 Enemies 👀💥  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2283271625790545/) | 227 | [🟣 IG](https://www.instagram.com/reel/De-77C4EozM/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW45.mp4) |
 | 4 | He Survived Museum Shootout 5 Enemies 🔫🔥  #videogames #gamingcommunity #gaming #codmw4 #gamingreels  | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/De-vjtED-JU/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW46.mp4) |
 | 5 | Museum Trap 4 Enemies Wrecked 🔥🎯  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1661492925378526/) | 454 | [🟣 IG](https://www.instagram.com/reel/De8U3qeDG2Y/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW47.mp4) |
