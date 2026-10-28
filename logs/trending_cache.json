@@ -1,51 +1,51 @@
 {
-  "last_updated": "2026-10-28 11:45:35 AM",
+  "last_updated": "2026-10-28 11:25:18 PM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 6776,
-      "avg_per_video": 451,
+      "views_7d": 6626,
+      "avg_per_video": 509,
       "trend": "viral",
-      "ratio": 2.692537313432836,
-      "fb_link": "",
+      "ratio": 3.050949050949051,
+      "fb_link": "https://www.facebook.com/reel/2368633470640935/",
       "source_link": ""
     },
     {
       "game": "MarvelsSpiderMan2",
-      "views_7d": 4918,
-      "avg_per_video": 327,
+      "views_7d": 3331,
+      "avg_per_video": 256,
       "trend": "trending",
-      "ratio": 1.9522388059701492,
-      "fb_link": "",
+      "ratio": 1.5344655344655345,
+      "fb_link": "https://www.facebook.com/reel/1759534302003257/",
       "source_link": ""
     }
   ],
   "below_avg": [
     {
       "game": "CallOfDutyMW2",
-      "views_7d": 165,
-      "avg_per_video": 165,
+      "views_7d": 166,
+      "avg_per_video": 166,
       "trend": "slow",
-      "ratio": 0.9850746268656716,
+      "ratio": 0.995004995004995,
       "fb_link": "https://www.facebook.com/reel/2181972149061480/",
       "source_link": ""
     },
     {
       "game": "ghostandela",
       "views_7d": 240,
-      "avg_per_video": 34,
+      "avg_per_video": 40,
       "trend": "below_avg",
-      "ratio": 0.20298507462686566,
+      "ratio": 0.23976023976023975,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "Wolverine",
-      "views_7d": 489,
-      "avg_per_video": 28,
+      "views_7d": 494,
+      "avg_per_video": 30,
       "trend": "below_avg",
-      "ratio": 0.16716417910447762,
+      "ratio": 0.1798201798201798,
       "fb_link": "",
       "source_link": ""
     },
@@ -61,11 +61,11 @@
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 6776,
-    "avg_per_video": 451,
+    "views_7d": 6626,
+    "avg_per_video": 509,
     "trend": "viral",
-    "ratio": 2.692537313432836,
-    "fb_link": "",
+    "ratio": 3.050949050949051,
+    "fb_link": "https://www.facebook.com/reel/2368633470640935/",
     "source_link": ""
   }
 }
