@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 27 | **Last Updated:** 2026-10-28 02:58:19 AM IST
+**Total Videos:** 27 | **Last Updated:** 2026-10-28 08:14:18 AM IST
 
 ---
 
@@ -15,7 +15,7 @@
 | FB Posted | 11 / 27 |
 | IG Posted | 9 / 27 |
 | Total FB Views | **131** |
-| Total IG Views | **530** |
+| Total IG Views | **540** |
 
 ---
 
@@ -23,7 +23,7 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | General Cried Over 1 Girl 🔥  #videogames #gamingcommunity #gaming #ghostandela #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DfAdsnSComT/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela5.mp4) |
+| 1 | General Cried Over 1 Girl 🔥  #videogames #gamingcommunity #gaming #ghostandela #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DfAdsnSComT/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela5.mp4) |
 | 2 | She Faced Soldiers In Standoff 👀🔥  #videogames #gamingcommunity #gaming #ghostandela #gamingreels #r | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/De-4bi4kilT/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela18.mp4) |
 | 3 | Skull Squad Found 1 Hidden Kid 🔥👀  #videogames #gamingcommunity #gaming #ghostandela #gamingreels #r | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/De-Ag0cERPy/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela25.mp4) |
 | 4 | He Survived Fiery Red Zone Trap 🔥😱  #videogames #gamingcommunity #gaming #ghostandela #gamingreels # | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/De1S0VejSJC/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela26.mp4) |
@@ -33,14 +33,14 @@
 | 8 | 1 Civilian vs 5 Soldiers Standoff 🔥🎯  #videogames #gamingcommunity #gaming #ghostandela #gamingreels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DelIxRnClXW/) | 40 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela38.mp4) |
 | 9 | Prison Cell Betrayal 1 Shot Execution 👀🔥  #videogames #gamingcommunity #gaming #ghostandela #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1808594343510424/) | 131 | [🟣 IG](https://www.instagram.com/reel/Dedc3nIjsd8/) | 260 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela45.mp4) |
 | 10 | ghostandela13 | [🔵 FB](https://www.facebook.com/18422342941150797) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela13.mp4) |
-| 11 | ghostandela51 | [🔵 FB](https://www.facebook.com/18132707410837561) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela51.mp4) |
-| 12 | ghostandela19 | [🔵 FB](https://www.facebook.com/18010219137004213) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela19.mp4) |
-| 13 | ghostandela24 | [🔵 FB](https://www.facebook.com/17957644143218048) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela24.mp4) |
-| 14 | ghostandela20 | [🔵 FB](https://www.facebook.com/18101262323333745) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela20.mp4) |
-| 15 | ghostandela8 | [🔵 FB](https://www.facebook.com/18093261095413863) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela8.mp4) |
-| 16 | ghostandela15 | [🔵 FB](https://www.facebook.com/18133617205635778) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela15.mp4) |
-| 17 | ghostandela23 | [🔵 FB](https://www.facebook.com/18132044668702630) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela23.mp4) |
-| 18 | ghostandela42 | [🔵 FB](https://www.facebook.com/18177772753447081) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela42.mp4) |
+| 11 | ghostandela24 | [🔵 FB](https://www.facebook.com/17957644143218048) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela24.mp4) |
+| 12 | ghostandela15 | [🔵 FB](https://www.facebook.com/18133617205635778) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela15.mp4) |
+| 13 | ghostandela19 | [🔵 FB](https://www.facebook.com/18010219137004213) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela19.mp4) |
+| 14 | ghostandela8 | [🔵 FB](https://www.facebook.com/18093261095413863) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela8.mp4) |
+| 15 | ghostandela51 | [🔵 FB](https://www.facebook.com/18132707410837561) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela51.mp4) |
+| 16 | ghostandela23 | [🔵 FB](https://www.facebook.com/18132044668702630) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela23.mp4) |
+| 17 | ghostandela42 | [🔵 FB](https://www.facebook.com/18177772753447081) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela42.mp4) |
+| 18 | ghostandela20 | [🔵 FB](https://www.facebook.com/18101262323333745) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela20.mp4) |
 | 19 | ghostandela17 | [🔵 FB](https://www.facebook.com/18173558278455466) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela17.mp4) |
 | 20 | ghostandela45 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela45.mp4) |
 | 21 | ghostandela38 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela38.mp4) |

@@ -1,22 +1,22 @@
 {
-  "last_updated": "2026-10-28 02:58:19 AM",
+  "last_updated": "2026-10-28 08:14:18 AM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 7557,
-      "avg_per_video": 503,
+      "views_7d": 7619,
+      "avg_per_video": 507,
       "trend": "viral",
-      "ratio": 2.8284910965323333,
+      "ratio": 2.819277108433735,
       "fb_link": "https://www.facebook.com/reel/1439404977770688/",
       "source_link": ""
     },
     {
       "game": "MarvelsSpiderMan2",
-      "views_7d": 4819,
-      "avg_per_video": 344,
+      "views_7d": 4883,
+      "avg_per_video": 348,
       "trend": "trending",
-      "ratio": 1.9343955014058105,
+      "ratio": 1.9351251158480074,
       "fb_link": "https://www.facebook.com/reel/1759534302003257/",
       "source_link": ""
     }
@@ -27,25 +27,25 @@
       "views_7d": 164,
       "avg_per_video": 164,
       "trend": "slow",
-      "ratio": 0.922211808809747,
+      "ratio": 0.9119555143651529,
       "fb_link": "https://www.facebook.com/reel/2181972149061480/",
       "source_link": ""
     },
     {
       "game": "ghostandela",
-      "views_7d": 230,
-      "avg_per_video": 32,
+      "views_7d": 240,
+      "avg_per_video": 34,
       "trend": "below_avg",
-      "ratio": 0.17994376757263356,
+      "ratio": 0.18906394810009267,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "Wolverine",
-      "views_7d": 443,
-      "avg_per_video": 24,
+      "views_7d": 485,
+      "avg_per_video": 26,
       "trend": "below_avg",
-      "ratio": 0.13495782567947515,
+      "ratio": 0.14457831325301204,
       "fb_link": "",
       "source_link": ""
     },
@@ -61,10 +61,10 @@
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 7557,
-    "avg_per_video": 503,
+    "views_7d": 7619,
+    "avg_per_video": 507,
     "trend": "viral",
-    "ratio": 2.8284910965323333,
+    "ratio": 2.819277108433735,
     "fb_link": "https://www.facebook.com/reel/1439404977770688/",
     "source_link": ""
   }
