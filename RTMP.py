@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🎮 MASTER AGENT v8.2 — SINGLE FILE (cleanup + audio fallback + error logs)
+🎮 MASTER AGENT v8.4 — SINGLE FILE (Title works even if Commentary OFF)
 ==============================================================
 """
 import os
@@ -62,18 +62,14 @@ FINAL_DUBBED_VIDEO = ARGS.out
 def now_ist():
     return datetime.now(IST)
 
-
 def now_ist_ampm():
     return datetime.now(IST).strftime("%Y-%m-%d %I:%M:%S %p")
-
 
 def log(msg, end="\n"):
     sys.stderr.write(f"{msg}{end}")
     sys.stderr.flush()
 
-
 INTERRUPTED = False
-
 
 def _sigint_handler(signum, frame):
     global INTERRUPTED
@@ -93,7 +89,6 @@ STREAM_MODE        = os.getenv("STREAM_MODE", "both").lower().strip()
 if STREAM_MODE not in ("fb", "yt", "both"):
     STREAM_MODE = "both"
 
-# trim keys (extra spaces/newlines from secrets)
 YOUTUBE_KEY  = (os.getenv("YOUTUBE_STREAM_KEY") or "").strip()
 FACEBOOK_KEY = (os.getenv("FACEBOOK_STREAM_KEY") or "").strip()
 USE_YT = STREAM_MODE in ("yt", "both") and bool(YOUTUBE_KEY)
@@ -109,7 +104,6 @@ FB_PAGE_ID      = os.getenv("PAGE_ID")
 FB_ACCESS_TOKEN = os.getenv("PAGE_ACCESS_TOKEN")
 FB_GRAPH_URL    = "https://graph.facebook.com/v24.0"
 
-# ── LOGS / DIRS
 LOGS_DIR       = "gaming_runtime_v8"
 MANUAL_DIR     = "Manual_links"
 AUTO_DIR       = "game_links_livestream"
@@ -128,7 +122,6 @@ for d in [LOGS_DIR, f"{LOGS_DIR}/games", f"{LOGS_DIR}/leaderboard",
           SEGMENTS_DIR, FONTS_DIR]:
     os.makedirs(d, exist_ok=True)
 
-
 def _keys(*names):
     return [os.getenv(n) for n in names if os.getenv(n)]
 
@@ -139,7 +132,6 @@ GROQ_KEYS = _keys("GROQ_API_KEY", "GROQ_API_KEY_2", "GROQ_API_KEY_3")
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
 VOICE_ID = ARGS.voice or os.getenv("VOICE_ID") or "91w4XjqhkWTX1Jr3O344"
 
-# Slots / Grid
 MIN_SLOTS_HARD = 8
 MAX_SLOTS_HARD = 80
 DUCK_VOLUME    = 0.35
@@ -156,7 +148,6 @@ MAX_GRIDS_SOFT     = 30
 GRID_TARGET_FRAMES = 1800
 GRID_BATCH_SIZES   = [30, 20, 15, 12, 10, 8, 6, 4, 2, 1]
 
-# Voice
 VOICE_SPEED_MIN   = 1.00
 VOICE_SPEED_MAX   = 1.17
 ATEMPO_MIN        = 1.00
@@ -176,10 +167,6 @@ if ARGS.subtitles is not None:
 else:
     SUBTITLES_ENABLED = os.getenv("SUBTITLES_ENABLED", "true").lower() == "true"
 
-
-# ═══════════════════════════════════════════════════════════
-# STYLE
-# ═══════════════════════════════════════════════════════════
 PALETTE = {
     "blue":   {"fill": (10, 170, 255), "glow": (0, 130, 255)},
     "white":  {"fill": (255, 255, 255), "glow": (255, 255, 255)},
@@ -195,7 +182,6 @@ LAYERS = {
 }
 IN_FADE  = 0.12
 OUT_FADE = 0.35
-
 
 def ass_color(rgb):
     r, g, b = rgb
@@ -215,82 +201,53 @@ def extract_urls(text):
             cleaned.append(u)
     return cleaned
 
-
 def detect_source_type(url):
-    if not url:
-        return "unknown"
+    if not url: return "unknown"
     u = url.lower()
-    if u.startswith("rtsp://"):
-        return "rtsp"
-    if u.startswith(("rtmp://", "rtmps://")):
-        return "rtmp"
-    if ".m3u8" in u or ".m3u" in u:
-        return "hls"
-    if u.startswith(("http://", "https://")):
-        return "http"
+    if u.startswith("rtsp://"): return "rtsp"
+    if u.startswith(("rtmp://", "rtmps://")): return "rtmp"
+    if ".m3u8" in u or ".m3u" in u: return "hls"
+    if u.startswith(("http://", "https://")): return "http"
     return "file"
-
 
 def is_live_source(url):
     return detect_source_type(url) in ("rtsp", "rtmp")
 
-
 def sec_to_srt(s):
-    h = int(s // 3600)
-    m = int((s % 3600) // 60)
-    sec = int(s % 60)
-    ms = int((s - int(s)) * 1000)
+    h = int(s // 3600); m = int((s % 3600) // 60); sec = int(s % 60); ms = int((s - int(s)) * 1000)
     return f"{h:02d}:{m:02d}:{sec:02d},{ms:03d}"
-
 
 def sec_to_ass(s):
     cs = int(round(max(s, 0) * 100))
-    h = cs // 360000
-    m = (cs % 360000) // 6000
-    sec = (cs % 6000) // 100
-    c = cs % 100
+    h = cs // 360000; m = (cs % 360000) // 6000; sec = (cs % 6000) // 100; c = cs % 100
     return f"{h}:{m:02d}:{sec:02d}.{c:02d}"
 
-
 def encode_image(p):
-    with open(p, "rb") as f:
-        return base64.b64encode(f.read()).decode('utf-8')
-
+    with open(p, "rb") as f: return base64.b64encode(f.read()).decode('utf-8')
 
 def get_duration(p):
     try:
-        out = subprocess.check_output(
-            f'ffprobe -v error -show_entries format=duration '
-            f'-of default=noprint_wrappers=1:nokey=1 "{p}"',
-            shell=True).decode().strip()
+        out = subprocess.check_output(f'ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "{p}"', shell=True).decode().strip()
         return float(out) if out else 10.0
-    except Exception:
-        return 10.0
-
+    except Exception: return 10.0
 
 def has_audio_stream(p):
     try:
-        out = subprocess.check_output(
-            f'ffprobe -v error -select_streams a -show_entries stream=index '
-            f'-of csv=p=0 "{p}"', shell=True).decode().strip()
+        out = subprocess.check_output(f'ffprobe -v error -select_streams a -show_entries stream=index -of csv=p=0 "{p}"', shell=True).decode().strip()
         return bool(out)
-    except Exception:
-        return False
-
+    except Exception: return False
 
 def parse_srt(srt):
     entries = []
     for block in srt.strip().split("\n\n"):
         lines = block.split("\n")
         if len(lines) >= 3:
-            tm = re.match(
-                r"(\d+):(\d+):(\d+),(\d+) --> (\d+):(\d+):(\d+),(\d+)", lines[1])
+            tm = re.match(r"(\d+):(\d+):(\d+),(\d+) --> (\d+):(\d+):(\d+),(\d+)", lines[1])
             if tm:
                 s = int(tm.group(1))*3600 + int(tm.group(2))*60 + int(tm.group(3)) + int(tm.group(4))/1000
                 e = int(tm.group(5))*3600 + int(tm.group(6))*60 + int(tm.group(7)) + int(tm.group(8))/1000
                 entries.append({"start": s, "end": e, "text": lines[2].strip()})
     return entries
-
 
 def speed_for_type(t):
     if t == "action": return SPEED_ACTION
@@ -299,14 +256,11 @@ def speed_for_type(t):
 
 
 # ═══════════════════════════════════════════════════════════
-# 🧹 CLEANUP — delete big files after run (prevents GitHub disk full)
+# 🧹 CLEANUP
 # ═══════════════════════════════════════════════════════════
 def cleanup_temp_files():
     log("🧹 Cleaning temp files...")
-    files = [
-        "source.mp4", "dubbed.mp4", "extracted_audio.mp3",
-        "final.srt", "subtitles.ass",
-    ]
+    files = ["source.mp4", "dubbed.mp4", "extracted_audio.mp3", "final.srt", "subtitles.ass"]
     total_freed = 0
     for f in files:
         if os.path.exists(f):
@@ -315,25 +269,18 @@ def cleanup_temp_files():
                 os.remove(f)
                 total_freed += sz
                 log(f"   🗑️ {f} ({sz//(1024*1024)} MB)")
-            except Exception as e:
-                log(f"   ⚠️ {f}: {e}")
+            except Exception: pass
     
     for d in [SEGMENTS_DIR, "temp_frames"]:
         if os.path.exists(d):
             for f in glob.glob(f"{d}/*"):
-                try:
-                    os.remove(f)
-                except Exception:
-                    pass
-            try:
-                os.rmdir(d)
-            except Exception:
-                pass
+                try: os.remove(f)
+                except Exception: pass
+            try: os.rmdir(d)
+            except Exception: pass
     
-    if total_freed > 0:
-        log(f"✅ Freed {total_freed//(1024*1024)} MB\n")
-    else:
-        log("✅ Nothing to clean\n")
+    if total_freed > 0: log(f"✅ Freed {total_freed//(1024*1024)} MB\n")
+    else: log("✅ Nothing to clean\n")
 
 
 # ═══════════════════════════════════════════════════════════
@@ -341,13 +288,10 @@ def cleanup_temp_files():
 # ═══════════════════════════════════════════════════════════
 def fb_views(vid, token):
     try:
-        r = requests.get(f"{FB_GRAPH_URL}/{vid}/video_insights?access_token={token}",
-                        timeout=5).json()
+        r = requests.get(f"{FB_GRAPH_URL}/{vid}/video_insights?access_token={token}", timeout=5).json()
         for m in r.get('data', []):
-            if m.get('name') == 'total_video_views':
-                return m.get('values', [{}])[0].get('value', 0)
-    except Exception:
-        pass
+            if m.get('name') == 'total_video_views': return m.get('values', [{}])[0].get('value', 0)
+    except Exception: pass
     return 0
 
 
@@ -357,30 +301,23 @@ def fb_views(vid, token):
 def _extract_game(fpath):
     base = os.path.basename(fpath)
     for suf in ["_manual.txt", "_links_livestream.txt", "_livestream.txt", ".txt"]:
-        if base.endswith(suf):
-            return base[:-len(suf)].strip()
+        if base.endswith(suf): return base[:-len(suf)].strip()
     return base.replace(".txt", "").strip()
-
 
 def get_source_file(game, g2m, g2a):
     mf = g2m.get(game)
     if mf and os.path.exists(mf):
         try:
             with open(mf, 'r', encoding='utf-8', errors='ignore') as fh:
-                if extract_urls(fh.read()):
-                    return mf, "manual"
-        except Exception:
-            pass
+                if extract_urls(fh.read()): return mf, "manual"
+        except Exception: pass
     af = g2a.get(game)
     if af and os.path.exists(af):
         try:
             with open(af, 'r', encoding='utf-8', errors='ignore') as fh:
-                if extract_urls(fh.read()):
-                    return af, "livestream"
-        except Exception:
-            pass
+                if extract_urls(fh.read()): return af, "livestream"
+        except Exception: pass
     return None, None
-
 
 def load_memory():
     mf = f"{LOGS_DIR}/agent_memory.json"
@@ -389,40 +326,26 @@ def load_memory():
         try:
             with open(mf, 'r', encoding='utf-8') as f:
                 d = json.load(f)
-            if isinstance(d, dict):
-                memory.update(d)
-        except Exception:
-            pass
+            if isinstance(d, dict): memory.update(d)
+        except Exception: pass
     return memory
-
 
 def save_memory(memory):
     try:
         with open(f"{LOGS_DIR}/agent_memory.json", 'w', encoding='utf-8') as f:
             json.dump(memory, f, indent=2, ensure_ascii=False)
-    except Exception as e:
-        log(f"⚠️ Memory save: {e}")
-
+    except Exception: pass
 
 def save_rotation(game_list, chosen, memory):
-    data = {
-        "rotation_order": list(game_list),
-        "current_game": chosen,
-        "last_updated": now_ist_ampm(),
-        "rotation_log": memory.get("rotation_log", [])[-20:],
-    }
+    data = {"rotation_order": list(game_list), "current_game": chosen, "last_updated": now_ist_ampm(), "rotation_log": memory.get("rotation_log", [])[-20:]}
     if chosen in game_list:
         idx = game_list.index(chosen)
         nxt = game_list[(idx + 1) % len(game_list)]
         data["next_game"] = nxt
         data["next_game_position"] = game_list.index(nxt) + 1
     try:
-        with open(f"{LOGS_DIR}/rotation_history.json", 'w', encoding='utf-8') as f:
-            json.dump(data, f, indent=2)
-    except Exception:
-        pass
-    return data
-
+        with open(f"{LOGS_DIR}/rotation_history.json", 'w', encoding='utf-8') as f: json.dump(data, f, indent=2)
+    except Exception: pass
 
 def run_brain():
     log("🧠 Brain: rotation...")
@@ -463,19 +386,13 @@ def run_brain():
         log("❌ All empty")
         return None
 
-    if chosen != original:
-        log(f"🔄 Switched: {original} → {chosen}")
-
     try:
-        with open(source_file, 'r', encoding='utf-8', errors='ignore') as f:
-            content = f.read()
-        pipe = re.findall(r'\|\s*Link:\s*(https?://[^\s\n\r\)\]\'"<>,;]+)', content)
-        pipe = [u.rstrip('.,;)\']"') for u in pipe]
+        with open(source_file, 'r', encoding='utf-8', errors='ignore') as f: content = f.read()
+        pipe = [u.rstrip('.,;)\']"') for u in re.findall(r'\|\s*Link:\s*(https?://[^\s\n\r\)\]\'"<>,;]+)', content)]
         all_urls = pipe if pipe else extract_urls(content)
         source_url = all_urls[0] if all_urls else ""
         total = max(len(pipe), len(extract_urls(content)))
-    except Exception:
-        source_url, total = "", 0
+    except Exception: source_url, total = "", 0
 
     if not source_url:
         log("❌ No URL")
@@ -483,21 +400,12 @@ def run_brain():
 
     memory["last_played_game"] = chosen
     memory["total_runs"] = memory.get("total_runs", 0) + 1
-    memory.setdefault("rotation_log", []).append({
-        "run": memory["total_runs"], "game": chosen, "timestamp": now_ist_ampm()})
+    memory.setdefault("rotation_log", []).append({"run": memory["total_runs"], "game": chosen, "timestamp": now_ist_ampm()})
     save_memory(memory)
     save_rotation(game_list, chosen, memory)
     os.environ["GAME_NAME_FOR_TITLE"] = chosen
 
-    return {
-        "game_name": chosen,
-        "source_url": source_url,
-        "source_file": source_file,
-        "source_kind": source_kind,
-        "total_links": total,
-        "game_list": game_list,
-        "ai_title": f"🎮 {chosen} Gameplay #{chosen.replace(' ', '')}",
-    }
+    return {"game_name": chosen, "source_url": source_url, "source_file": source_file, "source_kind": source_kind, "total_links": total, "game_list": game_list, "ai_title": f"🎮 {chosen} Gameplay #{chosen.replace(' ', '')}"}
 
 
 # ═══════════════════════════════════════════════════════════
@@ -505,10 +413,7 @@ def run_brain():
 # ═══════════════════════════════════════════════════════════
 def download_video(url, out="source.mp4"):
     log(f"📥 Download: {url[:110]}")
-    r = subprocess.run(
-        f'yt-dlp -f "best[ext=mp4]/best" -o "{out}" --no-warnings '
-        f'--no-playlist --retries 3 "{url}"',
-        shell=True, capture_output=True, text=True)
+    r = subprocess.run(f'yt-dlp -f "best[ext=mp4]/best" -o "{out}" --no-warnings --no-playlist --retries 3 "{url}"', shell=True, capture_output=True, text=True)
     if r.returncode == 0 and os.path.exists(out) and os.path.getsize(out) > 50_000:
         log(f"✅ yt-dlp: {os.path.getsize(out)//1024} KB")
         return out
@@ -516,13 +421,11 @@ def download_video(url, out="source.mp4"):
         with requests.get(url, stream=True, timeout=180) as resp:
             resp.raise_for_status()
             with open(out, "wb") as f:
-                for c in resp.iter_content(chunk_size=1 << 15):
-                    f.write(c)
+                for c in resp.iter_content(chunk_size=1 << 15): f.write(c)
         if os.path.getsize(out) > 50_000:
             log(f"✅ HTTP: {out}")
             return out
-    except Exception as e:
-        log(f"⚠️ HTTP: {e}")
+    except Exception as e: log(f"⚠️ HTTP: {e}")
     return None
 
 
@@ -533,19 +436,16 @@ def c_validate():
     missing = []
     if not OPENROUTER_KEYS: missing.append("OPENROUTER")
     if not GROQ_KEYS: missing.append("GROQ")
-    if not ELEVENLABS_API_KEY: missing.append("ELEVENLABS")
+    if COMMENTARY_ENABLED and not ELEVENLABS_API_KEY: missing.append("ELEVENLABS")
     if missing:
         log(f"❌ Missing: {', '.join(missing)}")
         return False
     return True
 
-
 def c_extract_audio(vid, out):
     log("🎧 [1] Extract audio...")
-    subprocess.run(f'ffmpeg -y -i "{vid}" -vn -acodec libmp3lame -q:a 4 "{out}"',
-                  shell=True, check=True)
+    subprocess.run(f'ffmpeg -y -i "{vid}" -vn -acodec libmp3lame -q:a 4 "{out}"', shell=True, check=True)
     log("✅ Audio\n")
-
 
 def c_transcribe(audio):
     log(f"📝 [2] Transcribe ({len(GROQ_KEYS)} keys)...")
@@ -557,65 +457,47 @@ def c_transcribe(audio):
             with open(audio, "rb") as f:
                 files = {"file": (audio, f, "audio/mp3")}
                 data = {"model": "whisper-large-v3", "response_format": "verbose_json"}
-                r = requests.post(url, headers={"Authorization": f"Bearer {k}"},
-                                 files=files, data=data, timeout=120)
+                r = requests.post(url, headers={"Authorization": f"Bearer {k}"}, files=files, data=data, timeout=120)
             if r.status_code == 200:
                 for i, s in enumerate(r.json().get("segments", []), 1):
-                    srt += (f"{i}\n{sec_to_srt(s.get('start',0))} --> "
-                            f"{sec_to_srt(s.get('end',0))}\n{s.get('text','').strip()}\n\n")
-                with open(SRT_PATH, "w", encoding="utf-8") as sf:
-                    sf.write(srt)
+                    srt += (f"{i}\n{sec_to_srt(s.get('start',0))} --> {sec_to_srt(s.get('end',0))}\n{s.get('text','').strip()}\n\n")
+                with open(SRT_PATH, "w", encoding="utf-8") as sf: sf.write(srt)
                 log(f"   ✅ Key {ki} worked\n")
                 return srt
-            elif r.status_code in (401, 403):
-                time.sleep(1)
-            elif r.status_code == 429:
-                time.sleep(2)
-        except Exception:
-            time.sleep(2)
+            elif r.status_code in (401, 403): time.sleep(1)
+            elif r.status_code == 429: time.sleep(2)
+        except Exception: time.sleep(2)
     return srt
-
 
 def c_scene_timeline(vid):
     cmd = f'ffmpeg -i "{vid}" -filter:v "select=\'gt(scene,0.3)\',showinfo" -f null - 2>&1'
     out = subprocess.run(cmd, shell=True, capture_output=True, text=True).stdout
     return [float(m.group(1)) for m in re.finditer(r"pts_time:([\d.]+)", out)]
 
-
 def c_loudness_timeline(vid):
-    cmd = (f'ffmpeg -i "{vid}" -af "astats=metadata=1:reset=1,'
-           f'ametadata=print:key=lavfi.astats.Overall.RMS_level:file=-" -f null - 2>&1')
+    cmd = f'ffmpeg -i "{vid}" -af "astats=metadata=1:reset=1,ametadata=print:key=lavfi.astats.Overall.RMS_level:file=-" -f null - 2>&1'
     out = subprocess.run(cmd, shell=True, capture_output=True, text=True).stdout
     tl, t = [], 0.0
     for line in out.split("\n"):
         pm = re.search(r"pts_time:([\d.]+)", line)
         if pm:
-            t = float(pm.group(1))
-            continue
+            t = float(pm.group(1)); continue
         m = re.search(r"RMS_level=(-?[\d.]+|-?inf)", line)
         if m and m.group(1) not in ("-inf", "inf"):
-            try:
-                tl.append((t, float(m.group(1))))
-            except Exception:
-                pass
+            try: tl.append((t, float(m.group(1))))
+            except Exception: pass
     return tl
-
 
 def c_slot_loud(tl, s, e):
     v = [x for t, x in tl if s <= t < e]
     return max(v) if v else -60
 
-
 def c_motion(vid, s, e):
     try:
         d = max(e - s, 0.5)
-        cmd = (f'ffmpeg -ss {s:.2f} -t {d:.2f} -i "{vid}" '
-               f'-vf "select=\'gt(scene,0.1)\',metadata=print" -f null - 2>&1')
-        return len(re.findall(r"pts_time",
-                             subprocess.run(cmd, shell=True, capture_output=True, text=True).stdout))
-    except Exception:
-        return 0
-
+        cmd = f'ffmpeg -ss {s:.2f} -t {d:.2f} -i "{vid}" -vf "select=\'gt(scene,0.1)\',metadata=print" -f null - 2>&1'
+        return len(re.findall(r"pts_time", subprocess.run(cmd, shell=True, capture_output=True, text=True).stdout))
+    except Exception: return 0
 
 def c_build_slots(vid, dur, srt):
     log("📐 [3] Slots...")
@@ -634,8 +516,7 @@ def c_build_slots(vid, dur, srt):
         v = [x for _, x in lt]
         th = sorted(v)[int(len(v) * 0.8)]
         for t, x in lt:
-            if x >= th and x > -20:
-                peaks.add(round(t, 2))
+            if x >= th and x > -20: peaks.add(round(t, 2))
     log(f"   SRT:{len(sb)} Scene:{len(scb)} Peak:{len(peaks)}")
 
     if dur <= 20: base = 2.0
@@ -674,29 +555,20 @@ def c_build_slots(vid, dur, srt):
             else: snap = min(cands, key=lambda x: abs(x - te))
             end = snap if abs(snap - te) < 1.0 else te
             used.add(snap)
-        else:
-            end = te
-        end = min(end, dur)
-        end = max(end, t + 1.5)
-        end = min(end, dur)
+        else: end = te
+        end = min(end, dur); end = max(end, t + 1.5)
         txt = " ".join(e["text"] for e in entries if e["start"] >= t and e["end"] <= end).strip()
-        slots.append({"start": round(t, 2), "end": round(end, 2), "type": None,
-                     "srt_text": txt, "scene_count": 0, "avg_loud": -50,
-                     "sub_analysis": {}, "voice_speed": 1.0, "motion_score": 0,
-                     "speed_boost_log": []})
+        slots.append({"start": round(t, 2), "end": round(end, 2), "type": None, "srt_text": txt, "scene_count": 0, "avg_loud": -50, "sub_analysis": {}, "voice_speed": 1.0, "motion_score": 0, "speed_boost_log": []})
         t = end
         if t >= dur - 0.1: break
-    if slots and slots[-1]["end"] < dur - 0.1:
-        slots[-1]["end"] = round(dur, 2)
+    if slots and slots[-1]["end"] < dur - 0.1: slots[-1]["end"] = round(dur, 2)
     for sl in slots:
         se = [e for e in entries if e["start"] >= sl["start"] - 0.15 and e["end"] <= sl["end"] + 0.15]
         sl["srt_text"] = " ".join(e["text"] for e in se)
         for e in se:
-            e["start"] = sl["start"]
-            e["end"] = sl["end"]
+            e["start"] = sl["start"]; e["end"] = sl["end"]
     log(f"   ✅ {len(slots)} slots\n")
     return slots
-
 
 def c_classify(vid, slots, srt):
     log("🔍 [4] Classify...")
@@ -722,9 +594,7 @@ def c_classify(vid, slots, srt):
             txt = " ".join(e["text"] for e in entries if e["start"] >= sw["start"] and e["end"] <= sw["end"]).lower()
             w = set(txt.split())
             if w & KW: ac += 1; continue
-            ha = len(w & AW) >= 1
-            hd = len(w & DW) >= 1
-            hs = len(txt.strip()) > 3
+            ha = len(w & AW) >= 1; hd = len(w & DW) >= 1; hs = len(txt.strip()) > 3
             if ha and scc >= 1: ac += 1
             elif ha: ac += 1
             elif scc >= 2: ac += 1
@@ -746,8 +616,7 @@ def c_classify(vid, slots, srt):
         else: sl["type"] = "calm"
         sl["scene_count"] = sum(1 for x in st if sl["start"] <= x < sl["end"])
         sl["avg_loud"] = round(c_slot_loud(lt, sl["start"], sl["end"]), 1)
-        sl["sub_analysis"] = {"action_ratio": round(ar,2), "dialog_ratio": round(dr,2),
-                              "calm_ratio": round(cr,2), "motion_score": mo}
+        sl["sub_analysis"] = {"action_ratio": round(ar,2), "dialog_ratio": round(dr,2), "calm_ratio": round(cr,2), "motion_score": mo}
         vs = speed_for_type(sl["type"])
         if sl["type"] == "action":
             if sl["scene_count"] >= 3: vs += 0.03
@@ -755,10 +624,8 @@ def c_classify(vid, slots, srt):
             if mo >= 5: vs += 0.02
         sl["voice_speed"] = round(max(VOICE_SPEED_MIN, min(VOICE_SPEED_MAX, vs)), 2)
     sp = [s["voice_speed"] for s in slots]
-    if sp:
-        log(f"✅ Speeds: min={min(sp):.2f} max={max(sp):.2f}\n")
+    if sp: log(f"✅ Speeds: min={min(sp):.2f} max={max(sp):.2f}\n")
     return slots
-
 
 def c_build_grids(vid, dur, slots):
     eff = FRAMES_PER_SECOND
@@ -768,23 +635,18 @@ def c_build_grids(vid, dur, slots):
     tf = max(3, min(tf, MAX_FRAMES_CAP))
     ng = max(1, (tf + FRAMES_PER_GRID - 1) // FRAMES_PER_GRID)
     if ng > MAX_GRIDS_SOFT:
-        tf = MAX_GRIDS_SOFT * FRAMES_PER_GRID
-        ng = MAX_GRIDS_SOFT
-        eff = tf / max(dur, 1)
+        tf = MAX_GRIDS_SOFT * FRAMES_PER_GRID; ng = MAX_GRIDS_SOFT; eff = tf / max(dur, 1)
     log(f"🖼️ [5] Grid: {tf}f ({dur:.1f}s × {eff:.2f}fps) → {ng} grid(s)")
 
     for old in glob.glob(f"{ANALYSIS_DIR}/grid_*.jpg"):
         try: os.remove(old)
         except Exception: pass
-    tmp = "temp_frames"
-    os.makedirs(tmp, exist_ok=True)
+    tmp = "temp_frames"; os.makedirs(tmp, exist_ok=True)
     for f in glob.glob(f"{tmp}/*.jpg"):
         try: os.remove(f)
         except Exception: pass
 
-    cmd = (f'ffmpeg -y -i "{vid}" '
-           f'-vf "fps={eff:.4f},scale=540:-1" '
-           f'-q:v 4 "{tmp}/frame_%05d.jpg"')
+    cmd = f'ffmpeg -y -i "{vid}" -vf "fps={eff:.4f},scale=540:-1" -q:v 4 "{tmp}/frame_%05d.jpg"'
     subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     ex = sorted(glob.glob(f"{tmp}/frame_*.jpg"))
@@ -795,8 +657,7 @@ def c_build_grids(vid, dur, slots):
     try:
         font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", max(18, cw // 20))
         sf = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", max(14, cw // 28))
-    except Exception:
-        font = sf = ImageFont.load_default()
+    except Exception: font = sf = ImageFont.load_default()
 
     grids = []
     for gi in range(ng):
@@ -808,17 +669,14 @@ def c_build_grids(vid, dur, slots):
         for i, fp in enumerate(chunk):
             if i >= FRAMES_PER_GRID: break
             try:
-                im = Image.open(fp)
-                im = ImageOps.fit(im, (cw, ch), method=Image.LANCZOS)
+                im = Image.open(fp); im = ImageOps.fit(im, (cw, ch), method=Image.LANCZOS)
             except Exception: continue
             m = re.search(r'frame_(\d+)', fp)
             fn = int(m.group(1)) if m else (s + i + 1)
             t = (fn - 1) / eff
             si, ss, se = 0, 0.0, dur
             for si2, sl in enumerate(slots):
-                if sl["start"] <= t < sl["end"]:
-                    si, ss, se = si2, sl["start"], sl["end"]
-                    break
+                if sl["start"] <= t < sl["end"]: si, ss, se = si2, sl["start"], sl["end"]; break
             x, y = (i % GRID_COLS) * cw, (i // GRID_COLS) * ch
             g.paste(im, (x, y))
             dr.rectangle([x+4, y+4, x+min(cw-8,260)+4, y+56], fill="black")
@@ -840,16 +698,13 @@ def c_build_grids(vid, dur, slots):
 
 
 def c_title_and_script(slots, srt, grids, game):
-    if not grids:
-        return f"🎮 {game} Gameplay", []
-    log(f"🏷️🎙️ [6+7] Combined ({len(grids)} grids)...")
+    if not grids: return f"🎮 {game} Gameplay", []
+    log(f"\n🏷️🎙️ [6+7] Title + Commentary Generation ({len(grids)} grids)")
 
     sl_txt = []
     for i, s in enumerate(slots, 1):
         sa = s.get("sub_analysis", {})
-        sl_txt.append(f"- S{i}: {s['start']:.1f}-{s['end']:.1f}s "
-                     f"[{s['type'].upper()}] scenes={s['scene_count']} "
-                     f"motion={sa.get('motion_score',0)} SRT:\"{s['srt_text'][:50]}\"")
+        sl_txt.append(f"- S{i}: {s['start']:.1f}-{s['end']:.1f}s [{s['type'].upper()}] scenes={s['scene_count']} motion={sa.get('motion_score',0)} SRT:\"{s['srt_text'][:50]}\"")
 
     prompt = f"""You are HYPED gaming YouTuber + viral title creator.
 {len(grids)} grids of actual gameplay. Read frames to verify.
@@ -885,14 +740,9 @@ def c_title_and_script(slots, srt, grids, game):
     def _try(mid, key, subset):
         blocks = [{"type": "text", "text": prompt}]
         for gp in subset:
-            blocks.append({"type": "image_url", "image_url":
-                          {"url": f"data:image/jpeg;base64,{encode_image(gp)}", "detail": "high"}})
-        payload = {"model": mid, "messages": [{"role": "user", "content": blocks}],
-                   "max_tokens": 16000, "temperature": 0.9,
-                   "response_format": {"type": "json_object"},
-                   "plugins": [{"id": "response-healing"}]}
-        headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json",
-                   "HTTP-Referer": "https://github.com/", "X-Title": "Gaming Agent"}
+            blocks.append({"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{encode_image(gp)}", "detail": "high"}})
+        payload = {"model": mid, "messages": [{"role": "user", "content": blocks}], "max_tokens": 16000, "temperature": 0.9, "response_format": {"type": "json_object"}, "plugins": [{"id": "response-healing"}]}
+        headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json", "HTTP-Referer": "https://github.com/", "X-Title": "Gaming Agent"}
         try:
             r = requests.post(url, headers=headers, json=payload, timeout=180)
             if r.status_code == 200:
@@ -911,44 +761,43 @@ def c_title_and_script(slots, srt, grids, game):
                 if not isinstance(segs, list) or len(segs) < int(len(slots) * 0.90):
                     return None, f"segs({len(segs) if isinstance(segs, list) else 0})"
                 segs = [s for s in segs if isinstance(s, dict)]
-                return {"title": title[:120], "reason": p.get("title_reason", ""),
-                        "segments": segs}, None
-            elif r.status_code == 404: return None, "NF"
-            elif r.status_code in (401, 402, 403): return None, "auth"
-            elif r.status_code == 429: return None, "rate"
-            elif r.status_code == 400: return None, "too_many"
-            else: return None, f"http_{r.status_code}"
-        except Exception as e:
-            return None, f"exc:{str(e)[:40]}"
+                return {"title": title[:120], "reason": p.get("title_reason", ""), "segments": segs}, None
+            elif r.status_code == 404: return None, "Not Found (404)"
+            elif r.status_code in (401, 402, 403): return None, "Auth/Quota"
+            elif r.status_code == 429: return None, "Rate Limit (429)"
+            elif r.status_code == 400: return None, "Too Many Images (400)"
+            else: return None, f"HTTP {r.status_code}"
+        except Exception as e: return None, f"Exc: {str(e)[:40]}"
 
-    models = ["nvidia/nemotron-3.5-super-vl:free",
-              "google/gemini-2.0-flash-exp:free", "openrouter/free"]
+    models = ["nvidia/nemotron-3.5-super-vl:free", "google/gemini-2.0-flash-exp:free", "openrouter/free"]
     keys = [k for k in OPENROUTER_KEYS if k]
 
     for bs in GRID_BATCH_SIZES:
         sub = grids if len(grids) <= bs else [grids[int(i*len(grids)/bs)] for i in range(bs)]
-        log(f"\n   📦 Batch: {len(sub)} imgs")
+        log(f"\n   📦 Trying Batch Size: {len(sub)} images")
         for model in models:
             for ki, key in enumerate(keys, 1):
-                log(f"      🤖 {model.split('/')[0]} k{ki}/{len(keys)}...", end=" ")
+                log(f"      🤖 {model.split('/')[1][:15]}... | Key {ki}/{len(keys)}", end=" ")
                 res, err = _try(model, key, sub)
                 if res:
-                    log("✅")
-                    log(f"      🏷️ {res['title']}")
+                    log("✅ SUCCESS!")
+                    log(f"      🏆 WINNING MODEL: {model}")
+                    log(f"      🏷️ Generated Title: {res['title']}")
+                    log(f"      💡 AI Reason: {res['reason']}")
+                    log(f"      📜 Segments Generated: {len(res['segments'])}")
                     return res["title"], res["segments"]
-                elif err in ("NF", "too_many"):
-                    log("❌"); break
-                else:
-                    log(f"⚠️ {err}")
-    log("\n❌ All failed")
+                elif err in ("Not Found (404)", "Too Many Images (400)"):
+                    log(f"❌ {err} → Skipping rest of keys")
+                    break
+                else: log(f"⚠️ {err}")
+    log("\n❌ All models & keys failed to generate Title/Script")
     return f"🎮 {game} Gameplay", []
 
 
 def c_tts(segments, slots, dur):
     log("🔊 [8] TTS...")
     url = f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID}"
-    headers = {"Accept": "audio/mpeg", "Content-Type": "application/json",
-               "xi-api-key": ELEVENLABS_API_KEY}
+    headers = {"Accept": "audio/mpeg", "Content-Type": "application/json", "xi-api-key": ELEVENLABS_API_KEY}
     audio = []
     for idx, seg in enumerate(segments):
         raw = seg.get("text")
@@ -969,9 +818,7 @@ def c_tts(segments, slots, dur):
         vs = max(VOICE_SPEED_MIN, min(VOICE_SPEED_MAX, ms.get("voice_speed", 1.0)))
         vt = (ms.get("type") or "calm").lower().strip()
         sf = f"{SEGMENTS_DIR}/seg_{idx:03d}.mp3"
-        data = {"text": tts, "model_id": "eleven_multilingual_v2",
-                "voice_settings": {"stability": 0.4, "similarity_boost": 0.75,
-                                  "style": 0.5, "use_speaker_boost": True, "speed": vs}}
+        data = {"text": tts, "model_id": "eleven_multilingual_v2", "voice_settings": {"stability": 0.4, "similarity_boost": 0.75, "style": 0.5, "use_speaker_boost": True, "speed": vs}}
         try:
             r = requests.post(url, json=data, headers=headers, timeout=60)
             for _retry in range(3):
@@ -988,8 +835,7 @@ def c_tts(segments, slots, dur):
                     tempo = max(ATEMPO_MIN, min(ATEMPO_MAX_ACTION, actual/tgt))
                     if tempo > 1.01:
                         ff = f"{SEGMENTS_DIR}/seg_{idx:03d}_fit.mp3"
-                        subprocess.run(f'ffmpeg -y -i "{sf}" -filter:a atempo={tempo:.3f} "{ff}"',
-                                     shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                        subprocess.run(f'ffmpeg -y -i "{sf}" -filter:a atempo={tempo:.3f} "{ff}"', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                         final = ff if os.path.exists(ff) else sf
                     else: final = sf
                     fd = get_duration(final)
@@ -998,28 +844,21 @@ def c_tts(segments, slots, dur):
                     tempo = max(ATEMPO_MIN, min(am, actual/tgt))
                     if tempo > 1.01:
                         ff = f"{SEGMENTS_DIR}/seg_{idx:03d}_fit.mp3"
-                        subprocess.run(f'ffmpeg -y -i "{sf}" -filter:a atempo={tempo:.3f} "{ff}"',
-                                     shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                        subprocess.run(f'ffmpeg -y -i "{sf}" -filter:a atempo={tempo:.3f} "{ff}"', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                         final = ff if os.path.exists(ff) else sf
                     else: final = sf
                 else: final = sf
-                audio.append({"file": final, "start": ss, "end": se + ext,
-                             "actual_end": ss + get_duration(final),
-                             "actual_dur": actual, "text": text, "visual_type": vt})
+                audio.append({"file": final, "start": ss, "end": se + ext, "actual_end": ss + get_duration(final), "actual_dur": actual, "text": text, "visual_type": vt})
                 fd = get_duration(final)
                 log(f"   ✅ S{sn} [{vt.upper()}] {actual:.2f}→{fd:.2f}s | {text[:35]}")
             elif r.status_code == 401:
                 log("   ❌ EL auth"); break
-            else:
-                log(f"   ⚠️ S{sn}: HTTP {r.status_code}")
-        except Exception as e:
-            log(f"   ⚠️ {idx}: {e}")
+            else: log(f"   ⚠️ S{sn}: HTTP {r.status_code}")
+        except Exception as e: log(f"   ⚠️ {idx}: {e}")
     log(f"\n✅ {len(audio)} audio segments\n")
     return audio
 
-
-def c_ass(audio_files, font_name="BebasNeue-Regular", font_size=40,
-         alignment=2, vertical_margin=65):
+def c_ass(audio_files, font_name="BebasNeue-Regular", font_size=40, alignment=2, vertical_margin=65):
     log("🎨 [9] ASS...")
     a = f"""[Script Info]
 ScriptType: v4.00+
@@ -1042,12 +881,10 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         txt = str(raw).strip().upper() if raw else ""
         if not txt or txt.lower() == "none": continue
         if len(txt) > 26:
-            words = txt.split()
-            lines, cl = [], []
+            words = txt.split(); lines, cl = [], []
             for w2 in words:
                 cl.append(w2)
-                if len(" ".join(cl)) > 26:
-                    lines.append(" ".join(cl)); cl = []
+                if len(" ".join(cl)) > 26: lines.append(" ".join(cl)); cl = []
             if cl: lines.append(" ".join(cl))
             txt = "\\N".join(lines)
         vt = (it.get("visual_type") or "calm").lower()
@@ -1060,12 +897,10 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         ev1 = e + (cn - 1) * outs + OUT_FADE + 0.05
         dur = int((ev1 - ev0) * 1000)
         rel = lambda t: max(0, int((t - ev0) * 1000))
-        cx = W * 0.50
-        nl = txt.count("\\N") + 1
+        cx = W * 0.50; nl = txt.count("\\N") + 1
         cy = H - vertical_margin - (font_size * 0.5 * nl)
         def pos(dx=0.0, dy=0.0):
-            if vt == "action":
-                return f"\\move({cx+dx:.1f},{cy+20+dy:.1f},{cx+dx:.1f},{cy-20+dy:.1f},0,{dur})"
+            if vt == "action": return f"\\move({cx+dx:.1f},{cy+20+dy:.1f},{cx+dx:.1f},{cy-20+dy:.1f},0,{dur})"
             return f"\\pos({cx+dx:.1f},{cy+dy:.1f})"
         _w = []
         for x in words: _w.extend(x.replace("\\N", " \\N ").split())
@@ -1095,29 +930,21 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     with open(ASS_PATH, "w", encoding="utf-8") as f: f.write(a)
     log(f"✅ ASS: {w} layers\n")
 
-
 def c_timed(audio, dur):
     log("🎼 [10] Timed audio...")
     sil = f"{SEGMENTS_DIR}/silent.mp3"
-    subprocess.run(f'ffmpeg -y -f lavfi -i anullsrc=r=44100:cl=stereo -t {dur} '
-                  f'-q:a 9 -acodec libmp3lame "{sil}"',
-                  shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    subprocess.run(f'ffmpeg -y -f lavfi -i anullsrc=r=44100:cl=stereo -t {dur} -q:a 9 -acodec libmp3lame "{sil}"', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     inp, parts, mix = ["-i", f'"{sil}"'], [], ["[0:a]"]
     for i, a in enumerate(audio, 1):
         inp.extend(["-i", f'"{a["file"]}"'])
         d = int(a["start"] * 1000)
         parts.append(f"[{i}:a]adelay={d}|{d}[a{i}]")
         mix.append(f"[a{i}]")
-    fc = (";".join(parts) +
-          f";{''.join(mix)}amix=inputs={len(mix)}:duration=first:"
-          f"dropout_transition=0:normalize=0,alimiter=limit=0.95[out]")
+    fc = (";".join(parts) + f";{''.join(mix)}amix=inputs={len(mix)}:duration=first:dropout_transition=0:normalize=0,alimiter=limit=0.95[out]")
     fa = f"{SEGMENTS_DIR}/final.mp3"
-    subprocess.run(f"ffmpeg -y {' '.join(inp)} -filter_complex \"{fc}\" "
-                  f"-map \"[out]\" -acodec libmp3lame -q:a 4 \"{fa}\"",
-                  shell=True, check=True)
+    subprocess.run(f"ffmpeg -y {' '.join(inp)} -filter_complex \"{fc}\" -map \"[out]\" -acodec libmp3lame -q:a 4 \"{fa}\"", shell=True, check=True)
     log("✅ Timed audio\n")
     return fa
-
 
 def c_merge(vid, caudio, out, audio, subs=True):
     log("🎬 [11] Merge...")
@@ -1131,96 +958,78 @@ def c_merge(vid, caudio, out, audio, subs=True):
     ve = f"if({ac},{DUCK_VOLUME},1.0)"
     vv = f"if({'+'.join(at)},{VOL_ACTION},{VOL_OTHER})" if at else f"{VOL_OTHER}"
     if has_audio_stream(vid):
-        fc = (f"[0:a]volume='{ve}':eval=frame[bg];"
-              f"[1:a]volume='{vv}':eval=frame[vo];"
-              f"[bg][vo]amix=inputs=2:duration=first:dropout_transition=0:"
-              f"normalize=0,alimiter=limit=0.95[aout]")
+        fc = f"[0:a]volume='{ve}':eval=frame[bg];[1:a]volume='{vv}':eval=frame[vo];[bg][vo]amix=inputs=2:duration=first:dropout_transition=0:normalize=0,alimiter=limit=0.95[aout]"
     else:
         log("   ℹ️ Source has no audio — voiceover only")
         fc = f"[1:a]volume='{vv}':eval=frame,alimiter=limit=0.95[aout]"
     sa = subs and os.path.exists(ASS_PATH)
     vf = f'-vf "subtitles={ASS_PATH}:fontsdir={FONTS_DIR}"' if sa else ""
     vc = "-c:v libx264 -preset fast -crf 23 -pix_fmt yuv420p" if sa else "-c:v copy"
-    subprocess.run(f'ffmpeg -y -i "{vid}" -i "{caudio}" -filter_complex "{fc}" {vf} '
-                  f'-map 0:v:0 -map "[aout]" {vc} -c:a aac -b:a 192k -shortest "{out}"',
-                  shell=True, check=True)
+    subprocess.run(f'ffmpeg -y -i "{vid}" -i "{caudio}" -filter_complex "{fc}" {vf} -map 0:v:0 -map "[aout]" {vc} -c:a aac -b:a 192k -shortest "{out}"', shell=True, check=True)
     log(f"🔥 Final: {out}\n")
-
-
-def c_fallback():
-    try:
-        subprocess.run(f'ffmpeg -y -i "{FINAL_CLIP_PATH}" -c copy "{FINAL_DUBBED_VIDEO}"',
-                      shell=True, check=True)
-        return True
-    except Exception:
-        return False
-
 
 def run_commentary_pipeline(video_in, video_out):
     global FINAL_CLIP_PATH, FINAL_DUBBED_VIDEO
     FINAL_CLIP_PATH = video_in
     FINAL_DUBBED_VIDEO = video_out
-
-    if not c_validate():
-        c_fallback()
-        return video_out if os.path.exists(video_out) else video_in
-
+    if not c_validate(): return video_in
+    
     dur = get_duration(video_in)
     log(f"📹 Duration: {dur:.2f}s\n")
+    
     try:
         c_extract_audio(video_in, AUDIO_PATH)
         srt = c_transcribe(AUDIO_PATH)
         slots = c_build_slots(video_in, dur, srt)
         slots = c_classify(video_in, slots, srt)
         grids = c_build_grids(video_in, dur, slots)
-        if not grids:
-            log("❌ No grids"); c_fallback(); return video_in
+        
+        if not grids: 
+            log("❌ No grids")
+            return video_in
+        
         game = os.getenv("GAME_NAME_FOR_TITLE", "Gameplay")
         title, segs = c_title_and_script(slots, srt, grids, game)
-        if not segs:
-            log("❌ No segments"); c_fallback(); return video_in
+        
+        if not segs: 
+            log("❌ No segments")
+            return video_in
 
         with open(TITLE_JSON, "w", encoding="utf-8") as f:
-            json.dump({"title": title, "game": game,
-                      "generated_at": datetime.now().isoformat()},
-                     f, indent=2, ensure_ascii=False)
+            json.dump({"title": title, "game": game, "generated_at": datetime.now().isoformat()}, f, indent=2, ensure_ascii=False)
         log(f"💾 Title: {title}\n")
+
+        # 🔥 IF COMMENTARY OFF: STOP HERE, just generate title, skip TTS & Merge
+        if not COMMENTARY_ENABLED:
+            log("⏭ Commentary OFF — Skipping voice/subtitles. Using original video.")
+            return video_in
 
         if len(segs) < len(slots):
             filled = {s.get("slot") for s in segs if s.get("slot")}
             for si in range(1, len(slots)+1):
                 if si not in filled:
-                    segs.append({"slot": si, "start": slots[si-1]["start"],
-                                "end": slots[si-1]["end"], "text": "",
-                                "visual_type": slots[si-1].get("type", "calm")})
+                    segs.append({"slot": si, "start": slots[si-1]["start"], "end": slots[si-1]["end"], "text": "", "visual_type": slots[si-1].get("type", "calm")})
             segs.sort(key=lambda x: x.get("slot", 0))
 
         for s in segs:
-            if s.get("text") is None or str(s.get("text")).strip().lower() == "none":
-                s["text"] = ""
-            else:
-                s["text"] = str(s["text"]).strip()
+            if s.get("text") is None or str(s.get("text")).strip().lower() == "none": s["text"] = ""
+            else: s["text"] = str(s["text"]).strip()
             if not s.get("visual_type"): s["visual_type"] = "calm"
 
         for s in segs:
             sn = s.get("slot")
-            if sn and 1 <= sn <= len(slots):
-                s["start"], s["end"] = slots[sn-1]["start"], slots[sn-1]["end"]
+            if sn and 1 <= sn <= len(slots): s["start"], s["end"] = slots[sn-1]["start"], slots[sn-1]["end"]
 
         audio = c_tts(segs, slots, dur)
-        if not audio:
-            log("❌ No audio"); c_fallback(); return video_in
-
-        if SUBTITLES_ENABLED:
-            c_ass(audio, font_name="BebasNeue-Regular", font_size=40,
-                 alignment=2, vertical_margin=65)
-
+        if not audio: return video_in
+        if SUBTITLES_ENABLED: c_ass(audio, font_name="BebasNeue-Regular", font_size=40, alignment=2, vertical_margin=65)
+        
         fa = c_timed(audio, dur)
         c_merge(video_in, fa, video_out, audio, subs=SUBTITLES_ENABLED)
         return video_out if os.path.exists(video_out) else video_in
+        
     except Exception as e:
-        log(f"\n❌ Commentary error: {e}")
-        c_fallback()
+        log(f"\n❌ Pipeline error: {e}")
         return video_in
 
 
@@ -1229,10 +1038,8 @@ def read_title(fallback):
         if os.path.exists(TITLE_JSON):
             with open(TITLE_JSON, 'r', encoding='utf-8') as f:
                 t = str(json.load(f).get("title", "")).strip()
-            if 5 < len(t) < 120:
-                return t
-    except Exception:
-        pass
+            if 5 < len(t) < 120: return t
+    except Exception: pass
     return fallback
 
 
@@ -1245,31 +1052,20 @@ def _tee():
     if USE_FB: o.append(f"[f=flv]rtmps://live-api-s.facebook.com:443/rtmp/{FACEBOOK_KEY}")
     return "|".join(o)
 
-
 def _in_flags(st):
-    if st == "rtsp":
-        return ("-rtsp_transport tcp -fflags nobuffer -flags low_delay "
-                "-analyzeduration 1000000 -probesize 1000000 ")
-    if st in ("rtmp", "rtmps"):
-        return "-fflags nobuffer -analyzeduration 2000000 -probesize 2000000 "
-    if st == "hls":
-        return "-live_start_index -3 -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 "
+    if st == "rtsp": return "-rtsp_transport tcp -fflags nobuffer -flags low_delay -analyzeduration 1000000 -probesize 1000000 "
+    if st in ("rtmp", "rtmps"): return "-fflags nobuffer -analyzeduration 2000000 -probesize 2000000 "
+    if st == "hls": return "-live_start_index -3 -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 "
     return ""
-
 
 def _enc(low=False):
     t = "-tune zerolatency " if low else ""
-    return (f"-c:v libx264 -preset veryfast {t}"
-            f"-b:v 3000k -maxrate 3000k -bufsize 6000k -r 30 "
-            f"-pix_fmt yuv420p -g 60 -keyint_min 60 -sc_threshold 0 "
-            f"-c:a aac -b:a 160k -ar 44100 -ac 2 ")
-
+    return f"-c:v libx264 -preset veryfast {t}-b:v 3000k -maxrate 3000k -bufsize 6000k -r 30 -pix_fmt yuv420p -g 60 -keyint_min 60 -sc_threshold 0 -c:a aac -b:a 160k -ar 44100 -ac 2 "
 
 def _run_ff(cmd, to):
     log("   $ ffmpeg stream command (keys hidden)")
     try:
-        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL,
-                             stderr=subprocess.PIPE, text=True, bufsize=1)
+        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True, bufsize=1)
     except Exception as e:
         return False, str(e)
 
@@ -1279,17 +1075,12 @@ def _run_ff(cmd, to):
             for line in iter(p.stderr.readline, ""):
                 safe = line.strip()
                 for k in (YOUTUBE_KEY, FACEBOOK_KEY):
-                    if k and k in safe:
-                        safe = safe.replace(k, "***")
-                if safe and any(x in safe.lower() for x in
-                                ["error", "failed", "connection", "rtmp",
-                                 "invalid", "denied", "cannot", "unable"]):
+                    if k and k in safe: safe = safe.replace(k, "***")
+                if safe and any(x in safe.lower() for x in ["error", "failed", "connection", "rtmp", "invalid", "denied", "cannot", "unable", "opening", "stream", "muxing"]):
                     log(f"      [ffmpeg] {safe[:200]}")
                 err_lines.append(safe)
-                if len(err_lines) > 20:
-                    err_lines.pop(0)
-        except Exception:
-            pass
+                if len(err_lines) > 30: err_lines.pop(0)
+        except Exception: pass
 
     t = threading.Thread(target=_reader, daemon=True)
     t.start()
@@ -1312,26 +1103,21 @@ def _run_ff(cmd, to):
     finally:
         if p.poll() is None: p.kill()
 
-
 def stream_rtmp(src, live):
     if not STREAMING_ENABLED:
         log(f"🚫 Stream off [{STREAM_MODE}]"); return False
-    
     n = int(USE_YT) + int(USE_FB)
-    if n == 0:
-        log("❌ No targets"); return False
+    if n == 0: log("❌ No targets"); return False
     
     st = detect_source_type(src)
     inf = _in_flags(st)
     ef = _enc(low=live)
     
     has_audio = has_audio_stream(src)
-    if not has_audio:
-        log("   🔊 Source me audio nahi — silent audio inject karunga")
+    if not has_audio: log("   🔊 Source me audio nahi — silent audio inject karunga")
     
     for att in range(1, MAX_STREAM_RETRIES + 1):
         log(f"📡 {att}/{MAX_STREAM_RETRIES} → {'LIVE' if live else 'VOD'} [{st}] ({n} target)")
-        
         re_flag = "" if live else "-re "
         loop = "-stream_loop -1 " if (not live and STREAM_LOOP) else ""
         dur = f"-t {STREAM_LIMIT_SEC} " if (not live and STREAM_LIMIT_SEC > 0) else ""
@@ -1341,31 +1127,23 @@ def stream_rtmp(src, live):
             map_args = "-map 0:v -map 0:a "
             extra = ""
         else:
-            in_args = (f'{re_flag}{loop}{inf}-i "{src}" '
-                       f'-f lavfi -i anullsrc=channel_layout=stereo:sample_rate=44100 ')
+            in_args = f'{re_flag}{loop}{inf}-i "{src}" -f lavfi -i anullsrc=channel_layout=stereo:sample_rate=44100 '
             map_args = "-map 0:v -map 1:a "
             extra = "-shortest "
         
         if n == 1:
             if USE_YT:
                 target = f"rtmp://a.rtmp.youtube.com/live2/{YOUTUBE_KEY}"
-                flv_extra = ""
+                cmd = f'ffmpeg -hide_banner -loglevel info {in_args}{dur}{ef}{map_args}{extra}-flvflags no_duration_filesize -f flv "{target}"'
             else:
                 target = f"rtmps://live-api-s.facebook.com:443/rtmp/{FACEBOOK_KEY}"
-                flv_extra = "-rtmp_live live "
-            cmd = (f'ffmpeg -hide_banner -loglevel warning '
-                   f'{in_args}{dur}{ef}{map_args}{extra}'
-                   f'{flv_extra}-f flv "{target}"')
+                cmd = f'ffmpeg -hide_banner -loglevel info {in_args}{dur}{ef}{map_args}{extra}-flvflags no_duration_filesize -f flv "{target}"'
         else:
             tee = _tee()
-            cmd = (f'ffmpeg -hide_banner -loglevel warning '
-                   f'{in_args}{dur}{ef}{map_args}{extra}'
-                   f'-flvflags no_duration_filesize -f tee "{tee}"')
+            cmd = f'ffmpeg -hide_banner -loglevel info {in_args}{dur}{ef}{map_args}{extra}-flvflags no_duration_filesize -f tee "{tee}"'
         
         ok, err = _run_ff(cmd, MAX_RUN_SECONDS)
-        
-        if ok:
-            log("✅ Stream done"); return True
+        if ok: log("✅ Stream done"); return True
         if err == "interrupted": return False
         if err == "time_limit": return True
         
@@ -1374,33 +1152,25 @@ def stream_rtmp(src, live):
             for l in err.split("\n")[-3:]:
                 if l and l != "done": log(f"      {l[:200]}")
         
-        if att < MAX_STREAM_RETRIES:
-            time.sleep(5 * att)
+        if att < MAX_STREAM_RETRIES: time.sleep(5 * att)
     return False
 
-
 def move_link(game, url, src_file, ok):
-    if not ok:
-        log("⏭ Not moved (fail)"); return False
-    if not src_file or not os.path.exists(src_file):
-        log("⚠️ No src"); return False
+    if not ok: log("⏭ Not moved (fail)"); return False
+    if not src_file or not os.path.exists(src_file): log("⚠️ No src"); return False
     dst = os.path.join(STREAMED_DIR, f"{game}_streamed.txt")
     kind = "manual" if MANUAL_DIR in src_file else "livestream"
     try:
-        with open(src_file, 'r', encoding='utf-8', errors='ignore') as f:
-            lines = f.readlines()
-    except Exception:
-        return False
+        with open(src_file, 'r', encoding='utf-8', errors='ignore') as f: lines = f.readlines()
+    except Exception: return False
     new, moved = [], None
     for line in lines:
         if moved is None and url in line: moved = line
         else: new.append(line)
-    if not moved:
-        log("⚠️ URL not found"); return False
+    if not moved: log("⚠️ URL not found"); return False
     try:
         with open(src_file, 'w', encoding='utf-8') as f: f.writelines(new)
-    except Exception:
-        return False
+    except Exception: return False
     try:
         with open(dst, 'a', encoding='utf-8') as f:
             f.write(f"\n# [SUCCESS] {now_ist_ampm()} | source={kind}\n")
@@ -1420,27 +1190,19 @@ def update_dashboard(res):
     game, url = res["game_name"], res["source_url"]
     title = read_title(res.get("ai_title", ""))
     gl = res["game_list"]
-    L = []
-    L.append("# 🎮 AGENT DASHBOARD v7\n\n")
-    L.append(f"> **Updated:** {now_ist_ampm()} IST\n")
-    L.append(f"> **Game:** **{game}**\n")
-    L.append(f"> **Title:** {title}\n")
-    L.append(f"> **Source:** [{url[:80]}]({url})\n\n---\n\n")
-    L.append("## 📊 Games\n\n| Game | Streamed | Views | Pending | Status |\n|---|---|---|---|---|\n")
+    L = [f"# 🎮 AGENT DASHBOARD v7\n\n", f"> **Updated:** {now_ist_ampm()} IST\n", f"> **Game:** **{game}**\n", f"> **Title:** {title}\n", f"> **Source:** [{url[:80]}]({url})\n\n---\n\n", "## 📊 Games\n\n| Game | Streamed | Views | Pending | Status |\n|---|---|---|---|---|\n"]
     for g in gl:
         sf = f"{STREAMED_DIR}/{g}_streamed.txt"
         sc = 0
         if os.path.exists(sf):
             try:
-                with open(sf, 'r', encoding='utf-8', errors='ignore') as f:
-                    c = f.read()
+                with open(sf, 'r', encoding='utf-8', errors='ignore') as f: c = f.read()
                 sc = len(re.findall(r'\|\s*Link:', c)) or len(re.findall(r'https?://', c))
             except Exception: pass
         views = 0
         if FB_ACCESS_TOKEN and os.path.exists(sf):
             try:
-                with open(sf, 'r', encoding='utf-8', errors='ignore') as f:
-                    c = f.read()
+                with open(sf, 'r', encoding='utf-8', errors='ignore') as f: c = f.read()
                 vids = re.findall(r'Video id\s*:\s*(\S+)', c)[:10]
                 for v in vids: views += fb_views(v, FB_ACCESS_TOKEN)
             except Exception: pass
@@ -1448,8 +1210,7 @@ def update_dashboard(res):
         for pf in [f"{AUTO_DIR}/{g}_links_livestream.txt", f"{MANUAL_DIR}/{g}_manual.txt"]:
             if os.path.exists(pf):
                 try:
-                    with open(pf, 'r', encoding='utf-8', errors='ignore') as f:
-                        c = f.read()
+                    with open(pf, 'r', encoding='utf-8', errors='ignore') as f: c = f.read()
                     p += max(len(re.findall(r'\|\s*Link:', c)), len(extract_urls(c)))
                 except Exception: pass
         st = "🎯 ACTIVE" if g == game else "⏳"
@@ -1457,26 +1218,19 @@ def update_dashboard(res):
     try:
         with open(DASHBOARD_PATH, 'w', encoding='utf-8') as f: f.writelines(L)
         log(f"✅ {DASHBOARD_PATH}")
-    except Exception as e:
-        log(f"⚠️ {e}")
-
+    except Exception as e: log(f"⚠️ {e}")
 
 def git_push():
     try:
         subprocess.run("git config user.name 'github-actions[bot]'", shell=True, check=False)
-        subprocess.run("git config user.email '41898282+github-actions[bot]@users.noreply.github.com'",
-                      shell=True, check=False)
-        subprocess.run(f"git add {DASHBOARD_PATH} {LOGS_DIR}/ {ANALYSIS_DIR}/ "
-                      f"{MANUAL_DIR}/ {AUTO_DIR}/ {STREAMED_DIR}/ || true",
-                      shell=True, check=False)
-        cr = subprocess.run("git commit -m '🤖 Agent run [skip ci]'",
-                          shell=True, capture_output=True, text=True)
+        subprocess.run("git config user.email '41898282+github-actions[bot]@users.noreply.github.com'", shell=True, check=False)
+        subprocess.run("git add -A", shell=True, check=False)
+        cr = subprocess.run("git commit -m '🤖 Agent run [skip ci]'", shell=True, capture_output=True, text=True)
         if cr.returncode == 0: log("   ✅ Committed")
         subprocess.run("git pull --rebase origin main", shell=True, check=False)
         pr = subprocess.run("git push", shell=True, capture_output=True, text=True)
         log(f"   {'🚀 Pushed' if pr.returncode == 0 else '⚠️ Push failed'}")
-    except Exception as e:
-        log(f"⚠️ Git: {e}")
+    except Exception as e: log(f"⚠️ Git: {e}")
 
 
 # ═══════════════════════════════════════════════════════════
@@ -1484,7 +1238,7 @@ def git_push():
 # ═══════════════════════════════════════════════════════════
 def main():
     log("=" * 62)
-    log("🎮 MASTER AGENT v8.2 — SINGLE FILE (cleanup + audio fallback)")
+    log("🎮 MASTER AGENT v8.4 — SINGLE FILE (Full Logs + Title Fix)")
     log(f"   Commentary : {'ON' if COMMENTARY_ENABLED else 'OFF'}")
     log(f"   Stream     : {'ON' if STREAMING_ENABLED else 'OFF'} [{STREAM_MODE.upper()}]")
     log(f"   YT:{'✅' if USE_YT else '❌'} FB:{'✅' if USE_FB else '❌'}")
@@ -1514,7 +1268,6 @@ def main():
         st = detect_source_type(url)
         log(f"🧭 Type: {st}")
 
-        # LIVE
         if is_live_source(url):
             log("\n🔴 LIVE relay")
             if COMMENTARY_ENABLED: log("   ⚠️ Live: no commentary")
@@ -1524,7 +1277,6 @@ def main():
             exit_code = 0 if ok else 1
             return
 
-        # VOD
         log("\n📥 [2/4] Download...")
         local = download_video(url, "source.mp4")
         if not local:
@@ -1532,12 +1284,12 @@ def main():
             return
 
         if COMMENTARY_ENABLED:
-            log("\n🎙️ [3/4] Commentary...")
-            final = run_commentary_pipeline(local, "dubbed.mp4")
-            title = read_title(title)
+            log("\n🎙️ [3/4] Commentary + Title...")
         else:
-            log("\n⏭ [3/4] Commentary OFF")
-            final = local
+            log("\n🏷️ [3/4] Title ONLY (Commentary OFF)...")
+            
+        final = run_commentary_pipeline(local, "dubbed.mp4" if COMMENTARY_ENABLED else local)
+        title = read_title(title)
 
         if not os.path.exists(final):
             log(f"❌ Missing: {final}")
@@ -1561,11 +1313,9 @@ def main():
         log(f"\n❌ Fatal error: {e}")
         exit_code = 1
     finally:
-        # 🧹 ALWAYS cleanup — bhale hi fail ho, disk free rahe
         cleanup_temp_files()
         git_push()
         sys.exit(exit_code)
-
 
 if __name__ == "__main__":
     main()
