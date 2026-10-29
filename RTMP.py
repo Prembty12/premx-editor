@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 """
-🎮 MASTER AGENT v8.1 — SINGLE FILE (Everything Integrated, bugfixed)
+🎮 MASTER AGENT v8.2 — SINGLE FILE (cleanup + audio fallback + error logs)
 ==============================================================
-Brain + Title + Commentary + TTS + Subtitles + RTMP + Dashboard
-Logs: gaming_runtime_v8/ (fresh, no old merge)
 """
 import os
 import sys
@@ -17,6 +15,7 @@ import requests
 import glob
 import argparse
 import base64
+import threading
 from datetime import datetime, timedelta, timezone
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
@@ -94,8 +93,9 @@ STREAM_MODE        = os.getenv("STREAM_MODE", "both").lower().strip()
 if STREAM_MODE not in ("fb", "yt", "both"):
     STREAM_MODE = "both"
 
-YOUTUBE_KEY  = os.getenv("YOUTUBE_STREAM_KEY")
-FACEBOOK_KEY = os.getenv("FACEBOOK_STREAM_KEY")
+# trim keys (extra spaces/newlines from secrets)
+YOUTUBE_KEY  = (os.getenv("YOUTUBE_STREAM_KEY") or "").strip()
+FACEBOOK_KEY = (os.getenv("FACEBOOK_STREAM_KEY") or "").strip()
 USE_YT = STREAM_MODE in ("yt", "both") and bool(YOUTUBE_KEY)
 USE_FB = STREAM_MODE in ("fb", "both") and bool(FACEBOOK_KEY)
 STREAMING_ENABLED = STREAM_ENABLED and (USE_YT or USE_FB)
@@ -109,7 +109,7 @@ FB_PAGE_ID      = os.getenv("PAGE_ID")
 FB_ACCESS_TOKEN = os.getenv("PAGE_ACCESS_TOKEN")
 FB_GRAPH_URL    = "https://graph.facebook.com/v24.0"
 
-# ── NEW LOGS FOLDER (no old merge)
+# ── LOGS / DIRS
 LOGS_DIR       = "gaming_runtime_v8"
 MANUAL_DIR     = "Manual_links"
 AUTO_DIR       = "game_links_livestream"
@@ -128,7 +128,7 @@ for d in [LOGS_DIR, f"{LOGS_DIR}/games", f"{LOGS_DIR}/leaderboard",
           SEGMENTS_DIR, FONTS_DIR]:
     os.makedirs(d, exist_ok=True)
 
-# Keys
+
 def _keys(*names):
     return [os.getenv(n) for n in names if os.getenv(n)]
 
@@ -139,7 +139,7 @@ GROQ_KEYS = _keys("GROQ_API_KEY", "GROQ_API_KEY_2", "GROQ_API_KEY_3")
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
 VOICE_ID = ARGS.voice or os.getenv("VOICE_ID") or "91w4XjqhkWTX1Jr3O344"
 
-# Slots / Grid / Voice
+# Slots / Grid
 MIN_SLOTS_HARD = 8
 MAX_SLOTS_HARD = 80
 DUCK_VOLUME    = 0.35
@@ -156,6 +156,7 @@ MAX_GRIDS_SOFT     = 30
 GRID_TARGET_FRAMES = 1800
 GRID_BATCH_SIZES   = [30, 20, 15, 12, 10, 8, 6, 4, 2, 1]
 
+# Voice
 VOICE_SPEED_MIN   = 1.00
 VOICE_SPEED_MAX   = 1.17
 ATEMPO_MIN        = 1.00
@@ -170,7 +171,6 @@ VOL_ACTION        = 1.9
 VOL_OTHER         = 1.4
 
 SUBTITLE_MODE = 1
-
 if ARGS.subtitles is not None:
     SUBTITLES_ENABLED = ARGS.subtitles.lower() == "true"
 else:
@@ -205,12 +205,6 @@ def ass_color(rgb):
 # ═══════════════════════════════════════════════════════════
 # HELPERS
 # ═══════════════════════════════════════════════════════════
-def normalize(s):
-    if not s:
-        return ""
-    return re.sub(r'[^a-z0-9]', '', s.lower())
-
-
 def extract_urls(text):
     urls = re.findall(r'https?://[^\s\)\]\'"<>,;]+', text)
     cleaned, seen = [], set()
@@ -305,7 +299,45 @@ def speed_for_type(t):
 
 
 # ═══════════════════════════════════════════════════════════
-# FB API (dashboard only)
+# 🧹 CLEANUP — delete big files after run (prevents GitHub disk full)
+# ═══════════════════════════════════════════════════════════
+def cleanup_temp_files():
+    log("🧹 Cleaning temp files...")
+    files = [
+        "source.mp4", "dubbed.mp4", "extracted_audio.mp3",
+        "final.srt", "subtitles.ass",
+    ]
+    total_freed = 0
+    for f in files:
+        if os.path.exists(f):
+            try:
+                sz = os.path.getsize(f)
+                os.remove(f)
+                total_freed += sz
+                log(f"   🗑️ {f} ({sz//(1024*1024)} MB)")
+            except Exception as e:
+                log(f"   ⚠️ {f}: {e}")
+    
+    for d in [SEGMENTS_DIR, "temp_frames"]:
+        if os.path.exists(d):
+            for f in glob.glob(f"{d}/*"):
+                try:
+                    os.remove(f)
+                except Exception:
+                    pass
+            try:
+                os.rmdir(d)
+            except Exception:
+                pass
+    
+    if total_freed > 0:
+        log(f"✅ Freed {total_freed//(1024*1024)} MB\n")
+    else:
+        log("✅ Nothing to clean\n")
+
+
+# ═══════════════════════════════════════════════════════════
+# FB API
 # ═══════════════════════════════════════════════════════════
 def fb_views(vid, token):
     try:
@@ -495,7 +527,7 @@ def download_video(url, out="source.mp4"):
 
 
 # ═══════════════════════════════════════════════════════════
-# COMMENTARY PIPELINE (all inline)
+# COMMENTARY PIPELINE
 # ═══════════════════════════════════════════════════════════
 def c_validate():
     missing = []
@@ -551,7 +583,6 @@ def c_scene_timeline(vid):
 
 
 def c_loudness_timeline(vid):
-    """Returns [(time_sec, rms_db)] using real pts_time from ametadata."""
     cmd = (f'ffmpeg -i "{vid}" -af "astats=metadata=1:reset=1,'
            f'ametadata=print:key=lavfi.astats.Overall.RMS_level:file=-" -f null - 2>&1')
     out = subprocess.run(cmd, shell=True, capture_output=True, text=True).stdout
@@ -943,9 +974,8 @@ def c_tts(segments, slots, dur):
                                   "style": 0.5, "use_speaker_boost": True, "speed": vs}}
         try:
             r = requests.post(url, json=data, headers=headers, timeout=60)
-            for _retry in range(3):          # retry on rate-limit
-                if r.status_code != 429:
-                    break
+            for _retry in range(3):
+                if r.status_code != 429: break
                 time.sleep(3 * (_retry + 1))
                 r = requests.post(url, json=data, headers=headers, timeout=60)
             if r.status_code == 200:
@@ -1050,7 +1080,6 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                 if wd == "\\N": bd += "\\N"; continue
                 wp = PALETTE["red"] if (wi == _t-1 and vt=="action") else (PALETTE["orange"] if wi==_t-1 else PALETTE["blue"])
                 wc = ass_color(wp["glow" if k=="glow" else "fill"])
-                # FIX: no backslash inside f-string braces (Python 3.11 SyntaxError)
                 col_tag = ("\\1c" + wc + "\\3c" + wc) if k == "glow" else ("\\1c" + wc)
                 bd += "{" + col_tag + "}"
                 for ch in wd:
@@ -1128,7 +1157,6 @@ def c_fallback():
 
 
 def run_commentary_pipeline(video_in, video_out):
-    """Full commentary inline. Returns video_out or video_in (fallback)."""
     global FINAL_CLIP_PATH, FINAL_DUBBED_VIDEO
     FINAL_CLIP_PATH = video_in
     FINAL_DUBBED_VIDEO = video_out
@@ -1232,19 +1260,40 @@ def _in_flags(st):
 def _enc(low=False):
     t = "-tune zerolatency " if low else ""
     return (f"-c:v libx264 -preset veryfast {t}"
-            f"-b:v 3000k -maxrate 3000k -bufsize 6000k "
+            f"-b:v 3000k -maxrate 3000k -bufsize 6000k -r 30 "
             f"-pix_fmt yuv420p -g 60 -keyint_min 60 -sc_threshold 0 "
             f"-c:a aac -b:a 160k -ar 44100 -ac 2 ")
 
 
 def _run_ff(cmd, to):
-    # NOTE: cmd contains stream keys — never log it in full.
     log("   $ ffmpeg stream command (keys hidden)")
     try:
         p = subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL,
-                             stderr=subprocess.PIPE, text=True)
+                             stderr=subprocess.PIPE, text=True, bufsize=1)
     except Exception as e:
         return False, str(e)
+
+    err_lines = []
+    def _reader():
+        try:
+            for line in iter(p.stderr.readline, ""):
+                safe = line.strip()
+                for k in (YOUTUBE_KEY, FACEBOOK_KEY):
+                    if k and k in safe:
+                        safe = safe.replace(k, "***")
+                if safe and any(x in safe.lower() for x in
+                                ["error", "failed", "connection", "rtmp",
+                                 "invalid", "denied", "cannot", "unable"]):
+                    log(f"      [ffmpeg] {safe[:200]}")
+                err_lines.append(safe)
+                if len(err_lines) > 20:
+                    err_lines.pop(0)
+        except Exception:
+            pass
+
+    t = threading.Thread(target=_reader, daemon=True)
+    t.start()
+
     start = time.time()
     try:
         while p.poll() is None:
@@ -1259,8 +1308,7 @@ def _run_ff(cmd, to):
                 except subprocess.TimeoutExpired: p.kill()
                 return True, "time_limit"
             time.sleep(0.5)
-        e = (p.stderr.read() if p.stderr else "") or ""
-        return p.returncode == 0, e
+        return p.returncode == 0, "\n".join(err_lines[-5:]) or "done"
     finally:
         if p.poll() is None: p.kill()
 
@@ -1268,30 +1316,64 @@ def _run_ff(cmd, to):
 def stream_rtmp(src, live):
     if not STREAMING_ENABLED:
         log(f"🚫 Stream off [{STREAM_MODE}]"); return False
-    tee = _tee()
-    if not tee:
+    
+    n = int(USE_YT) + int(USE_FB)
+    if n == 0:
         log("❌ No targets"); return False
+    
     st = detect_source_type(src)
     inf = _in_flags(st)
     ef = _enc(low=live)
+    
+    has_audio = has_audio_stream(src)
+    if not has_audio:
+        log("   🔊 Source me audio nahi — silent audio inject karunga")
+    
     for att in range(1, MAX_STREAM_RETRIES + 1):
-        log(f"📡 {att}/{MAX_STREAM_RETRIES} → {'LIVE' if live else 'VOD'} [{st}]")
-        if live:
-            cmd = f'ffmpeg -hide_banner -loglevel warning {inf}-i "{src}" {ef}-flvflags no_duration_filesize -f tee -map 0:v -map 0:a? "{tee}"'
+        log(f"📡 {att}/{MAX_STREAM_RETRIES} → {'LIVE' if live else 'VOD'} [{st}] ({n} target)")
+        
+        re_flag = "" if live else "-re "
+        loop = "-stream_loop -1 " if (not live and STREAM_LOOP) else ""
+        dur = f"-t {STREAM_LIMIT_SEC} " if (not live and STREAM_LIMIT_SEC > 0) else ""
+        
+        if has_audio:
+            in_args = f'{re_flag}{loop}{inf}-i "{src}" '
+            map_args = "-map 0:v -map 0:a "
+            extra = ""
         else:
-            loop = "-stream_loop -1 " if STREAM_LOOP else ""
-            dur = f"-t {STREAM_LIMIT_SEC} " if STREAM_LIMIT_SEC > 0 else ""
-            cmd = f'ffmpeg -hide_banner -loglevel warning -re {loop}-i "{src}" {dur}{ef}-map 0:v -map 0:a? -f tee "{tee}"'
+            in_args = (f'{re_flag}{loop}{inf}-i "{src}" '
+                       f'-f lavfi -i anullsrc=channel_layout=stereo:sample_rate=44100 ')
+            map_args = "-map 0:v -map 1:a "
+            extra = "-shortest "
+        
+        if n == 1:
+            if USE_YT:
+                target = f"rtmp://a.rtmp.youtube.com/live2/{YOUTUBE_KEY}"
+                flv_extra = ""
+            else:
+                target = f"rtmps://live-api-s.facebook.com:443/rtmp/{FACEBOOK_KEY}"
+                flv_extra = "-rtmp_live live "
+            cmd = (f'ffmpeg -hide_banner -loglevel warning '
+                   f'{in_args}{dur}{ef}{map_args}{extra}'
+                   f'{flv_extra}-f flv "{target}"')
+        else:
+            tee = _tee()
+            cmd = (f'ffmpeg -hide_banner -loglevel warning '
+                   f'{in_args}{dur}{ef}{map_args}{extra}'
+                   f'-flvflags no_duration_filesize -f tee "{tee}"')
+        
         ok, err = _run_ff(cmd, MAX_RUN_SECONDS)
-        if ok and err != "time_limit":
+        
+        if ok:
             log("✅ Stream done"); return True
         if err == "interrupted": return False
         if err == "time_limit": return True
-        # scrub keys from any error text before logging
-        safe = str(err)
-        for k in (YOUTUBE_KEY, FACEBOOK_KEY):
-            if k: safe = safe.replace(k, "***")
-        log(f"⚠️ {safe[:200]}")
+        
+        log(f"⚠️ Attempt {att} failed")
+        if err and err not in ("done", "time_limit", "interrupted"):
+            for l in err.split("\n")[-3:]:
+                if l and l != "done": log(f"      {l[:200]}")
+        
         if att < MAX_STREAM_RETRIES:
             time.sleep(5 * att)
     return False
@@ -1402,7 +1484,7 @@ def git_push():
 # ═══════════════════════════════════════════════════════════
 def main():
     log("=" * 62)
-    log("🎮 MASTER AGENT v8.1 — SINGLE FILE")
+    log("🎮 MASTER AGENT v8.2 — SINGLE FILE (cleanup + audio fallback)")
     log(f"   Commentary : {'ON' if COMMENTARY_ENABLED else 'OFF'}")
     log(f"   Stream     : {'ON' if STREAMING_ENABLED else 'OFF'} [{STREAM_MODE.upper()}]")
     log(f"   YT:{'✅' if USE_YT else '❌'} FB:{'✅' if USE_FB else '❌'}")
@@ -1410,66 +1492,79 @@ def main():
     log(f"   FPS        : {FRAMES_PER_SECOND}")
     log("=" * 62)
 
-    log("\n🧠 [1/4] Brain...")
-    result = run_brain()
-    if not result:
-        log("❌ Brain failed")
-        sys.exit(1)
+    exit_code = 1
+    try:
+        log("\n🧠 [1/4] Brain...")
+        result = run_brain()
+        if not result:
+            log("❌ Brain failed")
+            return
+        
+        game = result["game_name"]
+        url = result["source_url"]
+        title = result["ai_title"]
+        src_file = result["source_file"]
+        src_kind = result["source_kind"]
 
-    game = result["game_name"]
-    url = result["source_url"]
-    title = result["ai_title"]
-    src_file = result["source_file"]
-    src_kind = result["source_kind"]
+        log(f"\n🎯 Game: {game}")
+        log(f"📺 Title: {title}")
+        log(f"🔗 {url[:120]}")
+        log(f"📂 {os.path.basename(src_file)} [{src_kind}]")
 
-    log(f"\n🎯 Game: {game}")
-    log(f"📺 Title: {title}")
-    log(f"🔗 {url[:120]}")
-    log(f"📂 {os.path.basename(src_file)} [{src_kind}]")
+        st = detect_source_type(url)
+        log(f"🧭 Type: {st}")
 
-    st = detect_source_type(url)
-    log(f"🧭 Type: {st}")
+        # LIVE
+        if is_live_source(url):
+            log("\n🔴 LIVE relay")
+            if COMMENTARY_ENABLED: log("   ⚠️ Live: no commentary")
+            ok = stream_rtmp(url, live=True)
+            move_link(game, url, src_file, ok)
+            update_dashboard({**result, "ai_title": title})
+            exit_code = 0 if ok else 1
+            return
 
-    if is_live_source(url):
-        log("\n🔴 LIVE relay")
-        if COMMENTARY_ENABLED: log("   ⚠️ Live: no commentary")
-        ok = stream_rtmp(url, live=True)
+        # VOD
+        log("\n📥 [2/4] Download...")
+        local = download_video(url, "source.mp4")
+        if not local:
+            log("❌ Download failed")
+            return
+
+        if COMMENTARY_ENABLED:
+            log("\n🎙️ [3/4] Commentary...")
+            final = run_commentary_pipeline(local, "dubbed.mp4")
+            title = read_title(title)
+        else:
+            log("\n⏭ [3/4] Commentary OFF")
+            final = local
+
+        if not os.path.exists(final):
+            log(f"❌ Missing: {final}")
+            return
+
+        log(f"\n📡 [4/4] Stream {os.path.basename(final)}...")
+        ok = stream_rtmp(final, live=False)
         move_link(game, url, src_file, ok)
         update_dashboard({**result, "ai_title": title})
+        exit_code = 0 if ok else 1
+
+        log("\n" + "=" * 62)
+        log(f"{'✅ Complete' if ok else '❌ Failed'}")
+        log(f"🎮 {game}")
+        log(f"📺 {title}")
+        log(f"🎙️ {'ON' if COMMENTARY_ENABLED else 'OFF'} | 📡 {STREAM_MODE.upper()}")
+        log(f"🔗 {'Moved' if ok else 'Pending (retry next)'}")
+        log("=" * 62)
+
+    except Exception as e:
+        log(f"\n❌ Fatal error: {e}")
+        exit_code = 1
+    finally:
+        # 🧹 ALWAYS cleanup — bhale hi fail ho, disk free rahe
+        cleanup_temp_files()
         git_push()
-        sys.exit(0 if ok else 1)
-
-    log("\n📥 [2/4] Download...")
-    local = download_video(url, "source.mp4")
-    if not local:
-        log("❌ Download failed")
-        sys.exit(1)
-
-    if COMMENTARY_ENABLED:
-        log("\n🎙️ [3/4] Commentary...")
-        final = run_commentary_pipeline(local, "dubbed.mp4")
-        title = read_title(title)
-    else:
-        log("\n⏭ [3/4] Commentary OFF")
-        final = local
-
-    if not os.path.exists(final):
-        log(f"❌ Missing: {final}"); sys.exit(1)
-
-    log(f"\n📡 [4/4] Stream {os.path.basename(final)}...")
-    ok = stream_rtmp(final, live=False)
-    move_link(game, url, src_file, ok)
-    update_dashboard({**result, "ai_title": title})
-    git_push()
-
-    log("\n" + "=" * 62)
-    log(f"{'✅ Complete' if ok else '❌ Failed'}")
-    log(f"🎮 {game}")
-    log(f"📺 {title}")
-    log(f"🎙️ {'ON' if COMMENTARY_ENABLED else 'OFF'} | 📡 {STREAM_MODE.upper()}")
-    log(f"🔗 {'Moved' if ok else 'Pending (retry next)'}")
-    log("=" * 62)
-    sys.exit(0 if ok else 1)
+        sys.exit(exit_code)
 
 
 if __name__ == "__main__":
