@@ -1,0 +1,16 @@
+{
+  "rotation_order": [
+    "PUBG"
+  ],
+  "current_game": "PUBG",
+  "last_updated": "2026-10-29 06:39:40 PM",
+  "rotation_log": [
+    {
+      "run": 1,
+      "game": "PUBG",
+      "timestamp": "2026-10-29 06:39:40 PM"
+    }
+  ],
+  "next_game": "PUBG",
+  "next_game_position": 1
+}
