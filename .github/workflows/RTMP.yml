@@ -1,0 +1,75 @@
+name: Master Agent
+
+on:
+  workflow_dispatch:
+    inputs:
+      commentary:
+        type: choice
+        options: ['true', 'false']
+        default: 'true'
+      stream_mode:
+        type: choice
+        options: ['both', 'fb', 'yt']
+        default: 'both'
+      fps:
+        type: choice
+        options: ['1', '2', '3']
+        default: '3'
+
+jobs:
+  agent:
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with: { token: "${{ secrets.GITHUB_TOKEN }}" }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - name: Deps
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg fonts-dejavu-core
+          pip install --upgrade yt-dlp requests python-dotenv pillow reportlab matplotlib
+      - name: Font
+        run: |
+          mkdir -p fonts
+          [ -f fonts/BebasNeue-Regular.ttf ] || curl -sL -o fonts/BebasNeue-Regular.ttf \
+            "https://github.com/google/fonts/raw/main/ofl/bebasneue/BebasNeue-Regular.ttf" || true
+      - name: Run
+        env:
+          PAGE_ID: "${{ secrets.PAGE_ID }}"
+          PAGE_ACCESS_TOKEN: "${{ secrets.PAGE_ACCESS_TOKEN }}"
+          OPENROUTER_API_KEY:   "${{ secrets.OPENROUTER_API_KEY }}"
+          OPENROUTER_API_KEY_2: "${{ secrets.OPENROUTER_API_KEY_2 }}"
+          OPENROUTER_API_KEY_3: "${{ secrets.OPENROUTER_API_KEY_3 }}"
+          OPENROUTER_API_KEY_4: "${{ secrets.OPENROUTER_API_KEY_4 }}"
+          OPENROUTER_API_KEY_5: "${{ secrets.OPENROUTER_API_KEY_5 }}"
+          ELEVENLABS_API_KEY: "${{ secrets.ELEVENLABS_API_KEY }}"
+          VOICE_ID:           "${{ secrets.VOICE_ID }}"
+          GROQ_API_KEY:       "${{ secrets.GROQ_API_KEY }}"
+          GROQ_API_KEY_2:     "${{ secrets.GROQ_API_KEY_2 }}"
+          GROQ_API_KEY_3:     "${{ secrets.GROQ_API_KEY_3 }}"
+          COMMENTARY_ENABLED: "${{ inputs.commentary }}"
+          SUBTITLES_ENABLED:  'true'
+          STREAM_ENABLED:     'true'
+          STREAM_MODE:        "${{ inputs.stream_mode }}"
+          FRAMES_PER_SECOND:  "${{ inputs.fps }}"
+          YOUTUBE_STREAM_KEY:  "${{ secrets.YOUTUBE_STREAM_KEY }}"
+          FACEBOOK_STREAM_KEY: "${{ secrets.FACEBOOK_STREAM_KEY }}"
+          STREAM_LOOP: 'false'
+          STREAM_LIMIT_SEC: '0'
+          MAX_STREAM_RETRIES: '3'
+          MAX_RUN_SECONDS: '20700'
+        run: python master.py
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add AGENT_DASHBOARD_V7.md gaming_runtime_v8/ analysis/ \
+                  Manual_links/ game_links_livestream/ game_links_streamed/ || true
+          git commit -m "🤖 Agent run [skip ci]" || echo "no changes"
+          git pull --rebase origin main || true
+          git push || true
