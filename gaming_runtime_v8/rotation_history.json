@@ -3,12 +3,17 @@
     "PUBG"
   ],
   "current_game": "PUBG",
-  "last_updated": "2026-10-29 06:39:40 PM",
+  "last_updated": "2026-10-29 08:45:45 PM",
   "rotation_log": [
     {
       "run": 1,
       "game": "PUBG",
       "timestamp": "2026-10-29 06:39:40 PM"
+    },
+    {
+      "run": 2,
+      "game": "PUBG",
+      "timestamp": "2026-10-29 08:45:45 PM"
     }
   ],
   "next_game": "PUBG",
