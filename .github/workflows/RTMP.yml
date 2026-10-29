@@ -62,7 +62,7 @@ jobs:
           STREAM_LIMIT_SEC: '0'
           MAX_STREAM_RETRIES: '3'
           MAX_RUN_SECONDS: '20700'
-        run: python master.py
+        run: python RTMP.py
       - name: Commit
         if: always()
         run: |
