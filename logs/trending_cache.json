@@ -1,22 +1,22 @@
 {
-  "last_updated": "2026-10-29 11:33:02 PM",
+  "last_updated": "2026-10-30 09:56:40 AM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 5893,
-      "avg_per_video": 491,
+      "views_7d": 5963,
+      "avg_per_video": 496,
       "trend": "viral",
-      "ratio": 2.541407867494824,
+      "ratio": 2.719298245614035,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "MarvelsSpiderMan2",
-      "views_7d": 2842,
-      "avg_per_video": 236,
+      "views_7d": 2334,
+      "avg_per_video": 212,
       "trend": "steady",
-      "ratio": 1.2215320910973086,
+      "ratio": 1.162280701754386,
       "fb_link": "",
       "source_link": ""
     }
@@ -24,38 +24,38 @@
   "below_avg": [
     {
       "game": "CallOfDutyMW2",
-      "views_7d": 166,
-      "avg_per_video": 166,
+      "views_7d": 167,
+      "avg_per_video": 167,
       "trend": "slow",
-      "ratio": 0.8592132505175984,
+      "ratio": 0.9155701754385964,
       "fb_link": "https://www.facebook.com/reel/2181972149061480/",
       "source_link": ""
     },
     {
-      "game": "ghostandela",
-      "views_7d": 240,
-      "avg_per_video": 40,
+      "game": "Wolverine",
+      "views_7d": 508,
+      "avg_per_video": 31,
       "trend": "below_avg",
-      "ratio": 0.2070393374741201,
+      "ratio": 0.1699561403508772,
       "fb_link": "",
       "source_link": ""
     },
     {
-      "game": "Wolverine",
-      "views_7d": 502,
-      "avg_per_video": 33,
+      "game": "ghostandela",
+      "views_7d": 30,
+      "avg_per_video": 6,
       "trend": "below_avg",
-      "ratio": 0.17080745341614909,
+      "ratio": 0.03289473684210526,
       "fb_link": "",
       "source_link": ""
     }
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 5893,
-    "avg_per_video": 491,
+    "views_7d": 5963,
+    "avg_per_video": 496,
     "trend": "viral",
-    "ratio": 2.541407867494824,
+    "ratio": 2.719298245614035,
     "fb_link": "",
     "source_link": ""
   }
