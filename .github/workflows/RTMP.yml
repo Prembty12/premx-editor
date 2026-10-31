@@ -1,4 +1,4 @@
-name: Master Streamer & Editor
+name: RTMP
 
 on:
   workflow_dispatch:
