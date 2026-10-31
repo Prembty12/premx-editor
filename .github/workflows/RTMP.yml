@@ -102,7 +102,7 @@ jobs:
           FPS:            "${{ inputs.fps }}"
           BITRATE:        "${{ inputs.bitrate }}"
           STREAM_GAP_MIN: "${{ inputs.gap_minutes }}"
-        run: python master.py
+        run: python RTMP.py
 
       - name: Commit Streamed Links (Safe - No Videos)
         if: always()
