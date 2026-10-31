@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-🎮 MASTER AGENT v21.0 — STRICT FPS LOCKED DIRECT STREAM
+🎮 MASTER AGENT v22.0 — STRICT 30/60 FPS + NO LAG
 ======================================================================
-✅ 100% Strict FPS Lock (30 or 60)
-✅ 1GB RAM Buffer (60 Sec Delay before stream starts)
+✅ 100% Strict FPS Lock (30 or 60) with Frame Drop
+✅ 1GB RAM Buffer (No ruk-ruk kar lag)
 ✅ Watermark, Crop, Filters applied on-the-fly
 ✅ Audio Merge or Original Audio Safe Mapping
 ✅ Manual Key Input (Overrides Secret Key)
@@ -230,14 +230,15 @@ def stream_direct(url, game_name):
     B_V = f"{BITRATE}M"
     BUF = f"{int(BITRATE)*2}M"
 
-    # 🔥 FPS LOCK IN FILTER CHAIN
-    vf_chain = f"{V_SPEED}{CROP}{GAME}fps={TARGET_FPS},scale=trunc(iw/2)*2:trunc(ih/2)*2"
+    # 🔥 STRICT FPS FILTER (round=down forces exact drop)
+    vf_chain = f"{V_SPEED}{CROP}{GAME}fps={TARGET_FPS}:round=down,scale=trunc(iw/2)*2:trunc(ih/2)*2"
     af_chain = f"{A_SPEED}aresample=48000"
 
     META_TITLE = f"{game_name} Gameplay"
     
-    # 🛠️ 60 SEC BUFFER LOGIC
-    inputs = f'{LOOP_ARG}-re -readrate 3.0 -rtbufsize 1G -thread_queue_size 8192 -max_delay 10000000 -rw_timeout 120000000 -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -i "{url}" '
+    # 🛠️ 60 SEC BUFFER LOGIC (No Lag Fix)
+    # Note: -readrate 1.0 ensures it doesn't send fake 50-55 fps
+    inputs = f'{LOOP_ARG}-re -readrate 1.0 -rtbufsize 1G -thread_queue_size 8192 -max_delay 10000000 -rw_timeout 120000000 -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -i "{url}" '
     
     filter_complex = ""
     audio_map = ""
@@ -277,7 +278,7 @@ def stream_direct(url, game_name):
         enc_flags = (
             f"-c:v libx264 -preset ultrafast -threads 0 -profile:v high -level:v 4.2 "
             f"-pix_fmt yuv420p -b:v {B_V} -maxrate {B_V} -bufsize {BUF} "
-            f"-r {TARGET_FPS} -vsync cfr "  # 🔥 cfr force karega strict lock ke liye
+            f"-r {TARGET_FPS} -fps_mode cfr "  # 🔥 Modern CFR lock
             f"-g {TARGET_FPS} -keyint_min {TARGET_FPS} -sc_threshold 0 "
             f"-c:a aac -b:a 128k -ar 44100 -ac 2 "
             f"-metadata title=\"{META_TITLE}\" -metadata artist=\"{META_ARTIST}\" "
@@ -349,7 +350,7 @@ def move_link(game, url, src_file, ok):
 
 def main():
     log("=" * 62)
-    log("🎮 MASTER AGENT v21.0 — FPS LOCKED")
+    log("🎮 MASTER AGENT v22.0 — STRICT FPS + NO LAG")
     log(f"   Loop Setup : {LOOP_MSG}")
     log(f"   Metadata   : Artist='{META_ARTIST}'")
     log(f"   Ratio      : {RATIO} | Filter: {FILTER} | Speed: {SPEED_OPT} | Bitrate: {BITRATE}M")
