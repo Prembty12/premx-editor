@@ -34,11 +34,11 @@ on:
       fps:
         description: 'FPS [1=30, 2=60]'
         required: true
-        default: '2'
+        default: '1'
       bitrate:
         description: 'Bitrate [12, 16, 18] (Mbps)'
         required: true
-        default: '18'
+        default: '12'
       gap_minutes:
         description: 'Gap before stream starts (Minutes)'
         required: true
@@ -85,7 +85,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
-          # Core Stream Keys
+          # Core Stream Keys (Add these in GitHub Secrets)
           YOUTUBE_STREAM_KEY:  "${{ secrets.YOUTUBE_STREAM_KEY }}"
           FACEBOOK_STREAM_KEY: "${{ secrets.FACEBOOK_STREAM_KEY }}"
           
