@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-🎮 MASTER AGENT v18.0 — DIRECT STREAM (Buffer + Audio Fix)
+🎮 MASTER AGENT v18.1 — DIRECT STREAM (Buffer + Audio + Manual Key)
 ======================================================================
 ✅ Direct URL to RTMP Stream (No download)
 ✅ 200MB RAM Buffer (Delay) for Smooth Stream
 ✅ Watermark, Crop, Filters applied on-the-fly
 ✅ Audio Merge or Original Audio Safe Mapping
 ✅ Metadata (Artist: PremxGamer)
-✅ Smart Loop (0=Once, 10=10 times, 24h=24 Hours)
+✅ Manual Key Input (Overrides Secret Key)
 """
 import os
 import sys
@@ -41,8 +41,18 @@ STREAM_ENABLED     = os.getenv("STREAM_ENABLED", "true").lower() == "true"
 STREAM_MODE        = os.getenv("STREAM_MODE", "both").lower().strip()
 if STREAM_MODE not in ("fb", "yt", "both"): STREAM_MODE = "both"
 
-YOUTUBE_KEY  = (os.getenv("YOUTUBE_STREAM_KEY") or "").strip()
-FACEBOOK_KEY = (os.getenv("FACEBOOK_STREAM_KEY") or "").strip()
+# 🔥 MANUAL KEYS (Workflow Inputs)
+MANUAL_FB_KEY = os.getenv("MANUAL_FB_KEY", "").strip()
+MANUAL_YT_KEY = os.getenv("MANUAL_YT_KEY", "").strip()
+
+# Secrets Fallback
+SECRET_FB_KEY = (os.getenv("FACEBOOK_STREAM_KEY") or "").strip()
+SECRET_YT_KEY = (os.getenv("YOUTUBE_STREAM_KEY") or "").strip()
+
+# Final Keys Selection
+FACEBOOK_KEY = MANUAL_FB_KEY if MANUAL_FB_KEY else SECRET_FB_KEY
+YOUTUBE_KEY  = MANUAL_YT_KEY if MANUAL_YT_KEY else SECRET_YT_KEY
+
 USE_YT = STREAM_MODE in ("yt", "both") and bool(YOUTUBE_KEY)
 USE_FB = STREAM_MODE in ("fb", "both") and bool(FACEBOOK_KEY)
 STREAMING_ENABLED = STREAM_ENABLED and (USE_YT or USE_FB)
@@ -56,8 +66,8 @@ RATIO          = os.getenv("RATIO", "3")
 FILTER         = os.getenv("FILTER", "2")
 SPEED_OPT      = os.getenv("SPEED", "1")  # Default Normal Speed
 FPS_OPT        = os.getenv("FPS", "1")    # Default 30 FPS
-BITRATE        = os.getenv("BITRATE", "12") # Default 12M for smoothness
-STREAM_GAP_MIN = int(os.getenv("STREAM_GAP_MIN", "1"))
+BITRATE        = os.getenv("BITRATE", "12") # Default 12M
+STREAM_GAP_MIN = int(os.getenv("STREAM_GAP_MIN", "2"))
 META_ARTIST    = os.getenv("META_ARTIST", "PremxGamer")
 
 # SMART LOOP
@@ -188,7 +198,9 @@ def _tee():
     return "|".join(o)
 
 def stream_direct(url, game_name):
-    if not STREAMING_ENABLED: return False
+    if not STREAMING_ENABLED: 
+        log("❌ Stream disabled or no keys found.")
+        return False
     n = int(USE_YT) + int(USE_FB)
     if n == 0: return False
 
@@ -225,9 +237,6 @@ def stream_direct(url, game_name):
     META_TITLE = f"{game_name} Gameplay"
     
     # 🛠️ BUFFER & DELAY SETTINGS (Smooth Stream)
-    # -thread_queue_size 4096: Network data ke liye bada queue
-    # -rtbufsize 200M: 200MB ka RAM buffer (Delay)
-    # -max_delay 5000000: 5 second tak ka delay handle karega
     inputs = f'{LOOP_ARG}-re -thread_queue_size 4096 -rtbufsize 200M -max_delay 5000000 -rw_timeout 120000000 -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -i "{url}" '
     
     filter_complex = ""
@@ -342,10 +351,12 @@ def move_link(game, url, src_file, ok):
 
 def main():
     log("=" * 62)
-    log("🎮 MASTER AGENT v18.0 — DIRECT STREAM (Buffer + Audio)")
+    log("🎮 MASTER AGENT v18.1 — DIRECT STREAM (Manual Key)")
     log(f"   Loop Setup : {LOOP_MSG}")
     log(f"   Metadata   : Artist='{META_ARTIST}'")
     log(f"   Ratio      : {RATIO} | Filter: {FILTER} | Speed: {SPEED_OPT} | Bitrate: {BITRATE}M")
+    log(f"   FB Key     : {'MANUAL INPUT' if MANUAL_FB_KEY else ('SECRET KEY' if SECRET_FB_KEY else 'NONE')}")
+    log(f"   YT Key     : {'MANUAL INPUT' if MANUAL_YT_KEY else ('SECRET KEY' if SECRET_YT_KEY else 'NONE')}")
     log("=" * 62)
 
     if MANUAL_VIDEO_URL:
@@ -359,7 +370,7 @@ def main():
         if not result: return
         game, url, src_file = result["game_name"], result["source_url"], result["source_file"]
 
-    # 🔥 GAP (Wait for 1 min)
+    # 🔥 GAP (Wait for 2 mins)
     gap_seconds = STREAM_GAP_MIN * 60
     if gap_seconds > 0:
         log(f"⏳ Waiting for {STREAM_GAP_MIN} minutes before connecting to FB/YT...")
