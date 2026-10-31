@@ -1,75 +1,116 @@
-name: Master Agent
+name: Master Streamer & Editor
 
 on:
   workflow_dispatch:
     inputs:
-      commentary:
-        type: choice
-        options: ['true', 'false']
-        default: 'true'
+      video_url:
+        description: 'Direct Video URL (Leave blank to use auto-rotation)'
+        required: false
+        default: ''
+      loop_count:
+        description: 'Loop [0=Once, 2=Twice, 10=10 Times, 24h/24=24 Hours]'
+        required: true
+        default: '0'
       stream_mode:
-        type: choice
-        options: ['both', 'fb', 'yt']
+        description: 'Platform [both, fb, yt]'
+        required: true
         default: 'both'
-      fps:
-        type: choice
-        options: ['1', '2', '3']
+      audio_url:
+        description: 'Optional Audio URL (Leave blank if not needed)'
+        required: false
+        default: ''
+      ratio:
+        description: 'Crop Ratio [1=1:1, 2=4:5, 3=9:16, 4=3:4, 5=4:3]'
+        required: true
         default: '3'
+      filter:
+        description: 'Filter [0=OFF, 1=Pop, 2=Vivid, 3=Cyber, 4=Night, 5=Cinematic, 6=HDR]'
+        required: true
+        default: '2'
+      speed:
+        description: 'Speed [1=1x, 2=1.05x, 3=1.10x, 4=1.25x, 5=1.5x, 6=0.8x]'
+        required: true
+        default: '4'
+      fps:
+        description: 'FPS [1=30, 2=60]'
+        required: true
+        default: '2'
+      bitrate:
+        description: 'Bitrate [12, 16, 18] (Mbps)'
+        required: true
+        default: '18'
+      gap_minutes:
+        description: 'Gap before stream (Minutes)'
+        required: true
+        default: '5'
 
 jobs:
-  agent:
+  stream:
     runs-on: ubuntu-latest
-    timeout-minutes: 355
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
-        with: { token: "${{ secrets.GITHUB_TOKEN }}" }
-      - uses: actions/setup-python@v5
-        with: { python-version: '3.11' }
-      - name: Deps
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # 🚀 CACHE 1: APT Packages (FFmpeg, curl, jq)
+      - name: Cache APT Packages
+        uses: actions/cache@v4
+        with:
+          path: /var/cache/apt/archives
+          key: ${{ runner.os }}-apt-v1
+          restore-keys: |
+            ${{ runner.os }}-apt-
+
+      # 🚀 CACHE 2: Python Setup & Pip Packages
+      - name: Setup Python & Cache Pip
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install System Dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y ffmpeg fonts-dejavu-core
-          pip install --upgrade yt-dlp requests python-dotenv pillow reportlab matplotlib
-      - name: Font
+          sudo apt-get install -y ffmpeg curl python3-pip jq
+
+      - name: Install Python Dependencies
         run: |
-          mkdir -p fonts
-          [ -f fonts/BebasNeue-Regular.ttf ] || curl -sL -o fonts/BebasNeue-Regular.ttf \
-            "https://github.com/google/fonts/raw/main/ofl/bebasneue/BebasNeue-Regular.ttf" || true
-      - name: Run
+          pip install yt-dlp requests
+
+      - name: Run Master Streamer
         env:
-          PAGE_ID: "${{ secrets.PAGE_ID }}"
-          PAGE_ACCESS_TOKEN: "${{ secrets.PAGE_ACCESS_TOKEN }}"
-          OPENROUTER_API_KEY:   "${{ secrets.OPENROUTER_API_KEY }}"
-          OPENROUTER_API_KEY_2: "${{ secrets.OPENROUTER_API_KEY_2 }}"
-          OPENROUTER_API_KEY_3: "${{ secrets.OPENROUTER_API_KEY_3 }}"
-          OPENROUTER_API_KEY_4: "${{ secrets.OPENROUTER_API_KEY_4 }}"
-          OPENROUTER_API_KEY_5: "${{ secrets.OPENROUTER_API_KEY_5 }}"
-          ELEVENLABS_API_KEY: "${{ secrets.ELEVENLABS_API_KEY }}"
-          VOICE_ID:           "${{ secrets.VOICE_ID }}"
-          GROQ_API_KEY:       "${{ secrets.GROQ_API_KEY }}"
-          GROQ_API_KEY_2:     "${{ secrets.GROQ_API_KEY_2 }}"
-          GROQ_API_KEY_3:     "${{ secrets.GROQ_API_KEY_3 }}"
-          COMMENTARY_ENABLED: "${{ inputs.commentary }}"
-          SUBTITLES_ENABLED:  'true'
-          STREAM_ENABLED:     'true'
-          STREAM_MODE:        "${{ inputs.stream_mode }}"
-          FRAMES_PER_SECOND:  "${{ inputs.fps }}"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           YOUTUBE_STREAM_KEY:  "${{ secrets.YOUTUBE_STREAM_KEY }}"
           FACEBOOK_STREAM_KEY: "${{ secrets.FACEBOOK_STREAM_KEY }}"
-          STREAM_LOOP: 'false'
-          STREAM_LIMIT_SEC: '0'
-          MAX_STREAM_RETRIES: '3'
-          MAX_RUN_SECONDS: '20700'
+          
+          # 🔥 Manual Input mapping
+          MANUAL_VIDEO_URL: "${{ inputs.video_url }}"
+          
+          STREAM_MODE:    "${{ inputs.stream_mode }}"
+          LOOP_COUNT:     "${{ inputs.loop_count }}"
+          AUDIO_URL:      "${{ inputs.audio_url }}"
+          RATIO:          "${{ inputs.ratio }}"
+          FILTER:         "${{ inputs.filter }}"
+          SPEED:          "${{ inputs.speed }}"
+          FPS:            "${{ inputs.fps }}"
+          BITRATE:        "${{ inputs.bitrate }}"
+          STREAM_GAP_MIN: "${{ inputs.gap_minutes }}"
         run: python RTMP.py
-      - name: Commit
+
+      - name: Commit Streamed Links (Safe - No Videos)
         if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add AGENT_DASHBOARD_V7.md gaming_runtime_v8/ analysis/ \
-                  Manual_links/ game_links_livestream/ game_links_streamed/ || true
-          git commit -m "🤖 Agent run [skip ci]" || echo "no changes"
+          
+          git add "*.txt" "*.json" "*.md" || true
+          git add game_links_livestream/ game_links_streamed/ Manual_links/ gaming_runtime_v8/ || true
+          git reset "*.mp4" || true
+          
+          git commit -m "🤖 Stream Complete [skip ci]" || echo "No changes to commit"
           git pull --rebase origin main || true
           git push || true
