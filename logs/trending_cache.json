@@ -1,22 +1,22 @@
 {
-  "last_updated": "2026-10-31 09:37:09 AM",
+  "last_updated": "2026-10-31 10:20:34 PM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 4856,
-      "avg_per_video": 441,
+      "views_7d": 2513,
+      "avg_per_video": 279,
       "trend": "viral",
-      "ratio": 2.3902439024390243,
+      "ratio": 2.0180831826401446,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "MarvelsSpiderMan2",
-      "views_7d": 2305,
-      "avg_per_video": 256,
-      "trend": "steady",
-      "ratio": 1.3875338753387534,
+      "views_7d": 2325,
+      "avg_per_video": 232,
+      "trend": "trending",
+      "ratio": 1.678119349005425,
       "fb_link": "",
       "source_link": ""
     }
@@ -27,26 +27,26 @@
       "views_7d": 464,
       "avg_per_video": 35,
       "trend": "below_avg",
-      "ratio": 0.1897018970189702,
+      "ratio": 0.25316455696202533,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "ghostandela",
       "views_7d": 30,
-      "avg_per_video": 6,
+      "avg_per_video": 7,
       "trend": "below_avg",
-      "ratio": 0.032520325203252036,
+      "ratio": 0.05063291139240506,
       "fb_link": "",
       "source_link": ""
     }
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 4856,
-    "avg_per_video": 441,
+    "views_7d": 2513,
+    "avg_per_video": 279,
     "trend": "viral",
-    "ratio": 2.3902439024390243,
+    "ratio": 2.0180831826401446,
     "fb_link": "",
     "source_link": ""
   }
