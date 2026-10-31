@@ -11,10 +11,18 @@ on:
         description: 'Optional Audio URL (Leave blank if not needed)'
         required: false
         default: ''
+      fb_key:
+        description: 'Facebook Stream Key (Optional - Leave blank to use Secrets)'
+        required: false
+        default: ''
+      yt_key:
+        description: 'YouTube Stream Key (Optional - Leave blank to use Secrets)'
+        required: false
+        default: ''
       stream_mode:
         description: 'Platform [both, fb, yt]'
         required: true
-        default: 'both'
+        default: 'fb'
       loop_count:
         description: 'Loop [0=Once, 2=Twice, 10=10 Times, 24h/24=24 Hours]'
         required: true
@@ -42,7 +50,7 @@ on:
       gap_minutes:
         description: 'Gap before stream starts (Minutes)'
         required: true
-        default: '1'
+        default: '2'
 
 jobs:
   stream:
@@ -56,7 +64,6 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      # 🚀 Cache APT Packages (FFmpeg, jq, etc.)
       - name: Cache APT Packages
         uses: actions/cache@v4
         with:
@@ -65,7 +72,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-apt-
 
-      # 🚀 Setup Python & Cache Pip Packages
       - name: Setup Python & Cache Pip
         uses: actions/setup-python@v5
         with:
@@ -85,15 +91,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
-          # Core Stream Keys (Add these in GitHub Secrets)
+          # Secrets Fallback
           YOUTUBE_STREAM_KEY:  "${{ secrets.YOUTUBE_STREAM_KEY }}"
           FACEBOOK_STREAM_KEY: "${{ secrets.FACEBOOK_STREAM_KEY }}"
           
-          # Manual Inputs Mapping
+          # 🔥 Manual Keys (Inputs)
+          MANUAL_FB_KEY: "${{ inputs.fb_key }}"
+          MANUAL_YT_KEY: "${{ inputs.yt_key }}"
+          
+          # Inputs Mapping
           MANUAL_VIDEO_URL: "${{ inputs.video_url }}"
           AUDIO_URL:        "${{ inputs.audio_url }}"
           
-          # Editor Configs Mapping
           STREAM_MODE:    "${{ inputs.stream_mode }}"
           LOOP_COUNT:     "${{ inputs.loop_count }}"
           RATIO:          "${{ inputs.ratio }}"
@@ -110,11 +119,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          # Sirf text files add karo, video mp4 files ko chhodo
           git add "*.txt" "*.json" "*.md" || true
           git add game_links_livestream/ game_links_streamed/ Manual_links/ gaming_runtime_v8/ || true
-          
-          # Safety: Agar koi galti se mp4 add hone ki koshish kare to use unstage kar do
           git reset "*.mp4" || true
           
           git commit -m "🤖 Stream Complete [skip ci]" || echo "No changes to commit"
