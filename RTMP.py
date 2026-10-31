@@ -225,7 +225,7 @@ def stream_direct(url, game_name):
     META_TITLE = f"{game_name} Gameplay"
     
     # 🛠️ Input & Audio Safety
-    inputs = f'{LOOP_ARG}-re -i "{url}" '
+    inputs = f'{LOOP_ARG}-re -rw_timeout 120000000 -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -i "{url}" '
     
     # Agar user ne audio diya hai
     if AUDIO_URL:
