@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """
-🎮 MASTER AGENT v19.1 — 60 SEC BUFFER DIRECT STREAM
+🎮 MASTER AGENT v20.0 — FPS LOCKED DIRECT STREAM
 ======================================================================
-✅ 1GB RAM Buffer (60 Sec Delay before stream starts)
-✅ Zero Lag during stream (Smooth Playback)
-✅ Watermark, Crop, Filters applied on-the-fly
-✅ Audio Merge or Original Audio Safe Mapping
+✅ Strict FPS Lock (30 or 60)
+✅ 1GB RAM Buffer
+✅ Watermark, Crop, Filters
 ✅ Manual Key Input (Overrides Secret Key)
 """
 import os
@@ -48,7 +47,6 @@ MANUAL_YT_KEY = os.getenv("MANUAL_YT_KEY", "").strip()
 SECRET_FB_KEY = (os.getenv("FACEBOOK_STREAM_KEY") or "").strip()
 SECRET_YT_KEY = (os.getenv("YOUTUBE_STREAM_KEY") or "").strip()
 
-# Final Keys Selection
 FACEBOOK_KEY = MANUAL_FB_KEY if MANUAL_FB_KEY else SECRET_FB_KEY
 YOUTUBE_KEY  = MANUAL_YT_KEY if MANUAL_YT_KEY else SECRET_YT_KEY
 
@@ -64,10 +62,13 @@ AUDIO_URL      = os.getenv("AUDIO_URL", "").strip()
 RATIO          = os.getenv("RATIO", "3")
 FILTER         = os.getenv("FILTER", "2")
 SPEED_OPT      = os.getenv("SPEED", "1")  
-FPS_OPT        = os.getenv("FPS", "1")    
+FPS_OPT        = os.getenv("FPS", "1") # 1 = 30 FPS, 2 = 60 FPS
 BITRATE        = os.getenv("BITRATE", "12") 
 STREAM_GAP_MIN = int(os.getenv("STREAM_GAP_MIN", "2"))
 META_ARTIST    = os.getenv("META_ARTIST", "PremxGamer")
+
+# 🔥 STRICT FPS LOCK
+TARGET_FPS = "30" if FPS_OPT == "1" else "60"
 
 # SMART LOOP
 LOOP_INPUT = os.getenv("LOOP_COUNT", "0").strip().lower()
@@ -188,7 +189,7 @@ def run_brain():
     return {"game_name": chosen, "source_url": source_url, "source_file": source_file}
 
 # ═══════════════════════════════════════════════════════════
-# STREAMING (60 Sec Buffer & Audio Fix)
+# STREAMING (Direct URL with Strict FPS Lock)
 # ═══════════════════════════════════════════════════════════
 def _tee():
     o = []
@@ -225,19 +226,15 @@ def stream_direct(url, game_name):
     elif SPEED_OPT == "5": V_SPEED, A_SPEED = "setpts=0.6666*PTS,", "atempo=1.5,"
     elif SPEED_OPT == "6": V_SPEED, A_SPEED = "setpts=1.25*PTS,", "atempo=0.8,"
 
-    FPS = "30" if FPS_OPT == "1" else "60"
     B_V = f"{BITRATE}M"
     BUF = f"{int(BITRATE)*2}M"
 
-    vf_chain = f"{V_SPEED}{CROP}{GAME}scale=trunc(iw/2)*2:trunc(ih/2)*2"
+    # 🔥 STRICT FPS LOCK APPLIED HERE
+    vf_chain = f"{V_SPEED}{CROP}{GAME}fps={TARGET_FPS},scale=trunc(iw/2)*2:trunc(ih/2)*2"
     af_chain = f"{A_SPEED}aresample=48000"
 
     META_TITLE = f"{game_name} Gameplay"
     
-    # 🛠️ 60 SEC BUFFER LOGIC
-    # -rtbufsize 1G: 1GB RAM buffer (approx 60 seconds of 1080p video)
-    # -readrate 3.0: Network se 3x speed se data padhega taaki buffer jaldi bhare
-    # -re: Stream real-time speed par hi jayegi, par pehle 60 sec ka data RAM me load hoga
     inputs = f'{LOOP_ARG}-re -readrate 3.0 -rtbufsize 1G -thread_queue_size 8192 -max_delay 10000000 -rw_timeout 120000000 -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -i "{url}" '
     
     filter_complex = ""
@@ -272,14 +269,14 @@ def stream_direct(url, game_name):
         audio_map = f'-map 0:a? -af "{af_chain}" '
 
     for att in range(1, MAX_STREAM_RETRIES + 1):
-        log(f"📡 Stream Attempt {att}/{MAX_STREAM_RETRIES} → Buffering (60 sec delay)...")
+        log(f"📡 Stream Attempt {att}/{MAX_STREAM_RETRIES} → Locked at {TARGET_FPS} FPS...")
         
-        # Encoding flags
+        # 🔥 -r {TARGET_FPS} force karega ki stream exactly isi FPS par jaye
         enc_flags = (
             f"-c:v libx264 -preset ultrafast -threads 0 -profile:v high -level:v 4.2 "
             f"-pix_fmt yuv420p -b:v {B_V} -maxrate {B_V} -bufsize {BUF} "
-            f"-g 60 -keyint_min 60 -sc_threshold 0 "
-            f"-c:a aac -b:a 192k -ar 48000 -ac 2 "
+            f"-r {TARGET_FPS} -g {TARGET_FPS} -keyint_min {TARGET_FPS} -sc_threshold 0 "
+            f"-c:a aac -b:a 128k -ar 44100 -ac 2 "
             f"-metadata title=\"{META_TITLE}\" -metadata artist=\"{META_ARTIST}\" "
             f"-max_muxing_queue_size 8192 "
             f"-rtmp_buffer 10000 "
@@ -292,7 +289,7 @@ def stream_direct(url, game_name):
             tee = _tee()
             cmd = f'ffmpeg -hide_banner -loglevel info {inputs} -filter_complex "{filter_complex}" {video_map}{audio_map}{enc_flags} -flvflags no_duration_filesize -f tee "{tee}"'
 
-        log("   $ Loading 60 sec buffer into RAM...")
+        log(f"   $ Loading buffer & locking to {TARGET_FPS} FPS...")
         try:
             p = subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True, bufsize=1)
         except Exception as e:
@@ -306,9 +303,8 @@ def stream_direct(url, game_name):
                         if k and k in safe: safe = safe.replace(k, "***")
                     
                     if "frame=" in safe or "time=" in safe:
-                        # Logs me progress dikhega jab buffer bharega
                         if int(re.search(r"frame=\s*(\d+)", safe).group(1)) % 500 == 0:
-                            log(f"      ⏳ Buffering... {safe[:120]}")
+                            log(f"      ⏳ {safe[:120]}")
                     elif safe and any(x in safe.lower() for x in ["error", "failed", "connection", "rtmp", "mapping"]):
                         log(f"      [ffmpeg] {safe[:200]}")
             except Exception: pass
@@ -350,10 +346,11 @@ def move_link(game, url, src_file, ok):
 
 def main():
     log("=" * 62)
-    log("🎮 MASTER AGENT v19.1 — 60 SEC BUFFER STREAM")
+    log("🎮 MASTER AGENT v20.0 — FPS LOCKED")
     log(f"   Loop Setup : {LOOP_MSG}")
     log(f"   Metadata   : Artist='{META_ARTIST}'")
     log(f"   Ratio      : {RATIO} | Filter: {FILTER} | Speed: {SPEED_OPT} | Bitrate: {BITRATE}M")
+    log(f"   FPS Lock   : {TARGET_FPS} FPS")
     log(f"   FB Key     : {'MANUAL INPUT' if MANUAL_FB_KEY else ('SECRET KEY' if SECRET_FB_KEY else 'NONE')}")
     log(f"   YT Key     : {'MANUAL INPUT' if MANUAL_YT_KEY else ('SECRET KEY' if SECRET_YT_KEY else 'NONE')}")
     log("=" * 62)
