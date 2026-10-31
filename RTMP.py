@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 """
-🎮 MASTER AGENT v18.1 — DIRECT STREAM (Buffer + Audio + Manual Key)
+🎮 MASTER AGENT v19.1 — 60 SEC BUFFER DIRECT STREAM
 ======================================================================
-✅ Direct URL to RTMP Stream (No download)
-✅ 200MB RAM Buffer (Delay) for Smooth Stream
+✅ 1GB RAM Buffer (60 Sec Delay before stream starts)
+✅ Zero Lag during stream (Smooth Playback)
 ✅ Watermark, Crop, Filters applied on-the-fly
 ✅ Audio Merge or Original Audio Safe Mapping
-✅ Metadata (Artist: PremxGamer)
 ✅ Manual Key Input (Overrides Secret Key)
 """
 import os
@@ -60,13 +59,13 @@ STREAMING_ENABLED = STREAM_ENABLED and (USE_YT or USE_FB)
 MAX_STREAM_RETRIES = int(os.getenv("MAX_STREAM_RETRIES", "3"))
 MANUAL_VIDEO_URL = os.getenv("MANUAL_VIDEO_URL", "").strip()
 
-# Editor Configs (SPEED default "1" = Normal)
+# Editor Configs
 AUDIO_URL      = os.getenv("AUDIO_URL", "").strip()
 RATIO          = os.getenv("RATIO", "3")
 FILTER         = os.getenv("FILTER", "2")
-SPEED_OPT      = os.getenv("SPEED", "1")  # Default Normal Speed
-FPS_OPT        = os.getenv("FPS", "1")    # Default 30 FPS
-BITRATE        = os.getenv("BITRATE", "12") # Default 12M
+SPEED_OPT      = os.getenv("SPEED", "1")  
+FPS_OPT        = os.getenv("FPS", "1")    
+BITRATE        = os.getenv("BITRATE", "12") 
 STREAM_GAP_MIN = int(os.getenv("STREAM_GAP_MIN", "2"))
 META_ARTIST    = os.getenv("META_ARTIST", "PremxGamer")
 
@@ -189,7 +188,7 @@ def run_brain():
     return {"game_name": chosen, "source_url": source_url, "source_file": source_file}
 
 # ═══════════════════════════════════════════════════════════
-# STREAMING (Direct URL with Buffer & Audio Fix)
+# STREAMING (60 Sec Buffer & Audio Fix)
 # ═══════════════════════════════════════════════════════════
 def _tee():
     o = []
@@ -204,7 +203,6 @@ def stream_direct(url, game_name):
     n = int(USE_YT) + int(USE_FB)
     if n == 0: return False
 
-    # Setup Filters
     CROP = ""
     if RATIO == "1": CROP = "scale=1080:1080:force_original_aspect_ratio=increase,crop=1080:1080,"
     elif RATIO == "2": CROP = "scale=1080:1350:force_original_aspect_ratio=increase,crop=1080:1350,"
@@ -236,14 +234,16 @@ def stream_direct(url, game_name):
 
     META_TITLE = f"{game_name} Gameplay"
     
-    # 🛠️ BUFFER & DELAY SETTINGS (Smooth Stream)
-    inputs = f'{LOOP_ARG}-re -thread_queue_size 4096 -rtbufsize 200M -max_delay 5000000 -rw_timeout 120000000 -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -i "{url}" '
+    # 🛠️ 60 SEC BUFFER LOGIC
+    # -rtbufsize 1G: 1GB RAM buffer (approx 60 seconds of 1080p video)
+    # -readrate 3.0: Network se 3x speed se data padhega taaki buffer jaldi bhare
+    # -re: Stream real-time speed par hi jayegi, par pehle 60 sec ka data RAM me load hoga
+    inputs = f'{LOOP_ARG}-re -readrate 3.0 -rtbufsize 1G -thread_queue_size 8192 -max_delay 10000000 -rw_timeout 120000000 -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -i "{url}" '
     
     filter_complex = ""
     audio_map = ""
     video_map = ""
     
-    # 1. Check Audio Input
     audio_file_exists = False
     if AUDIO_URL:
         log("🎵 Fetching optional audio...")
@@ -254,7 +254,6 @@ def stream_direct(url, game_name):
             filter_complex = f'[0:v]{vf_chain}[vid];[1:a]{af_chain}[a_out]'
             audio_map = "-map \"[a_out]\" "
 
-    # 2. Check Watermark
     if os.path.exists("logo.png"):
         inputs += '-i "logo.png" '
         logo_idx = 2 if audio_file_exists else 1
@@ -269,22 +268,21 @@ def stream_direct(url, game_name):
             filter_complex = f'[0:v]{vf_chain}[vid]'
         video_map = "-map \"[vid]\" "
 
-    # 3. Fallback to original audio if no custom audio
     if not audio_file_exists:
         audio_map = f'-map 0:a? -af "{af_chain}" '
 
     for att in range(1, MAX_STREAM_RETRIES + 1):
-        log(f"📡 Stream Attempt {att}/{MAX_STREAM_RETRIES} → Direct URL to FB/YT")
+        log(f"📡 Stream Attempt {att}/{MAX_STREAM_RETRIES} → Buffering (60 sec delay)...")
         
-        # Anti-Lag & Buffer Settings for Output
+        # Encoding flags
         enc_flags = (
             f"-c:v libx264 -preset ultrafast -threads 0 -profile:v high -level:v 4.2 "
             f"-pix_fmt yuv420p -b:v {B_V} -maxrate {B_V} -bufsize {BUF} "
             f"-g 60 -keyint_min 60 -sc_threshold 0 "
             f"-c:a aac -b:a 192k -ar 48000 -ac 2 "
             f"-metadata title=\"{META_TITLE}\" -metadata artist=\"{META_ARTIST}\" "
-            f"-max_muxing_queue_size 4096 "
-            f"-rtmp_buffer 5000 "
+            f"-max_muxing_queue_size 8192 "
+            f"-rtmp_buffer 10000 "
         )
 
         if n == 1:
@@ -294,7 +292,7 @@ def stream_direct(url, game_name):
             tee = _tee()
             cmd = f'ffmpeg -hide_banner -loglevel info {inputs} -filter_complex "{filter_complex}" {video_map}{audio_map}{enc_flags} -flvflags no_duration_filesize -f tee "{tee}"'
 
-        log("   $ Rendering & Streaming on the fly...")
+        log("   $ Loading 60 sec buffer into RAM...")
         try:
             p = subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True, bufsize=1)
         except Exception as e:
@@ -308,8 +306,9 @@ def stream_direct(url, game_name):
                         if k and k in safe: safe = safe.replace(k, "***")
                     
                     if "frame=" in safe or "time=" in safe:
-                        if int(re.search(r"frame=\s*(\d+)", safe).group(1)) % 2000 == 0:
-                            log(f"      ⬇️⬆️ {safe[:120]}")
+                        # Logs me progress dikhega jab buffer bharega
+                        if int(re.search(r"frame=\s*(\d+)", safe).group(1)) % 500 == 0:
+                            log(f"      ⏳ Buffering... {safe[:120]}")
                     elif safe and any(x in safe.lower() for x in ["error", "failed", "connection", "rtmp", "mapping"]):
                         log(f"      [ffmpeg] {safe[:200]}")
             except Exception: pass
@@ -351,7 +350,7 @@ def move_link(game, url, src_file, ok):
 
 def main():
     log("=" * 62)
-    log("🎮 MASTER AGENT v18.1 — DIRECT STREAM (Manual Key)")
+    log("🎮 MASTER AGENT v19.1 — 60 SEC BUFFER STREAM")
     log(f"   Loop Setup : {LOOP_MSG}")
     log(f"   Metadata   : Artist='{META_ARTIST}'")
     log(f"   Ratio      : {RATIO} | Filter: {FILTER} | Speed: {SPEED_OPT} | Bitrate: {BITRATE}M")
@@ -370,7 +369,6 @@ def main():
         if not result: return
         game, url, src_file = result["game_name"], result["source_url"], result["source_file"]
 
-    # 🔥 GAP (Wait for 2 mins)
     gap_seconds = STREAM_GAP_MIN * 60
     if gap_seconds > 0:
         log(f"⏳ Waiting for {STREAM_GAP_MIN} minutes before connecting to FB/YT...")
@@ -380,7 +378,6 @@ def main():
                 log(f"   ⏱️ Time remaining: {i // 60} minutes...")
             time.sleep(10)
 
-    # 🚀 Stream Directly
     log(f"\n📡 Stream starting now...")
     ok = stream_direct(url, game)
     
