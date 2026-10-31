@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-🎮 MASTER AGENT v17.2 — DIRECT STREAM (No Download, No File Save)
+🎮 MASTER AGENT v18.0 — DIRECT STREAM (Buffer + Audio Fix)
 ======================================================================
-✅ Direct URL to RTMP Stream (No file download)
+✅ Direct URL to RTMP Stream (No download)
+✅ 200MB RAM Buffer (Delay) for Smooth Stream
 ✅ Watermark, Crop, Filters applied on-the-fly
-✅ Audio Merge or Silent Audio injection (No crash on silent videos)
-✅ Speed Default: Normal (1x)
-✅ Buffer Auto-Adjust + Metadata (PremxGamer)
+✅ Audio Merge or Original Audio Safe Mapping
+✅ Metadata (Artist: PremxGamer)
 ✅ Smart Loop (0=Once, 10=10 times, 24h=24 Hours)
 """
 import os
@@ -54,9 +54,9 @@ MANUAL_VIDEO_URL = os.getenv("MANUAL_VIDEO_URL", "").strip()
 AUDIO_URL      = os.getenv("AUDIO_URL", "").strip()
 RATIO          = os.getenv("RATIO", "3")
 FILTER         = os.getenv("FILTER", "2")
-SPEED_OPT      = os.getenv("SPEED", "1")  # 🔥 Default Normal Speed
-FPS_OPT        = os.getenv("FPS", "60")
-BITRATE        = os.getenv("BITRATE", "18") 
+SPEED_OPT      = os.getenv("SPEED", "1")  # Default Normal Speed
+FPS_OPT        = os.getenv("FPS", "1")    # Default 30 FPS
+BITRATE        = os.getenv("BITRATE", "12") # Default 12M for smoothness
 STREAM_GAP_MIN = int(os.getenv("STREAM_GAP_MIN", "1"))
 META_ARTIST    = os.getenv("META_ARTIST", "PremxGamer")
 
@@ -179,7 +179,7 @@ def run_brain():
     return {"game_name": chosen, "source_url": source_url, "source_file": source_file}
 
 # ═══════════════════════════════════════════════════════════
-# STREAMING (Direct URL with Filters & Audio Safety)
+# STREAMING (Direct URL with Buffer & Audio Fix)
 # ═══════════════════════════════════════════════════════════
 def _tee():
     o = []
@@ -224,82 +224,60 @@ def stream_direct(url, game_name):
 
     META_TITLE = f"{game_name} Gameplay"
     
-    # 🛠️ Input & Audio Safety
-    inputs = f'{LOOP_ARG}-re -rw_timeout 120000000 -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -i "{url}" '
+    # 🛠️ BUFFER & DELAY SETTINGS (Smooth Stream)
+    # -thread_queue_size 4096: Network data ke liye bada queue
+    # -rtbufsize 200M: 200MB ka RAM buffer (Delay)
+    # -max_delay 5000000: 5 second tak ka delay handle karega
+    inputs = f'{LOOP_ARG}-re -thread_queue_size 4096 -rtbufsize 200M -max_delay 5000000 -rw_timeout 120000000 -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -i "{url}" '
     
-    # Agar user ne audio diya hai
+    filter_complex = ""
+    audio_map = ""
+    video_map = ""
+    
+    # 1. Check Audio Input
+    audio_file_exists = False
     if AUDIO_URL:
         log("🎵 Fetching optional audio...")
         subprocess.run(f'yt-dlp --extract-audio --audio-format mp3 "{AUDIO_URL}" -o "optional_audio.mp3"', shell=True)
         if os.path.exists("optional_audio.mp3"):
-            inputs += '-i "optional_audio.mp3" '
-            audio_in_idx = 1
-        else:
-            audio_in_idx = None
-    else:
-        audio_in_idx = None
+            audio_file_exists = True
+            inputs += '-thread_queue_size 4096 -i "optional_audio.mp3" '
+            filter_complex = f'[0:v]{vf_chain}[vid];[1:a]{af_chain}[a_out]'
+            audio_map = "-map \"[a_out]\" "
 
-    filter_complex = ""
-    audio_map = ""
-    
-    # Agar audio file mili hai to usko use karo
-    if audio_in_idx is not None:
-        filter_complex = f'[0:v]{vf_chain}[vid];'
-        filter_complex += f'[{audio_in_idx}:a]{af_chain}[a_out];'
-        audio_map = "-map \"[a_out]\" "
-    else:
-        # Agar audio file nahi hai, toh check karo video me audio hai ya nahi (Safe handling)
-        filter_complex = f'[0:v]{vf_chain}[vid];'
-        # anullsrc se silent audio inject karo agar original audio missing ho
-        inputs += '-f lavfi -i anullsrc=channel_layout=stereo:sample_rate=48000 '
-        filter_complex += f'[0:a]{af_chain}[a_orig];' if True else "" 
-        # Let's use a cleaner approach: Map 0:a if it exists, else map anullsrc.
-        # Since we can't easily check remote URL audio without probing, we just map 0:a? and anullsrc.
-        # Actually, easier: just map 0:a and if it fails, we fallback.
-        # To be 100% safe without probing: Use map 0:a? and anullsrc as backup.
-        
-        # Best approach: Just use original audio if it exists, and let FFmpeg handle it.
-        # If no audio, FFmpeg will fail if we force [0:a]. So we use `-map 0:a?` and anullsrc as fallback.
-        # But wait, we need af_chain.
-        # Let's use: -map 0:v -map 0:a? -af "af_chain". If no audio, FFmpeg ignores -af.
-        # But we need the silent audio safety.
-        # Let's go with the previous approach: Assume audio exists, if not, script might fail (But we handle it via fallback in python).
-        # Actually, standard way: `-f lavfi -i anullsrc` as second input, then map [0:a] and [1:a] with amix? No, too complex.
-        
-        # Let's just use `-map 0:v -map 0:a?` and apply `-af`. If no audio, it just won't apply.
-        # But to prevent crash on missing audio, we'll use anullsrc if needed.
-        # Let's write a robust audio mapping:
-        filter_complex = f'[0:v]{vf_chain}[vid];'
-        # We map original audio, if it fails, we use anullsrc.
-        # Actually, the safest is to just map 0:a? and if it doesn't exist, FFmpeg outputs a warning but continues.
-        audio_map = "-map 0:a? "
-
-    # Watermark
+    # 2. Check Watermark
     if os.path.exists("logo.png"):
         inputs += '-i "logo.png" '
-        # Find logo index (last input)
-        logo_idx = len(re.findall(r'-i\s', inputs)) - 1
-        filter_complex += f'[{logo_idx}:v]scale=160:-1[logo];[vid][logo]overlay=30:H-h-20[v_out]'
+        logo_idx = 2 if audio_file_exists else 1
+        if audio_file_exists:
+            filter_complex += f';[{logo_idx}:v]scale=160:-1[logo];[vid][logo]overlay=30:H-h-20[v_out]'
+        else:
+            filter_complex = f'[0:v]{vf_chain}[vid];[{logo_idx}:v]scale=160:-1[logo];[vid][logo]overlay=30:H-h-20[v_out]'
         log("🏷️ Watermark applied.")
         video_map = "-map \"[v_out]\" "
     else:
-        filter_complex += f'[vid]copy[v_out]'
-        video_map = "-map \"[v_out]\" "
+        if not audio_file_exists:
+            filter_complex = f'[0:v]{vf_chain}[vid]'
+        video_map = "-map \"[vid]\" "
+
+    # 3. Fallback to original audio if no custom audio
+    if not audio_file_exists:
+        audio_map = f'-map 0:a? -af "{af_chain}" '
 
     for att in range(1, MAX_STREAM_RETRIES + 1):
         log(f"📡 Stream Attempt {att}/{MAX_STREAM_RETRIES} → Direct URL to FB/YT")
         
+        # Anti-Lag & Buffer Settings for Output
         enc_flags = (
-            f"-c:v libx264 -preset ultrafast -profile:v high -level:v 4.2 "
-            f"-pix_fmt yuv420p -b:v {B_V} -bufsize {BUF} "
+            f"-c:v libx264 -preset ultrafast -threads 0 -profile:v high -level:v 4.2 "
+            f"-pix_fmt yuv420p -b:v {B_V} -maxrate {B_V} -bufsize {BUF} "
             f"-g 60 -keyint_min 60 -sc_threshold 0 "
             f"-c:a aac -b:a 192k -ar 48000 -ac 2 "
             f"-metadata title=\"{META_TITLE}\" -metadata artist=\"{META_ARTIST}\" "
-            f"-max_muxing_queue_size 1024 "
-            f"-rtmp_buffer 1000 "
+            f"-max_muxing_queue_size 4096 "
+            f"-rtmp_buffer 5000 "
         )
 
-        # Build final command
         if n == 1:
             target = f"rtmp://a.rtmp.youtube.com/live2/{YOUTUBE_KEY}" if USE_YT else f"rtmps://live-api-s.facebook.com:443/rtmp/{FACEBOOK_KEY}"
             cmd = f'ffmpeg -hide_banner -loglevel info {inputs} -filter_complex "{filter_complex}" {video_map}{audio_map}{enc_flags} -flvflags no_duration_filesize -f flv "{target}"'
@@ -364,7 +342,7 @@ def move_link(game, url, src_file, ok):
 
 def main():
     log("=" * 62)
-    log("🎮 MASTER AGENT v17.2 — DIRECT STREAM (No Download)")
+    log("🎮 MASTER AGENT v18.0 — DIRECT STREAM (Buffer + Audio)")
     log(f"   Loop Setup : {LOOP_MSG}")
     log(f"   Metadata   : Artist='{META_ARTIST}'")
     log(f"   Ratio      : {RATIO} | Filter: {FILTER} | Speed: {SPEED_OPT} | Bitrate: {BITRATE}M")
