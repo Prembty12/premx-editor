@@ -1,4 +1,4 @@
-name: RTMP
+name: Master Direct Streamer
 
 on:
   workflow_dispatch:
@@ -7,30 +7,30 @@ on:
         description: 'Direct Video URL (Leave blank to use auto-rotation)'
         required: false
         default: ''
-      loop_count:
-        description: 'Loop [0=Once, 2=Twice, 10=10 Times, 24h/24=24 Hours]'
-        required: true
-        default: '0'
-      stream_mode:
-        description: 'Platform [both, fb, yt]'
-        required: true
-        default: 'both'
       audio_url:
         description: 'Optional Audio URL (Leave blank if not needed)'
         required: false
         default: ''
+      stream_mode:
+        description: 'Platform [both, fb, yt]'
+        required: true
+        default: 'both'
+      loop_count:
+        description: 'Loop [0=Once, 2=Twice, 10=10 Times, 24h/24=24 Hours]'
+        required: true
+        default: '0'
       ratio:
         description: 'Crop Ratio [1=1:1, 2=4:5, 3=9:16, 4=3:4, 5=4:3]'
         required: true
         default: '3'
       filter:
-        description: 'Filter [0=OFF, 1=Pop, 2=Vivid, 3=Cyber, 4=Night, 5=Cinematic, 6=HDR]'
+        description: 'Filter [1=Pop, 2=Vivid, 3=Cyber, 4=Night, 5=Cinematic, 6=HDR]'
         required: true
         default: '2'
       speed:
-        description: 'Speed [1=1x, 2=1.05x, 3=1.10x, 4=1.25x, 5=1.5x, 6=0.8x]'
+        description: 'Speed [1=Normal, 2=1.05x, 3=1.10x, 4=1.25x, 5=1.5x, 6=0.8x]'
         required: true
-        default: '4'
+        default: '1'
       fps:
         description: 'FPS [1=30, 2=60]'
         required: true
@@ -40,9 +40,9 @@ on:
         required: true
         default: '18'
       gap_minutes:
-        description: 'Gap before stream (Minutes)'
+        description: 'Gap before stream starts (Minutes)'
         required: true
-        default: '5'
+        default: '1'
 
 jobs:
   stream:
@@ -56,7 +56,7 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      # 🚀 CACHE 1: APT Packages (FFmpeg, curl, jq)
+      # 🚀 Cache APT Packages (FFmpeg, jq, etc.)
       - name: Cache APT Packages
         uses: actions/cache@v4
         with:
@@ -65,7 +65,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-apt-
 
-      # 🚀 CACHE 2: Python Setup & Pip Packages
+      # 🚀 Setup Python & Cache Pip Packages
       - name: Setup Python & Cache Pip
         uses: actions/setup-python@v5
         with:
@@ -84,22 +84,25 @@ jobs:
       - name: Run Master Streamer
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+          # Core Stream Keys
           YOUTUBE_STREAM_KEY:  "${{ secrets.YOUTUBE_STREAM_KEY }}"
           FACEBOOK_STREAM_KEY: "${{ secrets.FACEBOOK_STREAM_KEY }}"
           
-          # 🔥 Manual Input mapping
+          # Manual Inputs Mapping
           MANUAL_VIDEO_URL: "${{ inputs.video_url }}"
+          AUDIO_URL:        "${{ inputs.audio_url }}"
           
+          # Editor Configs Mapping
           STREAM_MODE:    "${{ inputs.stream_mode }}"
           LOOP_COUNT:     "${{ inputs.loop_count }}"
-          AUDIO_URL:      "${{ inputs.audio_url }}"
           RATIO:          "${{ inputs.ratio }}"
           FILTER:         "${{ inputs.filter }}"
           SPEED:          "${{ inputs.speed }}"
           FPS:            "${{ inputs.fps }}"
           BITRATE:        "${{ inputs.bitrate }}"
           STREAM_GAP_MIN: "${{ inputs.gap_minutes }}"
-        run: python RTMP.py
+        run: python master.py
 
       - name: Commit Streamed Links (Safe - No Videos)
         if: always()
@@ -107,8 +110,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
+          # Sirf text files add karo, video mp4 files ko chhodo
           git add "*.txt" "*.json" "*.md" || true
           git add game_links_livestream/ game_links_streamed/ Manual_links/ gaming_runtime_v8/ || true
+          
+          # Safety: Agar koi galti se mp4 add hone ki koshish kare to use unstage kar do
           git reset "*.mp4" || true
           
           git commit -m "🤖 Stream Complete [skip ci]" || echo "No changes to commit"
