@@ -1,42 +1,42 @@
 {
-  "last_updated": "2026-11-02 10:00:30 AM",
+  "last_updated": "2026-11-03 02:55:24 AM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 2556,
-      "avg_per_video": 284,
+      "views_7d": 3563,
+      "avg_per_video": 445,
       "trend": "viral",
-      "ratio": 2.0084865629420086,
-      "fb_link": "",
+      "ratio": 2.3009307135470527,
+      "fb_link": "https://www.facebook.com/reel/1148022197910849/",
+      "source_link": ""
+    },
+    {
+      "game": "codBlackops6",
+      "views_7d": 268,
+      "avg_per_video": 268,
+      "trend": "steady",
+      "ratio": 1.3857290589451914,
+      "fb_link": "https://www.facebook.com/1082871464600149/videos/1471500258505084",
       "source_link": ""
     },
     {
       "game": "MarvelsSpiderMan2",
-      "views_7d": 2237,
-      "avg_per_video": 279,
-      "trend": "trending",
-      "ratio": 1.973125884016973,
+      "views_7d": 1720,
+      "avg_per_video": 215,
+      "trend": "steady",
+      "ratio": 1.1116856256463288,
       "fb_link": "",
       "source_link": ""
     }
   ],
   "below_avg": [
     {
-      "game": "codBlackops6",
-      "views_7d": 102,
-      "avg_per_video": 102,
-      "trend": "slow",
-      "ratio": 0.7213578500707213,
-      "fb_link": "https://www.facebook.com/1082871464600149/videos/1471500258505084",
-      "source_link": ""
-    },
-    {
       "game": "Wolverine",
-      "views_7d": 475,
-      "avg_per_video": 36,
+      "views_7d": 406,
+      "avg_per_video": 33,
       "trend": "below_avg",
-      "ratio": 0.25459688826025456,
+      "ratio": 0.17063081695966908,
       "fb_link": "",
       "source_link": ""
     },
@@ -45,18 +45,18 @@
       "views_7d": 30,
       "avg_per_video": 6,
       "trend": "below_avg",
-      "ratio": 0.042432814710042434,
+      "ratio": 0.031023784901758014,
       "fb_link": "",
       "source_link": ""
     }
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 2556,
-    "avg_per_video": 284,
+    "views_7d": 3563,
+    "avg_per_video": 445,
     "trend": "viral",
-    "ratio": 2.0084865629420086,
-    "fb_link": "",
+    "ratio": 2.3009307135470527,
+    "fb_link": "https://www.facebook.com/reel/1148022197910849/",
     "source_link": ""
   }
 }
