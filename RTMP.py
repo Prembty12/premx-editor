@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 """
-🎮 MASTER AGENT v22.1 — STRICT 30/60 FPS + NO LAG (UPDATED)
+🎮 MASTER AGENT v25.2 — SMART NETWORK (UP+DOWN) + CPU TEST + 30s FAST BUFFER
 ======================================================================
-✅ 100% Strict FPS Lock (30 or 60) with Smooth Frame Handling
-✅ 1GB RAM Buffer (No ruk-ruk kar lag)
-✅ Watermark, Crop, Filters applied on-the-fly
-✅ Audio Merge or Original Audio Safe Mapping
-✅ Manual Key Input (Overrides Secret Key)
-✅ Removed -readrate to fix FPS drop issue
-✅ Lightened Filter 3 to save CPU
+✅ Tests CPU Speed (FFmpeg 10s test)
+✅ Tests Network Speed (Download + Upload test)
+✅ If ALL are fast -> Streams INSTANTLY with 30s Buffer
+✅ If ANY is slow -> Enables 5-Min Pre-Buffer + 2-Min RTMP
+✅ Heavy Filters & Real-Time Logs Intact
 """
 import os
 import sys
@@ -42,11 +40,8 @@ STREAM_ENABLED     = os.getenv("STREAM_ENABLED", "true").lower() == "true"
 STREAM_MODE        = os.getenv("STREAM_MODE", "both").lower().strip()
 if STREAM_MODE not in ("fb", "yt", "both"): STREAM_MODE = "both"
 
-# 🔥 MANUAL KEYS (Workflow Inputs)
 MANUAL_FB_KEY = os.getenv("MANUAL_FB_KEY", "").strip()
 MANUAL_YT_KEY = os.getenv("MANUAL_YT_KEY", "").strip()
-
-# Secrets Fallback
 SECRET_FB_KEY = (os.getenv("FACEBOOK_STREAM_KEY") or "").strip()
 SECRET_YT_KEY = (os.getenv("YOUTUBE_STREAM_KEY") or "").strip()
 
@@ -60,20 +55,17 @@ STREAMING_ENABLED = STREAM_ENABLED and (USE_YT or USE_FB)
 MAX_STREAM_RETRIES = int(os.getenv("MAX_STREAM_RETRIES", "3"))
 MANUAL_VIDEO_URL = os.getenv("MANUAL_VIDEO_URL", "").strip()
 
-# Editor Configs
 AUDIO_URL      = os.getenv("AUDIO_URL", "").strip()
 RATIO          = os.getenv("RATIO", "3")
 FILTER         = os.getenv("FILTER", "2")
 SPEED_OPT      = os.getenv("SPEED", "1")  
-FPS_OPT        = os.getenv("FPS", "1") # 1 = 30 FPS, 2 = 60 FPS
-BITRATE        = os.getenv("BITRATE", "12") 
+FPS_OPT        = os.getenv("FPS", "1") 
+BITRATE        = os.getenv("BITRATE", "8") 
 STREAM_GAP_MIN = int(os.getenv("STREAM_GAP_MIN", "2"))
 META_ARTIST    = os.getenv("META_ARTIST", "PremxGamer")
 
-# 🔥 STRICT FPS LOCK
 TARGET_FPS = "30" if FPS_OPT == "1" else "60"
 
-# SMART LOOP
 LOOP_INPUT = os.getenv("LOOP_COUNT", "0").strip().lower()
 LOOP_ARG = ""
 MAX_RUN_SECONDS = 5 * 3600 + 30 * 60 
@@ -102,15 +94,8 @@ except Exception:
 def now_ist_ampm():
     return datetime.now(IST).strftime("%Y-%m-%d %I:%M:%S %p")
 
-# ═══════════════════════════════════════════════════════════
-# BRAIN (Auto-Rotation Fallback)
-# ═══════════════════════════════════════════════════════════
-LOGS_DIR       = "gaming_runtime_v8"
-MANUAL_DIR     = "Manual_links"
-AUTO_DIR       = "game_links_livestream"
-STREAMED_DIR   = "game_links_streamed"
-
-for d in [LOGS_DIR, MANUAL_DIR, AUTO_DIR, STREAMED_DIR]:
+LOGS_DIR = "gaming_runtime_v8"
+for d in [LOGS_DIR, "Manual_links", "game_links_livestream", "game_links_streamed"]:
     os.makedirs(d, exist_ok=True)
 
 def _extract_game(fpath):
@@ -191,19 +176,79 @@ def run_brain():
     
     return {"game_name": chosen, "source_url": source_url, "source_file": source_file}
 
-# ═══════════════════════════════════════════════════════════
-# STREAMING (Direct URL with Strict FPS Lock & Buffer)
-# ═══════════════════════════════════════════════════════════
 def _tee():
     o = []
     if USE_YT: o.append(f"[f=flv]rtmp://a.rtmp.youtube.com/live2/{YOUTUBE_KEY}")
     if USE_FB: o.append(f"[f=flv]rtmps://live-api-s.facebook.com:443/rtmp/{FACEBOOK_KEY}")
     return "|".join(o)
 
-def stream_direct(url, game_name):
-    if not STREAMING_ENABLED: 
-        log("❌ Stream disabled or no keys found.")
+# ═══════════════════════════════════════════════════════════
+# ⚡ SMART DUAL-TEST (CPU + NETWORK DOWN/UP)
+# ═══════════════════════════════════════════════════════════
+def get_network_speeds():
+    log("🌐 Checking Network Download & Upload Speed...")
+    try:
+        import speedtest
+        st = speedtest.Speedtest()
+        st.get_best_server()
+        
+        log("   ⬇️ Testing Download...")
+        download_mbps = st.download() / 1_000_000
+        
+        log("   ⬆️ Testing Upload...")
+        upload_mbps = st.upload() / 1_000_000
+        
+        return download_mbps, upload_mbps
+    except Exception as e:
+        log(f"   ⚠️ Speedtest error: {e}. Defaulting to 0.")
+        return 0, 0
+
+def run_smart_test(url, vf_chain, base_enc_flags):
+    log("🔍 Pre-Flight Test: Checking CPU & Network (Down/Up)...")
+    
+    # --- 1. CPU Test (FFmpeg) ---
+    cmd = f'ffmpeg -hide_banner -loglevel info -t 10 -re -rtbufsize 512M -thread_queue_size 8192 -i "{url}" -filter_complex "[0:v]{vf_chain}[vid]" -map "[vid]" {base_enc_flags} -f null -'
+    cpu_speed = 0.0
+    try:
+        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
+        start = time.time()
+        while p.poll() is None:
+            if time.time() - start > 15:
+                p.kill()
+                break
+            line = p.stderr.readline()
+            if not line: continue
+            match = re.search(r"speed=\s*([\d\.]+)x", line)
+            if match:
+                cpu_speed = max(cpu_speed, float(match.group(1)))
+    except Exception as e:
+        log(f"   ❌ CPU Test error: {e}")
+        cpu_speed = 0.0
+
+    log(f"   🖥️ CPU Speed: {cpu_speed}x")
+    
+    # --- 2. Network Test ---
+    download_speed, upload_speed = get_network_speeds()
+    
+    log(f"   ⬇️ Download Speed: {download_speed:.2f} Mbps")
+    log(f"   ⬆️ Upload Speed: {upload_speed:.2f} Mbps")
+    
+    # --- 3. Decision Logic ---
+    # Both Download and Upload should be at least 1.5x of the target bitrate
+    required_net = int(BITRATE) * 1.5 
+    
+    if cpu_speed >= 0.95 and download_speed >= required_net and upload_speed >= required_net:
+        log(f"   ✅ SYSTEM IS FAST (CPU: {cpu_speed}x, Down: {download_speed:.1f}M, Up: {upload_speed:.1f}M).")
+        return True
+    else:
+        log(f"   ⚠️ SYSTEM IS SLOW/BOTTLENECKED. (Required Down & Up: >{required_net} Mbps).")
         return False
+
+# ═══════════════════════════════════════════════════════════
+# STREAMING (Smart Buffer Logic)
+# ═══════════════════════════════════════════════════════════
+def stream_direct(url, game_name):
+    if not STREAMING_ENABLED: return False
     n = int(USE_YT) + int(USE_FB)
     if n == 0: return False
 
@@ -214,14 +259,13 @@ def stream_direct(url, game_name):
     elif RATIO == "4": CROP = "scale=1080:1440:force_original_aspect_ratio=increase,crop=1080:1440,"
     elif RATIO == "5": CROP = "scale=1440:1080:force_original_aspect_ratio=increase,crop=1440:1080,"
 
-    # 🔥 LIGHTER FILTERS (Fixed CPU Overload)
     GAME = ""
-    if FILTER == "1": GAME = "eq=brightness=0.02:contrast=1.18:saturation=1.25,"
-    elif FILTER == "2": GAME = "eq=brightness=0.02:contrast=1.20:saturation=1.22:gamma=1.11,"
-    elif FILTER == "3": GAME = "eq=brightness=0.02:contrast=1.10:saturation=1.15:gamma=1.10,"  # <--- Lightened
-    elif FILTER == "4": GAME = "eq=brightness=0.15:contrast=1.20:gamma=1.25,"
-    elif FILTER == "5": GAME = "eq=contrast=1.25:saturation=1.20,colorbalance=rs=0.08:gs=0.02:bs=-0.08,"
-    elif FILTER == "6": GAME = "eq=contrast=1.35:saturation=1.55:gamma=1.05,"
+    if FILTER == "1": GAME = "eq=brightness=0.02:contrast=1.18:saturation=1.25,hqdn3d=1.5:1.5:6:6,unsharp=3:3:0.75:3:3:0.0,"
+    elif FILTER == "2": GAME = "eq=brightness=0.02:contrast=1.20:saturation=1.22:gamma=1.11,vibrance=intensity=0.20,hqdn3d=1.5:1.5:6:6,cas=0.3,noise=alls=3:allf=t+u,unsharp=3:3:0.75:3:3:0.0,"
+    elif FILTER == "3": GAME = "scale=flags=lanczos+accurate_rnd:param0=3.0,eq=brightness=0.02:contrast=1.10:saturation=1.10:gamma=1.10,vibrance=intensity=0.10,hqdn3d=1.0:1.0:3:3,cas=0.15,noise=alls=2:allf=t+u,unsharp=3:3:0.2:3:3:0.0,"
+    elif FILTER == "4": GAME = "eq=brightness=0.15:contrast=1.20:gamma=1.25,unsharp=5:5:1.0:5:5:0.0,"
+    elif FILTER == "5": GAME = "eq=contrast=1.25:saturation=1.20,colorbalance=rs=0.08:gs=0.02:bs=-0.08,unsharp=5:5:1.2:5:5:0.0,"
+    elif FILTER == "6": GAME = "eq=contrast=1.35:saturation=1.55:gamma=1.05,unsharp=7:7:2.5:7:7:0.0,"
 
     V_SPEED, A_SPEED = "", ""
     if SPEED_OPT == "2": V_SPEED, A_SPEED = "setpts=0.9523*PTS,", "atempo=1.05,"
@@ -233,15 +277,34 @@ def stream_direct(url, game_name):
     B_V = f"{BITRATE}M"
     BUF = f"{int(BITRATE)*2}M"
 
-    # 🔥 STRICT FPS FILTER (round=near for smooth drop)
     vf_chain = f"{V_SPEED}{CROP}{GAME}fps={TARGET_FPS}:round=near,scale=trunc(iw/2)*2:trunc(ih/2)*2"
     af_chain = f"{A_SPEED}aresample=48000"
-
     META_TITLE = f"{game_name} Gameplay"
     
-    # 🛠️ REMOVED -readrate 1.0 TO FIX FPS DROP
-    inputs = f'{LOOP_ARG}-re -rtbufsize 1G -thread_queue_size 8192 -max_delay 10000000 -rw_timeout 120000000 -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -i "{url}" '
-    
+    base_enc_flags = (
+        f"-c:v libx264 -preset ultrafast -threads 0 -profile:v high -level:v 4.2 "
+        f"-pix_fmt yuv420p -b:v {B_V} -maxrate {B_V} -bufsize {BUF} "
+        f"-r {TARGET_FPS} -fps_mode cfr "
+        f"-g {TARGET_FPS} -keyint_min {TARGET_FPS} -sc_threshold 0 "
+        f"-c:a aac -b:a 128k -ar 44100 -ac 2 "
+        f"-metadata title=\"{META_TITLE}\" -metadata artist=\"{META_ARTIST}\" "
+        f"-max_muxing_queue_size 16384 "
+    )
+
+    # 1. Run Smart Test (CPU + Network Down/Up)
+    is_fast_system = run_smart_test(url, vf_chain, base_enc_flags)
+
+    # 2. Set Inputs & Buffers
+    if is_fast_system:
+        log("🚀 CPU & Network are FAST! Streaming with 30-Sec Buffer.")
+        # 🔥 Yahan max_delay ko 10000000 se badhakar 30000000 (30 sec) kar diya gaya hai
+        inputs = f'{LOOP_ARG}-re -rtbufsize 512M -thread_queue_size 8192 -max_delay 30000000 -rw_timeout 120000000 -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -i "{url}" '
+        enc_flags = base_enc_flags + "-rtmp_buffer 10000 " # 10 Sec RTMP
+    else:
+        log("🐢 CPU or Network is SLOW! Enabling 5-Min Pre-Buffer & 2-Min RTMP.")
+        inputs = f'{LOOP_ARG}-re -rtbufsize 2G -thread_queue_size 16384 -max_delay 300000000 -rw_timeout 120000000 -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -i "{url}" '
+        enc_flags = base_enc_flags + "-rtmp_buffer 120000 " # 2 Min RTMP
+
     filter_complex = ""
     audio_map = ""
     video_map = ""
@@ -274,46 +337,33 @@ def stream_direct(url, game_name):
         audio_map = f'-map 0:a? -af "{af_chain}" '
 
     for att in range(1, MAX_STREAM_RETRIES + 1):
-        log(f"📡 Stream Attempt {att}/{MAX_STREAM_RETRIES} → Locked at {TARGET_FPS} FPS...")
+        log(f"📡 Stream Attempt {att}/{MAX_STREAM_RETRIES} → Starting...")
         
-        # 🔥 REAL STRICT FPS LOCK APPLIED
-        enc_flags = (
-            f"-c:v libx264 -preset ultrafast -threads 0 -profile:v high -level:v 4.2 "
-            f"-pix_fmt yuv420p -b:v {B_V} -maxrate {B_V} -bufsize {BUF} "
-            f"-r {TARGET_FPS} -fps_mode cfr "  # 🔥 Modern CFR lock
-            f"-g {TARGET_FPS} -keyint_min {TARGET_FPS} -sc_threshold 0 "
-            f"-c:a aac -b:a 128k -ar 44100 -ac 2 "
-            f"-metadata title=\"{META_TITLE}\" -metadata artist=\"{META_ARTIST}\" "
-            f"-max_muxing_queue_size 8192 "
-            f"-rtmp_buffer 10000 "
-        )
-
         if n == 1:
             target = f"rtmp://a.rtmp.youtube.com/live2/{YOUTUBE_KEY}" if USE_YT else f"rtmps://live-api-s.facebook.com:443/rtmp/{FACEBOOK_KEY}"
-            cmd = f'ffmpeg -hide_banner -loglevel info {inputs} -filter_complex "{filter_complex}" {video_map}{audio_map}{enc_flags} -flvflags no_duration_filesize -f flv "{target}"'
+            cmd = f'ffmpeg -hide_banner -loglevel info -stats {inputs} -filter_complex "{filter_complex}" {video_map}{audio_map}{enc_flags} -flvflags no_duration_filesize -f flv "{target}"'
         else:
             tee = _tee()
-            cmd = f'ffmpeg -hide_banner -loglevel info {inputs} -filter_complex "{filter_complex}" {video_map}{audio_map}{enc_flags} -flvflags no_duration_filesize -f tee "{tee}"'
+            cmd = f'ffmpeg -hide_banner -loglevel info -stats {inputs} -filter_complex "{filter_complex}" {video_map}{audio_map}{enc_flags} -flvflags no_duration_filesize -f tee "{tee}"'
 
-        log(f"   $ Loading buffer & locking to {TARGET_FPS} FPS...")
+        log(f"   $ Connecting to FB/YT...")
         try:
-            p = subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True, bufsize=1)
+            p = subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, universal_newlines=True)
         except Exception as e:
             return False
 
         def _reader():
             try:
-                for line in iter(p.stderr.readline, ""):
+                for line in iter(p.stderr.readline, ''):
                     safe = line.strip()
+                    if not safe: continue
+                    
                     for k in (YOUTUBE_KEY, FACEBOOK_KEY):
                         if k and k in safe: safe = safe.replace(k, "***")
                     
-                    if "frame=" in safe or "time=" in safe:
-                        # Log speed to check if CPU is keeping up
-                        match = re.search(r"frame=\s*(\d+).*speed=\s*([\d\.]+x)", safe)
-                        if match and int(match.group(1)) % 500 == 0:
-                            log(f"      ⏳ {safe[:120]}")
-                    elif safe and any(x in safe.lower() for x in ["error", "failed", "connection", "rtmp", "mapping"]):
+                    if "frame=" in safe or "speed=" in safe:
+                        log(f"      ⏳ {safe}")
+                    elif any(x in safe.lower() for x in ["error", "failed", "connection", "rtmp", "mapping"]):
                         log(f"      [ffmpeg] {safe[:200]}")
             except Exception: pass
 
@@ -334,9 +384,6 @@ def stream_direct(url, game_name):
         if att < MAX_STREAM_RETRIES: time.sleep(5 * att)
     return False
 
-# ═══════════════════════════════════════════════════════════
-# MAIN
-# ═══════════════════════════════════════════════════════════
 def move_link(game, url, src_file, ok):
     if src_file == "manual_url": return True
     if not ok: return False
@@ -354,13 +401,10 @@ def move_link(game, url, src_file, ok):
 
 def main():
     log("=" * 62)
-    log("🎮 MASTER AGENT v22.1 — STRICT FPS + NO LAG")
+    log("🎮 MASTER AGENT v25.2 — SMART NETWORK (DOWN+UP) + 30s FAST BUFFER")
     log(f"   Loop Setup : {LOOP_MSG}")
-    log(f"   Metadata   : Artist='{META_ARTIST}'")
-    log(f"   Ratio      : {RATIO} | Filter: {FILTER} | Speed: {SPEED_OPT} | Bitrate: {BITRATE}M")
+    log(f"   Ratio      : {RATIO} | Filter: {FILTER} | Bitrate: {BITRATE}M")
     log(f"   FPS Lock   : {TARGET_FPS} FPS")
-    log(f"   FB Key     : {'MANUAL INPUT' if MANUAL_FB_KEY else ('SECRET KEY' if SECRET_FB_KEY else 'NONE')}")
-    log(f"   YT Key     : {'MANUAL INPUT' if MANUAL_YT_KEY else ('SECRET KEY' if SECRET_YT_KEY else 'NONE')}")
     log("=" * 62)
 
     if MANUAL_VIDEO_URL:
@@ -376,14 +420,14 @@ def main():
 
     gap_seconds = STREAM_GAP_MIN * 60
     if gap_seconds > 0:
-        log(f"⏳ Waiting for {STREAM_GAP_MIN} minutes before connecting to FB/YT...")
+        log(f"⏳ Waiting for {STREAM_GAP_MIN} minutes before connecting...")
         for i in range(gap_seconds, 0, -10):
             if INTERRUPTED: return
             if i % 60 == 0:
                 log(f"   ⏱️ Time remaining: {i // 60} minutes...")
             time.sleep(10)
 
-    log(f"\n📡 Stream starting now...")
+    log(f"\n📡 Initializing Stream...")
     ok = stream_direct(url, game)
     
     move_link(game, url, src_file, ok)
