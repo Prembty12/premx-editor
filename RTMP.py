@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """
-🎮 MASTER AGENT v22.0 — STRICT 30/60 FPS + NO LAG
+🎮 MASTER AGENT v22.1 — STRICT 30/60 FPS + NO LAG (UPDATED)
 ======================================================================
-✅ 100% Strict FPS Lock (30 or 60) with Frame Drop
+✅ 100% Strict FPS Lock (30 or 60) with Smooth Frame Handling
 ✅ 1GB RAM Buffer (No ruk-ruk kar lag)
 ✅ Watermark, Crop, Filters applied on-the-fly
 ✅ Audio Merge or Original Audio Safe Mapping
 ✅ Manual Key Input (Overrides Secret Key)
+✅ Removed -readrate to fix FPS drop issue
+✅ Lightened Filter 3 to save CPU
 """
 import os
 import sys
@@ -76,7 +78,7 @@ LOOP_INPUT = os.getenv("LOOP_COUNT", "0").strip().lower()
 LOOP_ARG = ""
 MAX_RUN_SECONDS = 5 * 3600 + 30 * 60 
 
-if LOOP_INPUT in ("24", "24h", "-1", "infinite", "inf"):
+if LOOP_INPUT in ("24", "24h", "24h/24", "-1", "infinite", "inf"):
     LOOP_ARG = "-stream_loop -1 "
     MAX_RUN_SECONDS = 24 * 3600
     LOOP_MSG = "Infinite (24 Hours)"
@@ -212,13 +214,14 @@ def stream_direct(url, game_name):
     elif RATIO == "4": CROP = "scale=1080:1440:force_original_aspect_ratio=increase,crop=1080:1440,"
     elif RATIO == "5": CROP = "scale=1440:1080:force_original_aspect_ratio=increase,crop=1440:1080,"
 
+    # 🔥 LIGHTER FILTERS (Fixed CPU Overload)
     GAME = ""
-    if FILTER == "1": GAME = "eq=brightness=0.02:contrast=1.18:saturation=1.25,hqdn3d=1.5:1.5:6:6,unsharp=3:3:0.75:3:3:0.0,"
-    elif FILTER == "2": GAME = "eq=brightness=0.02:contrast=1.20:saturation=1.22:gamma=1.11,vibrance=intensity=0.20,hqdn3d=1.5:1.5:6:6,cas=0.3,noise=alls=3:allf=t+u,unsharp=3:3:0.75:3:3:0.0,"
-    elif FILTER == "3": GAME = "scale=flags=lanczos+accurate_rnd:param0=3.0,eq=brightness=0.02:contrast=1.10:saturation=1.10:gamma=1.10,vibrance=intensity=0.10,hqdn3d=1.0:1.0:3:3,cas=0.15,noise=alls=2:allf=t+u,unsharp=3:3:0.2:3:3:0.0,"
-    elif FILTER == "4": GAME = "eq=brightness=0.15:contrast=1.20:gamma=1.25,unsharp=5:5:1.0:5:5:0.0,"
-    elif FILTER == "5": GAME = "eq=contrast=1.25:saturation=1.20,colorbalance=rs=0.08:gs=0.02:bs=-0.08,unsharp=5:5:1.2:5:5:0.0,"
-    elif FILTER == "6": GAME = "eq=contrast=1.35:saturation=1.55:gamma=1.05,unsharp=7:7:2.5:7:7:0.0,"
+    if FILTER == "1": GAME = "eq=brightness=0.02:contrast=1.18:saturation=1.25,"
+    elif FILTER == "2": GAME = "eq=brightness=0.02:contrast=1.20:saturation=1.22:gamma=1.11,"
+    elif FILTER == "3": GAME = "eq=brightness=0.02:contrast=1.10:saturation=1.15:gamma=1.10,"  # <--- Lightened
+    elif FILTER == "4": GAME = "eq=brightness=0.15:contrast=1.20:gamma=1.25,"
+    elif FILTER == "5": GAME = "eq=contrast=1.25:saturation=1.20,colorbalance=rs=0.08:gs=0.02:bs=-0.08,"
+    elif FILTER == "6": GAME = "eq=contrast=1.35:saturation=1.55:gamma=1.05,"
 
     V_SPEED, A_SPEED = "", ""
     if SPEED_OPT == "2": V_SPEED, A_SPEED = "setpts=0.9523*PTS,", "atempo=1.05,"
@@ -230,15 +233,14 @@ def stream_direct(url, game_name):
     B_V = f"{BITRATE}M"
     BUF = f"{int(BITRATE)*2}M"
 
-    # 🔥 STRICT FPS FILTER (round=down forces exact drop)
-    vf_chain = f"{V_SPEED}{CROP}{GAME}fps={TARGET_FPS}:round=down,scale=trunc(iw/2)*2:trunc(ih/2)*2"
+    # 🔥 STRICT FPS FILTER (round=near for smooth drop)
+    vf_chain = f"{V_SPEED}{CROP}{GAME}fps={TARGET_FPS}:round=near,scale=trunc(iw/2)*2:trunc(ih/2)*2"
     af_chain = f"{A_SPEED}aresample=48000"
 
     META_TITLE = f"{game_name} Gameplay"
     
-    # 🛠️ 60 SEC BUFFER LOGIC (No Lag Fix)
-    # Note: -readrate 1.0 ensures it doesn't send fake 50-55 fps
-    inputs = f'{LOOP_ARG}-re -readrate 1.0 -rtbufsize 1G -thread_queue_size 8192 -max_delay 10000000 -rw_timeout 120000000 -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -i "{url}" '
+    # 🛠️ REMOVED -readrate 1.0 TO FIX FPS DROP
+    inputs = f'{LOOP_ARG}-re -rtbufsize 1G -thread_queue_size 8192 -max_delay 10000000 -rw_timeout 120000000 -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -i "{url}" '
     
     filter_complex = ""
     audio_map = ""
@@ -307,7 +309,9 @@ def stream_direct(url, game_name):
                         if k and k in safe: safe = safe.replace(k, "***")
                     
                     if "frame=" in safe or "time=" in safe:
-                        if int(re.search(r"frame=\s*(\d+)", safe).group(1)) % 500 == 0:
+                        # Log speed to check if CPU is keeping up
+                        match = re.search(r"frame=\s*(\d+).*speed=\s*([\d\.]+x)", safe)
+                        if match and int(match.group(1)) % 500 == 0:
                             log(f"      ⏳ {safe[:120]}")
                     elif safe and any(x in safe.lower() for x in ["error", "failed", "connection", "rtmp", "mapping"]):
                         log(f"      [ffmpeg] {safe[:200]}")
@@ -350,7 +354,7 @@ def move_link(game, url, src_file, ok):
 
 def main():
     log("=" * 62)
-    log("🎮 MASTER AGENT v22.0 — STRICT FPS + NO LAG")
+    log("🎮 MASTER AGENT v22.1 — STRICT FPS + NO LAG")
     log(f"   Loop Setup : {LOOP_MSG}")
     log(f"   Metadata   : Artist='{META_ARTIST}'")
     log(f"   Ratio      : {RATIO} | Filter: {FILTER} | Speed: {SPEED_OPT} | Bitrate: {BITRATE}M")
