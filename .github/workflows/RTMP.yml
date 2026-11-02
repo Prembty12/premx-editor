@@ -24,7 +24,7 @@ on:
         required: true
         default: 'fb'
       loop_count:
-        description: 'Loop [0=Once, 2=Twice, 10=10 Times, 24h/24=24 Hours]'
+        description: 'Loop [0=Once, 2=Twice, 10=10 Times, 24=24 Hours]'
         required: true
         default: '0'
       ratio:
@@ -44,9 +44,9 @@ on:
         required: true
         default: '1'
       bitrate:
-        description: 'Bitrate [12, 16, 18] (Mbps)'
+        description: 'Bitrate [8, 12, 16, 18] (Mbps)'
         required: true
-        default: '12'
+        default: '8'
       gap_minutes:
         description: 'Gap before stream starts (Minutes)'
         required: true
@@ -61,6 +61,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
+          fetch-depth: 1
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Cache APT Packages
@@ -84,7 +85,7 @@ jobs:
 
       - name: Install Python Dependencies
         run: |
-          pip install yt-dlp requests
+          pip install yt-dlp requests speedtest-cli
 
       - name: Run Master Streamer
         env:
