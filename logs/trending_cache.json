@@ -1,31 +1,31 @@
 {
-  "last_updated": "2026-11-03 10:58:06 AM",
+  "last_updated": "2026-11-04 12:35:39 AM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 3105,
-      "avg_per_video": 443,
+      "views_7d": 3840,
+      "avg_per_video": 480,
       "trend": "viral",
-      "ratio": 2.2905894519131333,
-      "fb_link": "https://www.facebook.com/reel/1148022197910849/",
+      "ratio": 2.378592666005946,
+      "fb_link": "https://www.facebook.com/reel/1582597047009589/",
       "source_link": ""
     },
     {
       "game": "codBlackops6",
-      "views_7d": 274,
-      "avg_per_video": 274,
+      "views_7d": 276,
+      "avg_per_video": 276,
       "trend": "steady",
-      "ratio": 1.4167528438469492,
+      "ratio": 1.367690782953419,
       "fb_link": "https://www.facebook.com/1082871464600149/videos/1471500258505084",
       "source_link": ""
     },
     {
       "game": "MarvelsSpiderMan2",
-      "views_7d": 1720,
-      "avg_per_video": 215,
+      "views_7d": 1330,
+      "avg_per_video": 221,
       "trend": "steady",
-      "ratio": 1.1116856256463288,
+      "ratio": 1.0951437066402379,
       "fb_link": "",
       "source_link": ""
     }
@@ -33,10 +33,10 @@
   "below_avg": [
     {
       "game": "Wolverine",
-      "views_7d": 351,
-      "avg_per_video": 29,
+      "views_7d": 240,
+      "avg_per_video": 26,
       "trend": "below_avg",
-      "ratio": 0.1499482936918304,
+      "ratio": 0.12884043607532208,
       "fb_link": "",
       "source_link": ""
     },
@@ -45,18 +45,18 @@
       "views_7d": 30,
       "avg_per_video": 6,
       "trend": "below_avg",
-      "ratio": 0.031023784901758014,
+      "ratio": 0.02973240832507433,
       "fb_link": "",
       "source_link": ""
     }
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 3105,
-    "avg_per_video": 443,
+    "views_7d": 3840,
+    "avg_per_video": 480,
     "trend": "viral",
-    "ratio": 2.2905894519131333,
-    "fb_link": "https://www.facebook.com/reel/1148022197910849/",
+    "ratio": 2.378592666005946,
+    "fb_link": "https://www.facebook.com/reel/1582597047009589/",
     "source_link": ""
   }
 }
