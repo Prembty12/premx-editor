@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 32 | **Last Updated:** 2026-11-05 01:39:46 AM IST
+**Total Videos:** 32 | **Last Updated:** 2026-11-05 01:56:33 AM IST
 
 ---
 
@@ -14,7 +14,7 @@
 | Posted (FB or IG) | 24 / 32 |
 | FB Posted | 18 / 32 |
 | IG Posted | 23 / 32 |
-| Total FB Views | **11,285** |
+| Total FB Views | **11,298** |
 | Total IG Views | **760** |
 
 ---
@@ -23,8 +23,8 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | Gunship Wrecks Snowy Base 🚀🔥  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1693110865579996/) | 9 | [🟣 IG](https://www.instagram.com/reel/DfVNpOOj9lJ/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW45.mp4) |
-| 2 | He Entered Palace Then 4 Enemies 🔥🎯  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1133449789050510/) | 225 | [🟣 IG](https://www.instagram.com/reel/DfVGs7kD36C/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW46.mp4) |
+| 1 | Gunship Wrecks Snowy Base 🚀🔥  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1693110865579996/) | 18 | [🟣 IG](https://www.instagram.com/reel/DfVNpOOj9lJ/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW45.mp4) |
+| 2 | He Entered Palace Then 4 Enemies 🔥🎯  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1133449789050510/) | 229 | [🟣 IG](https://www.instagram.com/reel/DfVGs7kD36C/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW46.mp4) |
 | 3 | Museum Ambush Destroyed Whole Squad 🔥😳  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1582597047009589/) | 886 | [🟣 IG](https://www.instagram.com/reel/DfRJvelDQ3l/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW48.mp4) |
 | 4 | Museum Robbery Turned Into 5 Enemies 💥🎯  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1148022197910849/) | 1,065 | [🟣 IG](https://www.instagram.com/reel/DfNTd6LFCEJ/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW49.mp4) |
 | 5 | Heavy Turret Fire Destroys 5 City Zones 💥🔥  #videogames #gamingcommunity #gaming #codmw4 #gamingreel | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DfIKP6SD7Vu/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW410.mp4) |
