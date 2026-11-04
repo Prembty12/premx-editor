@@ -80,7 +80,7 @@ jobs:
           DEBUG: '1'                       # 🐛 Verbose logs
 
         run: |
-          bash run.sh
+          bash  run.sh
 
       - name: Commit and Push Updated Memory & Posted Logs
         env:
@@ -88,13 +88,6 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # 🔥 temp_frames ko yahan add NAHI kiya hai, taaki video ki wajah se push fail na ho
-          git add logs/ posted_links_editor/ game_links_editor/ || true
-          
-          git commit -m "🤖 Auto-Agent: Update memory and shift posted links [skip ci]" || echo "No changes to commit"
-          
-          # 🔥 Push se pehle pull karo taaki koi conflict na aaye
-          git pull --rebase origin main || true
-          
-          git push origin HEAD:main --force-with-lease || echo "Nothing to push"
+          git add logs/ posted_links_editor/ game_links_editor/ temp_frames/ || true
+          git commit -m "🤖 Auto-Agent: Update memory, insights, and shift posted links [skip ci]" || echo "No changes to commit"
+          git push || echo "Nothing to push"
