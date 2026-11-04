@@ -1,13 +1,13 @@
 {
-  "last_updated": "2026-11-05 12:49:16 AM",
+  "last_updated": "2026-11-05 12:53:19 AM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 3796,
-      "avg_per_video": 542,
+      "views_7d": 3822,
+      "avg_per_video": 546,
       "trend": "viral",
-      "ratio": 3.140208574739282,
+      "ratio": 3.145161290322581,
       "fb_link": "https://www.facebook.com/reel/1133449789050510/",
       "source_link": ""
     },
@@ -16,7 +16,7 @@
       "views_7d": 279,
       "avg_per_video": 279,
       "trend": "trending",
-      "ratio": 1.6164542294322133,
+      "ratio": 1.6071428571428572,
       "fb_link": "https://www.facebook.com/1082871464600149/videos/1471500258505084",
       "source_link": ""
     }
@@ -27,16 +27,16 @@
       "views_7d": 90,
       "avg_per_video": 22,
       "trend": "below_avg",
-      "ratio": 0.12746234067207415,
+      "ratio": 0.12672811059907835,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "Wolverine",
-      "views_7d": 144,
-      "avg_per_video": 20,
+      "views_7d": 147,
+      "avg_per_video": 21,
       "trend": "below_avg",
-      "ratio": 0.11587485515643106,
+      "ratio": 0.12096774193548387,
       "fb_link": "",
       "source_link": ""
     },
@@ -52,10 +52,10 @@
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 3796,
-    "avg_per_video": 542,
+    "views_7d": 3822,
+    "avg_per_video": 546,
     "trend": "viral",
-    "ratio": 3.140208574739282,
+    "ratio": 3.145161290322581,
     "fb_link": "https://www.facebook.com/reel/1133449789050510/",
     "source_link": ""
   }
