@@ -75,12 +75,12 @@ jobs:
           VOICE_ID: ${{ secrets.VOICE_ID }}
 
           # ── 🎚️ MASTER SWITCHES (true / false)
-          COMMENTARY_ENABLED: 'true'       # 🎙️ AI commentary dub ON/OFF
+          COMMENTARY_ENABLED: 'false'       # 🎙️ AI commentary dub ON/OFF
           AUTO_COMMENT: 'true'             # 🤖 Auto-reply ON/OFF
           DEBUG: '1'                       # 🐛 Verbose logs
 
         run: |
-          bash  run.sh
+          bash run.sh
 
       - name: Commit and Push Updated Memory & Posted Logs
         env:
@@ -89,17 +89,12 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-          # 1. Normal files add karo (Logs, Links)
-          git add logs/ posted_links_editor/ game_links_editor/ || true
-          
-          # 2. 🔥 Sirf grid image force-add karo (Video ko chhod do)
+          # 🔥 temp_frames ko yahan add NAHI kiya hai, taaki video ki wajah se push fail na ho
           git add logs/ posted_links_editor/ game_links_editor/ temp_frames/ || true
           
-          # 3. Commit
-          git commit -m "🤖 Auto-Agent: Update memory, grid image, and shift posted links [skip ci]" || echo "No changes to commit"
+          git commit -m "🤖 Auto-Agent: Update memory and shift posted links [skip ci]" || echo "No changes to commit"
           
-          # 4. Remote se sync karo taaki conflict na ho
+          # 🔥 Push se pehle pull karo taaki koi conflict na aaye
           git pull --rebase origin main || true
           
-          # 5. Push
           git push origin HEAD:main --force-with-lease || echo "Nothing to push"
