@@ -1,22 +1,22 @@
 {
-  "last_updated": "2026-11-04 10:07:46 PM",
+  "last_updated": "2026-11-04 11:53:17 PM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 3768,
-      "avg_per_video": 628,
+      "views_7d": 3779,
+      "avg_per_video": 629,
       "trend": "viral",
-      "ratio": 3.29485834207765,
+      "ratio": 3.3140147523709165,
       "fb_link": "https://www.facebook.com/reel/1582597047009589/",
       "source_link": ""
     },
     {
       "game": "codBlackops6",
-      "views_7d": 278,
-      "avg_per_video": 278,
+      "views_7d": 279,
+      "avg_per_video": 279,
       "trend": "steady",
-      "ratio": 1.4585519412381953,
+      "ratio": 1.4699683877766068,
       "fb_link": "https://www.facebook.com/1082871464600149/videos/1471500258505084",
       "source_link": ""
     }
@@ -27,35 +27,35 @@
       "views_7d": 90,
       "avg_per_video": 22,
       "trend": "below_avg",
-      "ratio": 0.11542497376705142,
+      "ratio": 0.11591148577449947,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "Wolverine",
-      "views_7d": 134,
+      "views_7d": 139,
       "avg_per_video": 19,
       "trend": "below_avg",
-      "ratio": 0.09968520461699895,
+      "ratio": 0.10010537407797682,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "ghostandela",
-      "views_7d": 20,
-      "avg_per_video": 6,
+      "views_7d": 0,
+      "avg_per_video": 0,
       "trend": "below_avg",
-      "ratio": 0.031479538300104935,
+      "ratio": 0.0,
       "fb_link": "",
       "source_link": ""
     }
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 3768,
-    "avg_per_video": 628,
+    "views_7d": 3779,
+    "avg_per_video": 629,
     "trend": "viral",
-    "ratio": 3.29485834207765,
+    "ratio": 3.3140147523709165,
     "fb_link": "https://www.facebook.com/reel/1582597047009589/",
     "source_link": ""
   }

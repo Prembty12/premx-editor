@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 21 | **Last Updated:** 2026-11-04 10:07:46 PM IST
+**Total Videos:** 20 | **Last Updated:** 2026-11-04 11:53:17 PM IST
 
 ---
 
@@ -10,12 +10,12 @@
 
 | Metric | Value |
 |---|---|
-| Total Videos | **21** |
-| Posted (FB or IG) | 21 / 21 |
-| FB Posted | 16 / 21 |
-| IG Posted | 5 / 21 |
+| Total Videos | **20** |
+| Posted (FB or IG) | 20 / 20 |
+| FB Posted | 16 / 20 |
+| IG Posted | 4 / 20 |
 | Total FB Views | **0** |
-| Total IG Views | **70** |
+| Total IG Views | **60** |
 
 ---
 
@@ -27,20 +27,19 @@
 | 2 | He Wrecked 10 Enemies With Bare Hands 🔥🎯  #videogames #gamingcommunity #gaming #sifu #gamingreels #r | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeoyjypEZQD/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu6.mp4) |
 | 3 | How He Beat 10 Enemies Solo 🔥🎯  #videogames #gamingcommunity #gaming #sifu #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Dee1cS1lt1b/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu8.mp4) |
 | 4 | 10 Enemies Ambushed Him In Warehouse 🔥🎯  #videogames #gamingcommunity #gaming #sifu #gamingreels #re | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeWj8c3ik2S/) | 50 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu16.mp4) |
-| 5 | 5 Enemies Cooked In Corridor 🔥  #videogames #gamingcommunity #gaming #sifu #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeVxRMND1MR/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu5.mp4) |
-| 6 | sifu12 | [🔵 FB](https://www.facebook.com/18127945540864604) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu12.mp4) |
-| 7 | sifu7 | [🔵 FB](https://www.facebook.com/17960228733211678) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu7.mp4) |
-| 8 | sifu10 | [🔵 FB](https://www.facebook.com/18079585196705519) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu10.mp4) |
-| 9 | sifu3 | [🔵 FB](https://www.facebook.com/17955462258252297) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu3.mp4) |
-| 10 | sifu17 | [🔵 FB](https://www.facebook.com/18102462185570793) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu17.mp4) |
-| 11 | sifu18 | [🔵 FB](https://www.facebook.com/17916710871245907) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu18.mp4) |
-| 12 | sifu15 | [🔵 FB](https://www.facebook.com/18130726316502017) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu15.mp4) |
-| 13 | sifu11 | [🔵 FB](https://www.facebook.com/18106306556615026) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu11.mp4) |
-| 14 | sifu1 | [🔵 FB](https://www.facebook.com/18180011347442003) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu1.mp4) |
-| 15 | sifu2 | [🔵 FB](https://www.facebook.com/17903629215665069) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu2.mp4) |
+| 5 | sifu18 | [🔵 FB](https://www.facebook.com/17916710871245907) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu18.mp4) |
+| 6 | sifu17 | [🔵 FB](https://www.facebook.com/18102462185570793) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu17.mp4) |
+| 7 | sifu10 | [🔵 FB](https://www.facebook.com/18079585196705519) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu10.mp4) |
+| 8 | sifu11 | [🔵 FB](https://www.facebook.com/18106306556615026) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu11.mp4) |
+| 9 | sifu7 | [🔵 FB](https://www.facebook.com/17960228733211678) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu7.mp4) |
+| 10 | sifu3 | [🔵 FB](https://www.facebook.com/17955462258252297) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu3.mp4) |
+| 11 | sifu2 | [🔵 FB](https://www.facebook.com/17903629215665069) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu2.mp4) |
+| 12 | sifu12 | [🔵 FB](https://www.facebook.com/18127945540864604) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu12.mp4) |
+| 13 | sifu1 | [🔵 FB](https://www.facebook.com/18180011347442003) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu1.mp4) |
+| 14 | sifu15 | [🔵 FB](https://www.facebook.com/18130726316502017) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu15.mp4) |
+| 15 | sifu4 | [🔵 FB](https://www.facebook.com/18072155138492638) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu4.mp4) |
 | 16 | sifu5 | [🔵 FB](https://www.facebook.com/18148187695482922) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu5.mp4) |
-| 17 | sifu16 | [🔵 FB](https://www.facebook.com/18115851635084139) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu16.mp4) |
-| 18 | sifu13 | [🔵 FB](https://www.facebook.com/18130907746773302) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu13.mp4) |
+| 17 | sifu13 | [🔵 FB](https://www.facebook.com/18130907746773302) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu13.mp4) |
+| 18 | sifu6 | [🔵 FB](https://www.facebook.com/18116536346023748) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu6.mp4) |
 | 19 | sifu8 | [🔵 FB](https://www.facebook.com/18104271344197339) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu8.mp4) |
-| 20 | sifu6 | [🔵 FB](https://www.facebook.com/18116536346023748) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu6.mp4) |
-| 21 | sifu4 | [🔵 FB](https://www.facebook.com/18072155138492638) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu4.mp4) |
+| 20 | sifu16 | [🔵 FB](https://www.facebook.com/18115851635084139) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu16.mp4) |
