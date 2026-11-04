@@ -80,7 +80,7 @@ jobs:
           DEBUG: '1'                       # 🐛 Verbose logs
 
         run: |
-          bash run.sh
+          bash  run.sh
 
       - name: Commit and Push Updated Memory & Posted Logs
         env:
@@ -88,18 +88,6 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # 1. Normal add for logs and links
-          git add logs/ posted_links_editor/ game_links_editor/ || true
-          
-          # 2. 🔥 FORCE ADD: .gitignore ko bypass karke temp_frames ke videos upload karne ke liye
-          git add -f temp_frames/ || true
-          
-          # 3. Commit changes
-          git commit -m "🤖 Auto-Agent: Update memory, videos and shift posted links [skip ci]" || echo "No changes to commit"
-          
-          # 4. 🔥 FIX: Remote ke sath sync karo taaki push reject na ho
-          git pull --rebase origin main || true
-          
-          # 5. Push with force-with-lease
-          git push origin HEAD:main --force-with-lease || echo "Nothing to push"
+          git add logs/ posted_links_editor/ game_links_editor/ temp_frames/ || true
+          git commit -m "🤖 Auto-Agent: Update memory, insights, and shift posted links [skip ci]" || echo "No changes to commit"
+          git push || echo "Nothing to push"
