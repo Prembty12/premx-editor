@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 32 | **Last Updated:** 2026-11-04 02:55:13 PM IST
+**Total Videos:** 32 | **Last Updated:** 2026-11-04 03:12:45 PM IST
 
 ---
 
@@ -14,7 +14,7 @@
 | Posted (FB or IG) | 21 / 32 |
 | FB Posted | 15 / 32 |
 | IG Posted | 21 / 32 |
-| Total FB Views | **10,995** |
+| Total FB Views | **10,997** |
 | Total IG Views | **720** |
 
 ---
@@ -23,8 +23,8 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | Museum Ambush Destroyed Whole Squad 🔥😳  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1582597047009589/) | 856 | [🟣 IG](https://www.instagram.com/reel/DfRJvelDQ3l/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW43.mp4) |
-| 2 | Museum Robbery Turned Into 5 Enemies 💥🎯  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1148022197910849/) | 1,053 | [🟣 IG](https://www.instagram.com/reel/DfNTd6LFCEJ/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW44.mp4) |
+| 1 | Museum Ambush Destroyed Whole Squad 🔥😳  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1582597047009589/) | 857 | [🟣 IG](https://www.instagram.com/reel/DfRJvelDQ3l/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW43.mp4) |
+| 2 | Museum Robbery Turned Into 5 Enemies 💥🎯  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1148022197910849/) | 1,054 | [🟣 IG](https://www.instagram.com/reel/DfNTd6LFCEJ/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW44.mp4) |
 | 3 | Heavy Turret Fire Destroys 5 City Zones 💥🔥  #videogames #gamingcommunity #gaming #codmw4 #gamingreel | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DfIKP6SD7Vu/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW45.mp4) |
 | 4 | 4 Brave Soldiers Held The Line 🔥👀  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DfDDmgBCYE1/) | 150 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW46.mp4) |
 | 5 | Palace Lobby 5 Enemies Wrecked 🔫🔥  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/2368633470640935/) | 564 | [🟣 IG](https://www.instagram.com/reel/DfBayQEgIoY/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW47.mp4) |
