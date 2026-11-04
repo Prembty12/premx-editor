@@ -1,13 +1,13 @@
 {
-  "last_updated": "2026-11-04 12:35:39 AM",
+  "last_updated": "2026-11-04 10:23:47 AM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 3840,
-      "avg_per_video": 480,
+      "views_7d": 3986,
+      "avg_per_video": 569,
       "trend": "viral",
-      "ratio": 2.378592666005946,
+      "ratio": 2.7541142303969024,
       "fb_link": "https://www.facebook.com/reel/1582597047009589/",
       "source_link": ""
     },
@@ -16,46 +16,46 @@
       "views_7d": 276,
       "avg_per_video": 276,
       "trend": "steady",
-      "ratio": 1.367690782953419,
+      "ratio": 1.3359148112294288,
       "fb_link": "https://www.facebook.com/1082871464600149/videos/1471500258505084",
-      "source_link": ""
-    },
-    {
-      "game": "MarvelsSpiderMan2",
-      "views_7d": 1330,
-      "avg_per_video": 221,
-      "trend": "steady",
-      "ratio": 1.0951437066402379,
-      "fb_link": "",
       "source_link": ""
     }
   ],
   "below_avg": [
     {
+      "game": "MarvelsSpiderMan2",
+      "views_7d": 927,
+      "avg_per_video": 154,
+      "trend": "slow",
+      "ratio": 0.7454017424975798,
+      "fb_link": "",
+      "source_link": ""
+    },
+    {
       "game": "Wolverine",
-      "views_7d": 240,
-      "avg_per_video": 26,
+      "views_7d": 200,
+      "avg_per_video": 28,
       "trend": "below_avg",
-      "ratio": 0.12884043607532208,
+      "ratio": 0.13552758954501454,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "ghostandela",
-      "views_7d": 30,
+      "views_7d": 20,
       "avg_per_video": 6,
       "trend": "below_avg",
-      "ratio": 0.02973240832507433,
+      "ratio": 0.02904162633107454,
       "fb_link": "",
       "source_link": ""
     }
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 3840,
-    "avg_per_video": 480,
+    "views_7d": 3986,
+    "avg_per_video": 569,
     "trend": "viral",
-    "ratio": 2.378592666005946,
+    "ratio": 2.7541142303969024,
     "fb_link": "https://www.facebook.com/reel/1582597047009589/",
     "source_link": ""
   }
