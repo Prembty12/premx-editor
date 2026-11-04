@@ -14,7 +14,7 @@ POSTED_LINKS_DIR="$BASE/$POSTED_DIR"
 mkdir -p "$GAME_LINKS_DIR" "$POSTED_LINKS_DIR" "$FRAMES_DIR" "logs"
 
 LOG_FILE="logs/pipeline_debug.log"
-exec > >(tee -a "$LOG_FILE") 2>&1
+exec > >(tee "$LOG_FILE") 2>&1
 
 echo "===================================================="
 echo "🚀 Pipeline Started at: $(date)"
