@@ -1,22 +1,22 @@
 {
-  "last_updated": "2026-11-04 11:53:17 PM",
+  "last_updated": "2026-11-05 12:17:58 AM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 3779,
-      "avg_per_video": 629,
+      "views_7d": 3780,
+      "avg_per_video": 540,
       "trend": "viral",
-      "ratio": 3.3140147523709165,
-      "fb_link": "https://www.facebook.com/reel/1582597047009589/",
+      "ratio": 3.1358885017421603,
+      "fb_link": "",
       "source_link": ""
     },
     {
       "game": "codBlackops6",
       "views_7d": 279,
       "avg_per_video": 279,
-      "trend": "steady",
-      "ratio": 1.4699683877766068,
+      "trend": "trending",
+      "ratio": 1.6202090592334495,
       "fb_link": "https://www.facebook.com/1082871464600149/videos/1471500258505084",
       "source_link": ""
     }
@@ -27,16 +27,16 @@
       "views_7d": 90,
       "avg_per_video": 22,
       "trend": "below_avg",
-      "ratio": 0.11591148577449947,
+      "ratio": 0.12775842044134728,
       "fb_link": "",
       "source_link": ""
     },
     {
       "game": "Wolverine",
-      "views_7d": 139,
-      "avg_per_video": 19,
+      "views_7d": 141,
+      "avg_per_video": 20,
       "trend": "below_avg",
-      "ratio": 0.10010537407797682,
+      "ratio": 0.11614401858304298,
       "fb_link": "",
       "source_link": ""
     },
@@ -52,11 +52,11 @@
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 3779,
-    "avg_per_video": 629,
+    "views_7d": 3780,
+    "avg_per_video": 540,
     "trend": "viral",
-    "ratio": 3.3140147523709165,
-    "fb_link": "https://www.facebook.com/reel/1582597047009589/",
+    "ratio": 3.1358885017421603,
+    "fb_link": "",
     "source_link": ""
   }
 }
