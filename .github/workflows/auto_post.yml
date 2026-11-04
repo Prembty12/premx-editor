@@ -89,17 +89,12 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-          # 1. Normal files add karo (Logs, Links)
+          # 🔥 temp_frames ko yahan add NAHI kiya hai, taaki video ki wajah se push fail na ho
           git add logs/ posted_links_editor/ game_links_editor/ || true
           
-          # 2. 🔥 Sirf grid image force-add karo (Video ko chhod do)
-          git add -f temp_frames/merged_90_grid_portrait.jpg || true
+          git commit -m "🤖 Auto-Agent: Update memory and shift posted links [skip ci]" || echo "No changes to commit"
           
-          # 3. Commit
-          git commit -m "🤖 Auto-Agent: Update memory, grid image, and shift posted links [skip ci]" || echo "No changes to commit"
-          
-          # 4. Remote se sync karo taaki conflict na ho
+          # 🔥 Push se pehle pull karo taaki koi conflict na aaye
           git pull --rebase origin main || true
           
-          # 5. Push
           git push origin HEAD:main --force-with-lease || echo "Nothing to push"
