@@ -1,13 +1,13 @@
 {
-  "last_updated": "2026-11-05 01:33:56 AM",
+  "last_updated": "2026-11-05 01:39:46 AM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 4052,
-      "avg_per_video": 506,
+      "views_7d": 4058,
+      "avg_per_video": 507,
       "trend": "viral",
-      "ratio": 3.062953995157385,
+      "ratio": 3.065296251511487,
       "fb_link": "https://www.facebook.com/reel/1693110865579996/",
       "source_link": ""
     },
@@ -16,7 +16,7 @@
       "views_7d": 279,
       "avg_per_video": 279,
       "trend": "trending",
-      "ratio": 1.6888619854721552,
+      "ratio": 1.686819830713422,
       "fb_link": "https://www.facebook.com/1082871464600149/videos/1471500258505084",
       "source_link": ""
     }
@@ -27,7 +27,7 @@
       "views_7d": 90,
       "avg_per_video": 22,
       "trend": "below_avg",
-      "ratio": 0.13317191283292978,
+      "ratio": 0.13301088270858524,
       "fb_link": "",
       "source_link": ""
     },
@@ -36,7 +36,7 @@
       "views_7d": 156,
       "avg_per_video": 19,
       "trend": "below_avg",
-      "ratio": 0.11501210653753027,
+      "ratio": 0.11487303506650544,
       "fb_link": "",
       "source_link": ""
     },
@@ -52,10 +52,10 @@
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 4052,
-    "avg_per_video": 506,
+    "views_7d": 4058,
+    "avg_per_video": 507,
     "trend": "viral",
-    "ratio": 3.062953995157385,
+    "ratio": 3.065296251511487,
     "fb_link": "https://www.facebook.com/reel/1693110865579996/",
     "source_link": ""
   }
