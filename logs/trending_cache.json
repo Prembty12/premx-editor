@@ -1,13 +1,13 @@
 {
-  "last_updated": "2026-11-05 01:31:21 AM",
+  "last_updated": "2026-11-05 01:33:56 AM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 4047,
-      "avg_per_video": 505,
+      "views_7d": 4052,
+      "avg_per_video": 506,
       "trend": "viral",
-      "ratio": 3.0755176613885506,
+      "ratio": 3.062953995157385,
       "fb_link": "https://www.facebook.com/reel/1693110865579996/",
       "source_link": ""
     },
@@ -16,29 +16,29 @@
       "views_7d": 279,
       "avg_per_video": 279,
       "trend": "trending",
-      "ratio": 1.6991473812423874,
+      "ratio": 1.6888619854721552,
       "fb_link": "https://www.facebook.com/1082871464600149/videos/1471500258505084",
       "source_link": ""
     }
   ],
   "below_avg": [
     {
-      "game": "Wolverine",
-      "views_7d": 156,
-      "avg_per_video": 19,
+      "game": "MarvelsSpiderMan2",
+      "views_7d": 90,
+      "avg_per_video": 22,
       "trend": "below_avg",
-      "ratio": 0.11571254567600488,
+      "ratio": 0.13317191283292978,
       "fb_link": "",
       "source_link": ""
     },
     {
-      "game": "MarvelsSpiderMan2",
-      "views_7d": 90,
-      "avg_per_video": 18,
+      "game": "Wolverine",
+      "views_7d": 156,
+      "avg_per_video": 19,
       "trend": "below_avg",
-      "ratio": 0.10962241169305725,
+      "ratio": 0.11501210653753027,
       "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan217.mp4"
+      "source_link": ""
     },
     {
       "game": "ghostandela",
@@ -52,10 +52,10 @@
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 4047,
-    "avg_per_video": 505,
+    "views_7d": 4052,
+    "avg_per_video": 506,
     "trend": "viral",
-    "ratio": 3.0755176613885506,
+    "ratio": 3.062953995157385,
     "fb_link": "https://www.facebook.com/reel/1693110865579996/",
     "source_link": ""
   }
