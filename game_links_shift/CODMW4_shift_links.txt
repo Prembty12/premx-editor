@@ -7,3 +7,4 @@ CODMW412 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.
 CODMW415 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW415.mp4 | REJECT (OpenRouter): Monotonous room clearing, no combat
 CODMW417 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW417.mp4 | REJECT (OpenRouter): Dark cave navigation with zero engaging action.
 CODMW43 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW43.mp4 | REJECT (OpenRouter): Only static menus and passive cinematic travel.
+CODMW47 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW47.mp4 | REJECT (OpenRouter): Slow infiltration walking with no combat.
