@@ -332,7 +332,7 @@ MAX_TOTAL_RETRIES=10
 
 for ((attempt=1; attempt<=MAX_TOTAL_RETRIES; attempt++)); do
     CURRENT_GEMINI_KEY=$(get_random_gemini_key)
-    echo "🤖 Gemini Attempt $attempt/$MAX_TOTAL_RETRIES (Key ****${CURRENT_GEMINI_KEY: -4})"
+    echo "🤖 Gemini Attempt $attempt/$MAX_TOTAL_RETRIES (Key used: ${CURRENT_GEMINI_KEY:0,6}...)"
     
     if [ -f "$GRID_PATH" ]; then
         file_size=$(wc -c < "$GRID_PATH")
@@ -440,9 +440,6 @@ else:
 EOF
 )
 
-PARSED_STATUS=$(echo "$PARSED_JSON_DATA" | python3 -c "import sys, json; print(str(json.load(sys.stdin).get('status', 'failed')).lower().strip())" 2>/dev/null)
-echo "📊 Gemini parsed status: $PARSED_STATUS"
-
 # Agar Gemini fail ho gaya, toh Fallback Brain ko call karo
 if [ "$PARSED_STATUS" != "success" ]; then
     echo "⚠️ Gemini failed. Triggering Fallback Brain (OpenRouter)..."
@@ -500,10 +497,10 @@ if [ "$PARSED_STATUS" == "reject" ]; then
     echo "$SELECTED_LINE | REJECT (OpenRouter): $PARSED_REASON" >> "$SHIFT_LOG"
     echo "    ✅ Shift file: $SHIFT_LOG"
     
-    TARGET_FILE="$TARGET_FILE" SELECTED_LINE="$SELECTED_LINE" python3 - << 'PYEOF2'
+    python3 -c "
 import os
-tf = os.environ['TARGET_FILE']
-sl = os.environ['SELECTED_LINE']
+tf = '$TARGET_FILE'
+sl = '''$SELECTED_LINE'''
 if os.path.exists(tf):
     with open(tf, 'r', encoding='utf-8', errors='ignore') as f:
         c = f.read()
@@ -511,7 +508,7 @@ if os.path.exists(tf):
     with open(tf, 'w', encoding='utf-8') as f:
         f.write(cl + '\n\n')
     print(f'    🗑️  Editor removed: {tf}')
-PYEOF2
+"
 
     # 🛠️ GITHUB AUTO-COMMIT & PUSH (Root folder update karne ke liye)
     echo "🚀 Pushing updated links to GitHub root repository..."
@@ -725,7 +722,7 @@ ACTIVE_ID="${PUBLISH_ID:-$FB_POST_ID}"
 echo "📝 [STEP 10] Updating memory and file sync. Active ID: $ACTIVE_ID"
 
 if [ -n "$ACTIVE_ID" ] && [ "$ACTIVE_ID" != "None" ]; then
-    SELECTED_GAME_NAME="$SELECTED_GAME_NAME" SELECTED_STYLE="$SELECTED_STYLE" python3 - << 'PYEOF3'
+    python3 -c "
 import os, json
 memory_file = 'logs/agent_memory.json'
 memory = {'game_scores': {}, 'title_styles': {'curiosity': 10, 'aggressive': 10, 'question': 10, 'emoji_heavy': 10}}
@@ -733,45 +730,40 @@ if os.path.exists(memory_file):
     try:
         with open(memory_file, 'r', encoding='utf-8') as f:
             memory.update(json.load(f))
-    except Exception:
+    except:
         pass
 
-g_name = os.environ.get('SELECTED_GAME_NAME', '')
-memory.setdefault('game_scores', {})
+g_name = '$SELECTED_GAME_NAME'
 memory['game_scores'][g_name] = memory['game_scores'].get(g_name, 10) + 5
-used_style = os.environ.get('SELECTED_STYLE', '')
-if used_style in memory.get('title_styles', {}):
+used_style = '$SELECTED_STYLE'
+if used_style in memory['title_styles']:
     memory['title_styles'][used_style] += 3
 
 os.makedirs('logs', exist_ok=True)
 with open(memory_file, 'w', encoding='utf-8') as f:
     json.dump(memory, f, indent=4)
 print('🧠 Agent Memory Updated Successfully!')
-PYEOF3
+"
 
-    TARGET_FILE="$TARGET_FILE" GAME_POSTED_LOG="$GAME_POSTED_LOG" \
-    SELECTED_LINE="$SELECTED_LINE" ACTIVE_ID="$ACTIVE_ID" python3 - << 'PYEOF4'
+    python3 -c "
 import os
-target = os.environ['TARGET_FILE']
-posted = os.environ['GAME_POSTED_LOG']
-line = os.environ['SELECTED_LINE']
-act = os.environ['ACTIVE_ID']
+target_file = '$TARGET_FILE'
+posted_log = '$GAME_POSTED_LOG'
+selected_line = '''$SELECTED_LINE'''
+act_id = '$ACTIVE_ID'
 
-if os.path.exists(target):
-    with open(target, 'r', encoding='utf-8', errors='ignore') as f:
+if os.path.exists(target_file):
+    with open(target_file, 'r', encoding='utf-8', errors='ignore') as f:
         content = f.read()
-    if line in content:
-        content = content.replace(line, '')
-    else:
-        print('⚠️ Selected line not found in target file!')
-    with open(target, 'w', encoding='utf-8') as f:
-        f.write(content.strip() + '\n\n')
+    cleaned = content.replace(selected_line, '').strip()
+    with open(target_file, 'w', encoding='utf-8') as f:
+        f.write(cleaned + '\n\n')
 
-os.makedirs(os.path.dirname(posted), exist_ok=True)
-with open(posted, 'a', encoding='utf-8') as f:
-    f.write(line + f'\nVideo id : {act}\n\n')
-print('✅ Link removed from game_links_editor and moved to posted_links_editor')
-PYEOF4
+os.makedirs(os.path.dirname(posted_log), exist_ok=True)
+with open(posted_log, 'a', encoding='utf-8') as f:
+    f.write(selected_line + f'\nVideo id : {act_id}\n\n')
+print('✅ Link successfully removed from temp file and shifted to posted folder!')
+"
 else
     echo "⚠️ [WARNING] Skipped file sync because no active post ID was generated."
 fi
