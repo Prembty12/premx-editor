@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """
-🎮 MASTER AGENT v30.1 — DYNAMIC AUTO-ADJUST (FILTER + BITRATE) BUFFER
+🎮 MASTER AGENT v30.2 — STRICT 30 FPS (NO FRAME DROP) + DYNAMIC BUFFER
 ======================================================================
-✅ Tests CPU & Network Speed first.
-✅ If FAST: Streams immediately.
-✅ If SLOW: Auto-calculates buffer based on CPU Speed + Filter + Bitrate.
-✅ Downloads at full network speed simultaneously.
+✅ Forces Constant Frame Rate (CFR) - No dropped frames.
+✅ Explains FPS processing vs Video FPS.
+✅ Dynamic Auto-Adjust Buffer based on Filter, Bitrate, CPU.
 """
 import os
 import sys
@@ -263,6 +262,7 @@ def stream_direct(url, game_name):
     B_V = f"{BITRATE}M"
     BUF = f"{int(BITRATE)*2}M"
 
+    # 🔥 Ensure 30 FPS strictly using fps filter + CFR
     vf_chain = f"{V_SPEED}{CROP}{GAME}fps={TARGET_FPS}:round=near,scale=trunc(iw/2)*2:trunc(ih/2)*2"
     af_chain = f"{A_SPEED}aresample=48000"
     META_TITLE = f"{game_name} Gameplay"
@@ -270,7 +270,7 @@ def stream_direct(url, game_name):
     base_enc_flags = (
         f"-c:v libx264 -preset ultrafast -threads 0 -profile:v high -level:v 4.2 "
         f"-pix_fmt yuv420p -b:v {B_V} -maxrate {B_V} -bufsize {BUF} "
-        f"-r {TARGET_FPS} -fps_mode cfr "
+        f"-r {TARGET_FPS} -fps_mode cfr -vsync cfr " # 🔥 Force CFR strictly
         f"-g {TARGET_FPS} -keyint_min {TARGET_FPS} -sc_threshold 0 "
         f"-c:a aac -b:a 128k -ar 44100 -ac 2 "
         f"-metadata title=\"{META_TITLE}\" -metadata artist=\"{META_ARTIST}\" "
@@ -280,8 +280,8 @@ def stream_direct(url, game_name):
     # 1. Run Test
     is_fast_system, cpu_speed = run_smart_test(url, vf_chain, base_enc_flags)
 
-    # 2. Setup Inputs & Filters
-    inputs = f'{LOOP_ARG}-re -rtbufsize 2G -thread_queue_size 16384 -rw_timeout 120000000 -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -i "{url}" '
+    # 2. Setup Inputs (Removed -re to allow fast download)
+    inputs = f'{LOOP_ARG}-rtbufsize 2G -thread_queue_size 16384 -rw_timeout 120000000 -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -i "{url}" '
     
     filter_complex = ""
     audio_map = ""
@@ -324,7 +324,6 @@ def stream_direct(url, game_name):
     # 3. EXECUTION
     if is_fast_system:
         log("🚀 System is FAST! Streaming Immediately.")
-        # Direct Stream
         cmd = f'ffmpeg -hide_banner -loglevel info -stats {inputs} -filter_complex "{filter_complex}" {video_map}{audio_map} {base_enc_flags} -rtmp_buffer 30000 -flvflags no_duration_filesize {out_format}'
         try:
             p = subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, universal_newlines=True)
@@ -341,28 +340,21 @@ def stream_direct(url, game_name):
     
     else:
         # 🔥 SMART DYNAMIC AUTO-ADJUST CALCULATION (FILTER + BITRATE) 🔥
-        if cpu_speed <= 0: cpu_speed = 0.5 # Fallback safety
+        if cpu_speed <= 0: cpu_speed = 0.5 
         
-        # Filter Weight Multiplier (1=Light, 3=Heavy)
         f_load = {"1": 1.0, "2": 1.5, "3": 2.0, "4": 1.2, "5": 1.1, "6": 1.4}.get(FILTER, 1.5)
-        
-        # Bitrate Weight Multiplier (Compared to baseline 8M)
         b_load = int(BITRATE) / 8.0
-        
-        # Calculation: Base 60s / CPU Speed * Load Multipliers
         calc_buffer = int((60 / cpu_speed) * f_load * b_load)
-        
-        # Limit between 1 minute (60s) and 10 minutes (600s)
         auto_buffer_secs = max(60, min(600, calc_buffer))
         
         log(f"🐢 System is SLOW (CPU: {cpu_speed}x | Filter: {FILTER} | Bitrate: {BITRATE}M).")
         log(f"⚙️ Smart Auto-Adjusted Buffer: {auto_buffer_secs} seconds ({auto_buffer_secs/60:.1f} mins)")
         log(f"   Pre-buffering {auto_buffer_secs}s of RE-ENCODED video in RAM...")
         
-        # Process 1 (Encoder): Reads source, applies filters, encodes to MPEG-TS pipe
+        # Process 1 (Encoder)
         cmd1 = f'ffmpeg -hide_banner -loglevel error -stats {inputs} -filter_complex "{filter_complex}" {video_map}{audio_map} {base_enc_flags} -f mpegts pipe:1'
         
-        # Process 2 (Streamer): Reads encoded MPEG-TS from pipe and pushes to FB/YT
+        # Process 2 (Streamer)
         cmd2 = f'ffmpeg -hide_banner -loglevel info -stats -f mpegts -i pipe:0 -c copy -flvflags no_duration_filesize {out_format}'
 
         p1 = subprocess.Popen(cmd1, shell=True, stdout=subprocess.PIPE)
@@ -376,7 +368,6 @@ def stream_direct(url, game_name):
 
         threading.Thread(target=read_p2_logs, daemon=True).start()
 
-        # Calculate dynamic buffer size in bytes
         target_buffer_bytes = int(BITRATE) * 1000000 // 8 * auto_buffer_secs
         buffer = bytearray()
         
@@ -384,7 +375,7 @@ def stream_direct(url, game_name):
         
         try:
             while True:
-                chunk = p1.stdout.read(1024 * 1024) # Read 1MB of encoded data
+                chunk = p1.stdout.read(1024 * 1024) 
                 if not chunk:
                     break
                 
@@ -400,7 +391,6 @@ def stream_direct(url, game_name):
                         p2.stdin.flush()
                         buffer.clear()
                     
-                    # Send real-time encoded data
                     p2.stdin.write(chunk)
                     p2.stdin.flush()
                     
@@ -433,7 +423,7 @@ def move_link(game, url, src_file, ok):
 
 def main():
     log("=" * 62)
-    log("🎮 MASTER AGENT v30.1 — SMART DYNAMIC (FILTER + BITRATE) BUFFER")
+    log("🎮 MASTER AGENT v30.2 — STRICT 30 FPS DYNAMIC BUFFER")
     log(f"   Loop Setup : {LOOP_MSG}")
     log(f"   Ratio      : {RATIO} | Filter: {FILTER} | Bitrate: {BITRATE}M")
     log(f"   FPS Lock   : {TARGET_FPS} FPS")
