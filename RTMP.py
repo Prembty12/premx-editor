@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 """
-🎮 MASTER AGENT v25.2 — SMART NETWORK (UP+DOWN) + CPU TEST + 30s FAST BUFFER
+🎮 MASTER AGENT v30.1 — DYNAMIC AUTO-ADJUST (FILTER + BITRATE) BUFFER
 ======================================================================
-✅ Tests CPU Speed (FFmpeg 10s test)
-✅ Tests Network Speed (Download + Upload test)
-✅ If ALL are fast -> Streams INSTANTLY with 30s Buffer
-✅ If ANY is slow -> Enables 5-Min Pre-Buffer + 2-Min RTMP
-✅ Heavy Filters & Real-Time Logs Intact
+✅ Tests CPU & Network Speed first.
+✅ If FAST: Streams immediately.
+✅ If SLOW: Auto-calculates buffer based on CPU Speed + Filter + Bitrate.
+✅ Downloads at full network speed simultaneously.
 """
 import os
 import sys
@@ -35,7 +34,6 @@ def _sigint_handler(signum, frame):
 signal.signal(signal.SIGINT, _sigint_handler)
 signal.signal(signal.SIGTERM, _sigint_handler)
 
-# Streaming Configs
 STREAM_ENABLED     = os.getenv("STREAM_ENABLED", "true").lower() == "true"
 STREAM_MODE        = os.getenv("STREAM_MODE", "both").lower().strip()
 if STREAM_MODE not in ("fb", "yt", "both"): STREAM_MODE = "both"
@@ -191,23 +189,16 @@ def get_network_speeds():
         import speedtest
         st = speedtest.Speedtest()
         st.get_best_server()
-        
-        log("   ⬇️ Testing Download...")
         download_mbps = st.download() / 1_000_000
-        
-        log("   ⬆️ Testing Upload...")
         upload_mbps = st.upload() / 1_000_000
-        
         return download_mbps, upload_mbps
     except Exception as e:
         log(f"   ⚠️ Speedtest error: {e}. Defaulting to 0.")
         return 0, 0
 
 def run_smart_test(url, vf_chain, base_enc_flags):
-    log("🔍 Pre-Flight Test: Checking CPU & Network (Down/Up)...")
-    
-    # --- 1. CPU Test (FFmpeg) ---
-    cmd = f'ffmpeg -hide_banner -loglevel info -t 10 -re -rtbufsize 512M -thread_queue_size 8192 -i "{url}" -filter_complex "[0:v]{vf_chain}[vid]" -map "[vid]" {base_enc_flags} -f null -'
+    log("🔍 Pre-Flight Test: Checking CPU & Network...")
+    cmd = f'ffmpeg -hide_banner -loglevel info -t 10 -rtbufsize 512M -thread_queue_size 8192 -i "{url}" -filter_complex "[0:v]{vf_chain}[vid]" -map "[vid]" {base_enc_flags} -f null -'
     cpu_speed = 0.0
     try:
         p = subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
@@ -226,26 +217,21 @@ def run_smart_test(url, vf_chain, base_enc_flags):
         cpu_speed = 0.0
 
     log(f"   🖥️ CPU Speed: {cpu_speed}x")
-    
-    # --- 2. Network Test ---
     download_speed, upload_speed = get_network_speeds()
-    
     log(f"   ⬇️ Download Speed: {download_speed:.2f} Mbps")
     log(f"   ⬆️ Upload Speed: {upload_speed:.2f} Mbps")
     
-    # --- 3. Decision Logic ---
-    # Both Download and Upload should be at least 1.5x of the target bitrate
     required_net = int(BITRATE) * 1.5 
     
     if cpu_speed >= 0.95 and download_speed >= required_net and upload_speed >= required_net:
-        log(f"   ✅ SYSTEM IS FAST (CPU: {cpu_speed}x, Down: {download_speed:.1f}M, Up: {upload_speed:.1f}M).")
-        return True
+        log(f"   ✅ SYSTEM IS FAST.")
+        return True, cpu_speed
     else:
-        log(f"   ⚠️ SYSTEM IS SLOW/BOTTLENECKED. (Required Down & Up: >{required_net} Mbps).")
-        return False
+        log(f"   ⚠️ SYSTEM IS SLOW/BOTTLENECKED.")
+        return False, cpu_speed
 
 # ═══════════════════════════════════════════════════════════
-# STREAMING (Smart Buffer Logic)
+# STREAMING (Dynamic Auto-Adjust Buffer)
 # ═══════════════════════════════════════════════════════════
 def stream_direct(url, game_name):
     if not STREAMING_ENABLED: return False
@@ -291,20 +277,12 @@ def stream_direct(url, game_name):
         f"-max_muxing_queue_size 16384 "
     )
 
-    # 1. Run Smart Test (CPU + Network Down/Up)
-    is_fast_system = run_smart_test(url, vf_chain, base_enc_flags)
+    # 1. Run Test
+    is_fast_system, cpu_speed = run_smart_test(url, vf_chain, base_enc_flags)
 
-    # 2. Set Inputs & Buffers
-    if is_fast_system:
-        log("🚀 CPU & Network are FAST! Streaming with 30-Sec Buffer.")
-        # 🔥 Yahan max_delay ko 10000000 se badhakar 30000000 (30 sec) kar diya gaya hai
-        inputs = f'{LOOP_ARG}-re -rtbufsize 512M -thread_queue_size 8192 -max_delay 30000000 -rw_timeout 120000000 -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -i "{url}" '
-        enc_flags = base_enc_flags + "-rtmp_buffer 10000 " # 10 Sec RTMP
-    else:
-        log("🐢 CPU or Network is SLOW! Enabling 5-Min Pre-Buffer & 2-Min RTMP.")
-        inputs = f'{LOOP_ARG}-re -rtbufsize 2G -thread_queue_size 16384 -max_delay 300000000 -rw_timeout 120000000 -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -i "{url}" '
-        enc_flags = base_enc_flags + "-rtmp_buffer 120000 " # 2 Min RTMP
-
+    # 2. Setup Inputs & Filters
+    inputs = f'{LOOP_ARG}-re -rtbufsize 2G -thread_queue_size 16384 -rw_timeout 120000000 -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -i "{url}" '
+    
     filter_complex = ""
     audio_map = ""
     video_map = ""
@@ -336,53 +314,107 @@ def stream_direct(url, game_name):
     if not audio_file_exists:
         audio_map = f'-map 0:a? -af "{af_chain}" '
 
-    for att in range(1, MAX_STREAM_RETRIES + 1):
-        log(f"📡 Stream Attempt {att}/{MAX_STREAM_RETRIES} → Starting...")
-        
-        if n == 1:
-            target = f"rtmp://a.rtmp.youtube.com/live2/{YOUTUBE_KEY}" if USE_YT else f"rtmps://live-api-s.facebook.com:443/rtmp/{FACEBOOK_KEY}"
-            cmd = f'ffmpeg -hide_banner -loglevel info -stats {inputs} -filter_complex "{filter_complex}" {video_map}{audio_map}{enc_flags} -flvflags no_duration_filesize -f flv "{target}"'
-        else:
-            tee = _tee()
-            cmd = f'ffmpeg -hide_banner -loglevel info -stats {inputs} -filter_complex "{filter_complex}" {video_map}{audio_map}{enc_flags} -flvflags no_duration_filesize -f tee "{tee}"'
+    if n == 1:
+        target = f"rtmp://a.rtmp.youtube.com/live2/{YOUTUBE_KEY}" if USE_YT else f"rtmps://live-api-s.facebook.com:443/rtmp/{FACEBOOK_KEY}"
+        out_format = f'-f flv "{target}"'
+    else:
+        tee = _tee()
+        out_format = f'-f tee "{tee}"'
 
-        log(f"   $ Connecting to FB/YT...")
+    # 3. EXECUTION
+    if is_fast_system:
+        log("🚀 System is FAST! Streaming Immediately.")
+        # Direct Stream
+        cmd = f'ffmpeg -hide_banner -loglevel info -stats {inputs} -filter_complex "{filter_complex}" {video_map}{audio_map} {base_enc_flags} -rtmp_buffer 30000 -flvflags no_duration_filesize {out_format}'
         try:
             p = subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, universal_newlines=True)
-        except Exception as e:
-            return False
-
-        def _reader():
-            try:
-                for line in iter(p.stderr.readline, ''):
-                    safe = line.strip()
-                    if not safe: continue
-                    
-                    for k in (YOUTUBE_KEY, FACEBOOK_KEY):
-                        if k and k in safe: safe = safe.replace(k, "***")
-                    
-                    if "frame=" in safe or "speed=" in safe:
-                        log(f"      ⏳ {safe}")
-                    elif any(x in safe.lower() for x in ["error", "failed", "connection", "rtmp", "mapping"]):
-                        log(f"      [ffmpeg] {safe[:200]}")
-            except Exception: pass
-
-        threading.Thread(target=_reader, daemon=True).start()
-        start = time.time()
-        try:
+            start = time.time()
             while p.poll() is None:
                 if INTERRUPTED: p.terminate(); return False
                 if MAX_RUN_SECONDS and (time.time() - start) > MAX_RUN_SECONDS: p.terminate(); return True
-                time.sleep(0.5)
-            if p.returncode == 0:
-                if os.path.exists("optional_audio.mp3"): os.remove("optional_audio.mp3")
-                return True
-        finally:
-            if p.poll() is None: p.kill()
+                line = p.stderr.readline()
+                if line and ("frame=" in line or "speed=" in line):
+                    log(f"      ⏳ {line.strip()[:120]}")
+            return p.returncode == 0
+        except Exception:
+            return False
+    
+    else:
+        # 🔥 SMART DYNAMIC AUTO-ADJUST CALCULATION (FILTER + BITRATE) 🔥
+        if cpu_speed <= 0: cpu_speed = 0.5 # Fallback safety
+        
+        # Filter Weight Multiplier (1=Light, 3=Heavy)
+        f_load = {"1": 1.0, "2": 1.5, "3": 2.0, "4": 1.2, "5": 1.1, "6": 1.4}.get(FILTER, 1.5)
+        
+        # Bitrate Weight Multiplier (Compared to baseline 8M)
+        b_load = int(BITRATE) / 8.0
+        
+        # Calculation: Base 60s / CPU Speed * Load Multipliers
+        calc_buffer = int((60 / cpu_speed) * f_load * b_load)
+        
+        # Limit between 1 minute (60s) and 10 minutes (600s)
+        auto_buffer_secs = max(60, min(600, calc_buffer))
+        
+        log(f"🐢 System is SLOW (CPU: {cpu_speed}x | Filter: {FILTER} | Bitrate: {BITRATE}M).")
+        log(f"⚙️ Smart Auto-Adjusted Buffer: {auto_buffer_secs} seconds ({auto_buffer_secs/60:.1f} mins)")
+        log(f"   Pre-buffering {auto_buffer_secs}s of RE-ENCODED video in RAM...")
+        
+        # Process 1 (Encoder): Reads source, applies filters, encodes to MPEG-TS pipe
+        cmd1 = f'ffmpeg -hide_banner -loglevel error -stats {inputs} -filter_complex "{filter_complex}" {video_map}{audio_map} {base_enc_flags} -f mpegts pipe:1'
+        
+        # Process 2 (Streamer): Reads encoded MPEG-TS from pipe and pushes to FB/YT
+        cmd2 = f'ffmpeg -hide_banner -loglevel info -stats -f mpegts -i pipe:0 -c copy -flvflags no_duration_filesize {out_format}'
 
-        log(f"⚠️ Attempt {att} failed. Retrying...")
-        if att < MAX_STREAM_RETRIES: time.sleep(5 * att)
-    return False
+        p1 = subprocess.Popen(cmd1, shell=True, stdout=subprocess.PIPE)
+        p2 = subprocess.Popen(cmd2, shell=True, stdin=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=False)
+
+        def read_p2_logs():
+            for line_bytes in iter(p2.stderr.readline, b''):
+                safe = line_bytes.decode('utf-8', errors='ignore').strip()
+                if "frame=" in safe or "speed=" in safe or "error" in safe.lower():
+                    log(f"      [Sending] {safe[:150]}")
+
+        threading.Thread(target=read_p2_logs, daemon=True).start()
+
+        # Calculate dynamic buffer size in bytes
+        target_buffer_bytes = int(BITRATE) * 1000000 // 8 * auto_buffer_secs
+        buffer = bytearray()
+        
+        log(f"   $ Buffering Data (Target: {target_buffer_bytes / (1024*1024):.1f} MB)...")
+        
+        try:
+            while True:
+                chunk = p1.stdout.read(1024 * 1024) # Read 1MB of encoded data
+                if not chunk:
+                    break
+                
+                if len(buffer) < target_buffer_bytes:
+                    buffer.extend(chunk)
+                    percent = (len(buffer) / target_buffer_bytes) * 100
+                    if len(buffer) % (10 * 1024 * 1024) < (1024*1024):
+                        log(f"      📦 Buffering: {percent:.1f}% complete...")
+                else:
+                    if len(buffer) > 0:
+                        log(f"\n✅ {auto_buffer_secs}-Second Buffer FULL! Now Sending to Facebook...")
+                        p2.stdin.write(buffer)
+                        p2.stdin.flush()
+                        buffer.clear()
+                    
+                    # Send real-time encoded data
+                    p2.stdin.write(chunk)
+                    p2.stdin.flush()
+                    
+                if INTERRUPTED:
+                    p1.terminate(); p2.terminate(); return False
+                    
+        except Exception as e:
+            log(f"❌ Buffer Error: {e}")
+        finally:
+            p1.terminate()
+            p2.terminate()
+            if os.path.exists("optional_audio.mp3"): os.remove("optional_audio.mp3")
+            
+        return True
 
 def move_link(game, url, src_file, ok):
     if src_file == "manual_url": return True
@@ -401,7 +433,7 @@ def move_link(game, url, src_file, ok):
 
 def main():
     log("=" * 62)
-    log("🎮 MASTER AGENT v25.2 — SMART NETWORK (DOWN+UP) + 30s FAST BUFFER")
+    log("🎮 MASTER AGENT v30.1 — SMART DYNAMIC (FILTER + BITRATE) BUFFER")
     log(f"   Loop Setup : {LOOP_MSG}")
     log(f"   Ratio      : {RATIO} | Filter: {FILTER} | Bitrate: {BITRATE}M")
     log(f"   FPS Lock   : {TARGET_FPS} FPS")
