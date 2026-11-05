@@ -1,5 +1,5 @@
 {
-  "total_replies": 29,
+  "total_replies": 30,
   "total_skipped": 0,
   "replies": [
     {
@@ -537,9 +537,28 @@
       "time_window_hours": 1440,
       "timestamp": "2026-11-02 02:56:08 AM",
       "status": "posted"
+    },
+    {
+      "reply_id": "1126288533591775_3095000624214318",
+      "comment_id": "1126288533591775_2972185309815548",
+      "reply_to_id": "1126288533591775_2972185309815548",
+      "post_id": "100463226188818_1126288533591775",
+      "user_name": "Facebook User",
+      "user_id": "",
+      "user_comment": "You suck. Definitely not barehanded haha",
+      "openrouter_reply": "Haha, I promise it was bare hands! Just some serious skills! 😜 Wanna try it out?",
+      "type": "friendly",
+      "depth": 1,
+      "game": "ghostandela",
+      "post_title": "Surviving 4 Zombies With Bare Hands 🔥😳\n\n#videogames #gamingcommunity #gaming #gh",
+      "fb_post_link": "https://www.facebook.com/reel/1160601486834751/",
+      "source_link": "",
+      "time_window_hours": 1440,
+      "timestamp": "2026-11-05 08:49:43 PM",
+      "status": "posted"
     }
   ],
   "skipped": [],
-  "last_updated": "2026-11-05 03:28:55 PM",
+  "last_updated": "2026-11-05 08:49:43 PM",
   "time_window_hours": 1440
 }
