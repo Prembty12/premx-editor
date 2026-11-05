@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-🎮 MASTER AGENT v30.2 — STRICT 30 FPS (NO FRAME DROP) + DYNAMIC BUFFER
+🎮 MASTER AGENT v32.0 — PERFECT SMOOTH BUFFER (EXACT MATH)
 ======================================================================
-✅ Forces Constant Frame Rate (CFR) - No dropped frames.
-✅ Explains FPS processing vs Video FPS.
-✅ Dynamic Auto-Adjust Buffer based on Filter, Bitrate, CPU.
+✅ Probes source video length first.
+✅ Calculates EXACT buffer needed for smooth playback based on CPU speed.
+✅ Prevents "stuck at 70%" and "Cut-off" bugs.
 """
 import os
 import sys
@@ -180,6 +180,23 @@ def _tee():
     return "|".join(o)
 
 # ═══════════════════════════════════════════════════════════
+# ⚡ NEW: GET SOURCE DURATION
+# ═══════════════════════════════════════════════════════════
+def get_video_duration(url):
+    log("⏱️ Probing source video duration...")
+    cmd = f'ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "{url}"'
+    try:
+        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+        duration_str = result.stdout.strip()
+        if duration_str:
+            dur = float(duration_str)
+            log(f"   📏 Source Duration: {int(dur // 60)}m {int(dur % 60)}s ({int(dur)} seconds)")
+            return dur
+    except Exception as e:
+        log(f"   ⚠️ Could not probe duration: {e}")
+    return 0
+
+# ═══════════════════════════════════════════════════════════
 # ⚡ SMART DUAL-TEST (CPU + NETWORK DOWN/UP)
 # ═══════════════════════════════════════════════════════════
 def get_network_speeds():
@@ -230,12 +247,15 @@ def run_smart_test(url, vf_chain, base_enc_flags):
         return False, cpu_speed
 
 # ═══════════════════════════════════════════════════════════
-# STREAMING (Dynamic Auto-Adjust Buffer)
+# STREAMING (Perfect Math Buffer + Flush Logic)
 # ═══════════════════════════════════════════════════════════
 def stream_direct(url, game_name):
     if not STREAMING_ENABLED: return False
     n = int(USE_YT) + int(USE_FB)
     if n == 0: return False
+
+    # 🔥 1. PROBE VIDEO DURATION FIRST
+    source_duration = get_video_duration(url)
 
     CROP = ""
     if RATIO == "1": CROP = "scale=1080:1080:force_original_aspect_ratio=increase,crop=1080:1080,"
@@ -262,7 +282,6 @@ def stream_direct(url, game_name):
     B_V = f"{BITRATE}M"
     BUF = f"{int(BITRATE)*2}M"
 
-    # 🔥 Ensure 30 FPS strictly using fps filter + CFR
     vf_chain = f"{V_SPEED}{CROP}{GAME}fps={TARGET_FPS}:round=near,scale=trunc(iw/2)*2:trunc(ih/2)*2"
     af_chain = f"{A_SPEED}aresample=48000"
     META_TITLE = f"{game_name} Gameplay"
@@ -270,18 +289,16 @@ def stream_direct(url, game_name):
     base_enc_flags = (
         f"-c:v libx264 -preset ultrafast -threads 0 -profile:v high -level:v 4.2 "
         f"-pix_fmt yuv420p -b:v {B_V} -maxrate {B_V} -bufsize {BUF} "
-        f"-r {TARGET_FPS} -fps_mode cfr -vsync cfr " # 🔥 Force CFR strictly
+        f"-r {TARGET_FPS} -fps_mode cfr -vsync cfr "
         f"-g {TARGET_FPS} -keyint_min {TARGET_FPS} -sc_threshold 0 "
         f"-c:a aac -b:a 128k -ar 44100 -ac 2 "
         f"-metadata title=\"{META_TITLE}\" -metadata artist=\"{META_ARTIST}\" "
         f"-max_muxing_queue_size 16384 "
     )
 
-    # 1. Run Test
     is_fast_system, cpu_speed = run_smart_test(url, vf_chain, base_enc_flags)
 
-    # 2. Setup Inputs (Removed -re to allow fast download)
-    inputs = f'{LOOP_ARG}-rtbufsize 2G -thread_queue_size 16384 -rw_timeout 120000000 -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -i "{url}" '
+    inputs = f'{LOOP_ARG}-re -rtbufsize 2G -thread_queue_size 16384 -rw_timeout 120000000 -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -i "{url}" '
     
     filter_complex = ""
     audio_map = ""
@@ -321,7 +338,6 @@ def stream_direct(url, game_name):
         tee = _tee()
         out_format = f'-f tee "{tee}"'
 
-    # 3. EXECUTION
     if is_fast_system:
         log("🚀 System is FAST! Streaming Immediately.")
         cmd = f'ffmpeg -hide_banner -loglevel info -stats {inputs} -filter_complex "{filter_complex}" {video_map}{audio_map} {base_enc_flags} -rtmp_buffer 30000 -flvflags no_duration_filesize {out_format}'
@@ -339,22 +355,30 @@ def stream_direct(url, game_name):
             return False
     
     else:
-        # 🔥 SMART DYNAMIC AUTO-ADJUST CALCULATION (FILTER + BITRATE) 🔥
+        # 🔥 SMART EXACT MATH CALCULATION 🔥
         if cpu_speed <= 0: cpu_speed = 0.5 
         
-        f_load = {"1": 1.0, "2": 1.5, "3": 2.0, "4": 1.2, "5": 1.1, "6": 1.4}.get(FILTER, 1.5)
-        b_load = int(BITRATE) / 8.0
-        calc_buffer = int((60 / cpu_speed) * f_load * b_load)
-        auto_buffer_secs = max(60, min(600, calc_buffer))
-        
+        if source_duration > 0:
+            # Formula: Total Video Length * (1 - CPU Speed) + 15 seconds safety margin
+            # Example: 341 sec * (1 - 0.36) = 218 sec buffer needed
+            deficit_ratio = 1.0 - cpu_speed
+            calc_buffer = int(source_duration * deficit_ratio) + 15
+            
+            # Ensure buffer is at least 30s, but not more than the video itself
+            auto_buffer_secs = max(30, min(int(source_duration - 10), calc_buffer))
+            log(f"📐 Exact Math Applied: Source={int(source_duration)}s, CPU={cpu_speed}x. Required Buffer={auto_buffer_secs}s.")
+        else:
+            # Fallback if live stream (no duration)
+            f_load = {"1": 1.0, "2": 1.5, "3": 2.0, "4": 1.2, "5": 1.1, "6": 1.4}.get(FILTER, 1.5)
+            b_load = int(BITRATE) / 8.0
+            calc_buffer = int((60 / cpu_speed) * f_load * b_load)
+            auto_buffer_secs = max(60, min(600, calc_buffer))
+
         log(f"🐢 System is SLOW (CPU: {cpu_speed}x | Filter: {FILTER} | Bitrate: {BITRATE}M).")
         log(f"⚙️ Smart Auto-Adjusted Buffer: {auto_buffer_secs} seconds ({auto_buffer_secs/60:.1f} mins)")
         log(f"   Pre-buffering {auto_buffer_secs}s of RE-ENCODED video in RAM...")
         
-        # Process 1 (Encoder)
         cmd1 = f'ffmpeg -hide_banner -loglevel error -stats {inputs} -filter_complex "{filter_complex}" {video_map}{audio_map} {base_enc_flags} -f mpegts pipe:1'
-        
-        # Process 2 (Streamer)
         cmd2 = f'ffmpeg -hide_banner -loglevel info -stats -f mpegts -i pipe:0 -c copy -flvflags no_duration_filesize {out_format}'
 
         p1 = subprocess.Popen(cmd1, shell=True, stdout=subprocess.PIPE)
@@ -400,6 +424,14 @@ def stream_direct(url, game_name):
         except Exception as e:
             log(f"❌ Buffer Error: {e}")
         finally:
+            if len(buffer) > 0:
+                log(f"\n⚠️ Source ended before full buffer. Flushing remaining {len(buffer)/(1024*1024):.1f} MB to Facebook...")
+                try:
+                    p2.stdin.write(buffer)
+                    p2.stdin.flush()
+                except:
+                    pass
+            
             p1.terminate()
             p2.terminate()
             if os.path.exists("optional_audio.mp3"): os.remove("optional_audio.mp3")
@@ -423,7 +455,7 @@ def move_link(game, url, src_file, ok):
 
 def main():
     log("=" * 62)
-    log("🎮 MASTER AGENT v30.2 — STRICT 30 FPS DYNAMIC BUFFER")
+    log("🎮 MASTER AGENT v32.0 — PERFECT SMOOTH BUFFER (EXACT MATH)")
     log(f"   Loop Setup : {LOOP_MSG}")
     log(f"   Ratio      : {RATIO} | Filter: {FILTER} | Bitrate: {BITRATE}M")
     log(f"   FPS Lock   : {TARGET_FPS} FPS")
