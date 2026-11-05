@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 52 | **Last Updated:** 2026-11-05 01:56:33 AM IST
+**Total Videos:** 51 | **Last Updated:** 2026-11-05 10:41:12 AM IST
 
 ---
 
@@ -10,12 +10,12 @@
 
 | Metric | Value |
 |---|---|
-| Total Videos | **52** |
-| Posted (FB or IG) | 52 / 52 |
-| FB Posted | 39 / 52 |
-| IG Posted | 22 / 52 |
+| Total Videos | **51** |
+| Posted (FB or IG) | 51 / 51 |
+| FB Posted | 39 / 51 |
+| IG Posted | 21 / 51 |
 | Total FB Views | **6,297** |
-| Total IG Views | **760** |
+| Total IG Views | **740** |
 
 ---
 
@@ -44,34 +44,33 @@
 | 19 | Spider-Man Demolishes 5 Tough Boat Enemies 🕷️🔥  #videogames #gamingcommunity #gaming #marvelsspiderm | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DemZfXzgg2Y/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan220.mp4) |
 | 20 | Spider Man Faces 1 Giant Ship 🕷️🔥  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingre | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DehYwHADVKQ/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan222.mp4) |
 | 21 | Red Power Wrecked 5 Enemies 🔥🎯  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1824245135690981/) | 968 | [🟣 IG](https://www.instagram.com/reel/DeaJz75Cfsj/) | 150 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan238.mp4) |
-| 22 | Spider Survives Big Red Container Fire 🔥🕷️  #videogames #gamingcommunity #gaming #marvelsspiderman2  | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeWKzmViel1/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan234.mp4) |
-| 23 | Spider Man vs 5 Mercs 💥🎯  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1480647083999255/) | 761 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan242.mp4) |
-| 24 | MarvelsSpiderMan230 | [🔵 FB](https://www.facebook.com/17979933521897557) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan230.mp4) |
-| 25 | MarvelsSpiderMan245 | [🔵 FB](https://www.facebook.com/18042801212818759) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan245.mp4) |
-| 26 | MarvelsSpiderMan243 | [🔵 FB](https://www.facebook.com/18128977594729042) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan243.mp4) |
+| 22 | Spider Man vs 5 Mercs 💥🎯  #videogames #gamingcommunity #gaming #marvelsspiderman2 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1480647083999255/) | 761 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan226.mp4) |
+| 23 | MarvelsSpiderMan230 | [🔵 FB](https://www.facebook.com/17979933521897557) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan230.mp4) |
+| 24 | MarvelsSpiderMan243 | [🔵 FB](https://www.facebook.com/18128977594729042) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan243.mp4) |
+| 25 | MarvelsSpiderMan221 | [🔵 FB](https://www.facebook.com/18035025143839024) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan221.mp4) |
+| 26 | MarvelsSpiderMan245 | [🔵 FB](https://www.facebook.com/18042801212818759) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan245.mp4) |
 | 27 | MarvelsSpiderMan211 | [🔵 FB](https://www.facebook.com/18623231722003999) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan211.mp4) |
-| 28 | MarvelsSpiderMan227 | [🔵 FB](https://www.facebook.com/17892738174655518) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan227.mp4) |
-| 29 | MarvelsSpiderMan214 | [🔵 FB](https://www.facebook.com/18123803143850381) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan214.mp4) |
-| 30 | MarvelsSpiderMan221 | [🔵 FB](https://www.facebook.com/18035025143839024) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan221.mp4) |
-| 31 | MarvelsSpiderMan213 | [🔵 FB](https://www.facebook.com/17907837975513321) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan213.mp4) |
-| 32 | MarvelsSpiderMan228 | [🔵 FB](https://www.facebook.com/18110406041149487) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan228.mp4) |
-| 33 | MarvelsSpiderMan210 | [🔵 FB](https://www.facebook.com/18117987247767102) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan210.mp4) |
+| 28 | MarvelsSpiderMan213 | [🔵 FB](https://www.facebook.com/17907837975513321) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan213.mp4) |
+| 29 | MarvelsSpiderMan233 | [🔵 FB](https://www.facebook.com/18134942425643274) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan233.mp4) |
+| 30 | MarvelsSpiderMan214 | [🔵 FB](https://www.facebook.com/18123803143850381) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan214.mp4) |
+| 31 | MarvelsSpiderMan210 | [🔵 FB](https://www.facebook.com/18117987247767102) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan210.mp4) |
+| 32 | MarvelsSpiderMan227 | [🔵 FB](https://www.facebook.com/17892738174655518) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan227.mp4) |
+| 33 | MarvelsSpiderMan228 | [🔵 FB](https://www.facebook.com/18110406041149487) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan228.mp4) |
 | 34 | MarvelsSpiderMan26 | [🔵 FB](https://www.facebook.com/18098241482371283) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan26.mp4) |
-| 35 | MarvelsSpiderMan233 | [🔵 FB](https://www.facebook.com/18134942425643274) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan233.mp4) |
-| 36 | MarvelsSpiderMan237 | [🔵 FB](https://www.facebook.com/18056073362571724) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan237.mp4) |
-| 37 | MarvelsSpiderMan235 | [🔵 FB](https://www.facebook.com/17937735123380682) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan235.mp4) |
-| 38 | MarvelsSpiderMan231 | [🔵 FB](https://www.facebook.com/18082208675380319) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan231.mp4) |
-| 39 | MarvelsSpiderMan218 | [🔵 FB](https://www.facebook.com/17993700366019036) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan218.mp4) |
-| 40 | MarvelsSpiderMan226 | [🔵 FB](https://www.facebook.com/18117956918094791) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan226.mp4) |
-| 41 | MarvelsSpiderMan215 | [🔵 FB](https://www.facebook.com/18168919741482684) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan215.mp4) |
-| 42 | MarvelsSpiderMan222 | [🔵 FB](https://www.facebook.com/18128787124847494) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan222.mp4) |
-| 43 | MarvelsSpiderMan234 | [🔵 FB](https://www.facebook.com/18108171713227867) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan234.mp4) |
-| 44 | MarvelsSpiderMan220 | [🔵 FB](https://www.facebook.com/18104586572203396) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan220.mp4) |
-| 45 | MarvelsSpiderMan242 | [🔵 FB](https://www.facebook.com/18483508726118350) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan242.mp4) |
+| 35 | MarvelsSpiderMan231 | [🔵 FB](https://www.facebook.com/18082208675380319) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan231.mp4) |
+| 36 | MarvelsSpiderMan235 | [🔵 FB](https://www.facebook.com/17937735123380682) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan235.mp4) |
+| 37 | MarvelsSpiderMan237 | [🔵 FB](https://www.facebook.com/18056073362571724) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan237.mp4) |
+| 38 | MarvelsSpiderMan226 | [🔵 FB](https://www.facebook.com/18117956918094791) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan226.mp4) |
+| 39 | MarvelsSpiderMan222 | [🔵 FB](https://www.facebook.com/18128787124847494) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan222.mp4) |
+| 40 | MarvelsSpiderMan218 | [🔵 FB](https://www.facebook.com/17993700366019036) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan218.mp4) |
+| 41 | MarvelsSpiderMan220 | [🔵 FB](https://www.facebook.com/18104586572203396) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan220.mp4) |
+| 42 | MarvelsSpiderMan238 | [🔵 FB](https://www.facebook.com/17914272342546226) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan238.mp4) |
+| 43 | MarvelsSpiderMan215 | [🔵 FB](https://www.facebook.com/18168919741482684) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan215.mp4) |
+| 44 | MarvelsSpiderMan242 | [🔵 FB](https://www.facebook.com/18483508726118350) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan242.mp4) |
+| 45 | MarvelsSpiderMan234 | [🔵 FB](https://www.facebook.com/18108171713227867) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan234.mp4) |
 | 46 | MarvelsSpiderMan239 | [🔵 FB](https://www.facebook.com/18151993837555756) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan239.mp4) |
-| 47 | MarvelsSpiderMan216 | [🔵 FB](https://www.facebook.com/18227238766331516) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan216.mp4) |
-| 48 | MarvelsSpiderMan238 | [🔵 FB](https://www.facebook.com/17914272342546226) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan238.mp4) |
-| 49 | MarvelsSpiderMan240 | [🔵 FB](https://www.facebook.com/17979699656923199) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan240.mp4) |
-| 50 | MarvelsSpiderMan236 | [🔵 FB](https://www.facebook.com/18359102521174935) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan236.mp4) |
+| 47 | MarvelsSpiderMan240 | [🔵 FB](https://www.facebook.com/17979699656923199) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan240.mp4) |
+| 48 | MarvelsSpiderMan216 | [🔵 FB](https://www.facebook.com/18227238766331516) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan216.mp4) |
+| 49 | MarvelsSpiderMan236 | [🔵 FB](https://www.facebook.com/18359102521174935) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan236.mp4) |
+| 50 | MarvelsSpiderMan219 | [🔵 FB](https://www.facebook.com/18133014295679831) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan219.mp4) |
 | 51 | MarvelsSpiderMan217 | [🔵 FB](https://www.facebook.com/18136571665677025) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan217.mp4) |
-| 52 | MarvelsSpiderMan219 | [🔵 FB](https://www.facebook.com/18133014295679831) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan219.mp4) |
