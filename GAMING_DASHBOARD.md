@@ -1,6 +1,6 @@
 # 🚀 GAMING AGENT COMMAND & ANALYTICS DASHBOARD
 
-> **Last Updated:** 2026-11-05 10:41:12 AM IST | **Status:** All Systems Active & Synchronized
+> **Last Updated:** 2026-11-06 01:00:25 AM IST | **Status:** All Systems Active & Synchronized
 
 --- 
 
@@ -8,17 +8,17 @@
 
 | Rank | Game Name | Total Videos | Total Views | Avg Views / Video | Performance Tier |
 | :---: | :--- | :---: | :---: | :---: | :---: |
-| 🥇 | **CODMW4** | 38 | 12,922 | 340 | 📈 Stable |
+| 🥇 | **CODMW4** | 39 | 13,047 | 334 | 📈 Stable |
 | 🥈 | **MarvelsSpiderMan2** | 56 | 7,037 | 125 | 📈 Stable |
-| 🥉 | **Russian_secret_missions** | 26 | 3,408 | 131 | 📈 Stable |
-| 4️⃣ | **CallOfDutyMW2** | 12 | 3,075 | 256 | 📈 Stable |
-| 5️⃣ | **Wolverine** | 49 | 2,070 | 42 | 📈 Stable |
+| 🥉 | **CallOfDutyMW2** | 12 | 2,240 | 186 | 📈 Stable |
+| 4️⃣ | **Wolverine** | 49 | 2,094 | 42 | 📈 Stable |
+| 5️⃣ | **Russian_secret_missions** | 26 | 2,031 | 78 | 📈 Stable |
 | 6 | **Callofdutyaw** | 17 | 1,739 | 102 | 📈 Stable |
-| 7 | **codBlackops6** | 11 | 1,718 | 156 | 📈 Stable |
+| 7 | **codBlackops6** | 11 | 1,721 | 156 | 📈 Stable |
 | 8 | **GearsOfWar** | 10 | 1,405 | 140 | 📈 Stable |
-| 9 | **mm2remastered** | 14 | 1,328 | 94 | 📈 Stable |
-| 10 | **VietnamCavePrison** | 16 | 995 | 62 | 📈 Stable |
-| 11 | **ghostandela** | 56 | 675 | 12 | 📈 Stable |
+| 9 | **ghostandela** | 56 | 1,372 | 24 | 📈 Stable |
+| 10 | **mm2remastered** | 14 | 1,328 | 94 | 📈 Stable |
+| 11 | **VietnamCavePrison** | 16 | 995 | 62 | 📈 Stable |
 | 12 | **sifu** | 19 | 60 | 3 | 📈 Stable |
 
 --- 
@@ -29,13 +29,13 @@
 
 | Game Name | 📅 Last Posted | 📺 Latest Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📊 Remaining / Total | 📂 Source | 📜 All |
 |---|---|---|---|---|---|---|---|---|---|
+| **ghostandela** | 2026-11-05 05:33 PM | Surviving 4 Zombies With Bare Hands 🔥😳  #videogames #gamingcommunity #gaming #gh | [🔵 FB](https://www.facebook.com/reel/1160601486834751/) | 617 | [🟣 IG](https://www.instagram.com/reel/DfWQatVDSZr/) | 80 | ✅ 28 / 28 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela13.mp4) | **[📜 View 28](logs/games/ghostandela.md)** |
 | **Wolverine** | 2026-11-05 01:25 AM | Red Eye Traps The Yellow Hero 🔥🎯  #videogames #gamingcommunity #gaming #wolverin | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DfVQXy9CShR/) | 0 | **2** / 51 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine29.mp4) | **[📜 View 51](logs/games/Wolverine.md)** |
-| **CODMW4** | 2026-11-05 01:10 AM | Gunship Wrecks Snowy Base 🚀🔥  #videogames #gamingcommunity #gaming #codmw4 #gami | [🔵 FB](https://www.facebook.com/reel/1693110865579996/) | 52 | [🟣 IG](https://www.instagram.com/reel/DfVNpOOj9lJ/) | 20 | ✅ 32 / 32 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW44.mp4) | **[📜 View 32](logs/games/CODMW4.md)** |
-| **ghostandela** | 2026-11-04 10:27 PM | 1 Child Broke The Tough Soldier 😭🔥  #videogames #gamingcommunity #gaming #ghosta | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DfU8BN-FSns/) | 0 | ✅ 27 / 27 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela13.mp4) | **[📜 View 27](logs/games/ghostandela.md)** |
+| **CODMW4** | 2026-11-05 01:10 AM | Gunship Wrecks Snowy Base 🚀🔥  #videogames #gamingcommunity #gaming #codmw4 #gami | [🔵 FB](https://www.facebook.com/reel/1693110865579996/) | 81 | [🟣 IG](https://www.instagram.com/reel/DfVNpOOj9lJ/) | 20 | ✅ 32 / 32 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW44.mp4) | **[📜 View 32](logs/games/CODMW4.md)** |
 | **MarvelsSpiderMan2** | 2026-11-04 01:00 AM | Spider Man Wrecked 4 Enemies 🔥⚡  #videogames #gamingcommunity #gaming #marvelssp | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/De2QhS9k0E1/) | 20 | ✅ 51 / 51 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.95/MarvelsSpiderMan230.mp4) | **[📜 View 51](logs/games/MarvelsSpiderMan2.md)** |
-| **codBlackops6** | 2026-11-02 01:51 AM | CoD Black Ops 6 LIVE \| Destroying Every Squad | [🔵 FB](https://www.facebook.com/1082871464600149/videos/1471500258505084) | 281 | ⏳ Pending | _0_ | **18** / 29 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops62.mp4) | **[📜 View 29](logs/games/codBlackops6.md)** |
-| **CallOfDutyMW2** | 2026-10-23 01:37 AM | Ghost the Mask 🎭 #callofduty #mw2 | [🔵 FB](https://www.facebook.com/reel/2181972149061480/) | 176 | ⏳ Pending | _0_ | ✅ 12 / 12 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play8.mp4) | **[📜 View 12](logs/games/CallOfDutyMW2.md)** |
-| **Russian_secret_missions** | 2026-10-21 09:01 AM | Red Eye Soldier Survival 1 HP 🚀🔥  #videogames #gamingcommunity #gaming #russian_ | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DevcmWKjL0Y/) | 0 | ✅ 25 / 25 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions15.mp4) | **[📜 View 25](logs/games/Russian_secret_missions.md)** |
+| **codBlackops6** | 2026-11-02 01:51 AM | CoD Black Ops 6 LIVE \| Destroying Every Squad | [🔵 FB](https://www.facebook.com/1082871464600149/videos/1471500258505084) | 284 | ⏳ Pending | _0_ | **18** / 29 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops62.mp4) | **[📜 View 29](logs/games/codBlackops6.md)** |
+| **CallOfDutyMW2** | 2026-10-23 01:37 AM | Ghost the Mask 🎭 #callofduty #mw2 | [🔵 FB](https://www.facebook.com/reel/2181972149061480/) | 176 | ⏳ Pending | _0_ | ✅ 11 / 11 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play8.mp4) | **[📜 View 11](logs/games/CallOfDutyMW2.md)** |
+| **Russian_secret_missions** | 2026-10-21 09:01 AM | Red Eye Soldier Survival 1 HP 🚀🔥  #videogames #gamingcommunity #gaming #russian_ | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DevcmWKjL0Y/) | 0 | ✅ 24 / 24 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions15.mp4) | **[📜 View 24](logs/games/Russian_secret_missions.md)** |
 | **sifu** | 2026-10-19 03:57 PM | Brutal Kitchen Brawl 1 vs 5 Smashed 🔥🎯  #videogames #gamingcommunity #gaming #si | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DerCpG3DeWc/) | 0 | **1** / 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu13.mp4) | **[📜 View 20](logs/games/sifu.md)** |
 | **Callofdutyaw** | 2026-10-12 10:01 AM | Survived The Massive Firestorm 🔥😱  #videogames #gamingcommunity #gaming #callofd | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeYYZyClYL0/) | 10 | **15** / 32 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison37.mp4) | **[📜 View 32](logs/games/Callofdutyaw.md)** |
 | **VietnamCavePrison** | 2026-10-11 03:28 PM | Helicopter River Strike 4 Targets Hit 🔥🎯  #videogames #gamingcommunity #gaming # | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DeWZA7qDJ27/) | 270 | **7** / 23 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison11.mp4) | **[📜 View 23](logs/games/VietnamCavePrison.md)** |
@@ -46,30 +46,30 @@
 
 ## 📈 Trending Games (Last 7 Days)
 
-> Auto-detected based on views performance | Last Updated: 2026-11-05 10:41:12 AM
+> Auto-detected based on views performance | Last Updated: 2026-11-06 01:00:25 AM
 
 | Rank | Game Name | Views (7d) | Avg / Video | Trend | FB Post | Source |
 |:---:|---|---|---|---|---|---|
-| 🥇 | **CODMW4** | 3,827 | 546 | 🚀 **VIRAL** | [🔵](https://www.facebook.com/reel/1693110865579996/) | _N/A_ |
-| 🥈 | **codBlackops6** | 281 | 281 | 🔥 Trending | [🔵](https://www.facebook.com/1082871464600149/videos/1471500258505084) | _N/A_ |
+| 🥇 | **CODMW4** | 3,225 | 645 | 🚀 **VIRAL** | [🔵](https://www.facebook.com/reel/1693110865579996/) | _N/A_ |
+| 🥈 | **codBlackops6** | 284 | 284 | ⚡ Steady | [🔵](https://www.facebook.com/1082871464600149/videos/1471500258505084) | _N/A_ |
 
 ### 📉 Below Average This Week
 
 | Game | Views (7d) | Avg |
 |---|---|---|
+| ghostandela | 697 | 174 |
+| Wolverine | 184 | 30 |
 | MarvelsSpiderMan2 | 90 | 22 |
-| Wolverine | 160 | 22 |
-| ghostandela | 0 | 0 |
 
 ### 💡 Recommendation
 
-**Best game to post next:** 🚀 **CODMW4** (Avg 546 views/video)
+**Best game to post next:** 🚀 **CODMW4** (Avg 645 views/video)
 
 --- 
 
 ## 🎯 Best Time to Post (IST)
 
-> Analysis from 391 posts | Last Updated: 2026-11-05 10:41:12 AM
+> Analysis from 392 posts | Last Updated: 2026-11-06 01:00:25 AM
 
 | Rank | Time (IST) | Posts | Avg Views | Recommendation |
 |:---:|---|:---:|:---:|---|
@@ -90,7 +90,7 @@
 | Monday | 48 | 392 |
 | Tuesday | 82 | 248 |
 | Wednesday | 79 | 273 |
-| Thursday | 48 | 231 |
+| Thursday | 49 | 226 |
 | Friday | 35 | 275 |
 | Saturday | 45 | 244 |
 | Sunday | 54 | 229 |
@@ -99,41 +99,41 @@
 
 ## 🤖 Auto-Reply Log (v6 Timeout-Safe)
 
-> Auto-Comment Status: ✅ **ACTIVE** | Last Updated: 2026-11-05 10:41:12 AM | Total Replies: 29 | Skipped: 0
+> Auto-Comment Status: ✅ **ACTIVE** | Last Updated: 2026-11-06 01:00:25 AM | Total Replies: 30 | Skipped: 0
 
 ### 📊 Stats
 
 | Metric | Value |
 |---|---|
-| Friendly Replies | 29 |
+| Friendly Replies | 30 |
 | Savage Replies | 0 |
 | Unverified (timeout) | 0 |
-| Total | 29 |
+| Total | 30 |
 
 ### 💬 Recent Replies (Last 20)
 
 | # | Time | 👤 User | 💬 User Comment | 🤖 AI Reply | Type | Depth | Game | FB Post |
 |---|---|---|---|---|---|---|---|---|
-| 1 | 2026-11-02 02:56:08  | **Facebook User** | Harsh | Gotta keep it real, right? 😄 What’s your favorite game for some no mercy action? | ✅ Friendly | 1 | Video Game | [🔵](https://www.facebook.com/1082871464600149/videos/1787188529225003) |
-| 2 | 2026-10-13 02:00:32  | **Facebook User** | Komputer andrex | Bhai, computer se khelna toh OP hai! 😂 Game ka naam hai Helicopter River Strike! | ✅ Friendly | 1 | Video Game | [🔵](https://www.facebook.com/reel/1452885310067027/) |
-| 3 | 2026-10-09 02:52:14  | **Facebook User** | Please writ down full game play name and pc | It's Call of Duty: Black Ops 6, bhai, and yes, it's on PC. Chill! 🎮 | ✅ Friendly | 1 | Black Ops 6 | [🔵](https://www.facebook.com/reel/1768651854427402/) |
-| 4 | 2026-10-09 02:52:07  | **Facebook User** | the shot gun looks nice what weapon is this | That's the shotgun from MW2, bro. Fire weapon! 😎 | ✅ Friendly | 1 | Call of Duty | [🔵](https://www.facebook.com/reel/1413510794250292/) |
-| 5 | 2026-10-08 11:34:55  | **Facebook User** | Please writ down full game play name and | Hey yaar, the game is called 'Ukraine Covert Mission'. Enjoy! 🎮🔥 | ✅ Friendly | 1 | Video Game | [🔵](https://www.facebook.com/reel/1063836943354242/) |
-| 6 | 2026-10-08 09:38:06  | **Facebook User** | Please writ down full game play name | Sure, bro! The full game name is Video Game. Enjoy the raid! 🔥 | ✅ Friendly | 1 | Video Game | [🔵](https://www.facebook.com/reel/26623339340696588/) |
-| 7 | 2026-10-07 10:37:16  | **Facebook User** | Hi bro | Hey yaar! Ready to swing into action? 🕷️ | ✅ Friendly | 1 | Spider-Man | [🔵](https://www.facebook.com/reel/1776708160307603/) |
-| 8 | 2026-10-07 10:18:45  | **Facebook User** | PremxGamer ok bro well done | Thanks, bro! You know it! 🔥 | ✅ Friendly | 1 | Video Game | [🔵](https://www.facebook.com/reel/1544999520268289/) |
-| 9 | 2026-10-07 10:12:35  | **Facebook User** | And we lose Soap anyways 😭 | Bummer, losing Soap is rough, but we still got the heat! 🔥 | ✅ Friendly | 1 | Video Game | [🔵](https://www.facebook.com/reel/1420950820133993/) |
-| 10 | 2026-10-07 10:12:20  | **Facebook User** | What game? | Yo, it's Video Game, the ultimate arena shooter! 🔥 | ✅ Friendly | 1 | Video Game | [🔵](https://www.facebook.com/reel/1420950820133993/) |
-| 11 | 2026-10-07 10:12:11  | **Facebook User** | Oow nice shot | Nice shot bro! Keep those headshots coming, OP! 🎯 | ✅ Friendly | 1 | Video Game | [🔵](https://www.facebook.com/reel/1544999520268289/) |
-| 12 | 2026-10-07 10:12:04  | **Facebook User** | ____@ | Dude, you missed the point entirely 😂 | ✅ Friendly | 1 | Call of Duty | [🔵](https://www.facebook.com/reel/28324604270511325/) |
-| 13 | 2026-10-07 10:11:50  | **Facebook User** | Что за игра 🎮? | Yo bro, it's Call of Duty, the OG shooter! 🔥 | ✅ Friendly | 1 | Call of Duty | [🔵](https://www.facebook.com/reel/28324604270511325/) |
-| 14 | 2026-10-07 08:53:57  | **Facebook User** | It must be COD Advanced Warfare | Spot on! | ✅ Friendly | 1 | Call of Duty | [🔵](https://www.facebook.com/reel/28324604270511325/) |
-| 15 | 2026-10-07 08:53:44  | **Facebook User** | Name game please? | It's the Russian secret missions shooter, bro! 😎 | ✅ Friendly | 1 | Video Game | [🔵](https://www.facebook.com/reel/1353285143546456/) |
-| 16 | 2026-10-07 08:53:26  | **Facebook User** | Name | It's Black Ops 6, bro! 🔫 | ✅ Friendly | 1 | Black Ops 6 | [🔵](https://www.facebook.com/reel/1087694207200854/) |
-| 17 | 2026-10-07 08:53:00  | **Facebook User** | Game name | It's MM2 Remastered, bro! 🔥 | ✅ Friendly | 1 | mm2remastered | [🔵](https://www.facebook.com/reel/1829429441565917/) |
-| 18 | 2026-10-06 06:59:18  | **Facebook User** | Tem esses  jogo pra Xbox série S? | Yeah bro, it's Ukraine Covert Mission – works on Xbox Series S! 🎮🔥 | ✅ Friendly | 1 | Video Game | [🔵](https://www.facebook.com/reel/1063836943354242/) |
-| 19 | 2026-10-06 11:25:47  | **Facebook User** | Nice shot | Thanks, bro! 🔥 That fight was lit. What's your go-to move in the game? | ✅ Friendly | 1 | Spider-Man | [🔵](https://www.facebook.com/reel/1379906203935081/) |
-| 20 | 2026-10-01 10:01:33  | **Facebook User** | PremxGamer ok bro love you | Love you too, bro! ❤️ For the next video, what move should I prioritize? 🔥 | ✅ Friendly | 3 | sifu | [🔵](https://www.facebook.com/reel/1536392984956953/) |
+| 1 | 2026-11-05 08:49:43  | **Facebook User** | You suck. Definitely not barehanded haha | Haha, I promise it was bare hands! Just some serious skills! 😜 Wanna try it out? | ✅ Friendly | 1 | ghostandela | [🔵](https://www.facebook.com/reel/1160601486834751/) |
+| 2 | 2026-11-02 02:56:08  | **Facebook User** | Harsh | Gotta keep it real, right? 😄 What’s your favorite game for some no mercy action? | ✅ Friendly | 1 | Video Game | [🔵](https://www.facebook.com/1082871464600149/videos/1787188529225003) |
+| 3 | 2026-10-13 02:00:32  | **Facebook User** | Komputer andrex | Bhai, computer se khelna toh OP hai! 😂 Game ka naam hai Helicopter River Strike! | ✅ Friendly | 1 | Video Game | [🔵](https://www.facebook.com/reel/1452885310067027/) |
+| 4 | 2026-10-09 02:52:14  | **Facebook User** | Please writ down full game play name and pc | It's Call of Duty: Black Ops 6, bhai, and yes, it's on PC. Chill! 🎮 | ✅ Friendly | 1 | Black Ops 6 | [🔵](https://www.facebook.com/reel/1768651854427402/) |
+| 5 | 2026-10-09 02:52:07  | **Facebook User** | the shot gun looks nice what weapon is this | That's the shotgun from MW2, bro. Fire weapon! 😎 | ✅ Friendly | 1 | Call of Duty | [🔵](https://www.facebook.com/reel/1413510794250292/) |
+| 6 | 2026-10-08 11:34:55  | **Facebook User** | Please writ down full game play name and | Hey yaar, the game is called 'Ukraine Covert Mission'. Enjoy! 🎮🔥 | ✅ Friendly | 1 | Video Game | [🔵](https://www.facebook.com/reel/1063836943354242/) |
+| 7 | 2026-10-08 09:38:06  | **Facebook User** | Please writ down full game play name | Sure, bro! The full game name is Video Game. Enjoy the raid! 🔥 | ✅ Friendly | 1 | Video Game | [🔵](https://www.facebook.com/reel/26623339340696588/) |
+| 8 | 2026-10-07 10:37:16  | **Facebook User** | Hi bro | Hey yaar! Ready to swing into action? 🕷️ | ✅ Friendly | 1 | Spider-Man | [🔵](https://www.facebook.com/reel/1776708160307603/) |
+| 9 | 2026-10-07 10:18:45  | **Facebook User** | PremxGamer ok bro well done | Thanks, bro! You know it! 🔥 | ✅ Friendly | 1 | Video Game | [🔵](https://www.facebook.com/reel/1544999520268289/) |
+| 10 | 2026-10-07 10:12:35  | **Facebook User** | And we lose Soap anyways 😭 | Bummer, losing Soap is rough, but we still got the heat! 🔥 | ✅ Friendly | 1 | Video Game | [🔵](https://www.facebook.com/reel/1420950820133993/) |
+| 11 | 2026-10-07 10:12:20  | **Facebook User** | What game? | Yo, it's Video Game, the ultimate arena shooter! 🔥 | ✅ Friendly | 1 | Video Game | [🔵](https://www.facebook.com/reel/1420950820133993/) |
+| 12 | 2026-10-07 10:12:11  | **Facebook User** | Oow nice shot | Nice shot bro! Keep those headshots coming, OP! 🎯 | ✅ Friendly | 1 | Video Game | [🔵](https://www.facebook.com/reel/1544999520268289/) |
+| 13 | 2026-10-07 10:12:04  | **Facebook User** | ____@ | Dude, you missed the point entirely 😂 | ✅ Friendly | 1 | Call of Duty | [🔵](https://www.facebook.com/reel/28324604270511325/) |
+| 14 | 2026-10-07 10:11:50  | **Facebook User** | Что за игра 🎮? | Yo bro, it's Call of Duty, the OG shooter! 🔥 | ✅ Friendly | 1 | Call of Duty | [🔵](https://www.facebook.com/reel/28324604270511325/) |
+| 15 | 2026-10-07 08:53:57  | **Facebook User** | It must be COD Advanced Warfare | Spot on! | ✅ Friendly | 1 | Call of Duty | [🔵](https://www.facebook.com/reel/28324604270511325/) |
+| 16 | 2026-10-07 08:53:44  | **Facebook User** | Name game please? | It's the Russian secret missions shooter, bro! 😎 | ✅ Friendly | 1 | Video Game | [🔵](https://www.facebook.com/reel/1353285143546456/) |
+| 17 | 2026-10-07 08:53:26  | **Facebook User** | Name | It's Black Ops 6, bro! 🔫 | ✅ Friendly | 1 | Black Ops 6 | [🔵](https://www.facebook.com/reel/1087694207200854/) |
+| 18 | 2026-10-07 08:53:00  | **Facebook User** | Game name | It's MM2 Remastered, bro! 🔥 | ✅ Friendly | 1 | mm2remastered | [🔵](https://www.facebook.com/reel/1829429441565917/) |
+| 19 | 2026-10-06 06:59:18  | **Facebook User** | Tem esses  jogo pra Xbox série S? | Yeah bro, it's Ukraine Covert Mission – works on Xbox Series S! 🎮🔥 | ✅ Friendly | 1 | Video Game | [🔵](https://www.facebook.com/reel/1063836943354242/) |
+| 20 | 2026-10-06 11:25:47  | **Facebook User** | Nice shot | Thanks, bro! 🔥 That fight was lit. What's your go-to move in the game? | ✅ Friendly | 1 | Spider-Man | [🔵](https://www.facebook.com/reel/1379906203935081/) |
 
 --- 
 
@@ -141,13 +141,13 @@
 
 > Click any game below to view its complete video list with all FB/IG links:
 
+- **🎮 ghostandela** — [📜 View All 28 Videos](logs/games/ghostandela.md)
 - **🎮 Wolverine** — [📜 View All 51 Videos](logs/games/Wolverine.md)
 - **🎮 CODMW4** — [📜 View All 32 Videos](logs/games/CODMW4.md)
-- **🎮 ghostandela** — [📜 View All 27 Videos](logs/games/ghostandela.md)
 - **🎮 MarvelsSpiderMan2** — [📜 View All 51 Videos](logs/games/MarvelsSpiderMan2.md)
 - **🎮 codBlackops6** — [📜 View All 29 Videos](logs/games/codBlackops6.md)
-- **🎮 CallOfDutyMW2** — [📜 View All 12 Videos](logs/games/CallOfDutyMW2.md)
-- **🎮 Russian_secret_missions** — [📜 View All 25 Videos](logs/games/Russian_secret_missions.md)
+- **🎮 CallOfDutyMW2** — [📜 View All 11 Videos](logs/games/CallOfDutyMW2.md)
+- **🎮 Russian_secret_missions** — [📜 View All 24 Videos](logs/games/Russian_secret_missions.md)
 - **🎮 sifu** — [📜 View All 20 Videos](logs/games/sifu.md)
 - **🎮 Callofdutyaw** — [📜 View All 32 Videos](logs/games/Callofdutyaw.md)
 - **🎮 VietnamCavePrison** — [📜 View All 23 Videos](logs/games/VietnamCavePrison.md)
@@ -158,31 +158,31 @@
 
 ## 🔄 Game Rotation Queue
 
-**📊 Total Games:** 12 | **🎯 Current:** `ghostandela` | **⏭️ Next Game:** `mm2remastered` (Position #11) | **🔢 Total Runs:** 385
+**📊 Total Games:** 12 | **🎯 Current:** `CODMW4` | **⏭️ Next Game:** `CallOfDutyMW2` (Position #2) | **🔢 Total Runs:** 386
 
-**Last Updated:** 2026-11-05 10:41:12 AM IST
+**Last Updated:** 2026-11-06 01:00:25 AM IST
 
 | # | Game Name | Uploaded | Last Run # | Next Turn In | Status |
 |:---:|---|:---:|:---:|:---:|:---:|
-| 1 | **CODMW4** | 38 | 382 | 3 | ⏳ Wait 3 |
-| 2 | **CallOfDutyMW2** | 12 | 225 | 4 | ⏳ Wait 4 |
-| 3 | **Callofdutyaw** | 17 | 212 | 5 | ⏳ Wait 5 |
-| 4 | **GearsOfWar** | 10 | 196 | 6 | ⏳ Wait 6 |
-| 5 | **MarvelsSpiderMan2** | 56 | 383 | 7 | ⏳ Wait 7 |
-| 6 | **Russian_secret_missions** | 26 | 263 | 8 | ⏳ Wait 8 |
-| 7 | **VietnamCavePrison** | 16 | 207 | 9 | ⏳ Wait 9 |
-| 8 | **Wolverine** | 49 | 384 | 10 | ⏳ Wait 10 |
-| 9 | **codBlackops6** | 11 | 156 | 11 | ⏳ Wait 11 |
-| 10 | **ghostandela** | 56 | 385 | 0 | 🎯 **CURRENT** |
-| 11 | **mm2remastered** | 14 | 192 | 1 | ⏭️ **NEXT UP** |
-| 12 | **sifu** | 19 | 230 | 2 | ⏳ Wait 2 |
+| 1 | **CODMW4** | 39 | 386 | 0 | 🎯 **CURRENT** |
+| 2 | **CallOfDutyMW2** | 12 | 225 | 1 | ⏭️ **NEXT UP** |
+| 3 | **Callofdutyaw** | 17 | 212 | 2 | ⏳ Wait 2 |
+| 4 | **GearsOfWar** | 10 | 196 | 3 | ⏳ Wait 3 |
+| 5 | **MarvelsSpiderMan2** | 56 | 383 | 4 | ⏳ Wait 4 |
+| 6 | **Russian_secret_missions** | 26 | 263 | 5 | ⏳ Wait 5 |
+| 7 | **VietnamCavePrison** | 16 | 207 | 6 | ⏳ Wait 6 |
+| 8 | **Wolverine** | 49 | 384 | 7 | ⏳ Wait 7 |
+| 9 | **codBlackops6** | 11 | 156 | 8 | ⏳ Wait 8 |
+| 10 | **ghostandela** | 56 | 385 | 9 | ⏳ Wait 9 |
+| 11 | **mm2remastered** | 14 | 192 | 10 | ⏳ Wait 10 |
+| 12 | **sifu** | 19 | 230 | 11 | ⏳ Wait 11 |
 
 ### 📜 Recent Runs (Last 5)
 
 | Run # | Game | Timestamp (IST) |
 |:---:|---|---|
+| 386 | CODMW4 | 2026-11-06 01:00:25 AM |
 | 385 | ghostandela | 2026-11-05 10:41:12 AM |
 | 384 | Wolverine | 2026-11-05 01:56:33 AM |
 | 383 | MarvelsSpiderMan2 | 2026-11-05 01:39:46 AM |
 | 382 | CODMW4 | 2026-11-05 01:33:56 AM |
-| 381 | ghostandela | 2026-11-05 01:31:21 AM |
