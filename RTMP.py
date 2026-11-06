@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-🎮 MASTER AGENT v32.0 — PERFECT SMOOTH BUFFER (EXACT MATH)
+🎮 MASTER AGENT v33.0 — PERFECT SMOOTH BUFFER (RTMP SAFE)
 ======================================================================
-✅ Probes source video length first.
-✅ Calculates EXACT buffer needed for smooth playback based on CPU speed.
-✅ Prevents "stuck at 70%" and "Cut-off" bugs.
+✅ Fixes "Stream stops after 5 seconds" bug (RTMP Pacing)
+✅ Uses Threaded Queue to feed Facebook at real-time speed
+✅ Prevents CPU/Buffer starvation
 """
 import os
 import sys
@@ -16,6 +16,7 @@ import subprocess
 import requests
 import glob
 import threading
+import queue
 from datetime import datetime, timedelta, timezone
 
 # ═══════════════════════════════════════════════════════════
@@ -180,7 +181,7 @@ def _tee():
     return "|".join(o)
 
 # ═══════════════════════════════════════════════════════════
-# ⚡ NEW: GET SOURCE DURATION
+# ⚡ GET SOURCE DURATION
 # ═══════════════════════════════════════════════════════════
 def get_video_duration(url):
     log("⏱️ Probing source video duration...")
@@ -247,14 +248,13 @@ def run_smart_test(url, vf_chain, base_enc_flags):
         return False, cpu_speed
 
 # ═══════════════════════════════════════════════════════════
-# STREAMING (Perfect Math Buffer + Flush Logic)
+# STREAMING (Threaded Queue System)
 # ═══════════════════════════════════════════════════════════
 def stream_direct(url, game_name):
     if not STREAMING_ENABLED: return False
     n = int(USE_YT) + int(USE_FB)
     if n == 0: return False
 
-    # 🔥 1. PROBE VIDEO DURATION FIRST
     source_duration = get_video_duration(url)
 
     CROP = ""
@@ -355,20 +355,13 @@ def stream_direct(url, game_name):
             return False
     
     else:
-        # 🔥 SMART EXACT MATH CALCULATION 🔥
         if cpu_speed <= 0: cpu_speed = 0.5 
         
         if source_duration > 0:
-            # Formula: Total Video Length * (1 - CPU Speed) + 15 seconds safety margin
-            # Example: 341 sec * (1 - 0.36) = 218 sec buffer needed
             deficit_ratio = 1.0 - cpu_speed
             calc_buffer = int(source_duration * deficit_ratio) + 15
-            
-            # Ensure buffer is at least 30s, but not more than the video itself
             auto_buffer_secs = max(30, min(int(source_duration - 10), calc_buffer))
-            log(f"📐 Exact Math Applied: Source={int(source_duration)}s, CPU={cpu_speed}x. Required Buffer={auto_buffer_secs}s.")
         else:
-            # Fallback if live stream (no duration)
             f_load = {"1": 1.0, "2": 1.5, "3": 2.0, "4": 1.2, "5": 1.1, "6": 1.4}.get(FILTER, 1.5)
             b_load = int(BITRATE) / 8.0
             calc_buffer = int((60 / cpu_speed) * f_load * b_load)
@@ -378,17 +371,22 @@ def stream_direct(url, game_name):
         log(f"⚙️ Smart Auto-Adjusted Buffer: {auto_buffer_secs} seconds ({auto_buffer_secs/60:.1f} mins)")
         log(f"   Pre-buffering {auto_buffer_secs}s of RE-ENCODED video in RAM...")
         
-        cmd1 = f'ffmpeg -hide_banner -loglevel error -stats {inputs} -filter_complex "{filter_complex}" {video_map}{audio_map} {base_enc_flags} -f mpegts pipe:1'
-        cmd2 = f'ffmpeg -hide_banner -loglevel info -stats -f mpegts -i pipe:0 -c copy -flvflags no_duration_filesize {out_format}'
+        # 🔥 Add -flush_packets 1 to p1 so it sends data immediately
+        cmd1 = f'ffmpeg -hide_banner -loglevel error -stats {inputs} -filter_complex "{filter_complex}" {video_map}{audio_map} {base_enc_flags} -flush_packets 1 -f mpegts pipe:1'
+        
+        # 🔥 ADDED -re to p2 so Facebook gets data at real-time (Fixes 3-sec drop)
+        cmd2 = f'ffmpeg -hide_banner -loglevel info -stats -re -f mpegts -i pipe:0 -c copy -flvflags no_duration_filesize {out_format}'
 
         p1 = subprocess.Popen(cmd1, shell=True, stdout=subprocess.PIPE)
         p2 = subprocess.Popen(cmd2, shell=True, stdin=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=False)
 
         def read_p2_logs():
-            for line_bytes in iter(p2.stderr.readline, b''):
-                safe = line_bytes.decode('utf-8', errors='ignore').strip()
-                if "frame=" in safe or "speed=" in safe or "error" in safe.lower():
-                    log(f"      [Sending] {safe[:150]}")
+            try:
+                for line_bytes in iter(p2.stderr.readline, b''):
+                    safe = line_bytes.decode('utf-8', errors='ignore').strip()
+                    if "frame=" in safe or "speed=" in safe or "error" in safe.lower():
+                        log(f"      [Sending] {safe[:150]}")
+            except Exception: pass
 
         threading.Thread(target=read_p2_logs, daemon=True).start()
 
@@ -398,40 +396,68 @@ def stream_direct(url, game_name):
         log(f"   $ Buffering Data (Target: {target_buffer_bytes / (1024*1024):.1f} MB)...")
         
         try:
-            while True:
+            while len(buffer) < target_buffer_bytes:
                 chunk = p1.stdout.read(1024 * 1024) 
                 if not chunk:
                     break
                 
-                if len(buffer) < target_buffer_bytes:
-                    buffer.extend(chunk)
-                    percent = (len(buffer) / target_buffer_bytes) * 100
-                    if len(buffer) % (10 * 1024 * 1024) < (1024*1024):
-                        log(f"      📦 Buffering: {percent:.1f}% complete...")
-                else:
-                    if len(buffer) > 0:
-                        log(f"\n✅ {auto_buffer_secs}-Second Buffer FULL! Now Sending to Facebook...")
-                        p2.stdin.write(buffer)
+                buffer.extend(chunk)
+                percent = (len(buffer) / target_buffer_bytes) * 100
+                if len(buffer) % (10 * 1024 * 1024) < (1024*1024):
+                    log(f"      📦 Buffering: {percent:.1f}% complete...")
+            
+            # Buffer is full, now start streaming
+            if len(buffer) > 0:
+                log(f"\n✅ Buffer FULL ({len(buffer)/(1024*1024):.1f} MB)! Starting Stream to FB...")
+                
+                # Create Queue for real-time pacing
+                stream_queue = queue.Queue(maxsize=50) # 50MB max RAM queue
+                
+                def writer_thread_func():
+                    try:
+                        # Write the initial buffer to queue in 1MB chunks
+                        chunk_sz = 1024 * 1024
+                        for i in range(0, len(buffer), chunk_sz):
+                            if INTERRUPTED: break
+                            stream_queue.put(buffer[i:i+chunk_sz])
+                        
+                        # Keep passing data from p1 to queue
+                        while True:
+                            chunk = p1.stdout.read(chunk_sz)
+                            if not chunk:
+                                break
+                            stream_queue.put(chunk)
+                    except Exception:
+                        pass
+                    finally:
+                        stream_queue.put(None) # Sentinel to stop writer
+
+                # Start P1 -> Queue thread
+                threading.Thread(target=writer_thread_func, daemon=True).start()
+
+                # Main thread reads from Queue and writes to P2
+                while True:
+                    try:
+                        q_chunk = stream_queue.get(timeout=1)
+                        if q_chunk is None:
+                            break
+                        p2.stdin.write(q_chunk)
                         p2.stdin.flush()
-                        buffer.clear()
-                    
-                    p2.stdin.write(chunk)
-                    p2.stdin.flush()
+                    except queue.Empty:
+                        if p1.poll() is not None:
+                            break
+                    except Exception as e:
+                        log(f"❌ Stream Write Error: {e}")
+                        break
+                
+                log("✅ Stream processing finished.")
                     
                 if INTERRUPTED:
                     p1.terminate(); p2.terminate(); return False
                     
         except Exception as e:
-            log(f"❌ Buffer Error: {e}")
+            log(f"❌ Pipeline Error: {e}")
         finally:
-            if len(buffer) > 0:
-                log(f"\n⚠️ Source ended before full buffer. Flushing remaining {len(buffer)/(1024*1024):.1f} MB to Facebook...")
-                try:
-                    p2.stdin.write(buffer)
-                    p2.stdin.flush()
-                except:
-                    pass
-            
             p1.terminate()
             p2.terminate()
             if os.path.exists("optional_audio.mp3"): os.remove("optional_audio.mp3")
@@ -455,7 +481,7 @@ def move_link(game, url, src_file, ok):
 
 def main():
     log("=" * 62)
-    log("🎮 MASTER AGENT v32.0 — PERFECT SMOOTH BUFFER (EXACT MATH)")
+    log("🎮 MASTER AGENT v33.0 — RTMP SAFE BUFFER (FIXED CRASH)")
     log(f"   Loop Setup : {LOOP_MSG}")
     log(f"   Ratio      : {RATIO} | Filter: {FILTER} | Bitrate: {BITRATE}M")
     log(f"   FPS Lock   : {TARGET_FPS} FPS")
