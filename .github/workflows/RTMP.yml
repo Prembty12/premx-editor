@@ -30,7 +30,7 @@ on:
       ratio:
         description: 'Crop Ratio [1=1:1, 2=4:5, 3=9:16, 4=3:4, 5=4:3]'
         required: true
-        default: '3'
+        default: '1'
       filter:
         description: 'Filter [1=Pop, 2=Vivid, 3=Cyber, 4=Night, 5=Cinematic, 6=HDR]'
         required: true
@@ -46,11 +46,11 @@ on:
       bitrate:
         description: 'Bitrate [8, 12, 16, 18] (Mbps)'
         required: true
-        default: '8'
+        default: '12'
       gap_minutes:
         description: 'Gap before stream starts (Minutes)'
         required: true
-        default: '2'
+        default: '1'
 
 jobs:
   stream:
