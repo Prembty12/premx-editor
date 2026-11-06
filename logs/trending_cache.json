@@ -1,13 +1,13 @@
 {
-  "last_updated": "2026-11-06 01:03:49 AM",
+  "last_updated": "2026-11-06 08:24:29 AM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 3225,
-      "avg_per_video": 645,
+      "views_7d": 3237,
+      "avg_per_video": 647,
       "trend": "viral",
-      "ratio": 2.792207792207792,
+      "ratio": 2.684647302904564,
       "fb_link": "https://www.facebook.com/reel/1693110865579996/",
       "source_link": ""
     },
@@ -16,7 +16,7 @@
       "views_7d": 284,
       "avg_per_video": 284,
       "trend": "steady",
-      "ratio": 1.2294372294372293,
+      "ratio": 1.1784232365145229,
       "fb_link": "https://www.facebook.com/1082871464600149/videos/1471500258505084",
       "source_link": ""
     }
@@ -24,38 +24,38 @@
   "below_avg": [
     {
       "game": "ghostandela",
-      "views_7d": 698,
-      "avg_per_video": 174,
+      "views_7d": 896,
+      "avg_per_video": 224,
       "trend": "slow",
-      "ratio": 0.7532467532467533,
+      "ratio": 0.9294605809128631,
       "fb_link": "https://www.facebook.com/reel/1160601486834751/",
       "source_link": ""
     },
     {
       "game": "Wolverine",
-      "views_7d": 184,
-      "avg_per_video": 30,
+      "views_7d": 197,
+      "avg_per_video": 28,
       "trend": "below_avg",
-      "ratio": 0.12987012987012986,
+      "ratio": 0.11618257261410789,
       "fb_link": "",
-      "source_link": ""
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine26.mp4"
     },
     {
       "game": "MarvelsSpiderMan2",
       "views_7d": 90,
       "avg_per_video": 22,
       "trend": "below_avg",
-      "ratio": 0.09523809523809523,
+      "ratio": 0.0912863070539419,
       "fb_link": "",
       "source_link": ""
     }
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 3225,
-    "avg_per_video": 645,
+    "views_7d": 3237,
+    "avg_per_video": 647,
     "trend": "viral",
-    "ratio": 2.792207792207792,
+    "ratio": 2.684647302904564,
     "fb_link": "https://www.facebook.com/reel/1693110865579996/",
     "source_link": ""
   }
