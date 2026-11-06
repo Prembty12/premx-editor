@@ -34,7 +34,7 @@ on:
       filter:
         description: 'Filter [1=Pop, 2=Vivid, 3=Cyber, 4=Night, 5=Cinematic, 6=HDR]'
         required: true
-        default: '2'
+        default: '1'
       speed:
         description: 'Speed [1=Normal, 2=1.05x, 3=1.10x, 4=1.25x, 5=1.5x, 6=0.8x]'
         required: true
