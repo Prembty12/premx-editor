@@ -90,7 +90,12 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
           # 🔥 temp_frames ko yahan add NAHI kiya hai, taaki video ki wajah se push fail na ho
-          git add logs/ posted_links_editor/ game_links_editor/ temp_frames/ || true
+          #git add logs/ posted_links_editor/ game_links_editor/ temp_frames/ || true
+          
+          git add logs/ posted_links_editor/ game_links_editor/ || true
+          # 2. 🔥 Sirf grid image force-add karo (Video ko chhod do)
+          git add -f temp_frames/merged_90_grid_portrait.jpg || true
+
           
           git commit -m "🤖 Auto-Agent: Update memory and shift posted links [skip ci]" || echo "No changes to commit"
           
