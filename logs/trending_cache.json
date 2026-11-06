@@ -1,13 +1,13 @@
 {
-  "last_updated": "2026-11-06 08:24:29 AM",
+  "last_updated": "2026-11-06 10:41:02 AM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 3237,
+      "views_7d": 3238,
       "avg_per_video": 647,
       "trend": "viral",
-      "ratio": 2.684647302904564,
+      "ratio": 2.7984429065743948,
       "fb_link": "https://www.facebook.com/reel/1693110865579996/",
       "source_link": ""
     },
@@ -16,7 +16,7 @@
       "views_7d": 284,
       "avg_per_video": 284,
       "trend": "steady",
-      "ratio": 1.1784232365145229,
+      "ratio": 1.2283737024221455,
       "fb_link": "https://www.facebook.com/1082871464600149/videos/1471500258505084",
       "source_link": ""
     }
@@ -24,38 +24,38 @@
   "below_avg": [
     {
       "game": "ghostandela",
-      "views_7d": 896,
-      "avg_per_video": 224,
+      "views_7d": 938,
+      "avg_per_video": 187,
       "trend": "slow",
-      "ratio": 0.9294605809128631,
-      "fb_link": "https://www.facebook.com/reel/1160601486834751/",
-      "source_link": ""
+      "ratio": 0.8088235294117647,
+      "fb_link": "",
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela26.mp4"
     },
     {
       "game": "Wolverine",
       "views_7d": 197,
       "avg_per_video": 28,
       "trend": "below_avg",
-      "ratio": 0.11618257261410789,
+      "ratio": 0.12110726643598617,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine26.mp4"
     },
     {
       "game": "MarvelsSpiderMan2",
-      "views_7d": 90,
-      "avg_per_video": 22,
+      "views_7d": 30,
+      "avg_per_video": 10,
       "trend": "below_avg",
-      "ratio": 0.0912863070539419,
+      "ratio": 0.043252595155709346,
       "fb_link": "",
       "source_link": ""
     }
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 3237,
+    "views_7d": 3238,
     "avg_per_video": 647,
     "trend": "viral",
-    "ratio": 2.684647302904564,
+    "ratio": 2.7984429065743948,
     "fb_link": "https://www.facebook.com/reel/1693110865579996/",
     "source_link": ""
   }

@@ -2,10 +2,10 @@
     {
         "rank": 1,
         "game_name": "CODMW4",
-        "total_views": 13060,
-        "uploaded_videos": 39,
-        "avg_views_per_video": 334,
-        "view_share_percentage": 40.21
+        "total_views": 13061,
+        "uploaded_videos": 40,
+        "avg_views_per_video": 326,
+        "view_share_percentage": 41.19
     },
     {
         "rank": 2,
@@ -13,7 +13,7 @@
         "total_views": 7037,
         "uploaded_videos": 56,
         "avg_views_per_video": 125,
-        "view_share_percentage": 21.66
+        "view_share_percentage": 22.19
     },
     {
         "rank": 3,
@@ -21,7 +21,7 @@
         "total_views": 2107,
         "uploaded_videos": 50,
         "avg_views_per_video": 42,
-        "view_share_percentage": 6.49
+        "view_share_percentage": 6.64
     },
     {
         "rank": 4,
@@ -29,47 +29,47 @@
         "total_views": 2031,
         "uploaded_videos": 26,
         "avg_views_per_video": 78,
-        "view_share_percentage": 6.25
+        "view_share_percentage": 6.4
     },
     {
         "rank": 5,
-        "game_name": "Callofdutyaw",
-        "total_views": 1739,
-        "uploaded_videos": 17,
-        "avg_views_per_video": 102,
-        "view_share_percentage": 5.35
+        "game_name": "ghostandela",
+        "total_views": 1613,
+        "uploaded_videos": 57,
+        "avg_views_per_video": 28,
+        "view_share_percentage": 5.09
     },
     {
         "rank": 6,
-        "game_name": "ghostandela",
-        "total_views": 1571,
-        "uploaded_videos": 57,
-        "avg_views_per_video": 27,
-        "view_share_percentage": 4.84
-    },
-    {
-        "rank": 7,
         "game_name": "GearsOfWar",
         "total_views": 1405,
         "uploaded_videos": 10,
         "avg_views_per_video": 140,
-        "view_share_percentage": 4.33
+        "view_share_percentage": 4.43
     },
     {
-        "rank": 8,
+        "rank": 7,
         "game_name": "mm2remastered",
         "total_views": 1328,
         "uploaded_videos": 14,
         "avg_views_per_video": 94,
-        "view_share_percentage": 4.09
+        "view_share_percentage": 4.19
     },
     {
-        "rank": 9,
+        "rank": 8,
         "game_name": "CallOfDutyMW2",
         "total_views": 1135,
         "uploaded_videos": 12,
         "avg_views_per_video": 94,
-        "view_share_percentage": 3.49
+        "view_share_percentage": 3.58
+    },
+    {
+        "rank": 9,
+        "game_name": "Callofdutyaw",
+        "total_views": 974,
+        "uploaded_videos": 17,
+        "avg_views_per_video": 57,
+        "view_share_percentage": 3.07
     },
     {
         "rank": 10,
@@ -77,7 +77,7 @@
         "total_views": 725,
         "uploaded_videos": 16,
         "avg_views_per_video": 45,
-        "view_share_percentage": 2.23
+        "view_share_percentage": 2.29
     },
     {
         "rank": 11,
@@ -85,14 +85,14 @@
         "total_views": 284,
         "uploaded_videos": 11,
         "avg_views_per_video": 25,
-        "view_share_percentage": 0.87
+        "view_share_percentage": 0.9
     },
     {
         "rank": 12,
         "game_name": "sifu",
-        "total_views": 60,
+        "total_views": 10,
         "uploaded_videos": 19,
-        "avg_views_per_video": 3,
-        "view_share_percentage": 0.18
+        "avg_views_per_video": 0,
+        "view_share_percentage": 0.03
     }
 ]
