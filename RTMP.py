@@ -1,26 +1,27 @@
 #!/usr/bin/env python3
 """
-🎮 MASTER AGENT v36.0 — EXACT DEFICIT BUFFER (USER MATH)
+🎮 MASTER AGENT v37.2 — SELF-ADAPTING DUAL-PIPE
 ======================================================================
-✅ Calculates EXACT buffer using: Source_Duration * (1 - CPU_Speed).
-✅ Adds safety margin for heavy filter throttling.
-✅ No full pre-encode. Streams simultaneously after precise buffer.
+✅ Encoder kabhi block nahi hota (alag reader thread + byte buffer).
+✅ Buffer real CPU speed + RAM se auto-calculate hota hai.
+✅ Buffer temp disk me (RAM nahi), bhejte hi delete.
+✅ Tumhari settings kabhi nahi badalti (filter/bitrate/FPS/ratio fixed).
+✅ Pure logs: CPU, Network, Buffer, Watermark.
 """
 import os
 import sys
-import json
 import re
 import time
 import signal
 import subprocess
-import requests
-import glob
 import threading
-import queue
+import shutil
+import tempfile
+from collections import deque
 from datetime import datetime, timedelta, timezone
 
 # ═══════════════════════════════════════════════════════════
-# CONFIG & UTILS
+# LOGGING & UTILS
 # ═══════════════════════════════════════════════════════════
 def log(msg, end="\n"):
     sys.stderr.write(f"{msg}{end}")
@@ -34,10 +35,19 @@ def _sigint_handler(signum, frame):
 signal.signal(signal.SIGINT, _sigint_handler)
 signal.signal(signal.SIGTERM, _sigint_handler)
 
-STREAM_ENABLED     = os.getenv("STREAM_ENABLED", "true").lower() == "true"
-STREAM_MODE        = os.getenv("STREAM_MODE", "both").lower().strip()
-if STREAM_MODE not in ("fb", "yt", "both"): STREAM_MODE = "both"
+try:
+    from zoneinfo import ZoneInfo
+    IST = ZoneInfo("Asia/Kolkata")
+except Exception:
+    IST = timezone(timedelta(hours=5, minutes=30))
 
+def now_ist_ampm():
+    return datetime.now(IST).strftime("%Y-%m-%d %I:%M:%S %p")
+
+# ═══════════════════════════════════════════════════════════
+# CONFIG
+# ═══════════════════════════════════════════════════════════
+STREAM_MODE   = os.getenv("STREAM_MODE", "both").lower().strip()
 MANUAL_FB_KEY = os.getenv("MANUAL_FB_KEY", "").strip()
 MANUAL_YT_KEY = os.getenv("MANUAL_YT_KEY", "").strip()
 SECRET_FB_KEY = (os.getenv("FACEBOOK_STREAM_KEY") or "").strip()
@@ -48,15 +58,13 @@ YOUTUBE_KEY  = MANUAL_YT_KEY if MANUAL_YT_KEY else SECRET_YT_KEY
 
 USE_YT = STREAM_MODE in ("yt", "both") and bool(YOUTUBE_KEY)
 USE_FB = STREAM_MODE in ("fb", "both") and bool(FACEBOOK_KEY)
-STREAMING_ENABLED = STREAM_ENABLED and (USE_YT or USE_FB)
 
 MANUAL_VIDEO_URL = os.getenv("MANUAL_VIDEO_URL", "").strip()
 AUDIO_URL      = os.getenv("AUDIO_URL", "").strip()
 RATIO          = os.getenv("RATIO", "3")
 FILTER         = os.getenv("FILTER", "2")
-SPEED_OPT      = os.getenv("SPEED", "1")  
-FPS_OPT        = os.getenv("FPS", "1") 
-BITRATE        = os.getenv("BITRATE", "8") 
+FPS_OPT        = os.getenv("FPS", "1")
+BITRATE_REQ    = int(os.getenv("BITRATE", "8"))
 STREAM_GAP_MIN = int(os.getenv("STREAM_GAP_MIN", "2"))
 META_ARTIST    = os.getenv("META_ARTIST", "PremxGamer")
 
@@ -64,31 +72,24 @@ TARGET_FPS = "30" if FPS_OPT == "1" else "60"
 
 LOOP_INPUT = os.getenv("LOOP_COUNT", "0").strip().lower()
 LOOP_ARG = ""
-MAX_RUN_SECONDS = 5 * 3600 + 30 * 60 
-
+LOOP_MSG = "Once (No Loop)"
+PLAYS = 1            # 0 = infinite
 if LOOP_INPUT in ("24", "24h", "24h/24", "-1", "infinite", "inf"):
     LOOP_ARG = "-stream_loop -1 "
-    MAX_RUN_SECONDS = 24 * 3600
+    LOOP_MSG = "Infinite (24 Hours)"
+    PLAYS = 0
 else:
     try:
         plays = int(LOOP_INPUT)
         if plays > 1:
             LOOP_ARG = f"-stream_loop {plays - 1} "
+            LOOP_MSG = f"{plays} Times"
+            PLAYS = plays
     except ValueError:
         pass
 
-try:
-    from zoneinfo import ZoneInfo
-    IST = ZoneInfo("Asia/Kolkata")
-except Exception:
-    IST = timezone(timedelta(hours=5, minutes=30))
-
-def now_ist_ampm():
-    return datetime.now(IST).strftime("%Y-%m-%d %I:%M:%S %p")
-
-LOGS_DIR = "gaming_runtime_v8"
-for d in [LOGS_DIR, "Manual_links", "game_links_livestream", "game_links_streamed"]:
-    os.makedirs(d, exist_ok=True)
+SAFETY_FACTOR = 0.8     # assume CPU sustained speed 20% worse than test
+MIN_BUFFER_SECS = 30
 
 def _tee():
     o = []
@@ -97,121 +98,302 @@ def _tee():
     return "|".join(o)
 
 # ═══════════════════════════════════════════════════════════
-# ⚡ GET SOURCE DURATION & SMART TEST
+# FILTERS
 # ═══════════════════════════════════════════════════════════
-def get_video_duration(url):
-    log("⏱️ Probing source video duration...")
-    cmd = f'ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "{url}"'
-    try:
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-        duration_str = result.stdout.strip()
-        if duration_str:
-            dur = float(duration_str)
-            log(f"   📏 Source Duration: {int(dur // 60)}m {int(dur % 60)}s ({int(dur)} seconds)")
-            return dur
-    except Exception as e:
-        pass
-    return 0
+def crop_chain():
+    return {
+        "1": "scale=1080:1080:force_original_aspect_ratio=increase,crop=1080:1080,",
+        "2": "scale=1080:1350:force_original_aspect_ratio=increase,crop=1080:1350,",
+        "3": "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,",
+        "4": "scale=1080:1440:force_original_aspect_ratio=increase,crop=1080:1440,",
+        "5": "scale=1440:1080:force_original_aspect_ratio=increase,crop=1440:1080,",
+    }.get(RATIO, "")
 
-def run_smart_test(url, vf_chain, base_enc_flags):
-    log("🔍 Pre-Flight Test: Checking CPU & Network...")
-    cmd = f'ffmpeg -hide_banner -loglevel info -t 10 -rtbufsize 512M -thread_queue_size 8192 -i "{url}" -filter_complex "[0:v]{vf_chain}[vid]" -map "[vid]" {base_enc_flags} -f null -'
-    cpu_speed = 0.0
-    try:
-        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
-        start = time.time()
-        while p.poll() is None:
-            if time.time() - start > 15:
-                p.kill()
-                break
-            line = p.stderr.readline()
-            if not line: continue
-            match = re.search(r"speed=\s*([\d\.]+)x", line)
-            if match:
-                cpu_speed = max(cpu_speed, float(match.group(1)))
-    except Exception:
-        cpu_speed = 0.0
+GAME_FILTERS = {
+    "0": "",
+    "1": "eq=brightness=0.02:contrast=1.18:saturation=1.25,hqdn3d=1.5:1.5:6:6,unsharp=3:3:0.75:3:3:0.0,",
+    "2": "eq=brightness=0.02:contrast=1.20:saturation=1.22:gamma=1.11,vibrance=intensity=0.20,hqdn3d=1.5:1.5:6:6,cas=0.3,noise=alls=3:allf=t+u,unsharp=3:3:0.75:3:3:0.0,",
+    "3": "eq=brightness=0.02:contrast=1.10:saturation=1.10:gamma=1.10,vibrance=intensity=0.10,hqdn3d=1.0:1.0:3:3,cas=0.15,noise=alls=2:allf=t+u,unsharp=3:3:0.2:3:3:0.0,",
+    "4": "eq=brightness=0.15:contrast=1.20:gamma=1.25,unsharp=5:5:1.0:5:5:0.0,",
+    "5": "eq=contrast=1.25:saturation=1.20,colorbalance=rs=0.08:gs=0.02:bs=-0.08,unsharp=5:5:1.2:5:5:0.0,",
+    "6": "eq=contrast=1.35:saturation=1.55:gamma=1.05,unsharp=7:7:2.5:7:7:0.0,",
+}
 
-    log(f"   🖥️ CPU Speed: {cpu_speed}x")
-    return cpu_speed
+def build_vf(filter_id):
+    game = GAME_FILTERS.get(filter_id, "")
+    return f"{crop_chain()}{game}fps={TARGET_FPS}:round=near,scale=trunc(iw/2)*2:trunc(ih/2)*2"
 
-# ═══════════════════════════════════════════════════════════
-# STREAMING (User Math + Safety Margin)
-# ═══════════════════════════════════════════════════════════
-def stream_direct(url, game_name):
-    n = int(USE_YT) + int(USE_FB)
-    if n == 0: return False
+def fallback_chain(requested):
+    chain = [requested]
+    for f in ("1", "0"):
+        if f not in chain and requested not in ("4", "5", "6", "0"):
+            chain.append(f)
+    if "0" not in chain:
+        chain.append("0")
+    return chain
 
-    source_duration = get_video_duration(url)
-
-    CROP = ""
-    if RATIO == "1": CROP = "scale=1080:1080:force_original_aspect_ratio=increase,crop=1080:1080,"
-    elif RATIO == "2": CROP = "scale=1080:1350:force_original_aspect_ratio=increase,crop=1080:1350,"
-    elif RATIO == "3": CROP = "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,"
-    elif RATIO == "4": CROP = "scale=1080:1440:force_original_aspect_ratio=increase,crop=1080:1440,"
-    elif RATIO == "5": CROP = "scale=1440:1080:force_original_aspect_ratio=increase,crop=1440:1080,"
-
-    GAME = ""
-    if FILTER == "1": GAME = "eq=brightness=0.02:contrast=1.18:saturation=1.25,hqdn3d=1.5:1.5:6:6,unsharp=3:3:0.75:3:3:0.0,"
-    elif FILTER == "2": GAME = "eq=brightness=0.02:contrast=1.20:saturation=1.22:gamma=1.11,vibrance=intensity=0.20,hqdn3d=1.5:1.5:6:6,cas=0.3,noise=alls=3:allf=t+u,unsharp=3:3:0.75:3:3:0.0,"
-    elif FILTER == "3": GAME = "scale=flags=lanczos+accurate_rnd:param0=3.0,eq=brightness=0.02:contrast=1.10:saturation=1.10:gamma=1.10,vibrance=intensity=0.10,hqdn3d=1.0:1.0:3:3,cas=0.15,noise=alls=2:allf=t+u,unsharp=3:3:0.2:3:3:0.0,"
-    elif FILTER == "4": GAME = "eq=brightness=0.15:contrast=1.20:gamma=1.25,unsharp=5:5:1.0:5:5:0.0,"
-    elif FILTER == "5": GAME = "eq=contrast=1.25:saturation=1.20,colorbalance=rs=0.08:gs=0.02:bs=-0.08,unsharp=5:5:1.2:5:5:0.0,"
-    elif FILTER == "6": GAME = "eq=contrast=1.35:saturation=1.55:gamma=1.05,unsharp=7:7:2.5:7:7:0.0,"
-
-    vf_chain = f"{CROP}{GAME}fps={TARGET_FPS}:round=near,scale=trunc(iw/2)*2:trunc(ih/2)*2"
-    B_V = f"{BITRATE}M"
-    BUF = f"{int(BITRATE)*2}M"
-
-    base_enc_flags = (
+def enc_flags(bitrate):
+    b = f"{bitrate}M"
+    buf = f"{bitrate * 2}M"
+    return (
         f"-c:v libx264 -preset ultrafast -threads 0 -profile:v high -level:v 4.2 "
-        f"-pix_fmt yuv420p -b:v {B_V} -maxrate {B_V} -bufsize {BUF} "
-        f"-r {TARGET_FPS} -fps_mode cfr -vsync cfr "
+        f"-pix_fmt yuv420p -b:v {b} -maxrate {b} -bufsize {buf} "
+        f"-r {TARGET_FPS} -fps_mode cfr "
         f"-g {TARGET_FPS} -keyint_min {TARGET_FPS} -sc_threshold 0 "
         f"-c:a aac -b:a 128k -ar 44100 -ac 2 "
         f"-max_muxing_queue_size 16384 "
     )
 
-    cpu_speed = run_smart_test(url, vf_chain, base_enc_flags)
-    
-    if cpu_speed <= 0: cpu_speed = 0.3 # Default safety
+# ═══════════════════════════════════════════════════════════
+# SMART TESTS (DURATION, RAM, NETWORK, CPU)
+# ═══════════════════════════════════════════════════════════
+def get_video_duration(url):
+    log("⏱️ Probing source video duration...")
+    cmd = ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+           "-of", "default=noprint_wrappers=1:nokey=1", url]
+    try:
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+        if r.stdout.strip():
+            dur = float(r.stdout.strip())
+            log(f"   📏 Source Duration: {int(dur // 60)}m {int(dur % 60)}s ({int(dur)} seconds)")
+            return dur
+    except Exception:
+        pass
+    log("   ⚠️ Duration unknown.")
+    return 0
 
-    # 🔥 USER'S EXACT MATH + 15% SAFETY MARGIN
-    if source_duration > 0:
-        # Deficit = Total Time * (1 - CPU Speed)
-        deficit_secs = int(source_duration * (1.0 - cpu_speed))
-        
-        # Add 15% safety margin because CPU drops speed during heavy load
-        safety_margin = int(deficit_secs * 0.15)
-        auto_buffer_secs = deficit_secs + safety_margin
-        
-        log(f"📐 User Math Applied: Deficit={deficit_secs}s, +15% Safety Margin={safety_margin}s.")
-        log(f"⚙️ Final Buffer Required: {auto_buffer_secs} seconds ({auto_buffer_secs/60:.1f} mins)")
+def available_ram_bytes():
+    try:
+        with open("/proc/meminfo") as f:
+            for line in f:
+                if line.startswith("MemAvailable:"):
+                    return int(line.split()[1]) * 1024
+    except Exception:
+        pass
+    return 4 * 1024**3
+
+def get_network_speeds():
+    log("🌐 Checking Network Download & Upload Speed...")
+    try:
+        import speedtest
+        st = speedtest.Speedtest()
+        st.get_best_server()
+        d = st.download() / 1_000_000
+        u = st.upload() / 1_000_000
+        log(f"   ⬇️ Download Speed: {d:.2f} Mbps")
+        log(f"   ⬆️ Upload Speed: {u:.2f} Mbps")
+        return d, u
+    except Exception as e:
+        log(f"   ⚠️ Speedtest error: {e}. Network check skipped.")
+        return 0, 0
+
+def measure_cpu_speed(url, vf_chain, flags, secs=12):
+    """Real sustained speed: last reported value, warm-up ignore."""
+    cmd = (f'ffmpeg -hide_banner -loglevel error -t {secs} -thread_queue_size 8192 '
+           f'-i "{url}" -filter_complex "[0:v]{vf_chain}[vid]" -map "[vid]" '
+           f'{flags} -an -f null - -progress pipe:1 -nostats')
+    speeds = []
+    try:
+        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,
+                             stderr=subprocess.DEVNULL, text=True)
+        start = time.time()
+        for line in p.stdout:
+            if time.time() - start > secs + 20:
+                p.kill()
+                break
+            m = re.match(r"speed=\s*([\d\.]+)x", line.strip())
+            if m:
+                speeds.append(float(m.group(1)))
+        p.wait()
+    except Exception:
+        pass
+    if not speeds:
+        return 0.0
+    tail = speeds[max(1, len(speeds) // 3):] or speeds   # warm-up hata do
+    return sum(tail) / len(tail)
+
+# ═══════════════════════════════════════════════════════════
+# BYTE BUFFER (encoder kabhi block nahi hota)
+# ═══════════════════════════════════════════════════════════
+class ByteBuffer:
+    """Disk-backed buffer: chhote segment files temp folder me, bhejte hi delete."""
+    SEG = 8 * 1024 * 1024
+
+    def __init__(self, cap_bytes, directory):
+        self.dir = directory
+        os.makedirs(self.dir, exist_ok=True)
+        self.segs = deque()          # (path, length)
+        self.pending = bytearray()
+        self.size = 0
+        self.cap = cap_bytes
+        self.n = 0
+        self.cv = threading.Condition()
+        self.done = False
+
+    def _flush_pending(self):
+        path = os.path.join(self.dir, f"seg_{self.n:08d}.bin")
+        self.n += 1
+        with open(path, "wb") as f:
+            f.write(self.pending)
+        self.segs.append((path, len(self.pending)))
+        self.pending = bytearray()
+
+    def put(self, b):
+        with self.cv:
+            while self.size >= self.cap and not INTERRUPTED:
+                self.cv.wait(1)
+            self.pending.extend(b)
+            self.size += len(b)
+            if len(self.pending) >= self.SEG:
+                self._flush_pending()
+            self.cv.notify_all()
+
+    def get(self, timeout=1):
+        with self.cv:
+            if not self.segs and not self.pending and not self.done:
+                self.cv.wait(timeout)
+            if self.segs:
+                path, ln = self.segs.popleft()
+                with open(path, "rb") as f:
+                    data = f.read()
+                try:
+                    os.remove(path)
+                except Exception:
+                    pass
+                self.size -= len(data)
+                self.cv.notify_all()
+                return data
+            if self.pending:
+                data = bytes(self.pending)
+                self.pending = bytearray()
+                self.size -= len(data)
+                self.cv.notify_all()
+                return data
+            return None
+
+    def finish(self):
+        with self.cv:
+            self.done = True
+            self.cv.notify_all()
+
+    def cleanup(self):
+        shutil.rmtree(self.dir, ignore_errors=True)
+
+# ═══════════════════════════════════════════════════════════
+# STREAMING
+# ═══════════════════════════════════════════════════════════
+def stream_direct(url, game_name):
+    n = int(USE_YT) + int(USE_FB)
+    if n == 0:
+        log("❌ Koi stream key nahi mili.")
+        return False
+
+    src_dur = get_video_duration(url)
+    if PLAYS == 0:
+        total_dur = float("inf")
     else:
-        auto_buffer_secs = 300 # 5 mins fallback
-        
-    log(f"   Pre-buffering {auto_buffer_secs}s of RE-ENCODED video in RAM...")
+        total_dur = src_dur * PLAYS if src_dur > 0 else 0
 
-    inputs = f'{LOOP_ARG}-re -rtbufsize 2G -thread_queue_size 16384 -rw_timeout 120000000 -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -i "{url}" '
-    
-    filter_complex = f'[0:v]{vf_chain}[vid]'
-    video_map = "-map \"[vid]\" "
-    audio_map = f'-map 0:a? -af "aresample=48000" '
+    # ── 1. Network check (sirf warning, bitrate NAHI badlega) ──
+    _, upload = get_network_speeds()
+    bitrate = BITRATE_REQ
+    if upload > 0 and upload < bitrate * n * 1.2:
+        log(f"   ⚠️ Upload {upload:.1f} Mbps kam lag raha hai ({n} platform x {bitrate}M). Settings wahi rahengi.")
+    flags = enc_flags(bitrate)
+    bytes_per_sec = bitrate * 1.1 * 1_000_000 / 8
+
+    # ── 2. CPU test tumhare hi filter par, buffer usi se calculate ──
+    BUF_DIR = os.getenv("BUFFER_DIR", os.path.join(tempfile.gettempdir(), "stream_buf"))
+    os.makedirs(BUF_DIR, exist_ok=True)
+    ram_cap = int(shutil.disk_usage(BUF_DIR).free * 0.8)
+    log(f"💾 Temp disk buffer: {BUF_DIR} | limit: {ram_cap / (1024**3):.2f} GB")
+    log("🔍 Pre-Flight Test: Checking CPU...")
+
+    chosen = FILTER
+    speed = measure_cpu_speed(url, build_vf(chosen), flags)
+    log(f"   🖥️ Filter {chosen} | CPU Speed: {speed:.2f}x")
+    if speed <= 0:
+        speed = 0.3
+    chosen_speed = speed
+    worst = speed * SAFETY_FACTOR
+
+    if worst >= 1.0:
+        chosen_buf = MIN_BUFFER_SECS
+    elif total_dur == float("inf"):
+        chosen_buf = int(ram_cap / bytes_per_sec)
+        log("   ⚠️ 24h loop + CPU 1x se slow: buffer sirf delay karega, hamesha nahi bachayega.")
+    elif total_dur > 0:
+        chosen_buf = int(total_dur * (1.0 - worst)) + MIN_BUFFER_SECS
+    else:
+        chosen_buf = 300
+
+    max_secs = int(ram_cap / bytes_per_sec)
+    if chosen_buf > max_secs:
+        log(f"   ⚠️ Poora buffer ({chosen_buf}s) disk me nahi aata. {max_secs}s tak limit.")
+        chosen_buf = max_secs
+    target_bytes = int(chosen_buf * bytes_per_sec)
+
+    vf_chain = build_vf(chosen)
+    log(f"✅ Your settings: Filter {chosen} | Bitrate {bitrate}M | CPU {chosen_speed:.2f}x")
+    log(f"⚙️ Smart Buffer: {chosen_buf} sec ({chosen_buf / 60:.1f} min) = {target_bytes / (1024*1024):.0f} MB")
+
+    # ── 3. Inputs / filters ───────────────────────────────
+    inputs = (f'{LOOP_ARG}-rtbufsize 2G -thread_queue_size 16384 '
+              f'-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -i "{url}" ')
+
+    filter_complex = ""
+    audio_map = ""
+    video_map = ""
+    audio_file_exists = False
+
+    if AUDIO_URL:
+        log("🎵 Fetching optional audio...")
+        subprocess.run(f'yt-dlp --extract-audio --audio-format mp3 "{AUDIO_URL}" -o "optional_audio.%(ext)s"', shell=True)
+        if os.path.exists("optional_audio.mp3"):
+            audio_file_exists = True
+            inputs += '-thread_queue_size 4096 -stream_loop -1 -i "optional_audio.mp3" '
+            filter_complex = f'[0:v]{vf_chain}[vid];[1:a]aresample=48000[a_out]'
+            audio_map = '-map "[a_out]" '
+
+    if os.path.exists("logo.png"):
+        inputs += '-i "logo.png" '
+        logo_idx = 2 if audio_file_exists else 1
+        if audio_file_exists:
+            filter_complex += f';[{logo_idx}:v]scale=160:-1[logo];[vid][logo]overlay=30:H-h-20[v_out]'
+        else:
+            filter_complex = f'[0:v]{vf_chain}[vid];[{logo_idx}:v]scale=160:-1[logo];[vid][logo]overlay=30:H-h-20[v_out]'
+        log("🏷️ Watermark applied.")
+        video_map = '-map "[v_out]" '
+    else:
+        if not audio_file_exists:
+            filter_complex = f'[0:v]{vf_chain}[vid]'
+        video_map = '-map "[vid]" '
+
+    if not audio_file_exists:
+        audio_map = '-map 0:a? -af "aresample=48000" '
+
+    # audio-file ke saath stream khatam hone par shortest
+    shortest = "-shortest " if audio_file_exists and PLAYS != 0 else ""
 
     if n == 1:
-        target = f"rtmp://a.rtmp.youtube.com/live2/{YOUTUBE_KEY}" if USE_YT else f"rtmps://live-api-s.facebook.com:443/rtmp/{FACEBOOK_KEY}"
+        target = (f"rtmp://a.rtmp.youtube.com/live2/{YOUTUBE_KEY}" if USE_YT
+                  else f"rtmps://live-api-s.facebook.com:443/rtmp/{FACEBOOK_KEY}")
         out_format = f'-f flv "{target}"'
     else:
-        tee = _tee()
-        out_format = f'-f tee "{tee}"'
+        out_format = f'-f tee "{_tee()}"'
 
-    cmd1 = f'ffmpeg -hide_banner -loglevel error -stats {inputs} -filter_complex "{filter_complex}" {video_map}{audio_map} {base_enc_flags} -flush_packets 1 -f mpegts pipe:1'
-    
-    # 🔥 Added -re in p2 so FB data is received at 1x speed
-    cmd2 = f'ffmpeg -hide_banner -loglevel info -stats -re -f mpegts -i pipe:0 -c copy -flvflags no_duration_filesize {out_format}'
+    # Process 1: Encoder (NO -re: pure speed se encode, buffer cap rokta hai)
+    cmd1 = (f'ffmpeg -hide_banner -loglevel error -stats {inputs} '
+            f'-filter_complex "{filter_complex}" {video_map}{audio_map} {shortest}'
+            f'{flags} -flush_packets 1 -f mpegts pipe:1')
+
+    # Process 2: Streamer (-re = real-time pacing)
+    cmd2 = (f'ffmpeg -hide_banner -loglevel info -stats -re -f mpegts -i pipe:0 '
+            f'-c copy -flvflags no_duration_filesize {out_format}')
 
     p1 = subprocess.Popen(cmd1, shell=True, stdout=subprocess.PIPE)
-    p2 = subprocess.Popen(cmd2, shell=True, stdin=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=False)
+    p2 = subprocess.Popen(cmd2, shell=True, stdin=subprocess.PIPE,
+                          stderr=subprocess.PIPE, universal_newlines=False)
 
     def read_p2_logs():
         try:
@@ -219,94 +401,107 @@ def stream_direct(url, game_name):
                 safe = line_bytes.decode('utf-8', errors='ignore').strip()
                 if "frame=" in safe or "speed=" in safe or "error" in safe.lower():
                     log(f"      [Sending] {safe[:150]}")
-        except Exception: pass
-
+        except Exception:
+            pass
     threading.Thread(target=read_p2_logs, daemon=True).start()
 
-    target_buffer_bytes = int(BITRATE) * 1000000 // 8 * auto_buffer_secs
-    buffer = bytearray()
-    
-    log(f"   $ Buffering Data (Target: {target_buffer_bytes / (1024*1024):.1f} MB)...")
-    
-    try:
-        while len(buffer) < target_buffer_bytes:
-            chunk = p1.stdout.read(1024 * 1024) 
-            if not chunk:
-                break
-            
-            buffer.extend(chunk)
-            percent = (len(buffer) / target_buffer_bytes) * 100
-            if len(buffer) % (10 * 1024 * 1024) < (1024*1024):
-                log(f"      📦 Buffering: {percent:.1f}% complete...")
-        
-        if len(buffer) > 0:
-            log(f"\n✅ Buffer FULL ({len(buffer)/(1024*1024):.1f} MB)! Starting Stream to FB...")
-            
-            stream_queue = queue.Queue(maxsize=50)
-            
-            def writer_thread_func():
-                try:
-                    chunk_sz = 1024 * 1024
-                    for i in range(0, len(buffer), chunk_sz):
-                        if INTERRUPTED: break
-                        stream_queue.put(buffer[i:i+chunk_sz])
-                    
-                    while True:
-                        chunk = p1.stdout.read(chunk_sz)
-                        if not chunk:
-                            break
-                        stream_queue.put(chunk)
-                except Exception:
-                    pass
-                finally:
-                    stream_queue.put(None)
+    # Reader: encoder ko hamesha padhta rehta hai
+    buf = ByteBuffer(cap_bytes=target_bytes + 128 * 1024 * 1024, directory=BUF_DIR)
 
-            threading.Thread(target=writer_thread_func, daemon=True).start()
-
-            while True:
-                try:
-                    q_chunk = stream_queue.get(timeout=1)
-                    if q_chunk is None:
-                        break
-                    p2.stdin.write(q_chunk)
-                    p2.stdin.flush()
-                except queue.Empty:
-                    if p1.poll() is not None:
-                        break
-                except Exception as e:
-                    log(f"❌ Stream Write Error: {e}")
+    def reader():
+        try:
+            while not INTERRUPTED:
+                c = p1.stdout.read(1024 * 1024)
+                if not c:
                     break
-            
+                buf.put(c)
+        except Exception:
+            pass
+        finally:
+            buf.finish()
+    threading.Thread(target=reader, daemon=True).start()
+
+    # ── 4. Pre-buffer ─────────────────────────────────────
+    log(f"   $ Buffering Data (Target: {target_bytes / (1024*1024):.1f} MB)...")
+    last_log = 0
+    try:
+        while buf.size < target_bytes and not buf.done and not INTERRUPTED:
+            time.sleep(1)
+            if time.time() - last_log >= 10:
+                last_log = time.time()
+                log(f"      📦 Buffering: {buf.size / target_bytes * 100:.1f}% complete...")
+
+        if buf.size > 0 and not INTERRUPTED:
+            log(f"\n✅ Buffer FULL ({buf.size / (1024*1024):.1f} MB)! Starting Stream...")
+
+            # ── 5. Send ───────────────────────────────────
+            last_status = time.time()
+            starved = False
+            while not INTERRUPTED:
+                b = buf.get()
+                if b is None:
+                    if buf.done and buf.size == 0:
+                        break
+                    if not starved:
+                        starved = True
+                        log("   ⚠️ Buffer khali — CPU peeche hai, encoder ka wait...")
+                    continue
+                starved = False
+                p2.stdin.write(b)
+                p2.stdin.flush()
+                if time.time() - last_status >= 30:
+                    last_status = time.time()
+                    secs_left = buf.size / bytes_per_sec
+                    log(f"   📊 Buffer left: {secs_left:.0f}s ({buf.size / (1024*1024):.0f} MB)")
+
             log("✅ Stream processing finished.")
-                
+    except BrokenPipeError:
+        log("❌ Stream pipe toot gayi (platform ne disconnect kiya).")
     except Exception as e:
         log(f"❌ Pipeline Error: {e}")
     finally:
+        try:
+            p2.stdin.close()
+        except Exception:
+            pass
         p1.terminate()
-        p2.terminate()
-        
+        try:
+            p2.wait(timeout=15)
+        except Exception:
+            p2.terminate()
+        buf.cleanup()
+        if os.path.exists("optional_audio.mp3"):
+            os.remove("optional_audio.mp3")
+
     return True
 
 def main():
     log("=" * 62)
-    log("🎮 MASTER AGENT v36.0 — EXACT DEFICIT BUFFER")
+    log("🎮 MASTER AGENT v37.2 — SELF-ADAPTING (DETAILED LOGS)")
+    log(f"   Loop Setup : {LOOP_MSG}")
+    log(f"   Ratio      : {RATIO} | Filter: {FILTER} | Bitrate: {BITRATE_REQ}M")
+    log(f"   FPS Lock   : {TARGET_FPS} FPS")
     log("=" * 62)
 
     if MANUAL_VIDEO_URL:
-        game = "Manual_Game"
-        url = MANUAL_VIDEO_URL
+        log("🎯 Using MANUAL Video URL")
     else:
-        log("❌ No Manual URL. Provide URL.")
+        log("❌ No Manual URL provided.")
         return
 
     gap_seconds = STREAM_GAP_MIN * 60
     if gap_seconds > 0:
-        log(f"⏳ Waiting for {STREAM_GAP_MIN} minutes...")
-        time.sleep(gap_seconds)
+        log(f"⏳ Waiting for {STREAM_GAP_MIN} minutes before connecting...")
+        for i in range(gap_seconds, 0, -10):
+            if INTERRUPTED:
+                return
+            if i % 60 == 0:
+                log(f"   ⏱️ Time remaining: {i // 60} minutes...")
+            time.sleep(10)
 
-    log(f"\n📡 Initializing Stream...")
-    ok = stream_direct(url, game)
-    
+    log("\n📡 Initializing Stream...")
+    ok = stream_direct(MANUAL_VIDEO_URL, "Manual_Game")
+
     log("\n" + "=" * 62)
     log(f"{'✅ Complete' if ok else '❌ Failed'}")
     log("=" * 62)
