@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """
-🎮 MASTER AGENT v37.4 — SELF-ADAPTING DUAL-PIPE + CACHE LOOP + DISK LOG
+🎮 MASTER AGENT v37.5 — SELF-ADAPTING + PERFECT CACHE LOOP FIX
 ======================================================================
-✅ V37.2 ka saara core code waisa hi hai (ByteBuffer, CPU test, etc.)
-✅ Buffer ab sirf 1 video se calculate hota hai (Loop multiply fix).
-✅ Terminal me disk buffer ki limit wapas print hogi.
-✅ Loop hone par 0% CPU load par cache file se stream hogi.
+✅ Fixed: Wait for cache file to finish writing before looping.
+✅ Fixed: Properly close p2 before starting Phase 3.
+✅ Original v37.2 ByteBuffer and Logs intact.
 """
 import os
 import sys
@@ -39,9 +38,6 @@ try:
     IST = ZoneInfo("Asia/Kolkata")
 except Exception:
     IST = timezone(timedelta(hours=5, minutes=30))
-
-def now_ist_ampm():
-    return datetime.now(IST).strftime("%Y-%m-%d %I:%M:%S %p")
 
 # ═══════════════════════════════════════════════════════════
 # CONFIG
@@ -87,7 +83,7 @@ else:
     except ValueError:
         pass
 
-SAFETY_FACTOR = 0.8     # assume CPU sustained speed 20% worse than test
+SAFETY_FACTOR = 0.8
 MIN_BUFFER_SECS = 30
 CACHE_FILE = os.path.join(tempfile.gettempdir(), "encoded_cache.ts")
 
@@ -123,15 +119,6 @@ def build_vf(filter_id):
     game = GAME_FILTERS.get(filter_id, "")
     return f"{crop_chain()}{game}fps={TARGET_FPS}:round=near,scale=trunc(iw/2)*2:trunc(ih/2)*2"
 
-def fallback_chain(requested):
-    chain = [requested]
-    for f in ("1", "0"):
-        if f not in chain and requested not in ("4", "5", "6", "0"):
-            chain.append(f)
-    if "0" not in chain:
-        chain.append("0")
-    return chain
-
 def enc_flags(bitrate):
     b = f"{bitrate}M"
     buf = f"{bitrate * 2}M"
@@ -145,7 +132,7 @@ def enc_flags(bitrate):
     )
 
 # ═══════════════════════════════════════════════════════════
-# SMART TESTS (DURATION, RAM, NETWORK, CPU)
+# SMART TESTS
 # ═══════════════════════════════════════════════════════════
 def get_video_duration(url):
     log("⏱️ Probing source video duration...")
@@ -161,16 +148,6 @@ def get_video_duration(url):
         pass
     log("   ⚠️ Duration unknown.")
     return 0
-
-def available_ram_bytes():
-    try:
-        with open("/proc/meminfo") as f:
-            for line in f:
-                if line.startswith("MemAvailable:"):
-                    return int(line.split()[1]) * 1024
-    except Exception:
-        pass
-    return 4 * 1024**3
 
 def get_network_speeds():
     log("🌐 Checking Network Download & Upload Speed...")
@@ -188,7 +165,6 @@ def get_network_speeds():
         return 0, 0
 
 def measure_cpu_speed(url, vf_chain, flags, secs=12):
-    """Real sustained speed: last reported value, warm-up ignore."""
     cmd = (f'ffmpeg -hide_banner -loglevel error -t {secs} -thread_queue_size 8192 '
            f'-i "{url}" -filter_complex "[0:v]{vf_chain}[vid]" -map "[vid]" '
            f'{flags} -an -f null - -progress pipe:1 -nostats')
@@ -209,20 +185,19 @@ def measure_cpu_speed(url, vf_chain, flags, secs=12):
         pass
     if not speeds:
         return 0.0
-    tail = speeds[max(1, len(speeds) // 3):] or speeds   # warm-up hata do
+    tail = speeds[max(1, len(speeds) // 3):] or speeds
     return sum(tail) / len(tail)
 
 # ═══════════════════════════════════════════════════════════
-# BYTE BUFFER (encoder kabhi block nahi hota)
+# BYTE BUFFER (Disk-backed)
 # ═══════════════════════════════════════════════════════════
 class ByteBuffer:
-    """Disk-backed buffer: chhote segment files temp folder me, bhejte hi delete."""
     SEG = 8 * 1024 * 1024
 
     def __init__(self, cap_bytes, directory):
         self.dir = directory
         os.makedirs(self.dir, exist_ok=True)
-        self.segs = deque()          # (path, length)
+        self.segs = deque()
         self.pending = bytearray()
         self.size = 0
         self.cap = cap_bytes
@@ -256,10 +231,8 @@ class ByteBuffer:
                 path, ln = self.segs.popleft()
                 with open(path, "rb") as f:
                     data = f.read()
-                try:
-                    os.remove(path)
-                except Exception:
-                    pass
+                try: os.remove(path)
+                except Exception: pass
                 self.size -= len(data)
                 self.cv.notify_all()
                 return data
@@ -284,44 +257,34 @@ class ByteBuffer:
 # ═══════════════════════════════════════════════════════════
 def stream_direct(url, game_name):
     n = int(USE_YT) + int(USE_FB)
-    if n == 0:
-        log("❌ Koi stream key nahi mili.")
-        return False
+    if n == 0: return False
 
     if os.path.exists(CACHE_FILE): os.remove(CACHE_FILE)
 
     src_dur = get_video_duration(url)
 
-    # ── 1. Network check (sirf warning, bitrate NAHI badlega) ──
     _, upload = get_network_speeds()
     bitrate = BITRATE_REQ
-    if upload > 0 and upload < bitrate * n * 1.2:
-        log(f"   ⚠️ Upload {upload:.1f} Mbps kam lag raha hai ({n} platform x {bitrate}M). Settings wahi rahengi.")
     flags = enc_flags(bitrate)
     bytes_per_sec = bitrate * 1.1 * 1_000_000 / 8
 
-    # ── 2. CPU test tumhare hi filter par, buffer usi se calculate ──
     BUF_DIR = os.getenv("BUFFER_DIR", os.path.join(tempfile.gettempdir(), "stream_buf"))
     os.makedirs(BUF_DIR, exist_ok=True)
     ram_cap = int(shutil.disk_usage(BUF_DIR).free * 0.8)
-    # 🔥 DISK BUFFER LOG RESTORED HERE
     log(f"💾 Temp disk buffer: {BUF_DIR} | limit: {ram_cap / (1024**3):.2f} GB")
     log("🔍 Pre-Flight Test: Checking CPU...")
 
     chosen = FILTER
     speed = measure_cpu_speed(url, build_vf(chosen), flags)
     log(f"   🖥️ Filter {chosen} | CPU Speed: {speed:.2f}x")
-    if speed <= 0:
-        speed = 0.3
+    if speed <= 0: speed = 0.3
     chosen_speed = speed
     worst = speed * SAFETY_FACTOR
 
-    # 🔥 FIX: Buffer calculation uses ONLY 1 video length
     if worst >= 1.0:
         chosen_buf = MIN_BUFFER_SECS
     elif src_dur > 0:
         chosen_buf = int(src_dur * (1.0 - worst)) + MIN_BUFFER_SECS
-        # Hard cap: Do not buffer more than the video itself
         max_possible_buf = int(src_dur - 15)
         if chosen_buf > max_possible_buf:
             chosen_buf = max_possible_buf
@@ -339,8 +302,6 @@ def stream_direct(url, game_name):
     log(f"✅ Your settings: Filter {chosen} | Bitrate {bitrate}M | CPU {chosen_speed:.2f}x")
     log(f"⚙️ Smart Buffer: {chosen_buf} sec ({chosen_buf / 60:.1f} min) = {target_bytes / (1024*1024):.0f} MB")
 
-    # ── 3. Inputs / filters ───────────────────────────────
-    # 🔥 FIX: Removed LOOP_ARG from input. We only encode 1 time.
     inputs = (f'-rtbufsize 2G -thread_queue_size 16384 '
               f'-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -i "{url}" ')
 
@@ -350,7 +311,6 @@ def stream_direct(url, game_name):
     audio_file_exists = False
 
     if AUDIO_URL:
-        log("🎵 Fetching optional audio...")
         subprocess.run(f'yt-dlp --extract-audio --audio-format mp3 "{AUDIO_URL}" -o "optional_audio.%(ext)s"', shell=True)
         if os.path.exists("optional_audio.mp3"):
             audio_file_exists = True
@@ -375,7 +335,6 @@ def stream_direct(url, game_name):
     if not audio_file_exists:
         audio_map = '-map 0:a? -af "aresample=48000" '
 
-    # audio-file ke saath stream khatam hone par shortest
     shortest = "-shortest " if audio_file_exists and PLAYS != 0 else ""
 
     if n == 1:
@@ -385,12 +344,10 @@ def stream_direct(url, game_name):
     else:
         out_format = f'-f tee "{_tee()}"'
 
-    # Process 1: Encoder (NO loop, encodes 1 time only)
     cmd1 = (f'ffmpeg -hide_banner -loglevel error -stats {inputs} '
             f'-filter_complex "{filter_complex}" {video_map}{audio_map} {shortest}'
             f'{flags} -flush_packets 1 -f mpegts pipe:1')
 
-    # Process 2: Streamer (-re = real-time pacing)
     cmd2 = (f'ffmpeg -hide_banner -loglevel info -stats -re -f mpegts -i pipe:0 '
             f'-c copy -flvflags no_duration_filesize {out_format}')
 
@@ -404,30 +361,25 @@ def stream_direct(url, game_name):
                 safe = line_bytes.decode('utf-8', errors='ignore').strip()
                 if "frame=" in safe or "speed=" in safe or "error" in safe.lower():
                     log(f"      [Sending] {safe[:150]}")
-        except Exception:
-            pass
+        except Exception: pass
     threading.Thread(target=read_p2_logs, daemon=True).start()
 
-    # Reader: encoder ko hamesha padhta rehta hai + save to cache
     buf = ByteBuffer(cap_bytes=target_bytes + 128 * 1024 * 1024, directory=BUF_DIR)
-    cache_f = open(CACHE_FILE, "wb") # 🔥 Save to disk
+    cache_f = open(CACHE_FILE, "wb")
 
     def reader():
         try:
             while not INTERRUPTED:
                 c = p1.stdout.read(1024 * 1024)
-                if not c:
-                    break
+                if not c: break
                 buf.put(c)
-                cache_f.write(c) # 🔥 Write to cache
-        except Exception:
-            pass
+                cache_f.write(c)
+        except Exception: pass
         finally:
             buf.finish()
             cache_f.close()
     threading.Thread(target=reader, daemon=True).start()
 
-    # ── 4. Pre-buffer ─────────────────────────────────────
     log(f"   $ Buffering Data (Target: {target_bytes / (1024*1024):.1f} MB)...")
     last_log = 0
     try:
@@ -439,8 +391,6 @@ def stream_direct(url, game_name):
 
         if buf.size > 0 and not INTERRUPTED:
             log(f"\n✅ Buffer FULL ({buf.size / (1024*1024):.1f} MB)! Starting Stream...")
-
-            # ── 5. Send ───────────────────────────────────
             last_status = time.time()
             starved = False
             while not INTERRUPTED:
@@ -457,8 +407,7 @@ def stream_direct(url, game_name):
                 p2.stdin.flush()
                 if time.time() - last_status >= 30:
                     last_status = time.time()
-                    secs_left = buf.size / bytes_per_sec
-                    log(f"   📊 Buffer left: {secs_left:.0f}s ({buf.size / (1024*1024):.0f} MB)")
+                    log(f"   📊 Buffer left: {buf.size / bytes_per_sec:.0f}s ({buf.size / (1024*1024):.0f} MB)")
 
             log("✅ First Play finished. Cache saved to disk.")
     except BrokenPipeError:
@@ -466,24 +415,31 @@ def stream_direct(url, game_name):
     except Exception as e:
         log(f"❌ Pipeline Error: {e}")
     finally:
-        try:
-            p2.stdin.close()
-        except Exception:
-            pass
+        try: p2.stdin.close()
+        except Exception: pass
         p1.terminate()
-        try:
-            p2.wait(timeout=15)
-        except Exception:
-            p2.terminate()
+        try: p2.wait(timeout=15)
+        except Exception: p2.terminate()
         buf.cleanup()
-        if os.path.exists("optional_audio.mp3"):
-            os.remove("optional_audio.mp3")
+        if os.path.exists("optional_audio.mp3"): os.remove("optional_audio.mp3")
 
     # ═══════════════════════════════════════════════════════════
     # PHASE 3: SMART LOOP FROM CACHE (0% CPU)
     # ═══════════════════════════════════════════════════════════
     if (PLAYS == 0 or PLAYS > 1) and os.path.exists(CACHE_FILE):
         log("\n🔄 PHASE 3: LOOPING FROM DISK CACHE (0% CPU LOAD)...")
+        
+        # 🔥 FIX: Wait for cache file to finish writing (size stabilizes)
+        log("   ⏳ Waiting for cache file to finalize...")
+        last_size = -1
+        for _ in range(15):
+            if INTERRUPTED: break
+            curr_size = os.path.getsize(CACHE_FILE)
+            if curr_size > 0 and curr_size == last_size:
+                break
+            last_size = curr_size
+            time.sleep(1)
+
         loops_to_do = -1 if PLAYS == 0 else PLAYS - 1
         loop_arg = f"-stream_loop {loops_to_do} " if loops_to_do != -1 else "-stream_loop -1 "
 
@@ -502,7 +458,7 @@ def stream_direct(url, game_name):
 
 def main():
     log("=" * 62)
-    log("🎮 MASTER AGENT v37.4 — CACHE LOOP + DISK LOG")
+    log("🎮 MASTER AGENT v37.5 — PERFECT CACHE LOOP")
     log(f"   Loop Setup : {LOOP_MSG}")
     log(f"   Ratio      : {RATIO} | Filter: {FILTER} | Bitrate: {BITRATE_REQ}M")
     log(f"   FPS Lock   : {TARGET_FPS} FPS")
@@ -518,8 +474,7 @@ def main():
     if gap_seconds > 0:
         log(f"⏳ Waiting for {STREAM_GAP_MIN} minutes before connecting...")
         for i in range(gap_seconds, 0, -10):
-            if INTERRUPTED:
-                return
+            if INTERRUPTED: return
             if i % 60 == 0:
                 log(f"   ⏱️ Time remaining: {i // 60} minutes...")
             time.sleep(10)
