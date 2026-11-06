@@ -1,494 +1,1468 @@
+
 #!/usr/bin/env python3
 """
-🎮 MASTER AGENT v32.0 — PERFECT SMOOTH BUFFER (EXACT MATH)
-======================================================================
-✅ Probes source video length first.
-✅ Calculates EXACT buffer needed for smooth playback based on CPU speed.
-✅ Prevents "stuck at 70%" and "Cut-off" bugs.
+MASTER AGENT v34.1
+STABLE FACEBOOK + YOUTUBE STREAMING ENGINE
+
+REMOVED:
+- game_links_livestream
+- game_links_streamed
+- agent_memory.json
+- Game Memory / last played game
+
+FIXED:
+- Non-blocking bounded log queue
+- Progress monitoring without log starvation
+- Stream keys hidden in logs
+- Source URLs hidden in logs
+- FFmpeg process cleanup
+- Retry and runtime deadline
+- Audio mixing and optional watermark
+- Automatic and manual source selection
+
+FEATURES:
+- Facebook + YouTube RTMP
+- Single FFmpeg encoder with tee output
+- 1080p presets
+- 30 FPS default
+- Manual URL + automatic rotation
+- Finite / 24-hour looping
+- Six visual filters
+- Optional background music
+- Optional logo watermark
+- Retry with exponential backoff
+- Input reconnect options
+- Graceful shutdown
 """
+
 import os
 import sys
-import json
 import re
+import json
+import glob
 import time
 import signal
-import subprocess
-import requests
-import glob
+import random
+import shutil
+import queue
 import threading
+import subprocess
+
 from datetime import datetime, timedelta, timezone
 
-# ═══════════════════════════════════════════════════════════
-# CONFIG & UTILS
-# ═══════════════════════════════════════════════════════════
-def log(msg, end="\n"):
-    sys.stderr.write(f"{msg}{end}")
-    sys.stderr.flush()
 
-INTERRUPTED = False
-def _sigint_handler(signum, frame):
-    global INTERRUPTED
-    INTERRUPTED = True
-    log("\n⚠️ Signal — stopping...")
-signal.signal(signal.SIGINT, _sigint_handler)
-signal.signal(signal.SIGTERM, _sigint_handler)
+# =========================================================
+# 1. CONFIGURATION
+# =========================================================
 
-STREAM_ENABLED     = os.getenv("STREAM_ENABLED", "true").lower() == "true"
-STREAM_MODE        = os.getenv("STREAM_MODE", "both").lower().strip()
-if STREAM_MODE not in ("fb", "yt", "both"): STREAM_MODE = "both"
+def log(message):
+    print(
+        f"[{datetime.now().strftime('%H:%M:%S')}] {message}",
+        file=sys.stderr,
+        flush=True
+    )
 
-MANUAL_FB_KEY = os.getenv("MANUAL_FB_KEY", "").strip()
-MANUAL_YT_KEY = os.getenv("MANUAL_YT_KEY", "").strip()
-SECRET_FB_KEY = (os.getenv("FACEBOOK_STREAM_KEY") or "").strip()
-SECRET_YT_KEY = (os.getenv("YOUTUBE_STREAM_KEY") or "").strip()
 
-FACEBOOK_KEY = MANUAL_FB_KEY if MANUAL_FB_KEY else SECRET_FB_KEY
-YOUTUBE_KEY  = MANUAL_YT_KEY if MANUAL_YT_KEY else SECRET_YT_KEY
+def env_int(name, default, minimum, maximum):
+    try:
+        value = int(os.getenv(name, str(default)))
+        return max(minimum, min(maximum, value))
+    except (ValueError, TypeError):
+        return default
 
-USE_YT = STREAM_MODE in ("yt", "both") and bool(YOUTUBE_KEY)
-USE_FB = STREAM_MODE in ("fb", "both") and bool(FACEBOOK_KEY)
-STREAMING_ENABLED = STREAM_ENABLED and (USE_YT or USE_FB)
 
-MAX_STREAM_RETRIES = int(os.getenv("MAX_STREAM_RETRIES", "3"))
-MANUAL_VIDEO_URL = os.getenv("MANUAL_VIDEO_URL", "").strip()
+def env_bool(name, default=True):
+    value = os.getenv(
+        name, str(default)
+    ).strip().lower()
 
-AUDIO_URL      = os.getenv("AUDIO_URL", "").strip()
-RATIO          = os.getenv("RATIO", "3")
-FILTER         = os.getenv("FILTER", "2")
-SPEED_OPT      = os.getenv("SPEED", "1")  
-FPS_OPT        = os.getenv("FPS", "1") 
-BITRATE        = os.getenv("BITRATE", "8") 
-STREAM_GAP_MIN = int(os.getenv("STREAM_GAP_MIN", "2"))
-META_ARTIST    = os.getenv("META_ARTIST", "PremxGamer")
+    return value in ("1", "true", "yes", "on")
 
-TARGET_FPS = "30" if FPS_OPT == "1" else "60"
 
-LOOP_INPUT = os.getenv("LOOP_COUNT", "0").strip().lower()
-LOOP_ARG = ""
-MAX_RUN_SECONDS = 5 * 3600 + 30 * 60 
+INTERRUPTED = threading.Event()
 
-if LOOP_INPUT in ("24", "24h", "24h/24", "-1", "infinite", "inf"):
-    LOOP_ARG = "-stream_loop -1 "
-    MAX_RUN_SECONDS = 24 * 3600
-    LOOP_MSG = "Infinite (24 Hours)"
+
+def signal_handler(signum, frame):
+    log("Shutdown signal received.")
+    INTERRUPTED.set()
+
+
+signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
+
+
+# Directories
+MANUAL_DIR = "Manual_links"
+AUTO_DIR = "Auto_links"
+
+AUDIO_FILE = "optional_audio.mp3"
+
+for directory in (MANUAL_DIR, AUTO_DIR):
+    os.makedirs(directory, exist_ok=True)
+
+
+# Streaming
+STREAM_ENABLED = env_bool("STREAM_ENABLED", True)
+
+STREAM_MODE = os.getenv(
+    "STREAM_MODE", "both"
+).strip().lower()
+
+if STREAM_MODE not in ("fb", "yt", "both"):
+    STREAM_MODE = "both"
+
+
+# Stream keys
+MANUAL_FB_KEY = os.getenv(
+    "MANUAL_FB_KEY", ""
+).strip()
+
+MANUAL_YT_KEY = os.getenv(
+    "MANUAL_YT_KEY", ""
+).strip()
+
+SECRET_FB_KEY = os.getenv(
+    "FACEBOOK_STREAM_KEY", ""
+).strip()
+
+SECRET_YT_KEY = os.getenv(
+    "YOUTUBE_STREAM_KEY", ""
+).strip()
+
+FACEBOOK_KEY = MANUAL_FB_KEY or SECRET_FB_KEY
+YOUTUBE_KEY = MANUAL_YT_KEY or SECRET_YT_KEY
+
+USE_FB = (
+    STREAM_MODE in ("fb", "both")
+    and bool(FACEBOOK_KEY)
+)
+
+USE_YT = (
+    STREAM_MODE in ("yt", "both")
+    and bool(YOUTUBE_KEY)
+)
+
+STREAMING_ENABLED = (
+    STREAM_ENABLED and (USE_FB or USE_YT)
+)
+
+
+# Source URLs
+MANUAL_VIDEO_URL = os.getenv(
+    "MANUAL_VIDEO_URL", ""
+).strip()
+
+AUDIO_URL = os.getenv(
+    "AUDIO_URL", ""
+).strip()
+
+
+# Video configuration
+RATIO = os.getenv("RATIO", "3").strip()
+FILTER = os.getenv("FILTER", "2").strip()
+SPEED_OPT = os.getenv("SPEED", "1").strip()
+FPS_OPT = os.getenv("FPS", "1").strip()
+
+if RATIO not in ("1", "2", "3", "4", "5"):
+    RATIO = "3"
+
+if FILTER not in ("1", "2", "3", "4", "5", "6"):
+    FILTER = "2"
+
+if SPEED_OPT not in ("1", "2", "3", "4", "5", "6"):
+    SPEED_OPT = "1"
+
+if FPS_OPT not in ("1", "2"):
+    FPS_OPT = "1"
+
+BITRATE = env_int("BITRATE", 8, 2, 20)
+
+TARGET_FPS = 30 if FPS_OPT == "1" else 60
+
+BUFFER_SIZE = os.getenv(
+    "BUFFER_SIZE", f"{BITRATE * 2}M"
+).strip()
+
+FFMPEG_THREADS = env_int(
+    "FFMPEG_THREADS", 0, 0, 64
+)
+
+
+# Retry configuration
+STREAM_GAP_MIN = env_int(
+    "STREAM_GAP_MIN", 0, 0, 1440
+)
+
+MAX_STREAM_RETRIES = env_int(
+    "MAX_STREAM_RETRIES", 3, 0, 20
+)
+
+RETRY_DELAY = env_int(
+    "RETRY_DELAY", 5, 1, 300
+)
+
+PROGRESS_TIMEOUT = env_int(
+    "PROGRESS_TIMEOUT", 180, 30, 1800
+)
+
+INPUT_TIMEOUT = env_int(
+    "INPUT_TIMEOUT", 30000000, 5000000, 120000000
+)
+
+MAX_RUN_SECONDS = env_int(
+    "MAX_RUN_SECONDS", 19800, 60, 86400
+)
+
+META_ARTIST = os.getenv(
+    "META_ARTIST", "PremxGamer"
+)
+
+
+# Loop configuration
+LOOP_INPUT = os.getenv(
+    "LOOP_COUNT", "0"
+).strip().lower()
+
+if LOOP_INPUT in (
+    "24", "24h", "24h/24",
+    "-1", "infinite", "inf"
+):
+    LOOP_ARG = -1
+    MAX_RUN_SECONDS = 86400
+    LOOP_MSG = "24 Hours"
+
 else:
     try:
         plays = int(LOOP_INPUT)
+
         if plays > 1:
-            LOOP_ARG = f"-stream_loop {plays - 1} "
+            LOOP_ARG = min(plays - 1, 1000)
             LOOP_MSG = f"{plays} Times"
         else:
-            LOOP_MSG = "Once (No Loop)"
+            LOOP_ARG = 0
+            LOOP_MSG = "Once"
+
     except ValueError:
+        LOOP_ARG = 0
         LOOP_MSG = "Once (Default)"
 
+
+# Playback speed
+SPEED_MAP = {
+    "1": (1.0, 1.0),
+    "2": (1.05, 1.05),
+    "3": (1.10, 1.10),
+    "4": (1.25, 1.25),
+    "5": (1.50, 1.50),
+    "6": (0.80, 0.80),
+}
+
+VIDEO_SPEED, AUDIO_SPEED = SPEED_MAP[SPEED_OPT]
+
+
+# Timezone
 try:
     from zoneinfo import ZoneInfo
     IST = ZoneInfo("Asia/Kolkata")
-except Exception:
+except ImportError:
     IST = timezone(timedelta(hours=5, minutes=30))
 
-def now_ist_ampm():
-    return datetime.now(IST).strftime("%Y-%m-%d %I:%M:%S %p")
 
-LOGS_DIR = "gaming_runtime_v8"
-for d in [LOGS_DIR, "Manual_links", "game_links_livestream", "game_links_streamed"]:
-    os.makedirs(d, exist_ok=True)
-
-def _extract_game(fpath):
-    base = os.path.basename(fpath)
-    for suf in ["_manual.txt", "_links_livestream.txt", "_livestream.txt", ".txt"]:
-        if base.endswith(suf): return base[:-len(suf)].strip()
-    return base.replace(".txt", "").strip()
-
-def get_source_file(game, g2m, g2a):
-    mf = g2m.get(game)
-    if mf and os.path.exists(mf):
-        try:
-            with open(mf, 'r', encoding='utf-8', errors='ignore') as fh:
-                if re.findall(r'https?://', fh.read()): return mf, "manual"
-        except Exception: pass
-    af = g2a.get(game)
-    if af and os.path.exists(af):
-        try:
-            with open(af, 'r', encoding='utf-8', errors='ignore') as fh:
-                if re.findall(r'https?://', fh.read()): return af, "livestream"
-        except Exception: pass
-    return None, None
-
-def run_brain():
-    log("🧠 Brain: rotation...")
-    mf = glob.glob(os.path.join(MANUAL_DIR, "*.txt"))
-    af = glob.glob(os.path.join(AUTO_DIR, "*.txt"))
-    g2m, g2a = {}, {}
-    for f in mf:
-        g = _extract_game(f)
-        if g: g2m[g] = f
-    for f in af:
-        g = _extract_game(f)
-        if g: g2a[g] = f
-    
-    game_list = sorted(g2a.keys())
-    if not game_list: return None
-
-    mem_file = f"{LOGS_DIR}/agent_memory.json"
-    memory = {"last_played_game": ""}
-    if os.path.exists(mem_file):
-        try:
-            with open(mem_file, 'r', encoding='utf-8') as f:
-                d = json.load(f)
-                if isinstance(d, dict): memory.update(d)
-        except Exception: pass
-
-    last = memory.get("last_played_game", "")
-    chosen = game_list[(game_list.index(last) + 1) % len(game_list)] if last in game_list else game_list[0]
-
-    source_file, source_kind = None, None
-    attempts = 0
-    while attempts < len(game_list):
-        sf, kind = get_source_file(chosen, g2m, g2a)
-        if sf:
-            source_file, source_kind = sf, kind
-            log(f"✅ Pick: {chosen} [{kind}]")
-            break
-        ci = game_list.index(chosen)
-        chosen = game_list[(ci + 1) % len(game_list)]
-        attempts += 1
-
-    if not source_file: return None
-
-    try:
-        with open(source_file, 'r', encoding='utf-8', errors='ignore') as f: content = f.read()
-        pipe = [u.rstrip('.,;)\']"') for u in re.findall(r'\|\s*Link:\s*(https?://[^\s\n\r\)\]\'"<>,;]+)', content)]
-        all_urls = pipe if pipe else re.findall(r'https?://[^\s\n\r\)\]\'"<>,;]+', content)
-        source_url = all_urls[0] if all_urls else ""
-    except Exception: source_url = ""
-
-    if not source_url: return None
-
-    memory["last_played_game"] = chosen
-    try:
-        with open(mem_file, 'w', encoding='utf-8') as f: json.dump(memory, f, indent=2)
-    except Exception: pass
-    
-    return {"game_name": chosen, "source_url": source_url, "source_file": source_file}
-
-def _tee():
-    o = []
-    if USE_YT: o.append(f"[f=flv]rtmp://a.rtmp.youtube.com/live2/{YOUTUBE_KEY}")
-    if USE_FB: o.append(f"[f=flv]rtmps://live-api-s.facebook.com:443/rtmp/{FACEBOOK_KEY}")
-    return "|".join(o)
-
-# ═══════════════════════════════════════════════════════════
-# ⚡ NEW: GET SOURCE DURATION
-# ═══════════════════════════════════════════════════════════
-def get_video_duration(url):
-    log("⏱️ Probing source video duration...")
-    cmd = f'ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "{url}"'
-    try:
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-        duration_str = result.stdout.strip()
-        if duration_str:
-            dur = float(duration_str)
-            log(f"   📏 Source Duration: {int(dur // 60)}m {int(dur % 60)}s ({int(dur)} seconds)")
-            return dur
-    except Exception as e:
-        log(f"   ⚠️ Could not probe duration: {e}")
-    return 0
-
-# ═══════════════════════════════════════════════════════════
-# ⚡ SMART DUAL-TEST (CPU + NETWORK DOWN/UP)
-# ═══════════════════════════════════════════════════════════
-def get_network_speeds():
-    log("🌐 Checking Network Download & Upload Speed...")
-    try:
-        import speedtest
-        st = speedtest.Speedtest()
-        st.get_best_server()
-        download_mbps = st.download() / 1_000_000
-        upload_mbps = st.upload() / 1_000_000
-        return download_mbps, upload_mbps
-    except Exception as e:
-        log(f"   ⚠️ Speedtest error: {e}. Defaulting to 0.")
-        return 0, 0
-
-def run_smart_test(url, vf_chain, base_enc_flags):
-    log("🔍 Pre-Flight Test: Checking CPU & Network...")
-    cmd = f'ffmpeg -hide_banner -loglevel info -t 10 -rtbufsize 512M -thread_queue_size 8192 -i "{url}" -filter_complex "[0:v]{vf_chain}[vid]" -map "[vid]" {base_enc_flags} -f null -'
-    cpu_speed = 0.0
-    try:
-        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
-        start = time.time()
-        while p.poll() is None:
-            if time.time() - start > 15:
-                p.kill()
-                break
-            line = p.stderr.readline()
-            if not line: continue
-            match = re.search(r"speed=\s*([\d\.]+)x", line)
-            if match:
-                cpu_speed = max(cpu_speed, float(match.group(1)))
-    except Exception as e:
-        log(f"   ❌ CPU Test error: {e}")
-        cpu_speed = 0.0
-
-    log(f"   🖥️ CPU Speed: {cpu_speed}x")
-    download_speed, upload_speed = get_network_speeds()
-    log(f"   ⬇️ Download Speed: {download_speed:.2f} Mbps")
-    log(f"   ⬆️ Upload Speed: {upload_speed:.2f} Mbps")
-    
-    required_net = int(BITRATE) * 1.5 
-    
-    if cpu_speed >= 0.95 and download_speed >= required_net and upload_speed >= required_net:
-        log(f"   ✅ SYSTEM IS FAST.")
-        return True, cpu_speed
-    else:
-        log(f"   ⚠️ SYSTEM IS SLOW/BOTTLENECKED.")
-        return False, cpu_speed
-
-# ═══════════════════════════════════════════════════════════
-# STREAMING (Perfect Math Buffer + Flush Logic)
-# ═══════════════════════════════════════════════════════════
-def stream_direct(url, game_name):
-    if not STREAMING_ENABLED: return False
-    n = int(USE_YT) + int(USE_FB)
-    if n == 0: return False
-
-    # 🔥 1. PROBE VIDEO DURATION FIRST
-    source_duration = get_video_duration(url)
-
-    CROP = ""
-    if RATIO == "1": CROP = "scale=1080:1080:force_original_aspect_ratio=increase,crop=1080:1080,"
-    elif RATIO == "2": CROP = "scale=1080:1350:force_original_aspect_ratio=increase,crop=1080:1350,"
-    elif RATIO == "3": CROP = "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,"
-    elif RATIO == "4": CROP = "scale=1080:1440:force_original_aspect_ratio=increase,crop=1080:1440,"
-    elif RATIO == "5": CROP = "scale=1440:1080:force_original_aspect_ratio=increase,crop=1440:1080,"
-
-    GAME = ""
-    if FILTER == "1": GAME = "eq=brightness=0.02:contrast=1.18:saturation=1.25,hqdn3d=1.5:1.5:6:6,unsharp=3:3:0.75:3:3:0.0,"
-    elif FILTER == "2": GAME = "eq=brightness=0.02:contrast=1.20:saturation=1.22:gamma=1.11,vibrance=intensity=0.20,hqdn3d=1.5:1.5:6:6,cas=0.3,noise=alls=3:allf=t+u,unsharp=3:3:0.75:3:3:0.0,"
-    elif FILTER == "3": GAME = "scale=flags=lanczos+accurate_rnd:param0=3.0,eq=brightness=0.02:contrast=1.10:saturation=1.10:gamma=1.10,vibrance=intensity=0.10,hqdn3d=1.0:1.0:3:3,cas=0.15,noise=alls=2:allf=t+u,unsharp=3:3:0.2:3:3:0.0,"
-    elif FILTER == "4": GAME = "eq=brightness=0.15:contrast=1.20:gamma=1.25,unsharp=5:5:1.0:5:5:0.0,"
-    elif FILTER == "5": GAME = "eq=contrast=1.25:saturation=1.20,colorbalance=rs=0.08:gs=0.02:bs=-0.08,unsharp=5:5:1.2:5:5:0.0,"
-    elif FILTER == "6": GAME = "eq=contrast=1.35:saturation=1.55:gamma=1.05,unsharp=7:7:2.5:7:7:0.0,"
-
-    V_SPEED, A_SPEED = "", ""
-    if SPEED_OPT == "2": V_SPEED, A_SPEED = "setpts=0.9523*PTS,", "atempo=1.05,"
-    elif SPEED_OPT == "3": V_SPEED, A_SPEED = "setpts=0.9090*PTS,", "atempo=1.10,"
-    elif SPEED_OPT == "4": V_SPEED, A_SPEED = "setpts=0.8*PTS,", "atempo=1.25,"
-    elif SPEED_OPT == "5": V_SPEED, A_SPEED = "setpts=0.6666*PTS,", "atempo=1.5,"
-    elif SPEED_OPT == "6": V_SPEED, A_SPEED = "setpts=1.25*PTS,", "atempo=0.8,"
-
-    B_V = f"{BITRATE}M"
-    BUF = f"{int(BITRATE)*2}M"
-
-    vf_chain = f"{V_SPEED}{CROP}{GAME}fps={TARGET_FPS}:round=near,scale=trunc(iw/2)*2:trunc(ih/2)*2"
-    af_chain = f"{A_SPEED}aresample=48000"
-    META_TITLE = f"{game_name} Gameplay"
-    
-    base_enc_flags = (
-        f"-c:v libx264 -preset ultrafast -threads 0 -profile:v high -level:v 4.2 "
-        f"-pix_fmt yuv420p -b:v {B_V} -maxrate {B_V} -bufsize {BUF} "
-        f"-r {TARGET_FPS} -fps_mode cfr -vsync cfr "
-        f"-g {TARGET_FPS} -keyint_min {TARGET_FPS} -sc_threshold 0 "
-        f"-c:a aac -b:a 128k -ar 44100 -ac 2 "
-        f"-metadata title=\"{META_TITLE}\" -metadata artist=\"{META_ARTIST}\" "
-        f"-max_muxing_queue_size 16384 "
+def now_ist():
+    return datetime.now(IST).strftime(
+        "%Y-%m-%d %I:%M:%S %p"
     )
 
-    is_fast_system, cpu_speed = run_smart_test(url, vf_chain, base_enc_flags)
 
-    inputs = f'{LOOP_ARG}-re -rtbufsize 2G -thread_queue_size 16384 -rw_timeout 120000000 -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 -i "{url}" '
-    
-    filter_complex = ""
-    audio_map = ""
-    video_map = ""
-    
-    audio_file_exists = False
-    if AUDIO_URL:
-        log("🎵 Fetching optional audio...")
-        subprocess.run(f'yt-dlp --extract-audio --audio-format mp3 "{AUDIO_URL}" -o "optional_audio.mp3"', shell=True)
-        if os.path.exists("optional_audio.mp3"):
-            audio_file_exists = True
-            inputs += '-thread_queue_size 4096 -i "optional_audio.mp3" '
-            filter_complex = f'[0:v]{vf_chain}[vid];[1:a]{af_chain}[a_out]'
-            audio_map = "-map \"[a_out]\" "
+# =========================================================
+# 2. DEPENDENCY CHECK
+# =========================================================
 
-    if os.path.exists("logo.png"):
-        inputs += '-i "logo.png" '
-        logo_idx = 2 if audio_file_exists else 1
-        if audio_file_exists:
-            filter_complex += f';[{logo_idx}:v]scale=160:-1[logo];[vid][logo]overlay=30:H-h-20[v_out]'
-        else:
-            filter_complex = f'[0:v]{vf_chain}[vid];[{logo_idx}:v]scale=160:-1[logo];[vid][logo]overlay=30:H-h-20[v_out]'
-        log("🏷️ Watermark applied.")
-        video_map = "-map \"[v_out]\" "
-    else:
-        if not audio_file_exists:
-            filter_complex = f'[0:v]{vf_chain}[vid]'
-        video_map = "-map \"[vid]\" "
+def check_dependencies():
 
-    if not audio_file_exists:
-        audio_map = f'-map 0:a? -af "{af_chain}" '
+    for executable in ("ffmpeg", "ffprobe"):
 
-    if n == 1:
-        target = f"rtmp://a.rtmp.youtube.com/live2/{YOUTUBE_KEY}" if USE_YT else f"rtmps://live-api-s.facebook.com:443/rtmp/{FACEBOOK_KEY}"
-        out_format = f'-f flv "{target}"'
-    else:
-        tee = _tee()
-        out_format = f'-f tee "{tee}"'
-
-    if is_fast_system:
-        log("🚀 System is FAST! Streaming Immediately.")
-        cmd = f'ffmpeg -hide_banner -loglevel info -stats {inputs} -filter_complex "{filter_complex}" {video_map}{audio_map} {base_enc_flags} -rtmp_buffer 30000 -flvflags no_duration_filesize {out_format}'
-        try:
-            p = subprocess.Popen(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, universal_newlines=True)
-            start = time.time()
-            while p.poll() is None:
-                if INTERRUPTED: p.terminate(); return False
-                if MAX_RUN_SECONDS and (time.time() - start) > MAX_RUN_SECONDS: p.terminate(); return True
-                line = p.stderr.readline()
-                if line and ("frame=" in line or "speed=" in line):
-                    log(f"      ⏳ {line.strip()[:120]}")
-            return p.returncode == 0
-        except Exception:
+        if not shutil.which(executable):
+            log(f"ERROR: {executable} is not installed.")
             return False
-    
-    else:
-        # 🔥 SMART EXACT MATH CALCULATION 🔥
-        if cpu_speed <= 0: cpu_speed = 0.5 
-        
-        if source_duration > 0:
-            # Formula: Total Video Length * (1 - CPU Speed) + 15 seconds safety margin
-            # Example: 341 sec * (1 - 0.36) = 218 sec buffer needed
-            deficit_ratio = 1.0 - cpu_speed
-            calc_buffer = int(source_duration * deficit_ratio) + 15
-            
-            # Ensure buffer is at least 30s, but not more than the video itself
-            auto_buffer_secs = max(30, min(int(source_duration - 10), calc_buffer))
-            log(f"📐 Exact Math Applied: Source={int(source_duration)}s, CPU={cpu_speed}x. Required Buffer={auto_buffer_secs}s.")
-        else:
-            # Fallback if live stream (no duration)
-            f_load = {"1": 1.0, "2": 1.5, "3": 2.0, "4": 1.2, "5": 1.1, "6": 1.4}.get(FILTER, 1.5)
-            b_load = int(BITRATE) / 8.0
-            calc_buffer = int((60 / cpu_speed) * f_load * b_load)
-            auto_buffer_secs = max(60, min(600, calc_buffer))
 
-        log(f"🐢 System is SLOW (CPU: {cpu_speed}x | Filter: {FILTER} | Bitrate: {BITRATE}M).")
-        log(f"⚙️ Smart Auto-Adjusted Buffer: {auto_buffer_secs} seconds ({auto_buffer_secs/60:.1f} mins)")
-        log(f"   Pre-buffering {auto_buffer_secs}s of RE-ENCODED video in RAM...")
-        
-        cmd1 = f'ffmpeg -hide_banner -loglevel error -stats {inputs} -filter_complex "{filter_complex}" {video_map}{audio_map} {base_enc_flags} -f mpegts pipe:1'
-        cmd2 = f'ffmpeg -hide_banner -loglevel info -stats -f mpegts -i pipe:0 -c copy -flvflags no_duration_filesize {out_format}'
+    if AUDIO_URL and not shutil.which("yt-dlp"):
+        log(
+            "WARNING: yt-dlp missing. "
+            "Background audio will be disabled."
+        )
 
-        p1 = subprocess.Popen(cmd1, shell=True, stdout=subprocess.PIPE)
-        p2 = subprocess.Popen(cmd2, shell=True, stdin=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=False)
+    return True
 
-        def read_p2_logs():
-            for line_bytes in iter(p2.stderr.readline, b''):
-                safe = line_bytes.decode('utf-8', errors='ignore').strip()
-                if "frame=" in safe or "speed=" in safe or "error" in safe.lower():
-                    log(f"      [Sending] {safe[:150]}")
 
-        threading.Thread(target=read_p2_logs, daemon=True).start()
+# =========================================================
+# 3. SOURCE MANAGEMENT
+# =========================================================
 
-        target_buffer_bytes = int(BITRATE) * 1000000 // 8 * auto_buffer_secs
-        buffer = bytearray()
-        
-        log(f"   $ Buffering Data (Target: {target_buffer_bytes / (1024*1024):.1f} MB)...")
-        
-        try:
-            while True:
-                chunk = p1.stdout.read(1024 * 1024) 
-                if not chunk:
-                    break
-                
-                if len(buffer) < target_buffer_bytes:
-                    buffer.extend(chunk)
-                    percent = (len(buffer) / target_buffer_bytes) * 100
-                    if len(buffer) % (10 * 1024 * 1024) < (1024*1024):
-                        log(f"      📦 Buffering: {percent:.1f}% complete...")
-                else:
-                    if len(buffer) > 0:
-                        log(f"\n✅ {auto_buffer_secs}-Second Buffer FULL! Now Sending to Facebook...")
-                        p2.stdin.write(buffer)
-                        p2.stdin.flush()
-                        buffer.clear()
-                    
-                    p2.stdin.write(chunk)
-                    p2.stdin.flush()
-                    
-                if INTERRUPTED:
-                    p1.terminate(); p2.terminate(); return False
-                    
-        except Exception as e:
-            log(f"❌ Buffer Error: {e}")
-        finally:
-            if len(buffer) > 0:
-                log(f"\n⚠️ Source ended before full buffer. Flushing remaining {len(buffer)/(1024*1024):.1f} MB to Facebook...")
-                try:
-                    p2.stdin.write(buffer)
-                    p2.stdin.flush()
-                except:
-                    pass
-            
-            p1.terminate()
-            p2.terminate()
-            if os.path.exists("optional_audio.mp3"): os.remove("optional_audio.mp3")
-            
-        return True
+def extract_game(filepath):
 
-def move_link(game, url, src_file, ok):
-    if src_file == "manual_url": return True
-    if not ok: return False
-    dst = os.path.join(STREAMED_DIR, f"{game}_streamed.txt")
+    base = os.path.basename(filepath)
+
+    suffixes = (
+        "_manual.txt",
+        "_links_livestream.txt",
+        "_livestream.txt",
+        ".txt"
+    )
+
+    for suffix in suffixes:
+
+        if base.lower().endswith(suffix):
+            return base[:-len(suffix)].strip()
+
+    return os.path.splitext(base)[0].strip()
+
+
+def extract_urls(content):
+
+    pattern = r'https?://[^\s\n\r\)\]\'"<>,;]+'
+
+    urls = re.findall(pattern, content)
+
+    return [
+        url.rstrip(".,;)'\"")
+        for url in urls
+    ]
+
+
+def read_urls(filepath):
+
     try:
-        with open(src_file, 'r', encoding='utf-8', errors='ignore') as f: lines = f.readlines()
-        new, moved = [], None
-        for line in lines:
-            if moved is None and url in line: moved = line
-            else: new.append(line)
-        with open(src_file, 'w', encoding='utf-8') as f: f.writelines(new)
-        with open(dst, 'a', encoding='utf-8') as f: f.write(f"\n# [SUCCESS] {now_ist_ampm()} | source=auto\n{moved}")
-        return True
-    except Exception: return False
+
+        with open(
+            filepath,
+            "r",
+            encoding="utf-8",
+            errors="ignore"
+        ) as file:
+
+            return extract_urls(file.read())
+
+    except OSError as error:
+
+        log(f"Cannot read source file: {error}")
+        return []
+
+
+def get_source_file(game, manual, automatic):
+
+    manual_file = manual.get(game)
+
+    if manual_file and os.path.isfile(manual_file):
+
+        if read_urls(manual_file):
+            return manual_file, "manual"
+
+    auto_file = automatic.get(game)
+
+    if auto_file and os.path.isfile(auto_file):
+
+        if read_urls(auto_file):
+            return auto_file, "auto"
+
+    return None, None
+
+
+def run_brain():
+
+    log("Automatic source selection started.")
+
+    manual_files = glob.glob(
+        os.path.join(MANUAL_DIR, "*.txt")
+    )
+
+    auto_files = glob.glob(
+        os.path.join(AUTO_DIR, "*.txt")
+    )
+
+    manual = {
+        extract_game(path): path
+        for path in manual_files
+    }
+
+    automatic = {
+        extract_game(path): path
+        for path in auto_files
+    }
+
+    # Include manual-only source files.
+    game_list = sorted(
+        set(manual.keys()) | set(automatic.keys())
+    )
+
+    if not game_list:
+
+        log(
+            "No source files found. "
+            "Check Auto_links and Manual_links."
+        )
+
+        return None
+
+    candidates = []
+
+    for game in game_list:
+
+        source_file, source_kind = get_source_file(
+            game,
+            manual,
+            automatic
+        )
+
+        if not source_file:
+            continue
+
+        urls = read_urls(source_file)
+
+        if not urls:
+            continue
+
+        candidates.append({
+            "game_name": game,
+            "source_url": random.choice(urls),
+            "source_file": source_file,
+            "source_kind": source_kind
+        })
+
+    if not candidates:
+
+        log("No valid URLs found in source files.")
+        return None
+
+    selected = random.choice(candidates)
+
+    log(
+        f"Selected game: {selected['game_name']} "
+        f"[{selected['source_kind']}]"
+    )
+
+    return selected
+
+
+# =========================================================
+# 4. VIDEO PROBE
+# =========================================================
+
+def get_video_info(url):
+
+    command = [
+        "ffprobe",
+        "-v", "error",
+        "-show_entries",
+        "format=duration:stream=codec_type",
+        "-of", "json",
+        url
+    ]
+
+    try:
+
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            timeout=45
+        )
+
+        if result.returncode != 0:
+            log("Video probe failed.")
+            return 0.0, False
+
+        data = json.loads(result.stdout)
+
+        duration = float(
+            data.get("format", {}).get("duration", 0) or 0
+        )
+
+        has_audio = any(
+            stream.get("codec_type") == "audio"
+            for stream in data.get("streams", [])
+        )
+
+        log(f"Video duration: {duration:.1f} seconds")
+        log(f"Original audio: {has_audio}")
+
+        return duration, has_audio
+
+    except subprocess.TimeoutExpired:
+
+        log("Video probe timed out.")
+        return 0.0, False
+
+    except Exception as error:
+
+        log(f"Probe warning: {error}")
+        return 0.0, False
+
+
+# =========================================================
+# 5. OPTIONAL BACKGROUND AUDIO
+# =========================================================
+
+def download_audio():
+
+    if not AUDIO_URL:
+        return False
+
+    if not shutil.which("yt-dlp"):
+        return False
+
+    try:
+
+        if os.path.exists(AUDIO_FILE):
+            os.remove(AUDIO_FILE)
+
+        command = [
+            "yt-dlp",
+            "--no-playlist",
+            "--extract-audio",
+            "--audio-format", "mp3",
+            "--output", "optional_audio.%(ext)s",
+            AUDIO_URL
+        ]
+
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            timeout=600
+        )
+
+        if (
+            result.returncode == 0
+            and os.path.isfile(AUDIO_FILE)
+            and os.path.getsize(AUDIO_FILE) > 0
+        ):
+
+            log("Background music downloaded.")
+            return True
+
+        log("Background music download failed.")
+
+    except subprocess.TimeoutExpired:
+
+        log("Background audio download timed out.")
+
+    except Exception as error:
+
+        log(f"Background audio error: {error}")
+
+    return False
+
+
+# =========================================================
+# 6. VIDEO FILTERS
+# =========================================================
+
+def build_video_filter():
+
+    ratio_map = {
+
+        "1": (
+            "scale=1080:1080:"
+            "force_original_aspect_ratio=increase,"
+            "crop=1080:1080"
+        ),
+
+        "2": (
+            "scale=1080:1350:"
+            "force_original_aspect_ratio=increase,"
+            "crop=1080:1350"
+        ),
+
+        "3": (
+            "scale=1080:1920:"
+            "force_original_aspect_ratio=increase,"
+            "crop=1080:1920"
+        ),
+
+        "4": (
+            "scale=1080:1440:"
+            "force_original_aspect_ratio=increase,"
+            "crop=1080:1440"
+        ),
+
+        "5": (
+            "scale=1440:1080:"
+            "force_original_aspect_ratio=increase,"
+            "crop=1440:1080"
+        )
+    }
+
+    filters = {
+
+        "1": (
+            "eq=brightness=0.02:contrast=1.18:saturation=1.25,"
+            "hqdn3d=1.5:1.5:6:6,"
+            "unsharp=3:3:0.75:3:3:0"
+        ),
+
+        "2": (
+            "eq=brightness=0.02:contrast=1.20:"
+            "saturation=1.22:gamma=1.11,"
+            "vibrance=intensity=0.20,"
+            "hqdn3d=1.5:1.5:6:6,"
+            "cas=0.3,"
+            "noise=alls=3:allf=t+u,"
+            "unsharp=3:3:0.75:3:3:0"
+        ),
+
+        "3": (
+            "eq=brightness=0.02:contrast=1.10:"
+            "saturation=1.10:gamma=1.10,"
+            "vibrance=intensity=0.10,"
+            "hqdn3d=1:1:3:3,"
+            "cas=0.15,"
+            "noise=alls=2:allf=t+u,"
+            "unsharp=3:3:0.2:3:3:0"
+        ),
+
+        "4": (
+            "eq=brightness=0.15:contrast=1.20:gamma=1.25,"
+            "unsharp=5:5:1.0:5:5:0"
+        ),
+
+        "5": (
+            "eq=contrast=1.25:saturation=1.20,"
+            "colorbalance=rs=0.08:gs=0.02:bs=-0.08,"
+            "unsharp=5:5:1.2:5:5:0"
+        ),
+
+        "6": (
+            "eq=contrast=1.35:saturation=1.55:gamma=1.05,"
+            "unsharp=7:7:2.5:7:7:0"
+        )
+    }
+
+    parts = []
+
+    if VIDEO_SPEED != 1.0:
+        parts.append(f"setpts=PTS/{VIDEO_SPEED}")
+
+    parts.append(ratio_map[RATIO])
+
+    selected_filter = filters.get(FILTER, "")
+
+    if selected_filter:
+        parts.append(selected_filter)
+
+    parts.append(f"fps={TARGET_FPS}")
+
+    parts.append(
+        "scale=trunc(iw/2)*2:trunc(ih/2)*2"
+    )
+
+    return ",".join(parts)
+
+
+# =========================================================
+# 7. AUDIO FILTER
+# =========================================================
+
+def build_audio_filter(has_audio, music_exists):
+
+    filters = []
+
+    if has_audio:
+
+        filters.append(
+            f"[0:a]atempo={AUDIO_SPEED},"
+            "aresample=48000[original]"
+        )
+
+    if music_exists:
+
+        filters.append(
+            "[1:a]aresample=48000[music]"
+        )
+
+        if has_audio:
+
+            filters.append(
+                "[original][music]"
+                "amix=inputs=2:duration=first:"
+                "dropout_transition=2,"
+                "alimiter=limit=0.95[aout]"
+            )
+
+        else:
+
+            filters.append(
+                "[music]volume=0.8,"
+                "aresample=48000[aout]"
+            )
+
+        return ";".join(filters), "[aout]"
+
+    if has_audio:
+
+        return (
+            "[original]anull[aout]",
+            "[aout]"
+        )
+
+    return "", None
+
+
+# =========================================================
+# 8. RTMP DESTINATIONS
+# =========================================================
+
+def escape_tee_url(url):
+
+    return (
+        url.replace("\\", "\\\\")
+           .replace("|", "\\|")
+           .replace("[", "\\[")
+           .replace("]", "\\]")
+    )
+
+
+def get_output_targets():
+
+    targets = []
+
+    if USE_YT:
+
+        targets.append(
+            "rtmp://a.rtmp.youtube.com/live2/"
+            + YOUTUBE_KEY
+        )
+
+    if USE_FB:
+
+        targets.append(
+            "rtmps://live-api-s.facebook.com:443/rtmp/"
+            + FACEBOOK_KEY
+        )
+
+    return targets
+
+
+# =========================================================
+# 9. BUILD FFMPEG COMMAND
+# =========================================================
+
+def build_ffmpeg_command(
+    url,
+    game_name,
+    has_audio,
+    music_exists
+):
+
+    command = [
+        "ffmpeg",
+        "-hide_banner",
+        "-nostats",
+        "-loglevel", "warning",
+        "-stats_period", "5",
+        "-progress", "pipe:1"
+    ]
+
+    # Video input
+    if LOOP_ARG != 0:
+
+        command += [
+            "-stream_loop", str(LOOP_ARG)
+        ]
+
+    command += [
+        "-re",
+        "-thread_queue_size", "512",
+        "-rw_timeout", str(INPUT_TIMEOUT),
+        "-reconnect", "1",
+        "-reconnect_streamed", "1",
+        "-reconnect_delay_max", "5",
+        "-i", url
+    ]
+
+    # Music input
+    if music_exists:
+
+        command += [
+            "-stream_loop", "-1",
+            "-thread_queue_size", "256",
+            "-i", AUDIO_FILE
+        ]
+
+    filters = [
+        f"[0:v]{build_video_filter()}[vid]"
+    ]
+
+    # Optional logo
+    logo_exists = (
+        os.path.isfile("logo.png")
+        and os.path.getsize("logo.png") > 0
+    )
+
+    if logo_exists:
+
+        logo_index = 2 if music_exists else 1
+
+        command += [
+            "-i", "logo.png"
+        ]
+
+        filters.append(
+            f"[{logo_index}:v]scale=160:-1[logo]"
+        )
+
+        filters.append(
+            "[vid][logo]overlay=30:H-h-20[vout]"
+        )
+
+        video_map = "[vout]"
+
+    else:
+
+        video_map = "[vid]"
+
+    # Audio
+    audio_filter, audio_map = build_audio_filter(
+        has_audio,
+        music_exists
+    )
+
+    if audio_filter:
+        filters.append(audio_filter)
+
+    command += [
+        "-filter_complex", ";".join(filters),
+        "-map", video_map
+    ]
+
+    if audio_map:
+        command += ["-map", audio_map]
+    else:
+        command += ["-an"]
+
+    # Video encoder
+    command += [
+        "-c:v", "libx264",
+        "-preset", "ultrafast",
+        "-threads", str(FFMPEG_THREADS),
+        "-profile:v", "high",
+        "-pix_fmt", "yuv420p",
+        "-b:v", f"{BITRATE}M",
+        "-maxrate", f"{BITRATE}M",
+        "-bufsize", BUFFER_SIZE,
+        "-r", str(TARGET_FPS),
+        "-fps_mode", "cfr",
+        "-g", str(TARGET_FPS * 2),
+        "-keyint_min", str(TARGET_FPS * 2),
+        "-sc_threshold", "0"
+    ]
+
+    # Audio encoder
+    if audio_map:
+
+        command += [
+            "-c:a", "aac",
+            "-b:a", "128k",
+            "-ar", "48000",
+            "-ac", "2"
+        ]
+
+    # Stop at video end if music is the only audio.
+    if music_exists and not has_audio:
+        command += ["-shortest"]
+
+    command += [
+        "-metadata", f"title={game_name} Gameplay",
+        "-metadata", f"artist={META_ARTIST}",
+        "-max_muxing_queue_size", "1024"
+    ]
+
+    targets = get_output_targets()
+
+    if not targets:
+        raise RuntimeError("No RTMP destinations configured.")
+
+    if len(targets) == 1:
+
+        command += [
+            "-flvflags", "no_duration_filesize",
+            "-f", "flv",
+            targets[0]
+        ]
+
+    else:
+
+        tee_outputs = []
+
+        for target in targets:
+
+            tee_outputs.append(
+                "[f=flv:onfail=ignore]"
+                + escape_tee_url(target)
+            )
+
+        command += [
+            "-f", "tee",
+            "|".join(tee_outputs)
+        ]
+
+    return command
+
+
+# =========================================================
+# 10. SAFE LOGGING
+# =========================================================
+
+def safe_command_log(command, source_url=""):
+
+    safe = " ".join(
+        str(part) for part in command
+    )
+
+    secrets = [
+        FACEBOOK_KEY,
+        YOUTUBE_KEY,
+        MANUAL_FB_KEY,
+        MANUAL_YT_KEY,
+        source_url,
+        MANUAL_VIDEO_URL,
+        AUDIO_URL
+    ]
+
+    # Replace longest secrets first.
+    secrets = sorted(
+        {item for item in secrets if item},
+        key=len,
+        reverse=True
+    )
+
+    for secret in secrets:
+        safe = safe.replace(secret, "[HIDDEN]")
+
+    return safe
+
+
+# =========================================================
+# 11. PROCESS MANAGEMENT
+# =========================================================
+
+def terminate_process(process):
+
+    if process is None:
+        return
+
+    if process.poll() is not None:
+        return
+
+    try:
+
+        process.send_signal(signal.SIGINT)
+        process.wait(timeout=15)
+        return
+
+    except subprocess.TimeoutExpired:
+        pass
+
+    except Exception:
+        pass
+
+    try:
+
+        process.terminate()
+        process.wait(timeout=8)
+
+    except subprocess.TimeoutExpired:
+
+        process.kill()
+
+        try:
+            process.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            pass
+
+    except Exception:
+        pass
+
+
+# =========================================================
+# 12. NON-BLOCKING READER THREAD
+# =========================================================
+
+def reader_thread(pipe, output_queue, source):
+
+    important_words = (
+        "error",
+        "failed",
+        "unable",
+        "refused",
+        "timeout",
+        "invalid",
+        "connection",
+        "broken pipe",
+        "server returned"
+    )
+
+    try:
+
+        for line in iter(pipe.readline, ""):
+
+            line = line.rstrip()
+
+            # Progress messages are low-volume and important.
+            if source == "progress":
+
+                try:
+                    output_queue.put_nowait(
+                        (source, line)
+                    )
+                except queue.Full:
+                    # Never block the FFmpeg pipe reader.
+                    continue
+
+            else:
+
+                # Drop ordinary stderr messages.
+                lower = line.lower()
+
+                if any(
+                    word in lower
+                    for word in important_words
+                ):
+
+                    try:
+                        output_queue.put_nowait(
+                            (source, line)
+                        )
+                    except queue.Full:
+                        # Drop excess logs, never block.
+                        continue
+
+    except Exception:
+        pass
+
+    finally:
+
+        try:
+            output_queue.put_nowait(
+                (source, None)
+            )
+        except queue.Full:
+            pass
+
+
+# =========================================================
+# 13. FFMPEG MONITOR
+# =========================================================
+
+def run_ffmpeg(command, deadline, source_url):
+
+    if INTERRUPTED.is_set():
+        return False
+
+    log("Starting FFmpeg...")
+
+    log(
+        safe_command_log(
+            command,
+            source_url
+        )
+    )
+
+    try:
+
+        process = subprocess.Popen(
+            command,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            bufsize=1
+        )
+
+    except Exception as error:
+
+        log(f"FFmpeg start failed: {error}")
+        return False
+
+    # Bounded queue. Reader threads never block on a full queue.
+    messages = queue.Queue(maxsize=1000)
+
+    stdout_thread = threading.Thread(
+        target=reader_thread,
+        args=(process.stdout, messages, "progress"),
+        daemon=True
+    )
+
+    stderr_thread = threading.Thread(
+        target=reader_thread,
+        args=(process.stderr, messages, "error"),
+        daemon=True
+    )
+
+    stdout_thread.start()
+    stderr_thread.start()
+
+    start_time = time.monotonic()
+    last_progress = start_time
+    last_log = start_time
+
+    try:
+
+        while process.poll() is None:
+
+            if INTERRUPTED.is_set():
+
+                log("Shutdown requested. Stopping FFmpeg.")
+                terminate_process(process)
+                return False
+
+            now = time.monotonic()
+
+            # Global runtime deadline
+            if now >= deadline:
+
+                log("Maximum stream duration reached.")
+
+                terminate_process(process)
+                return True
+
+            try:
+
+                source, line = messages.get(
+                    timeout=0.5
+                )
+
+                if line is not None:
+
+                    if source == "progress":
+
+                        if (
+                            line.startswith("frame=")
+                            or line.startswith("out_time=")
+                            or line.startswith("progress=")
+                        ):
+
+                            last_progress = now
+
+                        if line.startswith("speed="):
+
+                            speed = line.split(
+                                "=", 1
+                            )[-1]
+
+                            if now - last_log >= 5:
+
+                                log(
+                                    f"Encoding speed: {speed}"
+                                )
+
+                                last_log = now
+
+                        elif line.startswith("frame="):
+
+                            frame = line.split(
+                                "=", 1
+                            )[-1]
+
+                            if now - last_log >= 15:
+
+                                log(
+                                    f"Processed frames: {frame}"
+                                )
+
+                                last_log = now
+
+                    else:
+
+                        # Do not print URLs or keys from error logs.
+                        log(f"FFmpeg warning/error: {line[:300]}")
+
+            except queue.Empty:
+                pass
+
+            # Stalled progress detection
+            if now - last_progress > PROGRESS_TIMEOUT:
+
+                log(
+                    "No FFmpeg progress detected. "
+                    "Restarting stream."
+                )
+
+                terminate_process(process)
+                return False
+
+        exit_code = process.wait(timeout=5)
+
+        if exit_code == 0:
+
+            log("FFmpeg completed successfully.")
+            return True
+
+        log(f"FFmpeg exited with code: {exit_code}")
+
+        return False
+
+    except Exception as error:
+
+        log(f"FFmpeg monitor error: {error}")
+
+        terminate_process(process)
+
+        return False
+
+    finally:
+
+        if process.poll() is None:
+            terminate_process(process)
+
+        for pipe in (
+            process.stdout,
+            process.stderr
+        ):
+
+            try:
+                pipe.close()
+            except Exception:
+                pass
+
+
+# =========================================================
+# 14. RETRY MANAGER
+# =========================================================
+
+def stream_with_retry(
+    url,
+    game_name,
+    has_audio,
+    music_exists
+):
+
+    command = build_ffmpeg_command(
+        url,
+        game_name,
+        has_audio,
+        music_exists
+    )
+
+    deadline = (
+        time.monotonic() + MAX_RUN_SECONDS
+    )
+
+    total_attempts = MAX_STREAM_RETRIES + 1
+
+    for attempt in range(total_attempts):
+
+        if INTERRUPTED.is_set():
+            return False
+
+        if time.monotonic() >= deadline:
+
+            log("Maximum runtime reached.")
+            return True
+
+        log(
+            f"Streaming attempt "
+            f"{attempt + 1}/{total_attempts}"
+        )
+
+        success = run_ffmpeg(
+            command,
+            deadline,
+            url
+        )
+
+        if success:
+            return True
+
+        if INTERRUPTED.is_set():
+            return False
+
+        if attempt >= MAX_STREAM_RETRIES:
+            break
+
+        delay = min(
+            RETRY_DELAY * (2 ** attempt),
+            300
+        )
+
+        remaining = deadline - time.monotonic()
+
+        if remaining <= 0:
+            return True
+
+        delay = min(delay, remaining)
+
+        log(
+            f"Stream failed. "
+            f"Retrying in {delay:.0f} seconds."
+        )
+
+        if INTERRUPTED.wait(delay):
+            return False
+
+    log("All streaming retries exhausted.")
+
+    return False
+
+
+# =========================================================
+# 15. MAIN STREAM FUNCTION
+# =========================================================
+
+def stream_direct(url, game_name):
+
+    if not STREAMING_ENABLED:
+
+        log(
+            "Streaming disabled or stream keys missing."
+        )
+
+        return False
+
+    if not url.startswith(("http://", "https://")):
+
+        log("Invalid source URL.")
+        return False
+
+    log("Probing source video...")
+
+    duration, has_audio = get_video_info(url)
+
+    if duration <= 0:
+
+        log(
+            "WARNING: Duration unavailable. "
+            "Check source URL and media accessibility."
+        )
+
+    music_exists = download_audio()
+
+    log("=" * 55)
+    log("STREAM CONFIGURATION")
+    log(f"Game        : {game_name}")
+    log(f"Ratio       : {RATIO}")
+    log(f"FPS         : {TARGET_FPS}")
+    log(f"Bitrate     : {BITRATE} Mbps")
+    log(f"Filter      : {FILTER}")
+    log(f"Video speed : {VIDEO_SPEED}x")
+    log(f"Original audio: {has_audio}")
+    log(f"Music       : {music_exists}")
+    log(f"Loop        : {LOOP_MSG}")
+    log(f"Facebook    : {USE_FB}")
+    log(f"YouTube     : {USE_YT}")
+    log(f"Max runtime : {MAX_RUN_SECONDS}s")
+    log("=" * 55)
+
+    return stream_with_retry(
+        url,
+        game_name,
+        has_audio,
+        music_exists
+    )
+
+
+# =========================================================
+# 16. MAIN
+# =========================================================
 
 def main():
-    log("=" * 62)
-    log("🎮 MASTER AGENT v32.0 — PERFECT SMOOTH BUFFER (EXACT MATH)")
-    log(f"   Loop Setup : {LOOP_MSG}")
-    log(f"   Ratio      : {RATIO} | Filter: {FILTER} | Bitrate: {BITRATE}M")
-    log(f"   FPS Lock   : {TARGET_FPS} FPS")
-    log("=" * 62)
 
+    log("=" * 60)
+    log("MASTER AGENT v34.1")
+    log("NO GAME MEMORY")
+    log("UPDATED LOGGING + PROCESS MANAGEMENT")
+    log("=" * 60)
+
+    log(f"Loop       : {LOOP_MSG}")
+    log(f"FPS        : {TARGET_FPS}")
+    log(f"Bitrate    : {BITRATE} Mbps")
+    log(f"Mode       : {STREAM_MODE}")
+    log(f"Retries    : {MAX_STREAM_RETRIES}")
+
+    if not check_dependencies():
+        return 1
+
+    if not STREAMING_ENABLED:
+
+        log(
+            "ERROR: Streaming is not enabled. "
+            "Check stream keys and STREAM_MODE."
+        )
+
+        return 1
+
+    # Manual URL gets priority.
     if MANUAL_VIDEO_URL:
-        log(f"🎯 Using MANUAL Video URL")
+
+        log("Manual video URL selected.")
+
         game = "Manual_Game"
         url = MANUAL_VIDEO_URL
-        src_file = "manual_url"
+
     else:
-        log("🤖 No Manual URL. Running Auto-Rotation Brain...")
+
+        log("Selecting automatic source...")
+
         result = run_brain()
-        if not result: return
-        game, url, src_file = result["game_name"], result["source_url"], result["source_file"]
 
+        if not result:
+
+            log("No valid automatic source found.")
+            return 1
+
+        game = result["game_name"]
+        url = result["source_url"]
+
+    # Optional start delay
     gap_seconds = STREAM_GAP_MIN * 60
-    if gap_seconds > 0:
-        log(f"⏳ Waiting for {STREAM_GAP_MIN} minutes before connecting...")
-        for i in range(gap_seconds, 0, -10):
-            if INTERRUPTED: return
-            if i % 60 == 0:
-                log(f"   ⏱️ Time remaining: {i // 60} minutes...")
-            time.sleep(10)
 
-    log(f"\n📡 Initializing Stream...")
-    ok = stream_direct(url, game)
-    
-    move_link(game, url, src_file, ok)
-    
-    log("\n" + "=" * 62)
-    log(f"{'✅ Complete' if ok else '❌ Failed'}")
-    log("=" * 62)
+    if gap_seconds > 0:
+
+        log(
+            f"Waiting {STREAM_GAP_MIN} minutes "
+            "before streaming."
+        )
+
+        if INTERRUPTED.wait(gap_seconds):
+            return 1
+
+    if INTERRUPTED.is_set():
+        return 1
+
+    success = False
+
+    try:
+
+        success = stream_direct(
+            url,
+            game
+        )
+
+    except Exception as error:
+
+        log(f"MAIN ERROR: {error}")
+        success = False
+
+    finally:
+
+        if os.path.exists(AUDIO_FILE):
+
+            try:
+                os.remove(AUDIO_FILE)
+            except OSError:
+                pass
+
+    log("=" * 60)
+
+    if success:
+
+        log("STREAM COMPLETED.")
+        return 0
+
+    log("STREAM FAILED.")
+
+    return 1
+
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
