@@ -2,10 +2,10 @@
     {
         "rank": 1,
         "game_name": "CODMW4",
-        "total_views": 13061,
+        "total_views": 13094,
         "uploaded_videos": 40,
-        "avg_views_per_video": 326,
-        "view_share_percentage": 41.19
+        "avg_views_per_video": 327,
+        "view_share_percentage": 43.71
     },
     {
         "rank": 2,
@@ -13,15 +13,15 @@
         "total_views": 7037,
         "uploaded_videos": 56,
         "avg_views_per_video": 125,
-        "view_share_percentage": 22.19
+        "view_share_percentage": 23.49
     },
     {
         "rank": 3,
         "game_name": "Wolverine",
-        "total_views": 2107,
-        "uploaded_videos": 50,
-        "avg_views_per_video": 42,
-        "view_share_percentage": 6.64
+        "total_views": 2056,
+        "uploaded_videos": 51,
+        "avg_views_per_video": 40,
+        "view_share_percentage": 6.86
     },
     {
         "rank": 4,
@@ -29,70 +29,70 @@
         "total_views": 2031,
         "uploaded_videos": 26,
         "avg_views_per_video": 78,
-        "view_share_percentage": 6.4
+        "view_share_percentage": 6.78
     },
     {
         "rank": 5,
         "game_name": "ghostandela",
-        "total_views": 1613,
+        "total_views": 1849,
         "uploaded_videos": 57,
-        "avg_views_per_video": 28,
-        "view_share_percentage": 5.09
+        "avg_views_per_video": 32,
+        "view_share_percentage": 6.17
     },
     {
         "rank": 6,
-        "game_name": "GearsOfWar",
-        "total_views": 1405,
-        "uploaded_videos": 10,
-        "avg_views_per_video": 140,
-        "view_share_percentage": 4.43
-    },
-    {
-        "rank": 7,
         "game_name": "mm2remastered",
         "total_views": 1328,
         "uploaded_videos": 14,
         "avg_views_per_video": 94,
-        "view_share_percentage": 4.19
+        "view_share_percentage": 4.43
+    },
+    {
+        "rank": 7,
+        "game_name": "CallOfDutyMW2",
+        "total_views": 1123,
+        "uploaded_videos": 12,
+        "avg_views_per_video": 93,
+        "view_share_percentage": 3.75
     },
     {
         "rank": 8,
-        "game_name": "CallOfDutyMW2",
-        "total_views": 1135,
-        "uploaded_videos": 12,
-        "avg_views_per_video": 94,
-        "view_share_percentage": 3.58
-    },
-    {
-        "rank": 9,
         "game_name": "Callofdutyaw",
         "total_views": 974,
         "uploaded_videos": 17,
         "avg_views_per_video": 57,
-        "view_share_percentage": 3.07
+        "view_share_percentage": 3.25
     },
     {
-        "rank": 10,
-        "game_name": "VietnamCavePrison",
-        "total_views": 725,
-        "uploaded_videos": 16,
-        "avg_views_per_video": 45,
-        "view_share_percentage": 2.29
-    },
-    {
-        "rank": 11,
+        "rank": 9,
         "game_name": "codBlackops6",
         "total_views": 284,
         "uploaded_videos": 11,
         "avg_views_per_video": 25,
-        "view_share_percentage": 0.9
+        "view_share_percentage": 0.95
     },
     {
-        "rank": 12,
+        "rank": 10,
+        "game_name": "GearsOfWar",
+        "total_views": 170,
+        "uploaded_videos": 10,
+        "avg_views_per_video": 17,
+        "view_share_percentage": 0.57
+    },
+    {
+        "rank": 11,
         "game_name": "sifu",
         "total_views": 10,
         "uploaded_videos": 19,
         "avg_views_per_video": 0,
         "view_share_percentage": 0.03
+    },
+    {
+        "rank": 12,
+        "game_name": "VietnamCavePrison",
+        "total_views": 0,
+        "uploaded_videos": 16,
+        "avg_views_per_video": 0,
+        "view_share_percentage": 0.0
     }
 ]
