@@ -1,6 +1,6 @@
 # 🚀 GAMING AGENT COMMAND & ANALYTICS DASHBOARD
 
-> **Last Updated:** 2026-11-07 10:12:29 AM IST | **Status:** All Systems Active & Synchronized
+> **Last Updated:** 2026-11-07 10:13:51 AM IST | **Status:** All Systems Active & Synchronized
 
 --- 
 
@@ -8,7 +8,7 @@
 
 | Rank | Game Name | Total Videos | Total Views | Avg Views / Video | Performance Tier |
 | :---: | :--- | :---: | :---: | :---: | :---: |
-| 🥇 | **CODMW4** | 40 | 13,098 | 327 | 📈 Stable |
+| 🥇 | **CODMW4** | 41 | 13,098 | 319 | 📈 Stable |
 | 🥈 | **MarvelsSpiderMan2** | 56 | 7,038 | 125 | 📈 Stable |
 | 🥉 | **Wolverine** | 51 | 2,056 | 40 | 📈 Stable |
 | 4️⃣ | **Russian_secret_missions** | 26 | 2,031 | 78 | 📈 Stable |
@@ -46,7 +46,7 @@
 
 ## 📈 Trending Games (Last 7 Days)
 
-> Auto-detected based on views performance | Last Updated: 2026-11-07 10:12:29 AM
+> Auto-detected based on views performance | Last Updated: 2026-11-07 10:13:51 AM
 
 | Rank | Game Name | Views (7d) | Avg / Video | Trend | FB Post | Source |
 |:---:|---|---|---|---|---|---|
@@ -69,7 +69,7 @@
 
 ## 🎯 Best Time to Post (IST)
 
-> Analysis from 397 posts | Last Updated: 2026-11-07 10:12:29 AM
+> Analysis from 398 posts | Last Updated: 2026-11-07 10:13:51 AM
 
 | Rank | Time (IST) | Posts | Avg Views | Recommendation |
 |:---:|---|:---:|:---:|---|
@@ -92,14 +92,14 @@
 | Wednesday | 79 | 273 |
 | Thursday | 49 | 226 |
 | Friday | 39 | 275 |
-| Saturday | 46 | 239 |
+| Saturday | 47 | 235 |
 | Sunday | 54 | 229 |
 
 --- 
 
 ## 🤖 Auto-Reply Log (v6 Timeout-Safe)
 
-> Auto-Comment Status: ✅ **ACTIVE** | Last Updated: 2026-11-07 10:12:29 AM | Total Replies: 30 | Skipped: 0
+> Auto-Comment Status: ✅ **ACTIVE** | Last Updated: 2026-11-07 10:13:51 AM | Total Replies: 30 | Skipped: 0
 
 ### 📊 Stats
 
@@ -158,31 +158,31 @@
 
 ## 🔄 Game Rotation Queue
 
-**📊 Total Games:** 12 | **🎯 Current:** `ghostandela` | **⏭️ Next Game:** `mm2remastered` (Position #11) | **🔢 Total Runs:** 391
+**📊 Total Games:** 12 | **🎯 Current:** `CODMW4` | **⏭️ Next Game:** `CallOfDutyMW2` (Position #2) | **🔢 Total Runs:** 392
 
-**Last Updated:** 2026-11-07 10:12:29 AM IST
+**Last Updated:** 2026-11-07 10:13:51 AM IST
 
 | # | Game Name | Uploaded | Last Run # | Next Turn In | Status |
 |:---:|---|:---:|:---:|:---:|:---:|
-| 1 | **CODMW4** | 40 | 389 | 3 | ⏳ Wait 3 |
-| 2 | **CallOfDutyMW2** | 12 | 225 | 4 | ⏳ Wait 4 |
-| 3 | **Callofdutyaw** | 17 | 212 | 5 | ⏳ Wait 5 |
-| 4 | **GearsOfWar** | 10 | 196 | 6 | ⏳ Wait 6 |
-| 5 | **MarvelsSpiderMan2** | 56 | 383 | 7 | ⏳ Wait 7 |
-| 6 | **Russian_secret_missions** | 26 | 263 | 8 | ⏳ Wait 8 |
-| 7 | **VietnamCavePrison** | 16 | 207 | 9 | ⏳ Wait 9 |
-| 8 | **Wolverine** | 51 | 390 | 10 | ⏳ Wait 10 |
-| 9 | **codBlackops6** | 11 | 156 | 11 | ⏳ Wait 11 |
-| 10 | **ghostandela** | 58 | 391 | 0 | 🎯 **CURRENT** |
-| 11 | **mm2remastered** | 14 | 192 | 1 | ⏭️ **NEXT UP** |
-| 12 | **sifu** | 19 | 230 | 2 | ⏳ Wait 2 |
+| 1 | **CODMW4** | 41 | 392 | 0 | 🎯 **CURRENT** |
+| 2 | **CallOfDutyMW2** | 12 | 225 | 1 | ⏭️ **NEXT UP** |
+| 3 | **Callofdutyaw** | 17 | 212 | 2 | ⏳ Wait 2 |
+| 4 | **GearsOfWar** | 10 | 196 | 3 | ⏳ Wait 3 |
+| 5 | **MarvelsSpiderMan2** | 56 | 383 | 4 | ⏳ Wait 4 |
+| 6 | **Russian_secret_missions** | 26 | 263 | 5 | ⏳ Wait 5 |
+| 7 | **VietnamCavePrison** | 16 | 207 | 6 | ⏳ Wait 6 |
+| 8 | **Wolverine** | 51 | 390 | 7 | ⏳ Wait 7 |
+| 9 | **codBlackops6** | 11 | 156 | 8 | ⏳ Wait 8 |
+| 10 | **ghostandela** | 58 | 391 | 9 | ⏳ Wait 9 |
+| 11 | **mm2remastered** | 14 | 192 | 10 | ⏳ Wait 10 |
+| 12 | **sifu** | 19 | 230 | 11 | ⏳ Wait 11 |
 
 ### 📜 Recent Runs (Last 5)
 
 | Run # | Game | Timestamp (IST) |
 |:---:|---|---|
+| 392 | CODMW4 | 2026-11-07 10:13:51 AM |
 | 391 | ghostandela | 2026-11-07 10:12:29 AM |
 | 390 | Wolverine | 2026-11-07 12:25:14 AM |
 | 389 | CODMW4 | 2026-11-06 10:41:02 AM |
 | 388 | ghostandela | 2026-11-06 08:24:29 AM |
-| 387 | Wolverine | 2026-11-06 01:03:49 AM |
