@@ -55,3 +55,6 @@ Video id : 18127179178845123
 Wolverine9 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine9.mp4
 Video id : 18096239861165805
 
+Wolverine12 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine12.mp4
+Video id : 18094531202664022
+
