@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-🎮 MASTER AGENT v37.5 — SELF-ADAPTING + PERFECT CACHE LOOP FIX
+🎮 MASTER AGENT v37.6 — SMART CACHE (NO DISK FILL FOR LONG VIDEOS)
 ======================================================================
-✅ Fixed: Wait for cache file to finish writing before looping.
-✅ Fixed: Properly close p2 before starting Phase 3.
+✅ If Loop = 1: Does NOT save cache to disk (Prevents disk full on long videos).
+✅ If Loop > 1: Saves cache for 0% CPU looping.
 ✅ Original v37.2 ByteBuffer and Logs intact.
 """
 import os
@@ -365,7 +365,14 @@ def stream_direct(url, game_name):
     threading.Thread(target=read_p2_logs, daemon=True).start()
 
     buf = ByteBuffer(cap_bytes=target_bytes + 128 * 1024 * 1024, directory=BUF_DIR)
-    cache_f = open(CACHE_FILE, "wb")
+    
+    # 🔥 SMART CACHE: Only open file if loop is needed
+    cache_f = None
+    if PLAYS == 0 or PLAYS > 1:
+        cache_f = open(CACHE_FILE, "wb")
+        log("💾 Loop detected. Saving to cache for 0% CPU loop.")
+    else:
+        log("⚡ Single play detected. NO cache saving (Saves Disk Space).")
 
     def reader():
         try:
@@ -373,11 +380,13 @@ def stream_direct(url, game_name):
                 c = p1.stdout.read(1024 * 1024)
                 if not c: break
                 buf.put(c)
-                cache_f.write(c)
+                if cache_f: # 🔥 Only write if loop is needed
+                    cache_f.write(c)
         except Exception: pass
         finally:
             buf.finish()
-            cache_f.close()
+            if cache_f:
+                cache_f.close()
     threading.Thread(target=reader, daemon=True).start()
 
     log(f"   $ Buffering Data (Target: {target_bytes / (1024*1024):.1f} MB)...")
@@ -409,7 +418,7 @@ def stream_direct(url, game_name):
                     last_status = time.time()
                     log(f"   📊 Buffer left: {buf.size / bytes_per_sec:.0f}s ({buf.size / (1024*1024):.0f} MB)")
 
-            log("✅ First Play finished. Cache saved to disk.")
+            log("✅ First Play finished.")
     except BrokenPipeError:
         log("❌ Stream pipe toot gayi (platform ne disconnect kiya).")
     except Exception as e:
@@ -429,7 +438,6 @@ def stream_direct(url, game_name):
     if (PLAYS == 0 or PLAYS > 1) and os.path.exists(CACHE_FILE):
         log("\n🔄 PHASE 3: LOOPING FROM DISK CACHE (0% CPU LOAD)...")
         
-        # 🔥 FIX: Wait for cache file to finish writing (size stabilizes)
         log("   ⏳ Waiting for cache file to finalize...")
         last_size = -1
         for _ in range(15):
@@ -458,7 +466,7 @@ def stream_direct(url, game_name):
 
 def main():
     log("=" * 62)
-    log("🎮 MASTER AGENT v37.5 — PERFECT CACHE LOOP")
+    log("🎮 MASTER AGENT v37.6 — SMART CACHE (NO DISK FILL)")
     log(f"   Loop Setup : {LOOP_MSG}")
     log(f"   Ratio      : {RATIO} | Filter: {FILTER} | Bitrate: {BITRATE_REQ}M")
     log(f"   FPS Lock   : {TARGET_FPS} FPS")
