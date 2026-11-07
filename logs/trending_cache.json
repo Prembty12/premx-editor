@@ -1,33 +1,33 @@
 {
-  "last_updated": "2026-11-07 12:25:14 AM",
+  "last_updated": "2026-11-07 10:12:29 AM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 3270,
-      "avg_per_video": 545,
+      "views_7d": 3274,
+      "avg_per_video": 654,
       "trend": "viral",
-      "ratio": 2.4571686203787193,
+      "ratio": 2.5368502715283165,
+      "fb_link": "https://www.facebook.com/reel/1693110865579996/",
+      "source_link": ""
+    },
+    {
+      "game": "ghostandela",
+      "views_7d": 1220,
+      "avg_per_video": 305,
+      "trend": "steady",
+      "ratio": 1.1830876648564779,
       "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW410.mp4"
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela26.mp4"
     },
     {
       "game": "codBlackops6",
       "views_7d": 284,
       "avg_per_video": 284,
       "trend": "steady",
-      "ratio": 1.2804328223624886,
+      "ratio": 1.1016291698991465,
       "fb_link": "https://www.facebook.com/1082871464600149/videos/1471500258505084",
       "source_link": ""
-    },
-    {
-      "game": "ghostandela",
-      "views_7d": 1174,
-      "avg_per_video": 234,
-      "trend": "steady",
-      "ratio": 1.0550045085662758,
-      "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela26.mp4"
     }
   ],
   "below_avg": [
@@ -36,7 +36,7 @@
       "views_7d": 216,
       "avg_per_video": 36,
       "trend": "below_avg",
-      "ratio": 0.1623083859332732,
+      "ratio": 0.13964313421256788,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.108/Wolverine26.mp4"
     },
@@ -45,18 +45,18 @@
       "views_7d": 30,
       "avg_per_video": 10,
       "trend": "below_avg",
-      "ratio": 0.045085662759242556,
+      "ratio": 0.038789759503491075,
       "fb_link": "",
       "source_link": ""
     }
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 3270,
-    "avg_per_video": 545,
+    "views_7d": 3274,
+    "avg_per_video": 654,
     "trend": "viral",
-    "ratio": 2.4571686203787193,
-    "fb_link": "",
-    "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW410.mp4"
+    "ratio": 2.5368502715283165,
+    "fb_link": "https://www.facebook.com/reel/1693110865579996/",
+    "source_link": ""
   }
 }
