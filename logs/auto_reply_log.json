@@ -1,5 +1,5 @@
 {
-  "total_replies": 30,
+  "total_replies": 31,
   "total_skipped": 0,
   "replies": [
     {
@@ -556,9 +556,28 @@
       "time_window_hours": 1440,
       "timestamp": "2026-11-05 08:49:43 PM",
       "status": "posted"
+    },
+    {
+      "reply_id": "1126288533591775_1857995768710509",
+      "comment_id": "1126288533591775_2360569684704247",
+      "reply_to_id": "1126288533591775_2360569684704247",
+      "post_id": "100463226188818_1126288533591775",
+      "user_name": "Facebook User",
+      "user_id": "",
+      "user_comment": "PremxGamer odd that you're wasting so much ammo against zombies, maybe try aiming higher or go full on knife? 😂",
+      "openrouter_reply": "Haha, right? Sometimes you gotta go all melee for the memes! 😂🗡️ You ever tried that in ghostandela?",
+      "type": "friendly",
+      "depth": 1,
+      "game": "ghostandela",
+      "post_title": "Surviving 4 Zombies With Bare Hands 🔥😳\n\n#videogames #gamingcommunity #gaming #gh",
+      "fb_post_link": "https://www.facebook.com/reel/1160601486834751/",
+      "source_link": "",
+      "time_window_hours": 1440,
+      "timestamp": "2026-11-08 08:27:47 AM",
+      "status": "posted"
     }
   ],
   "skipped": [],
-  "last_updated": "2026-11-08 02:39:57 AM",
+  "last_updated": "2026-11-08 08:27:47 AM",
   "time_window_hours": 1440
 }
