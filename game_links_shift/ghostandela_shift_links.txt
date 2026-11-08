@@ -29,3 +29,4 @@ ghostandela36 | Link: https://github.com/Prembty12/premx-editor/releases/downloa
 ghostandela25 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela25.mp4 | REJECT (OpenRouter): Cinematic dialogue and slow prison walking
 ghostandela38 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela38.mp4 | REJECT (OpenRouter): Only dark corridor walking and menu screens, no combat.
 ghostandela5 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela5.mp4 | REJECT (OpenRouter): Black screen with no gameplay or action
+ghostandela45 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela45.mp4 | REJECT (OpenRouter): Only black frames or blank screen with no action.
