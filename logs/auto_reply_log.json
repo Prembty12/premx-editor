@@ -1,5 +1,5 @@
 {
-  "total_replies": 31,
+  "total_replies": 32,
   "total_skipped": 0,
   "replies": [
     {
@@ -575,9 +575,28 @@
       "time_window_hours": 1440,
       "timestamp": "2026-11-08 08:27:47 AM",
       "status": "posted"
+    },
+    {
+      "reply_id": "1126288533591775_1127031436591473",
+      "comment_id": "1126288533591775_1505086951442462",
+      "reply_to_id": "1126288533591775_1505086951442462",
+      "post_id": "100463226188818_1126288533591775",
+      "user_name": "Facebook User",
+      "user_id": "",
+      "user_comment": "What game is this ?",
+      "openrouter_reply": "It's Ghostandela! It's a wild ride. You tried it yet? 🔥👾",
+      "type": "friendly",
+      "depth": 1,
+      "game": "ghostandela",
+      "post_title": "Surviving 4 Zombies With Bare Hands 🔥😳\n\n#videogames #gamingcommunity #gaming #gh",
+      "fb_post_link": "https://www.facebook.com/reel/1160601486834751/",
+      "source_link": "",
+      "time_window_hours": 1440,
+      "timestamp": "2026-11-08 03:16:51 PM",
+      "status": "posted"
     }
   ],
   "skipped": [],
-  "last_updated": "2026-11-08 10:00:47 AM",
+  "last_updated": "2026-11-08 03:16:51 PM",
   "time_window_hours": 1440
 }
