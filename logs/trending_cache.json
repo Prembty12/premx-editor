@@ -1,42 +1,33 @@
 {
-  "last_updated": "2026-11-09 10:13:22 AM",
+  "last_updated": "2026-11-10 03:27:04 AM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 3431,
-      "avg_per_video": 571,
+      "views_7d": 3457,
+      "avg_per_video": 576,
       "trend": "viral",
-      "ratio": 2.1148148148148147,
+      "ratio": 2.387564766839378,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW46.mp4"
     },
     {
       "game": "ghostandela",
-      "views_7d": 1338,
-      "avg_per_video": 446,
-      "trend": "trending",
-      "ratio": 1.651851851851852,
-      "fb_link": "",
-      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela26.mp4"
-    },
-    {
-      "game": "codBlackops6",
-      "views_7d": 284,
-      "avg_per_video": 284,
+      "views_7d": 1356,
+      "avg_per_video": 339,
       "trend": "steady",
-      "ratio": 1.0518518518518518,
-      "fb_link": "https://www.facebook.com/1082871464600149/videos/1471500258505084",
-      "source_link": ""
+      "ratio": 1.405181347150259,
+      "fb_link": "",
+      "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela28.mp4"
     }
   ],
   "below_avg": [
     {
       "game": "Wolverine",
-      "views_7d": 279,
-      "avg_per_video": 39,
+      "views_7d": 280,
+      "avg_per_video": 40,
       "trend": "below_avg",
-      "ratio": 0.14444444444444443,
+      "ratio": 0.16580310880829016,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.107/Wolverine12.mp4"
     },
@@ -45,17 +36,17 @@
       "views_7d": 20,
       "avg_per_video": 10,
       "trend": "below_avg",
-      "ratio": 0.037037037037037035,
+      "ratio": 0.04145077720207254,
       "fb_link": "",
       "source_link": ""
     }
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 3431,
-    "avg_per_video": 571,
+    "views_7d": 3457,
+    "avg_per_video": 576,
     "trend": "viral",
-    "ratio": 2.1148148148148147,
+    "ratio": 2.387564766839378,
     "fb_link": "",
     "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW46.mp4"
   }
