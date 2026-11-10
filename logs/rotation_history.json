@@ -18,8 +18,8 @@
     "current_game": "CODMW4",
     "next_game": "CallOfDutyMW2",
     "next_game_position": 2,
-    "last_updated": "2026-11-11 12:49:46 AM",
-    "total_runs": 401,
+    "last_updated": "2026-11-11 12:52:37 AM",
+    "total_runs": 402,
     "rotation_log": [
         {
             "run": 1,
@@ -2025,14 +2025,19 @@
             "run": 401,
             "game": "CODMW4",
             "timestamp": "2026-11-11 12:49:46 AM"
+        },
+        {
+            "run": 402,
+            "game": "CODMW4",
+            "timestamp": "2026-11-11 12:52:37 AM"
         }
     ],
     "all_games": [
         {
             "position": 1,
             "game": "CODMW4",
-            "uploaded": 45,
-            "last_run": 401,
+            "uploaded": 46,
+            "last_run": 402,
             "next_turn_in": 0,
             "status": "current"
         },
