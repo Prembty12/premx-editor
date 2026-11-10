@@ -10,3 +10,4 @@ CODMW43 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0
 CODMW47 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW47.mp4 | REJECT (OpenRouter): Slow infiltration walking with no combat.
 CODMW419 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW419.mp4 | REJECT (OpenRouter): Static talking heads, no active gameplay.
 CODMW413 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW413.mp4 | REJECT (OpenRouter): Boring corridor walking with flat colors.
+CODMW416 | Link: https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW416.mp4 | REJECT (OpenRouter): Boring tactical walking with zero combat action.
