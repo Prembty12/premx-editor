@@ -1,22 +1,22 @@
 {
-  "last_updated": "2026-11-12 12:45:49 AM",
+  "last_updated": "2026-11-12 11:18:45 AM",
   "period_days": 7,
   "trending": [
     {
       "game": "ghostandela",
       "views_7d": 1370,
       "avg_per_video": 274,
-      "trend": "trending",
-      "ratio": 1.535014005602241,
+      "trend": "steady",
+      "ratio": 1.1759656652360515,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela18.mp4"
     },
     {
       "game": "CODMW4",
-      "views_7d": 1479,
-      "avg_per_video": 246,
+      "views_7d": 1493,
+      "avg_per_video": 248,
       "trend": "steady",
-      "ratio": 1.3781512605042017,
+      "ratio": 1.0643776824034334,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW45.mp4"
     }
@@ -24,20 +24,11 @@
   "below_avg": [
     {
       "game": "Wolverine",
-      "views_7d": 1048,
-      "avg_per_video": 174,
+      "views_7d": 1067,
+      "avg_per_video": 177,
       "trend": "slow",
-      "ratio": 0.9747899159663865,
+      "ratio": 0.759656652360515,
       "fb_link": "https://www.facebook.com/reel/2105490700333378/",
-      "source_link": ""
-    },
-    {
-      "game": "MarvelsSpiderMan2",
-      "views_7d": 20,
-      "avg_per_video": 20,
-      "trend": "below_avg",
-      "ratio": 0.11204481792717087,
-      "fb_link": "",
       "source_link": ""
     }
   ],
@@ -45,8 +36,8 @@
     "game": "ghostandela",
     "views_7d": 1370,
     "avg_per_video": 274,
-    "trend": "trending",
-    "ratio": 1.535014005602241,
+    "trend": "steady",
+    "ratio": 1.1759656652360515,
     "fb_link": "",
     "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela18.mp4"
   }
