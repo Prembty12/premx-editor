@@ -1,44 +1,44 @@
 {
-  "last_updated": "2026-11-13 01:03:58 AM",
+  "last_updated": "2026-11-13 10:38:39 AM",
   "period_days": 7,
   "trending": [
+    {
+      "game": "Wolverine",
+      "views_7d": 925,
+      "avg_per_video": 462,
+      "trend": "trending",
+      "ratio": 1.6325088339222615,
+      "fb_link": "https://www.facebook.com/reel/2105490700333378/",
+      "source_link": ""
+    },
     {
       "game": "ghostandela",
       "views_7d": 1371,
       "avg_per_video": 342,
-      "trend": "trending",
-      "ratio": 1.6259904912836767,
+      "trend": "steady",
+      "ratio": 1.2084805653710247,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela18.mp4"
-    },
-    {
-      "game": "Wolverine",
-      "views_7d": 909,
-      "avg_per_video": 227,
-      "trend": "steady",
-      "ratio": 1.0792393026941363,
-      "fb_link": "https://www.facebook.com/reel/2105490700333378/",
-      "source_link": ""
     }
   ],
   "below_avg": [
     {
       "game": "CODMW4",
-      "views_7d": 314,
-      "avg_per_video": 62,
+      "views_7d": 180,
+      "avg_per_video": 45,
       "trend": "below_avg",
-      "ratio": 0.294770206022187,
+      "ratio": 0.15901060070671377,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW45.mp4"
     }
   ],
   "recommendation": {
-    "game": "ghostandela",
-    "views_7d": 1371,
-    "avg_per_video": 342,
+    "game": "Wolverine",
+    "views_7d": 925,
+    "avg_per_video": 462,
     "trend": "trending",
-    "ratio": 1.6259904912836767,
-    "fb_link": "",
-    "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela18.mp4"
+    "ratio": 1.6325088339222615,
+    "fb_link": "https://www.facebook.com/reel/2105490700333378/",
+    "source_link": ""
   }
 }

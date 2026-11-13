@@ -1,5 +1,5 @@
 ====================================================
-🚀 Pipeline Started at: Thu Nov 12 19:33:40 UTC 2026
+🚀 Pipeline Started at: Fri Nov 13 05:08:21 UTC 2026
 ====================================================
 🔍 [STEP 0] Checking Facebook Cookie Session Health...
 ⚠️ Checking Facebook Cookie Session Health...
@@ -10,7 +10,7 @@ python3: can't open file '/home/runner/work/premx-editor/premx-editor/agent_brai
 📁 Found 12 games: ['CODMW4', 'CallOfDutyMW2', 'Callofdutyaw', 'GearsOfWar', 'MarvelsSpiderMan2', 'Russian_secret_missions', 'VietnamCavePrison', 'Wolverine', 'codBlackops6', 'ghostandela', 'mm2remastered', 'sifu']
 📋 ID→Source map: 359 entries
 📊 Total 203 videos processing (parallel)...
-✅ FB page: 48 videos fetched
+✅ FB page: 47 videos fetched
 ✅ IG: 100 media fetched
 📂 CODMW4: 0 videos in source file
 📂 CallOfDutyMW2: 0 videos in source file
