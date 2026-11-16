@@ -1,34 +1,34 @@
 {
-  "last_updated": "2026-11-16 07:26:28 PM",
+  "last_updated": "2026-11-17 03:09:26 AM",
   "period_days": 7,
   "trending": [
     {
       "game": "Wolverine",
-      "views_7d": 937,
-      "avg_per_video": 937,
+      "views_7d": 938,
+      "avg_per_video": 938,
       "trend": "viral",
-      "ratio": 2.7579102281089036,
+      "ratio": 2.4700460829493087,
       "fb_link": "https://www.facebook.com/reel/2105490700333378/",
-      "source_link": ""
-    },
-    {
-      "game": "CODMW4",
-      "views_7d": 1053,
-      "avg_per_video": 351,
-      "trend": "steady",
-      "ratio": 1.033112582781457,
-      "fb_link": "https://www.facebook.com/reel/1895684885140827/",
       "source_link": ""
     }
   ],
   "below_avg": [
     {
+      "game": "CODMW4",
+      "views_7d": 1075,
+      "avg_per_video": 358,
+      "trend": "slow",
+      "ratio": 0.9427254772876893,
+      "fb_link": "https://www.facebook.com/reel/1895684885140827/",
+      "source_link": ""
+    },
+    {
       "game": "CodblackCopsColdwar",
-      "views_7d": 370,
-      "avg_per_video": 61,
-      "trend": "below_avg",
-      "ratio": 0.17954378219278883,
-      "fb_link": "",
+      "views_7d": 1492,
+      "avg_per_video": 213,
+      "trend": "slow",
+      "ratio": 0.5608953258722844,
+      "fb_link": "https://www.facebook.com/reel/1514245494093748/",
       "source_link": ""
     },
     {
@@ -36,17 +36,17 @@
       "views_7d": 20,
       "avg_per_video": 10,
       "trend": "below_avg",
-      "ratio": 0.029433406916850625,
+      "ratio": 0.026333113890717578,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela18.mp4"
     }
   ],
   "recommendation": {
     "game": "Wolverine",
-    "views_7d": 937,
-    "avg_per_video": 937,
+    "views_7d": 938,
+    "avg_per_video": 938,
     "trend": "viral",
-    "ratio": 2.7579102281089036,
+    "ratio": 2.4700460829493087,
     "fb_link": "https://www.facebook.com/reel/2105490700333378/",
     "source_link": ""
   }
