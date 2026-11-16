@@ -1,6 +1,6 @@
 {
-  "last_updated": "2026-11-17 03:09:26 AM",
-  "total_posts_analyzed": 420,
+  "last_updated": "2026-11-17 03:14:03 AM",
+  "total_posts_analyzed": 421,
   "top_slots": [
     {
       "rank": 1,
@@ -37,9 +37,9 @@
     {
       "rank": 5,
       "icon": "5",
-      "time_slot": "23:00 - 00:00",
-      "posts": 42,
-      "avg_views": 318,
+      "time_slot": "03:00 - 04:00",
+      "posts": 9,
+      "avg_views": 355,
       "recommendation": "Below avg"
     }
   ],
@@ -53,8 +53,8 @@
       "posts": 60
     },
     "Tuesday": {
-      "avg_views": 243,
-      "posts": 84
+      "avg_views": 249,
+      "posts": 85
     },
     "Wednesday": {
       "avg_views": 266,
