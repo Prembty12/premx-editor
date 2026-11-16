@@ -677,7 +677,6 @@ if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "3" ]; then
     if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$PAGE_ID" ] && [ -n "$PUBLIC_VIDEO_URL" ]; then
         echo "🚀 Uploading to Facebook Page via Authenticated Public URL..."
         
-        # GitHub release asset url me token attach karna padta hai taaki Facebook server usko download kar sake
         AUTH_VIDEO_URL=$(echo "$PUBLIC_VIDEO_URL" | sed "s|https://github.com/|https://$TOKEN@github.com/|")
         
         FB_RES=$(curl -s -X POST "$API/$PAGE_ID/videos" \
@@ -691,44 +690,33 @@ if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "3" ]; then
         if [ -n "$FB_POST_ID" ] && [ "$FB_POST_ID" != "None" ]; then
             echo "⏳ Facebook container created (ID: $FB_POST_ID). Checking processing status..."
             
-            # Facebook status check loop (Fixed JSON parser)
-        for i in {1..45}; do
-            sleep 5
-            FB_STATUS_RES=$(curl -s "$API/$FB_POST_ID?fields=status,processing_phase,video_status&access_token=$PAGE_ACCESS_TOKEN")
-            
-            FB_STATUS=$(echo "$FB_STATUS_RES" | python3 -c "
+            # Instagram jaisa exact simple check loop
+            for i in {1..45}; do
+                sleep 5
+                FB_STATUS_RES=$(curl -s "$API/$FB_POST_ID?fields=status,video_status&access_token=$PAGE_ACCESS_TOKEN")
+                
+                # Python se status nikalne ka ekdum simple tarika
+                FB_STATUS=$(echo "$FB_STATUS_RES" | python3 -c "
 import sys, json
 try:
     res = json.load(sys.stdin)
-    # Facebook ke alag-alag fields ko check karega
-    v_status = (
-        res.get('video_status') or 
-        res.get('processing_phase') or 
-        res.get('status', {}).get('video_status') or 
-        res.get('status', {}) or 
-        'IN_PROGRESS'
-    )
-    if isinstance(v_status, dict):
-        v_status = v_status.get('video_status', 'IN_PROGRESS')
-    print(str(v_status).upper())
-except Exception as e:
-    print('IN_PROGRESS')
+    st = res.get('video_status', '') or res.get('status', '')
+    if isinstance(st, dict):
+        st = st.get('video_status', '')
+    print(str(st).upper())
+except:
+    print('')
 ")
-            
-            echo "Status check $i/45: [FB API Response Status: '$FB_STATUS']"
-            
-            if [[ "$FB_STATUS" == *"READY"* ]] || [[ "$FB_STATUS" == *"COMPLETE"* ]] || [[ "$FB_STATUS" == *"FINISH"* ]] || [[ "$FB_STATUS" == *"PUBLISHED"* ]]; then
-                echo "✅ Video processing finished by Facebook!"
-                break
-            elif [[ "$FB_STATUS" == *"ERROR"* ]] || [[ "$FB_STATUS" == *"FAILED"* ]]; then
-                echo "❌ Facebook video processing failed!"
-                break
-            else
-                echo "⏳ Facebook video still processing (Status: $FB_STATUS)..."
-            fi
-        done
+                
+                echo "Status check $i/45: $FB_STATUS"
+                
+                if [ "$FB_STATUS" == "READY" ] || [ "$FB_STATUS" == "COMPLETE" ] || [ "$FB_STATUS" == "FINISHED" ]; then
+                    echo "✅ Video processing finished by Facebook!"
+                    break
+                fi
+            done
 
-            echo "🎉 Facebook Post Published Successfully! ID: $FB_POST_ID"
+            echo "🎉 Successfully Published to Facebook Page! ID: $FB_POST_ID"
         else
             echo "❌ Error: Failed to publish video to Facebook Page!"
         fi
