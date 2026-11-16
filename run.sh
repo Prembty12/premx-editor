@@ -688,35 +688,54 @@ if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "3" ]; then
         FB_POST_ID=$(echo "$FB_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
 
         if [ -n "$FB_POST_ID" ] && [ "$FB_POST_ID" != "None" ]; then
-            echo "⏳ Facebook container created (ID: $FB_POST_ID). Checking processing status..."
+            echo "⏳ Facebook video object created (ID: $FB_POST_ID). Waiting for live confirmation..."
             
-            # Instagram jaisa exact simple check loop
+            FB_LIVE="no"
+            FB_PERMALINK=""
+
+            # 45 attempts × 5 sec = ~3.75 min max wait
             for i in {1..45}; do
                 sleep 5
-                FB_STATUS_RES=$(curl -s "$API/$FB_POST_ID?fields=status,video_status&access_token=$PAGE_ACCESS_TOKEN")
+                FB_CHECK=$(curl -s "$API/$FB_POST_ID?fields=permalink_url,post_id&access_token=$PAGE_ACCESS_TOKEN")
                 
-                # Python se status nikalne ka ekdum simple tarika
-                FB_STATUS=$(echo "$FB_STATUS_RES" | python3 -c "
+                FB_PERMALINK=$(echo "$FB_CHECK" | python3 -c "
 import sys, json
 try:
     res = json.load(sys.stdin)
-    st = res.get('video_status', '') or res.get('status', '')
-    if isinstance(st, dict):
-        st = st.get('video_status', '')
-    print(str(st).upper())
+    print(res.get('permalink_url', '') or '')
 except:
     print('')
-")
+" 2>/dev/null)
                 
-                echo "Status check $i/45: $FB_STATUS"
+                FB_POSTID_LINK=$(echo "$FB_CHECK" | python3 -c "
+import sys, json
+try:
+    res = json.load(sys.stdin)
+    print(res.get('post_id', '') or '')
+except:
+    print('')
+" 2>/dev/null)
                 
-                if [ "$FB_STATUS" == "READY" ] || [ "$FB_STATUS" == "COMPLETE" ] || [ "$FB_STATUS" == "FINISHED" ]; then
-                    echo "✅ Video processing finished by Facebook!"
+                echo "Publish check $i/45: permalink='$FB_PERMALINK' post_id='$FB_POSTID_LINK'"
+                
+                if [ -n "$FB_PERMALINK" ] || [ -n "$FB_POSTID_LINK" ]; then
+                    FB_LIVE="yes"
+                    echo "✅ Facebook video is LIVE!"
                     break
                 fi
             done
 
-            echo "🎉 Successfully Published to Facebook Page! ID: $FB_POST_ID"
+            if [ "$FB_LIVE" == "yes" ]; then
+                echo "🎉 Successfully Published to Facebook Page! ID: $FB_POST_ID"
+                if [ -n "$FB_PERMALINK" ]; then
+                    echo "🔗 Live URL: https://facebook.com$FB_PERMALINK"
+                fi
+            else
+                # 45 attempts ke baad bhi permalink nahi aaya
+                # Lekin FB_POST_ID hai matlab video accept ho chuki hai — success treat karo
+                echo "⚠️ Permalink 3.75 min mein nahi aaya, par video accept ho chuki hai (ID: $FB_POST_ID)."
+                echo "🎉 Facebook post treated as SUCCESS (Facebook kabhi kabhi late publish karta hai)."
+            fi
         else
             echo "❌ Error: Failed to publish video to Facebook Page!"
         fi
