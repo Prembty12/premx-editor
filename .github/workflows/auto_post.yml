@@ -53,7 +53,7 @@ jobs:
           IG_ID: ${{ secrets.IG_ID }}
           FB_C_USER: ${{ secrets.FB_C_USER }}
           FB_XS: ${{ secrets.FB_XS }}
-          POST_MODE: '3'
+          POST_MODE: '1'
 
           # ── GitHub
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
