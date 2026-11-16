@@ -2,10 +2,10 @@
     {
         "rank": 1,
         "game_name": "CODMW4",
-        "total_views": 14257,
+        "total_views": 14260,
         "uploaded_videos": 46,
-        "avg_views_per_video": 309,
-        "view_share_percentage": 60.61
+        "avg_views_per_video": 310,
+        "view_share_percentage": 60.48
     },
     {
         "rank": 2,
@@ -13,7 +13,7 @@
         "total_views": 5166,
         "uploaded_videos": 56,
         "avg_views_per_video": 92,
-        "view_share_percentage": 21.96
+        "view_share_percentage": 21.91
     },
     {
         "rank": 3,
@@ -21,7 +21,7 @@
         "total_views": 1642,
         "uploaded_videos": 52,
         "avg_views_per_video": 31,
-        "view_share_percentage": 6.98
+        "view_share_percentage": 6.96
     },
     {
         "rank": 4,
@@ -29,31 +29,31 @@
         "total_views": 1618,
         "uploaded_videos": 62,
         "avg_views_per_video": 26,
-        "view_share_percentage": 6.88
+        "view_share_percentage": 6.86
     },
     {
         "rank": 5,
+        "game_name": "CodblackCopsColdwar",
+        "total_views": 300,
+        "uploaded_videos": 10,
+        "avg_views_per_video": 30,
+        "view_share_percentage": 1.27
+    },
+    {
+        "rank": 6,
         "game_name": "codBlackops6",
         "total_views": 286,
         "uploaded_videos": 11,
         "avg_views_per_video": 26,
-        "view_share_percentage": 1.22
+        "view_share_percentage": 1.21
     },
     {
-        "rank": 6,
+        "rank": 7,
         "game_name": "CallOfDutyMW2",
         "total_views": 275,
         "uploaded_videos": 12,
         "avg_views_per_video": 22,
         "view_share_percentage": 1.17
-    },
-    {
-        "rank": 7,
-        "game_name": "CodblackCopsColdwar",
-        "total_views": 250,
-        "uploaded_videos": 9,
-        "avg_views_per_video": 27,
-        "view_share_percentage": 1.06
     },
     {
         "rank": 8,
