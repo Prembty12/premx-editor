@@ -689,27 +689,38 @@ if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "3" ]; then
         FB_POST_ID=$(echo "$FB_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
 
         if [ -n "$FB_POST_ID" ] && [ "$FB_POST_ID" != "None" ]; then
-            echo "⏳ Facebook video initialized (ID: $FB_POST_ID). Waiting for processing..."
+            echo "⏳ Facebook container created (ID: $FB_POST_ID). Checking processing status..."
             
-            # Instagram jaisa 45 baar 5-5 seconds (Total ~225 seconds) ka wait loop
+            # Instagram jaisa clean status tracking loop
             for i in {1..45}; do
                 sleep 5
                 FB_STATUS_RES=$(curl -s "$API/$FB_POST_ID?fields=status,processing_phase&access_token=$PAGE_ACCESS_TOKEN")
-                FB_STATUS=$(echo "$FB_STATUS_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status', {}).get('video_status', ''))" 2>/dev/null)
+                FB_STATUS=$(echo "$FB_STATUS_RES" | python3 -c "
+import sys, json
+try:
+    res = json.load(sys.stdin)
+    status_obj = res.get('status', {})
+    if isinstance(status_obj, dict):
+        v_status = status_obj.get('video_status', '') or status_obj.get('processing_phase', '')
+    else:
+        v_status = str(status_obj)
+    print(v_status.upper())
+except:
+    print('IN_PROGRESS')
+")
                 
-                echo "Status check $i/45: $FB_STATUS"
-                
-                if [ "$FB_STATUS" == "ready" ]; then
-                    echo "✅ Facebook video processing & publishing finished!"
+                if [[ "$FB_STATUS" == *"READY"* ]] || [[ "$FB_STATUS" == *"COMPLETE"* ]] || [[ "$FB_STATUS" == *"FINISH"* ]]; then
+                    echo "✅ Video processing finished by Facebook!"
                     break
-                elif [ "$FB_STATUS" == "error" ]; then
+                elif [[ "$FB_STATUS" == *"ERROR"* ]] || [[ "$FB_STATUS" == *"FAILED"* ]]; then
                     echo "❌ Facebook video processing failed!"
-                    echo "Response: $FB_STATUS_RES"
                     break
+                else
+                    echo "⏳ Facebook video still processing (Status: ${FB_STATUS:-IN_PROGRESS})..."
                 fi
             done
 
-            echo "🎉 Successfully Published to Facebook Page! Video ID: $FB_POST_ID"
+            echo "🎉 Facebook Post Published Successfully! ID: $FB_POST_ID"
         else
             echo "❌ Error: Failed to publish video to Facebook Page!"
         fi
