@@ -689,6 +689,26 @@ if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "3" ]; then
         FB_POST_ID=$(echo "$FB_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
 
         if [ -n "$FB_POST_ID" ] && [ "$FB_POST_ID" != "None" ]; then
+            echo "⏳ Facebook video initialized (ID: $FB_POST_ID). Waiting for processing..."
+            
+            # Instagram jaisa 45 baar 5-5 seconds (Total ~225 seconds) ka wait loop
+            for i in {1..45}; do
+                sleep 5
+                FB_STATUS_RES=$(curl -s "$API/$FB_POST_ID?fields=status,processing_phase&access_token=$PAGE_ACCESS_TOKEN")
+                FB_STATUS=$(echo "$FB_STATUS_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status', {}).get('video_status', ''))" 2>/dev/null)
+                
+                echo "Status check $i/45: $FB_STATUS"
+                
+                if [ "$FB_STATUS" == "ready" ]; then
+                    echo "✅ Facebook video processing & publishing finished!"
+                    break
+                elif [ "$FB_STATUS" == "error" ]; then
+                    echo "❌ Facebook video processing failed!"
+                    echo "Response: $FB_STATUS_RES"
+                    break
+                fi
+            done
+
             echo "🎉 Successfully Published to Facebook Page! Video ID: $FB_POST_ID"
         else
             echo "❌ Error: Failed to publish video to Facebook Page!"
