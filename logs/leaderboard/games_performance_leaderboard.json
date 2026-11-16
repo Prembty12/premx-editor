@@ -2,10 +2,10 @@
     {
         "rank": 1,
         "game_name": "CODMW4",
-        "total_views": 14240,
+        "total_views": 14241,
         "uploaded_videos": 46,
         "avg_views_per_video": 309,
-        "view_share_percentage": 60.25
+        "view_share_percentage": 61.1
     },
     {
         "rank": 2,
@@ -13,7 +13,7 @@
         "total_views": 5166,
         "uploaded_videos": 56,
         "avg_views_per_video": 92,
-        "view_share_percentage": 21.86
+        "view_share_percentage": 22.17
     },
     {
         "rank": 3,
@@ -21,7 +21,7 @@
         "total_views": 1657,
         "uploaded_videos": 62,
         "avg_views_per_video": 26,
-        "view_share_percentage": 7.01
+        "view_share_percentage": 7.11
     },
     {
         "rank": 4,
@@ -29,31 +29,31 @@
         "total_views": 1652,
         "uploaded_videos": 52,
         "avg_views_per_video": 31,
-        "view_share_percentage": 6.99
+        "view_share_percentage": 7.09
     },
     {
         "rank": 5,
-        "game_name": "Russian_secret_missions",
-        "total_views": 360,
-        "uploaded_videos": 26,
-        "avg_views_per_video": 13,
-        "view_share_percentage": 1.52
-    },
-    {
-        "rank": 6,
         "game_name": "codBlackops6",
         "total_views": 286,
         "uploaded_videos": 11,
         "avg_views_per_video": 26,
-        "view_share_percentage": 1.21
+        "view_share_percentage": 1.23
     },
     {
-        "rank": 7,
+        "rank": 6,
         "game_name": "CallOfDutyMW2",
         "total_views": 275,
         "uploaded_videos": 12,
         "avg_views_per_video": 22,
-        "view_share_percentage": 1.16
+        "view_share_percentage": 1.18
+    },
+    {
+        "rank": 7,
+        "game_name": "Russian_secret_missions",
+        "total_views": 30,
+        "uploaded_videos": 26,
+        "avg_views_per_video": 1,
+        "view_share_percentage": 0.13
     },
     {
         "rank": 8,
@@ -67,7 +67,7 @@
         "rank": 9,
         "game_name": "CodblackCopsColdwar",
         "total_views": 0,
-        "uploaded_videos": 2,
+        "uploaded_videos": 3,
         "avg_views_per_video": 0,
         "view_share_percentage": 0.0
     },
