@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-11-16 05:56:46 PM",
+  "last_updated": "2026-11-16 05:59:41 PM",
   "period_days": 7,
   "trending": [
     {
@@ -7,16 +7,16 @@
       "views_7d": 937,
       "avg_per_video": 937,
       "trend": "viral",
-      "ratio": 2.850190114068441,
+      "ratio": 2.8458618071374335,
       "fb_link": "https://www.facebook.com/reel/2105490700333378/",
       "source_link": ""
     },
     {
       "game": "CODMW4",
-      "views_7d": 1037,
-      "avg_per_video": 345,
+      "views_7d": 1041,
+      "avg_per_video": 347,
       "trend": "steady",
-      "ratio": 1.049429657794677,
+      "ratio": 1.0539104024297645,
       "fb_link": "https://www.facebook.com/reel/1895684885140827/",
       "source_link": ""
     }
@@ -27,7 +27,7 @@
       "views_7d": 70,
       "avg_per_video": 23,
       "trend": "below_avg",
-      "ratio": 0.0699619771863118,
+      "ratio": 0.06985573272589218,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar23.mp4"
     },
@@ -36,7 +36,7 @@
       "views_7d": 20,
       "avg_per_video": 10,
       "trend": "below_avg",
-      "ratio": 0.030418250950570342,
+      "ratio": 0.030372057706909643,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela18.mp4"
     }
@@ -46,7 +46,7 @@
     "views_7d": 937,
     "avg_per_video": 937,
     "trend": "viral",
-    "ratio": 2.850190114068441,
+    "ratio": 2.8458618071374335,
     "fb_link": "https://www.facebook.com/reel/2105490700333378/",
     "source_link": ""
   }

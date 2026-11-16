@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 17 | **Last Updated:** 2026-11-16 05:56:46 PM IST
+**Total Videos:** 16 | **Last Updated:** 2026-11-16 05:59:41 PM IST
 
 ---
 
@@ -10,10 +10,10 @@
 
 | Metric | Value |
 |---|---|
-| Total Videos | **17** |
-| Posted (FB or IG) | 4 / 17 |
-| FB Posted | 1 / 17 |
-| IG Posted | 3 / 17 |
+| Total Videos | **16** |
+| Posted (FB or IG) | 4 / 16 |
+| FB Posted | 1 / 16 |
+| IG Posted | 3 / 16 |
 | Total FB Views | **0** |
 | Total IG Views | **70** |
 
@@ -33,10 +33,9 @@
 | 8 | CodblackCopsColdwar16 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar16.mp4) |
 | 9 | CodblackCopsColdwar15 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar15.mp4) |
 | 10 | CodblackCopsColdwar14 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar14.mp4) |
-| 11 | CodblackCopsColdwar13 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar13.mp4) |
-| 12 | CodblackCopsColdwar12 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar12.mp4) |
-| 13 | CodblackCopsColdwar11 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar11.mp4) |
-| 14 | CodblackCopsColdwar10 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar10.mp4) |
-| 15 | CodblackCopsColdwar9 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar9.mp4) |
-| 16 | CodblackCopsColdwar8 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar8.mp4) |
-| 17 | CodblackCopsColdwar7 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar7.mp4) |
+| 11 | CodblackCopsColdwar12 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar12.mp4) |
+| 12 | CodblackCopsColdwar11 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar11.mp4) |
+| 13 | CodblackCopsColdwar10 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar10.mp4) |
+| 14 | CodblackCopsColdwar9 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar9.mp4) |
+| 15 | CodblackCopsColdwar8 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar8.mp4) |
+| 16 | CodblackCopsColdwar7 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar7.mp4) |
