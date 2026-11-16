@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 17 | **Last Updated:** 2026-11-16 05:14:07 PM IST
+**Total Videos:** 17 | **Last Updated:** 2026-11-16 05:56:46 PM IST
 
 ---
 
@@ -15,7 +15,7 @@
 | FB Posted | 1 / 17 |
 | IG Posted | 3 / 17 |
 | Total FB Views | **0** |
-| Total IG Views | **0** |
+| Total IG Views | **70** |
 
 ---
 
@@ -24,8 +24,8 @@
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
 | 1 | 100 Missiles Fired No Survivors 🎯🔥  #videogames #gamingcommunity #gaming #codblackcopscoldwar #gamin | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DfzQz0IlJRK/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar23.mp4) |
-| 2 | Helicopter survived 10 Missiles 🔥🎯  #videogames #gamingcommunity #gaming #codblackcopscoldwar #gamin | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DfzOMT7j0Ht/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar8.mp4) |
-| 3 | 1 HP Red Screen Survival Fight 🔥🎯  #videogames #gamingcommunity #gaming #codblackcopscoldwar #gaming | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DfzL0jyjjNA/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar9.mp4) |
+| 2 | Helicopter survived 10 Missiles 🔥🎯  #videogames #gamingcommunity #gaming #codblackcopscoldwar #gamin | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DfzOMT7j0Ht/) | 50 | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar8.mp4) |
+| 3 | 1 HP Red Screen Survival Fight 🔥🎯  #videogames #gamingcommunity #gaming #codblackcopscoldwar #gaming | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DfzL0jyjjNA/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar9.mp4) |
 | 4 | CodblackCopsColdwar23 | [🔵 FB](https://www.facebook.com/18426682825158332) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar23.mp4) |
 | 5 | CodblackCopsColdwar19 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar19.mp4) |
 | 6 | CodblackCopsColdwar18 | ⏳ Pending | _0_ | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar18.mp4) |

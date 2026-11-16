@@ -2,10 +2,10 @@
     {
         "rank": 1,
         "game_name": "CODMW4",
-        "total_views": 14242,
+        "total_views": 14247,
         "uploaded_videos": 46,
         "avg_views_per_video": 309,
-        "view_share_percentage": 61.13
+        "view_share_percentage": 60.95
     },
     {
         "rank": 2,
@@ -13,7 +13,7 @@
         "total_views": 5166,
         "uploaded_videos": 56,
         "avg_views_per_video": 92,
-        "view_share_percentage": 22.17
+        "view_share_percentage": 22.1
     },
     {
         "rank": 3,
@@ -21,7 +21,7 @@
         "total_views": 1657,
         "uploaded_videos": 62,
         "avg_views_per_video": 26,
-        "view_share_percentage": 7.11
+        "view_share_percentage": 7.09
     },
     {
         "rank": 4,
@@ -29,7 +29,7 @@
         "total_views": 1642,
         "uploaded_videos": 52,
         "avg_views_per_video": 31,
-        "view_share_percentage": 7.05
+        "view_share_percentage": 7.03
     },
     {
         "rank": 5,
@@ -37,7 +37,7 @@
         "total_views": 286,
         "uploaded_videos": 11,
         "avg_views_per_video": 26,
-        "view_share_percentage": 1.23
+        "view_share_percentage": 1.22
     },
     {
         "rank": 6,
@@ -49,6 +49,14 @@
     },
     {
         "rank": 7,
+        "game_name": "CodblackCopsColdwar",
+        "total_views": 70,
+        "uploaded_videos": 6,
+        "avg_views_per_video": 11,
+        "view_share_percentage": 0.3
+    },
+    {
+        "rank": 8,
         "game_name": "Russian_secret_missions",
         "total_views": 30,
         "uploaded_videos": 26,
@@ -56,18 +64,10 @@
         "view_share_percentage": 0.13
     },
     {
-        "rank": 8,
+        "rank": 9,
         "game_name": "Callofdutyaw",
         "total_views": 0,
         "uploaded_videos": 17,
-        "avg_views_per_video": 0,
-        "view_share_percentage": 0.0
-    },
-    {
-        "rank": 9,
-        "game_name": "CodblackCopsColdwar",
-        "total_views": 0,
-        "uploaded_videos": 5,
         "avg_views_per_video": 0,
         "view_share_percentage": 0.0
     },
