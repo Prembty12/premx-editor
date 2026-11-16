@@ -699,13 +699,13 @@ fi
 
 # --- B. Facebook Page Video Upload ---
 if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "3" ]; then
-    if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$PAGE_ID" ]; then
-        echo "🚀 Uploading to Facebook Page..."
+    if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$PAGE_ID" ] && [ -n "$PUBLIC_VIDEO_URL" ]; then
+        echo "🚀 Uploading to Facebook Page via Public URL..."
         FB_RES=$(curl -s -X POST "$API/$PAGE_ID/videos" \
-          --data-urlencode "source=@$FINAL_CLIP_PATH" \
-          --data-urlencode "description=$CAPTION" \
-          --data-urlencode "access_token=$PAGE_ACCESS_TOKEN")
-
+         --data-urlencode "file_url=$PUBLIC_VIDEO_URL" \
+         --data-urlencode "description=$CAPTION" \
+         --data-urlencode "access_token=$PAGE_ACCESS_TOKEN")
+         
         echo "📦 FB Upload Response: $FB_RES"
         FB_POST_ID=$(echo "$FB_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
 
