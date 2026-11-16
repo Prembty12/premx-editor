@@ -2,10 +2,10 @@
     {
         "rank": 1,
         "game_name": "CODMW4",
-        "total_views": 14251,
+        "total_views": 14255,
         "uploaded_videos": 46,
         "avg_views_per_video": 309,
-        "view_share_percentage": 60.96
+        "view_share_percentage": 60.73
     },
     {
         "rank": 2,
@@ -13,23 +13,23 @@
         "total_views": 5166,
         "uploaded_videos": 56,
         "avg_views_per_video": 92,
-        "view_share_percentage": 22.1
+        "view_share_percentage": 22.01
     },
     {
         "rank": 3,
-        "game_name": "ghostandela",
-        "total_views": 1657,
-        "uploaded_videos": 62,
-        "avg_views_per_video": 26,
-        "view_share_percentage": 7.09
-    },
-    {
-        "rank": 4,
         "game_name": "Wolverine",
         "total_views": 1642,
         "uploaded_videos": 52,
         "avg_views_per_video": 31,
-        "view_share_percentage": 7.02
+        "view_share_percentage": 7.0
+    },
+    {
+        "rank": 4,
+        "game_name": "ghostandela",
+        "total_views": 1617,
+        "uploaded_videos": 62,
+        "avg_views_per_video": 26,
+        "view_share_percentage": 6.89
     },
     {
         "rank": 5,
@@ -45,15 +45,15 @@
         "total_views": 275,
         "uploaded_videos": 12,
         "avg_views_per_video": 22,
-        "view_share_percentage": 1.18
+        "view_share_percentage": 1.17
     },
     {
         "rank": 7,
         "game_name": "CodblackCopsColdwar",
-        "total_views": 70,
-        "uploaded_videos": 7,
-        "avg_views_per_video": 10,
-        "view_share_percentage": 0.3
+        "total_views": 200,
+        "uploaded_videos": 8,
+        "avg_views_per_video": 25,
+        "view_share_percentage": 0.85
     },
     {
         "rank": 8,
