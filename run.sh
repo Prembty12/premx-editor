@@ -672,13 +672,16 @@ if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "2" ]; then
     fi
 fi
 
-# --- 2. Facebook Page Video Upload (Using Direct Binary Upload with Timeout Protection) ---
+# --- B. Facebook Page Video Upload via Authenticated Public URL ---
 if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "3" ]; then
-    if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$PAGE_ID" ]; then
-        echo "🚀 Uploading to Facebook Page (Direct Binary with extended timeout)..."
+    if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$PAGE_ID" ] && [ -n "$PUBLIC_VIDEO_URL" ]; then
+        echo "🚀 Uploading to Facebook Page via Authenticated Public URL..."
+        
+        # GitHub release asset url me token attach karna padta hai taaki Facebook server usko download kar sake
+        AUTH_VIDEO_URL=$(echo "$PUBLIC_VIDEO_URL" | sed "s|https://github.com/|https://$TOKEN@github.com/|")
+        
         FB_RES=$(curl -s -X POST "$API/$PAGE_ID/videos" \
-         --max-time 600 \
-         --data-urlencode "source=@$FINAL_CLIP_PATH" \
+         --data-urlencode "file_url=$AUTH_VIDEO_URL" \
          --data-urlencode "description=$CAPTION" \
          --data-urlencode "access_token=$PAGE_ACCESS_TOKEN")
 
