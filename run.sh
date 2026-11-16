@@ -691,34 +691,42 @@ if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "3" ]; then
         if [ -n "$FB_POST_ID" ] && [ "$FB_POST_ID" != "None" ]; then
             echo "⏳ Facebook container created (ID: $FB_POST_ID). Checking processing status..."
             
-            # Instagram jaisa clean status tracking loop
-            for i in {1..45}; do
-                sleep 5
-                FB_STATUS_RES=$(curl -s "$API/$FB_POST_ID?fields=status,processing_phase&access_token=$PAGE_ACCESS_TOKEN")
-                FB_STATUS=$(echo "$FB_STATUS_RES" | python3 -c "
+            # Facebook status check loop (Fixed JSON parser)
+        for i in {1..45}; do
+            sleep 5
+            FB_STATUS_RES=$(curl -s "$API/$FB_POST_ID?fields=status,processing_phase,video_status&access_token=$PAGE_ACCESS_TOKEN")
+            
+            FB_STATUS=$(echo "$FB_STATUS_RES" | python3 -c "
 import sys, json
 try:
     res = json.load(sys.stdin)
-    status_obj = res.get('status', {})
-    if isinstance(status_obj, dict):
-        v_status = status_obj.get('video_status', '') or status_obj.get('processing_phase', '')
-    else:
-        v_status = str(status_obj)
-    print(v_status.upper())
-except:
+    # Facebook ke alag-alag fields ko check karega
+    v_status = (
+        res.get('video_status') or 
+        res.get('processing_phase') or 
+        res.get('status', {}).get('video_status') or 
+        res.get('status', {}) or 
+        'IN_PROGRESS'
+    )
+    if isinstance(v_status, dict):
+        v_status = v_status.get('video_status', 'IN_PROGRESS')
+    print(str(v_status).upper())
+except Exception as e:
     print('IN_PROGRESS')
 ")
-                
-                if [[ "$FB_STATUS" == *"READY"* ]] || [[ "$FB_STATUS" == *"COMPLETE"* ]] || [[ "$FB_STATUS" == *"FINISH"* ]]; then
-                    echo "✅ Video processing finished by Facebook!"
-                    break
-                elif [[ "$FB_STATUS" == *"ERROR"* ]] || [[ "$FB_STATUS" == *"FAILED"* ]]; then
-                    echo "❌ Facebook video processing failed!"
-                    break
-                else
-                    echo "⏳ Facebook video still processing (Status: ${FB_STATUS:-IN_PROGRESS})..."
-                fi
-            done
+            
+            echo "Status check $i/45: [FB API Response Status: '$FB_STATUS']"
+            
+            if [[ "$FB_STATUS" == *"READY"* ]] || [[ "$FB_STATUS" == *"COMPLETE"* ]] || [[ "$FB_STATUS" == *"FINISH"* ]] || [[ "$FB_STATUS" == *"PUBLISHED"* ]]; then
+                echo "✅ Video processing finished by Facebook!"
+                break
+            elif [[ "$FB_STATUS" == *"ERROR"* ]] || [[ "$FB_STATUS" == *"FAILED"* ]]; then
+                echo "❌ Facebook video processing failed!"
+                break
+            else
+                echo "⏳ Facebook video still processing (Status: $FB_STATUS)..."
+            fi
+        done
 
             echo "🎉 Facebook Post Published Successfully! ID: $FB_POST_ID"
         else
