@@ -603,7 +603,7 @@ echo "🚀 Using Posting Mode: $POST_MODE (1: Both, 2: Insta Only, 3: FB Only)"
 PUBLISH_ID=""
 FB_POST_ID=""
 
-# --- A. Instagram Reels Upload via GitHub Release Asset ---
+# --- 1. Instagram Reels Upload via GitHub Release Asset ---
 if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "2" ]; then
     if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$IG_ID" ]; then
         echo "🚀 Uploading to Instagram Reels via GitHub Release Asset..."
@@ -645,7 +645,6 @@ if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "2" ]; then
                   --data-urlencode "caption=$CAPTION" \
                   --data-urlencode "access_token=$PAGE_ACCESS_TOKEN")
 
-                echo "📦 IG Container Response: $CONTAINER_RES"
                 CREATION_ID=$(echo "$CONTAINER_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
 
                 if [ -n "$CREATION_ID" ] && [ "$CREATION_ID" != "None" ]; then
@@ -659,8 +658,6 @@ if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "2" ]; then
                         if [ "$STATUS_CODE" == "FINISHED" ]; then
                             echo "✅ Video processing finished by Instagram!"
                             break
-                        else
-                            echo "⏳ Video still processing (Status: $STATUS_CODE)..."
                         fi
                     done
 
@@ -668,44 +665,23 @@ if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "2" ]; then
                       -d "creation_id=$CREATION_ID" \
                       -d "access_token=$PAGE_ACCESS_TOKEN")
                     
-                    echo "📢 IG Publish Response: $PUBLISH_RES"
                     PUBLISH_ID=$(echo "$PUBLISH_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
-                    
-                    if [ -n "$PUBLISH_ID" ] && [ "$PUBLISH_ID" != "None" ]; then
-                        echo "🎉 Instagram Post Published Successfully! ID: $PUBLISH_ID"
-                    else
-                        echo "❌ Error: Failed to publish container to Instagram!"
-                    fi
                 fi
-            else
-                echo "❌ Error: Failed to upload video asset to GitHub release!"
-                echo "Response: $ASSET_RES"
             fi
-            
-            echo "🗑️ Cleaning up temporary GitHub release and tag..."
-            curl -s -X DELETE "https://api.github.com/repos/$REPO/releases/$RELEASE_ID" \
-              -H "Authorization: token $TOKEN" > /dev/null
-              
-            curl -s -X DELETE "https://api.github.com/repos/$REPO/git/refs/tags/$TAG_NAME" \
-              -H "Authorization: token $TOKEN" > /dev/null
-            echo "✨ GitHub release and tag cleaned up successfully."
-            
-        else
-            echo "❌ Error: Failed to create temporary GitHub Release!"
-            echo "Response: $RELEASE_RES"
         fi
     fi
 fi
 
-# --- B. Facebook Page Video Upload ---
+# --- 2. Facebook Page Video Upload (Using Direct Binary Upload with Timeout Protection) ---
 if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "3" ]; then
-    if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$PAGE_ID" ] && [ -n "$PUBLIC_VIDEO_URL" ]; then
-        echo "🚀 Uploading to Facebook Page via Public URL..."
+    if [ -n "$PAGE_ACCESS_TOKEN" ] && [ -n "$PAGE_ID" ]; then
+        echo "🚀 Uploading to Facebook Page (Direct Binary with extended timeout)..."
         FB_RES=$(curl -s -X POST "$API/$PAGE_ID/videos" \
-         --data-urlencode "file_url=$PUBLIC_VIDEO_URL" \
+         --max-time 600 \
+         --data-urlencode "source=@$FINAL_CLIP_PATH" \
          --data-urlencode "description=$CAPTION" \
          --data-urlencode "access_token=$PAGE_ACCESS_TOKEN")
-         
+
         echo "📦 FB Upload Response: $FB_RES"
         FB_POST_ID=$(echo "$FB_RES" | python3 -c "import sys, json; print(json.load(sys.stdin).get('id', ''))" 2>/dev/null)
 
@@ -715,6 +691,17 @@ if [ "$POST_MODE" == "1" ] || [ "$POST_MODE" == "3" ]; then
             echo "❌ Error: Failed to publish video to Facebook Page!"
         fi
     fi
+fi
+
+# --- 3. Cleanup Temporary GitHub Release & Tag (NOW EXECUTED AT THE VERY END) ---
+if [ -n "$RELEASE_ID" ] && [ "$RELEASE_ID" != "None" ]; then
+    echo "🗑️ Cleaning up temporary GitHub release and tag..."
+    curl -s -X DELETE "https://api.github.com/repos/$REPO/releases/$RELEASE_ID" \
+      -H "Authorization: token $TOKEN" > /dev/null
+      
+    curl -s -X DELETE "https://api.github.com/repos/$REPO/git/refs/tags/$TAG_NAME" \
+      -H "Authorization: token $TOKEN" > /dev/null
+    echo "✨ GitHub release and tag cleaned up successfully."
 fi
 
 # 10. 🧠 Memory & Adaptive Feedback Update & File Cleanup
