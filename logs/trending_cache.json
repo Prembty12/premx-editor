@@ -1,13 +1,13 @@
 {
-  "last_updated": "2026-11-17 03:14:03 AM",
+  "last_updated": "2026-11-17 12:07:05 PM",
   "period_days": 7,
   "trending": [
     {
       "game": "Wolverine",
-      "views_7d": 938,
-      "avg_per_video": 938,
+      "views_7d": 939,
+      "avg_per_video": 939,
       "trend": "viral",
-      "ratio": 2.4700460829493087,
+      "ratio": 2.396936821952776,
       "fb_link": "https://www.facebook.com/reel/2105490700333378/",
       "source_link": ""
     }
@@ -15,38 +15,38 @@
   "below_avg": [
     {
       "game": "CODMW4",
-      "views_7d": 1075,
-      "avg_per_video": 358,
+      "views_7d": 1091,
+      "avg_per_video": 363,
       "trend": "slow",
-      "ratio": 0.9427254772876893,
+      "ratio": 0.9266113592852585,
       "fb_link": "https://www.facebook.com/reel/1895684885140827/",
       "source_link": ""
     },
     {
       "game": "CodblackCopsColdwar",
-      "views_7d": 1493,
-      "avg_per_video": 213,
+      "views_7d": 2046,
+      "avg_per_video": 255,
       "trend": "slow",
-      "ratio": 0.5608953258722844,
-      "fb_link": "https://www.facebook.com/reel/1514245494093748/",
+      "ratio": 0.6509253350350989,
+      "fb_link": "https://www.facebook.com/reel/1691985202629856/",
       "source_link": ""
     },
     {
       "game": "ghostandela",
-      "views_7d": 20,
+      "views_7d": 10,
       "avg_per_video": 10,
       "trend": "below_avg",
-      "ratio": 0.026333113890717578,
+      "ratio": 0.025526483726866625,
       "fb_link": "",
       "source_link": "https://github.com/Prembty12/premx-editor/releases/download/v1.0.98/ghostandela18.mp4"
     }
   ],
   "recommendation": {
     "game": "Wolverine",
-    "views_7d": 938,
-    "avg_per_video": 938,
+    "views_7d": 939,
+    "avg_per_video": 939,
     "trend": "viral",
-    "ratio": 2.4700460829493087,
+    "ratio": 2.396936821952776,
     "fb_link": "https://www.facebook.com/reel/2105490700333378/",
     "source_link": ""
   }

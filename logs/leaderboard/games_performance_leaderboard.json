@@ -2,10 +2,10 @@
     {
         "rank": 1,
         "game_name": "CODMW4",
-        "total_views": 13911,
+        "total_views": 13072,
         "uploaded_videos": 46,
-        "avg_views_per_video": 302,
-        "view_share_percentage": 56.96
+        "avg_views_per_video": 284,
+        "view_share_percentage": 54.31
     },
     {
         "rank": 2,
@@ -13,31 +13,31 @@
         "total_views": 5166,
         "uploaded_videos": 56,
         "avg_views_per_video": 92,
-        "view_share_percentage": 21.15
+        "view_share_percentage": 21.46
     },
     {
         "rank": 3,
-        "game_name": "Wolverine",
-        "total_views": 1643,
-        "uploaded_videos": 52,
-        "avg_views_per_video": 31,
-        "view_share_percentage": 6.73
+        "game_name": "CodblackCopsColdwar",
+        "total_views": 2046,
+        "uploaded_videos": 14,
+        "avg_views_per_video": 146,
+        "view_share_percentage": 8.5
     },
     {
         "rank": 4,
+        "game_name": "Wolverine",
+        "total_views": 1644,
+        "uploaded_videos": 52,
+        "avg_views_per_video": 31,
+        "view_share_percentage": 6.83
+    },
+    {
+        "rank": 5,
         "game_name": "ghostandela",
         "total_views": 1618,
         "uploaded_videos": 62,
         "avg_views_per_video": 26,
-        "view_share_percentage": 6.62
-    },
-    {
-        "rank": 5,
-        "game_name": "CodblackCopsColdwar",
-        "total_views": 1493,
-        "uploaded_videos": 13,
-        "avg_views_per_video": 114,
-        "view_share_percentage": 6.11
+        "view_share_percentage": 6.72
     },
     {
         "rank": 6,
@@ -45,15 +45,15 @@
         "total_views": 286,
         "uploaded_videos": 11,
         "avg_views_per_video": 26,
-        "view_share_percentage": 1.17
+        "view_share_percentage": 1.19
     },
     {
         "rank": 7,
         "game_name": "CallOfDutyMW2",
-        "total_views": 276,
+        "total_views": 206,
         "uploaded_videos": 12,
-        "avg_views_per_video": 23,
-        "view_share_percentage": 1.13
+        "avg_views_per_video": 17,
+        "view_share_percentage": 0.86
     },
     {
         "rank": 8,
