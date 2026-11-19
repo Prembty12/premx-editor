@@ -1,13 +1,13 @@
 {
-  "last_updated": "2026-11-19 01:46:15 AM",
+  "last_updated": "2026-11-19 11:27:38 AM",
   "period_days": 7,
   "trending": [
     {
       "game": "CODMW4",
-      "views_7d": 1103,
-      "avg_per_video": 1103,
+      "views_7d": 1104,
+      "avg_per_video": 1104,
       "trend": "trending",
-      "ratio": 1.6055312954876273,
+      "ratio": 1.5259156876295785,
       "fb_link": "https://www.facebook.com/reel/1895684885140827/",
       "source_link": ""
     }
@@ -15,20 +15,20 @@
   "below_avg": [
     {
       "game": "CodblackCopsColdwar",
-      "views_7d": 2987,
-      "avg_per_video": 271,
+      "views_7d": 4126,
+      "avg_per_video": 343,
       "trend": "below_avg",
-      "ratio": 0.39446870451237265,
-      "fb_link": "https://www.facebook.com/reel/1471771644892710/",
+      "ratio": 0.47408431237042153,
+      "fb_link": "https://www.facebook.com/reel/1029126536873968/",
       "source_link": ""
     }
   ],
   "recommendation": {
     "game": "CODMW4",
-    "views_7d": 1103,
-    "avg_per_video": 1103,
+    "views_7d": 1104,
+    "avg_per_video": 1104,
     "trend": "trending",
-    "ratio": 1.6055312954876273,
+    "ratio": 1.5259156876295785,
     "fb_link": "https://www.facebook.com/reel/1895684885140827/",
     "source_link": ""
   }
