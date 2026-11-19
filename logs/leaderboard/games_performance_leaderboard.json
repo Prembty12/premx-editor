@@ -2,18 +2,18 @@
     {
         "rank": 1,
         "game_name": "CODMW4",
-        "total_views": 10943,
+        "total_views": 10411,
         "uploaded_videos": 46,
-        "avg_views_per_video": 237,
-        "view_share_percentage": 51.37
+        "avg_views_per_video": 226,
+        "view_share_percentage": 46.97
     },
     {
         "rank": 2,
         "game_name": "CodblackCopsColdwar",
-        "total_views": 4128,
-        "uploaded_videos": 19,
-        "avg_views_per_video": 217,
-        "view_share_percentage": 19.38
+        "total_views": 5546,
+        "uploaded_videos": 20,
+        "avg_views_per_video": 277,
+        "view_share_percentage": 25.02
     },
     {
         "rank": 3,
@@ -21,15 +21,15 @@
         "total_views": 2462,
         "uploaded_videos": 56,
         "avg_views_per_video": 43,
-        "view_share_percentage": 11.56
+        "view_share_percentage": 11.11
     },
     {
         "rank": 4,
         "game_name": "Wolverine",
-        "total_views": 1636,
+        "total_views": 1638,
         "uploaded_videos": 52,
         "avg_views_per_video": 31,
-        "view_share_percentage": 7.68
+        "view_share_percentage": 7.39
     },
     {
         "rank": 5,
@@ -37,7 +37,7 @@
         "total_views": 1611,
         "uploaded_videos": 62,
         "avg_views_per_video": 25,
-        "view_share_percentage": 7.56
+        "view_share_percentage": 7.27
     },
     {
         "rank": 6,
@@ -45,26 +45,18 @@
         "total_views": 286,
         "uploaded_videos": 11,
         "avg_views_per_video": 26,
-        "view_share_percentage": 1.34
+        "view_share_percentage": 1.29
     },
     {
         "rank": 7,
         "game_name": "CallOfDutyMW2",
-        "total_views": 208,
+        "total_views": 209,
         "uploaded_videos": 12,
         "avg_views_per_video": 17,
-        "view_share_percentage": 0.98
+        "view_share_percentage": 0.94
     },
     {
         "rank": 8,
-        "game_name": "Russian_secret_missions",
-        "total_views": 30,
-        "uploaded_videos": 26,
-        "avg_views_per_video": 1,
-        "view_share_percentage": 0.14
-    },
-    {
-        "rank": 9,
         "game_name": "Callofdutyaw",
         "total_views": 0,
         "uploaded_videos": 17,
@@ -72,10 +64,18 @@
         "view_share_percentage": 0.0
     },
     {
-        "rank": 10,
+        "rank": 9,
         "game_name": "GearsOfWar",
         "total_views": 0,
         "uploaded_videos": 10,
+        "avg_views_per_video": 0,
+        "view_share_percentage": 0.0
+    },
+    {
+        "rank": 10,
+        "game_name": "Russian_secret_missions",
+        "total_views": 0,
+        "uploaded_videos": 26,
         "avg_views_per_video": 0,
         "view_share_percentage": 0.0
     },
