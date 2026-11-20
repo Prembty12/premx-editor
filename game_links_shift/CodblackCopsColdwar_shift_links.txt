@@ -3,3 +3,4 @@ CodblackCopsColdwar13 | Link: https://github.com/Prembty12/premx-editor/releases
 CodblackCopsColdwar8 | Link: https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar8.mp4 | REJECT (OpenRouter): Boring running and traveling without combat
 CodblackCopsColdwar17 | Link: https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar17.mp4 | REJECT (OpenRouter): Boring helicopter flight with no combat
 CodblackCopsColdwar24 | Link: https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar24.mp4 | REJECT (OpenRouter): No action, just slow walking
+CodblackCopsColdwar14 | Link: https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar14.mp4 | REJECT (OpenRouter): Boring walking and empty bunkers.
