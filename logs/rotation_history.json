@@ -19,8 +19,8 @@
     "current_game": "CodblackCopsColdwar",
     "next_game": "GearsOfWar",
     "next_game_position": 5,
-    "last_updated": "2026-11-21 11:16:04 AM",
-    "total_runs": 428,
+    "last_updated": "2026-11-22 12:13:03 AM",
+    "total_runs": 429,
     "rotation_log": [
         {
             "run": 1,
@@ -2161,6 +2161,11 @@
             "run": 428,
             "game": "CodblackCopsColdwar",
             "timestamp": "2026-11-21 11:16:04 AM"
+        },
+        {
+            "run": 429,
+            "game": "CodblackCopsColdwar",
+            "timestamp": "2026-11-22 12:13:03 AM"
         }
     ],
     "all_games": [
@@ -2191,8 +2196,8 @@
         {
             "position": 4,
             "game": "CodblackCopsColdwar",
-            "uploaded": 26,
-            "last_run": 428,
+            "uploaded": 27,
+            "last_run": 429,
             "next_turn_in": 0,
             "status": "current"
         },
