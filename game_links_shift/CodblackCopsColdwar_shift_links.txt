@@ -8,3 +8,4 @@ CodblackCopsColdwar11 | Link: https://github.com/Prembty12/premx-editor/releases
 CodblackCopsColdwar16 | Link: https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar16.mp4 | REJECT (OpenRouter): Boring walking and exploring without combat
 CodblackCopsColdwar21 | Link: https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar21.mp4 | REJECT (OpenRouter): Only helicopter flying no active combat
 CodblackCopsColdwar15 | Link: https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar15.mp4 | REJECT (OpenRouter): Only reading documents and walking, no action
+CodblackCopsColdwar28 | Link: https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar28.mp4 | REJECT (OpenRouter): Death screen and skydiving dominate with little combat
