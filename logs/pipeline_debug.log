@@ -1,5 +1,5 @@
 ====================================================
-🚀 Pipeline Started at: Sun Nov 22 04:36:38 UTC 2026
+🚀 Pipeline Started at: Sun Nov 22 05:08:31 UTC 2026
 ====================================================
 🔍 [STEP 0] Checking Facebook Cookie Session Health...
 ⚠️ Checking Facebook Cookie Session Health...
@@ -7,59 +7,5 @@
 📈 [STEP 1] Pulling real analytics and insights from past posts...
 python3: can't open file '/home/runner/work/premx-editor/premx-editor/agent_brain.py': [Errno 2] No such file or directory
 🔍 [STEP 2] Checking last post time on Facebook Page...
-📊 Hours since last post: 9.829493333611111
-✅ 3 ghante ka gap poora ho chuka hai.
-🤖 [STEP 3] Consulting AI Agent Brain (ai_agent.py)...
-📁 Found 14 games: ['CODMW4', 'CallOfDutyMW2', 'Callofdutyaw', 'CodblackCopsColdwar', 'GTA6', 'GearsOfWar', 'MarvelsSpiderMan2', 'Russian_secret_missions', 'VietnamCavePrison', 'Wolverine', 'codBlackops6', 'ghostandela', 'mm2remastered', 'sifu']
-📋 ID→Source map: 371 entries
-📊 Total 215 videos processing (parallel)...
-✅ FB page: 43 videos fetched
-✅ IG: 100 media fetched
-📂 CODMW4: 0 videos in source file
-📂 CallOfDutyMW2: 0 videos in source file
-📂 Callofdutyaw: 0 videos in source file
-📂 CodblackCopsColdwar: 0 videos in source file
-📂 GTA6: 0 videos in source file
-📂 GearsOfWar: 0 videos in source file
-📂 MarvelsSpiderMan2: 0 videos in source file
-📂 Russian_secret_missions: 0 videos in source file
-📂 VietnamCavePrison: 0 videos in source file
-📂 Wolverine: 0 videos in source file
-📂 codBlackops6: 0 videos in source file
-📂 ghostandela: 0 videos in source file
-📂 mm2remastered: 0 videos in source file
-📂 sifu: 0 videos in source file
-🤖 Auto-reply processing started (v6 — timeout-safe)...
-📄 Page name: PremxGamer
-📂 Existing history: 32 replies
-📂 Replied history cache: 64 IDs
-📥 Fetching latest 25 posts from FB Page: 100463226188818
-✅ Got 25 posts from FB page
-⚡ Parallel fetching comments from 25 posts...
-✅ Total 2 comments fetched from all posts
-      📌 Hashtags: ['videogames', 'gamingcommunity', 'gaming', 'ghostandela', 'gamingreels', 'reels']
-🔍 Post: 100463226188818_1126288533591775 | Surviving 4 Zombies With Bare Hands 🔥😳
-
-#videogames #gamingcommunity #gaming #gh | 2 comments
-      🎮 Detected game: ghostandela
-ℹ️ No valid comments to reply.
-💾 Saved 64 IDs to replied_comment_ids.json
-🤖 Auto-reply done. 0 replies posted.
-📊 Total in history: 32
-⚠️ GTA6: File has no URLs — trying next game
-⚠️ GearsOfWar: File has no URLs — trying next game
-⚠️ MarvelsSpiderMan2: File has no URLs — trying next game
-⚠️ Russian_secret_missions: File has no URLs — trying next game
-⚠️ VietnamCavePrison: File has no URLs — trying next game
-⚠️ Wolverine: File has no URLs — trying next game
-⚠️ codBlackops6: File has no URLs — trying next game
-⚠️ ghostandela: File has no URLs — trying next game
-⚠️ mm2remastered: File has no URLs — trying next game
-⚠️ sifu: File has no URLs — trying next game
-⚠️ CODMW4: File has no URLs — trying next game
-⚠️ CallOfDutyMW2: File has no URLs — trying next game
-⚠️ Callofdutyaw: File has no URLs — trying next game
-⚠️ CodblackCopsColdwar: File has no URLs — trying next game
-❌ All game files empty. Cannot proceed.
-🧠 AI Agent Raw Output: 
-⚠️ [WARNING] AI Agent ko koi valid game file nahi mili! Target File: 
+📊 Hours since last post: 0.30570456805555557
+⏳ 3 ghante ka gap poora nahi hua hai! Sirf 0.30570456805555557 ghante hue hain.
