@@ -1,6 +1,6 @@
 # 🚀 GAMING AGENT COMMAND & ANALYTICS DASHBOARD
 
-> **Last Updated:** 2026-11-22 09:58:17 AM IST | **Status:** All Systems Active & Synchronized
+> **Last Updated:** 2026-11-22 10:01:32 AM IST | **Status:** All Systems Active & Synchronized
 
 --- 
 
@@ -8,7 +8,7 @@
 
 | Rank | Game Name | Total Videos | Total Views | Avg Views / Video | Performance Tier |
 | :---: | :--- | :---: | :---: | :---: | :---: |
-| 🥇 | **CodblackCopsColdwar** | 29 | 7,525 | 259 | 📈 Stable |
+| 🥇 | **CodblackCopsColdwar** | 30 | 7,525 | 250 | 📈 Stable |
 | 🥈 | **CODMW4** | 46 | 7,503 | 163 | 📈 Stable |
 | 🥉 | **MarvelsSpiderMan2** | 56 | 2,465 | 44 | 📈 Stable |
 | 4️⃣ | **Wolverine** | 52 | 1,641 | 31 | 📈 Stable |
@@ -39,18 +39,18 @@
 | **codBlackops6** | 2026-11-02 01:51 AM | CoD Black Ops 6 LIVE \| Destroying Every Squad | [🔵 FB](https://www.facebook.com/1082871464600149/videos/1471500258505084) | 288 | ⏳ Pending | _0_ | **16** / 27 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.88/codBlackops62.mp4) | **[📜 View 27](logs/games/codBlackops6.md)** |
 | **Russian_secret_missions** | 2026-10-21 09:01 AM | Red Eye Soldier Survival 1 HP 🚀🔥  #videogames #gamingcommunity #gaming #russian_ | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DevcmWKjL0Y/) | 0 | ✅ 20 / 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.83/Russian_secret_missions15.mp4) | **[📜 View 20](logs/games/Russian_secret_missions.md)** |
 | **CallOfDutyMW2** | — | The.Most.Unexpected.Play8 | [🔵 FB](https://www.facebook.com/17916697872460249) | 0 | ⏳ Pending | _0_ | ✅ 6 / 6 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.61/The.Most.Unexpected.Play8.mp4) | **[📜 View 6](logs/games/CallOfDutyMW2.md)** |
-| **Callofdutyaw** | — | Escape.from.Atlas.High.Security.Prison23 | [🔵 FB](https://www.facebook.com/18206166976369181) | 0 | ⏳ Pending | _0_ | **11** / 28 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison23.mp4) | **[📜 View 28](logs/games/Callofdutyaw.md)** |
+| **Callofdutyaw** | — | Escape.from.Atlas.High.Security.Prison10 | [🔵 FB](https://www.facebook.com/17942736384317083) | 0 | ⏳ Pending | _0_ | **11** / 28 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.87/Escape.from.Atlas.High.Security.Prison10.mp4) | **[📜 View 28](logs/games/Callofdutyaw.md)** |
 | **GTA6** | — | _Not Posted Yet_ | ⏳ Pending | _0_ | ⏳ Pending | _0_ | _N/A_ | _N/A_ | — |
-| **GearsOfWar** | — | GearsOfWar9 | [🔵 FB](https://www.facebook.com/17870525709642100) | 0 | ⏳ Pending | _0_ | ✅ 6 / 6 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar9.mp4) | **[📜 View 6](logs/games/GearsOfWar.md)** |
-| **VietnamCavePrison** | — | VietnamCavePrison16 | [🔵 FB](https://www.facebook.com/18375989677230198) | 0 | ⏳ Pending | _0_ | **5** / 21 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison16.mp4) | **[📜 View 21](logs/games/VietnamCavePrison.md)** |
+| **GearsOfWar** | — | GearsOfWar12 | [🔵 FB](https://www.facebook.com/17950968966297160) | 0 | ⏳ Pending | _0_ | ✅ 6 / 6 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.109/GearsOfWar12.mp4) | **[📜 View 6](logs/games/GearsOfWar.md)** |
+| **VietnamCavePrison** | — | VietnamCavePrison5 | [🔵 FB](https://www.facebook.com/18099295997318109) | 0 | ⏳ Pending | _0_ | **5** / 21 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.96/VietnamCavePrison5.mp4) | **[📜 View 21](logs/games/VietnamCavePrison.md)** |
 | **mm2remastered** | — | mm2remastered 19 | [🔵 FB](https://www.facebook.com/18340518010268231) | 0 | ⏳ Pending | _0_ | ✅ 12 / 12 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.92/mm2remastered_19.mp4) | **[📜 View 12](logs/games/mm2remastered.md)** |
-| **sifu** | — | sifu10 | [🔵 FB](https://www.facebook.com/18079585196705519) | 0 | ⏳ Pending | _0_ | ✅ 16 / 16 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu10.mp4) | **[📜 View 16](logs/games/sifu.md)** |
+| **sifu** | — | sifu18 | [🔵 FB](https://www.facebook.com/17916710871245907) | 0 | ⏳ Pending | _0_ | ✅ 16 / 16 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.97/sifu18.mp4) | **[📜 View 16](logs/games/sifu.md)** |
 
 --- 
 
 ## 📈 Trending Games (Last 7 Days)
 
-> Auto-detected based on views performance | Last Updated: 2026-11-22 09:58:17 AM
+> Auto-detected based on views performance | Last Updated: 2026-11-22 10:01:32 AM
 
 | Rank | Game Name | Views (7d) | Avg / Video | Trend | FB Post | Source |
 |:---:|---|---|---|---|---|---|
@@ -70,7 +70,7 @@
 
 ## 🎯 Best Time to Post (IST)
 
-> Analysis from 437 posts | Last Updated: 2026-11-22 09:58:17 AM
+> Analysis from 438 posts | Last Updated: 2026-11-22 10:01:32 AM
 
 | Rank | Time (IST) | Posts | Avg Views | Recommendation |
 |:---:|---|:---:|:---:|---|
@@ -94,13 +94,13 @@
 | Thursday | 52 | 258 |
 | Friday | 43 | 320 |
 | Saturday | 53 | 250 |
-| Sunday | 59 | 233 |
+| Sunday | 60 | 236 |
 
 --- 
 
 ## 🤖 Auto-Reply Log (v6 Timeout-Safe)
 
-> Auto-Comment Status: ✅ **ACTIVE** | Last Updated: 2026-11-22 09:58:17 AM | Total Replies: 32 | Skipped: 0
+> Auto-Comment Status: ✅ **ACTIVE** | Last Updated: 2026-11-22 10:01:32 AM | Total Replies: 32 | Skipped: 0
 
 ### 📊 Stats
 
@@ -160,16 +160,16 @@
 
 ## 🔄 Game Rotation Queue
 
-**📊 Total Games:** 14 | **🎯 Current:** `CodblackCopsColdwar` | **⏭️ Next Game:** `GTA6` (Position #5) | **🔢 Total Runs:** 431
+**📊 Total Games:** 14 | **🎯 Current:** `CodblackCopsColdwar` | **⏭️ Next Game:** `GTA6` (Position #5) | **🔢 Total Runs:** 432
 
-**Last Updated:** 2026-11-22 09:58:17 AM IST
+**Last Updated:** 2026-11-22 10:01:32 AM IST
 
 | # | Game Name | Uploaded | Last Run # | Next Turn In | Status |
 |:---:|---|:---:|:---:|:---:|:---:|
 | 1 | **CODMW4** | 46 | 402 | 11 | ⏳ Wait 11 |
 | 2 | **CallOfDutyMW2** | 12 | 225 | 12 | ⏳ Wait 12 |
 | 3 | **Callofdutyaw** | 17 | 212 | 13 | ⏳ Wait 13 |
-| 4 | **CodblackCopsColdwar** | 29 | 431 | 0 | 🎯 **CURRENT** |
+| 4 | **CodblackCopsColdwar** | 30 | 432 | 0 | 🎯 **CURRENT** |
 | 5 | **GTA6** | 0 | — | 1 | ⏭️ **NEXT UP** |
 | 6 | **GearsOfWar** | 10 | 196 | 2 | ⏳ Wait 2 |
 | 7 | **MarvelsSpiderMan2** | 56 | 383 | 3 | ⏳ Wait 3 |
@@ -185,8 +185,8 @@
 
 | Run # | Game | Timestamp (IST) |
 |:---:|---|---|
+| 432 | CodblackCopsColdwar | 2026-11-22 10:01:32 AM |
 | 431 | CodblackCopsColdwar | 2026-11-22 09:58:17 AM |
 | 430 | CodblackCopsColdwar | 2026-11-22 09:53:39 AM |
 | 429 | CodblackCopsColdwar | 2026-11-22 12:13:03 AM |
 | 428 | CodblackCopsColdwar | 2026-11-21 11:16:04 AM |
-| 427 | CodblackCopsColdwar | 2026-11-21 11:13:11 AM |

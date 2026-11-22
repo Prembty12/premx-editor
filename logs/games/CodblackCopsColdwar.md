@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 28 | **Last Updated:** 2026-11-22 09:58:17 AM IST
+**Total Videos:** 28 | **Last Updated:** 2026-11-22 10:01:32 AM IST
 
 ---
 
@@ -39,15 +39,15 @@
 | 14 | Napalm Strike Destroys Village 🔥😳  #videogames #gamingcommunity #gaming #codblackcopscoldwar #gaming | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DfzXZouD6-D/) | 60 | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar7.mp4) |
 | 15 | Helicopter survived 10 Missiles 🔥🎯  #videogames #gamingcommunity #gaming #codblackcopscoldwar #gamin | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DfzOMT7j0Ht/) | 120 | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar18.mp4) |
 | 16 | 1 HP Red Screen Survival Fight 🔥🎯  #videogames #gamingcommunity #gaming #codblackcopscoldwar #gaming | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DfzL0jyjjNA/) | 130 | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar18.mp4) |
-| 17 | CodblackCopsColdwar23 | [🔵 FB](https://www.facebook.com/18426682825158332) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar23.mp4) |
-| 18 | CodblackCopsColdwar7 | [🔵 FB](https://www.facebook.com/18453960709124906) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar7.mp4) |
-| 19 | CodblackCopsColdwar9 | [🔵 FB](https://www.facebook.com/18030815405696467) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar9.mp4) |
+| 17 | CodblackCopsColdwar7 | [🔵 FB](https://www.facebook.com/18453960709124906) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar7.mp4) |
+| 18 | CodblackCopsColdwar23 | [🔵 FB](https://www.facebook.com/18426682825158332) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar23.mp4) |
+| 19 | CodblackCopsColdwar12 | [🔵 FB](https://www.facebook.com/18041236715850866) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar12.mp4) |
 | 20 | CodblackCopsColdwar27 | [🔵 FB](https://www.facebook.com/17880744438567056) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar27.mp4) |
-| 21 | CodblackCopsColdwar12 | [🔵 FB](https://www.facebook.com/18041236715850866) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar12.mp4) |
+| 21 | CodblackCopsColdwar9 | [🔵 FB](https://www.facebook.com/18030815405696467) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar9.mp4) |
 | 22 | CodblackCopsColdwar25 | [🔵 FB](https://www.facebook.com/18135107446688372) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar25.mp4) |
 | 23 | CodblackCopsColdwar26 | [🔵 FB](https://www.facebook.com/18131840395867149) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar26.mp4) |
-| 24 | CodblackCopsColdwar22 | [🔵 FB](https://www.facebook.com/18102619955552283) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar22.mp4) |
-| 25 | CodblackCopsColdwar20 | [🔵 FB](https://www.facebook.com/18142929310715138) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar20.mp4) |
-| 26 | CodblackCopsColdwar10 | [🔵 FB](https://www.facebook.com/17975091168167723) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar10.mp4) |
-| 27 | CodblackCopsColdwar19 | [🔵 FB](https://www.facebook.com/18117047948595006) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar19.mp4) |
-| 28 | CodblackCopsColdwar18 | [🔵 FB](https://www.facebook.com/18103390457550279) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar18.mp4) |
+| 24 | CodblackCopsColdwar10 | [🔵 FB](https://www.facebook.com/17975091168167723) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar10.mp4) |
+| 25 | CodblackCopsColdwar19 | [🔵 FB](https://www.facebook.com/18117047948595006) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar19.mp4) |
+| 26 | CodblackCopsColdwar22 | [🔵 FB](https://www.facebook.com/18102619955552283) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar22.mp4) |
+| 27 | CodblackCopsColdwar18 | [🔵 FB](https://www.facebook.com/18103390457550279) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar18.mp4) |
+| 28 | CodblackCopsColdwar20 | [🔵 FB](https://www.facebook.com/18142929310715138) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/release-CodblackCopsColdwar/CodblackCopsColdwar20.mp4) |
