@@ -2,7 +2,7 @@
 
 [⬅️ Back to Dashboard](../../GAMING_DASHBOARD.md)
 
-**Total Videos:** 31 | **Last Updated:** 2026-11-22 12:13:03 AM IST
+**Total Videos:** 31 | **Last Updated:** 2026-11-22 09:53:39 AM IST
 
 ---
 
@@ -14,7 +14,7 @@
 | Posted (FB or IG) | 31 / 31 |
 | FB Posted | 15 / 31 |
 | IG Posted | 25 / 31 |
-| Total FB Views | **6,622** |
+| Total FB Views | **6,623** |
 | Total IG Views | **880** |
 
 ---
@@ -23,7 +23,7 @@
 
 | # | 📺 Title | 🔵 Facebook | 👁️ FB Views | 🟣 Instagram | 👁️ IG Views | 📂 Source |
 |---|---|---|---|---|---|---|
-| 1 | 1 Turret Wrecks Snowy Palace 🎯🔥  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1895684885140827/) | 955 | [🟣 IG](https://www.instagram.com/reel/DffUeQ_HAjZ/) | 150 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW44.mp4) |
+| 1 | 1 Turret Wrecks Snowy Palace 🎯🔥  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | [🔵 FB](https://www.facebook.com/reel/1895684885140827/) | 956 | [🟣 IG](https://www.instagram.com/reel/DffUeQ_HAjZ/) | 150 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW44.mp4) |
 | 2 | Tank Fights 3 Giant Statues In Snow 💥❄️  #videogames #gamingcommunity #gaming #codmw4 #gamingreels # | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DfkpzmPAMtY/) | 0 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW45.mp4) |
 | 3 | 4 Enemies Ambush In Palace Dominated 🔥🎯  #videogames #gamingcommunity #gaming #codmw4 #gamingreels # | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/DfiWtzGkXxN/) | 20 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW49.mp4) |
 | 4 | 5 Enemies 1 HP Palace Cooked 🔥🎯  #videogames #gamingcommunity #gaming #codmw4 #gamingreels #reels | ⏳ Pending | _0_ | [🟣 IG](https://www.instagram.com/reel/Dfd6HzcDfqt/) | 10 | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW48.mp4) |
@@ -51,6 +51,6 @@
 | 26 | CODMW410 | [🔵 FB](https://www.facebook.com/18107086313460537) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW410.mp4) |
 | 27 | CODMW44 | [🔵 FB](https://www.facebook.com/18199338982390706) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW44.mp4) |
 | 28 | CODMW48 | [🔵 FB](https://www.facebook.com/18115599649844146) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW48.mp4) |
-| 29 | CODMW46 | [🔵 FB](https://www.facebook.com/17996648520028237) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW46.mp4) |
-| 30 | CODMW49 | [🔵 FB](https://www.facebook.com/17936313201142469) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW49.mp4) |
+| 29 | CODMW49 | [🔵 FB](https://www.facebook.com/17936313201142469) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW49.mp4) |
+| 30 | CODMW46 | [🔵 FB](https://www.facebook.com/17996648520028237) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW46.mp4) |
 | 31 | CODMW45 | [🔵 FB](https://www.facebook.com/18123564691941391) | 0 | ⏳ Pending | _0_ | [📂](https://github.com/Prembty12/premx-editor/releases/download/v1.0.110/CODMW45.mp4) |
