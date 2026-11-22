@@ -20,8 +20,8 @@
     "current_game": "CodblackCopsColdwar",
     "next_game": "GTA6",
     "next_game_position": 5,
-    "last_updated": "2026-11-22 09:53:39 AM",
-    "total_runs": 430,
+    "last_updated": "2026-11-22 09:58:17 AM",
+    "total_runs": 431,
     "rotation_log": [
         {
             "run": 1,
@@ -2172,6 +2172,11 @@
             "run": 430,
             "game": "CodblackCopsColdwar",
             "timestamp": "2026-11-22 09:53:39 AM"
+        },
+        {
+            "run": 431,
+            "game": "CodblackCopsColdwar",
+            "timestamp": "2026-11-22 09:58:17 AM"
         }
     ],
     "all_games": [
@@ -2202,8 +2207,8 @@
         {
             "position": 4,
             "game": "CodblackCopsColdwar",
-            "uploaded": 28,
-            "last_run": 430,
+            "uploaded": 29,
+            "last_run": 431,
             "next_turn_in": 0,
             "status": "current"
         },
