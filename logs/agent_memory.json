@@ -19,7 +19,8 @@
         "CallOfDutyMW2": 40,
         "Wolverine": 110,
         "CODMW4": 40,
-        "CodblackCopsColdwar": 70
+        "CodblackCopsColdwar": 70,
+        "Battlefield": 15
     },
     "title_styles": {
         "curiosity": 34,
@@ -35,7 +36,7 @@
         "exposed": 94,
         "unbelievable": 37,
         "crazy": 25,
-        "secret": 25,
+        "secret": 28,
         "shocking": 46
     },
     "last_used_style": "secret",
