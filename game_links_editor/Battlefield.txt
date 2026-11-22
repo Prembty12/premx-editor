@@ -2,3 +2,4 @@ Battlefield1 | Link: https://github.com/Prembty12/premx-editor/releases/download
 Battlefield2 | Link: https://github.com/Prembty12/premx-editor/releases/download/release-Battlefield/Battlefield2.mp4
 Battlefield3 | Link: https://github.com/Prembty12/premx-editor/releases/download/release-Battlefield/Battlefield3.mp4
 Battlefield4 | Link: https://github.com/Prembty12/premx-editor/releases/download/release-Battlefield/Battlefield4.mp4
+Battlefield5 | Link: https://github.com/Prembty12/premx-editor/releases/download/release-Battlefield/Battlefield5.mp4
