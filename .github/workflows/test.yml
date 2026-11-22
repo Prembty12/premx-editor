@@ -22,7 +22,7 @@ on:
       ratio:
         description: 'Crop Ratio [0=None, 1=1:1, 2=4:5, 3=9:16, 4=3:4, 5=4:3]'
         required: true
-        default: '3'
+        default: '2'
       filter:
         description: 'Filter [0=OFF, 1=BALANCED POP, 2=PRO GAMING VIVID, 3=CYBER FPS BOOST, 4=NIGHT MAP ENHANCER, 5=CINEMATIC TEAL-ORANGE, 6=ULTRA SHARP HDR]'
         required: true
@@ -38,11 +38,11 @@ on:
       clip_len:
         description: 'Har clip kitne second ka ho?'
         required: true
-        default: '15'
+        default: '30'
       fps:
         description: 'FPS [1=30, 2=60]'
         required: true
-        default: '2'
+        default: '1'
 
 jobs:
   process-video:
