@@ -21,8 +21,8 @@
     "current_game": "Battlefield",
     "next_game": "CODMW4",
     "next_game_position": 2,
-    "last_updated": "2026-11-23 12:33:18 AM",
-    "total_runs": 433,
+    "last_updated": "2026-11-23 11:19:56 AM",
+    "total_runs": 434,
     "rotation_log": [
         {
             "run": 1,
@@ -2188,14 +2188,19 @@
             "run": 433,
             "game": "Battlefield",
             "timestamp": "2026-11-23 12:33:18 AM"
+        },
+        {
+            "run": 434,
+            "game": "Battlefield",
+            "timestamp": "2026-11-23 11:19:56 AM"
         }
     ],
     "all_games": [
         {
             "position": 1,
             "game": "Battlefield",
-            "uploaded": 1,
-            "last_run": 433,
+            "uploaded": 2,
+            "last_run": 434,
             "next_turn_in": 0,
             "status": "current"
         },
