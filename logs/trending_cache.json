@@ -1,44 +1,44 @@
 {
-  "last_updated": "2026-11-26 02:34:41 AM",
+  "last_updated": "2026-11-26 12:25:09 PM",
   "period_days": 7,
   "trending": [
     {
-      "game": "Battlefield",
-      "views_7d": 1842,
-      "avg_per_video": 921,
+      "game": "CodblackCopsColdwar",
+      "views_7d": 4907,
+      "avg_per_video": 981,
       "trend": "steady",
-      "ratio": 1.173248407643312,
-      "fb_link": "https://www.facebook.com/reel/1805182220564605/",
+      "ratio": 1.1871722468737393,
+      "fb_link": "https://www.facebook.com/reel/3015647978790335/",
       "source_link": ""
     },
     {
-      "game": "CodblackCopsColdwar",
-      "views_7d": 5207,
-      "avg_per_video": 867,
+      "game": "Battlefield",
+      "views_7d": 1857,
+      "avg_per_video": 928,
       "trend": "steady",
-      "ratio": 1.1044585987261146,
-      "fb_link": "https://www.facebook.com/reel/3015647978790335/",
+      "ratio": 1.1230334812424365,
+      "fb_link": "https://www.facebook.com/reel/1805182220564605/",
       "source_link": ""
     }
   ],
   "below_avg": [
     {
       "game": "GTA6",
-      "views_7d": 567,
-      "avg_per_video": 567,
+      "views_7d": 570,
+      "avg_per_video": 570,
       "trend": "slow",
-      "ratio": 0.7222929936305732,
+      "ratio": 0.6897942718838241,
       "fb_link": "https://www.facebook.com/reel/977909011678466/",
       "source_link": ""
     }
   ],
   "recommendation": {
-    "game": "Battlefield",
-    "views_7d": 1842,
-    "avg_per_video": 921,
+    "game": "CodblackCopsColdwar",
+    "views_7d": 4907,
+    "avg_per_video": 981,
     "trend": "steady",
-    "ratio": 1.173248407643312,
-    "fb_link": "https://www.facebook.com/reel/1805182220564605/",
+    "ratio": 1.1871722468737393,
+    "fb_link": "https://www.facebook.com/reel/3015647978790335/",
     "source_link": ""
   }
 }
